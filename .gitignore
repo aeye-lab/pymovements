@@ -41,6 +41,12 @@ pip-delete-this-directory.txt
 \#*\#
 .\#*
 
-# coverage
-htmlcov/
+# Docs
+docs/build
+docs/doctree*
+
+# Testing
+.tox
 .coverage
+.coverage.*
+htmlcov/
