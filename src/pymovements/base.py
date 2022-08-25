@@ -74,7 +74,7 @@ class Screen:
 
     def pix2deg(
             self,
-            positions: float | list[float] | list[list[float]] | np.ndarray,
+            arr: float | list[float] | list[list[float]] | np.ndarray,
             center_origin: bool = True,
     ) -> np.ndarray:
         """
@@ -99,7 +99,7 @@ class Screen:
 
         """
         return pix2deg(
-            positions=positions,
+            arr=arr,
             screen_px=(self.width_px, self.height_px),
             screen_cm=(self.width_cm, self.height_cm),
             distance_cm=self.distance_cm,

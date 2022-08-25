@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import numpy as np
+import scipy
 
 from . import checks
 
 
 def pix2deg(
-        positions: float | list[float] | list[list[float]] | np.ndarray,
+        arr: float | list[float] | list[list[float]] | np.ndarray,
         screen_px: float | list[float] | tuple[float, float] | np.ndarray,
         screen_cm: float | list[float] | tuple[float, float] | np.ndarray,
         distance_cm: float,
@@ -16,7 +17,7 @@ def pix2deg(
 
     Parameters
     ----------
-    positions : float, array_like
+    arr : float, array_like
         Pixel coordinates to transform into degrees of visual angle
     screen_px : int, int
         Screen dimension in pixels
@@ -25,7 +26,7 @@ def pix2deg(
     distance_cm : float
         Eye-to-screen distance in centimeters
     center_origin: bool
-        Center origin to (0,0) if positions origin is in bottom left corner
+        Center origin to (0,0) if arr origin is in bottom left corner
 
     Returns
     -------
@@ -35,7 +36,7 @@ def pix2deg(
     Raises
     ------
     ValueError
-        If dimension screen_px or screen_cm don't match dimension of positions.
+        If dimension screen_px or screen_cm don't match dimension of arr.
         If screen_px or screen_cm or one of its elements is zero.
         If distance_cm is zero.
 
@@ -44,57 +45,67 @@ def pix2deg(
     checks.check_no_zeros(screen_cm, "screen_px")
     checks.check_no_zeros(distance_cm, "distance_cm")
 
-    positions = np.array(positions)
+    arr = np.array(arr)
     screen_px = np.array(screen_px)
     screen_cm = np.array(screen_cm)
 
-    # check basic positions dimensions
-    if positions.ndim not in [0, 1, 2]:
+    # check basic arr dimensions
+    if arr.ndim not in [0, 1, 2]:
         raise ValueError(
-            'Number of dimensions of positions must be either 0, 1 or 2'
-            f' (positions.ndim: {positions.ndim})'
+            'Number of dimensions of arr must be either 0, 1 or 2'
+            f' (arr.ndim: {arr.ndim})'
         )
-    if positions.ndim == 2 and positions.shape[-1] > 2:
+    if arr.ndim == 2 and arr.shape[-1] not in [1, 2, 4]:
         raise ValueError(
-            'Last coord dimension must have length 1 or 2.'
-            f' (positions.shape: {positions.shape})'
+            'Last coord dimension must have length 1, 2 or 4.'
+            f' (arr.shape: {arr.shape})'
         )
 
-    # check if positions dimensions match screen_px and screen_cm dimensions
-    if positions.ndim in {0, 1}:
+    # check if arr dimensions match screen_px and screen_cm dimensions
+    if arr.ndim in {0, 1}:
         if screen_px.ndim != 0 and screen_px.shape != (1, ):
-            raise ValueError('positions is 1-dimensional, but screen_px is not')
+            raise ValueError('arr is 1-dimensional, but screen_px is not')
         if screen_cm.ndim != 0 and screen_cm.shape != (1, ):
-            raise ValueError('positions is 1-dimensional, but screen_cm is not')
-    if positions.ndim != 0 and positions.shape[-1] == 2:
+            raise ValueError('arr is 1-dimensional, but screen_cm is not')
+    if arr.ndim != 0 and arr.shape[-1] == 2:
         if screen_px.shape != (2, ):
-            raise ValueError('positions is 2-dimensional, but screen_px is not')
+            raise ValueError('arr is 2-dimensional, but screen_px is not')
         if screen_cm.shape != (2, ):
-            raise ValueError('positions is 2-dimensional, but screen_cm is not')
+            raise ValueError('arr is 2-dimensional, but screen_cm is not')
+    if arr.ndim != 0 and arr.shape[-1] == 4:
+        if screen_px.shape != (2, ):
+            raise ValueError('arr is 4-dimensional, but screen_px is not 2-dimensional')
+        if screen_cm.shape != (2, ):
+            raise ValueError('arr is 4-dimensional, but screen_cm is not 2-dimensional')
+
+        # we have binocular data. double tile screen parameters.
+        screen_px = np.tile(screen_px, 2)
+        screen_cm = np.tile(screen_cm, 2)
 
     # compute eye-to-screen-distance in pixels
     distance_px = distance_cm * (screen_px / screen_cm)
 
     # center screen coordinates such that 0 is in the center of the screen
     if center_origin:
-        positions = positions - (screen_px - 1) / 2
+        arr = arr - (screen_px - 1) / 2
 
     # 180 / pi transforms arc measure to degrees
-    return np.arctan2(positions, distance_px) * 180 / np.pi
+    return np.arctan2(arr, distance_px) * 180 / np.pi
 
 
 def pos2vel(
-        positions: list[float] | list[list[float]] | np.ndarray,
+        arr: list[float] | list[list[float]] | np.ndarray,
         sampling_rate: float = 1000,
         method: str = 'smooth',
+        **kwargs,
 ) -> np.ndarray:
     """Compute velocity time series from 2-dimensional position time series.
 
-    Adapted from Engbert et al.: Microsaccade Toolbox 0.9.
+    Methods 'smooth', 'neighbors' and 'preceding' are adapted from Engbert et al.: Microsaccade Toolbox 0.9.
 
     Parameters
     ----------
-    positions : array_like
+    arr : array_like
         Continuous 2D position time series
     sampling_rate : int
         Sampling rate of input time series
@@ -106,6 +117,8 @@ def pos2vel(
         sample and the preceding sample
         * *preceding*: velocity is calculated from the difference of the current
         sample to the preceding sample
+    kwargs: dict
+        Additional keyword arguments used for savitzky golay method.
 
     Returns
     -------
@@ -115,50 +128,167 @@ def pos2vel(
     Raises
     ------
     ValueError
-        If selected method is invalid, positions-array is too short for the
+        If selected method is invalid, input array is too short for the
         selected method or the sampling rate is below zero
 
     """
     if sampling_rate <= 0:
         raise ValueError('sampling_rate needs to be above zero')
 
-    pos = np.array(positions)
+    # make sure that we're operating on a numpy array
+    arr = np.array(arr)
 
-    if method == 'smooth' and pos.shape[0] < 6:
+    if arr.ndim not in [1, 2]:
         raise ValueError(
-            'positions has to have at least 6 elements for method "smooth"')
-    if method == 'neighbors' and pos.shape[0] < 3:
+            'arr needs to have 1 or 2 dimensions (are: {arr.ndim = })'
+        )
+    if method == 'smooth' and arr.shape[0] < 6:
         raise ValueError(
-            'positions has to have at least 3 elements for method "neighbors"')
-    if method == 'preceding' and pos.shape[0] < 2:
+            'arr has to have at least 6 elements for method "smooth"'
+        )
+    if method == 'neighbors' and arr.shape[0] < 3:
         raise ValueError(
-            'positions has to have at least 2 elements for method "preceding"')
+            'arr has to have at least 3 elements for method "neighbors"'
+        )
+    if method == 'preceding' and arr.shape[0] < 2:
+        raise ValueError(
+            'arr has to have at least 2 elements for method "preceding"'
+        )
+    if method != 'savitzky_golay' and kwargs:
+        raise ValueError(
+            'selected method doesn\'t support any additional kwargs'
+        )
+        
 
-    N = pos.shape[0]
-    vel = np.zeros(pos.shape)
+    N = arr.shape[0]
+    v = np.zeros(arr.shape)
 
+    valid_methods = ['smooth', 'neighbors', 'preceding', 'savitzky_golay']
     if method == 'smooth':
-        moving_pos_avg = pos[4:N] + pos[3:N-1] - pos[1:N-3] - pos[0:N-4]
-        # mean(pos_-2, pos_-1) and mean(pos_1, pos_2)
-        # needs division by two
-        # window is now 3 samples long (pos_-1.5, pos_0, pos_1+5)
+        # center is N - 2
+        moving_avg = arr[4:N] + arr[3:N-1] - arr[1:N-3] - arr[0:N-4]
+        # mean(arr_-2, arr_-1) and mean(arr_1, arr_2) needs division by two
+        # window is now 3 samples long (arr_-1.5, arr_0, arr_1+5)
         # we therefore need a divison by three, all in all it's a division by 6
-        vel[2:N-2] = moving_pos_avg * sampling_rate / 6
+        v[2:N-2] = moving_avg * sampling_rate / 6
+
         # for second and second last sample:
-        # calculate velocity from preceding and subsequent sample
-        vel[1] = (pos[2] - pos[0]) * sampling_rate / 2
-        vel[N-2] = (pos[N-1] - pos[N-3]) * sampling_rate / 2
+        # calculate vocity from preceding and subsequent sample
+        v[1] = (arr[2] - arr[0]) * sampling_rate / 2
+        v[N-2] = (arr[N-1] - arr[N-3]) * sampling_rate / 2
+
+        # for first and second sample:
+        # calculate velocity from current and neighboring sample
+        v[0] = (arr[1] - arr[0]) * sampling_rate / 2
+        v[N-1] = (arr[N-1] - arr[N-2]) * sampling_rate / 2
 
     elif method == 'neighbors':
         # window size is two, so we need to divide by two
-        vel[1:N-1] = (pos[2:N] - pos[0:N-2]) * sampling_rate / 2
+        v[1:N-1] = (arr[2:N] - arr[0:N-2]) * sampling_rate / 2
 
     elif method == 'preceding':
-        vel[1:N] = (pos[1:N] - pos[0:N-1]) * sampling_rate
+        v[1:N] = (arr[1:N] - arr[0:N-1]) * sampling_rate
+
+    elif method == 'savitzky_golay':
+        # transform to velocities
+        if arr.ndim == 1:
+            v = scipy.signal.savgol_filter(x=arr, **kwargs)
+        else:  # we already checked for error cases
+
+            for channel_id in range(arr.shape[1]):
+                v[:, channel_id] = scipy.signal.savgol_filter(
+                    x=arr[:, channel_id], **kwargs,
+                )
+        v = v * sampling_rate
 
     else:
-        valid_methods = ['smooth', 'neighbors', 'preceding']
         raise ValueError(f'Method needs to be in {valid_methods}'
                          f' (is: {method})')
 
-    return vel
+    return v
+
+
+def vnorm(arr: np.ndarray, axis: Optional[int] = None) -> np.ndarray:
+    if axis is None:
+        # for single vector and array of vectors the axis is 0
+        # shape is assumed to be either (2, ) or (2, sequence_length)
+        if arr.ndim in [1, 2]:
+            axis = 0
+
+        # for batched array of vectors, the
+        # shape is assumed to be (n_batches, 2, sequence_length)
+        elif arr.ndim == 3:
+            axis = 1
+        
+    return np.linalg.norm(arr, axis=axis)
+
+
+def cut_into_subsequences(arr: np.ndarray, window_size: int, keep_padded: bool = True):
+    """
+    Example: if old seq len was 7700, window_size=1000:
+    Input arr has: 144 x 7700 x n_channels
+    Output arr has: 144*8 x 1000 x n_channels
+    The last piece of each trial 7000-7700 gets padded with first 300 of this piece to be 1000 long
+    :param arr:
+    :param window_size:
+    :return:
+    """
+    n, rest = np.divmod(arr.shape[1], window_size)
+
+    if rest > 0 and keep_padded:
+        n_rows = arr.shape[0]*(n+1)
+    else:
+        n_rows = arr.shape[0]*n
+
+    arr_new = np.nan * np.ones((n_rows, window_size, arr.shape[2]))
+
+    idx = 0
+    for t in range(0, arr.shape[0]):
+        for i in range(0, n):
+            # cut out 1000 ms piece of trial t
+            arr_tmp = np.expand_dims(arr[t, i*window_size: (i+1)*window_size, :], axis=0)
+
+            # concatenate pieces
+            arr_new[idx, :, :] = arr_tmp
+
+            idx = idx + 1
+
+        if rest > 0 and keep_padded:
+            # concatenate last one with pad
+            start_idx_last_piece = window_size*(n)
+            len_pad_to_add = window_size-rest
+            # piece to pad:
+            arr_incomplete = np.expand_dims(arr[t, start_idx_last_piece:arr.shape[1], :], axis=0)
+            # padding piece:
+            start_idx_last_piece = window_size*(n-1)
+            arr_pad = np.expand_dims(arr[t, start_idx_last_piece:start_idx_last_piece+len_pad_to_add, :], axis=0)
+
+
+            arr_tmp = np.concatenate((arr_incomplete, arr_pad), axis=1)
+
+            # concatenate last piece of original row t
+            arr_new[idx, :, :] = arr_tmp
+
+            idx = idx + 1
+
+    seq_len = window_size
+    if np.sum(np.isnan(arr_new[:, :, 0])) != 0:
+        raise ValueError(
+            'Cutting into pieces failed, did not fill each position of new matrix.'
+        )
+
+    return arr_new
+
+
+def downsample(
+        arr: np.ndarray,
+        downsampling_factor: int,
+):
+    # TODO: add channel axis argument
+    # TODO: add batched dimension
+    # arr data array to downsample with shape (seqlen, channels)
+    
+    sequence_length = arr.shape[0]
+    select = [i % downsampling_factor == 0 for i in range(sequence_length)]
+
+    return arr[select].copy()
