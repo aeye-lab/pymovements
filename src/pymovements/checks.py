@@ -31,7 +31,7 @@ def check_nan_both_directions(arr: np.ndarray):
     # sanity check: horizontal and vertical gaze coordinates missing
     # values at the same time (Eyelink eyetracker never records only
     # one coordinate)
-    if not np.array_equal(np.isnan(arr[:, 0]), np.isnan(x[:, 1])):
+    if not np.array_equal(np.isnan(arr[:, 0]), np.isnan(arr[:, 1])):
         raise ValueError(
-            "nans have to occur at the same steps of horizontal and vertical direction"
+            "nans have to occur at the same steps of horizontal and vertical direction",
         )

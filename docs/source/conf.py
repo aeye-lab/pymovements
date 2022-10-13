@@ -3,22 +3,21 @@
 # This file only contains a selection of the most common options. For a full
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
-
 # -- Path setup --------------------------------------------------------------
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import inspect
 import os
 import sys
-from subprocess import run, CalledProcessError
-import inspect
-import pkg_resources
+from subprocess import CalledProcessError
+from subprocess import run
 
+import pkg_resources
+from pybtex.plugin import register_plugin
 from pybtex.style.formatting.plain import Style as PlainStyle
 from pybtex.style.labels import BaseLabelStyle
-from pybtex.plugin import register_plugin
 
 # add relative source path to python path
 sys.path.insert(0, os.path.abspath('src'))
@@ -33,7 +32,7 @@ copyright = '2022, AEye Lab Universität Potsdam'
 author = 'Daniel Krakowczyk, David R. Reich, Patrick Haller, Paul Prasse, Lena Jäger'
 
 # The full version, including alpha/beta/rc tags
-#release = '0.0.5'
+# release = '0.0.5'
 
 
 # -- General configuration ---------------------------------------------------
@@ -72,7 +71,7 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = []
+# exclude_patterns = []
 
 
 copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "
@@ -91,7 +90,7 @@ html_theme = 'sphinx_rtd_theme'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = []
+# html_static_path = []
 
 
 # -- Options for BibTeX ------------------------------------------------------
@@ -120,7 +119,7 @@ def getrev():
             ['git', 'describe', '--tags', 'HEAD'],
             capture_output=True,
             check=True,
-            text=True
+            text=True,
         ).stdout[:-1]
     except CalledProcessError:
         revision = 'main'
@@ -133,8 +132,8 @@ REVISION = getrev()
 extlinks = {
     'repo': (
         f'https://github.com/aeye-lab/pymovements/blob/{REVISION}/%s',
-        '%s'
-    )
+        '%s',
+    ),
 }
 
 LINKCODE_URL = (
