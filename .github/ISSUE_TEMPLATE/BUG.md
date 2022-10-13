@@ -1,7 +1,7 @@
 ---
 name: Issue Report
 about: Use this template to report a problem
-title: "[VERSION] [PROBLEM SUMMARY]"
+title: "[PROBLEM SUMMARY]"
 labels: bug
 assignees: 
 ---
