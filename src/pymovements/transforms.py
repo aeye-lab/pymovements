@@ -53,29 +53,29 @@ def pix2deg(
     if arr.ndim not in [0, 1, 2]:
         raise ValueError(
             'Number of dimensions of arr must be either 0, 1 or 2'
-            f' (arr.ndim: {arr.ndim})'
+            f' (arr.ndim: {arr.ndim})',
         )
     if arr.ndim == 2 and arr.shape[-1] not in [1, 2, 4]:
         raise ValueError(
             'Last coord dimension must have length 1, 2 or 4.'
-            f' (arr.shape: {arr.shape})'
+            f' (arr.shape: {arr.shape})',
         )
 
     # check if arr dimensions match screen_px and screen_cm dimensions
     if arr.ndim in {0, 1}:
-        if screen_px.ndim != 0 and screen_px.shape != (1, ):
+        if screen_px.ndim != 0 and screen_px.shape != (1,):
             raise ValueError('arr is 1-dimensional, but screen_px is not')
-        if screen_cm.ndim != 0 and screen_cm.shape != (1, ):
+        if screen_cm.ndim != 0 and screen_cm.shape != (1,):
             raise ValueError('arr is 1-dimensional, but screen_cm is not')
     if arr.ndim != 0 and arr.shape[-1] == 2:
-        if screen_px.shape != (2, ):
+        if screen_px.shape != (2,):
             raise ValueError('arr is 2-dimensional, but screen_px is not')
-        if screen_cm.shape != (2, ):
+        if screen_cm.shape != (2,):
             raise ValueError('arr is 2-dimensional, but screen_cm is not')
     if arr.ndim != 0 and arr.shape[-1] == 4:
-        if screen_px.shape != (2, ):
+        if screen_px.shape != (2,):
             raise ValueError('arr is 4-dimensional, but screen_px is not 2-dimensional')
-        if screen_cm.shape != (2, ):
+        if screen_cm.shape != (2,):
             raise ValueError('arr is 4-dimensional, but screen_cm is not 2-dimensional')
 
         # we have binocular data. double tile screen parameters.
@@ -101,7 +101,8 @@ def pos2vel(
 ) -> np.ndarray:
     """Compute velocity time series from 2-dimensional position time series.
 
-    Methods 'smooth', 'neighbors' and 'preceding' are adapted from Engbert et al.: Microsaccade Toolbox 0.9.
+    Methods 'smooth', 'neighbors' and 'preceding' are adapted from
+        Engbert et al.: Microsaccade Toolbox 0.9.
 
     Parameters
     ----------
@@ -140,25 +141,24 @@ def pos2vel(
 
     if arr.ndim not in [1, 2]:
         raise ValueError(
-            'arr needs to have 1 or 2 dimensions (are: {arr.ndim = })'
+            'arr needs to have 1 or 2 dimensions (are: {arr.ndim = })',
         )
     if method == 'smooth' and arr.shape[0] < 6:
         raise ValueError(
-            'arr has to have at least 6 elements for method "smooth"'
+            'arr has to have at least 6 elements for method "smooth"',
         )
     if method == 'neighbors' and arr.shape[0] < 3:
         raise ValueError(
-            'arr has to have at least 3 elements for method "neighbors"'
+            'arr has to have at least 3 elements for method "neighbors"',
         )
     if method == 'preceding' and arr.shape[0] < 2:
         raise ValueError(
-            'arr has to have at least 2 elements for method "preceding"'
+            'arr has to have at least 2 elements for method "preceding"',
         )
     if method != 'savitzky_golay' and kwargs:
         raise ValueError(
-            'selected method doesn\'t support any additional kwargs'
+            'selected method doesn\'t support any additional kwargs',
         )
-        
 
     N = arr.shape[0]
     v = np.zeros(arr.shape)
@@ -202,13 +202,15 @@ def pos2vel(
         v = v * sampling_rate
 
     else:
-        raise ValueError(f'Method needs to be in {valid_methods}'
-                         f' (is: {method})')
+        raise ValueError(
+            f'Method needs to be in {valid_methods}'
+            f' (is: {method})',
+        )
 
     return v
 
 
-def vnorm(arr: np.ndarray, axis: Optional[int] = None) -> np.ndarray:
+def vnorm(arr: np.ndarray, axis: int | None = None) -> np.ndarray:
     if axis is None:
         # for single vector and array of vectors the axis is 0
         # shape is assumed to be either (2, ) or (2, sequence_length)
@@ -219,7 +221,7 @@ def vnorm(arr: np.ndarray, axis: Optional[int] = None) -> np.ndarray:
         # shape is assumed to be (n_batches, 2, sequence_length)
         elif arr.ndim == 3:
             axis = 1
-        
+
     return np.linalg.norm(arr, axis=axis)
 
 
@@ -261,8 +263,9 @@ def cut_into_subsequences(arr: np.ndarray, window_size: int, keep_padded: bool =
             arr_incomplete = np.expand_dims(arr[t, start_idx_last_piece:arr.shape[1], :], axis=0)
             # padding piece:
             start_idx_last_piece = window_size*(n-1)
-            arr_pad = np.expand_dims(arr[t, start_idx_last_piece:start_idx_last_piece+len_pad_to_add, :], axis=0)
-
+            arr_pad = np.expand_dims(
+                arr[t, start_idx_last_piece:start_idx_last_piece+len_pad_to_add, :], axis=0,
+            )
 
             arr_tmp = np.concatenate((arr_incomplete, arr_pad), axis=1)
 
@@ -271,10 +274,11 @@ def cut_into_subsequences(arr: np.ndarray, window_size: int, keep_padded: bool =
 
             idx = idx + 1
 
-    seq_len = window_size
+    # XXX unused in current implementation:
+    # seq_len = window_size
     if np.sum(np.isnan(arr_new[:, :, 0])) != 0:
         raise ValueError(
-            'Cutting into pieces failed, did not fill each position of new matrix.'
+            'Cutting into pieces failed, did not fill each position of new matrix.',
         )
 
     return arr_new
@@ -287,7 +291,7 @@ def downsample(
     # TODO: add channel axis argument
     # TODO: add batched dimension
     # arr data array to downsample with shape (seqlen, channels)
-    
+
     sequence_length = arr.shape[0]
     select = [i % downsampling_factor == 0 for i in range(sequence_length)]
 

@@ -34,8 +34,10 @@ class Screen:
         Minimum screen y-coordinate in degrees of visual angle
 
     """
-    def __init__(self, width_px: int, height_px: int, width_cm: float,
-                 height_cm: float, distance_cm: float):
+    def __init__(
+        self, width_px: int, height_px: int, width_cm: float,
+        height_cm: float, distance_cm: float,
+    ):
         """
         Initializes Screen.
 
@@ -120,9 +122,11 @@ class Experiment:
         Sampling rate in Hz
     """
 
-    def __init__(self, screen_width_px: int, screen_height_px: int,
-                 screen_width_cm: float, screen_height_cm: float,
-                 distance_cm: float, sampling_rate: float):
+    def __init__(
+        self, screen_width_px: int, screen_height_px: int,
+        screen_width_cm: float, screen_height_cm: float,
+        distance_cm: float, sampling_rate: float,
+    ):
         """
         Initializes Experiment.
 

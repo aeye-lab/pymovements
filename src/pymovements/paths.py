@@ -1,16 +1,17 @@
+from __future__ import annotations
+
 import re
 from pathlib import Path
-from typing import List
 
 
 def get_filepaths(
-        rootpath: str,
+        rootpath: str | Path,
         extension: str = None,
         regex: re.Pattern = None,
-) -> List[Path]:
+) -> list[Path]:
     if extension is not None and regex is not None:
         raise ValueError("extension and regex are mutually exclusive")
-    
+
     rootpath = Path(rootpath)
     if not rootpath.is_dir():
         return []

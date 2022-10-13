@@ -1,39 +1,53 @@
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Tuple
 
 import matplotlib
 import matplotlib.colors as colors
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.patches import Rectangle
 from matplotlib.collections import LineCollection
 
 
 default_segmentdata = {
-    'red':   [[0.0,  0.0, 0.0],
-              [0.5,  1.0, 1.0],
-              [1.0,  1.0, 1.0]],
-    'green': [[0.0,  0.0, 0.0],
-              [0.5,  1.0, 1.0],
-              [1.0,  0.0, 0.0]],
-    'blue':  [[0.0,  0.0, 0.0],
-              [0.5,  0.0, 0.0],
-              [1.0,  0.0, 0.0]],
+    'red':   [
+        [0.0,  0.0, 0.0],
+        [0.5,  1.0, 1.0],
+        [1.0,  1.0, 1.0],
+    ],
+    'green': [
+        [0.0,  0.0, 0.0],
+        [0.5,  1.0, 1.0],
+        [1.0,  0.0, 0.0],
+    ],
+    'blue':  [
+        [0.0,  0.0, 0.0],
+        [0.5,  0.0, 0.0],
+        [1.0,  0.0, 0.0],
+    ],
 }
 
 default_segmentdata_twoslope = {
-    'red':   [[0.0,  0.0, 0.0],
-              [0.5,  0.0, 0.0],
-              [0.75, 1.0, 1.0],
-              [1.0,  1.0, 1.0]],
-    'green': [[0.0,  0.0, 0.0],
-              [0.25, 1.0, 1.0],
-              [0.5,  0.0, 0.0],
-              [0.75, 1.0, 1.0],
-              [1.0,  0.0, 0.0]],
-    'blue':  [[0.0,  1.0, 1.0],
-              [0.25, 1.0, 1.0],
-              [0.5,  0.0, 0.0],
-              [1.0,  0.0, 0.0]],
+    'red':   [
+        [0.0,  0.0, 0.0],
+        [0.5,  0.0, 0.0],
+        [0.75, 1.0, 1.0],
+        [1.0,  1.0, 1.0],
+    ],
+    'green': [
+        [0.0,  0.0, 0.0],
+        [0.25, 1.0, 1.0],
+        [0.5,  0.0, 0.0],
+        [0.75, 1.0, 1.0],
+        [1.0,  0.0, 0.0],
+    ],
+    'blue':  [
+        [0.0,  1.0, 1.0],
+        [0.25, 1.0, 1.0],
+        [0.5,  0.0, 0.0],
+        [1.0,  0.0, 0.0],
+    ],
 }
 
 
@@ -48,17 +62,19 @@ def traceplot(
     show_cbar: bool = False,
     padding: Optional[float] = None,
     pad_factor: float = 0.05,
-    figsize: int = (15, 5),
+    figsize: Tuple[int, int] = (15, 5),
     title: Optional[str] = None,
     savepath: Optional[str] = None,
     show: bool = True,
 ) -> None:
-    
+
     if len(x) != len(y):
-        raise ValueError('x and y do not share same length '
-                         f'({len(x)} != {len(y)})')
+        raise ValueError(
+            'x and y do not share same length '
+            f'({len(x)} != {len(y)})',
+        )
     n = len(x)
-    
+
     fig = plt.figure(figsize=figsize)
     ax = fig.gca()
 
@@ -69,7 +85,7 @@ def traceplot(
     if cmap_norm is None:
         cval_max = np.nanmax(np.abs(cval))
         cval_min = np.nanmin(cval)
-        
+
         if cval_max and cval_min < 0:
             cmap_norm = 'twoslope'
         elif cval_max:
@@ -119,15 +135,15 @@ def traceplot(
     else:
         x_pad = padding
         y_pad = padding
-    
+
     ax.set_xlim(np.nanmin(x) - x_pad, np.nanmax(x) + x_pad)
     ax.set_ylim(np.nanmin(y) - y_pad, np.nanmax(y) + y_pad)
 
     if show_cbar:
-        #sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
-        #sm.set_array(cval)
+        # sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
+        # sm.set_array(cval)
         fig.colorbar(line, label=cbar_label, ax=ax)
-    
+
     ax.set_title(title)
 
     if savepath is not None:
@@ -137,7 +153,7 @@ def traceplot(
         plt.show()
     plt.close(fig)
 
-    
+
 def tsplot(
     arr: np.array,
     channel_names: Optional[List[str]] = None,
@@ -152,32 +168,32 @@ def tsplot(
     rotate_ylabels: bool = True,
     show_grid: bool = True,
     show_yticks: bool = True,
-    figsize: int = (15, 5),
+    figsize: Tuple[int, int] = (15, 5),
     title: Optional[str] = None,
     savepath: Optional[str] = None,
     show: bool = True,
 ) -> None:
-    
+
     if arr.ndim == 1:
         arr = np.expand_dims(arr, axis=0)
     elif arr.ndim == 2:
         pass
     else:
         raise ValueError(arr.shape)
-        
+
     if channel_axis != 0:
         raise NotImplementedError()
     if sample_axis != 1:
         raise NotImplementedError()
-        
+
     n_channels = arr.shape[channel_axis]
     n_samples = arr.shape[sample_axis]
-    
+
     # determine number of subplots and height ratios for events
     if events is not None:
         raise NotImplementedError()
-        n_subplots = n_channels + len(events)
-        height_ratios = height_ratios + [1 * n_event_types]
+        # n_subplots = n_channels + len(events)
+        # height_ratios = height_ratios + [1 * n_event_types]
     else:
         n_subplots = n_channels
         height_ratios = [1] * n_channels
@@ -204,12 +220,13 @@ def tsplot(
     for channel_id in range(n_channels):
         ax = axs[channel_id]
         x_channel = arr[channel_id, :]
-        
+
         # set ylims to have zero centered y-axis (for single axis)
-        if not share_y and zerp_centered_yaxis:
-            ylim_abs = np.nanmax(np.abs(x_channel))
-            ylims = -ylim_abs * 1.1, ylim_abs * 1.1
-            
+        # TODO: fix zerp_centered_yaxis undefined
+        # if not share_y and zerp_centered_yaxis:
+        #     ylim_abs = np.nanmax(np.abs(x_channel))
+        #     ylims = -ylim_abs * 1.1, ylim_abs * 1.1
+
         ax.plot(t, x_channel, color=line_color, linewidth=line_width)
 
         '''
@@ -218,12 +235,12 @@ def tsplot(
         for i_attr, (attr_name, attr_vals) in enumerate(attribution_dict.items()):
             y_seg = (ylims[1] - ylims[0]) / n_attr
             y_bot = i_attr * y_seg + ylims[0]
-            
+
             y_top = y_bot + y_seg
             y_mid = y_bot + y_seg / 2
 
             extent = xlims[0], xlims[1], y_bot, y_top
-            
+
             attr_val_max = max(abs(attr_vals.min()), abs(attr_vals.max()))
             colornorm = colors.TwoSlopeNorm(
                 vmin=-attr_val_max,
@@ -256,91 +273,96 @@ def tsplot(
         )
 
         if show_yticks:
-            #from matplotlib.ticker import AutoMinorLocator
-            #ax.yaxis.set_minor_locator(AutoMinorLocator())
+            # from matplotlib.ticker import AutoMinorLocator
+            # ax.yaxis.set_minor_locator(AutoMinorLocator())
             plt.setp(ax.get_yticklabels(), visible=True)
         else:
             ax.set_yticks([])
             plt.setp(ax.get_yticklabels(), visible=False)
 
         # TODO: find out why this is needed
-        params = {'mathtext.default': 'regular' }          
+        params = {'mathtext.default': 'regular'}
         plt.rcParams.update(params)
-        
+
         # set channel names as y-axis labels
         if channel_names:
             if rotate_ylabels:
-                ax.set_ylabel(channel_names[channel_id],
-                              rotation='horizontal',
-                              ha='right', va='center')
+                ax.set_ylabel(
+                    channel_names[channel_id],
+                    rotation='horizontal',
+                    ha='right', va='center',
+                )
             else:
                 ax.set_ylabel(channel_names[channel_id])
 
         # TODO: find out why this is needed
-        if False: # events is not None or channel_id != n_channels - 1:
-            raise NotImplementedError()
-            plt.setp(ax.get_xticklabels(), visible=False)
+        # if False: # events is not None or channel_id != n_channels - 1:
+        #     raise NotImplementedError()
+        #     plt.setp(ax.get_xticklabels(), visible=False)
 
-    if events is not None:
-        raise NotImplementedError()
-        ax = axs[-1]
-        t = list(range(len(inputs)))
+    # TODO fix: inputs not defined
+    # if events is not None:
+    #     raise NotImplementedError()
+    #     ax = axs[-1]
+    #     t = list(range(len(inputs)))
 
-        height = 1
-        padding = 0.1
-        
-        for event_id, (event_name, event_data) in enumerate(events.items()):
-            y_top = (n_event_types - event_id) * height
-            y_bot = y_top - height
-            y_mid = y_top - height / 2
-            
-            y_top_padded = y_top - padding
-            y_bot_padded = y_bot + padding
-            height_padded = height - 2 * padding
+    #     height = 1
+    #     padding = 0.1
 
-            event_color = event_colors[event_id]
-            for _, event in event_data.iterrows():
-                event_xy = event.start, y_bot_padded
-                event_length = event.end - event.start
+    #     for event_id, (event_name, event_data) in enumerate(events.items()):
+    #         y_top = (n_event_types - event_id) * height
+    #         y_bot = y_top - height
+    #         y_mid = y_top - height / 2
 
-                patch = Rectangle(
-                    xy=event_xy,
-                    width=event_length,
-                    height=height_padded,
-                    color=event_color)
-                ax.add_patch(patch)
+    #         y_top_padded = y_top - padding
+    #         y_bot_padded = y_bot + padding
+    #         height_padded = height - 2 * padding
 
-            ax.text(-10, y_mid, event_name, ha='right', va='center')
+    #         event_color = event_colors[event_id]
+    #         for _, event in event_data.iterrows():
+    #             event_xy = event.start, y_bot_padded
+    #             event_length = event.end - event.start
 
-        ax.set_yticks([])
-        ax.xaxis.grid(True, which='major')
-        ax.xaxis.grid(True, which='minor')
-        ax.yaxis.grid(False, which='major')
-        ax.yaxis.grid(False, which='minor')
+    #             patch = Rectangle(
+    #                 xy=event_xy,
+    #                 width=event_length,
+    #                 height=height_padded,
+    #                 color=event_color,
+    #             )
+    #             ax.add_patch(patch)
 
-        ax.set_xlim(xlims)
-        ax.set_ylim(0, n_event_types)
-    
+    #         ax.text(-10, y_mid, event_name, ha='right', va='center')
+
+    #     ax.set_yticks([])
+    #     ax.xaxis.grid(True, which='major')
+    #     ax.xaxis.grid(True, which='minor')
+    #     ax.yaxis.grid(False, which='major')
+    #     ax.yaxis.grid(False, which='minor')
+
+    #     ax.set_xlim(xlims)
+    #     ax.set_ylim(0, n_event_types)
+
     # print x label on last used (bottom) axis
     ax.set_xlabel(xlabel)
-    
-    if False: #show_cbar: # and (subfig_id + 1 == n_subfigs):
-        fig.subplots_adjust(right=0.8)
-        # put colorbar at desire position
-        cbar_ax = fig.add_axes([0.85, 0.1, 0.025, 0.8])
-        cbar = fig.colorbar(im, cax=cbar_ax)
-        cbar.ax.set_ylabel(cbar_label, rotation=90)
 
-        '''
-        from mpl_toolkits.axes_grid1 import make_axes_locatable
-        #divider = make_axes_locatable(ax)
-        #cax = divider.append_axes('right', size='5%', pad=0.05)
-        cax = None
-        fig.colorbar(im, cax=cax, orientation='vertical')
-        '''
-            
+    # TODO implement correctly
+    # if False: #show_cbar: # and (subfig_id + 1 == n_subfigs):
+    #    fig.subplots_adjust(right=0.8)
+    #    # put colorbar at desire position
+    #    cbar_ax = fig.add_axes([0.85, 0.1, 0.025, 0.8])
+    #    cbar = fig.colorbar(im, cax=cbar_ax)
+    #    cbar.ax.set_ylabel(cbar_label, rotation=90)
+
+    #    '''
+    #    from mpl_toolkits.axes_grid1 import make_axes_locatable
+    #    #divider = make_axes_locatable(ax)
+    #    #cax = divider.append_axes('right', size='5%', pad=0.05)
+    #    cax = None
+    #    fig.colorbar(im, cax=cax, orientation='vertical')
+    #    '''
+
     axs[0].set_title(title)
-    
+
     if savepath is not None:
         fig.savefig(savepath)
 
