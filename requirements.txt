@@ -1,3 +1,2 @@
-numpy>=1.10.0
-scipy>=1.7
-matplotlib>=3.0.0
+# installs dependencies from ./setup.cfg, and the package itself, in editable mode
+-e .[test,docs]
