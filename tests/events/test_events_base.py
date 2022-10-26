@@ -45,5 +45,9 @@ def test_event_class(event_class: Event, init_params: dict[str, Any], expected: 
     """Test if instantiated event attributes fit expected values."""
     event = event_class(**init_params)
 
-    assert event.name == expected['name']
-    assert event.duration == expected['duration']
+    assert event.name == expected['name'], (
+        f'event name does not match expected value ({event.name} != {expected["name"]})'
+    )
+    assert event.duration == expected['duration'], (
+        f'event duration does not match expected value ({event.duration} != {expected["duration"]})'
+    )
