@@ -84,7 +84,7 @@ class Screen:
 
         Parameters
         ----------
-        positions : float, array_like
+        arr : float, array_like
             Pixel coordinates to transform into degrees of visual angle
         center_origin: bool
             Center origin to (0,0) if positions origin is in bottom left corner
