@@ -1,10 +1,14 @@
+"""
+This module holds basic checks which will be reused in other modules.
+"""
 from typing import Any
 
 import numpy as np
 
 
 def check_no_zeros(variable: Any, name: str = 'variable'):
-    """Check if variable, or if it is iterable, any of its components are zero.
+    """
+    Check if variable, or if it is iterable, any of its components are zero.
     """
     # construct error message first
     error_message = f'{name} must not be zero'
@@ -27,7 +31,10 @@ def check_no_zeros(variable: Any, name: str = 'variable'):
                 raise ValueError(error_message)
 
 
-def check_nan_both_directions(arr: np.ndarray):
+def check_nan_both_channels(arr: np.ndarray):
+    """
+    Checks if all nans occur at the same time steps for both channels.
+    """
     # sanity check: horizontal and vertical gaze coordinates missing
     # values at the same time (Eyelink eyetracker never records only
     # one coordinate)

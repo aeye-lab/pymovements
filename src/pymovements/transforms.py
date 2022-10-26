@@ -1,3 +1,6 @@
+"""
+Transforms module.
+"""
 from __future__ import annotations
 
 import numpy as np
@@ -211,6 +214,20 @@ def pos2vel(
 
 
 def vnorm(arr: np.ndarray, axis: int | None = None) -> np.ndarray:
+    """
+    Takes the velocity norm sqrt(x^2 + y^2).
+
+    Parameters
+    ----------
+    arr: np.ndarray
+        velocity sequence
+    axis: int, optional
+        axis to take norm. If None it is inferred from arr.shape.
+
+    Returns
+    -------
+    np.ndarray
+    """
     if axis is None:
         # for single vector and array of vectors the axis is 0
         # shape is assumed to be either (2, ) or (2, sequence_length)
@@ -231,11 +248,19 @@ def cut_into_subsequences(arr: np.ndarray, window_size: int, keep_padded: bool =
     Input arr has: 144 x 7700 x n_channels
     Output arr has: 144*8 x 1000 x n_channels
     The last piece of each trial 7000-7700 gets padded with first 300 of this piece to be 1000 long
-    :param arr: uncut sequence
-    :param window_size: size of subsequences
-    :param keep_padded: If True, last subsequence (which is padded) is kept in the output array.
-    :raises AssertionError
-    :return:
+
+    Parameters
+    ----------
+    arr: np.ndarray
+        uncut sequence
+    window_size: int
+        size of subsequences
+    keep_padded: bool
+        If True, last subsequence (which is padded) is kept in the output array.
+
+    Returns
+    -------
+    np.ndarray
     """
     n, rest = np.divmod(arr.shape[1], window_size)
 
@@ -244,7 +269,7 @@ def cut_into_subsequences(arr: np.ndarray, window_size: int, keep_padded: bool =
     else:
         n_rows = arr.shape[0]*n
 
-    arr_new = np.nan * np.ones((n_rows, window_size, arr.shape[2]))
+    arr_cut = np.nan * np.ones((n_rows, window_size, arr.shape[2]))
 
     idx = 0
     for t in range(0, arr.shape[0]):
@@ -253,7 +278,7 @@ def cut_into_subsequences(arr: np.ndarray, window_size: int, keep_padded: bool =
             arr_tmp = np.expand_dims(arr[t, i*window_size: (i+1)*window_size, :], axis=0)
 
             # concatenate pieces
-            arr_new[idx, :, :] = arr_tmp
+            arr_cut[idx, :, :] = arr_tmp
 
             idx = idx + 1
 
@@ -272,29 +297,32 @@ def cut_into_subsequences(arr: np.ndarray, window_size: int, keep_padded: bool =
             arr_tmp = np.concatenate((arr_incomplete, arr_pad), axis=1)
 
             # concatenate last piece of original row t
-            arr_new[idx, :, :] = arr_tmp
+            arr_cut[idx, :, :] = arr_tmp
 
             idx = idx + 1
 
-    # XXX unused in current implementation:
-    # seq_len = window_size
-    if np.sum(np.isnan(arr_new[:, :, 0])) != 0:
-        raise AssertionError(
-            'Cutting into pieces failed, did not fill each position of new matrix.',
-        )
-
-    return arr_new
+    return arr_cut
 
 
 def downsample(
         arr: np.ndarray,
-        downsampling_factor: int,
+        factor: int,
 ):
-    # TODO: add channel axis argument
-    # TODO: add batched dimension
-    # arr data array to downsample with shape (seqlen, channels)
+    """
+    Downsamples array by integer factor.
 
+    Parameters
+    ----------
+    arr: np.ndarray
+        sequence to be downsampled
+    factor: int
+        factor to be downsampled with
+
+    Returns
+    -------
+    np.ndarray
+    """
     sequence_length = arr.shape[0]
-    select = [i % downsampling_factor == 0 for i in range(sequence_length)]
+    select = [i % factor == 0 for i in range(sequence_length)]
 
     return arr[select].copy()

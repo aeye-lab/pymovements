@@ -1,3 +1,8 @@
+"""
+This module holds the base classes Screen and Experiment.
+"""
+
+
 from __future__ import annotations
 
 import numpy as np
