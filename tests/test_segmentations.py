@@ -30,12 +30,14 @@ linspace_arr_10_bins_expected[6, 60] = False
         ),
         pytest.param(
             {'arr': np.zeros(1000), 'n_bins': 3, 'v_min': -1, 'v_max': 1},
-            np.stack([np.zeros(1000, dtype=bool), np.ones(1000, dtype=bool), np.zeros(1000, dtype=bool)]),
+            np.stack([np.zeros(1000, dtype=bool), np.ones(1000, dtype=bool),
+                      np.zeros(1000, dtype=bool)]),
             id='all_zero_arr_3_bins_vmin=-1',
         ),
         pytest.param(
             {'arr': np.ones(1000), 'n_bins': 3, 'v_min': -1, 'v_max': 1},
-            np.stack([np.zeros(1000, dtype=bool), np.zeros(1000, dtype=bool), np.ones(1000, dtype=bool)]),
+            np.stack([np.zeros(1000, dtype=bool), np.zeros(1000, dtype=bool),
+                      np.ones(1000, dtype=bool)]),
             id='all_one_arr_3_bins_vmin=-1',
         ),
         pytest.param(
