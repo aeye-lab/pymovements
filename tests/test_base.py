@@ -1,10 +1,15 @@
+"""
+Test pymovements base classes.
+"""
+
+
 def test_screen_attributes():
     """Test correct attribute saving."""
     return
 
 
 def test_screen_attribute_exceptions():
-    """Test correct exception raising for initialization paramters."""
+    """Test correct exception raising for initialization parameters."""
     return
 
 

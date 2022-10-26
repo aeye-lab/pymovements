@@ -1,3 +1,6 @@
+"""
+This module holds path specific funtions.
+"""
 from __future__ import annotations
 
 import re
@@ -6,9 +9,32 @@ from pathlib import Path
 
 def get_filepaths(
         rootpath: str | Path,
-        extension: str = None,
-        regex: re.Pattern = None,
+        extension: str | None = None,
+        regex: re.Pattern | None = None,
 ) -> list[Path]:
+    """
+    Get filepaths from rootpath depending on extension or regular expression.
+    Passing extension and regex is mutually exclusive.
+
+    Parameters
+    ----------
+    rootpath: str | Path
+        Root path to be traversed.
+    extension: str, optional
+        File extension to be filtered for.
+    regex: re.Pattern, optional
+        Regular expression filenames will be filtered for.
+
+    Returns
+    -------
+    list[Path]
+
+    Raises
+    ------
+    ValueError
+        If both extension and regex is being passed.
+
+    """
     if extension is not None and regex is not None:
         raise ValueError("extension and regex are mutually exclusive")
 
