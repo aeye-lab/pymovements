@@ -1,22 +1,36 @@
-.. pymovements documentation master file, created by
-   sphinx-quickstart on Tue Jun 14 16:02:58 2022.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+=========================================
+Welcome to the pymovements documentation!
+=========================================
 
-Welcome to pymovements's documentation!
-=======================================
+**pymovements** is a Python library for processing eye tracking data.
 
-**pymovement** is a Python library for processing eye tracking data.
+This package is available on PyPI and may be installed using:
+
+.. code-block:: console
+
+   $ pip install pymovements
+
+
+Contents
+--------
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
-   API <pymovements.rst>
+   getting-started
+   how-to/index
+   tutorial/index
+   reference/index
+   bibliography
+
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+
+Citing
+------
