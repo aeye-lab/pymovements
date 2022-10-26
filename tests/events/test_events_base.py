@@ -1,3 +1,6 @@
+"""
+This module tests functionality of base event classes.
+"""
 from __future__ import annotations
 from typing import Any
 
@@ -8,6 +11,7 @@ from pymovements.events import Fixation
 from pymovements.events import Saccade
 
 
+# pylint: disable=protected-access
 @pytest.mark.parametrize(
     'event_class, init_params, expected',
     [
@@ -38,6 +42,7 @@ from pymovements.events import Saccade
     ]
 )
 def test_event_class(event_class: Event, init_params: dict[str, Any], expected: dict[str, Any]):
+    """Test if instantiated event attributes fit expected values."""
     event = event_class(**init_params)
 
     assert event.name == expected['name']
