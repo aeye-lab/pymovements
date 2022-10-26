@@ -44,7 +44,7 @@ pip-delete-this-directory.txt
 # Docs
 docs/build
 docs/doctree*
-
+docs/source/reference/pymovements.*.rst
 # Testing
 .tox
 .coverage
