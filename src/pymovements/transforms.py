@@ -214,7 +214,7 @@ def vnorm(arr: np.ndarray, axis: int | None = None) -> np.ndarray:
     if axis is None:
         # for single vector and array of vectors the axis is 0
         # shape is assumed to be either (2, ) or (2, sequence_length)
-        if arr.ndim in [1, 2]:
+        if arr.ndim in {1, 2}:
             axis = 0
 
         # for batched array of vectors, the
@@ -231,8 +231,10 @@ def cut_into_subsequences(arr: np.ndarray, window_size: int, keep_padded: bool =
     Input arr has: 144 x 7700 x n_channels
     Output arr has: 144*8 x 1000 x n_channels
     The last piece of each trial 7000-7700 gets padded with first 300 of this piece to be 1000 long
-    :param arr:
-    :param window_size:
+    :param arr: uncut sequence
+    :param window_size: size of subsequences
+    :param keep_padded: If True, last subsequence (which is padded) is kept in the output array.
+    :raises AssertionError
     :return:
     """
     n, rest = np.divmod(arr.shape[1], window_size)
@@ -257,12 +259,12 @@ def cut_into_subsequences(arr: np.ndarray, window_size: int, keep_padded: bool =
 
         if rest > 0 and keep_padded:
             # concatenate last one with pad
-            start_idx_last_piece = window_size*(n)
+            start_idx_last_piece = window_size * n
             len_pad_to_add = window_size-rest
             # piece to pad:
             arr_incomplete = np.expand_dims(arr[t, start_idx_last_piece:arr.shape[1], :], axis=0)
             # padding piece:
-            start_idx_last_piece = window_size*(n-1)
+            start_idx_last_piece = window_size * (n-1)
             arr_pad = np.expand_dims(
                 arr[t, start_idx_last_piece:start_idx_last_piece+len_pad_to_add, :], axis=0,
             )
@@ -277,7 +279,7 @@ def cut_into_subsequences(arr: np.ndarray, window_size: int, keep_padded: bool =
     # XXX unused in current implementation:
     # seq_len = window_size
     if np.sum(np.isnan(arr_new[:, :, 0])) != 0:
-        raise ValueError(
+        raise AssertionError(
             'Cutting into pieces failed, did not fill each position of new matrix.',
         )
 

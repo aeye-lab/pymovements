@@ -1,12 +1,9 @@
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Tuple
+from __future__ import annotations
 
 import matplotlib
-import matplotlib.colors as colors
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import colors
 from matplotlib.collections import LineCollection
 
 
@@ -54,17 +51,17 @@ default_segmentdata_twoslope = {
 def traceplot(
     x: np.array,
     y: np.array,
-    cval: Optional[np.array] = None,
-    cmap: Optional[colors.Colormap] = None,
-    cmap_norm: Optional[colors.Normalize] = None,
-    cmap_segmentdata: Optional[Dict[str, List[List[float]]]] = None,
-    cbar_label: Optional[str] = None,
+    cval: np.array | None = None,
+    cmap: colors.Colormap | None = None,
+    cmap_norm: colors.Normalize | str | None = None,
+    cmap_segmentdata: dict[str, list[list[float]]] | None = None,
+    cbar_label: str | None= None,
     show_cbar: bool = False,
-    padding: Optional[float] = None,
+    padding: float | None = None,
     pad_factor: float = 0.05,
-    figsize: Tuple[int, int] = (15, 5),
-    title: Optional[str] = None,
-    savepath: Optional[str] = None,
+    figsize: tuple[int, int] = (15, 5),
+    title: str | None = None,
+    savepath: str | None = None,
     show: bool = True,
 ) -> None:
 
@@ -156,11 +153,11 @@ def traceplot(
 
 def tsplot(
     arr: np.array,
-    channel_names: Optional[List[str]] = None,
+    channel_names: list[str] | None = None,
     channel_axis: int = 0,
-    xlabel: Optional[str] = None,
+    xlabel: str | None = None,
     sample_axis: int = 1,
-    events: Optional[np.array] = None,
+    events: np.array | None = None,
     share_y: bool = True,
     zero_centered_yaxis: bool = True,
     line_color: str = 'k',  # TODO: use correct color type
@@ -168,9 +165,9 @@ def tsplot(
     rotate_ylabels: bool = True,
     show_grid: bool = True,
     show_yticks: bool = True,
-    figsize: Tuple[int, int] = (15, 5),
-    title: Optional[str] = None,
-    savepath: Optional[str] = None,
+    figsize: tuple[int, int] = (15, 5),
+    title: str | None = None,
+    savepath: str | None = None,
     show: bool = True,
 ) -> None:
 
@@ -191,12 +188,11 @@ def tsplot(
 
     # determine number of subplots and height ratios for events
     if events is not None:
-        raise NotImplementedError()
         # n_subplots = n_channels + len(events)
         # height_ratios = height_ratios + [1 * n_event_types]
-    else:
-        n_subplots = n_channels
-        height_ratios = [1] * n_channels
+        raise NotImplementedError()
+    n_subplots = n_channels
+    height_ratios = [1] * n_channels
 
     fig, axs = plt.subplots(
         nrows=n_subplots,
@@ -229,35 +225,33 @@ def tsplot(
 
         ax.plot(t, x_channel, color=line_color, linewidth=line_width)
 
-        '''
-        n_attr = 1 #len(attributions)
-        attribution_dict = {' ': attributions}
-        for i_attr, (attr_name, attr_vals) in enumerate(attribution_dict.items()):
-            y_seg = (ylims[1] - ylims[0]) / n_attr
-            y_bot = i_attr * y_seg + ylims[0]
+        # n_attr = 1 #len(attributions)
+        # attribution_dict = {' ': attributions}
+        # for i_attr, (attr_name, attr_vals) in enumerate(attribution_dict.items()):
+        #     y_seg = (ylims[1] - ylims[0]) / n_attr
+        #     y_bot = i_attr * y_seg + ylims[0]
 
-            y_top = y_bot + y_seg
-            y_mid = y_bot + y_seg / 2
+        #     y_top = y_bot + y_seg
+        #     y_mid = y_bot + y_seg / 2
 
-            extent = xlims[0], xlims[1], y_bot, y_top
+        #     extent = xlims[0], xlims[1], y_bot, y_top
 
-            attr_val_max = max(abs(attr_vals.min()), abs(attr_vals.max()))
-            colornorm = colors.TwoSlopeNorm(
-                vmin=-attr_val_max,
-                vcenter=0,
-                vmax=attr_val_max,
-            )
-            im = ax.imshow(X=np.expand_dims(attr_vals[:, channel_id], 0),
-                           norm=colornorm,
-                           cmap=plt.cm.coolwarm, interpolation='nearest',
-                           extent=extent, alpha=1, aspect='auto')
+        #     attr_val_max = max(abs(attr_vals.min()), abs(attr_vals.max()))
+        #     colornorm = colors.TwoSlopeNorm(
+        #         vmin=-attr_val_max,
+        #         vcenter=0,
+        #         vmax=attr_val_max,
+        #     )
+        #     im = ax.imshow(X=np.expand_dims(attr_vals[:, channel_id], 0),
+        #                    norm=colornorm,
+        #                    cmap=plt.cm.coolwarm, interpolation='nearest',
+        #                    extent=extent, alpha=1, aspect='auto')
 
-            #if feature_importance_names is not None:
-            #    ax.text(-10, y_mid, feature_importance_names[i_fimp],
-            #            ha='right', va='center')
+        #     #if feature_importance_names is not None:
+        #     #    ax.text(-10, y_mid, feature_importance_names[i_fimp],
+        #     #            ha='right', va='center')
 
-        #fig.colorbar(im, ax=ax, orientation='vertical')
-        '''
+        # fig.colorbar(im, ax=ax, orientation='vertical')
 
         ax.set_xlim(xlims)
         ax.set_ylim(ylims)
