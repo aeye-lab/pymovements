@@ -1,8 +1,11 @@
-import pytest
-
+"""
+Test all functions in pymovements.transforms.
+"""
+# pylint: disable=missing-function-docstring
 import numpy as np
-
-from pymovements.transforms import pix2deg, pos2vel
+import pytest
+from pymovements.transforms import pix2deg
+from pymovements.transforms import pos2vel
 
 
 def test_pix2deg_none_coords_raise_type_error():

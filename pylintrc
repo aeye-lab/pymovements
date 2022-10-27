@@ -95,16 +95,11 @@ enable=
 # --disable=W"
 
 disable=
-    attribute-defined-outside-init,
     invalid-name,
-    missing-docstring,
-    protected-access,
     too-few-public-methods,
-    # handled by black
-    format,
-    # We anticipate #3512 where it will become optional
-    fixme,
-
+    too-many-arguments,
+    too-many-locals,
+    redefined-variable-type,
 
 [REPORTS]
 
@@ -204,7 +199,7 @@ redefining-builtins-modules=six.moves,past.builtins,future.builtins,builtins,io
 [FORMAT]
 
 # Maximum number of characters on a single line.
-max-line-length=85
+max-line-length=100
 
 # Regexp for a line that is allowed to be longer than the limit.
 ignore-long-lines=^\s*(# )?<?https?://\S+>?$
