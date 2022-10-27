@@ -1,3 +1,8 @@
+"""
+This module holds the base classes Screen and Experiment.
+"""
+
+
 from __future__ import annotations
 
 import numpy as np
@@ -34,8 +39,10 @@ class Screen:
         Minimum screen y-coordinate in degrees of visual angle
 
     """
-    def __init__(self, width_px: int, height_px: int, width_cm: float,
-                 height_cm: float, distance_cm: float):
+    def __init__(
+        self, width_px: int, height_px: int, width_cm: float,
+        height_cm: float, distance_cm: float,
+    ):
         """
         Initializes Screen.
 
@@ -82,7 +89,7 @@ class Screen:
 
         Parameters
         ----------
-        positions : float, array_like
+        arr : float, array_like
             Pixel coordinates to transform into degrees of visual angle
         center_origin: bool
             Center origin to (0,0) if positions origin is in bottom left corner
@@ -120,9 +127,11 @@ class Experiment:
         Sampling rate in Hz
     """
 
-    def __init__(self, screen_width_px: int, screen_height_px: int,
-                 screen_width_cm: float, screen_height_cm: float,
-                 distance_cm: float, sampling_rate: float):
+    def __init__(
+        self, screen_width_px: int, screen_height_px: int,
+        screen_width_cm: float, screen_height_cm: float,
+        distance_cm: float, sampling_rate: float,
+    ):
         """
         Initializes Experiment.
 

@@ -1,3 +1,6 @@
+"""
+Transforms module.
+"""
 from __future__ import annotations
 
 import numpy as np
@@ -53,29 +56,29 @@ def pix2deg(
     if arr.ndim not in [0, 1, 2]:
         raise ValueError(
             'Number of dimensions of arr must be either 0, 1 or 2'
-            f' (arr.ndim: {arr.ndim})'
+            f' (arr.ndim: {arr.ndim})',
         )
     if arr.ndim == 2 and arr.shape[-1] not in [1, 2, 4]:
         raise ValueError(
             'Last coord dimension must have length 1, 2 or 4.'
-            f' (arr.shape: {arr.shape})'
+            f' (arr.shape: {arr.shape})',
         )
 
     # check if arr dimensions match screen_px and screen_cm dimensions
     if arr.ndim in {0, 1}:
-        if screen_px.ndim != 0 and screen_px.shape != (1, ):
+        if screen_px.ndim != 0 and screen_px.shape != (1,):
             raise ValueError('arr is 1-dimensional, but screen_px is not')
-        if screen_cm.ndim != 0 and screen_cm.shape != (1, ):
+        if screen_cm.ndim != 0 and screen_cm.shape != (1,):
             raise ValueError('arr is 1-dimensional, but screen_cm is not')
     if arr.ndim != 0 and arr.shape[-1] == 2:
-        if screen_px.shape != (2, ):
+        if screen_px.shape != (2,):
             raise ValueError('arr is 2-dimensional, but screen_px is not')
-        if screen_cm.shape != (2, ):
+        if screen_cm.shape != (2,):
             raise ValueError('arr is 2-dimensional, but screen_cm is not')
     if arr.ndim != 0 and arr.shape[-1] == 4:
-        if screen_px.shape != (2, ):
+        if screen_px.shape != (2,):
             raise ValueError('arr is 4-dimensional, but screen_px is not 2-dimensional')
-        if screen_cm.shape != (2, ):
+        if screen_cm.shape != (2,):
             raise ValueError('arr is 4-dimensional, but screen_cm is not 2-dimensional')
 
         # we have binocular data. double tile screen parameters.
@@ -101,7 +104,8 @@ def pos2vel(
 ) -> np.ndarray:
     """Compute velocity time series from 2-dimensional position time series.
 
-    Methods 'smooth', 'neighbors' and 'preceding' are adapted from Engbert et al.: Microsaccade Toolbox 0.9.
+    Methods 'smooth', 'neighbors' and 'preceding' are adapted from
+        Engbert et al.: Microsaccade Toolbox 0.9.
 
     Parameters
     ----------
@@ -140,25 +144,24 @@ def pos2vel(
 
     if arr.ndim not in [1, 2]:
         raise ValueError(
-            'arr needs to have 1 or 2 dimensions (are: {arr.ndim = })'
+            'arr needs to have 1 or 2 dimensions (are: {arr.ndim = })',
         )
     if method == 'smooth' and arr.shape[0] < 6:
         raise ValueError(
-            'arr has to have at least 6 elements for method "smooth"'
+            'arr has to have at least 6 elements for method "smooth"',
         )
     if method == 'neighbors' and arr.shape[0] < 3:
         raise ValueError(
-            'arr has to have at least 3 elements for method "neighbors"'
+            'arr has to have at least 3 elements for method "neighbors"',
         )
     if method == 'preceding' and arr.shape[0] < 2:
         raise ValueError(
-            'arr has to have at least 2 elements for method "preceding"'
+            'arr has to have at least 2 elements for method "preceding"',
         )
     if method != 'savitzky_golay' and kwargs:
         raise ValueError(
-            'selected method doesn\'t support any additional kwargs'
+            'selected method doesn\'t support any additional kwargs',
         )
-        
 
     N = arr.shape[0]
     v = np.zeros(arr.shape)
@@ -202,24 +205,40 @@ def pos2vel(
         v = v * sampling_rate
 
     else:
-        raise ValueError(f'Method needs to be in {valid_methods}'
-                         f' (is: {method})')
+        raise ValueError(
+            f'Method needs to be in {valid_methods}'
+            f' (is: {method})',
+        )
 
     return v
 
 
-def vnorm(arr: np.ndarray, axis: Optional[int] = None) -> np.ndarray:
+def vnorm(arr: np.ndarray, axis: int | None = None) -> np.ndarray:
+    """
+    Takes the velocity norm sqrt(x^2 + y^2).
+
+    Parameters
+    ----------
+    arr: np.ndarray
+        velocity sequence
+    axis: int, optional
+        axis to take norm. If None it is inferred from arr.shape.
+
+    Returns
+    -------
+    np.ndarray
+    """
     if axis is None:
         # for single vector and array of vectors the axis is 0
         # shape is assumed to be either (2, ) or (2, sequence_length)
-        if arr.ndim in [1, 2]:
+        if arr.ndim in {1, 2}:
             axis = 0
 
         # for batched array of vectors, the
         # shape is assumed to be (n_batches, 2, sequence_length)
         elif arr.ndim == 3:
             axis = 1
-        
+
     return np.linalg.norm(arr, axis=axis)
 
 
@@ -229,9 +248,19 @@ def cut_into_subsequences(arr: np.ndarray, window_size: int, keep_padded: bool =
     Input arr has: 144 x 7700 x n_channels
     Output arr has: 144*8 x 1000 x n_channels
     The last piece of each trial 7000-7700 gets padded with first 300 of this piece to be 1000 long
-    :param arr:
-    :param window_size:
-    :return:
+
+    Parameters
+    ----------
+    arr: np.ndarray
+        uncut sequence
+    window_size: int
+        size of subsequences
+    keep_padded: bool
+        If True, last subsequence (which is padded) is kept in the output array.
+
+    Returns
+    -------
+    np.ndarray
     """
     n, rest = np.divmod(arr.shape[1], window_size)
 
@@ -240,7 +269,7 @@ def cut_into_subsequences(arr: np.ndarray, window_size: int, keep_padded: bool =
     else:
         n_rows = arr.shape[0]*n
 
-    arr_new = np.nan * np.ones((n_rows, window_size, arr.shape[2]))
+    arr_cut = np.nan * np.ones((n_rows, window_size, arr.shape[2]))
 
     idx = 0
     for t in range(0, arr.shape[0]):
@@ -249,46 +278,51 @@ def cut_into_subsequences(arr: np.ndarray, window_size: int, keep_padded: bool =
             arr_tmp = np.expand_dims(arr[t, i*window_size: (i+1)*window_size, :], axis=0)
 
             # concatenate pieces
-            arr_new[idx, :, :] = arr_tmp
+            arr_cut[idx, :, :] = arr_tmp
 
             idx = idx + 1
 
         if rest > 0 and keep_padded:
             # concatenate last one with pad
-            start_idx_last_piece = window_size*(n)
+            start_idx_last_piece = window_size * n
             len_pad_to_add = window_size-rest
             # piece to pad:
             arr_incomplete = np.expand_dims(arr[t, start_idx_last_piece:arr.shape[1], :], axis=0)
             # padding piece:
-            start_idx_last_piece = window_size*(n-1)
-            arr_pad = np.expand_dims(arr[t, start_idx_last_piece:start_idx_last_piece+len_pad_to_add, :], axis=0)
-
+            start_idx_last_piece = window_size * (n-1)
+            arr_pad = np.expand_dims(
+                arr[t, start_idx_last_piece:start_idx_last_piece+len_pad_to_add, :], axis=0,
+            )
 
             arr_tmp = np.concatenate((arr_incomplete, arr_pad), axis=1)
 
             # concatenate last piece of original row t
-            arr_new[idx, :, :] = arr_tmp
+            arr_cut[idx, :, :] = arr_tmp
 
             idx = idx + 1
 
-    seq_len = window_size
-    if np.sum(np.isnan(arr_new[:, :, 0])) != 0:
-        raise ValueError(
-            'Cutting into pieces failed, did not fill each position of new matrix.'
-        )
-
-    return arr_new
+    return arr_cut
 
 
 def downsample(
         arr: np.ndarray,
-        downsampling_factor: int,
+        factor: int,
 ):
-    # TODO: add channel axis argument
-    # TODO: add batched dimension
-    # arr data array to downsample with shape (seqlen, channels)
-    
+    """
+    Downsamples array by integer factor.
+
+    Parameters
+    ----------
+    arr: np.ndarray
+        sequence to be downsampled
+    factor: int
+        factor to be downsampled with
+
+    Returns
+    -------
+    np.ndarray
+    """
     sequence_length = arr.shape[0]
-    select = [i % downsampling_factor == 0 for i in range(sequence_length)]
+    select = [i % factor == 0 for i in range(sequence_length)]
 
     return arr[select].copy()

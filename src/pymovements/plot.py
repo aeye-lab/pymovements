@@ -1,64 +1,121 @@
-from typing import Dict, List, Optional, Tuple, Union
+"""
+This module holds all plotting functions.
+"""
+from __future__ import annotations
 
 import matplotlib
-import matplotlib.colors as colors
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.patches import Rectangle
+from matplotlib import colors
 from matplotlib.collections import LineCollection
 
 
+# pylint: disable=consider-using-namedtuple-or-dataclass
 default_segmentdata = {
-    'red':   [[0.0,  0.0, 0.0],
-              [0.5,  1.0, 1.0],
-              [1.0,  1.0, 1.0]],
-    'green': [[0.0,  0.0, 0.0],
-              [0.5,  1.0, 1.0],
-              [1.0,  0.0, 0.0]],
-    'blue':  [[0.0,  0.0, 0.0],
-              [0.5,  0.0, 0.0],
-              [1.0,  0.0, 0.0]],
+    'red':   [
+        [0.0,  0.0, 0.0],
+        [0.5,  1.0, 1.0],
+        [1.0,  1.0, 1.0],
+    ],
+    'green': [
+        [0.0,  0.0, 0.0],
+        [0.5,  1.0, 1.0],
+        [1.0,  0.0, 0.0],
+    ],
+    'blue':  [
+        [0.0,  0.0, 0.0],
+        [0.5,  0.0, 0.0],
+        [1.0,  0.0, 0.0],
+    ],
 }
 
+# pylint: disable=consider-using-namedtuple-or-dataclass
 default_segmentdata_twoslope = {
-    'red':   [[0.0,  0.0, 0.0],
-              [0.5,  0.0, 0.0],
-              [0.75, 1.0, 1.0],
-              [1.0,  1.0, 1.0]],
-    'green': [[0.0,  0.0, 0.0],
-              [0.25, 1.0, 1.0],
-              [0.5,  0.0, 0.0],
-              [0.75, 1.0, 1.0],
-              [1.0,  0.0, 0.0]],
-    'blue':  [[0.0,  1.0, 1.0],
-              [0.25, 1.0, 1.0],
-              [0.5,  0.0, 0.0],
-              [1.0,  0.0, 0.0]],
+    'red':   [
+        [0.0,  0.0, 0.0],
+        [0.5,  0.0, 0.0],
+        [0.75, 1.0, 1.0],
+        [1.0,  1.0, 1.0],
+    ],
+    'green': [
+        [0.0,  0.0, 0.0],
+        [0.25, 1.0, 1.0],
+        [0.5,  0.0, 0.0],
+        [0.75, 1.0, 1.0],
+        [1.0,  0.0, 0.0],
+    ],
+    'blue':  [
+        [0.0,  1.0, 1.0],
+        [0.25, 1.0, 1.0],
+        [0.5,  0.0, 0.0],
+        [1.0,  0.0, 0.0],
+    ],
 }
 
 
 def traceplot(
-    x: np.array,
-    y: np.array,
-    cval: Optional[np.array] = None,
-    cmap: Optional[colors.Colormap] = None,
-    cmap_norm: Optional[colors.Normalize] = None,
-    cmap_segmentdata: Optional[Dict[str, List[List[float]]]] = None,
-    cbar_label: Optional[str] = None,
+    x: np.ndarray,
+    y: np.ndarray,
+    cval: np.ndarray | None = None,
+    cmap: colors.Colormap | None = None,
+    cmap_norm: colors.Normalize | str | None = None,
+    cmap_segmentdata: dict[str, list[list[float]]] | None = None,
+    cbar_label: str | None = None,
     show_cbar: bool = False,
-    padding: Optional[float] = None,
-    pad_factor: float = 0.05,
-    figsize: int = (15, 5),
-    title: Optional[str] = None,
-    savepath: Optional[str] = None,
+    padding: float | None = None,
+    pad_factor: float | None = 0.05,
+    figsize: tuple[int, int] = (15, 5),
+    title: str | None = None,
+    savepath: str | None = None,
     show: bool = True,
 ) -> None:
-    
+    """
+    Plot eye gaze trace from positional data.
+
+    Parameters
+    ----------
+    x: np.ndarray
+        x-coordinates
+    y: np.ndarray
+        y-coordinates
+    cval: np.ndarray
+        line color values.
+    cmap: matplotlib.colors.Colormap, optional
+        color map for line color values
+    cmap_norm: matplotlib.colors.Normalize, str, optional
+        normalization for color values
+    cmap_segmentdata: dict, optional
+        color map segmentation to build color map
+    cbar_label: str, optional
+        string label for color bar
+    show_cbar: bool
+        Shows color bar if True.
+    padding: float, optional
+        Absolute padding value. If None it is inferred from pad_factor and limits.
+    pad_factor: float, optional
+        Relative padding factor to construct padding value if not given.
+    figsize: tuple
+        Figure size.
+    title: str, optional
+        Figure title.
+    savepath: str, optional
+        If given, figure will be saved to this path.
+    show: bool
+        If True, figure will be shown.
+
+    Raises
+    ------
+    ValueError
+        If length of x and y coordinates do not match.
+    """
+
     if len(x) != len(y):
-        raise ValueError('x and y do not share same length '
-                         f'({len(x)} != {len(y)})')
+        raise ValueError(
+            'x and y do not share same length '
+            f'({len(x)} != {len(y)})',
+        )
     n = len(x)
-    
+
     fig = plt.figure(figsize=figsize)
     ax = fig.gca()
 
@@ -69,7 +126,7 @@ def traceplot(
     if cmap_norm is None:
         cval_max = np.nanmax(np.abs(cval))
         cval_min = np.nanmin(cval)
-        
+
         if cval_max and cval_min < 0:
             cmap_norm = 'twoslope'
         elif cval_max:
@@ -103,7 +160,7 @@ def traceplot(
     # This creates the points as a N x 1 x 2 array so that we can stack points
     # together easily to get the segments. The segments array for line collection
     # needs to be (numlines) x (points per line) x 2 (for x and y)
-    points = np.array([x, y]).T.reshape(-1, 1, 2)
+    points = np.array([x, y]).T.reshape((-1, 1, 2))
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
 
     # Create a continuous norm to map from data points to colors
@@ -119,15 +176,15 @@ def traceplot(
     else:
         x_pad = padding
         y_pad = padding
-    
+
     ax.set_xlim(np.nanmin(x) - x_pad, np.nanmax(x) + x_pad)
     ax.set_ylim(np.nanmin(y) - y_pad, np.nanmax(y) + y_pad)
 
     if show_cbar:
-        #sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
-        #sm.set_array(cval)
+        # sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
+        # sm.set_array(cval)
         fig.colorbar(line, label=cbar_label, ax=ax)
-    
+
     ax.set_title(title)
 
     if savepath is not None:
@@ -137,50 +194,79 @@ def traceplot(
         plt.show()
     plt.close(fig)
 
-    
+
 def tsplot(
     arr: np.array,
-    channel_names: Optional[List[str]] = None,
-    channel_axis: int = 0,
-    xlabel: Optional[str] = None,
-    sample_axis: int = 1,
-    events: Optional[np.array] = None,
+    channel_names: list[str] | None = None,
+    xlabel: str | None = None,
+    rotate_ylabels: bool = True,
     share_y: bool = True,
     zero_centered_yaxis: bool = True,
-    line_color: str = 'k',  # TODO: use correct color type
+    line_color: tuple[int, int, int] | str = 'k',
     line_width: int = 1,
-    rotate_ylabels: bool = True,
     show_grid: bool = True,
     show_yticks: bool = True,
-    figsize: int = (15, 5),
-    title: Optional[str] = None,
-    savepath: Optional[str] = None,
+    figsize: tuple[int, int] = (15, 5),
+    title: str | None = None,
+    savepath: str | None = None,
     show: bool = True,
 ) -> None:
-    
+    """
+    Plot time series with each channel getting a separate subplot.
+
+    Parameters
+    ----------
+    arr: np.ndarray
+        array with channeled time series
+    channel_names: list, optional
+        list of channel names
+    xlabel: str, optional
+        set x label
+    rotate_ylabels: bool
+        set to rotate ylabels
+    share_y: bool
+        set if y-axes should share common axis
+    zero_centered_yaxis: bool
+        set if y-axis should be zero centered
+    line_color: tuple, str
+        set line color
+    line_width: int
+        set line width
+    show_grid: bool
+        set to show grid
+    show_yticks: bool
+        set to show yticks
+    figsize: tuple
+        Figure size.
+    title: str, optional
+        Figure title.
+    savepath: str, optional
+        If given, figure will be saved to this path.
+    show: bool
+        If True, figure will be shown.
+
+    Raises
+    ------
+    ValueError
+        If array has more than two dimensions.
+    """
+
     if arr.ndim == 1:
         arr = np.expand_dims(arr, axis=0)
     elif arr.ndim == 2:
         pass
     else:
         raise ValueError(arr.shape)
-        
-    if channel_axis != 0:
-        raise NotImplementedError()
-    if sample_axis != 1:
-        raise NotImplementedError()
-        
+
+    channel_axis = 0
+    sample_axis = 1
+
     n_channels = arr.shape[channel_axis]
     n_samples = arr.shape[sample_axis]
-    
+
     # determine number of subplots and height ratios for events
-    if events is not None:
-        raise NotImplementedError()
-        n_subplots = n_channels + len(events)
-        height_ratios = height_ratios + [1 * n_event_types]
-    else:
-        n_subplots = n_channels
-        height_ratios = [1] * n_channels
+    n_subplots = n_channels
+    height_ratios = [1] * n_channels
 
     fig, axs = plt.subplots(
         nrows=n_subplots,
@@ -197,55 +283,19 @@ def tsplot(
 
     # set ylims to have zero centered y-axis (for all axes)
     if share_y and zero_centered_yaxis:
+        y_pad_factor = 1.1
         ylim_abs = np.nanmax(np.abs(arr))
-        # TODO: factor 1.1 out as padding argument
-        ylims = -ylim_abs * 1.1, ylim_abs * 1.1
+        ylims = -ylim_abs * y_pad_factor, ylim_abs * y_pad_factor
 
     for channel_id in range(n_channels):
         ax = axs[channel_id]
         x_channel = arr[channel_id, :]
-        
-        # set ylims to have zero centered y-axis (for single axis)
-        if not share_y and zerp_centered_yaxis:
-            ylim_abs = np.nanmax(np.abs(x_channel))
-            ylims = -ylim_abs * 1.1, ylim_abs * 1.1
-            
+
         ax.plot(t, x_channel, color=line_color, linewidth=line_width)
-
-        '''
-        n_attr = 1 #len(attributions)
-        attribution_dict = {' ': attributions}
-        for i_attr, (attr_name, attr_vals) in enumerate(attribution_dict.items()):
-            y_seg = (ylims[1] - ylims[0]) / n_attr
-            y_bot = i_attr * y_seg + ylims[0]
-            
-            y_top = y_bot + y_seg
-            y_mid = y_bot + y_seg / 2
-
-            extent = xlims[0], xlims[1], y_bot, y_top
-            
-            attr_val_max = max(abs(attr_vals.min()), abs(attr_vals.max()))
-            colornorm = colors.TwoSlopeNorm(
-                vmin=-attr_val_max,
-                vcenter=0,
-                vmax=attr_val_max,
-            )
-            im = ax.imshow(X=np.expand_dims(attr_vals[:, channel_id], 0),
-                           norm=colornorm,
-                           cmap=plt.cm.coolwarm, interpolation='nearest',
-                           extent=extent, alpha=1, aspect='auto')
-
-            #if feature_importance_names is not None:
-            #    ax.text(-10, y_mid, feature_importance_names[i_fimp],
-            #            ha='right', va='center')
-
-        #fig.colorbar(im, ax=ax, orientation='vertical')
-        '''
 
         ax.set_xlim(xlims)
         ax.set_ylim(ylims)
 
-        # TODO: add setting for minor and major
         ax.grid(show_grid, which='major')
         ax.grid(show_grid, which='minor')
 
@@ -256,91 +306,32 @@ def tsplot(
         )
 
         if show_yticks:
-            #from matplotlib.ticker import AutoMinorLocator
-            #ax.yaxis.set_minor_locator(AutoMinorLocator())
+            # from matplotlib.ticker import AutoMinorLocator
+            # ax.yaxis.set_minor_locator(AutoMinorLocator())
             plt.setp(ax.get_yticklabels(), visible=True)
         else:
             ax.set_yticks([])
             plt.setp(ax.get_yticklabels(), visible=False)
 
-        # TODO: find out why this is needed
-        params = {'mathtext.default': 'regular' }          
+        params = {'mathtext.default': 'regular'}
         plt.rcParams.update(params)
-        
+
         # set channel names as y-axis labels
         if channel_names:
             if rotate_ylabels:
-                ax.set_ylabel(channel_names[channel_id],
-                              rotation='horizontal',
-                              ha='right', va='center')
+                ax.set_ylabel(
+                    channel_names[channel_id],
+                    rotation='horizontal',
+                    ha='right', va='center',
+                )
             else:
                 ax.set_ylabel(channel_names[channel_id])
 
-        # TODO: find out why this is needed
-        if False: # events is not None or channel_id != n_channels - 1:
-            raise NotImplementedError()
-            plt.setp(ax.get_xticklabels(), visible=False)
-
-    if events is not None:
-        raise NotImplementedError()
-        ax = axs[-1]
-        t = list(range(len(inputs)))
-
-        height = 1
-        padding = 0.1
-        
-        for event_id, (event_name, event_data) in enumerate(events.items()):
-            y_top = (n_event_types - event_id) * height
-            y_bot = y_top - height
-            y_mid = y_top - height / 2
-            
-            y_top_padded = y_top - padding
-            y_bot_padded = y_bot + padding
-            height_padded = height - 2 * padding
-
-            event_color = event_colors[event_id]
-            for _, event in event_data.iterrows():
-                event_xy = event.start, y_bot_padded
-                event_length = event.end - event.start
-
-                patch = Rectangle(
-                    xy=event_xy,
-                    width=event_length,
-                    height=height_padded,
-                    color=event_color)
-                ax.add_patch(patch)
-
-            ax.text(-10, y_mid, event_name, ha='right', va='center')
-
-        ax.set_yticks([])
-        ax.xaxis.grid(True, which='major')
-        ax.xaxis.grid(True, which='minor')
-        ax.yaxis.grid(False, which='major')
-        ax.yaxis.grid(False, which='minor')
-
-        ax.set_xlim(xlims)
-        ax.set_ylim(0, n_event_types)
-    
     # print x label on last used (bottom) axis
     ax.set_xlabel(xlabel)
-    
-    if False: #show_cbar: # and (subfig_id + 1 == n_subfigs):
-        fig.subplots_adjust(right=0.8)
-        # put colorbar at desire position
-        cbar_ax = fig.add_axes([0.85, 0.1, 0.025, 0.8])
-        cbar = fig.colorbar(im, cax=cbar_ax)
-        cbar.ax.set_ylabel(cbar_label, rotation=90)
 
-        '''
-        from mpl_toolkits.axes_grid1 import make_axes_locatable
-        #divider = make_axes_locatable(ax)
-        #cax = divider.append_axes('right', size='5%', pad=0.05)
-        cax = None
-        fig.colorbar(im, cax=cax, orientation='vertical')
-        '''
-            
     axs[0].set_title(title)
-    
+
     if savepath is not None:
         fig.savefig(savepath)
 
