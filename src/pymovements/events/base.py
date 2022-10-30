@@ -54,11 +54,25 @@ class Fixation(Event):
         Starting index of event (included).
     offset: int
         Ending index of event (excluded).
+    position: tuple[float]
+        (x, y) position of fixation
     """
     _name = 'fixation'
 
-    def __init__(self, onset: int, offset: int):
+    def __init__(self, onset: int, offset: int, position: tuple[float]):
         super().__init__(name=self._name, onset=onset, offset=offset)
+
+    @property
+    def position(self) -> tuple[float]:
+        """
+        Get position of fixation.
+
+        Returns
+        -------
+            int
+            position as tuple.
+        """
+        return self.position
 
 
 class Saccade(Event):
