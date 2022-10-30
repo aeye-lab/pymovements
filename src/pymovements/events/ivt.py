@@ -4,18 +4,32 @@ from typing import Optional
 import numpy as np
 
 from pymovements.transforms import vnorm
+from pymovements.events import Fixation
 
 
 def ivt(
         x: list[list[float]] | np.ndarray,
         v: Optional[list[list[float]] | np.ndarray],
         t: float
-):
+) -> list[Fixation]:
     """
     Identification of fixations based on velocity-threshold
-    """
-    # TODO: Add documentation
 
+    Parameters
+    ----------
+    x: array-like
+        Continuous 2D position time series.
+    v: array-like
+        Corresponding continuous 2D velocity time series.
+    t: float
+        Velocity threshold.
+
+    Returns
+    -------
+    fixations: array
+        List of fixations
+
+    """
     x = np.array(x)
     v = np.array(v)
 
@@ -23,6 +37,17 @@ def ivt(
     if not t > 0:
         raise ValueError(
             'velocity threshold must be greater than 0'
+        )
+
+    # make sure x and v have shape (n, 2)
+    if x.ndim != 2 and x.shape[1] != 2:
+        raise ValueError(
+            'x needs to have shape (n, 2)'
+        )
+
+    if x.ndim != 2 and x.shape[1] != 2:
+        raise ValueError(
+            'v needs to have shape (n, 2)'
         )
 
     # Check matching shape for x and v
@@ -50,8 +75,12 @@ def ivt(
     groups = np.stack((ind_group_onsets, ind_group_offsets), axis=1)
     fix_groups = groups[[fix_map[group[0]] == 1 for group in groups]]
 
+    fixations = []
+
     for onset, offset in fix_groups:
         fixation_points = x[onset:offset]
         centroid = np.sum(fixation_points, axis=0) / len(fixation_points)
 
-        #TODO: return Events
+        fixations.append(Fixation(onset, offset, centroid))
+
+    return fixations
