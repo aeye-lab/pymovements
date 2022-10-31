@@ -53,7 +53,7 @@ def ivt(
     # Check matching shape for x and v
     if not x.shape == v.shape:
         raise ValueError(
-            "shape x {} doesn't match shape v {}".format(x.shape, v.shape)
+            f"shape x {x.shape} doesn't match shape v {v.shape}"
         )
 
     total_velocity = vnorm(v)
