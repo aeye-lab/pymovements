@@ -35,31 +35,23 @@ def ivt(
 
     # Check if threshold is greater 0
     if not t > 0:
-        raise ValueError(
-            'velocity threshold must be greater than 0'
-        )
+        raise ValueError('velocity threshold must be greater than 0')
 
     # make sure x and v have shape (n, 2)
     if x.ndim != 2 and x.shape[1] != 2:
-        raise ValueError(
-            'x needs to have shape (n, 2)'
-        )
+        raise ValueError('x needs to have shape (n, 2)')
 
     if x.ndim != 2 and x.shape[1] != 2:
-        raise ValueError(
-            'v needs to have shape (n, 2)'
-        )
+        raise ValueError('v needs to have shape (n, 2)')
 
     # Check matching shape for x and v
     if not x.shape == v.shape:
-        raise ValueError(
-            f"shape x {x.shape} doesn't match shape v {v.shape}"
-        )
+        raise ValueError(f"shape x {x.shape} doesn't match shape v {v.shape}")
 
-    total_velocity = vnorm(v)
+    velocity_norm = vnorm(v)
 
     # Map velocities lower than threshold to 1 and greater equals to 0
-    fix_map = np.array(list(map(lambda point: 1 if point < t else 0, total_velocity)))
+    fix_map = np.array(list(map(lambda point: 1 if point < t else 0, velocity_norm)))
 
     # Find onsets for group of velocities
     loc_group_onsets = np.empty(len(x), dtype=bool)
