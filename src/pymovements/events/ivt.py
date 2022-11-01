@@ -13,14 +13,7 @@ def ivt(
         t: float
 ) -> list[Fixation]:
     """
-    Identification of fixations based on velocity-threshold.
-
-    The Velocity-Threshold Identification (I-VT) classifies each sample as a fixation point
-    if velocity is below threshold t. Otherwise, the sample is labeled as a saccade point.
-    Consecutive fixation points are collapsed into fixation groups. The onset and offset
-    of a fixation is the index of the first and last sample in that group in relation
-    to their original position in the complete continuous time series of samples.
-    The coordinates for each fixation are the centroid of all points in a fixation group.
+    Identification of fixations based on velocity-threshold
 
     Parameters
     ----------
@@ -29,8 +22,7 @@ def ivt(
     v: array-like
         Corresponding continuous 2D velocity time series.
     t: float
-        Velocity threshold in velocity-input-unit/second. Samples below this threshold
-        are labeled as fixation points
+        Velocity threshold.
 
     Returns
     -------
