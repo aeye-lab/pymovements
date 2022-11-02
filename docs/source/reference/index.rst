@@ -6,10 +6,11 @@
     :toctree:
     :nosignatures:
     :recursive:
-    :template: modules.rst
+    :template: module.rst
 
     pymovements.base
     pymovements.checks
+    pymovements.events
     pymovements.paths
     pymovements.plot
     pymovements.transforms

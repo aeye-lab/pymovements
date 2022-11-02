@@ -80,6 +80,14 @@ copybutton_line_continuation_character = "\\"
 copybutton_here_doc_delimiter = "EOT"
 
 
+# -- Options for autosummary -------------------------------------------------
+numpydoc_show_class_members = False
+numpydoc_class_members_toctree = False
+autosummary_generate = True
+autosummary_generate_overwrite = True
+autosummary_imported_members = False
+add_module_names = True
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
