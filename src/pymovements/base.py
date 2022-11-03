@@ -7,10 +7,12 @@ from __future__ import annotations
 
 import numpy as np
 
-from . import checks
-from .transforms import pix2deg
+from pymovements import checks
+from pymovements.transforms import pix2deg
+from pymovements.utils import auto_str
 
 
+@auto_str
 class Screen:
     """
     Screen class for holding screen properties and transforming pixel
@@ -40,15 +42,13 @@ class Screen:
 
     """
     def __init__(
-        self, width_px: int, height_px: int, width_cm: float,
-        height_cm: float, distance_cm: float,
+        self, width_px: int, height_px: int, width_cm: float, height_cm: float, distance_cm: float,
     ):
         """
         Initializes Screen.
 
-        Paramters
-        ---------
-
+        Parameters
+        ----------
         width_px : int
             Screen width in pixels
         height_px : int
@@ -60,12 +60,25 @@ class Screen:
         distance_cm : float
             Eye-to-screen distance in centimeters
 
+        Examples
+        --------
+        >>> screen = Screen(
+        ...     width_px=1280,
+        ...     height_px=1024,
+        ...     width_cm=38,
+        ...     height_cm=30,
+        ...     distance_cm=68,
+        ... )
+        >>> print(screen)  # doctest: +NORMALIZE_WHITESPACE
+        Screen(width_px=1280, height_px=1024, width_cm=38, height_cm=30, distance_cm=68,
+         x_max_dva=15.60, y_max_dva=12.43, x_min_dva=-15.60, y_min_dva=-12.43)
+
         """
         checks.check_no_zeros(width_px, "width_px")
-        checks.check_no_zeros(width_px, "height_px")
-        checks.check_no_zeros(width_px, "width_cm")
-        checks.check_no_zeros(width_px, "height_cm")
-        checks.check_no_zeros(width_px, "distamce_cm")
+        checks.check_no_zeros(height_px, "height_px")
+        checks.check_no_zeros(width_cm, "width_cm")
+        checks.check_no_zeros(height_cm, "height_cm")
+        checks.check_no_zeros(distance_cm, "distance_cm")
 
         self.width_px = width_px
         self.height_px = height_px
@@ -104,6 +117,15 @@ class Screen:
         ValueError
             If positions aren't two-dimensional.
 
+        Examples
+        --------
+        >>> screen = Screen(
+        ...     width_px=1280,
+        ...     height_px=1024,
+        ...     width_cm=38,
+        ...     height_cm=30,
+        ...     distance_cm=68,
+        ... )
         """
         return pix2deg(
             arr=arr,
@@ -135,8 +157,8 @@ class Experiment:
         """
         Initializes Experiment.
 
-        Paramters
-        ---------
+        Parameters
+        ----------
 
         width_px : int
             Screen width in pixels
