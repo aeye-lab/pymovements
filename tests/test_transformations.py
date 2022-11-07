@@ -13,6 +13,7 @@ screen_cm_1d = 100
 screen_px_2d = [100, 100]
 screen_cm_2d = [100, 100]
 
+
 @pytest.mark.parametrize(
     'kwargs, expected_error',
     [
@@ -24,7 +25,7 @@ screen_cm_2d = [100, 100]
                 'distance_cm': 1
             },
             TypeError,
-            id='none_coords_raise_type_error'
+            id='none_coords_raises_type_error'
         ),
         pytest.param(
             {
@@ -34,7 +35,7 @@ screen_cm_2d = [100, 100]
                 'distance_cm': 1
             },
             TypeError,
-            id='none_screen_px_raise_type_error'
+            id='none_screen_px_raises_type_error'
         ),
         pytest.param(
             {
@@ -44,7 +45,7 @@ screen_cm_2d = [100, 100]
                 'distance_cm': 1
             },
             TypeError,
-            id='none_screen_cm_raise_type_error'
+            id='none_screen_cm_raises_type_error'
         ),
         pytest.param(
             {
@@ -54,7 +55,7 @@ screen_cm_2d = [100, 100]
                 'distance_cm': None
             },
             TypeError,
-            id='none_distance_cm_raise_type_error'
+            id='none_distance_cm_raises_type_error'
         ),
         pytest.param(
             {
@@ -64,7 +65,7 @@ screen_cm_2d = [100, 100]
                 'distance_cm': 1
             },
             ValueError,
-            id='zero_screen_px_raise_value_error'
+            id='zero_screen_px_raises_value_error'
         ),
         pytest.param(
             {
@@ -74,7 +75,7 @@ screen_cm_2d = [100, 100]
                 'distance_cm': 1
             },
             ValueError,
-            id='zero_screen_cm_raise_value_error'
+            id='zero_screen_cm_raises_value_error'
         ),
         pytest.param(
             {
@@ -84,7 +85,7 @@ screen_cm_2d = [100, 100]
                 'distance_cm': 0
             },
             ValueError,
-            id='zero_distance_cm_raise_value_error'
+            id='zero_distance_cm_raises_value_error'
         ),
         pytest.param(
             {
@@ -106,7 +107,7 @@ screen_cm_2d = [100, 100]
                 'center_origin': False
             },
             ValueError,
-            id='list_coords_2d_screen_px_1d_raise_value_error'
+            id='list_coords_2d_screen_px_1d_raises_value_error'
         ),
         pytest.param(
             {
@@ -117,29 +118,29 @@ screen_cm_2d = [100, 100]
                 'center_origin': False
             },
             ValueError,
-            id='list_coords_2d_screen_cm_1d_raise_value_error'
+            id='list_coords_2d_screen_cm_1d_raises_value_error'
         ),
         pytest.param(
             {
-                'arr': [0]* n_coords,
+                'arr': [0] * n_coords,
                 'screen_px': screen_px_2d,
                 'screen_cm': screen_px_1d,
                 'distance_cm': screen_cm_1d,
                 'center_origin': False
             },
             ValueError,
-            id='list_coords_1d_screen_px_2d_raise_value_error'
+            id='list_coords_1d_screen_px_2d_raises_value_error'
         ),
         pytest.param(
             {
-                'arr': [0]* n_coords,
+                'arr': [0] * n_coords,
                 'screen_px': screen_px_1d,
                 'screen_cm': screen_px_2d,
                 'distance_cm': screen_cm_1d,
                 'center_origin': False
             },
             ValueError,
-            id='list_coords_1d_screen_cm_2d_raise_value_error'
+            id='list_coords_1d_screen_cm_2d_raises_value_error'
         ),
         pytest.param(
             {
@@ -150,11 +151,11 @@ screen_cm_2d = [100, 100]
                 'center_origin': False
             },
             ValueError,
-            id='list_coords_3d_raise_value_error'
+            id='list_coords_3d_raises_value_error'
         )
     ]
 )
-def test_pix2deg_raise_error(kwargs, expected_error):
+def test_pix2deg_raises_error(kwargs, expected_error):
     with pytest.raises(expected_error):
         pix2deg(**kwargs)
 
@@ -171,7 +172,7 @@ def test_pix2deg_raise_error(kwargs, expected_error):
                 'center_origin': False
             },
             0,
-            id='zero_coord_without_center_origin_equals_zero'
+            id='zero_coord_without_center_origin_returns_zero'
         ),
         pytest.param(
             {
@@ -182,7 +183,7 @@ def test_pix2deg_raise_error(kwargs, expected_error):
                 'center_origin': True
             },
             0,
-            id='center_coord_with_center_origin_equals_zero'
+            id='center_coord_with_center_origin_returns_zero'
         ),
         pytest.param(
             {
@@ -193,7 +194,7 @@ def test_pix2deg_raise_error(kwargs, expected_error):
                 'center_origin': False
             },
             45,
-            id='isosceles_triangle_without_center_origin_equals_45'
+            id='isosceles_triangle_without_center_origin_returns_45'
         ),
         pytest.param(
             {
@@ -204,7 +205,7 @@ def test_pix2deg_raise_error(kwargs, expected_error):
                 'center_origin': True
             },
             45,
-            id='isosceles_triangle_with_center_origin_equals_45'
+            id='isosceles_triangle_with_center_origin_returns_45'
         ),
         pytest.param(
             {
@@ -215,7 +216,7 @@ def test_pix2deg_raise_error(kwargs, expected_error):
                 'center_origin': True
             },
             -45,
-            id='isosceles_triangle_left_with_center_origin_equals_minus45'
+            id='isosceles_triangle_left_with_center_origin_returns_minus45'
         ),
         pytest.param(
             {
@@ -226,7 +227,7 @@ def test_pix2deg_raise_error(kwargs, expected_error):
                 'center_origin': False
             },
             45,
-            id='nparray_of_isosceles_triangle_without_center_origin_equals_45'
+            id='nparray_of_isosceles_triangle_without_center_origin_returns_45'
         ),
         pytest.param(
             {
@@ -237,7 +238,7 @@ def test_pix2deg_raise_error(kwargs, expected_error):
                 'center_origin': False
             },
             pytest.approx(26.565, abs=1e-4),
-            id='ankathet_half_without_center_origin_equals_26565'
+            id='ankathet_half_without_center_origin_returns_26565'
         ),
         pytest.param(
             {
@@ -248,7 +249,7 @@ def test_pix2deg_raise_error(kwargs, expected_error):
                 'center_origin': True
             },
             pytest.approx(26.565, abs=1e-4),
-            id='ankathet_half_with_center_origin_equals_26565'
+            id='ankathet_half_with_center_origin_returns_26565'
         ),
         pytest.param(
             {
@@ -259,7 +260,7 @@ def test_pix2deg_raise_error(kwargs, expected_error):
                 'center_origin': False
             },
             pytest.approx(60),
-            id='ankathet_sqrt_3_without_center_origin_equals_60'
+            id='ankathet_sqrt_3_without_center_origin_returns_60'
         ),
         pytest.param(
             {
@@ -270,7 +271,7 @@ def test_pix2deg_raise_error(kwargs, expected_error):
                 'center_origin': True
             },
             pytest.approx(60),
-            id='ankathet_sqrt_3_with_center_origin_equals_60'
+            id='ankathet_sqrt_3_with_center_origin_returns_60'
         ),
         pytest.param(
             {
@@ -281,7 +282,7 @@ def test_pix2deg_raise_error(kwargs, expected_error):
                 'center_origin': False
             },
             pytest.approx(30),
-            id='opposite_sqrt_3_without_center_origin_equals_30'
+            id='opposite_sqrt_3_without_center_origin_returns_30'
         ),
         pytest.param(
             {
@@ -292,7 +293,7 @@ def test_pix2deg_raise_error(kwargs, expected_error):
                 'center_origin': True
             },
             pytest.approx(30),
-            id='opposite_sqrt_3_with_center_origin_equals_30'
+            id='opposite_sqrt_3_with_center_origin_returns_30'
         ),
         pytest.param(
             {
@@ -340,7 +341,7 @@ def test_pix2deg_raise_error(kwargs, expected_error):
         )
     ]
 )
-def test_pix2deg_equals(kwargs, expected_value):
+def test_pix2deg_returns(kwargs, expected_value):
     actual_value = pix2deg(**kwargs)
     assert (actual_value == expected_value).all()
 
@@ -354,7 +355,7 @@ def test_pix2deg_equals(kwargs, expected_value):
                 'sampling_rate': 0
             },
             ValueError,
-            id='sampling_rate_zero_raise_value_error'
+            id='sampling_rate_zero_raises_value_error'
         ),
         pytest.param(
             {
@@ -362,7 +363,7 @@ def test_pix2deg_equals(kwargs, expected_value):
                 'sampling_rate': -1
             },
             ValueError,
-            id='sampling_rate_less_zero_raise_value_error'
+            id='sampling_rate_less_zero_raises_value_error'
         ),
         pytest.param(
             {
@@ -370,7 +371,7 @@ def test_pix2deg_equals(kwargs, expected_value):
                 'method': 'smooth'
             },
             ValueError,
-            id='list_length_below_six_method_smooth_raise_value_error'
+            id='list_length_below_six_method_smooth_raises_value_error'
         ),
         pytest.param(
             {
@@ -378,7 +379,7 @@ def test_pix2deg_equals(kwargs, expected_value):
                 'method': 'neighbors'
             },
             ValueError,
-            id='list_length_below_three_method_neighbors_raise_value_error'
+            id='list_length_below_three_method_neighbors_raises_value_error'
         ),
         pytest.param(
             {
@@ -386,7 +387,7 @@ def test_pix2deg_equals(kwargs, expected_value):
                 'method': 'preceding'
             },
             ValueError,
-            id='list_length_below_two_method_preceding_raise_value_error'
+            id='list_length_below_two_method_preceding_raises_value_error'
         ),
         pytest.param(
             {
@@ -398,7 +399,7 @@ def test_pix2deg_equals(kwargs, expected_value):
         )
     ]
 )
-def test_pos2vel_raise_error(kwargs, expected_error):
+def test_pos2vel_raises_error(kwargs, expected_error):
     with pytest.raises(expected_error):
         pos2vel(**kwargs)
 
