@@ -29,8 +29,8 @@ from pymovements.events import Saccade
         ),
         pytest.param(
             Fixation,
-            {'onset': 10, 'offset': 100},
-            {'name': Fixation._name, 'duration': 90},
+            {'onset': 10, 'offset': 100, 'position': (1, 1)},
+            {'name': Fixation._name, 'duration': 90, 'position': (1, 1)},
             id='fixation',
         ),
         pytest.param(
@@ -51,3 +51,8 @@ def test_event_class(event_class: Event, init_params: dict[str, Any], expected: 
     assert event.duration == expected['duration'], (
         f'event duration does not match expected value ({event.duration} != {expected["duration"]})'
     )
+    if 'position' in expected.keys():
+        assert event.position == expected['position'], (
+            'fixation event position does not match expected value'
+            f'({event.position} != {expected["position"]})'
+        )
