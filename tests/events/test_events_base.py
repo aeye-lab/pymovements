@@ -2,7 +2,6 @@
 This module tests functionality of base event classes.
 """
 from __future__ import annotations
-from typing import Any
 
 import pytest
 
@@ -41,7 +40,7 @@ from pymovements.events import Saccade
         ),
     ]
 )
-def test_event_class(event_class: Event, init_params: dict[str, Any], expected: dict[str, Any]):
+def test_event_class(event_class, init_params, expected):
     """Test if instantiated event attributes fit expected values."""
     event = event_class(**init_params)
 
