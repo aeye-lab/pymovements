@@ -440,37 +440,29 @@ def test_pos2vel_returns(method, kwargs, padding, expected_value):
     assert (actual_value[padding[0]:padding[1]] == expected_value[padding[0]:padding[1]]).all()
 
 
-def test_pos2vel_stepped_input_returns_alternating_velocity_method_preceding():
+@pytest.mark.parametrize(
+    'method, expected_value',
+    [
+        pytest.param(
+            'preceding', np.array([2.0, 0.0] * (100 // 2)),
+            id='method_preceding_alternating_velocity',
+        ),
+        pytest.param(
+            'neighbors', np.ones((100, )),
+            id='method_neighbors_alternating_velocity',
+        ),
+        pytest.param(
+            'smooth', np.ones((100, )),
+            id='method_smooth_alternating_velocity',
+        ),
+    ]
+)
+def test_pos2vel_stepped_input_returns(method, expected_value):
     N = 100
     x = np.linspace(0, N - 2, N // 2)
     x = np.repeat(x, 2)
 
-    actual_value = pos2vel(x, sampling_rate=1, method='preceding')
-    control_value = np.array([2.0, 0.0] * (N // 2))
+    actual_value = pos2vel(x, sampling_rate=1, method=method)
 
     lpad, rpad = 1, -1
-    assert (actual_value[lpad:rpad] == control_value[lpad:rpad]).all()
-
-
-def test_pos2vel_stepped_input_returns_constant_velocity_method_neighbors():
-    N = 100
-    x = np.linspace(0, N - 2, N // 2)
-    x = np.repeat(x, 2)
-
-    actual_value = pos2vel(x, sampling_rate=1, method='neighbors')
-    control_value = np.ones(x.shape)
-
-    lpad, rpad = 1, -1
-    assert (actual_value[lpad:rpad] == control_value[lpad:rpad]).all()
-
-
-def test_pos2vel_stepped_input_returns_constant_velocity_method_smooth():
-    N = 100
-    x = np.linspace(0, N - 2, N // 2)
-    x = np.repeat(x, 2)
-
-    actual_value = pos2vel(x, sampling_rate=1, method='smooth')
-    control_value = np.ones(x.shape)
-
-    lpad, rpad = 1, -1
-    assert (actual_value[lpad:rpad] == control_value[lpad:rpad]).all()
+    assert (actual_value[lpad:rpad] == expected_value[lpad:rpad]).all()
