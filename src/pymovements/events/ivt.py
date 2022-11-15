@@ -33,10 +33,6 @@ def ivt(
     positions = np.array(positions)
     velocities = np.array(velocities)
 
-    # Check if threshold is greater 0
-    if threshold <= 0:
-        raise ValueError('velocity threshold must be greater than 0')
-
     # make sure positions and velocities have shape (n, 2)
     if positions.ndim != 2:
         raise ValueError('positions need to have shape (N, 2)')
@@ -55,7 +51,15 @@ def ivt(
         raise ValueError(f"shape of positions {positions.shape} doesn't match"
                          f"shape of velocities {velocities.shape}")
 
-    velocity_norm = vnorm(velocities)
+    # Check if threshold is None
+    if threshold is None:
+        raise ValueError('velocity threshold is None')
+
+    # Check if threshold is greater 0
+    if threshold <= 0:
+        raise ValueError('velocity threshold must be greater than 0')
+
+    velocity_norm = vnorm(velocities, axis=1)
 
     # Map velocities lower than threshold to True and greater equals to False
     fix_map = velocity_norm < threshold
