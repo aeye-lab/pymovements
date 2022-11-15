@@ -8,20 +8,20 @@ from pymovements.events import Fixation
 
 
 def ivt(
-        x: list[list[float]] | np.ndarray,
-        v: Optional[list[list[float]] | np.ndarray],
-        t: float
+        positions: list[list[float]] | np.ndarray,
+        velocities: Optional[list[list[float]] | np.ndarray],
+        threshold: float
 ) -> list[Fixation]:
     """
     Identification of fixations based on velocity-threshold
 
     Parameters
     ----------
-    x: array-like
+    positions: array-like
         Continuous 2D position time series.
-    v: array-like
+    velocities: array-like
         Corresponding continuous 2D velocity time series.
-    t: float
+    threshold: float
         Velocity threshold.
 
     Returns
@@ -30,37 +30,44 @@ def ivt(
         List of fixations
 
     """
-    x = np.array(x)
-    v = np.array(v)
+    positions = np.array(positions)
+    velocities = np.array(velocities)
 
     # Check if threshold is greater 0
-    if not t > 0:
+    if threshold <= 0:
         raise ValueError('velocity threshold must be greater than 0')
 
-    # make sure x and v have shape (n, 2)
-    if x.ndim != 2 and x.shape[1] != 2:
-        raise ValueError('x needs to have shape (n, 2)')
+    # make sure positions and velocities have shape (n, 2)
+    if positions.ndim != 2:
+        raise ValueError('positions need to have shape (N, 2)')
 
-    if x.ndim != 2 and x.shape[1] != 2:
-        raise ValueError('v needs to have shape (n, 2)')
+    if positions.shape[1] != 2:
+        raise ValueError('positions need to have shape (N, 2)')
 
-    # Check matching shape for x and v
-    if not x.shape == v.shape:
-        raise ValueError(f"shape x {x.shape} doesn't match shape v {v.shape}")
+    if velocities.ndim != 2:
+        raise ValueError('velocities need to have shape (N, 2)')
 
-    velocity_norm = vnorm(v)
+    if velocities.shape[1] != 2:
+        raise ValueError('velocities need to have shape (N, 2)')
 
-    # Map velocities lower than threshold to 1 and greater equals to 0
-    fix_map = np.array(list(map(lambda point: 1 if point < t else 0, velocity_norm)))
+    # Check matching shape for positions and velocities
+    if not positions.shape == velocities.shape:
+        raise ValueError(f"shape of positions {positions.shape} doesn't match"
+                         f"shape of velocities {velocities.shape}")
+
+    velocity_norm = vnorm(velocities)
+
+    # Map velocities lower than threshold to True and greater equals to False
+    fix_map = velocity_norm < threshold
 
     # Find onsets for group of velocities
-    loc_group_onsets = np.empty(len(x), dtype=bool)
+    loc_group_onsets = np.empty(len(positions), dtype=bool)
     loc_group_onsets[0] = True
     np.not_equal(fix_map[:-1], fix_map[1:], out=loc_group_onsets[1:])
     ind_group_onsets = np.nonzero(loc_group_onsets)[0]
 
     # Find offsets for group of velocities
-    group_lengths = np.diff(np.append(ind_group_onsets, len(x)))
+    group_lengths = np.diff(np.append(ind_group_onsets, len(positions)))
     ind_group_offsets = np.add(ind_group_onsets, group_lengths)
 
     # Stack onsets and offsets and filter out fixation groups
@@ -70,8 +77,8 @@ def ivt(
     fixations = []
 
     for onset, offset in fix_groups:
-        fixation_points = x[onset:offset]
-        centroid = np.sum(fixation_points, axis=0) / len(fixation_points)
+        fixation_points = positions[onset:offset]
+        centroid = tuple(np.mean(fixation_points, axis=0))
 
         fixations.append(Fixation(onset, offset, centroid))
 
