@@ -1,6 +1,7 @@
 """
 This module tests functionality of base event classes.
 """
+
 from __future__ import annotations
 
 import pytest
