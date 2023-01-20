@@ -75,8 +75,10 @@ If you can, try to add [unit tests](#testing) early on to verify correctness.
 
 ## Getting Started
 
-This is a general guide to contributing changes to pymovements. Before you start developing, make
-sure to read our [documentation](https://pymovements.readthedocs.io/) first.
+This is a general guide to contributing changes to pymovements.
+
+Before you start developing, make sure to read our [documentation](
+https://pymovements.readthedocs.io/) first.
 
 
 ### Development Installation
