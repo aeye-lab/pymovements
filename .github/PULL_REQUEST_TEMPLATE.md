@@ -4,13 +4,15 @@ Please include a clear and concise description of the change and which issue is 
 Please also include excepted improvements, relevant motivation and context.
 List any dependencies that are required for this change.
 
-Fixes # (issue) (see: [issues](https://github.com/aeye-lab/pymovements/issues))
+Fixes issue #
 
 ## Implemented changes
-- Insert a description of the changes implemented in the pull request.
-  - [ ] Change 1
-  - [ ] Change 2
-  - [ ] Change 3
+
+Insert a description of the changes implemented in the pull request.
+
+- [ ] Change 1
+- [ ] Change 2
+- [ ] Change 3
 
 ## Type of change
 
