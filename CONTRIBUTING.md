@@ -174,7 +174,7 @@ Once you are ready to publish your changes:
 
 - Create a [pull request (PR)](https://github.com/aeye-lab/pymovements/compare).
 - Provide a summary of the changes you are introducing according to the default template.
-- In case you are resolving an issue, don't forget to link it.
+- In case you are resolving an issue, don't forget to add a reference in the description.
 
 The default template is meant as a helper and should guide you through the process of creating a
 pull request. It's also totally fine to submit work in progress, in which case you'll likely be
