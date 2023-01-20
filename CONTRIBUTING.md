@@ -233,8 +233,8 @@ Make sure:
   - that when merging a multi-commit PR the commit message doesn't
     contain the local history from the committer and the review history from
     the PR. Edit the message to only describe the end state of the PR.
-  - that there is a *single- newline between subject and description, 
-  - that there is a *single- newline at the end of the commit message.
+  - that there is a *single* newline between subject and description, 
+  - that there is a *single* newline at the end of the commit message.
     This way there is a single empty line between commits in `git log`
     output.
   - that the maximum subject line length is under 50 characters
