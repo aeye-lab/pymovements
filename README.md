@@ -1,5 +1,5 @@
 # pymovements
-[![PyPI version](https://badge.fury.io/py/pymovements.svg)](hhttps://pypi.python.org/pypi/pymovements/)
+[![PyPI Latest Release](https://img.shields.io/pypi/v/pymovements.svg)](https://pypi.org/project/pymovements/)
 [![PyPI status](https://img.shields.io/pypi/status/pymovements.svg)](https://pypi.python.org/pypi/pymovements/)
 [![Python version](https://img.shields.io/pypi/pyversions/pymovements.svg)](https://pypi.python.org/pypi/pymovements/)
 ![os](https://img.shields.io/badge/os-win%7CmacOS%7Clinux-brightgreen)
