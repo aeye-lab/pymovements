@@ -16,6 +16,6 @@ We welcome any sort of contribution to pymovements!
 
 For a detailed guide, please refer to our [CONTRIBUTING.md](CONTRIBUTING.md) first.
 
-If you have any developer-related questions, please [open an issue](
+If you have any questions, please [open an issue](
 https://github.com/aeye-lab/pymovements/issues/new/choose) or write us at
 [daniel.krakowczyk@uni-potsdam.de](mailto:daniel.krakowczyk@uni-potsdam.de)
