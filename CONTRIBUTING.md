@@ -68,7 +68,7 @@ To start out with developing, [install the dependencies](#development-installati
 [create a branch](#creating-a-branch) for your contribution.
 
 
-Open a [pull request](#pull-requests) when you feel confident to publish your progress. Don't
+Create a [pull request](#pull-requests) when you feel confident to publish your progress. Don't
 hesitate if it's a work in progress, we can give you early feedback on your work.
 If you can, try to add [unit tests](#testing) early on to verify correctness.
 
