@@ -6,13 +6,12 @@ labels: bug
 assignees:
 ---
 
-## Expected Behavior
-
-- Insert a clear and concise description of what the issue or bug is.
 
 ## Current Behavior
+Insert a clear and concise description of what the issue or bug is.
 
-What is the current behavior?
+## Expected Behavior
+What behavior is actually expected?
 
 ## Minimum acceptance criteria
 Specify what is necessary for the issue to be closed.
