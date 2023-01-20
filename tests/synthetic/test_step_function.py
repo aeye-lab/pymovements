@@ -3,7 +3,6 @@ This module tests functionality of the synthetic eye gaze step function.
 """
 
 
-from __future__ import annotations
 from typing import Any
 
 import numpy as np
@@ -47,7 +46,7 @@ from pymovements.synthetic import step_function
         ),
     ]
 )
-def test_step_function(params: dict[str, Any], expected: dict[str, Any]):
+def test_step_function(params, expected):
     """Test step function."""
 
     if 'exception' in expected:
