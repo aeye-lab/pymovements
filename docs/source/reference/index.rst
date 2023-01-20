@@ -13,4 +13,5 @@
     pymovements.events
     pymovements.paths
     pymovements.plot
+    pymovements.synthetic
     pymovements.transforms
