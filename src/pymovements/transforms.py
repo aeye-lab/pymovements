@@ -2,6 +2,7 @@
 Transforms module.
 """
 from __future__ import annotations
+from typing import Any
 
 import numpy as np
 import scipy
@@ -213,7 +214,7 @@ def pos2vel(
     return v
 
 
-def vnorm(arr: np.ndarray, axis: int | None = None) -> np.ndarray:
+def vnorm(arr: np.ndarray, axis: int | None = None) -> np.ndarray | Any:
     """
     Takes the velocity norm sqrt(x^2 + y^2).
 
@@ -242,7 +243,9 @@ def vnorm(arr: np.ndarray, axis: int | None = None) -> np.ndarray:
     return np.linalg.norm(arr, axis=axis)
 
 
-def cut_into_subsequences(arr: np.ndarray, window_size: int, keep_padded: bool = True):
+def cut_into_subsequences(
+    arr: np.ndarray, window_size: int, keep_padded: bool = True,
+) -> np.ndarray:
     """
     Example: if old seq len was 7700, window_size=1000:
     Input arr has: 144 x 7700 x n_channels
