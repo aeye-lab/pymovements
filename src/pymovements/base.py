@@ -1,12 +1,9 @@
 """
 This module holds the base classes Screen and Experiment.
 """
-
-
 from __future__ import annotations
 
 import numpy as np
-
 from pymovements import checks
 from pymovements.transforms import pix2deg
 from pymovements.utils import auto_str

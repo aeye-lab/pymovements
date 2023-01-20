@@ -7,4 +7,3 @@ These How-Tos provide detailed information on the usage of specific parts of pym
 
 .. toctree::
     :maxdepth: 1
-

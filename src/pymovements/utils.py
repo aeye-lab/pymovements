@@ -1,8 +1,6 @@
 """
 This module holds utils for developers and is not part of the user API.
 """
-
-
 from typing import Any
 
 

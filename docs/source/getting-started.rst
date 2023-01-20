@@ -22,4 +22,3 @@ alternatively cloned and installed with
 
 Basic Usage
 -----------
-
