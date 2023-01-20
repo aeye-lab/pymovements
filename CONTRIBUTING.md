@@ -1,11 +1,12 @@
 # Contributing to pymovements
-Thank you for taking your time to contribute to pymovements! We encourage you to report any bugs or contribute
-to new features, optimisations or documentation.
+Thank you for taking your time to contribute to pymovements!
+
+We encourage you to report any bugs or contribute to new features, optimisations or documentation.
 
 Here we give you an overview of the workflow and best practices for contributing
 to pymovements.
 
-*Questions:* If you have any developer-related questions, please [open an issue](
+**Questions:** If you have any developer-related questions, please [open an issue](
 https://github.com/aeye-lab/pymovements/issues/new/choose) or write us at
 [daniel.krakowczyk@uni-potsdam.de](mailto:daniel.krakowczyk@uni-potsdam.de).
 
