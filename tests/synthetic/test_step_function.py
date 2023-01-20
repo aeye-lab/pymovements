@@ -3,8 +3,6 @@ This module tests functionality of the synthetic eye gaze step function.
 """
 
 
-from typing import Any
-
 import numpy as np
 import pytest
 
