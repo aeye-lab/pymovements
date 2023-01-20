@@ -8,7 +8,7 @@ on:
 jobs:
   test:
     name: test ${{matrix.tox_env}}
-    runs-on: ${{matrix.os}}
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
