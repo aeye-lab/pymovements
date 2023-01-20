@@ -18,4 +18,4 @@ https://github.com/aeye-lab/pymovements/blob/main/CONTRIBUTING.md) documentation
 
 If you have any developer-related questions, please [open an issue](
 https://github.com/aeye-lab/pymovements/issues/new/choose) or write us at
-[daniel.krakowczyk@uni-potsdam.de](mailto:daniel.krakowczyk@uni-potsdam.de).scanner
+[daniel.krakowczyk@uni-potsdam.de](mailto:daniel.krakowczyk@uni-potsdam.de)
