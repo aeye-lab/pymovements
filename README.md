@@ -1,6 +1,6 @@
 # pymovements
 [![PyPI version](https://badge.fury.io/py/pymovements.svg)](https://badge.fury.io/py/pymovements)
-![Python version](https://img.shields.io/badge/python-3.7%20%7C%203.8%20%7C%203.9-blue.svg)
+![Python version](https://img.shields.io/badge/python-3.7%20%7C%203.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue.svg)
 [![GitHub license](https://badgen.net/github/license/aeye-lab/pymovements)](https://github.com/aeye-lab/pymovements/blob/master/LICENSE)
 [![Documentation Status](https://readthedocs.org/projects/pymovements/badge/?version=latest)](https://pymovements.readthedocs.io/en/latest/?badge=latest)
 ![GitHub issues](https://img.shields.io/github/issues/aeye-lab/pymovements)
