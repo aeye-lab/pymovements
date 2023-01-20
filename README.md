@@ -1,4 +1,4 @@
-# PyMovements
+# pymovements
 [![PyPI version](https://badge.fury.io/py/pymovements.svg)](https://badge.fury.io/py/pymovements)
 ![Python version](https://img.shields.io/badge/python-3.7%20%7C%203.8%20%7C%203.9-blue.svg)
 [![GitHub license](https://badgen.net/github/license/aeye-lab/pymovements)](https://github.com/aeye-lab/pymovements/blob/master/LICENSE)
