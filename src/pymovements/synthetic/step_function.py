@@ -38,6 +38,16 @@ def step_function(
     ValueError
         If steps not sorted in ascending order or length of steps not equal to length of values.
 
+
+    Examples
+    --------
+        >>> step_functions(
+        ...     length=10,
+        ...     steps=[2, 5, 9],
+        ...     values=[1, 2, 3]
+        ...     start_value=0,
+        ... )
+        array([0., 0., 1., 1., 1., 2., 2., 2., 2., 3.])
     """
     if len(steps) != len(values):
         raise ValueError('length of steps not equal to length of values'
