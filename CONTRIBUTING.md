@@ -172,7 +172,7 @@ tox -e docs -- -aE
 
 Once you are ready to publish your changes:
 
-- Create a [pull request (PR)](https://github.com/aeye-lab/pymovements/compare)
+- Create a [pull request (PR)](https://github.com/aeye-lab/pymovements/compare).
 - Provide a summary of the changes you are introducing according to the [template](
 https://github.com/aeye-lab/pymovements/blob/main/.github/PULL_REQUEST_TEMPLATE.md).
 - In case you are resolving an issue, don't forget to link it.
