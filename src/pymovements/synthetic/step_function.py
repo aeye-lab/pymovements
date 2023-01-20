@@ -41,10 +41,10 @@ def step_function(
 
     Examples
     --------
-        >>> step_functions(
+        >>> step_function(
         ...     length=10,
         ...     steps=[2, 5, 9],
-        ...     values=[1, 2, 3]
+        ...     values=[1, 2, 3],
         ...     start_value=0,
         ... )
         array([0., 0., 1., 1., 1., 2., 2., 2., 2., 3.])
