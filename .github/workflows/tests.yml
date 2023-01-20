@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    name: test ${{matrix.tox_env}} ${{ matrix.os }}
+    name: test ${{ matrix.tox_env }} (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -54,11 +54,15 @@ jobs:
 
 
   check:
-    name: check ${{ matrix.tox_env }}
-    runs-on: ubuntu-latest
+    name: check ${{ matrix.tox_env }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
         tox_env:
           - flake8
           - pylint
@@ -78,10 +82,15 @@ jobs:
         run: tox --skip-pkg-install -e ${{ matrix.tox_env }}
 
   docs:
-    name: docs
-    runs-on: ubuntu-latest
+    name: docs (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
+      matrix:
+        os:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
     steps:
       - uses: actions/checkout@v2
         with:
