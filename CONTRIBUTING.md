@@ -12,6 +12,18 @@ https://github.com/aeye-lab/pymovements/issues/new/choose) or write us at
 
 ## Table of Contents
 - [Reporting Bugs](#reporting-bugs)
+- [First-time Contributors](#first-time-contributors)
+- [Getting Started](#getting-started)
+  - [Development Installation](#development-installation)
+  - [Creating a Branch](#creating-a-branch)
+  - [Code Style](#code-style)
+  - [Testing](#testing)
+  - [Documentation](#documentation)
+  - [Pull Requests](#pull-requests)
+  - [Continuous Integration](#continuous-integration)
+- [Core Developer Guidelines](#core-developer-guidelines)
+- [License](#license)
+- [Questions](#questions)
 
 
 ## Code of Conduct
@@ -36,7 +48,7 @@ would be very helpful to us.
 Once a bug is reported, our development team will try to address the issue as quickly as possible.
 
 
-## First time contributors
+## First-time Contributors
 
 If you're looking for things to help with, try browsing our [issue tracker](
 https://github.com/aeye-lab/pymovements/issues) first.
@@ -189,7 +201,7 @@ Linting, tests and the documentation are all additionally checked using a Github
 workflow which executes the appropriate tox environments.
 
 
-## Core developer guidelines
+## Core Developer Guidelines
 
 Core developers should follow these rules when processing pull requests:
 
