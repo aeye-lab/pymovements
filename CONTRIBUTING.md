@@ -242,8 +242,8 @@ Make sure:
   - to capitalize the subject and each paragraph.
   - that the subject of the commit message has no trailing dot.
   - to use the imperative mood in the subject line (e.g. "Fix typo in README").
-  - if the PR fixes an issue, something like "Fixes #xxx." occurs in the body of the message (not in
-the subject).
+  - if the PR fixes an issue, that something like "Fixes #xxx." occurs in the body of the message
+(not in the subject).
   - to use Markdown for formatting.
 
 
