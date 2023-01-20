@@ -38,7 +38,9 @@ articulated in the [Python Community Code of Conduct](https://www.python.org/psf
 
 If you discover a bug, as a first step please check the existing
 [Issues](https://github.com/aeye-lab/pymovements/issues) to see if this bug has already been
-reported. In case the bug has not been reported yet, please do the following:
+reported.
+
+In case the bug has not been reported yet, please do the following:
 
 - [Open an issue](https://github.com/aeye-lab/pymovements/issues/new?labels=bug&template=ISSUE.md).
 - Add a descriptive title to the issue and write a short summary of the problem.
@@ -52,9 +54,7 @@ Once a bug is reported, our development team will try to address the issue as qu
 ## First-time Contributors
 
 If you're looking for things to help with, try browsing our [issue tracker](
-https://github.com/aeye-lab/pymovements/issues) first.
-
-In particular, look for:
+https://github.com/aeye-lab/pymovements/issues) first. In particular, look for:
 
 - [good first issues](https://github.com/aeye-lab/pymovements/labels/good-first-issue)
 - [documentation issues](https://github.com/aeye-lab/pymovements/labels/documentation)
