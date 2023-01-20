@@ -13,8 +13,7 @@ This is a python package for extracting oculomotoric event information from eye 
 ## Contributing
 
 We welcome any sort of contribution to pymovements!
-For a detailed contribution guide, please refer to our [Contributing](
-https://github.com/aeye-lab/pymovements/blob/main/CONTRIBUTING.md) documentation first.
+For a detailed contribution guide, please refer to our [Contributing](CONTRIBUTING.md) documentation first.
 
 If you have any developer-related questions, please [open an issue](
 https://github.com/aeye-lab/pymovements/issues/new/choose) or write us at
