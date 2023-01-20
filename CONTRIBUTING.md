@@ -173,15 +173,12 @@ tox -e docs -- -aE
 Once you are ready to publish your changes:
 
 - Create a [pull request (PR)](https://github.com/aeye-lab/pymovements/compare).
-- Provide a summary of the changes you are introducing according to the [template](
-https://github.com/aeye-lab/pymovements/blob/main/.github/PULL_REQUEST_TEMPLATE.md).
+- Provide a summary of the changes you are introducing according to the default template.
 - In case you are resolving an issue, don't forget to link it.
 
-The [pull request template](
-https://github.com/aeye-lab/pymovements/blob/main/.github/PULL_REQUEST_TEMPLATE.md) is meant as a
-helper and should guide you through the process of creating a pull request. 
-It's also OK to submit work in progress, in which case you'll likely be asked to make some further
-changes.
+The default template is meant as a helper and should guide you through the process of creating a
+pull request. It's also totally fine to submit work in progress, in which case you'll likely be
+asked to make some further changes.
 
 If your change will be a significant amount of work to write, we highly recommend starting by
 opening an issue laying out what you want to do. That lets a conversation happen early in case other
