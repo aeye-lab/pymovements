@@ -2,6 +2,7 @@
 Transforms module.
 """
 from __future__ import annotations
+
 from typing import Any
 
 import numpy as np
@@ -214,9 +215,9 @@ def pos2vel(
     return v
 
 
-def vnorm(arr: np.ndarray, axis: int | None = None) -> np.ndarray | Any:
+def norm(arr: np.ndarray, axis: int | None = None) -> np.ndarray | Any:
     """
-    Takes the velocity norm sqrt(x^2 + y^2).
+    Takes the norm sqrt(x^2 + y^2).
 
     Parameters
     ----------
