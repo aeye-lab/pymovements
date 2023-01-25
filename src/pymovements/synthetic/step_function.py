@@ -9,8 +9,8 @@ import numpy as np
 def step_function(
     length: int,
     steps: list[int],
-    values: list[float],
-    start_value: float = 0,
+    values: list[float | tuple[float, ...]],
+    start_value: float | tuple[float, ...] = 0,
 ) -> np.ndarray:
     """
     Create a synthetic eye gaze by using a simple step function.
@@ -54,9 +54,29 @@ def step_function(
         )
 
     if sorted(steps) != steps:
-        raise ValueError('steps need to be sorted in ascending order.')
+        raise ValueError('steps must be sorted in ascending order.')
 
-    arr = np.ones(length) * start_value
+    if isinstance(values[0], (int, float)):
+        n_channels = 1
+    else:
+        n_channels = len(values[0])
+
+    if n_channels > 1 and any(len(value) != n_channels for value in values):
+        raise ValueError('all values must have equal number of channels.')
+
+    if n_channels > 1:
+        if isinstance(start_value, (int, float)):
+            start_value = tuple(start_value for _ in range(n_channels))
+
+        elif len(start_value) != n_channels:
+            raise ValueError(
+                'start_value must be scalar or must have same number of channels as values.'
+            )
+
+    if n_channels == 1:
+        arr = np.ones(length) * start_value
+    else:
+        arr = np.tile(start_value, (length, 1))
 
     # Iterate through all steps except the last.
     for begin, end, value in zip(steps[:-1], steps[1:], values[:-1]):
