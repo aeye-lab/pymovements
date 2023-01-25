@@ -44,7 +44,7 @@ class PublicDataset(Dataset):
         for resource in self.resources:
             for mirror in self.mirrors:
 
-                url = f'{mirror}/{resource["path"]}'
+                url = f'{mirror}{resource["path"]}'
 
                 try:
                     print(f"Downloading {url}")
