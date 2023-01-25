@@ -1,8 +1,6 @@
 """
 This module tests functionality of the synthetic eye gaze step function.
 """
-
-
 import numpy as np
 import pytest
 
@@ -42,7 +40,7 @@ from pymovements.synthetic import step_function
             {'exception': ValueError},
             id='steps_not_sorted_raises_value_error',
         ),
-    ]
+    ],
 )
 def test_step_function(params, expected):
     """Test step function."""

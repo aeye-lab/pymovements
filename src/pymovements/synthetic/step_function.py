@@ -1,8 +1,6 @@
 """
 This module holds the synthetic eye gaze step function.
 """
-
-
 from __future__ import annotations
 
 import numpy as np
@@ -50,8 +48,10 @@ def step_function(
         array([0., 0., 1., 1., 1., 2., 2., 2., 2., 3.])
     """
     if len(steps) != len(values):
-        raise ValueError('length of steps not equal to length of values'
-                         f' ({len(steps)} != {len(values)})')
+        raise ValueError(
+            'length of steps not equal to length of values'
+            f' ({len(steps)} != {len(values)})',
+        )
 
     if sorted(steps) != steps:
         raise ValueError('steps need to be sorted in ascending order.')
