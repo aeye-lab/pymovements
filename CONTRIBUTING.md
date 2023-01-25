@@ -12,6 +12,7 @@ https://github.com/aeye-lab/pymovements/issues/new/choose) or write us at
 
 
 ## Table of Contents
+- [Code of Conduct](#code-of-conduct)
 - [Reporting Bugs](#reporting-bugs)
 - [First-time Contributors](#first-time-contributors)
 - [Getting Started](#getting-started)
@@ -187,9 +188,7 @@ contributors disagree with what you'd like to do or have ideas that will help yo
 The best pull requests are focused, clearly describe what they're for and why they're correct, and
 contain tests for whatever changes they make to the code's behavior. As a bonus these are easiest
 for someone to review, which helps your pull request get merged quickly. Standard advice about good
-pull requests for open-source projects applies. We have our own [template](
-https://github.com/aeye-lab/pymovements/blob/main/.github/PULL_REQUEST_TEMPLATE.md) to guide you
-through the process.
+pull requests for open-source projects applies.
 
 Do not squash your commits after you have submitted a pull request, as this
 erases context during review. We will squash commits when the pull request is ready to be merged.
@@ -197,8 +196,9 @@ erases context during review. We will squash commits when the pull request is re
 
 ### Continuous Integration
 
-Linting, tests and the documentation are all additionally checked using a Github Actions
-workflow which executes the appropriate tox environments.
+Tests, code style and documentation are all additionally checked using a GitHub Actions
+workflow which executes the appropriate tox environments. Merging of Pull requests will not be
+possible until all checks pass.
 
 
 ## Core Developer Guidelines
@@ -212,7 +212,7 @@ Core developers should follow these rules when processing pull requests:
 clean `git log` output):
 
 ```
-Category: Short subject describing changes (50 characters or less)
+Category: Short subject describing changes (#PR-id) (50 characters or less)
 
 - detailed description, wrapped at 72 characters
 - bullet points or sentences are okay
@@ -232,7 +232,6 @@ Make sure:
     contain the local history from the committer and the review history from
     the PR. Edit the message to only describe the end state of the PR.
   - that there is a *single* newline between subject and description, 
-  - that there is a *single* newline at the end of the commit message.
     This way there is a single empty line between commits in `git log`
     output.
   - that the maximum subject line length is under 50 characters
