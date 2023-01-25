@@ -2,9 +2,14 @@ from __future__ import annotations
 from pathlib import Path
 from urllib.error import URLError
 from typing import Any
+from typing import Callable
+from typing import IO
+from typing import Iterator
 import hashlib
 import sys
 import urllib.request
+
+from tqdm.auto import tqdm
 
 
 USER_AGENT: str = 'aeye-lab/pymovements'
@@ -74,6 +79,8 @@ class PublicDataset(Dataset):
         return self.dirpath / "raw"
 
 
+# TODO: move all these static methods to a utils module
+
 def download_and_extract_archive(
     url: str,
     download_root: Path,
@@ -117,7 +124,7 @@ def download_url(
 
     Returns
     -------
-    filepath : pathlib.Path
+    pathlib.Path :
         Filepath to downloaded file.
 
     """
@@ -141,12 +148,14 @@ def download_url(
     # download the file
     try:
         print(f"Downloading {url} to {filepath}")
-        _urlretrieve(url, filepath)
+        retrieve_url(url, filepath)
+
     except (urllib.error.URLError, OSError) as e:  # type: ignore[attr-defined]
         if url[:5] == "https":
             url = url.replace("https:", "http:")
-            print("Failed download. Trying https -> http instead. Downloading " + url + " to " + filepath)
-            _urlretrieve(url, filepath)
+            print("Download failed. Trying https -> http instead.")
+            print(f"Downloading {url} to {filepath}")
+            retrieve_url(url, filepath)
         else:
             raise e
 
@@ -169,7 +178,7 @@ def check_integrity(
 
 
 def check_md5(
-    filepath: str,
+    filepath: Path,
     md5: str,
     **kwargs: Any,
 ) -> bool:
@@ -177,7 +186,7 @@ def check_md5(
 
 
 def calculate_md5(
-    filepath: str,
+    filepath: Path,
     chunk_size: int = 1024 * 1024,
 ) -> str:
     # Setting the `usedforsecurity` flag does not change anything about the functionality, but
@@ -195,7 +204,10 @@ def calculate_md5(
     return md5.hexdigest()
 
 
-def get_redirect_url(url: str, max_hops: int = 3) -> str:
+def get_redirect_url(
+    url: str,
+    max_hops: int = 3,
+) -> str:
     initial_url = url
     headers = {"Method": "HEAD", "User-Agent": USER_AGENT}
 
@@ -203,8 +215,8 @@ def get_redirect_url(url: str, max_hops: int = 3) -> str:
         with urllib.request.urlopen(urllib.request.Request(url, headers=headers)) as response:
             if response.url == url or response.url is None:
                 return url
-
             url = response.url
+
     else:
         raise RecursionError(
             f"Request to {initial_url} exceeded {max_hops} redirects."
@@ -212,24 +224,222 @@ def get_redirect_url(url: str, max_hops: int = 3) -> str:
         )
 
 
-def _urlretrieve(url: str, filename: str, chunk_size: int = 1024 * 32) -> None:
-    with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": USER_AGENT})) as response:
-        _save_response_content(iter(lambda: response.read(chunk_size), b""), filename, length=response.length)
-
-
-from tqdm import tqdm
-from typing import Optional, Iterator
-
-def _save_response_content(
-    content: Iterator[bytes],
-    destination: str,
-    length: Optional[int] = None,
+def retrieve_url(
+    url: str,
+    filename: Path,
+    chunk_size: int = 1024 * 32,
 ) -> None:
-    with open(destination, "wb") as fh, tqdm(total=length) as pbar:
+    header = {"User-Agent": USER_AGENT}
+    with urllib.request.urlopen(urllib.request.Request(url, headers=header)) as response:
+        save_response_content(
+            content=iter(lambda: response.read(chunk_size), b""),
+            destination=filename,
+            length=response.length,
+        )
+
+
+def save_response_content(
+    content: Iterator[bytes],
+    destination: Path,
+    length: int | None = None,
+) -> None:
+    with open(destination, "wb") as filehandler, tqdm(total=length) as pbar:
         for chunk in content:
-            # filter out keep-alive new chunks
+            # filter out keep-alive chunks
             if not chunk:
                 continue
 
-            fh.write(chunk)
+            filehandler.write(chunk)
             pbar.update(len(chunk))
+
+
+def extract_archive(
+    source_path: Path,
+    destination_path: Path | None = None,
+    remove_after_extract: bool = False,
+) -> Path:
+    """Extract an archive.
+    The archive type and a possible compression is automatically detected from the file name.
+    If the file is compressed but not an archive the call is dispatched to :func:`_decompress`.
+
+    Parameters
+    ----------
+    source_path : str
+        Path to the file to be extracted.
+    destination_path : str
+        Path to the directory the file will be extracted to. If omitted, the directory of the file
+         is used.
+    remove_after_extract : bool
+        If ``True``, remove the file after the extraction.
+
+    Returns
+    -------
+    str :
+        Path to the directory the file was extracted to.
+    """
+    if destination_path is None:
+        destination_path = source_path.parent
+
+    suffix, archive_type, compression = _detect_file_type(source_path)
+    if not archive_type:
+        return _decompress(
+            source_path=source_path,
+            destination_path=os.path.join(to_path, os.path.basename(from_path).replace(suffix, "")),
+            remove_after_extract=remove_after_extract,
+        )
+
+    # We don't need to check for a missing key here, since this was already done in_detect_file_type()
+    extractor = _ARCHIVE_EXTRACTORS[archive_type]
+
+    extractor(source_path, destination_path, compression)
+    if remove_after_extract:
+        source_path.unlink()
+
+    return destination_path
+
+
+def _detect_file_type(filepath: Path) -> tuple[str, str | None, str | None]:
+    """Detect the archive type and/or compression of a file.
+
+    Parameters
+    ----------
+    filepath : Path
+        The path of the file.
+
+    Returns
+    -------
+    tuple :
+        tuple of suffix, archive type, and compression
+
+    Raises
+    ------
+        RuntimeError: if file has no suffix or suffix is not supported
+    """
+    suffixes = filepath.suffixes
+
+    if not suffixes:
+        raise RuntimeError(
+            f"File '{filepath}' has no suffixes that could be used to detect the archive type and"
+            " compression."
+        )
+    suffix = suffixes[-1]
+
+    # check if the suffix is a known alias
+    if suffix in _ARCHIVE_TYPE_ALIASES:
+        return (suffix, *_ARCHIVE_TYPE_ALIASES[suffix])
+
+    # check if the suffix is an archive type
+    if suffix in _ARCHIVE_EXTRACTORS:
+        return suffix, suffix, None
+
+    # check if the suffix is a compression
+    if suffix in _COMPRESSED_FILE_OPENERS:
+        # check for suffix hierarchy
+        if len(suffixes) > 1:
+            suffix2 = suffixes[-2]
+
+            # check if the suffix2 is an archive type
+            if suffix2 in _ARCHIVE_EXTRACTORS:
+                return suffix2 + suffix, suffix2, suffix
+
+        return suffix, None, suffix
+
+    valid_suffixes = sorted(set(_ARCHIVE_TYPE_ALIASES) | set(_ARCHIVE_EXTRACTORS) | set(_COMPRESSED_FILE_OPENERS))
+    raise RuntimeError(f"Unknown compression or archive type: '{suffix}'.\nKnown suffixes are: '{valid_suffixes}'.")
+
+
+import tarfile
+import bz2
+import gzip
+import lzma
+import zipfile
+
+
+def _extract_tar(
+    source_path: Path,
+    destination_path: Path,
+    compression: str | None,
+) -> None:
+    with tarfile.open(source_path, f"r:{compression[1:]}" if compression else "r") as tar_archive:
+        tar_archive.extractall(destination_path)
+
+
+_ZIP_COMPRESSION_MAP: dict[str, int] = {
+    ".bz2": zipfile.ZIP_BZIP2,
+    ".xz": zipfile.ZIP_LZMA,
+}
+
+
+def _extract_zip(
+    source_path: Path,
+    destination_path: Path,
+    compression: str | None,
+) -> None:
+    with zipfile.ZipFile(
+        source_path, "r",
+        compression=_ZIP_COMPRESSION_MAP[compression] if compression else zipfile.ZIP_STORED
+    ) as zip_archive:
+        zip_archive.extractall(destination_path)
+
+
+_ARCHIVE_EXTRACTORS: dict[str, Callable[[Path, Path, str | None], None]] = {
+    ".tar": _extract_tar,
+    ".zip": _extract_zip,
+}
+
+_ARCHIVE_TYPE_ALIASES: dict[str, tuple[str, str]] = {
+    ".tbz": (".tar", ".bz2"),
+    ".tbz2": (".tar", ".bz2"),
+    ".tgz": (".tar", ".gz"),
+}
+
+_COMPRESSED_FILE_OPENERS: dict[str, Callable[..., IO]] = {
+    ".bz2": bz2.open,
+    ".gz": gzip.open,
+    ".xz": lzma.open,
+}
+
+
+def _decompress(
+    source_path: Path,
+    destination_path: Path | None = None,
+    remove_after_extract: bool = False,
+) -> Path:
+    r"""Decompress a file.
+
+    The compression is automatically detected from the file name.
+
+    Parameters
+    ----------
+    source_path : str
+        Path to the file to be decompressed.
+    destination_path : str
+        Path to the decompressed file. If omitted, ``source_path`` without compression extension is
+        used.
+    remove_after_extract : bool
+        If ``True``, remove the file after the extraction.
+
+    Returns
+    -------
+    str : Path to the decompressed file.
+    """
+    suffix, archive_type, compression = _detect_file_type(source_path)
+    if not compression:
+        raise RuntimeError(f"Couldn't detect a compression from suffix {suffix}.")
+
+    if destination_path is None:
+        # TODO: this will actually rename the file
+        # dont remove the assert before fixing this!!!!
+        assert False
+        destination_path = source_path.replace(suffix, archive_type if archive_type is not None else "")
+
+    # We don't need to check for a missing key here, since this was already done in _detect_file_type()
+    compressed_file_opener = _COMPRESSED_FILE_OPENERS[compression]
+
+    with compressed_file_opener(from_path, "rb") as rfh, open(to_path, "wb") as wfh:
+        wfh.write(rfh.read())
+
+    if remove_after_extract:
+        source_path.unlink()
+
+    return destination_path
