@@ -8,7 +8,7 @@ def test_no_mirrors_download_exception():
         mirrors = []
 
     with pytest.raises(ValueError):
-        dataset = NoMirrorsPublicDataset(
+        NoMirrorsPublicDataset(
             root='data/',
             download=True,
         )
@@ -20,7 +20,7 @@ def test_no_resources_download_exception():
         resources = []
 
     with pytest.raises(ValueError):
-        dataset = NoResourcesPublicDataset(
+        NoResourcesPublicDataset(
             root='data/',
             download=True,
         )
