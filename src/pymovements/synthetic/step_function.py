@@ -3,6 +3,8 @@ This module holds the synthetic eye gaze step function.
 """
 from __future__ import annotations
 
+from collections.abc import Sized
+
 import numpy as np
 
 
@@ -65,8 +67,9 @@ def step_function(
         n_channels = len(values[0])
 
     # Check that all values have equal number of channels.
-    if n_channels > 1 and any(len(value) != n_channels for value in values):
-        raise ValueError('all values must have equal number of channels.')
+    if n_channels > 1:
+        if any(not isinstance(value, Sized) or len(value) != n_channels for value in values):
+            raise ValueError('all values must have equal number of channels.')
 
     # Make sure start value corresponds to number of channels.
     if n_channels > 1:
@@ -78,7 +81,7 @@ def step_function(
         # Raise error if length of start value doesn't match n_channels.
         elif len(start_value) != n_channels:
             raise ValueError(
-                'start_value must be scalar or must have same number of channels as values.'
+                'start_value must be scalar or must have same number of channels as values.',
             )
 
     # Initialize output array with start value.

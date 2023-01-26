@@ -3,7 +3,6 @@ This module tests functionality of the synthetic eye gaze step function.
 """
 import numpy as np
 import pytest
-
 from pymovements.synthetic import step_function
 
 
@@ -42,10 +41,12 @@ from pymovements.synthetic import step_function
         ),
         pytest.param(
             {'length': 10, 'steps': [5], 'values': [(1, 2, 3, 4)], 'start_value': (11, 12, 13, 14)},
-            {'value': np.concatenate([
-                np.tile((11, 12, 13, 14), (5, 1)),
-                np.tile((1, 2, 3, 4), (5, 1)),
-            ])},
+            {
+                'value': np.concatenate([
+                    np.tile((11, 12, 13, 14), (5, 1)),
+                    np.tile((1, 2, 3, 4), (5, 1)),
+                ]),
+            },
             id='length_10_4_channel_single_step_with_start_value',
         ),
         pytest.param(
