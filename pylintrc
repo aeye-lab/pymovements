@@ -100,7 +100,7 @@ disable=
     too-many-arguments,
     too-many-locals,
     redefined-variable-type,
-    consider-using-namedtuple-or-dataclass
+    consider-using-namedtuple-or-dataclass,
 
 [REPORTS]
 

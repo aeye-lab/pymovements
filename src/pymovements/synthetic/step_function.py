@@ -67,9 +67,11 @@ def step_function(
         n_channels = len(values[0])
 
     # Check that all values have equal number of channels.
-    if n_channels > 1:
-        if any(not isinstance(value, Sized) or len(value) != n_channels for value in values):
+    if n_channels == 1:
+        if any(not isinstance(value, (int, float)) for value in values):
             raise ValueError('all values must have equal number of channels.')
+    elif any(not isinstance(value, Sized) or len(value) != n_channels for value in values):
+        raise ValueError('all values must have equal number of channels.')
 
     # Make sure start value corresponds to number of channels.
     if n_channels > 1:
