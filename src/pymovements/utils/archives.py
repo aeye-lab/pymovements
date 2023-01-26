@@ -163,7 +163,7 @@ def _detect_file_type(filepath: Path) -> tuple[str, str | None, str | None]:
 
     # Check if suffix is a known alias.
     if suffix in _ARCHIVE_TYPE_ALIASES:
-        return suffix, *_ARCHIVE_TYPE_ALIASES[suffix]
+        return (suffix, *_ARCHIVE_TYPE_ALIASES[suffix])
 
     # Check if suffix refers to an archive type.
     if suffix in _ARCHIVE_EXTRACTORS:
