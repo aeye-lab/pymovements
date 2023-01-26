@@ -61,9 +61,14 @@ from pymovements.synthetic import step_function
             id='steps_not_sorted_raises_value_error',
         ),
         pytest.param(
+            {'length': 10, 'steps': [3, 5], 'values': [1, (2, 3)]},
+            {'exception': ValueError},
+            id='varying_number_of_channels_1_2_raises_value_error',
+        ),
+        pytest.param(
             {'length': 10, 'steps': [3, 5], 'values': [(1, 2), (3, 5, 6)]},
             {'exception': ValueError},
-            id='varying_number_of_channels_raises_value_error',
+            id='varying_number_of_channels_2_3_raises_value_error',
         ),
         pytest.param(
             {'length': 10, 'steps': [5], 'values': [(1, 2)], 'start_value': (1, 2, 3)},
