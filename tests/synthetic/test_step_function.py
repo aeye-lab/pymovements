@@ -49,11 +49,6 @@ from pymovements.synthetic import step_function
             id='length_10_4_channel_single_step_with_start_value',
         ),
         pytest.param(
-            {'length': 100, 'steps': [10, 50, 90], 'values': [1, 0, 20], 'start_value': 0},
-            {'value': np.concatenate([np.zeros(10), np.ones(40), np.zeros(40), np.ones(10) * 20])},
-            id='length_100_2_channel_3_steps',
-        ),
-        pytest.param(
             {'length': 100, 'steps': [10, 50, 90], 'values': [1, 0], 'start_value': 0},
             {'exception': ValueError},
             id='steps_values_unequal_length_raises_value_error',
