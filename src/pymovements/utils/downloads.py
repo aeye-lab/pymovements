@@ -166,6 +166,11 @@ class _DownloadProgressBar(tqdm):
 
     Reference: https://github.com/tqdm/tqdm#hooks-and-callbacks
     """
+    def __init__(self):
+        super().__init__(
+            unit='B', unit_scale=True, unit_divisor=1024, miniters=1, desc='downloading',
+        )
+
     def update_to(self, b=1, bsize=1, tsize=None):
         """
         b  : int, optional
@@ -197,70 +202,9 @@ def _download_url(
     -------
     None
     """
-    with _DownloadProgressBar(unit='B', unit_scale=True, unit_divisor=1024, miniters=1,
-                              desc=url.split('/')[-1]) as t:
+    with _DownloadProgressBar() as t:
         urllib.request.urlretrieve(url=url, filename=destination, reporthook=t.update_to)
         t.total = t.n
-
-
-def _retrieve_url_and_save_response(
-    url: str,
-    destination: Path,
-    chunk_size: int = 1024 * 32,
-) -> None:
-    """Retrieve URL and save response to file.
-
-    Parameters
-    ----------
-    url : str
-        URL of file to be downloaded.
-    destination : Path
-        Destination path of downloaded file.
-    chunk_size : int
-        Byte size of each downloaded chunk.
-
-    Returns
-    -------
-    None
-    """
-    header = {"User-Agent": USER_AGENT}
-    with urllib.request.urlopen(urllib.request.Request(url, headers=header)) as response:
-        _save_response_content(
-            content=iter(lambda: response.read(chunk_size), b""),
-            destination=destination,
-            length=response.length,
-        )
-
-
-def _save_response_content(
-    content: Iterator[bytes],
-    destination: Path,
-    length: int | None = None,
-) -> None:
-    """Save response content to file.
-
-    Parameters
-    ----------
-    content : iterator[bytes]
-        Byte iterator for downloaded content.
-    destination : Path
-        Destination filepath.
-    length : int, optional
-        Size in bytes of downloaded content.
-
-    Returns
-    -------
-    None
-    """
-    with open(destination, "wb") as filehandler, tqdm(total=length) as pbar:
-        for chunk in content:
-            # Filter out keep-alive chunks.
-            if not chunk:
-                continue
-
-            # Write chunk and update progress bar.
-            filehandler.write(chunk)
-            pbar.update(len(chunk))
 
 
 def _check_integrity(
