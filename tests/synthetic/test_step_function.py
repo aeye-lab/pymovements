@@ -3,6 +3,7 @@ This module tests functionality of the synthetic eye gaze step function.
 """
 import numpy as np
 import pytest
+
 from pymovements.synthetic import step_function
 
 

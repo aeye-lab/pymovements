@@ -2,6 +2,7 @@
 This module tests functionality of base event classes.
 """
 import pytest
+
 from pymovements.events import Event
 from pymovements.events import Fixation
 from pymovements.events import Saccade
