@@ -1,11 +1,8 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
-from typing import Iterator
 from urllib.error import URLError
 import hashlib
-import sys
 import urllib.request
 
 from tqdm.auto import tqdm
@@ -57,6 +54,9 @@ def download_and_extract_archive(
         md5=md5,
     )
 
+    if extract_dirpath is None:
+        extract_dirpath = download_dirpath
+
     print(f"Extracting {archive_path.name} to {extract_dirpath}")
     extract_archive(archive_path, extract_dirpath, remove_finished)
 
@@ -97,13 +97,13 @@ def download_file(
     if _check_integrity(filepath, md5):
         print("Using already downloaded and verified file:", filepath)
         return filepath
+    print(f"Downloading {url} to {filepath}")
 
     # expand redirect chain if needed
     url = _get_redirected_url(url=url, max_hops=max_redirect_hops)
 
     # download the file
     try:
-        print(f"Downloading {url} to {filepath}")
         _download_url(url=url, destination=filepath)
 
     except (urllib.error.URLError, OSError) as e:
@@ -166,10 +166,8 @@ class _DownloadProgressBar(tqdm):
 
     Reference: https://github.com/tqdm/tqdm#hooks-and-callbacks
     """
-    def __init__(self):
-        super().__init__(
-            unit='B', unit_scale=True, unit_divisor=1024, miniters=1, desc='downloading',
-        )
+    def __init__(self, **kwargs):
+        super().__init__(unit='B', unit_scale=True, unit_divisor=1024, miniters=1, **kwargs)
 
     def update_to(self, b=1, bsize=1, tsize=None):
         """
@@ -202,7 +200,7 @@ def _download_url(
     -------
     None
     """
-    with _DownloadProgressBar() as t:
+    with _DownloadProgressBar(desc=destination.name) as t:
         urllib.request.urlretrieve(url=url, filename=destination, reporthook=t.update_to)
         t.total = t.n
 
