@@ -1,13 +1,16 @@
+"""
+Utils module for extracting archives and decompressing files.
+"""
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Callable
-from typing import IO
-import tarfile
 import bz2
 import gzip
 import lzma
+import tarfile
 import zipfile
+from collections.abc import Callable
+from pathlib import Path
+from typing import IO
 
 
 def extract_archive(
@@ -31,15 +34,12 @@ def extract_archive(
 
     Returns
     -------
-    str :
+    Path :
         Path to the directory the file was extracted to.
     """
-    suffix, archive_type, compression_type = _detect_file_type(source_path)
+    archive_type, compression_type = _detect_file_type(source_path)
 
     if not archive_type:
-        if destination_path is None:
-            destination_path = source_path.parent / source_path.stem
-
         return _decompress(
             source_path=source_path,
             destination_path=destination_path,
@@ -75,10 +75,6 @@ def _extract_tar(
         Path to the directory the file will be extracted to.
     compression : str, optional
         Compression filename suffix.
-
-    Returns
-    -------
-    None
     """
     with tarfile.open(source_path, f"r:{compression[1:]}" if compression else "r") as archive:
         archive.extractall(destination_path)
@@ -105,10 +101,6 @@ def _extract_zip(
         Path to the directory the file will be extracted to.
     compression : str, optional
         Compression filename suffix.
-
-    Returns
-    -------
-    None
     """
     compression_id = _ZIP_COMPRESSION_MAP[compression] if compression else zipfile.ZIP_STORED
     with zipfile.ZipFile(source_path, "r", compression=compression_id) as archive:
@@ -133,7 +125,7 @@ _COMPRESSED_FILE_OPENERS: dict[str, Callable[..., IO]] = {
 }
 
 
-def _detect_file_type(filepath: Path) -> tuple[str, str | None, str | None]:
+def _detect_file_type(filepath: Path) -> tuple[str | None, str | None]:
     """Detect the archive type and/or compression of a file.
 
     Parameters
@@ -143,19 +135,20 @@ def _detect_file_type(filepath: Path) -> tuple[str, str | None, str | None]:
 
     Returns
     -------
-    tuple[str, str, str] :
-        Tuple of suffix, archive type, and compression type.
+    tuple[str, str] :
+        Tuple of archive type, and compression type.
 
     Raises
     ------
-        RuntimeError: if file has no suffix or suffix is not supported.
+    RuntimeError
+        If the file has no suffix or the suffix is not supported.
     """
     suffixes = filepath.suffixes
 
     if not suffixes:
         raise RuntimeError(
             f"File '{filepath}' has no suffixes that could be used to detect the archive type or"
-            " compression."
+            " compression.",
         )
 
     # Get last suffix only.
@@ -163,11 +156,11 @@ def _detect_file_type(filepath: Path) -> tuple[str, str | None, str | None]:
 
     # Check if suffix is a known alias.
     if suffix in _ARCHIVE_TYPE_ALIASES:
-        return (suffix, *_ARCHIVE_TYPE_ALIASES[suffix])
+        return _ARCHIVE_TYPE_ALIASES[suffix]
 
     # Check if suffix refers to an archive type.
     if suffix in _ARCHIVE_EXTRACTORS:
-        return suffix, suffix, None
+        return suffix, None
 
     # Check if the suffix refers to a compression type.
     if suffix in _COMPRESSED_FILE_OPENERS:
@@ -177,18 +170,18 @@ def _detect_file_type(filepath: Path) -> tuple[str, str | None, str | None]:
 
             # Check if the second last suffix refers to an archive type.
             if suffix2 in _ARCHIVE_EXTRACTORS:
-                return suffix2 + suffix, suffix2, suffix
+                return suffix2, suffix
 
         # We detected a single compressed file not an archive.
-        return suffix, None, suffix
+        return None, suffix
 
     # Raise error as we didn't find a valid suffix.
     valid_suffixes = sorted(
-        set(_ARCHIVE_TYPE_ALIASES) | set(_ARCHIVE_EXTRACTORS) | set(_COMPRESSED_FILE_OPENERS)
+        set(_ARCHIVE_TYPE_ALIASES) | set(_ARCHIVE_EXTRACTORS) | set(_COMPRESSED_FILE_OPENERS),
     )
     raise RuntimeError(
         f"Unsupported compression or archive type: '{suffix}'.\n"
-        f"Supported suffixes are: '{valid_suffixes}'."
+        f"Supported suffixes are: '{valid_suffixes}'.",
     )
 
 
@@ -212,11 +205,19 @@ def _decompress(
 
     Returns
     -------
-    str : Path to the decompressed file.
+    Path : Path to the decompressed file.
+
+    Raises
+    ------
+    RuntimeError
+        If the file has no suffix or the suffix is not supported for decompression.
     """
-    suffix, archive_type, compression = _detect_file_type(source_path)
+    _, compression = _detect_file_type(source_path)
     if not compression:
-        raise RuntimeError(f"Couldn't detect a compression from suffix {suffix}.")
+        raise RuntimeError(f"Couldn't detect a compression from suffix {source_path.suffix}.")
+
+    if destination_path is None:
+        destination_path = source_path.parent / source_path.stem
 
     # We don't need to check for a missing key, since this was already done in _detect_file_type().
     compressed_file_opener = _COMPRESSED_FILE_OPENERS[compression]

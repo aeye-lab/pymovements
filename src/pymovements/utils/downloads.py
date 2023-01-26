@@ -1,14 +1,15 @@
+"""
+Utils module for downloading files.
+"""
 from __future__ import annotations
 
-from pathlib import Path
-from urllib.error import URLError
 import hashlib
 import urllib.request
+from pathlib import Path
 
 from tqdm.auto import tqdm
 
 from pymovements.utils.archives import extract_archive
-
 
 USER_AGENT: str = 'aeye-lab/pymovements'
 
@@ -16,7 +17,7 @@ USER_AGENT: str = 'aeye-lab/pymovements'
 def download_and_extract_archive(
     url: str,
     download_dirpath: Path,
-    download_filename: str | None = None,
+    download_filename: str,
     extract_dirpath: Path | None = None,
     md5: str | None = None,
     remove_finished: bool = False,
@@ -38,13 +39,10 @@ def download_and_extract_archive(
     remove_finished : bool
         Remove downloaded file after successful extraction or decompression.
 
-    Returns
-    -------
-    None
-
     Raises
     ------
-    RuntimeError: if the downloaded file has no suffix or suffix is not supported, or in case of a
+    RuntimeError
+        If the downloaded file has no suffix or suffix is not supported, or in case of a
         specified MD5 checksum which doesn't match the checksum of the downloaded file.
     """
     archive_path = download_file(
@@ -88,6 +86,12 @@ def download_file(
     pathlib.Path :
         Filepath to downloaded file.
 
+    Raises
+    ------
+    OSError
+        If the download process failed.
+    RuntimeError
+        If the MD5 checksum of the downloaded file did not match the expected checksum.
     """
     dirpath = dirpath.expanduser()
     dirpath.mkdir(parents=True, exist_ok=True)
@@ -106,7 +110,7 @@ def download_file(
     try:
         _download_url(url=url, destination=filepath)
 
-    except (urllib.error.URLError, OSError) as e:
+    except OSError as e:
         if url[:5] == "https":
             url = url.replace("https:", "http:")
             print("Download failed. Trying https -> http instead.")
@@ -141,7 +145,8 @@ def _get_redirected_url(
 
     Raises
     ------
-        RuntimeError : If number of redirects exceed `max_hops`.
+    RuntimeError
+        If number of redirects exceed `max_hops`.
     """
     initial_url = url
     headers = {"Method": "HEAD", "User-Agent": USER_AGENT}
@@ -152,11 +157,10 @@ def _get_redirected_url(
                 return url
             url = response.url
 
-    else:
-        raise RuntimeError(
-            f"Request to {initial_url} exceeded {max_hops} redirects."
-            f" The last redirect points to {url}."
-        )
+    raise RuntimeError(
+        f"Request to {initial_url} exceeded {max_hops} redirects."
+        f" The last redirect points to {url}.",
+    )
 
 
 class _DownloadProgressBar(tqdm):
@@ -195,10 +199,6 @@ def _download_url(
         URL of file to be downloaded.
     destination : Path
         Destination path of downloaded file.
-
-    Returns
-    -------
-    None
     """
     with _DownloadProgressBar(desc=destination.name) as t:
         urllib.request.urlretrieve(url=url, filename=destination, reporthook=t.update_to)
@@ -253,7 +253,7 @@ def _calculate_md5(
     # Setting the `usedforsecurity` flag does not change anything about the functionality, but
     # indicates that we are not using the MD5 checksum for cryptography.
     # This enables its usage in restricted environments like FIPS without raising an error.
-    file_md5 = hashlib.new('md5', usedforsecurity=False)
+    file_md5 = hashlib.new('md5', usedforsecurity=False)  # type: ignore[call-arg]
 
     with open(filepath, "rb") as f:
         for chunk in iter(lambda: f.read(chunk_size), b""):
