@@ -8,7 +8,7 @@ from typing import Any
 import numpy as np
 import scipy
 
-from . import checks
+from pymovements.utils import checks
 
 
 def pix2deg(
