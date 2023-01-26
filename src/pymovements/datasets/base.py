@@ -43,11 +43,10 @@ class PublicDataset(Dataset):
                 url = f'{mirror}{resource["path"]}'
 
                 try:
-                    print(f"Downloading {url}")
                     download_and_extract_archive(
                         url=url,
-                        download_root=self.raw_dirpath,
-                        filename=resource['filename'],
+                        download_dirpath=self.raw_dirpath,
+                        download_filename=resource['filename'],
                         md5=resource['md5'],
                     )
 
