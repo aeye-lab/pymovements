@@ -1,4 +1,6 @@
-![pymovements](./docs/source/_static/logo.svg)
+<img width="50%" height="100%" src="./docs/source/_static/logo.svg">
+
+---
 
 [![PyPI Latest Release](https://img.shields.io/pypi/v/pymovements.svg)](https://pypi.python.org/pypi/pymovements/)
 [![PyPI status](https://img.shields.io/pypi/status/pymovements.svg)](https://pypi.python.org/pypi/pymovements/)
