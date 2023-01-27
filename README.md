@@ -1,4 +1,4 @@
-<img width="50%" height="100%" src="./docs/source/_static/logo.svg">
+<img width="50%" height="100%" src=https://user-images.githubusercontent.com/43832476/215137143-fae43d01-e6ab-45df-ab0b-6622848c8675.svg>
 
 ---
 
