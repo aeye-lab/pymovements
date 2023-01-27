@@ -45,7 +45,7 @@ def get_filepaths(
     filepaths = []
     for childpath in rootpath.iterdir():
         if childpath.is_dir():
-            filepaths.extend(get_filepaths(childpath, extension))
+            filepaths.extend(get_filepaths(rootpath=childpath, extension=extension, regex=regex))
         else:
             # if extension specified and not matching, continue to next
             if extension and childpath.suffix != extension:
