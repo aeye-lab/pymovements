@@ -8,15 +8,6 @@ class Event:
     """
     Base Event class.
 
-    Parameters
-    ----------
-    name: str
-        Name of event.
-    onset: int
-        Starting index of event (included).
-    offset: int
-        Ending index of event (excluded).
-
     Attributes
     ----------
     name: str
@@ -28,14 +19,24 @@ class Event:
     """
     def __init__(self, name: str, onset: int, offset: int):
         """
+        Parameters
+        ----------
+        name: str
+            Name of event.
+        onset: int
+            Starting index of event (included).
+        offset: int
+            Ending index of event (excluded).
 
         Examples
         --------
         >>> event = Event(
         ...    name="fixation",
-        ...    onset=,
-        ...    offset=
+        ...    onset=5,
+        ...    offset=10
         ...)
+        >>> print(event)
+        Event(name="fixation", onset=5, offset=10)
         """
         self.name = name
         self.onset = onset
@@ -58,15 +59,6 @@ class Fixation(Event):
     """
     Fixation class.
 
-    Parameters
-    ----------
-    onset: int
-        Starting index of event (included).
-    offset: int
-        Ending index of event (excluded).
-    position: tuple[float, float]
-        (x, y) position of fixation
-
     Attributes
     ----------
     name: str
@@ -81,6 +73,19 @@ class Fixation(Event):
     _name = 'fixation'
 
     def __init__(self, onset: int, offset: int, position: tuple[float, float]):
+        """
+        Parameters
+        ----------
+        onset: int
+            Starting index of event (included).
+        offset: int
+            Ending index of event (excluded).
+        position: tuple[float, float]
+            (x, y) position of fixation
+
+        Examples
+        --------
+        """
         super().__init__(name=self._name, onset=onset, offset=offset)
         self.position = position
 
@@ -88,13 +93,6 @@ class Fixation(Event):
 class Saccade(Event):
     """
     Saccade class.
-
-    Parameters
-    ----------
-    onset: int
-        Starting index of event (included).
-    offset: int
-        Ending index of event (excluded).
 
     Attributes
     ----------
@@ -108,4 +106,18 @@ class Saccade(Event):
     _name = 'saccade'
 
     def __init__(self, onset: int, offset: int):
+
+        """
+        Parameters
+        ----------
+        onset: int
+            Starting index of event (included).
+        offset: int
+            Ending index of event (excluded).
+
+        Examples
+        --------
+
+        """
+
         super().__init__(name=self._name, onset=onset, offset=offset)

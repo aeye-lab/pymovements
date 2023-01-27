@@ -13,8 +13,8 @@ from pymovements.utils import checks
 
 def pix2deg(
         arr: float | list[float] | list[list[float]] | np.ndarray,
-        screen_px: float | list[float] | tuple[float, float] | np.ndarray,
-        screen_cm: float | list[float] | tuple[float, float] | np.ndarray,
+        screen_px: tuple[int, int] | list[tuple[int, int]] | tuple[float, float] | np.ndarray,
+        screen_cm: tuple[int, int]  | list[float] | tuple[float, float] | np.ndarray,
         distance_cm: float,
         center_origin: bool = True,
 ) -> np.ndarray:
