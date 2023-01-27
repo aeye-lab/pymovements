@@ -27,6 +27,16 @@ class Event:
         Ending index of event (excluded).
     """
     def __init__(self, name: str, onset: int, offset: int):
+        """
+
+        Examples
+        --------
+        >>> event = Event(
+        ...    name="fixation",
+        ...    onset=,
+        ...    offset=
+        ...)
+        """
         self.name = name
         self.onset = onset
         self.offset = offset

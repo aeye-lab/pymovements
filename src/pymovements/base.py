@@ -92,7 +92,7 @@ class Screen:
 
     def pix2deg(
             self,
-            arr: float | list[float] | list[list[float]] | np.ndarray,
+            arr: tuple[float, float] | list[tuple[float, float]] | list[list[tuple[float, float]]] | np.ndarray,
             center_origin: bool = True,
     ) -> np.ndarray:
         """
@@ -124,6 +124,10 @@ class Screen:
         ...     height_cm=30,
         ...     distance_cm=68,
         ... )
+        >>> screen.pix2deg((0.0))
+        Traceback (most recent call last):
+                        ...
+        ValueError: arr should contain two-dimensional pixel coordinates
         """
         return pix2deg(
             arr=arr,
@@ -170,6 +174,20 @@ class Experiment:
             Eye-to-screen distance in centimeters
         sampling_rate : float
             Sampling rate in Hz
+
+        Examples
+        --------
+        >>> experiment = Experiment(
+        ...     width_px=1280,
+        ...     height_px=1024,
+        ...     width_cm=38,
+        ...     height_cm=30,
+        ...     distance_cm=68,
+        ...     sampling_rate=1000.0
+        ... )
+        >>> print(experiment)  # doctest: +NORMALIZE_WHITESPACE
+        Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38, height_cm=30, distance_cm=68,
+         x_max_dva=15.60, y_max_dva=12.43, x_min_dva=-15.60, y_min_dva=-12.43), sampling_rate=1000.0)
 
         """
         self.screen = Screen(
