@@ -35,7 +35,7 @@ class Event:
         ...    onset=5,
         ...    offset=10
         ...)
-        >>> print(event)
+        >>> print(event) # doctest: +NORMALIZE_WHITESPACE
         Event(name="fixation", onset=5, offset=10)
         """
         self.name = name
@@ -51,6 +51,16 @@ class Event:
         -------
         int
             duration in samples.
+
+        Examples
+        --------
+        >>> event = Event(
+        ...    name="fixation",
+        ...    onset=5,
+        ...    offset=10
+        ...)
+        >>> event.duration
+        5
         """
         return self.offset - self.onset
 
@@ -85,6 +95,13 @@ class Fixation(Event):
 
         Examples
         --------
+        >>> fixation = fixation(
+        ...    onset=5,
+        ...    offset=10,
+        ...    position=(125, 852)
+        ...)
+        >>> print(event) # doctest: +NORMALIZE_WHITESPACE
+        Fixation(name="fixation", onset=5, offset=10, position=(125.1, 852.3))
         """
         super().__init__(name=self._name, onset=onset, offset=offset)
         self.position = position
@@ -117,6 +134,12 @@ class Saccade(Event):
 
         Examples
         --------
+        >>> saccade = saccade(
+        ...    onset=8,
+        ...    offset=10
+        ...)
+        >>> print(event) # doctest: +NORMALIZE_WHITESPACE
+        Fixation(name="saccade", onset=8, offset=10)
 
         """
 

@@ -63,12 +63,12 @@ class Screen:
         >>> screen = Screen(
         ...     width_px=1280,
         ...     height_px=1024,
-        ...     width_cm=38,
-        ...     height_cm=30,
-        ...     distance_cm=68,
+        ...     width_cm=38.0,
+        ...     height_cm=30.0,
+        ...     distance_cm=68.0,
         ... )
         >>> print(screen)  # doctest: +NORMALIZE_WHITESPACE
-        Screen(width_px=1280, height_px=1024, width_cm=38, height_cm=30, distance_cm=68,
+        Screen(width_px=1280, height_px=1024, width_cm=38.0, height_cm=30.0, distance_cm=68.0,
          x_max_dva=15.60, y_max_dva=12.43, x_min_dva=-15.60, y_min_dva=-12.43)
 
         """
@@ -120,10 +120,14 @@ class Screen:
         >>> screen = Screen(
         ...     width_px=1280,
         ...     height_px=1024,
-        ...     width_cm=38,
-        ...     height_cm=30,
-        ...     distance_cm=68,
+        ...     width_cm=38.0,
+        ...     height_cm=30.0,
+        ...     distance_cm=68.0,
         ... )
+        >>> screen.pix2deg((123.0, 865.0))
+        array([-12.70732231,   8.65963972])
+        >>> screen.pix2deg((123.0, 865.0), center_origin=False)
+        array([ 3.07379946, 20.43909054])
         >>> screen.pix2deg((0.0))
         Traceback (most recent call last):
                         ...

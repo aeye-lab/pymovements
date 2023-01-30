@@ -14,7 +14,7 @@ from pymovements.utils import checks
 def pix2deg(
         arr: float | list[float] | list[list[float]] | np.ndarray,
         screen_px: tuple[int, int] | list[tuple[int, int]] | tuple[float, float] | np.ndarray,
-        screen_cm: tuple[int, int]  | list[float] | tuple[float, float] | np.ndarray,
+        screen_cm: tuple[float, float]  | list[tuple[float, float]] | tuple[float, float] | np.ndarray,
         distance_cm: float,
         center_origin: bool = True,
 ) -> np.ndarray:
@@ -44,6 +44,13 @@ def pix2deg(
         If dimension screen_px or screen_cm don't match dimension of arr.
         If screen_px or screen_cm or one of its elements is zero.
         If distance_cm is zero.
+
+    Examples
+    --------
+    >>> pix2deg((123.0, 865.0), (1280, 1024), (38.0, 30.0), 68.0)
+    array([-12.70732231,   8.65963972])
+    >>> pix2deg((123.0, 865.0), (1280, 1024), (38.0, 30.0), 68.0, center_origin=False)
+    array([ 3.07379946, 20.43909054])
 
     """
     checks.check_no_zeros(screen_px, "screen_px")
@@ -99,7 +106,7 @@ def pix2deg(
 
 
 def pos2vel(
-        arr: list[float] | list[list[float]] | np.ndarray,
+        arr: list[tuple[float, float]] | list[list[tuple[float, float]]] | np.ndarray,
         sampling_rate: float = 1000,
         method: str = 'smooth',
         **kwargs,
@@ -136,6 +143,10 @@ def pos2vel(
     ValueError
         If selected method is invalid, input array is too short for the
         selected method or the sampling rate is below zero
+
+    Examples
+    --------
+    >>> pos2level()
 
     """
     if sampling_rate <= 0:
