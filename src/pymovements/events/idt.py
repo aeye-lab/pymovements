@@ -6,13 +6,13 @@ from pymovements.events import Fixation
 
 
 def dispersion(x):
-    return np.sum(np.max(x, axis=0), np.min(x, axis=0))
+    return np.sum(np.max(x, axis=0) - np.min(x, axis=0))
 
 
 def idt(
         x: list[list[float]] | np.ndarray,
         dispersion_threshold: float,
-        duration_threshold: float
+        duration_threshold: int,
 ) -> list[Fixation]:
     """
     Fixation identification based on dispersion threshold.
@@ -23,7 +23,7 @@ def idt(
         Continuous 2D position time series
     dispersion_threshold: float
         Threshold for dispersion for a group of consecutive points to be identified as fixation
-    duration_threshold: float
+    duration_threshold: int
         Minimum fixation duration
 
     Returns
@@ -60,8 +60,12 @@ def idt(
     while win_end < len(x):
         if dispersion(x[win_start:win_end]) <= dispersion_threshold:
             # Add additional points to the window until dispersion > threshold
-            while not dispersion(x[win_start:win_end]) > dispersion_threshold:
+            while dispersion(x[win_start:win_end]) < dispersion_threshold:
                 win_end += 1
+
+                # break if we reach end of input data
+                if win_end == len(x) - 1:
+                    break
 
             # Note a fixation at the centroid of the window points
             centroid = np.sum(x[win_start:win_end], axis=0) / len(x[win_start:win_end])
