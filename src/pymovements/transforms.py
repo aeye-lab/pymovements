@@ -146,8 +146,17 @@ def pos2vel(
 
     Examples
     --------
-    >>> pos2level()
-
+    >>> pos2level(
+    ...    arr=[(0., 0.), (1., 1.), (2., 2.), (3., 3.), (4., 4.), (5., 5.)],
+    ...    sampling_rate=1000,
+    ...    method="smooth"
+    ... )
+    array([[   0.,    0.],
+           [1000., 1000.],
+           [1000., 1000.],
+           [1000., 1000.],
+           [1000., 1000.],
+           [   0.,    0.]])
     """
     if sampling_rate <= 0:
         raise ValueError('sampling_rate needs to be above zero')
@@ -240,6 +249,15 @@ def norm(arr: np.ndarray, axis: int | None = None) -> np.ndarray | Any:
     Returns
     -------
     np.ndarray
+
+    Examples
+    --------
+    >>> arr = np.array([[1., 1., 1., 1., 1., 1.], [1., 1., 1., 1., 1., 1.]])
+    >>> norm(
+    ...    arr=arr
+    ... )
+    array([1.41421356, 1.41421356, 1.41421356, 1.41421356, 1.41421356,
+       1.41421356])
     """
     if axis is None:
         # for single vector and array of vectors the axis is 0
@@ -276,6 +294,28 @@ def cut_into_subsequences(
     Returns
     -------
     np.ndarray
+
+    Examples
+    --------
+    >>> cut_into_subsequences(
+    ...    arr=np.array([
+    ...                  [[1., 1.], [2., 2.], [3., 3.]],
+    ...                  [[4., 4.], [5., 5.], [6., 6.]]
+    ...                ]),
+    ...    window_size=2,
+    ...    keep_padded=True,
+    ... )
+    array([[[1., 1.],
+            [2., 2.]],
+
+           [[3., 3.],
+            [1., 1.]],
+
+           [[4., 4.],
+            [5., 5.]],
+
+           [[6., 6.],
+            [4., 4.]]])
     """
     n, rest = np.divmod(arr.shape[1], window_size)
 
@@ -336,6 +376,21 @@ def downsample(
     Returns
     -------
     np.ndarray
+
+    Examples
+    --------
+    >>> downsample(
+    ...    arr=np.array([0., 0., 1., 1., 2., 2., 3., 3., 4., 4., 5., 5.]),
+    ...    factor=2
+    ... )
+    array([0., 1., 2., 3., 4., 5.])
+    >>> downsample(
+    ...    arr=np.array([(0., 0.), (1., 1.), (2., 2.), (3., 3.), (4., 4.), (5., 5.)]),
+    ...    factor=2
+    ... )
+    array([[0., 0.],
+       [2., 2.],
+       [4., 4.]])
     """
     sequence_length = arr.shape[0]
     select = [i % factor == 0 for i in range(sequence_length)]

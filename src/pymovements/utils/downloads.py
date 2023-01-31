@@ -44,6 +44,9 @@ def download_and_extract_archive(
     RuntimeError
         If the downloaded file has no suffix or suffix is not supported, or in case of a
         specified MD5 checksum which doesn't match the checksum of the downloaded file.
+
+    Examples
+    --------
     """
     archive_path = download_file(
         url=url,
