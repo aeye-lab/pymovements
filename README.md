@@ -23,6 +23,7 @@ and render plots to visually analyze your results.
 - **Source code:** https://github.com/aeye-lab/pymovements
 - **Contributing:** https://github.com/aeye-lab/pymovements/blob/main/CONTRIBUTING.md
 - **Bug reports:** https://github.com/aeye-lab/pymovements/issues
+- **PyPI package:** https://pypi.org/project/pymovements
 
 
 ## Installation
