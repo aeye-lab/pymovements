@@ -29,14 +29,14 @@ and render plots to visually analyze your results.
 
 pymovements can be installed directly from the PyPI repositories:
 
-```
+```bash
 pip install pymovements
 ```
 
 To use the latest development version or to try out tutorials, pymovements may be alternatively
 cloned and installed with
 
-```
+```bash
 git clone https://github.com/aeye-lab/pymovements.git
 pip install -e ./pymovements
 ```
@@ -58,7 +58,7 @@ https://github.com/aeye-lab/pymovements/issues/new/choose) or write us at
 If you are using pymovements in your research, we would be happy if you cite our work by using the
 following BibTex entry:
 
-```
+```bibtex
 @misc{pymovements,
   author = {Krakowczyk, Daniel and Reich, David R. and Chwastek, Jakob, Prasse Paul and Jäger, Lena
   },
