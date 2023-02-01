@@ -47,9 +47,20 @@ def pix2deg(
 
     Examples
     --------
-    >>> pix2deg(arr=[(123.0, 865.0)], screen_px=(1280, 1024), screen_cm=(38.0, 30.0), distance_cm=68.0)
+    >>> pix2deg(
+    ...    arr=[(123.0, 865.0)],
+    ...    screen_px=(1280, 1024),
+    ...    screen_cm=(38.0, 30.0),
+    ...    distance_cm=68.0
+    ... )
     array([[-12.70732231,   8.65963972]])
-    >>> pix2deg(arr=[(123.0, 865.0)], screen_px=(1280, 1024), screen_cm=(38.0, 30.0), distance_cm=68.0, center_origin=False)
+    >>> pix2deg(
+    ...    arr=[(123.0, 865.0)],
+    ...    screen_px=(1280, 1024),
+    ...    screen_cm=(38.0, 30.0),
+    ...    distance_cm=68.0,
+    ...    center_origin=False
+    ... )
     array([[ 3.07379946, 20.43909054]])
 
     """

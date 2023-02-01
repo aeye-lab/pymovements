@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from pymovements.utils.decorators import auto_str
 
+
 @auto_str
 class Event:
     """
@@ -66,6 +67,7 @@ class Event:
         """
         return self.offset - self.onset
 
+
 @auto_str
 class Fixation(Event):
     """
@@ -107,6 +109,7 @@ class Fixation(Event):
         """
         super().__init__(name=self._name, onset=onset, offset=offset)
         self.position = position
+
 
 @auto_str
 class Saccade(Event):
