@@ -19,7 +19,7 @@ interface to download publicly available datasets, preprocess gaze data, detect 
 and render plots to visually analyze your results. 
 
 - **Website:** https://github.com/aeye-lab/pymovements
-- **Documentation:** https://readthedocs.org/projects/pymovements
+- **Documentation:** https://pymovements.readthedocs.io
 - **Source code:** https://github.com/aeye-lab/pymovements
 - **Contributing:** https://github.com/aeye-lab/pymovements/blob/main/CONTRIBUTING.md
 - **Bug reports:** https://github.com/aeye-lab/pymovements/issues
