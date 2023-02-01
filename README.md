@@ -1,4 +1,6 @@
-<img width="50%" height="100%" src="./docs/source/_static/logo.svg">
+<p align="center"><picture>
+<img width="110%" height="110%" src="./docs/source/_static/logo.svg" alt="pymovements">
+</picture></p>
 
 ---
 
@@ -11,7 +13,34 @@
 [![Documentation Status](https://readthedocs.org/projects/pymovements/badge/?version=latest)](https://pymovements.readthedocs.io/en/latest/?badge=latest)
 [![PyPI download month](https://img.shields.io/pypi/dm/pymovements.svg)](https://pypistats.org/packages/pymovements)
 
-This is a python package for extracting oculomotoric event information from eye tracking signals.
+
+pymovements is an open-source python package for processing eye movement data. It provides a simple
+interface to download publicly available datasets, preprocess gaze data, detect oculomotoric events
+and render plots to visually analyze your results. 
+
+- **Website:** https://github.com/aeye-lab/pymovements
+- **Documentation:** https://readthedocs.org/projects/pymovements
+- **Source code:** https://github.com/aeye-lab/pymovements
+- **Contributing:** https://github.com/aeye-lab/pymovements/blob/main/CONTRIBUTING.md
+- **Bug reports:** https://github.com/aeye-lab/pymovements/issues
+- **PyPI package:** https://pypi.org/project/pymovements
+
+
+## Installation
+
+pymovements can be installed directly from the PyPI repositories:
+
+```bash
+pip install pymovements
+```
+
+To use the latest development version or to try out tutorials, pymovements may be alternatively
+cloned and installed with
+
+```bash
+git clone https://github.com/aeye-lab/pymovements.git
+pip install -e ./pymovements
+```
 
 
 ## Contributing
@@ -23,3 +52,19 @@ For a detailed guide, please refer to our [CONTRIBUTING.md](CONTRIBUTING.md) fir
 If you have any questions, please [open an issue](
 https://github.com/aeye-lab/pymovements/issues/new/choose) or write us at
 [daniel.krakowczyk@uni-potsdam.de](mailto:daniel.krakowczyk@uni-potsdam.de)
+
+
+## Citing
+
+If you are using pymovements in your research, we would be happy if you cite our work by using the
+following BibTex entry:
+
+```bibtex
+@misc{pymovements,
+  author = {Krakowczyk, Daniel and Reich, David R. and Chwastek, Jakob, Prasse, Paul and Jäger, Lena},
+  title = {pymovements: A Python Package for Processing Eye Movement Data},
+  year = {2023},
+  publisher = {GitHub},
+  howpublished = {\url{https://github.com/aeye-lab/pymovements}},
+}
+```
