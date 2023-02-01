@@ -60,8 +60,7 @@ following BibTex entry:
 
 ```bibtex
 @misc{pymovements,
-  author = {Krakowczyk, Daniel and Reich, David R. and Chwastek, Jakob, Prasse Paul and Jäger, Lena
-  },
+  author = {Krakowczyk, Daniel and Reich, David R. and Chwastek, Jakob, Prasse, Paul and Jäger, Lena},
   title = {pymovements: A Python Package for Processing Eye Movement Data},
   year = {2023},
   publisher = {GitHub},
