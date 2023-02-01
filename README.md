@@ -1,5 +1,5 @@
 <p align="center"><picture>
-<img width="100%" height="100%" src="./docs/source/_static/logo.svg" alt="pymovements">
+<img width="110%" height="100%" src="./docs/source/_static/logo.svg" alt="pymovements">
 </picture></p>
 
 ---
