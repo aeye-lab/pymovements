@@ -1,6 +1,6 @@
-<p align="center"><a href="#">
+<p align="center"><picture>
 <img width="75%" height="100%" src="./docs/source/_static/logo.svg" alt="pymovements">
-</a></p>
+</picture></p>
 
 ---
 
