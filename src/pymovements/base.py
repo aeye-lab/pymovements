@@ -68,7 +68,9 @@ class Screen:
         ...     distance_cm=68.0,
         ... )
         >>> print(screen)  # doctest: +NORMALIZE_WHITESPACE
-        Screen(width_px=1280, height_px=1024, width_cm=38.00, height_cm=30.00, distance_cm=68.00, x_max_dva=15.60, y_max_dva=12.43, x_min_dva=-15.60, y_min_dva=-12.43)
+        Screen(width_px=1280, height_px=1024, width_cm=38.00,
+        height_cm=30.00, distance_cm=68.00, x_max_dva=15.60,
+        y_max_dva=12.43, x_min_dva=-15.60, y_min_dva=-12.43)
 
         """
         checks.check_no_zeros(width_px, "width_px")
@@ -123,14 +125,14 @@ class Screen:
         ...     height_cm=30.0,
         ...     distance_cm=68.0,
         ... )
-        >>> screen.pix2deg((123.0, 865.0))
-        array([-12.70732231,   8.65963972])
-        >>> screen.pix2deg((123.0, 865.0), center_origin=False)
-        array([ 3.07379946, 20.43909054])
-        >>> screen.pix2deg((0.0))
+        >>> screen.pix2deg(arr=[(123.0, 865.0)])
+        array([[-12.70732231,   8.65963972]])
+        >>> screen.pix2deg(arr=[(123.0, 865.0)], center_origin=False)
+        array([[ 3.07379946, 20.43909054]])
+        >>> screen.pix2deg(arr=[(0.0)])
         Traceback (most recent call last):
                         ...
-        ValueError: arr should contain two-dimensional pixel coordinates
+        ValueError: arr is 1-dimensional, but screen_px is not
         """
         return pix2deg(
             arr=arr,
@@ -189,7 +191,9 @@ class Experiment:
         ...     sampling_rate=1000.0
         ... )
         >>> print(experiment) # doctest: +NORMALIZE_WHITESPACE
-        Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38, height_cm=30, distance_cm=68, x_max_dva=15.60, y_max_dva=12.43, x_min_dva=-15.60, y_min_dva=-12.43), sampling_rate=1000.00)
+        Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38,
+        height_cm=30, distance_cm=68, x_max_dva=15.60, y_max_dva=12.43,
+        x_min_dva=-15.60, y_min_dva=-12.43), sampling_rate=1000.00)
 
         """
         self.screen = Screen(
