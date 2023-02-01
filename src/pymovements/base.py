@@ -68,8 +68,7 @@ class Screen:
         ...     distance_cm=68.0,
         ... )
         >>> print(screen)  # doctest: +NORMALIZE_WHITESPACE
-        Screen(width_px=1280, height_px=1024, width_cm=38.0, height_cm=30.0, distance_cm=68.0,
-         x_max_dva=15.60, y_max_dva=12.43, x_min_dva=-15.60, y_min_dva=-12.43)
+        Screen(width_px=1280, height_px=1024, width_cm=38.00, height_cm=30.00, distance_cm=68.00, x_max_dva=15.60, y_max_dva=12.43, x_min_dva=-15.60, y_min_dva=-12.43)
 
         """
         checks.check_no_zeros(width_px, "width_px")
@@ -141,7 +140,7 @@ class Screen:
             center_origin=center_origin,
         )
 
-
+@auto_str
 class Experiment:
     """
     Experiment class for holding experiment properties.
@@ -189,11 +188,8 @@ class Experiment:
         ...     distance_cm=68,
         ...     sampling_rate=1000.0
         ... )
-        >>> print(experiment)  # doctest: +NORMALIZE_WHITESPACE
-        Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38,
-         height_cm=30, distance_cm=68,
-         x_max_dva=15.60, y_max_dva=12.43,
-         x_min_dva=-15.60, y_min_dva=-12.43), sampling_rate=1000.0)
+        >>> print(experiment) # doctest: +NORMALIZE_WHITESPACE
+        Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38, height_cm=30, distance_cm=68, x_max_dva=15.60, y_max_dva=12.43, x_min_dva=-15.60, y_min_dva=-12.43), sampling_rate=1000.00)
 
         """
         self.screen = Screen(

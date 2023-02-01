@@ -257,7 +257,7 @@ def norm(arr: np.ndarray, axis: int | None = None) -> np.ndarray | Any:
     ...    arr=arr
     ... )
     array([1.41421356, 1.41421356, 1.41421356, 1.41421356, 1.41421356,
-       1.41421356])
+           1.41421356])
     """
     if axis is None:
         # for single vector and array of vectors the axis is 0
@@ -308,13 +308,13 @@ def cut_into_subsequences(
     ... )
     array([[[1., 1.],
             [2., 2.]],
-
+    <BLANKLINE>
            [[3., 3.],
             [1., 1.]],
-
+    <BLANKLINE>
            [[4., 4.],
             [5., 5.]],
-
+    <BLANKLINE>
            [[6., 6.],
             [4., 4.]]])
     """
