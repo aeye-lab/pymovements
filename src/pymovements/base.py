@@ -92,7 +92,7 @@ class Screen:
 
     def pix2deg(
             self,
-            arr: tuple[float, float] | list[tuple[float, float]] | list[list[tuple[float, float]]] | np.ndarray,
+            arr: float | list[float] | list[list[float]] | np.ndarray,
             center_origin: bool = True,
     ) -> np.ndarray:
         """
@@ -182,16 +182,18 @@ class Experiment:
         Examples
         --------
         >>> experiment = Experiment(
-        ...     width_px=1280,
-        ...     height_px=1024,
-        ...     width_cm=38,
-        ...     height_cm=30,
+        ...     screen_width_px=1280,
+        ...     screen_height_px=1024,
+        ...     screen_width_cm=38,
+        ...     screen_height_cm=30,
         ...     distance_cm=68,
         ...     sampling_rate=1000.0
         ... )
         >>> print(experiment)  # doctest: +NORMALIZE_WHITESPACE
-        Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38, height_cm=30, distance_cm=68,
-         x_max_dva=15.60, y_max_dva=12.43, x_min_dva=-15.60, y_min_dva=-12.43), sampling_rate=1000.0)
+        Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38,
+         height_cm=30, distance_cm=68,
+         x_max_dva=15.60, y_max_dva=12.43,
+         x_min_dva=-15.60, y_min_dva=-12.43), sampling_rate=1000.0)
 
         """
         self.screen = Screen(

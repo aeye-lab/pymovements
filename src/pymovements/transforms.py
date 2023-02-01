@@ -13,8 +13,8 @@ from pymovements.utils import checks
 
 def pix2deg(
         arr: float | list[float] | list[list[float]] | np.ndarray,
-        screen_px: tuple[int, int] | list[tuple[int, int]] | tuple[float, float] | np.ndarray,
-        screen_cm: tuple[float, float]  | list[tuple[float, float]] | tuple[float, float] | np.ndarray,
+        screen_px: float | list[float] | tuple[float, float] | np.ndarray,
+        screen_cm: float | list[float] | tuple[float, float] | np.ndarray,
         distance_cm: float,
         center_origin: bool = True,
 ) -> np.ndarray:
@@ -47,9 +47,9 @@ def pix2deg(
 
     Examples
     --------
-    >>> pix2deg((123.0, 865.0), (1280, 1024), (38.0, 30.0), 68.0)
+    >>> pix2deg([123.0, 865.0], (1280, 1024), (38.0, 30.0), 68.0)
     array([-12.70732231,   8.65963972])
-    >>> pix2deg((123.0, 865.0), (1280, 1024), (38.0, 30.0), 68.0, center_origin=False)
+    >>> pix2deg([123.0, 865.0], (1280, 1024), (38.0, 30.0), 68.0, center_origin=False)
     array([ 3.07379946, 20.43909054])
 
     """
@@ -106,7 +106,7 @@ def pix2deg(
 
 
 def pos2vel(
-        arr: list[tuple[float, float]] | list[list[tuple[float, float]]] | np.ndarray,
+        arr: list[float] | list[list[float]] | np.ndarray,
         sampling_rate: float = 1000,
         method: str = 'smooth',
         **kwargs,
@@ -146,17 +146,17 @@ def pos2vel(
 
     Examples
     --------
-    >>> pos2level(
+    >>> pos2vel(
     ...    arr=[(0., 0.), (1., 1.), (2., 2.), (3., 3.), (4., 4.), (5., 5.)],
     ...    sampling_rate=1000,
     ...    method="smooth"
     ... )
-    array([[   0.,    0.],
+    array([[ 500.,  500.],
            [1000., 1000.],
            [1000., 1000.],
            [1000., 1000.],
            [1000., 1000.],
-           [   0.,    0.]])
+           [ 500.,  500.]])
     """
     if sampling_rate <= 0:
         raise ValueError('sampling_rate needs to be above zero')
@@ -297,11 +297,12 @@ def cut_into_subsequences(
 
     Examples
     --------
-    >>> cut_into_subsequences(
-    ...    arr=np.array([
+    >>> arr = np.array([
     ...                  [[1., 1.], [2., 2.], [3., 3.]],
     ...                  [[4., 4.], [5., 5.], [6., 6.]]
-    ...                ]),
+    ...                ])
+    >>> cut_into_subsequences(
+    ...    arr=arr,
     ...    window_size=2,
     ...    keep_padded=True,
     ... )
@@ -379,15 +380,17 @@ def downsample(
 
     Examples
     --------
+    >>> arr = np.array([0., 0., 1., 1., 2., 2., 3., 3., 4., 4., 5., 5.])
     >>> downsample(
-    ...    arr=np.array([0., 0., 1., 1., 2., 2., 3., 3., 4., 4., 5., 5.]),
+    ...    arr=arr,
     ...    factor=2
-    ... )
+    ... ) # doctest: +NORMALIZE_WHITESPACE
     array([0., 1., 2., 3., 4., 5.])
+    >>> arr2 = np.array([(0., 0.), (1., 1.), (2., 2.), (3., 3.), (4., 4.), (5., 5.)])
     >>> downsample(
-    ...    arr=np.array([(0., 0.), (1., 1.), (2., 2.), (3., 3.), (4., 4.), (5., 5.)]),
+    ...    arr=arr2,
     ...    factor=2
-    ... )
+    ... ) # doctest: +NORMALIZE_WHITESPACE
     array([[0., 0.],
        [2., 2.],
        [4., 4.]])

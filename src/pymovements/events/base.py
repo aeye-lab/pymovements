@@ -3,7 +3,9 @@ This module holds all the main Event classes used for event detection.
 """
 from __future__ import annotations
 
+from pymovements.utils.decorators import auto_str
 
+@auto_str
 class Event:
     """
     Base Event class.
@@ -34,7 +36,7 @@ class Event:
         ...    name="fixation",
         ...    onset=5,
         ...    offset=10
-        ...)
+        ... )
         >>> print(event) # doctest: +NORMALIZE_WHITESPACE
         Event(name="fixation", onset=5, offset=10)
         """
@@ -58,13 +60,13 @@ class Event:
         ...    name="fixation",
         ...    onset=5,
         ...    offset=10
-        ...)
+        ... )
         >>> event.duration
         5
         """
         return self.offset - self.onset
 
-
+@auto_str
 class Fixation(Event):
     """
     Fixation class.
@@ -95,18 +97,18 @@ class Fixation(Event):
 
         Examples
         --------
-        >>> fixation = fixation(
+        >>> fixation = Fixation(
         ...    onset=5,
         ...    offset=10,
         ...    position=(125, 852)
-        ...)
-        >>> print(event) # doctest: +NORMALIZE_WHITESPACE
+        ... ) # doctest: +NORMALIZE_WHITESPACE
+        >>> print(fixation)
         Fixation(name="fixation", onset=5, offset=10, position=(125.1, 852.3))
         """
         super().__init__(name=self._name, onset=onset, offset=offset)
         self.position = position
 
-
+@auto_str
 class Saccade(Event):
     """
     Saccade class.
@@ -134,12 +136,12 @@ class Saccade(Event):
 
         Examples
         --------
-        >>> saccade = saccade(
+        >>> saccade = Saccade(
         ...    onset=8,
         ...    offset=10
-        ...)
-        >>> print(event) # doctest: +NORMALIZE_WHITESPACE
-        Fixation(name="saccade", onset=8, offset=10)
+        ... )
+        >>> print(saccade) # doctest: +NORMALIZE_WHITESPACE
+        Saccade(name="saccade", onset=8, offset=10)
 
         """
 

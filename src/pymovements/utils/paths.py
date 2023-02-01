@@ -34,13 +34,6 @@ def get_filepaths(
     ValueError
         If both extension and regex is being passed.
 
-    Examples
-    --------
-    >>> get_filepaths(
-    ...    rootpath="user/some_path",
-    ...    extension=".txt"
-    ... )
-    [Path('some_text_file.txt')]
     """
     if extension is not None and regex is not None:
         raise ValueError("extension and regex are mutually exclusive")
