@@ -9,6 +9,8 @@ from pymovements.datasets import PublicDataset
 class JuDo1000(PublicDataset):
     """JuDo1000 dataset.
 
+    :cite:p:`JuDo1000`
+
     """
     mirrors = [
         'https://osf.io/download/',
@@ -24,7 +26,7 @@ class JuDo1000(PublicDataset):
         screen_width_cm=38,
         screen_height_cm=30.2,
         distance_cm=68,
-        sampling_rate=2000,
+        sampling_rate=1000,
     )
 
     filename_regex = re.compile(

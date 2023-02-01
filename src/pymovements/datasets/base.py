@@ -144,7 +144,7 @@ class PublicDataset(Dataset):
             raise ValueError("no mirrors defined for dataset")
 
         if not self.resources:
-            raise ValueError("no resources defined for datasaet")
+            raise ValueError("no resources defined for dataset")
 
         self.raw_dirpath.mkdir(parents=True, exist_ok=True)
 
