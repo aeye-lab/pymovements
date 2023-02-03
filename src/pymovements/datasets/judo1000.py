@@ -63,6 +63,6 @@ class JuDo1000(PublicDataset):
             experiment=self._experiment,
             filename_regex=self._filename_regex,
             filename_regex_dtypes=self._filename_regex_dtypes,
-            custom_csv_kwargs=self._read_csv_kwargs,
+            custom_read_kwargs=self._read_csv_kwargs,
             **kwargs,
         )
