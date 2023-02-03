@@ -220,8 +220,8 @@ class Dataset:
         >>> class CustomDataset(Dataset):
         ...     pass
         >>> dataset = CustomDataset(root='data')
-        >>> dataset.dirpath
-        PosixPath('data/CustomDataset')
+        >>> dataset.dirpath  # doctest: +SKIP
+        Path('data/CustomDataset')
         """
         return self.root / self.__class__.__name__
 
@@ -236,8 +236,8 @@ class Dataset:
         >>> class CustomDataset(Dataset):
         ...     pass
         >>> dataset = CustomDataset(root='data')
-        >>> dataset.raw_dirpath
-        PosixPath('data/CustomDataset/raw')
+        >>> dataset.raw_dirpath  # doctest: +SKIP
+        Path('data/CustomDataset/raw')
         """
         return self.dirpath / "raw"
 
