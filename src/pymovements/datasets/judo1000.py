@@ -6,11 +6,11 @@ from pymovements.datasets.base import PublicDataset
 class JuDo1000(PublicDataset):
     """JuDo1000 dataset :cite:p:`JuDo1000`.
 
-    This dataset includes binocular eye tracking data from 150 participants in four experimental
-    sessions with an interval of at least one week between two sessions. Eye movements are recorded
-    at a sampling frequence of 1000 Hz using an EyeLink Portable Duo video-based eye tracker and are
-    provided as pixel coordinates. Participants are instructed to watch a random jumping dot on a
-    computer screen.
+    This dataset includes binocular eye tracking data from 150 participants in four sessions with an
+    interval of at least one week between two sessions. Eye movements are recorded at a sampling
+    frequency of 1000 Hz using an EyeLink Portable Duo video-based eye tracker and are provided as
+    pixel coordinates. Participants are instructed to watch a random jumping dot on a computer
+    screen.
 
     Check the respective `repository <'https://osf.io/download/4wy7s/'>` for details.
     """
