@@ -23,7 +23,8 @@ screen_cm_2d = [100, 100]
                 'arr': None,
                 'screen_px': 1,
                 'screen_cm': 1,
-                'distance_cm': 1
+                'distance_cm': 1,
+                'origin': 'center',
             },
             TypeError,
             id='none_coords_raises_type_error'
@@ -33,7 +34,8 @@ screen_cm_2d = [100, 100]
                 'arr': 0,
                 'screen_px': None,
                 'screen_cm': 1,
-                'distance_cm': 1
+                'distance_cm': 1,
+                'origin': 'center',
             },
             TypeError,
             id='none_screen_px_raises_type_error'
@@ -43,7 +45,8 @@ screen_cm_2d = [100, 100]
                 'arr': 0,
                 'screen_px': 1,
                 'screen_cm': None,
-                'distance_cm': 1
+                'distance_cm': 1,
+                'origin': 'center',
             },
             TypeError,
             id='none_screen_cm_raises_type_error'
@@ -53,7 +56,8 @@ screen_cm_2d = [100, 100]
                 'arr': 0,
                 'screen_px': 1,
                 'screen_cm': 1,
-                'distance_cm': None
+                'distance_cm': None,
+                'origin': 'center',
             },
             TypeError,
             id='none_distance_cm_raises_type_error'
@@ -63,7 +67,8 @@ screen_cm_2d = [100, 100]
                 'arr': 0,
                 'screen_px': 0,
                 'screen_cm': 1,
-                'distance_cm': 1
+                'distance_cm': 1,
+                'origin': 'center',
             },
             ValueError,
             id='zero_screen_px_raises_value_error'
@@ -73,7 +78,8 @@ screen_cm_2d = [100, 100]
                 'arr': 0,
                 'screen_px': 1,
                 'screen_cm': 0,
-                'distance_cm': 1
+                'distance_cm': 1,
+                'origin': 'center',
             },
             ValueError,
             id='zero_screen_cm_raises_value_error'
@@ -83,7 +89,8 @@ screen_cm_2d = [100, 100]
                 'arr': 0,
                 'screen_px': 1,
                 'screen_cm': 1,
-                'distance_cm': 0
+                'distance_cm': 0,
+                'origin': 'center',
             },
             ValueError,
             id='zero_distance_cm_raises_value_error'
@@ -94,7 +101,7 @@ screen_cm_2d = [100, 100]
                 'screen_px': screen_px_2d,
                 'screen_cm': screen_cm_2d,
                 'distance_cm': screen_cm_1d,
-                'center_origin': False
+                'origin': 'center',
             },
             ValueError,
             id='rank_3_tensor_raises_value_error'
@@ -105,7 +112,7 @@ screen_cm_2d = [100, 100]
                 'screen_px': screen_px_1d,
                 'screen_cm': screen_px_2d,
                 'distance_cm': screen_cm_1d,
-                'center_origin': False
+                'origin': 'center',
             },
             ValueError,
             id='list_coords_2d_screen_px_1d_raises_value_error'
@@ -116,7 +123,7 @@ screen_cm_2d = [100, 100]
                 'screen_px': screen_px_2d,
                 'screen_cm': screen_px_1d,
                 'distance_cm': screen_cm_1d,
-                'center_origin': False
+                'origin': 'center',
             },
             ValueError,
             id='list_coords_2d_screen_cm_1d_raises_value_error'
@@ -127,7 +134,7 @@ screen_cm_2d = [100, 100]
                 'screen_px': screen_px_2d,
                 'screen_cm': screen_px_1d,
                 'distance_cm': screen_cm_1d,
-                'center_origin': False
+                'origin': 'center',
             },
             ValueError,
             id='list_coords_1d_screen_px_2d_raises_value_error'
@@ -138,7 +145,7 @@ screen_cm_2d = [100, 100]
                 'screen_px': screen_px_1d,
                 'screen_cm': screen_px_2d,
                 'distance_cm': screen_cm_1d,
-                'center_origin': False
+                'origin': 'center',
             },
             ValueError,
             id='list_coords_1d_screen_cm_2d_raises_value_error'
@@ -149,7 +156,7 @@ screen_cm_2d = [100, 100]
                 'screen_px': [1, 1, 1],
                 'screen_cm': [1, 1, 1],
                 'distance_cm': screen_cm_1d,
-                'center_origin': False
+                'origin': 'center',
             },
             ValueError,
             id='list_coords_3d_raises_value_error'
@@ -170,7 +177,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'screen_px': screen_px_1d,
                 'screen_cm': screen_cm_1d,
                 'distance_cm': screen_cm_1d,
-                'center_origin': False
+                'origin': 'center',
             },
             0,
             id='zero_coord_without_center_origin_returns_zero'
@@ -181,7 +188,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'screen_px': screen_px_1d,
                 'screen_cm': screen_cm_1d,
                 'distance_cm': screen_cm_1d,
-                'center_origin': True
+                'origin': 'lower left',
             },
             0,
             id='center_coord_with_center_origin_returns_zero'
@@ -192,7 +199,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'screen_px': screen_px_1d,
                 'screen_cm': screen_cm_1d,
                 'distance_cm': screen_cm_1d / 2,
-                'center_origin': False
+                'origin': 'center',
             },
             45,
             id='isosceles_triangle_without_center_origin_returns_45'
@@ -203,7 +210,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'screen_px': screen_px_1d,
                 'screen_cm': screen_cm_1d,
                 'distance_cm': screen_cm_1d / 2,
-                'center_origin': True
+                'origin': 'lower left',
             },
             45,
             id='isosceles_triangle_with_center_origin_returns_45'
@@ -214,7 +221,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'screen_px': screen_px_1d,
                 'screen_cm': screen_cm_1d,
                 'distance_cm': screen_cm_1d / 2,
-                'center_origin': True
+                'origin': 'lower left',
             },
             -45,
             id='isosceles_triangle_left_with_center_origin_returns_minus45'
@@ -225,7 +232,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'screen_px': screen_px_2d,
                 'screen_cm': screen_cm_2d,
                 'distance_cm': screen_px_2d[0] / 2,
-                'center_origin': False
+                'origin': 'center',
             },
             45,
             id='nparray_of_isosceles_triangle_without_center_origin_returns_45'
@@ -236,7 +243,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'screen_px': screen_px_1d,
                 'screen_cm': screen_cm_1d,
                 'distance_cm': screen_cm_1d,
-                'center_origin': False
+                'origin': 'center',
             },
             pytest.approx(26.565, abs=1e-4),
             id='ankathet_half_without_center_origin_returns_26565'
@@ -247,7 +254,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'screen_px': screen_px_1d,
                 'screen_cm': screen_cm_1d,
                 'distance_cm': screen_cm_1d,
-                'center_origin': True
+                'origin': 'lower left',
             },
             pytest.approx(26.565, abs=1e-4),
             id='ankathet_half_with_center_origin_returns_26565'
@@ -258,7 +265,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'screen_px': screen_px_1d,
                 'screen_cm': screen_cm_1d,
                 'distance_cm': screen_cm_1d / 2 / np.sqrt(3),
-                'center_origin': False
+                'origin': 'center',
             },
             pytest.approx(60),
             id='ankathet_sqrt_3_without_center_origin_returns_60'
@@ -269,7 +276,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'screen_px': screen_px_1d,
                 'screen_cm': screen_cm_1d,
                 'distance_cm': screen_cm_1d / 2 / np.sqrt(3),
-                'center_origin': True
+                'origin': 'lower left',
             },
             pytest.approx(60),
             id='ankathet_sqrt_3_with_center_origin_returns_60'
@@ -280,7 +287,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'screen_px': screen_px_1d,
                 'screen_cm': screen_cm_1d,
                 'distance_cm': screen_cm_1d / 2 * np.sqrt(3),
-                'center_origin': False
+                'origin': 'center',
             },
             pytest.approx(30),
             id='opposite_sqrt_3_without_center_origin_returns_30'
@@ -291,7 +298,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'screen_px': screen_px_1d,
                 'screen_cm': screen_cm_1d,
                 'distance_cm': screen_cm_1d / 2 * np.sqrt(3),
-                'center_origin': True
+                'origin': 'lower left',
             },
             pytest.approx(30),
             id='opposite_sqrt_3_with_center_origin_returns_30'
@@ -302,7 +309,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'screen_px': screen_px_1d,
                 'screen_cm': screen_cm_1d,
                 'distance_cm': screen_cm_1d,
-                'center_origin': False
+                'origin': 'center',
             },
             np.array([0.0] * n_coords),
             id='list_of_zero_coords_1d'
@@ -313,7 +320,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'screen_px': screen_px_1d,
                 'screen_cm': screen_cm_1d,
                 'distance_cm': screen_cm_1d,
-                'center_origin': False
+                'origin': 'center',
             },
             np.array([0.0] * n_coords),
             id='nparray_of_zero_coords_1d'
@@ -324,7 +331,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'screen_px': screen_px_2d,
                 'screen_cm': screen_cm_2d,
                 'distance_cm': screen_cm_1d,
-                'center_origin': False
+                'origin': 'center',
             },
             np.array([[0.0, 0.0]] * n_coords),
             id='list_of_zero_coords_2d'
@@ -335,7 +342,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'screen_px': screen_px_2d,
                 'screen_cm': screen_cm_2d,
                 'distance_cm': screen_cm_1d,
-                'center_origin': False
+                'origin': 'center',
             },
             np.array([[0.0, 0.0]] * n_coords),
             id='nparray_of_zero_coords_2d'
