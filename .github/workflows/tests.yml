@@ -60,12 +60,11 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macos-latest
           - ubuntu-latest
-          - windows-latest
         tox_env:
           - flake8
           - pylint
+          - mypy
     steps:
       - uses: actions/checkout@v3
         with:
