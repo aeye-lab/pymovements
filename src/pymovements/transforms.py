@@ -16,7 +16,7 @@ def pix2deg(
         screen_px: float | list[float] | tuple[float, float] | np.ndarray,
         screen_cm: float | list[float] | tuple[float, float] | np.ndarray,
         distance_cm: float,
-        center_origin: bool = True,
+        origin: str,
 ) -> np.ndarray:
     """Converts pixel screen coordinates to degrees of visual angle.
 
@@ -30,8 +30,8 @@ def pix2deg(
         Screen dimension in centimeters
     distance_cm : float
         Eye-to-screen distance in centimeters
-    center_origin: bool
-        Center origin to (0,0) if arr origin is in bottom left corner
+    origin : str
+        Specifies the origin location of pixel coordinates. Valid values are: center, lower left.
 
     Returns
     -------
@@ -44,8 +44,12 @@ def pix2deg(
         If dimension screen_px or screen_cm don't match dimension of arr.
         If screen_px or screen_cm or one of its elements is zero.
         If distance_cm is zero.
+        If origin value is not supported.
 
     """
+    if arr is None:
+        raise TypeError("arr must not be None")
+
     checks.check_no_zeros(screen_px, "screen_px")
     checks.check_no_zeros(screen_cm, "screen_px")
     checks.check_no_zeros(distance_cm, "distance_cm")
@@ -91,8 +95,10 @@ def pix2deg(
     distance_px = distance_cm * (screen_px / screen_cm)
 
     # center screen coordinates such that 0 is in the center of the screen
-    if center_origin:
+    if origin == "lower left":
         arr = arr - (screen_px - 1) / 2
+    elif origin != "center":
+        raise ValueError(f"origin {origin} is not supported.")
 
     # 180 / pi transforms arc measure to degrees
     return np.arctan2(arr, distance_px) * 180 / np.pi

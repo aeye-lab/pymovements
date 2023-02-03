@@ -18,7 +18,6 @@ class Screen:
 
     Attributes
     ----------
-
     width_px : int
         Screen width in pixels
     height_px : int
@@ -29,6 +28,8 @@ class Screen:
         Screen height in centimeters
     distance_cm : float
         Eye-to-screen distance in centimeters
+    origin : str
+        Specifies the origin location of pixel coordinates.
     x_max_dva : float
         Maximum screen x-coordinate in degrees of visual angle
     y_max_dva : float
@@ -40,7 +41,13 @@ class Screen:
 
     """
     def __init__(
-        self, width_px: int, height_px: int, width_cm: float, height_cm: float, distance_cm: float,
+        self,
+        width_px: int,
+        height_px: int,
+        width_cm: float,
+        height_cm: float,
+        distance_cm: float,
+        origin: str,
     ):
         """
         Initializes Screen.
@@ -57,6 +64,8 @@ class Screen:
             Screen height in centimeters
         distance_cm : float
             Eye-to-screen distance in centimeters
+        origin : str
+            Specifies the origin location of pixel coordinates.
 
         Examples
         --------
@@ -66,10 +75,11 @@ class Screen:
         ...     width_cm=38,
         ...     height_cm=30,
         ...     distance_cm=68,
+        ...     origin='lower left',
         ... )
         >>> print(screen)  # doctest: +NORMALIZE_WHITESPACE
         Screen(width_px=1280, height_px=1024, width_cm=38, height_cm=30, distance_cm=68,
-         x_max_dva=15.60, y_max_dva=12.43, x_min_dva=-15.60, y_min_dva=-12.43)
+        origin=lower left, x_max_dva=15.60, y_max_dva=12.43, x_min_dva=-15.60, y_min_dva=-12.43)
 
         """
         checks.check_no_zeros(width_px, "width_px")
@@ -83,17 +93,17 @@ class Screen:
         self.width_cm = width_cm
         self.height_cm = height_cm
         self.distance_cm = distance_cm
+        self.origin = origin
 
         # calculate screen boundary coordinates in degrees of visual angle
-        self.x_max_dva = pix2deg(width_px-1, width_px, width_cm, distance_cm)
-        self.y_max_dva = pix2deg(height_px-1, height_px, height_cm, distance_cm)
-        self.x_min_dva = pix2deg(0, width_px, width_cm, distance_cm)
-        self.y_min_dva = pix2deg(0, height_px, height_cm, distance_cm)
+        self.x_max_dva = pix2deg(width_px-1, width_px, width_cm, distance_cm, origin=origin)
+        self.y_max_dva = pix2deg(height_px-1, height_px, height_cm, distance_cm, origin=origin)
+        self.x_min_dva = pix2deg(0, width_px, width_cm, distance_cm, origin=origin)
+        self.y_min_dva = pix2deg(0, height_px, height_cm, distance_cm, origin=origin)
 
     def pix2deg(
             self,
             arr: float | list[float] | list[list[float]] | np.ndarray,
-            center_origin: bool = True,
     ) -> np.ndarray:
         """
         Converts pixel screen coordinates to degrees of visual angle.
@@ -102,8 +112,6 @@ class Screen:
         ----------
         arr : float, array_like
             Pixel coordinates to transform into degrees of visual angle
-        center_origin: bool
-            Center origin to (0,0) if positions origin is in bottom left corner
 
         Returns
         -------
@@ -123,6 +131,7 @@ class Screen:
         ...     width_cm=38,
         ...     height_cm=30,
         ...     distance_cm=68,
+        ...     origin='lower left',
         ... )
         """
         return pix2deg(
@@ -130,7 +139,7 @@ class Screen:
             screen_px=(self.width_px, self.height_px),
             screen_cm=(self.width_cm, self.height_cm),
             distance_cm=self.distance_cm,
-            center_origin=center_origin,
+            origin=self.origin,
         )
 
 
@@ -150,7 +159,7 @@ class Experiment:
     def __init__(
         self, screen_width_px: int, screen_height_px: int,
         screen_width_cm: float, screen_height_cm: float,
-        distance_cm: float, sampling_rate: float,
+        distance_cm: float, origin: str, sampling_rate: float,
     ):
         """
         Initializes Experiment.
@@ -168,6 +177,8 @@ class Experiment:
             Screen height in centimeters
         distance_cm : float
             Eye-to-screen distance in centimeters
+        origin : str
+            Specifies the origin location of pixel coordinates.
         sampling_rate : float
             Sampling rate in Hz
 
@@ -178,5 +189,6 @@ class Experiment:
             width_cm=screen_width_cm,
             height_cm=screen_height_cm,
             distance_cm=distance_cm,
+            origin=origin,
         )
         self.sampling_rate = sampling_rate
