@@ -21,13 +21,12 @@ class GazeBase(PublicDataset):
         },
     ]
 
-    # FIXME: we don't have any of these screen informations and gaze data is already given in dva
     _experiment = Experiment(
-        screen_width_px=1280,
-        screen_height_px=1024,
-        screen_width_cm=38,
-        screen_height_cm=30.2,
-        distance_cm=68,
+        screen_width_px=1680,
+        screen_height_px=1050,
+        screen_width_cm=47.4,
+        screen_height_cm=29.7,
+        distance_cm=55,
         sampling_rate=1000,
     )
 
@@ -53,7 +52,6 @@ class GazeBase(PublicDataset):
     }
 
     _read_csv_kwargs = {
-        'sep': '\t',
         'columns': list(_column_map.keys()),
         'new_columns': list(_column_map.values()),
     }
