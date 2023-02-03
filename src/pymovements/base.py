@@ -6,6 +6,7 @@ from __future__ import annotations
 import numpy as np
 
 from pymovements.transforms import pix2deg
+from pymovements.transforms import pos2vel
 from pymovements.utils import checks
 from pymovements.utils.decorators import auto_str
 
@@ -158,13 +159,13 @@ class Experiment:
         Parameters
         ----------
 
-        width_px : int
+        screen_width_px : int
             Screen width in pixels
-        height_px : int
+        screen_height_px : int
             Screen height in pixels
-        width_cm : float
+        screen_width_cm : float
             Screen width in centimeters
-        height_cm : float
+        screen_height_cm : float
             Screen height in centimeters
         distance_cm : float
             Eye-to-screen distance in centimeters
@@ -180,3 +181,37 @@ class Experiment:
             distance_cm=distance_cm,
         )
         self.sampling_rate = sampling_rate
+
+    def pos2vel(
+        self,
+        arr: list[float] | list[list[float]] | np.ndarray,
+        method: str = 'smooth',
+        **kwargs,
+    ) -> np.ndarray:
+        """Compute velocity time series from 2-dimensional position time series.
+
+        Methods 'smooth', 'neighbors' and 'preceding' are adapted from
+            Engbert et al.: Microsaccade Toolbox 0.9.
+
+        Parameters
+        ----------
+        arr : array_like
+            Continuous 2D position time series
+        method : str
+            Computation method. See :func:`~transforms.pos2vel` for details, default: smooth.
+        kwargs: dict
+            Additional keyword arguments used for savitzky golay method.
+
+        Returns
+        -------
+        velocities : array_like
+            Velocity time series in input_unit / sec
+
+        Raises
+        ------
+        ValueError
+            If selected method is invalid, input array is too short for the
+            selected method or the sampling rate is below zero
+
+        """
+        return pos2vel(arr=arr, sampling_rate=self.sampling_rate, method=method, **kwargs)
