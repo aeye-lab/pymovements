@@ -46,10 +46,10 @@ class JuDo1000(PublicDataset):
         'trialId': 'trial_id',
         'pointId': 'point_id',
         'time': 'time',
-        'x_left': 'x_left_pixel',
-        'y_left': 'y_left_pixel',
-        'x_right': 'x_right_pixel',
-        'y_right': 'y_right_pixel',
+        'x_left': 'x_left_pix',
+        'y_left': 'y_left_pix',
+        'x_right': 'x_right_pix',
+        'y_right': 'y_right_pix',
     }
 
     _read_csv_kwargs = {

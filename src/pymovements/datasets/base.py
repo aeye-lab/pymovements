@@ -164,11 +164,11 @@ class Dataset:
 
         return file_dfs
 
-    def compute_dva(self, verbose: bool = True) -> None:
-        """Compute gaze positions in degrees of visual from pixel coordinates.
+    def pix2deg(self, verbose: bool = True) -> None:
+        """Compute gaze positions in degrees of visual angle from pixel coordinates.
 
-        This requires an experiment definition and also assumes that the columns 'x_left_pixel',
-         'y_left_pixel', 'x_right_pixel' and 'y_right_pixel' are available in the gaze dataframe.
+        This requires an experiment definition and also assumes that the columns 'x_left_pix',
+         'y_left_pix', 'x_right_pix' and 'y_right_pix' are available in the gaze dataframe.
 
         After success, the gaze dataframe is extended by the columns 'x_left_dva', 'y_left_dva',
         'x_right_dva' and, 'y_right_dva'.
@@ -196,16 +196,62 @@ class Dataset:
         disable_progressbar = not verbose
 
         for file_id, file_df in enumerate(tqdm(self.gaze, disable=disable_progressbar)):
-            pix_pos_cols = ['x_left_pixel', 'y_left_pixel', 'x_right_pixel', 'y_right_pixel']
-            dva_pos_cols = ['x_left_dva', 'y_left_dva', 'x_right_dva', 'y_right_dva']
+            pix_position_columns = ['x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix']
+            dva_position_columns = ['x_left_dva', 'y_left_dva', 'x_right_dva', 'y_right_dva']
 
-            pixel_data = file_df.select(pix_pos_cols)
+            pixel_positions = file_df.select(pix_position_columns)
 
-            dva_data = self.experiment.screen.pix2deg(pixel_data.transpose(), center_origin=True)
+            dva_positions = self.experiment.screen.pix2deg(pixel_positions.transpose())
 
-            for dva_pos_col_id, dva_pos_col_name in enumerate(dva_pos_cols):
+            for dva_column_id, dva_column_name in enumerate(dva_position_columns):
                 self.gaze[file_id] = self.gaze[file_id].with_columns(
-                    pl.Series(name=dva_pos_col_name, values=dva_data[:, dva_pos_col_id]),
+                    pl.Series(name=dva_column_name, values=dva_positions[:, dva_column_id]),
+                )
+
+    def pos2vel(self, method: str = 'smooth', verbose: bool = True) -> None:
+        """Compute gaze velocites in dva/s from dva coordinates.
+
+        This requires an experiment definition and also assumes that the columns 'x_left_dva',
+         'y_left_dva', 'x_right_dva' and 'y_right_dva' are available in the gaze dataframe.
+
+        After success, the gaze dataframe is extended by the columns 'x_left_vel', 'y_left_vel',
+        'x_right_vel' and, 'y_right_vel'.
+
+        Parameters
+        ----------
+        method : str
+            Computation method. See :func:`~transforms.pos2vel` for details, default: smooth.
+        verbose : bool
+            If True, show progress of computation.
+
+        Raises
+        ------
+        AttributeError
+            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
+            if experiment is None.
+        """
+        if self.gaze is None:
+            raise AttributeError(
+                "gaze files were not read yet. please run read() or read_gaze_files() beforehand",
+            )
+        if len(self.gaze) == 0:
+            raise AttributeError("no files present in gaze attribute")
+        if self.experiment is None:
+            raise AttributeError('experiment must be specified for this method.')
+
+        disable_progressbar = not verbose
+
+        for file_id, file_df in enumerate(tqdm(self.gaze, disable=disable_progressbar)):
+            position_columns = ['x_left_dva', 'y_left_dva', 'x_right_dva', 'y_right_dva']
+            velocity_columns = ['x_left_vel', 'y_left_vel', 'x_right_vel', 'y_right_vel']
+
+            positions = file_df.select(position_columns)
+
+            velocities = self.experiment.pos2vel(positions.transpose(), method=method)
+
+            for col_id, velocity_column_name in enumerate(velocity_columns):
+                self.gaze[file_id] = self.gaze[file_id].with_columns(
+                    pl.Series(name=velocity_column_name, values=velocities[:, col_id]),
                 )
 
     @property
