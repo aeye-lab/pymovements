@@ -26,7 +26,7 @@ class JuDo1000(PublicDataset):
         },
     ]
 
-    experiment = Experiment(
+    _experiment = Experiment(
         screen_width_px=1280,
         screen_height_px=1024,
         screen_width_cm=38,
@@ -60,7 +60,7 @@ class JuDo1000(PublicDataset):
 
     def __init__(self, **kwargs):
         super().__init__(
-            experiment=self.experiment,
+            experiment=self._experiment,
             filename_regex=self._filename_regex,
             filename_regex_dtypes=self._filename_regex_dtypes,
             custom_csv_kwargs=self._read_csv_kwargs,
