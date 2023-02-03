@@ -40,6 +40,8 @@ def pix2deg(
 
     Raises
     ------
+    TypeError
+        If arr is None.
     ValueError
         If dimension screen_px or screen_cm don't match dimension of arr.
         If screen_px or screen_cm or one of its elements is zero.
