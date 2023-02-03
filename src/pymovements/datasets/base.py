@@ -119,7 +119,7 @@ class Dataset:
             fileinfo_records.append(fileinfo_record)
 
         # Create dataframe from all fileinfo records.
-        fileinfo_df = pl.from_records(data=fileinfo_records)
+        fileinfo_df = pl.from_dicts(dicts=fileinfo_records, infer_schema_length=1)
         fileinfo_df = fileinfo_df.sort(by='filepath')
 
         return fileinfo_df
