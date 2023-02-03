@@ -1,23 +1,29 @@
-import re
-
-import pandas as pd
-
+"""This module provides an interface to the JuDo1000 dataset."""
 from pymovements.base import Experiment
-from pymovements.datasets import PublicDataset
+from pymovements.datasets.base import PublicDataset
 
 
 class JuDo1000(PublicDataset):
-    """JuDo1000 dataset.
+    """JuDo1000 dataset :cite:p:`JuDo1000`.
 
-    :cite:p:`JuDo1000`
+    This dataset includes binocular eye tracking data from 150 participants in four experimental
+    sessions with an interval of at least one week between two sessions. Eye movements are recorded
+    at a sampling frequence of 1000 Hz using an EyeLink Portable Duo video-based eye tracker and are
+    provided as pixel coordinates. Participants are instructed to watch a random jumping dot on a
+    computer screen.
 
+    Check the respective `repository <'https://osf.io/download/4wy7s/'>` for details.
     """
-    mirrors = [
+    _mirrors = [
         'https://osf.io/download/',
     ]
 
-    resources = [
-        {'path': '4wy7s/', 'filename': "JuDo1000.zip", 'md5': 'b8b9e5bb65b78d6f2bd260451cdd89f8'},
+    _resources = [
+        {
+            'resource': '4wy7s/',
+            'filename': "JuDo1000.zip",
+            'md5': 'b8b9e5bb65b78d6f2bd260451cdd89f8',
+        },
     ]
 
     experiment = Experiment(
@@ -29,17 +35,14 @@ class JuDo1000(PublicDataset):
         sampling_rate=1000,
     )
 
-    filename_regex = re.compile(
-        r'(?P<subject_id>\d+)'
-        r'_(?P<session_id>\d+).csv'
-    )
+    _filename_regex = r'(?P<subject_id>\d+)_(?P<session_id>\d+).csv'
 
-    filename_regex_dtypes = {
+    _filename_regex_dtypes = {
         'subject_id': int,
         'session_id': int,
     }
 
-    column_map = {
+    _column_map = {
         'trialId': 'trial_id',
         'pointId': 'point_id',
         'time': 'time',
@@ -49,11 +52,17 @@ class JuDo1000(PublicDataset):
         'y_right': 'y_right_pixel',
     }
 
-    read_csv_kwargs = {
+    _read_csv_kwargs = {
         'sep': '\t',
-        'columns': list(column_map.keys()),
-        'new_columns': list(column_map.values()),
+        'columns': list(_column_map.keys()),
+        'new_columns': list(_column_map.values()),
     }
 
     def __init__(self, **kwargs):
-        super().__init__(custom_csv_kwargs=self.read_csv_kwargs, **kwargs)
+        super().__init__(
+            experiment=self.experiment,
+            filename_regex=self._filename_regex,
+            filename_regex_dtypes=self._filename_regex_dtypes,
+            custom_csv_kwargs=self._read_csv_kwargs,
+            **kwargs,
+        )
