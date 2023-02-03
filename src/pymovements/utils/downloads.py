@@ -20,6 +20,7 @@ def download_and_extract_archive(
     download_filename: str,
     extract_dirpath: Path | None = None,
     md5: str | None = None,
+    recursive: bool = True,
     remove_finished: bool = False,
 ) -> None:
     """Download and extract archive file.
@@ -36,8 +37,10 @@ def download_and_extract_archive(
         Path to directory where archive files will be extracted to.
     md5 : str, optional
         MD5 checksum of downloaded file. If None, do not check.
+    recursive : bool
+        Recursively extract archives which are included in extracted archive.
     remove_finished : bool
-        Remove downloaded file after successful extraction or decompression.
+        Remove downloaded file after successful extraction or decompression, default: False.
 
     Raises
     ------
@@ -56,7 +59,12 @@ def download_and_extract_archive(
         extract_dirpath = download_dirpath
 
     print(f"Extracting {archive_path.name} to {extract_dirpath}")
-    extract_archive(archive_path, extract_dirpath, remove_finished)
+    extract_archive(
+        source_path=archive_path,
+        destination_path=extract_dirpath,
+        recursive=recursive,
+        remove_finished=remove_finished,
+    )
 
 
 def download_file(

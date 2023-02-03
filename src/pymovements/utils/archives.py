@@ -12,10 +12,13 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import IO
 
+from pymovements.utils.paths import get_filepaths
+
 
 def extract_archive(
     source_path: Path,
     destination_path: Path | None = None,
+    recursive: bool = True,
     remove_finished: bool = False,
 ) -> Path:
     """Extract an archive.
@@ -29,6 +32,8 @@ def extract_archive(
     destination_path : Path, optional
         Path to the directory the file will be extracted to. If omitted, the directory of the file
         is used.
+    recursive : bool
+        Recursively extract archives which are included in extracted archive.
     remove_finished : bool
         If ``True``, remove the file after the extraction.
 
@@ -56,6 +61,26 @@ def extract_archive(
     extractor(source_path, destination_path, compression_type)
     if remove_finished:
         source_path.unlink()
+
+    if recursive:
+        # Get filepaths of all archives in extracted directory.
+        archive_extensions = [
+            *_ARCHIVE_EXTRACTORS.keys(),
+            *_ARCHIVE_TYPE_ALIASES.keys(),
+            *_COMPRESSED_FILE_OPENERS.keys(),
+        ]
+        archive_filepaths = get_filepaths(path=destination_path, extension=archive_extensions)
+
+        # Extract all found archives.
+        for archive_filepath in archive_filepaths:
+            extract_destination = archive_filepath.parent / archive_filepath.stem
+
+            extract_archive(
+                source_path=archive_filepath,
+                destination_path=extract_destination,
+                recursive=recursive,
+                remove_finished=remove_finished,
+            )
 
     return destination_path
 
