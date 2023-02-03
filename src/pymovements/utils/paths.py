@@ -8,8 +8,8 @@ from pathlib import Path
 
 
 def get_filepaths(
-        rootpath: str | Path,
-        extension: str | None = None,
+        path: str | Path,
+        extension: str | list[str] | None = None,
         regex: re.Pattern | None = None,
 ) -> list[Path]:
     """
@@ -18,9 +18,9 @@ def get_filepaths(
 
     Parameters
     ----------
-    rootpath: str | Path
+    path: str | Path
         Root path to be traversed.
-    extension: str, optional
+    extension: str, list of str, optional
         File extension to be filtered for.
     regex: re.Pattern, optional
         Regular expression filenames will be filtered for.
@@ -38,17 +38,20 @@ def get_filepaths(
     if extension is not None and regex is not None:
         raise ValueError("extension and regex are mutually exclusive")
 
-    rootpath = Path(rootpath)
-    if not rootpath.is_dir():
+    if extension is not None and isinstance(extension, str):
+        extension = [extension]
+
+    path = Path(path)
+    if not path.is_dir():
         return []
 
     filepaths = []
-    for childpath in rootpath.iterdir():
+    for childpath in path.iterdir():
         if childpath.is_dir():
-            filepaths.extend(get_filepaths(rootpath=childpath, extension=extension, regex=regex))
+            filepaths.extend(get_filepaths(path=childpath, extension=extension, regex=regex))
         else:
             # if extension specified and not matching, continue to next
-            if extension and childpath.suffix != extension:
+            if extension and childpath.suffix not in extension:
                 continue
             # if regex specified and not matching, continue to next
             if regex and not regex.match(childpath.name):
