@@ -92,7 +92,7 @@ class Dataset:
 
         # Get all filepaths that match regular expression.
         csv_filepaths = get_filepaths(
-            rootpath=self.raw_dirpath,
+            path=self.raw_dirpath,
             regex=filename_regex,
         )
 
@@ -288,6 +288,7 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
                         download_filename=resource['filename'],
                         extract_dirpath=self.raw_dirpath,
                         md5=resource['md5'],
+                        recursive=True,
                         remove_finished=remove_finished,
                     )
                     success = True
