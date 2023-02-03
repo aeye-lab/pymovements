@@ -6,8 +6,7 @@ from pymovements.datasets.base import PublicDataset
 class GazeBase(PublicDataset):
     """GazeBase dataset :cite:p:`GazeBase`.
 
-    Check the respective `repository
-    <'https://figshare.com/articles/dataset/GazeBase_Data_Repository/12912257'>` for details.
+    Check the respective paper for details.
     """
     _mirrors = [
         'https://figshare.com/ndownloader/files/',
