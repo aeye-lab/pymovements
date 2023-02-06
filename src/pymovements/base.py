@@ -30,7 +30,7 @@ class Screen:
     distance_cm : float
         Eye-to-screen distance in centimeters
     origin : str
-        Specifies the screen location of the origin in the pixel coordinate system.
+        Specifies the screen location of the origin of the pixel coordinate system.
     x_max_dva : float
         Maximum screen x-coordinate in degrees of visual angle
     y_max_dva : float
@@ -66,7 +66,7 @@ class Screen:
         distance_cm : float
             Eye-to-screen distance in centimeters
         origin : str
-            Specifies the screen location of the origin in the pixel coordinate system.
+            Specifies the screen location of the origin of the pixel coordinate system.
 
         Examples
         --------
@@ -179,7 +179,7 @@ class Experiment:
         distance_cm : float
             Eye-to-screen distance in centimeters
         origin : str
-            Specifies the screen location of the origin in the pixel coordinate system.
+            Specifies the screen location of the origin of the pixel coordinate system.
         sampling_rate : float
             Sampling rate in Hz
 
