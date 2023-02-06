@@ -15,7 +15,7 @@ class GazeBase(PublicDataset):
 
     In each of the two sessions per round, participants are instructed to complete a series of
     tasks, including a fixation task (FIX), a horizontal saccade task (HSS), a random saccade task
-    (RAN), a reading task (TEX), two free viewing video task (VD1 and VD2) and a gaze-driven gaming
+    (RAN), a reading task (TEX), two free viewing video tasks (VD1 and VD2) and a gaze-driven gaming
     task (BLG).
 
     Check the respective paper for details :cite:p:`GazeBase`.
