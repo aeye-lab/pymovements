@@ -27,7 +27,7 @@ class GazeBase(PublicDataset):
     _resources = [
         {
             'resource': '27039812',
-            'filename': "GazeBase_v2_0.zip",
+            'filename': 'GazeBase_v2_0.zip',
             'md5': 'cb7eb895fb48f8661decf038ab998c9a',
         },
     ]
