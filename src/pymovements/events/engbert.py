@@ -44,8 +44,8 @@ def microsaccades(
 
     Returns
     -------
-    : list[Saccade]
-      List of Saccades
+    list[Saccade]
+        List of Saccades
 
     Raises
     ------
@@ -53,8 +53,6 @@ def microsaccades(
             If `threshold` value is below `min_threshold` value.
             If passed `threshold` is either not two-dimensional or not a supported method.
     """
-    velocities = np.array(velocities)
-
     if isinstance(threshold, str):
         threshold = compute_threshold(velocities, method=threshold)
     else:
@@ -104,6 +102,23 @@ def compute_threshold(arr: np.ndarray, method: str = 'engbert2015') -> np.ndarra
     - `mad`: This is the channel-wise median absolute deviation.
     - `engbert2003`: This is the threshold method as described in :cite:p:`EngbertKliegl2003`.
     - `engbert2015`: This is the threshold method as described in :cite:p:`Engbert2015`.
+
+    Parameters
+    ----------
+    arr : np.ndarray
+        Array for which threshold is to be computed.
+    method : str
+        Method for threshold computation.
+
+    Returns
+    -------
+    np.ndarray
+        Threshold values for horizontal and vertical direction.
+
+    Raises
+    ------
+    ValueError
+        If passed method is not supported.
     """
     if method == 'std':
         thx = np.nanstd(arr[:, 0])
