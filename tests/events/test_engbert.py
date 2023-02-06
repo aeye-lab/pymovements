@@ -1,3 +1,4 @@
+"""Test all functions in pymovements.events.engbert."""
 import pytest
 
 import numpy as np
