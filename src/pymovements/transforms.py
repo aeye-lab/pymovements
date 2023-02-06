@@ -12,7 +12,7 @@ from pymovements.utils import checks
 
 
 def pix2deg(
-        arr: float | list[float] | list[list[float]] | np.ndarray,
+        arr: float | list[float] | list[list[float]] | list[tuple[float, float]] | np.ndarray,
         screen_px: float | list[float] | tuple[float, float] | np.ndarray,
         screen_cm: float | list[float] | tuple[float, float] | np.ndarray,
         distance_cm: float,
@@ -55,7 +55,8 @@ def pix2deg(
     ...    arr=[(123.0, 865.0)],
     ...    screen_px=(1280, 1024),
     ...    screen_cm=(38.0, 30.0),
-    ...    distance_cm=68.0
+    ...    distance_cm=68.0,
+    ...    origin='lower left',
     ... )
     array([[-12.70732231,   8.65963972]])
     >>> pix2deg(
@@ -63,7 +64,7 @@ def pix2deg(
     ...    screen_px=(1280, 1024),
     ...    screen_cm=(38.0, 30.0),
     ...    distance_cm=68.0,
-    ...    center_origin=False
+    ...    origin='center',
     ... )
     array([[ 3.07379946, 20.43909054]])
 
