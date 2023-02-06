@@ -31,7 +31,7 @@ def pix2deg(
     distance_cm : float
         Eye-to-screen distance in centimeters
     origin : str
-        Specifies the screen location of the origin in the pixel coordinate system. Valid values
+        Specifies the screen location of the origin of the pixel coordinate system. Valid values
         are: center, lower left.
 
     Returns
