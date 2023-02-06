@@ -341,7 +341,7 @@ def downsample(
     return arr[select].copy()
 
 
-def consecutive(arr: np.ndarray) -> np.ndarray:
+def consecutive(arr: np.ndarray) -> list[np.ndarray]:
     """Split array into groups of consecutive numbers.
 
     Parameters
