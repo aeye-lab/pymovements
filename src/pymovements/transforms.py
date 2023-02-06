@@ -320,7 +320,7 @@ def cut_into_subsequences(
 def downsample(
         arr: np.ndarray,
         factor: int,
-):
+) -> np.ndarray:
     """
     Downsamples array by integer factor.
 
@@ -339,3 +339,25 @@ def downsample(
     select = [i % factor == 0 for i in range(sequence_length)]
 
     return arr[select].copy()
+
+
+def consecutive(arr: np.ndarray) -> np.ndarray:
+    """Split array into groups of consecutive numbers.
+
+    Parameters
+    ----------
+    arr : np.ndarray
+        Array to be split into groups of consecutive numbers.
+
+    Returns
+    -------
+    list[np.ndarray]
+        List of arrays with consecutive numbers.
+
+    Example
+    -------
+    >>> arr = np.array([0, 47, 48, 49, 50, 97, 98, 99])
+    >>> consecutive(arr)
+    [array([0]), array([47, 48, 49, 50]), array([97, 98, 99])]
+    """
+    return np.split(arr, np.where(np.diff(arr) != 1)[0] + 1)
