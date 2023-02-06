@@ -58,7 +58,7 @@ class GazeBase(PublicDataset):
         'n': 'time',
         'x': 'x_left_dva',
         'y': 'y_left_dva',
-        'val': 'val',
+        'val': 'validity',
         'xT': 'x_target_dva',
         'yT': 'y_target_dva',
     }
