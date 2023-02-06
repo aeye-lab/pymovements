@@ -35,7 +35,7 @@ def pix2deg(
 
     Returns
     -------
-    degrees_of_visual_angle : np.ndarray
+    np.ndarray
         Coordinates in degrees of visual angle
 
     Raises
@@ -60,7 +60,7 @@ def pix2deg(
     screen_px = np.array(screen_px)
     screen_cm = np.array(screen_cm)
 
-    # check basic arr dimensions
+    # Check basic arr dimensions.
     if arr.ndim not in [0, 1, 2]:
         raise ValueError(
             'Number of dimensions of arr must be either 0, 1 or 2'
@@ -89,20 +89,20 @@ def pix2deg(
         if screen_cm.shape != (2,):
             raise ValueError('arr is 4-dimensional, but screen_cm is not 2-dimensional')
 
-        # we have binocular data. double tile screen parameters.
+        # We have binocular data. Double tile screen parameters.
         screen_px = np.tile(screen_px, 2)
         screen_cm = np.tile(screen_cm, 2)
 
-    # compute eye-to-screen-distance in pixels
+    # Compute eye-to-screen-distance in pixels.
     distance_px = distance_cm * (screen_px / screen_cm)
 
-    # center screen coordinates such that 0 is in the center of the screen
+    # If pixel coordinate system is not centered, shift pixel coordinate to the center.
     if origin == "lower left":
         arr = arr - (screen_px - 1) / 2
     elif origin != "center":
         raise ValueError(f"origin {origin} is not supported.")
 
-    # 180 / pi transforms arc measure to degrees
+    # 180 / pi transforms arc measure to degrees.
     return np.arctan2(arr, distance_px) * 180 / np.pi
 
 
@@ -136,7 +136,7 @@ def pos2vel(
 
     Returns
     -------
-    velocities : array_like
+    np.ndarray
         Velocity time series in input_unit / sec
 
     Raises
