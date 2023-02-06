@@ -78,8 +78,6 @@ from pymovements.synthetic import step_function
     ],
 )
 def test_step_function(params, expected):
-    """Test step function."""
-
     if 'exception' in expected:
         with pytest.raises(expected['exception']):
             step_function(**params)
