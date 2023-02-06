@@ -49,9 +49,9 @@ def microsaccades(
 
     Raises
     ------
-        ValueError
-            If `threshold` value is below `min_threshold` value.
-            If passed `threshold` is either not two-dimensional or not a supported method.
+    ValueError
+        If `threshold` value is below `min_threshold` value.
+        If passed `threshold` is either not two-dimensional or not a supported method.
     """
     if isinstance(threshold, str):
         threshold = compute_threshold(velocities, method=threshold)
