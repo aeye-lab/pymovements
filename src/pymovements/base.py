@@ -29,7 +29,7 @@ class Screen:
     distance_cm : float
         Eye-to-screen distance in centimeters
     origin : str
-        Specifies the origin location of pixel coordinates.
+        Specifies the screen location of the origin in the pixel coordinate system.
     x_max_dva : float
         Maximum screen x-coordinate in degrees of visual angle
     y_max_dva : float
