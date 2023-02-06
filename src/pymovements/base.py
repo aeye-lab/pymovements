@@ -66,7 +66,7 @@ class Screen:
         distance_cm : float
             Eye-to-screen distance in centimeters
         origin : str
-            Specifies the origin location of pixel coordinates.
+            Specifies the screen location of the origin in the pixel coordinate system.
 
         Examples
         --------
@@ -179,7 +179,7 @@ class Experiment:
         distance_cm : float
             Eye-to-screen distance in centimeters
         origin : str
-            Specifies the origin location of pixel coordinates.
+            Specifies the screen location of the origin in the pixel coordinate system.
         sampling_rate : float
             Sampling rate in Hz
 
