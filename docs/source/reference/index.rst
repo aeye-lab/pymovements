@@ -9,6 +9,7 @@
     :template: module.rst
 
     pymovements.base
+    pymovements.datasets
     pymovements.events
     pymovements.plot
     pymovements.synthetic
