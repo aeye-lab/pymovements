@@ -63,29 +63,21 @@ def idt(
 
     positions = np.array(positions)
 
-    # make sure x is 2d
+    # make sure positions is 2d
     if positions.ndim != 2:
-        raise ValueError(
-            'positions needs to have shape (N, 2)'
-        )
+        raise ValueError('positions needs to have shape (N, 2)')
 
-    # make sure x has shape (n, 2)
+    # make sure positions has shape (N, 2)
     if positions.shape[1] != 2:
-        raise ValueError(
-            'positions needs to have shape (N, 2)'
-        )
+        raise ValueError('positions needs to have shape (N, 2)')
 
     # Check if dispersion_threshold is greater 0
     if dispersion_threshold <= 0:
-        raise ValueError(
-            'dispersion threshold must be greater than 0'
-        )
+        raise ValueError('dispersion threshold must be greater than 0')
 
     # Check if duration_threshold is greater 0
     if duration_threshold <= 0:
-        raise ValueError(
-            'duration threshold must be greater than 0'
-        )
+        raise ValueError( 'duration threshold must be greater than 0')
 
     fixations = []
 
