@@ -57,7 +57,7 @@ Once a bug is reported, our development team will try to address the issue as qu
 If you're looking for things to help with, try browsing our [issue tracker](
 https://github.com/aeye-lab/pymovements/issues) first. In particular, look for:
 
-- [good first issues](https://github.com/aeye-lab/pymovements/labels/good+first+issue)
+- [good first issues](https://github.com/aeye-lab/pymovements/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 - [documentation issues](https://github.com/aeye-lab/pymovements/labels/documentation)
 
 You do not need to ask for permission to work on any of these issues. The current status of the
