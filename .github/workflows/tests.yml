@@ -7,11 +7,21 @@ on:
 
 jobs:
   test:
-    name: test ${{matrix.tox_env}}
-    runs-on: ubuntu-latest
+    name: test ${{ matrix.tox_env }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
+        tox_env:
+          - py37
+          - py38
+          - py39
+          - py310
+          - py311
         include:
           - tox_env: py37
             python: "3.7"
@@ -19,18 +29,22 @@ jobs:
             python: "3.8"
           - tox_env: py39
             python: "3.9"
+          - tox_env: py310
+            python: "3.10"
+          - tox_env: py311
+            python: "3.11"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Install base python for tox
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: "3.9"
       - name: Install tox
         run: python -m pip install tox
       - name: Install python for test
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
       - name: Setup test environment
@@ -40,20 +54,23 @@ jobs:
 
 
   check:
-    name: check ${{ matrix.tox_env }}
-    runs-on: ubuntu-latest
+    name: check ${{ matrix.tox_env }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os:
+          - ubuntu-latest
         tox_env:
           - flake8
           - pylint
+          - mypy
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Install base python for tox
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: "3.9"
       - name: Install tox
@@ -64,20 +81,23 @@ jobs:
         run: tox --skip-pkg-install -e ${{ matrix.tox_env }}
 
   docs:
-    name: docs
-    runs-on: ubuntu-latest
+    name: docs (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
+      matrix:
+        os:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Install base python for tox
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: "3.9"
-      - name: Install pandoc
-        run: sudo apt-get update -y && sudo apt-get install -y pandoc
       - name: Install tox
         run: python -m pip install tox
       - name: Setup test environment

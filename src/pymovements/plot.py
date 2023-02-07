@@ -10,7 +10,6 @@ from matplotlib import colors
 from matplotlib.collections import LineCollection
 
 
-# pylint: disable=consider-using-namedtuple-or-dataclass
 default_segmentdata = {
     'red':   [
         [0.0,  0.0, 0.0],
@@ -29,7 +28,7 @@ default_segmentdata = {
     ],
 }
 
-# pylint: disable=consider-using-namedtuple-or-dataclass
+
 default_segmentdata_twoslope = {
     'red':   [
         [0.0,  0.0, 0.0],

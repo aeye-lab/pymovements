@@ -1,9 +1,6 @@
 """
 This module tests functionality of base event classes.
 """
-from __future__ import annotations
-from typing import Any
-
 import pytest
 
 from pymovements.events import Event
@@ -11,7 +8,6 @@ from pymovements.events import Fixation
 from pymovements.events import Saccade
 
 
-# pylint: disable=protected-access
 @pytest.mark.parametrize(
     'event_class, init_params, expected',
     [
@@ -29,8 +25,8 @@ from pymovements.events import Saccade
         ),
         pytest.param(
             Fixation,
-            {'onset': 10, 'offset': 100},
-            {'name': Fixation._name, 'duration': 90},
+            {'onset': 10, 'offset': 100, 'position': (1, 1)},
+            {'name': Fixation._name, 'duration': 90, 'position': (1, 1)},
             id='fixation',
         ),
         pytest.param(
@@ -39,9 +35,9 @@ from pymovements.events import Saccade
             {'name': Saccade._name, 'duration': 90},
             id='saccade',
         ),
-    ]
+    ],
 )
-def test_event_class(event_class: Event, init_params: dict[str, Any], expected: dict[str, Any]):
+def test_event_class(event_class, init_params, expected):
     """Test if instantiated event attributes fit expected values."""
     event = event_class(**init_params)
 
@@ -51,3 +47,8 @@ def test_event_class(event_class: Event, init_params: dict[str, Any], expected: 
     assert event.duration == expected['duration'], (
         f'event duration does not match expected value ({event.duration} != {expected["duration"]})'
     )
+    if 'position' in expected.keys():
+        assert event.position == expected['position'], (
+            'fixation event position does not match expected value'
+            f'({event.position} != {expected["position"]})'
+        )
