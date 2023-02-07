@@ -41,7 +41,7 @@ def idt(
 
     Parameters
     ----------
-    positions: array-like
+    positions: array-like, shape (N, 2)
         Continuous 2D position time series
     dispersion_threshold: float
         Threshold for dispersion for a group of consecutive samples to be identified as fixation
@@ -50,7 +50,7 @@ def idt(
 
     Returns
     -------
-    fixations:
+    list[Fixation]:
         List of Fixation events
 
     Raises
