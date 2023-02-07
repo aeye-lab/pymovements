@@ -12,6 +12,12 @@ def dispersion(positions: list[list[float]] | np.ndarray) -> float:
     """
     Compute the dispersion of a group of consecutive points in a 2D position time series.
 
+    The algorithm identifies fixations by grouping consecutive points
+    within a maximum separation (dispersion) threshold and a minimum duration threshold.
+    The algorithm uses a moving window to check the dispersion of the points in the window.
+    If the dispersion is below the threshold, the window represents a fixation,
+    and the window is expanded until the dispersion is above threshold.
+
     The dispersion is defined as the sum of the differences between
     the points' maximum and minimum x and y values
 
@@ -77,7 +83,7 @@ def idt(
 
     # Check if duration_threshold is greater 0
     if duration_threshold <= 0:
-        raise ValueError( 'duration threshold must be greater than 0')
+        raise ValueError('duration threshold must be greater than 0')
 
     fixations = []
 
