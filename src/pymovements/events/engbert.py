@@ -2,6 +2,7 @@
 This module holds the implementation for the Engbert microsaccades algorithm.
 """
 from __future__ import annotations
+
 from collections.abc import Sized
 
 import numpy as np
@@ -63,7 +64,7 @@ def microsaccades(
     if (threshold < min_threshold).any():
         raise ValueError(
             'threshold does not provide enough variance as required by min_threshold'
-            f' ({threshold} < {min_threshold})'
+            f' ({threshold} < {min_threshold})',
         )
 
     # Radius of elliptic threshold.
@@ -129,10 +130,12 @@ def compute_threshold(arr: np.ndarray, method: str = 'engbert2015') -> np.ndarra
         thy = np.nanmedian(np.absolute(arr[:, 1] - np.nanmedian(arr[:, 1])))
 
     elif method == 'engbert2003':
-        thx = np.sqrt(np.nanmedian(np.power(arr[:, 0], 2))
-                      - np.power(np.nanmedian(arr[:, 0]), 2))
-        thy = np.sqrt(np.nanmedian(np.power(arr[:, 1], 2))
-                      - np.power(np.nanmedian(arr[:, 1]), 2))
+        thx = np.sqrt(
+            np.nanmedian(np.power(arr[:, 0], 2)) - np.power(np.nanmedian(arr[:, 0]), 2),
+        )
+        thy = np.sqrt(
+            np.nanmedian(np.power(arr[:, 1], 2)) - np.power(np.nanmedian(arr[:, 1]), 2),
+        )
 
     elif method == 'engbert2015':
         thx = np.sqrt(np.nanmedian(np.power(arr[:, 0] - np.nanmedian(arr[:, 0]), 2)))
@@ -140,7 +143,6 @@ def compute_threshold(arr: np.ndarray, method: str = 'engbert2015') -> np.ndarra
 
     else:
         valid_methods = ['std', 'mad', 'engbert2003', 'engbert2015']
-        raise ValueError(
-            f'Method "{method}" not implemented. Valid methods: {valid_methods}')
+        raise ValueError(f'Method "{method}" not implemented. Valid methods: {valid_methods}')
 
     return np.array([thx, thy])
