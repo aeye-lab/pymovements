@@ -33,8 +33,14 @@ def idt(
     """
     x = np.array(x)
 
+    # make sure x is 2d
+    if x.ndim != 2:
+        raise ValueError(
+            'x needs to have shape (n, 2)'
+        )
+
     # make sure x has shape (n, 2)
-    if x.ndim != 2 and x.shape[1] != 2:
+    if x.shape[1] != 2:
         raise ValueError(
             'x needs to have shape (n, 2)'
         )
