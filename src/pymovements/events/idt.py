@@ -1,3 +1,6 @@
+"""
+This module holds the implementation for idt algorithm.
+"""
 from __future__ import annotations
 
 import numpy as np
@@ -5,8 +8,24 @@ import numpy as np
 from pymovements.events import Fixation
 
 
-def dispersion(positions):
-    return np.sum(np.max(positions, axis=0) - np.min(positions, axis=0))
+def dispersion(positions: list[list[float]] | np.ndarray) -> float:
+    """
+    Compute the dispersion of a group of consecutive points in a 2D position time series.
+
+    The dispersion is defined as the sum of the differences between
+    the points' maximum and minimum x and y values
+
+    Parameters
+    ----------
+    positions: array-like
+        Continuous 2D position time series.
+
+    Returns
+    -------
+    dispersion: float
+        Dispersion of the group of points.
+    """
+    return sum(np.max(positions, axis=0) - np.min(positions, axis=0))
 
 
 def idt(
@@ -85,7 +104,9 @@ def idt(
                     break
 
             # Note a fixation at the centroid of the window points
-            centroid = tuple(np.mean(positions[win_start:win_end], axis=0))
+            centroid = np.mean(positions[win_start:win_end], axis=0)
+            centroid = (centroid[0], centroid[1])
+
             fixations.append(Fixation(win_start, win_end, centroid))
 
             # Initialize new window excluding the previous window
