@@ -16,7 +16,7 @@
 
 pymovements is an open-source python package for processing eye movement data. It provides a simple
 interface to download publicly available datasets, preprocess gaze data, detect oculomotoric events
-and render plots to visually analyze your results. 
+and render plots to visually analyze your results.
 
 - **Website:** https://github.com/aeye-lab/pymovements
 - **Documentation:** https://pymovements.readthedocs.io

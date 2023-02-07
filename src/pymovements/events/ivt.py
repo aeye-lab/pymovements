@@ -5,14 +5,14 @@ from __future__ import annotations
 
 import numpy as np
 
-from pymovements.transforms import norm
 from pymovements.events import Fixation
+from pymovements.transforms import norm
 
 
 def ivt(
         positions: list[list[float]] | np.ndarray,
         velocities: list[list[float]] | np.ndarray,
-        velocity_threshold: float
+        velocity_threshold: float,
 ) -> list[Fixation]:
     """
     Identification of fixations based on velocity-threshold
@@ -66,8 +66,10 @@ def ivt(
 
     # Check matching shape for positions and velocities
     if positions.shape != velocities.shape:
-        raise ValueError(f"shape of positions {positions.shape} doesn't match"
-                         f"shape of velocities {velocities.shape}")
+        raise ValueError(
+            f"shape of positions {positions.shape} doesn't match"
+            f"shape of velocities {velocities.shape}",
+        )
 
     # Check if threshold is None
     if velocity_threshold is None:

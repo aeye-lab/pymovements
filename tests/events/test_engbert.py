@@ -1,9 +1,9 @@
 """Test all functions in pymovements.events.engbert."""
+import numpy as np
 import pytest
 
-import numpy as np
-
-from pymovements.events.engbert import microsaccades, compute_threshold
+from pymovements.events.engbert import compute_threshold
+from pymovements.events.engbert import microsaccades
 
 
 @pytest.mark.parametrize(
@@ -24,7 +24,7 @@ from pymovements.events.engbert import microsaccades, compute_threshold
             {'exception': ValueError},
             id='low_variance_pitch_threshold_raise_runtime_error',
         ),
-    ]
+    ],
 )
 def test_microsaccades(params, expected):
     if 'exception' in expected:
@@ -64,7 +64,7 @@ def test_microsaccades(params, expected):
             {'value': np.array((1., 1.))},
             id='engbert2015',
         ),
-    ]
+    ],
 )
 def test_compute_threshold(params, expected):
     v = np.empty((101, 2))

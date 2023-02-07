@@ -26,7 +26,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             TypeError,
-            id='none_coords_raises_type_error'
+            id='none_coords_raises_type_error',
         ),
         pytest.param(
             {
@@ -37,7 +37,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             TypeError,
-            id='none_screen_px_raises_type_error'
+            id='none_screen_px_raises_type_error',
         ),
         pytest.param(
             {
@@ -48,7 +48,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             TypeError,
-            id='none_screen_cm_raises_type_error'
+            id='none_screen_cm_raises_type_error',
         ),
         pytest.param(
             {
@@ -59,7 +59,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             TypeError,
-            id='none_distance_cm_raises_type_error'
+            id='none_distance_cm_raises_type_error',
         ),
         pytest.param(
             {
@@ -70,7 +70,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             ValueError,
-            id='zero_screen_px_raises_value_error'
+            id='zero_screen_px_raises_value_error',
         ),
         pytest.param(
             {
@@ -81,7 +81,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             ValueError,
-            id='zero_screen_cm_raises_value_error'
+            id='zero_screen_cm_raises_value_error',
         ),
         pytest.param(
             {
@@ -92,7 +92,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             ValueError,
-            id='zero_distance_cm_raises_value_error'
+            id='zero_distance_cm_raises_value_error',
         ),
         pytest.param(
             {
@@ -103,7 +103,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             ValueError,
-            id='rank_3_tensor_raises_value_error'
+            id='rank_3_tensor_raises_value_error',
         ),
         pytest.param(
             {
@@ -114,7 +114,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             ValueError,
-            id='list_coords_2d_screen_px_1d_raises_value_error'
+            id='list_coords_2d_screen_px_1d_raises_value_error',
         ),
         pytest.param(
             {
@@ -125,7 +125,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             ValueError,
-            id='list_coords_2d_screen_cm_1d_raises_value_error'
+            id='list_coords_2d_screen_cm_1d_raises_value_error',
         ),
         pytest.param(
             {
@@ -136,7 +136,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             ValueError,
-            id='list_coords_1d_screen_px_2d_raises_value_error'
+            id='list_coords_1d_screen_px_2d_raises_value_error',
         ),
         pytest.param(
             {
@@ -147,7 +147,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             ValueError,
-            id='list_coords_1d_screen_cm_2d_raises_value_error'
+            id='list_coords_1d_screen_cm_2d_raises_value_error',
         ),
         pytest.param(
             {
@@ -158,9 +158,9 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             ValueError,
-            id='list_coords_3d_raises_value_error'
-        )
-    ]
+            id='list_coords_3d_raises_value_error',
+        ),
+    ],
 )
 def test_pix2deg_raises_error(kwargs, expected_error):
     with pytest.raises(expected_error):
@@ -179,7 +179,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'origin': 'center',
             },
             0,
-            id='zero_coord_without_center_origin_returns_zero'
+            id='zero_coord_without_center_origin_returns_zero',
         ),
         pytest.param(
             {
@@ -190,7 +190,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'origin': 'lower left',
             },
             0,
-            id='center_coord_with_center_origin_returns_zero'
+            id='center_coord_with_center_origin_returns_zero',
         ),
         pytest.param(
             {
@@ -201,7 +201,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'origin': 'center',
             },
             45,
-            id='isosceles_triangle_without_center_origin_returns_45'
+            id='isosceles_triangle_without_center_origin_returns_45',
         ),
         pytest.param(
             {
@@ -212,7 +212,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'origin': 'lower left',
             },
             45,
-            id='isosceles_triangle_with_center_origin_returns_45'
+            id='isosceles_triangle_with_center_origin_returns_45',
         ),
         pytest.param(
             {
@@ -223,7 +223,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'origin': 'lower left',
             },
             -45,
-            id='isosceles_triangle_left_with_center_origin_returns_minus45'
+            id='isosceles_triangle_left_with_center_origin_returns_minus45',
         ),
         pytest.param(
             {
@@ -234,7 +234,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'origin': 'center',
             },
             45,
-            id='nparray_of_isosceles_triangle_without_center_origin_returns_45'
+            id='nparray_of_isosceles_triangle_without_center_origin_returns_45',
         ),
         pytest.param(
             {
@@ -245,7 +245,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'origin': 'center',
             },
             pytest.approx(26.565, abs=1e-4),
-            id='ankathet_half_without_center_origin_returns_26565'
+            id='ankathet_half_without_center_origin_returns_26565',
         ),
         pytest.param(
             {
@@ -256,7 +256,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'origin': 'lower left',
             },
             pytest.approx(26.565, abs=1e-4),
-            id='ankathet_half_with_center_origin_returns_26565'
+            id='ankathet_half_with_center_origin_returns_26565',
         ),
         pytest.param(
             {
@@ -267,7 +267,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'origin': 'center',
             },
             pytest.approx(60),
-            id='ankathet_sqrt_3_without_center_origin_returns_60'
+            id='ankathet_sqrt_3_without_center_origin_returns_60',
         ),
         pytest.param(
             {
@@ -278,7 +278,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'origin': 'lower left',
             },
             pytest.approx(60),
-            id='ankathet_sqrt_3_with_center_origin_returns_60'
+            id='ankathet_sqrt_3_with_center_origin_returns_60',
         ),
         pytest.param(
             {
@@ -289,7 +289,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'origin': 'center',
             },
             pytest.approx(30),
-            id='opposite_sqrt_3_without_center_origin_returns_30'
+            id='opposite_sqrt_3_without_center_origin_returns_30',
         ),
         pytest.param(
             {
@@ -300,7 +300,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'origin': 'lower left',
             },
             pytest.approx(30),
-            id='opposite_sqrt_3_with_center_origin_returns_30'
+            id='opposite_sqrt_3_with_center_origin_returns_30',
         ),
         pytest.param(
             {
@@ -311,7 +311,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'origin': 'center',
             },
             np.array([0.0] * n_coords),
-            id='list_of_zero_coords_1d'
+            id='list_of_zero_coords_1d',
         ),
         pytest.param(
             {
@@ -322,7 +322,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'origin': 'center',
             },
             np.array([0.0] * n_coords),
-            id='nparray_of_zero_coords_1d'
+            id='nparray_of_zero_coords_1d',
         ),
         pytest.param(
             {
@@ -333,7 +333,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'origin': 'center',
             },
             np.array([[0.0, 0.0]] * n_coords),
-            id='list_of_zero_coords_2d'
+            id='list_of_zero_coords_2d',
         ),
         pytest.param(
             {
@@ -344,9 +344,9 @@ def test_pix2deg_raises_error(kwargs, expected_error):
                 'origin': 'center',
             },
             np.array([[0.0, 0.0]] * n_coords),
-            id='nparray_of_zero_coords_2d'
-        )
-    ]
+            id='nparray_of_zero_coords_2d',
+        ),
+    ],
 )
 def test_pix2deg_returns(kwargs, expected_value):
     actual_value = pix2deg(**kwargs)
@@ -359,52 +359,52 @@ def test_pix2deg_returns(kwargs, expected_value):
         pytest.param(
             {
                 'arr': [[0] * 10],
-                'sampling_rate': 0
+                'sampling_rate': 0,
             },
             ValueError,
-            id='sampling_rate_zero_raises_value_error'
+            id='sampling_rate_zero_raises_value_error',
         ),
         pytest.param(
             {
                 'arr': [[0] * 10],
-                'sampling_rate': -1
+                'sampling_rate': -1,
             },
             ValueError,
-            id='sampling_rate_less_zero_raises_value_error'
+            id='sampling_rate_less_zero_raises_value_error',
         ),
         pytest.param(
             {
                 'arr': [0] * 5,
-                'method': 'smooth'
+                'method': 'smooth',
             },
             ValueError,
-            id='list_length_below_six_method_smooth_raises_value_error'
+            id='list_length_below_six_method_smooth_raises_value_error',
         ),
         pytest.param(
             {
                 'arr': [0] * 2,
-                'method': 'neighbors'
+                'method': 'neighbors',
             },
             ValueError,
-            id='list_length_below_three_method_neighbors_raises_value_error'
+            id='list_length_below_three_method_neighbors_raises_value_error',
         ),
         pytest.param(
             {
                 'arr': [0],
-                'method': 'preceding'
+                'method': 'preceding',
             },
             ValueError,
-            id='list_length_below_two_method_preceding_raises_value_error'
+            id='list_length_below_two_method_preceding_raises_value_error',
         ),
         pytest.param(
             {
                 'arr': [0] * 10,
-                'method': 'invalid'
+                'method': 'invalid',
             },
             ValueError,
-            id='invalid_method_raises_value_error'
-        )
-    ]
+            id='invalid_method_raises_value_error',
+        ),
+    ],
 )
 def test_pos2vel_raises_error(kwargs, expected_error):
     with pytest.raises(expected_error):
@@ -416,8 +416,8 @@ def test_pos2vel_raises_error(kwargs, expected_error):
     [
         pytest.param('smooth', id='method_smooth'),
         pytest.param('neighbors', id='method_neighbors'),
-        pytest.param('preceding', id='method_preceding')
-    ]
+        pytest.param('preceding', id='method_preceding'),
+    ],
 )
 @pytest.mark.parametrize(
     'kwargs, padding, expected_value',
@@ -425,22 +425,22 @@ def test_pos2vel_raises_error(kwargs, expected_error):
         pytest.param(
             {
                 'arr': np.repeat(0, n_coords),
-                'sampling_rate': 1
+                'sampling_rate': 1,
             },
             (0, n_coords),
             np.zeros(n_coords),
-            id='constant_input_returns_zero_velocity'
+            id='constant_input_returns_zero_velocity',
         ),
         pytest.param(
             {
                 'arr': np.linspace(0, n_coords - 1, n_coords),
-                'sampling_rate': 1
+                'sampling_rate': 1,
             },
             (1, -1),
             np.ones(n_coords),
-            id='linear_input_returns_constant_velocity'
-        )
-    ]
+            id='linear_input_returns_constant_velocity',
+        ),
+    ],
 )
 def test_pos2vel_returns(method, kwargs, padding, expected_value):
     actual_value = pos2vel(**kwargs, method=method)
@@ -455,14 +455,14 @@ def test_pos2vel_returns(method, kwargs, padding, expected_value):
             id='method_preceding_alternating_velocity',
         ),
         pytest.param(
-            'neighbors', np.ones((100, )),
+            'neighbors', np.ones((100,)),
             id='method_neighbors_alternating_velocity',
         ),
         pytest.param(
-            'smooth', np.ones((100, )),
+            'smooth', np.ones((100,)),
             id='method_smooth_alternating_velocity',
         ),
-    ]
+    ],
 )
 def test_pos2vel_stepped_input_returns(method, expected_value):
     N = 100
