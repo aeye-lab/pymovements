@@ -41,10 +41,13 @@ pip-delete-this-directory.txt
 \#*\#
 .\#*
 
+# PyCharm files
+.idea
+
 # Docs
 docs/build
 docs/doctree*
-
+docs/source/reference/pymovements.*.rst
 # Testing
 .tox
 .coverage

@@ -3,10 +3,12 @@ Transforms module.
 """
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 import scipy
 
-from . import checks
+from pymovements.utils import checks
 
 
 def pix2deg(
@@ -14,7 +16,7 @@ def pix2deg(
         screen_px: float | list[float] | tuple[float, float] | np.ndarray,
         screen_cm: float | list[float] | tuple[float, float] | np.ndarray,
         distance_cm: float,
-        center_origin: bool = True,
+        origin: str,
 ) -> np.ndarray:
     """Converts pixel screen coordinates to degrees of visual angle.
 
@@ -28,22 +30,29 @@ def pix2deg(
         Screen dimension in centimeters
     distance_cm : float
         Eye-to-screen distance in centimeters
-    center_origin: bool
-        Center origin to (0,0) if arr origin is in bottom left corner
+    origin : str
+        Specifies the screen location of the origin of the pixel coordinate system. Valid values
+        are: center, lower left.
 
     Returns
     -------
-    degrees_of_visual_angle : np.ndarray
+    np.ndarray
         Coordinates in degrees of visual angle
 
     Raises
     ------
+    TypeError
+        If arr is None.
     ValueError
         If dimension screen_px or screen_cm don't match dimension of arr.
         If screen_px or screen_cm or one of its elements is zero.
         If distance_cm is zero.
+        If origin value is not supported.
 
     """
+    if arr is None:
+        raise TypeError("arr must not be None")
+
     checks.check_no_zeros(screen_px, "screen_px")
     checks.check_no_zeros(screen_cm, "screen_px")
     checks.check_no_zeros(distance_cm, "distance_cm")
@@ -52,7 +61,7 @@ def pix2deg(
     screen_px = np.array(screen_px)
     screen_cm = np.array(screen_cm)
 
-    # check basic arr dimensions
+    # Check basic arr dimensions.
     if arr.ndim not in [0, 1, 2]:
         raise ValueError(
             'Number of dimensions of arr must be either 0, 1 or 2'
@@ -81,18 +90,20 @@ def pix2deg(
         if screen_cm.shape != (2,):
             raise ValueError('arr is 4-dimensional, but screen_cm is not 2-dimensional')
 
-        # we have binocular data. double tile screen parameters.
+        # We have binocular data. Double tile screen parameters.
         screen_px = np.tile(screen_px, 2)
         screen_cm = np.tile(screen_cm, 2)
 
-    # compute eye-to-screen-distance in pixels
+    # Compute eye-to-screen-distance in pixels.
     distance_px = distance_cm * (screen_px / screen_cm)
 
-    # center screen coordinates such that 0 is in the center of the screen
-    if center_origin:
+    # If pixel coordinate system is not centered, shift pixel coordinate to the center.
+    if origin == "lower left":
         arr = arr - (screen_px - 1) / 2
+    elif origin != "center":
+        raise ValueError(f"origin {origin} is not supported.")
 
-    # 180 / pi transforms arc measure to degrees
+    # 180 / pi transforms arc measure to degrees.
     return np.arctan2(arr, distance_px) * 180 / np.pi
 
 
@@ -126,7 +137,7 @@ def pos2vel(
 
     Returns
     -------
-    velocities : array_like
+    np.ndarray
         Velocity time series in input_unit / sec
 
     Raises
@@ -213,9 +224,9 @@ def pos2vel(
     return v
 
 
-def vnorm(arr: np.ndarray, axis: int | None = None) -> np.ndarray:
+def norm(arr: np.ndarray, axis: int | None = None) -> np.ndarray | Any:
     """
-    Takes the velocity norm sqrt(x^2 + y^2).
+    Takes the norm sqrt(x^2 + y^2).
 
     Parameters
     ----------
@@ -242,7 +253,9 @@ def vnorm(arr: np.ndarray, axis: int | None = None) -> np.ndarray:
     return np.linalg.norm(arr, axis=axis)
 
 
-def cut_into_subsequences(arr: np.ndarray, window_size: int, keep_padded: bool = True):
+def cut_into_subsequences(
+    arr: np.ndarray, window_size: int, keep_padded: bool = True,
+) -> np.ndarray:
     """
     Example: if old seq len was 7700, window_size=1000:
     Input arr has: 144 x 7700 x n_channels
@@ -307,7 +320,7 @@ def cut_into_subsequences(arr: np.ndarray, window_size: int, keep_padded: bool =
 def downsample(
         arr: np.ndarray,
         factor: int,
-):
+) -> np.ndarray:
     """
     Downsamples array by integer factor.
 
@@ -326,3 +339,25 @@ def downsample(
     select = [i % factor == 0 for i in range(sequence_length)]
 
     return arr[select].copy()
+
+
+def consecutive(arr: np.ndarray) -> list[np.ndarray]:
+    """Split array into groups of consecutive numbers.
+
+    Parameters
+    ----------
+    arr : np.ndarray
+        Array to be split into groups of consecutive numbers.
+
+    Returns
+    -------
+    list[np.ndarray]
+        List of arrays with consecutive numbers.
+
+    Example
+    -------
+    >>> arr = np.array([0, 47, 48, 49, 50, 97, 98, 99])
+    >>> consecutive(arr)
+    [array([0]), array([47, 48, 49, 50]), array([97, 98, 99])]
+    """
+    return np.split(arr, np.where(np.diff(arr) != 1)[0] + 1)

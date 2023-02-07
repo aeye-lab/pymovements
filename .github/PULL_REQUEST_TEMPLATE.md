@@ -4,22 +4,22 @@ Please include a clear and concise description of the change and which issue is 
 Please also include excepted improvements, relevant motivation and context.
 List any dependencies that are required for this change.
 
-Fixes # (issue) (see: [issues](https://github.com/aeye-lab/pymovements/issues))
+Fixes issue #
 
 ## Implemented changes
-- Insert a description of the changes implemented in the pull request.
-  - [ ] Change 1
-  - [ ] Change 2
-  - [ ] Change 3
+
+Insert a description of the changes implemented in the pull request.
+
+- [ ] Change 1
+- [ ] Change 2
+- [ ] Change 3
 
 ## Type of change
-
-Please delete options that are not relevant.
 
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] This change requires a documentation update
+- [ ] This change is or requires a documentation update
 
 ## How Has This Been Tested?
 

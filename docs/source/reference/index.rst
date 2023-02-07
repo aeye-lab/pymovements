@@ -9,9 +9,9 @@
     :template: module.rst
 
     pymovements.base
-    pymovements.checks
+    pymovements.datasets
     pymovements.events
-    pymovements.paths
     pymovements.plot
     pymovements.synthetic
     pymovements.transforms
+    pymovements.utils

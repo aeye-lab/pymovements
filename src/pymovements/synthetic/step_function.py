@@ -1,8 +1,6 @@
 """
 This module holds the synthetic eye gaze step function.
 """
-
-
 from __future__ import annotations
 
 from collections.abc import Sized
@@ -53,8 +51,10 @@ def step_function(
     """
     # Check that steps and values have equal length.
     if len(steps) != len(values):
-        raise ValueError('length of steps not equal to length of values'
-                         f' ({len(steps)} != {len(values)})')
+        raise ValueError(
+            'length of steps not equal to length of values'
+            f' ({len(steps)} != {len(values)})',
+        )
 
     # Check that steps are sorted in ascending order.
     if sorted(steps) != steps:

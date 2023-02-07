@@ -28,7 +28,7 @@ default_segmentdata = {
     ],
 }
 
-# pylint: disable=consider-using-namedtuple-or-dataclass
+
 default_segmentdata_twoslope = {
     'red':   [
         [0.0,  0.0, 0.0],
