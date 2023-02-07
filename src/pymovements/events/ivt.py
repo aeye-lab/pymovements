@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from pymovements.transforms import vnorm
+from pymovements.transforms import norm
 from pymovements.events import Fixation
 
 
@@ -77,7 +77,7 @@ def ivt(
     if velocity_threshold <= 0:
         raise ValueError('velocity threshold must be greater than 0')
 
-    velocity_norm = vnorm(velocities, axis=1)
+    velocity_norm = norm(velocities, axis=1)
 
     # Map velocities lower than threshold to True and greater equals to False
     fix_map = velocity_norm < velocity_threshold
