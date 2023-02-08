@@ -21,6 +21,7 @@ and render plots to visually analyze your results.
 - **Website:** https://github.com/aeye-lab/pymovements
 - **Documentation:** https://pymovements.readthedocs.io
 - **Source code:** https://github.com/aeye-lab/pymovements
+- **Mailing list:** pymovements-list@uni-potsdam.de
 - **Contributing:** https://github.com/aeye-lab/pymovements/blob/main/CONTRIBUTING.md
 - **Bug reports:** https://github.com/aeye-lab/pymovements/issues
 - **PyPI package:** https://pypi.org/project/pymovements
@@ -51,7 +52,7 @@ For a detailed guide, please refer to our [CONTRIBUTING.md](CONTRIBUTING.md) fir
 
 If you have any questions, please [open an issue](
 https://github.com/aeye-lab/pymovements/issues/new/choose) or write us at
-[daniel.krakowczyk@uni-potsdam.de](mailto:daniel.krakowczyk@uni-potsdam.de)
+[pymovements-list@uni-potsdam.de](mailto:pymovements-list@uni-potsdam.de)
 
 
 ## Citing
