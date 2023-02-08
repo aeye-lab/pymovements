@@ -8,7 +8,7 @@ to pymovements.
 
 **Questions:** If you have any developer-related questions, please [open an issue](
 https://github.com/aeye-lab/pymovements/issues/new/choose) or write us at
-[daniel.krakowczyk@uni-potsdam.de](mailto:daniel.krakowczyk@uni-potsdam.de).
+[pymovements-list@uni-potsdam.de](mailto:pymovements-list@uni-potsdam.de)
 
 
 ## Table of Contents
@@ -258,4 +258,4 @@ relicense the contributed code.
 
 If you have any developer-related questions, please [open an issue](
 https://github.com/aeye-lab/pymovements/issues/new/choose) or write us at
-[daniel.krakowczyk@uni-potsdam.de](mailto:daniel.krakowczyk@uni-potsdam.de).
+[pymovements-list@uni-potsdam.de](mailto:pymovements-list@uni-potsdam.de)
