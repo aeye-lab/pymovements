@@ -443,33 +443,45 @@ def test_pos2vel_raises_error(kwargs, expected_error):
     ],
 )
 def test_pos2vel_returns(method, kwargs, padding, expected_value):
-    actual_value = pos2vel(**kwargs, method=method)
+    actual_value = pos2vel(method=method, **kwargs)
     assert (actual_value[padding[0]:padding[1]] == expected_value[padding[0]:padding[1]]).all()
 
 
 @pytest.mark.parametrize(
-    'method, expected_value',
+    'params, expected_value',
     [
         pytest.param(
-            'preceding', np.array([2.0, 0.0] * (100 // 2)),
+            {'method': 'preceding', 'sampling_rate': 1},
+            np.array([2.0, 0.0] * (100 // 2)),
             id='method_preceding_alternating_velocity',
         ),
         pytest.param(
-            'neighbors', np.ones((100,)),
-            id='method_neighbors_alternating_velocity',
+            {'method': 'neighbors', 'sampling_rate': 1},
+            np.ones((100,)),
+            id='method_neighbors_linear_velocity',
         ),
         pytest.param(
-            'smooth', np.ones((100,)),
-            id='method_smooth_alternating_velocity',
+            {'method': 'smooth', 'sampling_rate': 1},
+            np.ones((100,)),
+            id='method_smooth_linear_velocity',
+        ),
+        pytest.param(
+            {'method': 'savitzky_golay', 'window_length': 7, 'polyorder': 2, 'sampling_rate': 1},
+            np.concatenate([
+                np.array([0.71428571, 0.80952381, 0.9047619]),
+                np.ones((94,)),
+                np.array([0.9047619 , 0.80952381, 0.71428571]),
+            ]),
+            id='method_savitzky_golay_linear_velocity',
         ),
     ],
 )
-def test_pos2vel_stepped_input_returns(method, expected_value):
+def test_pos2vel_stepped_input_returns(params, expected_value):
     N = 100
     x = np.linspace(0, N - 2, N // 2)
     x = np.repeat(x, 2)
 
-    actual_value = pos2vel(x, sampling_rate=1, method=method)
+    actual_value = pos2vel(x, **params)
 
     lpad, rpad = 1, -1
-    assert (actual_value[lpad:rpad] == expected_value[lpad:rpad]).all()
+    assert np.allclose(actual_value[lpad:rpad], expected_value[lpad:rpad])
