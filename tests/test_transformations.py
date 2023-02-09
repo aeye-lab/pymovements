@@ -470,7 +470,7 @@ def test_pos2vel_returns(method, kwargs, padding, expected_value):
             np.concatenate([
                 np.array([0.71428571, 0.80952381, 0.9047619]),
                 np.ones((94,)),
-                np.array([0.9047619 , 0.80952381, 0.71428571]),
+                np.array([0.9047619, 0.80952381, 0.71428571]),
             ]),
             id='method_savitzky_golay_linear_velocity',
         ),
