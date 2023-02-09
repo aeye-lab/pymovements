@@ -139,12 +139,12 @@ class Dataset:
         """
         file_dfs: list[pl.DataFrame] = []
 
-        if self.gaze is None:
+        if self.fileinfo is None:
             raise AttributeError(
-                "fileinfo was not read yet. please run read() or read_gaze_files() beforehand",
+                "fileinfo was not read yet. please run read() or read_fileinfo() beforehand",
             )
-        if len(self.gaze) == 0:
-            raise AttributeError("no files present in gaze attribute")
+        if len(self.fileinfo) == 0:
+            raise AttributeError("no files present in fileinfo attribute")
 
         # read and preprocess input files
         for file_id, filepath in enumerate(tqdm(self.fileinfo['filepath'])):
