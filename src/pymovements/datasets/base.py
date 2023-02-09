@@ -208,7 +208,7 @@ class Dataset:
                     pl.Series(name=dva_column_name, values=dva_positions[:, dva_column_id]),
                 )
 
-    def pos2vel(self, method: str = 'smooth', verbose: bool = True) -> None:
+    def pos2vel(self, method: str = 'smooth', verbose: bool = True, **kwargs) -> None:
         """Compute gaze velocites in dva/s from dva coordinates.
 
         This requires an experiment definition and also assumes that the columns 'x_left_dva',
@@ -220,9 +220,11 @@ class Dataset:
         Parameters
         ----------
         method : str
-            Computation method. See :func:`~transforms.pos2vel` for details, default: smooth.
+            Computation method. See :func:`~transforms.pos2vel()` for details, default: smooth.
         verbose : bool
             If True, show progress of computation.
+        **kwargs
+            Additional keyword arguments to be passed to the :func:`~transforms.pos2vel()` method.
 
         Raises
         ------
@@ -247,7 +249,7 @@ class Dataset:
 
             positions = file_df.select(position_columns)
 
-            velocities = self.experiment.pos2vel(positions.transpose(), method=method)
+            velocities = self.experiment.pos2vel(positions.transpose(), method=method, **kwargs)
 
             for col_id, velocity_column_name in enumerate(velocity_columns):
                 self.gaze[file_id] = self.gaze[file_id].with_columns(
