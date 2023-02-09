@@ -6,7 +6,7 @@ from __future__ import annotations
 from typing import Any
 
 import numpy as np
-import scipy
+from scipy.signal import savgol_filter
 
 from pymovements.utils import checks
 
@@ -206,12 +206,12 @@ def pos2vel(
     elif method == 'savitzky_golay':
         # transform to velocities
         if arr.ndim == 1:
-            v = scipy.signal.savgol_filter(x=arr, **kwargs)
+            v = savgol_filter(x=arr, deriv=1, **kwargs)
         else:  # we already checked for error cases
 
             for channel_id in range(arr.shape[1]):
-                v[:, channel_id] = scipy.signal.savgol_filter(
-                    x=arr[:, channel_id], **kwargs,
+                v[:, channel_id] = savgol_filter(
+                    x=arr[:, channel_id], deriv=1, **kwargs,
                 )
         v = v * sampling_rate
 
