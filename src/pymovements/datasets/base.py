@@ -224,7 +224,7 @@ class Dataset:
         verbose : bool
             If True, show progress of computation.
         **kwargs
-            Additional keyword arguments passed to the :func:`~transforms.pos2vel()` method.
+            Additional keyword arguments to be passed to the :func:`~transforms.pos2vel()` method.
 
         Raises
         ------
