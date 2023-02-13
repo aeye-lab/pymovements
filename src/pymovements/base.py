@@ -41,6 +41,7 @@ class Screen:
         Minimum screen y-coordinate in degrees of visual angle
 
     """
+
     def __init__(
         self,
         width_px: int,
@@ -97,8 +98,8 @@ class Screen:
         self.origin = origin
 
         # calculate screen boundary coordinates in degrees of visual angle
-        self.x_max_dva = pix2deg(width_px-1, width_px, width_cm, distance_cm, origin=origin)
-        self.y_max_dva = pix2deg(height_px-1, height_px, height_cm, distance_cm, origin=origin)
+        self.x_max_dva = pix2deg(width_px - 1, width_px, width_cm, distance_cm, origin=origin)
+        self.y_max_dva = pix2deg(height_px - 1, height_px, height_cm, distance_cm, origin=origin)
         self.x_min_dva = pix2deg(0, width_px, width_cm, distance_cm, origin=origin)
         self.y_min_dva = pix2deg(0, height_px, height_cm, distance_cm, origin=origin)
 

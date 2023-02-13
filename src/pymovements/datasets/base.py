@@ -296,6 +296,7 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
     To implement this abstract base class for a new dataset, the attributes/properties `_mirrors`
     and `_resources` must be implemented.
     """
+
     def __init__(
         self,
         root: str,

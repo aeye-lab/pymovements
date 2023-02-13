@@ -178,6 +178,7 @@ class _DownloadProgressBar(tqdm):
 
     Reference: https://github.com/tqdm/tqdm#hooks-and-callbacks
     """
+
     def __init__(self, **kwargs):
         super().__init__(unit='B', unit_scale=True, unit_divisor=1024, miniters=1, **kwargs)
 
