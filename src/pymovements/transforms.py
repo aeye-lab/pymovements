@@ -51,11 +51,11 @@ def pix2deg(
 
     """
     if arr is None:
-        raise TypeError("arr must not be None")
+        raise TypeError('arr must not be None')
 
-    checks.check_no_zeros(screen_px, "screen_px")
-    checks.check_no_zeros(screen_cm, "screen_px")
-    checks.check_no_zeros(distance_cm, "distance_cm")
+    checks.check_no_zeros(screen_px, 'screen_px')
+    checks.check_no_zeros(screen_cm, 'screen_px')
+    checks.check_no_zeros(distance_cm, 'distance_cm')
 
     arr = np.array(arr)
     screen_px = np.array(screen_px)
@@ -98,10 +98,10 @@ def pix2deg(
     distance_px = distance_cm * (screen_px / screen_cm)
 
     # If pixel coordinate system is not centered, shift pixel coordinate to the center.
-    if origin == "lower left":
+    if origin == 'lower left':
         arr = arr - (screen_px - 1) / 2
-    elif origin != "center":
-        raise ValueError(f"origin {origin} is not supported.")
+    elif origin != 'center':
+        raise ValueError(f'origin {origin} is not supported.')
 
     # 180 / pi transforms arc measure to degrees.
     return np.arctan2(arr, distance_px) * 180 / np.pi

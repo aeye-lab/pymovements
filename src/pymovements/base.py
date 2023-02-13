@@ -83,11 +83,11 @@ class Screen:
         origin=lower left, x_max_dva=15.60, y_max_dva=12.43, x_min_dva=-15.60, y_min_dva=-12.43)
 
         """
-        checks.check_no_zeros(width_px, "width_px")
-        checks.check_no_zeros(height_px, "height_px")
-        checks.check_no_zeros(width_cm, "width_cm")
-        checks.check_no_zeros(height_cm, "height_cm")
-        checks.check_no_zeros(distance_cm, "distance_cm")
+        checks.check_no_zeros(width_px, 'width_px')
+        checks.check_no_zeros(height_px, 'height_px')
+        checks.check_no_zeros(width_cm, 'width_cm')
+        checks.check_no_zeros(height_cm, 'height_cm')
+        checks.check_no_zeros(distance_cm, 'distance_cm')
 
         self.width_px = width_px
         self.height_px = height_px

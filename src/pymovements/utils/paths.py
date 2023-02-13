@@ -36,7 +36,7 @@ def get_filepaths(
 
     """
     if extension is not None and regex is not None:
-        raise ValueError("extension and regex are mutually exclusive")
+        raise ValueError('extension and regex are mutually exclusive')
 
     if extension is not None and isinstance(extension, str):
         extension = [extension]

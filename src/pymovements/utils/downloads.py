@@ -58,7 +58,7 @@ def download_and_extract_archive(
     if extract_dirpath is None:
         extract_dirpath = download_dirpath
 
-    print(f"Extracting {archive_path.name} to {extract_dirpath}")
+    print(f'Extracting {archive_path.name} to {extract_dirpath}')
     extract_archive(
         source_path=archive_path,
         destination_path=extract_dirpath,
@@ -107,9 +107,9 @@ def download_file(
 
     # check if file is already present locally
     if _check_integrity(filepath, md5):
-        print("Using already downloaded and verified file:", filepath)
+        print('Using already downloaded and verified file:', filepath)
         return filepath
-    print(f"Downloading {url} to {filepath}")
+    print(f'Downloading {url} to {filepath}')
 
     # expand redirect chain if needed
     url = _get_redirected_url(url=url, max_hops=max_redirect_hops)
@@ -119,10 +119,10 @@ def download_file(
         _download_url(url=url, destination=filepath)
 
     except OSError as e:
-        if url[:5] == "https":
-            url = url.replace("https:", "http:")
-            print("Download failed. Trying https -> http instead.")
-            print(f"Downloading {url} to {filepath}")
+        if url[:5] == 'https':
+            url = url.replace('https:', 'http:')
+            print('Download failed. Trying https -> http instead.')
+            print(f'Downloading {url} to {filepath}')
             _download_url(url=url, destination=filepath)
         else:
             raise e
@@ -157,7 +157,7 @@ def _get_redirected_url(
         If number of redirects exceed `max_hops`.
     """
     initial_url = url
-    headers = {"Method": "HEAD", "User-Agent": USER_AGENT}
+    headers = {'Method': 'HEAD', 'User-Agent': USER_AGENT}
 
     for _ in range(max_hops + 1):
         with urllib.request.urlopen(urllib.request.Request(url, headers=headers)) as response:
@@ -166,8 +166,8 @@ def _get_redirected_url(
             url = response.url
 
     raise RuntimeError(
-        f"Request to {initial_url} exceeded {max_hops} redirects."
-        f" The last redirect points to {url}.",
+        f'Request to {initial_url} exceeded {max_hops} redirects.'
+        f' The last redirect points to {url}.',
     )
 
 
@@ -263,7 +263,7 @@ def _calculate_md5(
     # This enables its usage in restricted environments like FIPS without raising an error.
     file_md5 = hashlib.new('md5', usedforsecurity=False)  # type: ignore[call-arg]
 
-    with open(filepath, "rb") as f:
-        for chunk in iter(lambda: f.read(chunk_size), b""):
+    with open(filepath, 'rb') as f:
+        for chunk in iter(lambda: f.read(chunk_size), b''):
             file_md5.update(chunk)
     return file_md5.hexdigest()
