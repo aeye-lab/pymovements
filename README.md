@@ -1,6 +1,4 @@
-<picture>
-<img width="110%" height="110%" src="./docs/source/_static/logo.svg" alt="pymovements">
-</picture>
+![](https://raw.githubusercontent.com/aeye-lab/pymovements/main/docs/source/_static/logo.svg)
 
 ---
 
