@@ -195,7 +195,7 @@ def traceplot(
 
 
 def tsplot(
-    arr: np.array,
+    arr: np.ndarray,
     channel_names: list[str] | None = None,
     xlabel: str | None = None,
     rotate_ylabels: bool = True,
