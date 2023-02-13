@@ -8,7 +8,7 @@ repos:
     rev: v3.3.1
     hooks:
     -   id: pyupgrade
-        args: [--py36-plus]
+        args: [--py37-plus]
 -   repo: https://github.com/asottile/reorder_python_imports
     rev: v3.9.0
     hooks:
