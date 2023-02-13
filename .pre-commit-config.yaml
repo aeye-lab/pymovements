@@ -14,6 +14,10 @@ repos:
     hooks:
     -   id: reorder-python-imports
         args: [--application-directories=src]
+-   repo: https://github.com/pappasam/toml-sort
+    rev: v0.22.3
+    hooks:
+    -   id: toml-sort-fix
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
