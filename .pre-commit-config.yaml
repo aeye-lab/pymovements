@@ -17,10 +17,16 @@ repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
+    -   id: check-builtin-literals
+    -   id: check-case-conflict
     -   id: check-docstring-first
+    -   id: check-merge-conflict
+    -   id: check-toml
+    -   id: check-xml
     -   id: check-yaml
     -   id: debug-statements
     -   id: end-of-file-fixer
+    -   id: no-commit-to-branch
     -   id: requirements-txt-fixer
     -   id: trailing-whitespace
 -   repo: https://github.com/pre-commit/mirrors-mypy
@@ -28,6 +34,11 @@ repos:
     hooks:
     -   id: mypy
         additional_dependencies: [types-all]
+-   repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.10.0
+    hooks:
+    -   id: python-check-blanket-noqa
+    -   id: python-check-blanket-type-ignore
 -   repo: https://github.com/PyCQA/flake8
     rev: 6.0.0
     hooks:
