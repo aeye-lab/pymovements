@@ -88,7 +88,7 @@ class Dataset:
         if self._filename_regex is not None:
             filename_regex = re.compile(self._filename_regex)
         else:
-            raise AttributeError("no regular expression for filenames is defined.")
+            raise AttributeError('no regular expression for filenames is defined.')
 
         # Get all filepaths that match regular expression.
         csv_filepaths = get_filepaths(
@@ -106,7 +106,7 @@ class Dataset:
             # This actually should never happen but mypy will complain otherwise.
             if match is None:
                 raise RuntimeError(
-                    f"file {filepath} did not match regular expression {self._filename_regex}",
+                    f'file {filepath} did not match regular expression {self._filename_regex}',
                 )
 
             # We use the groupdict of the match as a base and add the filepath.
@@ -141,10 +141,10 @@ class Dataset:
 
         if self.fileinfo is None:
             raise AttributeError(
-                "fileinfo was not read yet. please run read() or read_fileinfo() beforehand",
+                'fileinfo was not read yet. please run read() or read_fileinfo() beforehand',
             )
         if len(self.fileinfo) == 0:
-            raise AttributeError("no files present in fileinfo attribute")
+            raise AttributeError('no files present in fileinfo attribute')
 
         # read and preprocess input files
         for file_id, filepath in enumerate(tqdm(self.fileinfo['filepath'])):
@@ -186,10 +186,10 @@ class Dataset:
         """
         if self.gaze is None:
             raise AttributeError(
-                "gaze files were not read yet. please run read() or read_gaze_files() beforehand",
+                'gaze files were not read yet. please run read() or read_gaze_files() beforehand',
             )
         if len(self.gaze) == 0:
-            raise AttributeError("no files present in gaze attribute")
+            raise AttributeError('no files present in gaze attribute')
         if self.experiment is None:
             raise AttributeError('experiment must be specified for this method.')
 
@@ -234,10 +234,10 @@ class Dataset:
         """
         if self.gaze is None:
             raise AttributeError(
-                "gaze files were not read yet. please run read() or read_gaze_files() beforehand",
+                'gaze files were not read yet. please run read() or read_gaze_files() beforehand',
             )
         if len(self.gaze) == 0:
-            raise AttributeError("no files present in gaze attribute")
+            raise AttributeError('no files present in gaze attribute')
         if self.experiment is None:
             raise AttributeError('experiment must be specified for this method.')
 
@@ -287,7 +287,7 @@ class Dataset:
         >>> dataset.raw_dirpath  # doctest: +SKIP
         Path('data/CustomDataset/raw')
         """
-        return self.dirpath / "raw"
+        return self.dirpath / 'raw'
 
 
 class PublicDataset(Dataset, metaclass=ABCMeta):
@@ -342,7 +342,7 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
                     success = True
 
                 except URLError as error:
-                    print(f"Failed to download (trying next):\n{error}")
+                    print(f'Failed to download (trying next):\n{error}')
                     # downloading the resource, try next mirror
                     continue
 

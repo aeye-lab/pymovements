@@ -40,5 +40,5 @@ def check_nan_both_channels(arr: np.ndarray):
     # one coordinate)
     if not np.array_equal(np.isnan(arr[:, 0]), np.isnan(arr[:, 1])):
         raise ValueError(
-            "nans have to occur at the same steps of horizontal and vertical direction",
+            'nans have to occur at the same steps of horizontal and vertical direction',
         )

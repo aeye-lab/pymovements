@@ -68,7 +68,7 @@ def ivt(
     if positions.shape != velocities.shape:
         raise ValueError(
             f"shape of positions {positions.shape} doesn't match"
-            f"shape of velocities {velocities.shape}",
+            f'shape of velocities {velocities.shape}',
         )
 
     # Check if threshold is None
