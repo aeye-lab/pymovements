@@ -79,7 +79,7 @@ class Screen:
         ...     distance_cm=68.0,
         ...     origin='lower left',
         ... )
-        >>> print(screen)  
+        >>> print(screen)
         Screen(width_px=1280, height_px=1024, width_cm=38.00,
         height_cm=30.00, distance_cm=68.00, origin=lower left,
         x_max_dva=15.60, y_max_dva=12.43, x_min_dva=-15.60,
@@ -138,7 +138,7 @@ class Screen:
         ...     distance_cm=68.0,
         ...     origin='lower left',
         ... )
-        >>> screen.pix2deg(arr=arr) 
+        >>> screen.pix2deg(arr=arr)
         array([[-12.70732231, 8.65963972]])
 
         >>> screen = Screen(
@@ -149,7 +149,7 @@ class Screen:
         ...     distance_cm=68.0,
         ...     origin='center',
         ... )
-        >>> screen.pix2deg(arr=arr)  
+        >>> screen.pix2deg(arr=arr)
         array([[ 3.07379946, 20.43909054]])
         """
         return pix2deg(
@@ -212,7 +212,7 @@ class Experiment:
         ...     origin='lower left',
         ...     sampling_rate=1000.0,
         ... )
-        >>> print(experiment) 
+        >>> print(experiment)
         Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38,
         height_cm=30, distance_cm=68, origin=lower left, x_max_dva=15.60, y_max_dva=12.43,
         x_min_dva=-15.60, y_min_dva=-12.43), sampling_rate=1000.00)
