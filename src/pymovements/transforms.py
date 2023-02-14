@@ -57,17 +57,17 @@ def pix2deg(
     ...    screen_cm=(38.0, 30.0),
     ...    distance_cm=68.0,
     ...    origin='lower left',
-    ... )
-    array([[-12.70732231,   8.65963972]])
+    ... ) # doctest: +NORMALIZE_WHITESPACE
+    array([[-12.70732231, 8.65963972]])
+
     >>> pix2deg(
     ...    arr=[(123.0, 865.0)],
     ...    screen_px=(1280, 1024),
     ...    screen_cm=(38.0, 30.0),
     ...    distance_cm=68.0,
     ...    origin='center',
-    ... )
+    ... ) # doctest: +NORMALIZE_WHITESPACE
     array([[ 3.07379946, 20.43909054]])
-
     """
     if arr is None:
         raise TypeError("arr must not be None")
@@ -167,10 +167,11 @@ def pos2vel(
 
     Examples
     --------
+    >>> arr = [(0., 0.), (1., 1.), (2., 2.), (3., 3.), (4., 4.), (5., 5.)]
     >>> pos2vel(
-    ...    arr=[(0., 0.), (1., 1.), (2., 2.), (3., 3.), (4., 4.), (5., 5.)],
+    ...    arr=arr,
     ...    sampling_rate=1000,
-    ...    method="smooth"
+    ...    method="smooth",
     ... )
     array([[ 500.,  500.],
            [1000., 1000.],
@@ -274,9 +275,7 @@ def norm(arr: np.ndarray, axis: int | None = None) -> np.ndarray | Any:
     Examples
     --------
     >>> arr = np.array([[1., 1., 1., 1., 1., 1.], [1., 1., 1., 1., 1., 1.]])
-    >>> norm(
-    ...    arr=arr
-    ... )
+    >>> norm(arr=arr)
     array([1.41421356, 1.41421356, 1.41421356, 1.41421356, 1.41421356,
            1.41421356])
     """
@@ -318,26 +317,40 @@ def cut_into_subsequences(
 
     Examples
     --------
-    >>> arr = np.array([
-    ...                  [[1., 1.], [2., 2.], [3., 3.]],
-    ...                  [[4., 4.], [5., 5.], [6., 6.]]
-    ...                ])
-    >>> cut_into_subsequences(
+    >>> # one sequence of length 10 and 2 channels
+    >>> arr = np.ones((1, 10, 2))
+    >>> arr.shape
+    (1, 10, 2)
+    >>> cut_arr = cut_into_subsequences(
     ...    arr=arr,
-    ...    window_size=2,
+    ...    window_size=5,
+    ...    keep_padded=False,
+    ... ) # doctest: +NORMALIZE_WHITESPACE
+    >>> cut_arr.shape # the array is cut into 2 sequences of length 5 with 2 channels
+    (2, 5, 2)
+
+    >>> # one sequence of length 9 and 2 channels
+    >>> arr = np.ones((1, 9, 2))
+    >>> arr.shape
+    (1, 9, 2)
+    >>> cut_arr = cut_into_subsequences(
+    ...    arr=arr,
+    ...    window_size=5,
     ...    keep_padded=True,
-    ... )
+    ... ) # doctest: +NORMALIZE_WHITESPACE
+    >>> cut_arr.shape # the array is cut into 2 sequences of length 5 with 2 channels
+    (2, 5, 2)
+    >>> cut_arr # doctest: +NORMALIZE_WHITESPACE
     array([[[1., 1.],
-            [2., 2.]],
-    <BLANKLINE>
-           [[3., 3.],
+            [1., 1.],
+            [1., 1.],
+            [1., 1.],
             [1., 1.]],
-    <BLANKLINE>
-           [[4., 4.],
-            [5., 5.]],
-    <BLANKLINE>
-           [[6., 6.],
-            [4., 4.]]])
+           [[1., 1.],
+            [1., 1.],
+            [1., 1.],
+            [1., 1.],
+            [1., 1.]]])
     """
     n, rest = np.divmod(arr.shape[1], window_size)
 
@@ -402,19 +415,14 @@ def downsample(
     Examples
     --------
     >>> arr = np.array([0., 0., 1., 1., 2., 2., 3., 3., 4., 4., 5., 5.])
-    >>> downsample(
-    ...    arr=arr,
-    ...    factor=2
-    ... ) # doctest: +NORMALIZE_WHITESPACE
+    >>> downsample(arr=arr, factor=2) # doctest: +NORMALIZE_WHITESPACE
     array([0., 1., 2., 3., 4., 5.])
+
     >>> arr2 = np.array([(0., 0.), (1., 1.), (2., 2.), (3., 3.), (4., 4.), (5., 5.)])
-    >>> downsample(
-    ...    arr=arr2,
-    ...    factor=2
-    ... ) # doctest: +NORMALIZE_WHITESPACE
+    >>> downsample(arr=arr2, factor=2) # doctest: +NORMALIZE_WHITESPACE
     array([[0., 0.],
-       [2., 2.],
-       [4., 4.]])
+           [2., 2.],
+           [4., 4.]])
     """
     sequence_length = arr.shape[0]
     select = [i % factor == 0 for i in range(sequence_length)]

@@ -128,6 +128,7 @@ class Screen:
 
         Examples
         --------
+        >>> arr = [(123.0, 865.0)]
         >>> screen = Screen(
         ...     width_px=1280,
         ...     height_px=1024,
@@ -136,8 +137,8 @@ class Screen:
         ...     distance_cm=68.0,
         ...     origin='lower left',
         ... )
-        >>> screen.pix2deg(arr=[(123.0, 865.0)])
-        array([[-12.70732231,   8.65963972]])
+        >>> screen.pix2deg(arr=arr) # doctest: +NORMALIZE_WHITESPACE
+        array([[-12.70732231, 8.65963972]])
 
         >>> screen = Screen(
         ...     width_px=1280,
@@ -147,12 +148,8 @@ class Screen:
         ...     distance_cm=68.0,
         ...     origin='center',
         ... )
-        >>> screen.pix2deg(arr=[(123.0, 865.0)])
+        >>> screen.pix2deg(arr=arr)  # doctest: +NORMALIZE_WHITESPACE
         array([[ 3.07379946, 20.43909054]])
-        >>> screen.pix2deg(arr=[(0.0)])
-        Traceback (most recent call last):
-                        ...
-        ValueError: arr is 1-dimensional, but screen_px is not
         """
         return pix2deg(
             arr=arr,
@@ -212,7 +209,7 @@ class Experiment:
         ...     screen_height_cm=30,
         ...     distance_cm=68,
         ...     origin='lower left',
-        ...     sampling_rate=1000.0
+        ...     sampling_rate=1000.0,
         ... )
         >>> print(experiment) # doctest: +NORMALIZE_WHITESPACE
         Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38,
@@ -261,5 +258,27 @@ class Experiment:
             If selected method is invalid, input array is too short for the
             selected method or the sampling rate is below zero
 
+        Examples
+        --------
+        >>> experiment = Experiment(
+        ...     screen_width_px=1280,
+        ...     screen_height_px=1024,
+        ...     screen_width_cm=38,
+        ...     screen_height_cm=30,
+        ...     distance_cm=68,
+        ...     origin='lower left',
+        ...     sampling_rate=1000.0,
+        ... )
+        >>> arr = [[0., 0.], [1., 1.], [2., 2.], [3., 3.], [4., 4.], [5., 5.]]
+        >>> experiment.pos2vel(
+        ...    arr=arr,
+        ...    method="smooth",
+        ... )
+        array([[ 500.,  500.],
+               [1000., 1000.],
+               [1000., 1000.],
+               [1000., 1000.],
+               [1000., 1000.],
+               [ 500.,  500.]])
         """
         return pos2vel(arr=arr, sampling_rate=self.sampling_rate, method=method, **kwargs)
