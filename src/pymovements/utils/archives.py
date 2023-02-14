@@ -101,13 +101,13 @@ def _extract_tar(
     compression : str, optional
         Compression filename suffix.
     """
-    with tarfile.open(source_path, f"r:{compression[1:]}" if compression else "r") as archive:
+    with tarfile.open(source_path, f'r:{compression[1:]}' if compression else 'r') as archive:
         archive.extractall(destination_path)
 
 
 _ZIP_COMPRESSION_MAP: dict[str, int] = {
-    ".bz2": zipfile.ZIP_BZIP2,
-    ".xz": zipfile.ZIP_LZMA,
+    '.bz2': zipfile.ZIP_BZIP2,
+    '.xz': zipfile.ZIP_LZMA,
 }
 
 
@@ -128,25 +128,25 @@ def _extract_zip(
         Compression filename suffix.
     """
     compression_id = _ZIP_COMPRESSION_MAP[compression] if compression else zipfile.ZIP_STORED
-    with zipfile.ZipFile(source_path, "r", compression=compression_id) as archive:
+    with zipfile.ZipFile(source_path, 'r', compression=compression_id) as archive:
         archive.extractall(destination_path)
 
 
 _ARCHIVE_EXTRACTORS: dict[str, Callable[[Path, Path, str | None], None]] = {
-    ".tar": _extract_tar,
-    ".zip": _extract_zip,
+    '.tar': _extract_tar,
+    '.zip': _extract_zip,
 }
 
 _ARCHIVE_TYPE_ALIASES: dict[str, tuple[str, str]] = {
-    ".tbz": (".tar", ".bz2"),
-    ".tbz2": (".tar", ".bz2"),
-    ".tgz": (".tar", ".gz"),
+    '.tbz': ('.tar', '.bz2'),
+    '.tbz2': ('.tar', '.bz2'),
+    '.tgz': ('.tar', '.gz'),
 }
 
 _COMPRESSED_FILE_OPENERS: dict[str, Callable[..., IO]] = {
-    ".bz2": bz2.open,
-    ".gz": gzip.open,
-    ".xz": lzma.open,
+    '.bz2': bz2.open,
+    '.gz': gzip.open,
+    '.xz': lzma.open,
 }
 
 
@@ -173,7 +173,7 @@ def _detect_file_type(filepath: Path) -> tuple[str | None, str | None]:
     if not suffixes:
         raise RuntimeError(
             f"File '{filepath}' has no suffixes that could be used to detect the archive type or"
-            " compression.",
+            ' compression.',
         )
 
     # Get last suffix only.
@@ -248,7 +248,7 @@ def _decompress(
     compressed_file_opener = _COMPRESSED_FILE_OPENERS[compression]
 
     # Decompress by reading from compressed file and writing to destination.
-    with compressed_file_opener(source_path, "rb") as rfh, open(destination_path, "wb") as wfh:
+    with compressed_file_opener(source_path, 'rb') as rfh, open(destination_path, 'wb') as wfh:
         wfh.write(rfh.read())
 
     if remove_finished:

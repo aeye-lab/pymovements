@@ -52,4 +52,5 @@ docs/source/reference/pymovements.*.rst
 .tox
 .coverage
 .coverage.*
+coverage.xml
 htmlcov/

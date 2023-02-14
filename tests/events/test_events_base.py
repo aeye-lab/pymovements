@@ -8,7 +8,6 @@ from pymovements.events import Fixation
 from pymovements.events import Saccade
 
 
-# pylint: disable=protected-access
 @pytest.mark.parametrize(
     'event_class, init_params, expected',
     [

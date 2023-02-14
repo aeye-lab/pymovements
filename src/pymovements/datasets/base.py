@@ -88,7 +88,7 @@ class Dataset:
         if self._filename_regex is not None:
             filename_regex = re.compile(self._filename_regex)
         else:
-            raise AttributeError("no regular expression for filenames is defined.")
+            raise AttributeError('no regular expression for filenames is defined.')
 
         # Get all filepaths that match regular expression.
         csv_filepaths = get_filepaths(
@@ -106,7 +106,7 @@ class Dataset:
             # This actually should never happen but mypy will complain otherwise.
             if match is None:
                 raise RuntimeError(
-                    f"file {filepath} did not match regular expression {self._filename_regex}",
+                    f'file {filepath} did not match regular expression {self._filename_regex}',
                 )
 
             # We use the groupdict of the match as a base and add the filepath.
@@ -139,12 +139,12 @@ class Dataset:
         """
         file_dfs: list[pl.DataFrame] = []
 
-        if self.gaze is None:
+        if self.fileinfo is None:
             raise AttributeError(
-                "fileinfo was not read yet. please run read() or read_gaze_files() beforehand",
+                'fileinfo was not read yet. please run read() or read_fileinfo() beforehand',
             )
-        if len(self.gaze) == 0:
-            raise AttributeError("no files present in gaze attribute")
+        if len(self.fileinfo) == 0:
+            raise AttributeError('no files present in fileinfo attribute')
 
         # read and preprocess input files
         for file_id, filepath in enumerate(tqdm(self.fileinfo['filepath'])):
@@ -186,10 +186,10 @@ class Dataset:
         """
         if self.gaze is None:
             raise AttributeError(
-                "gaze files were not read yet. please run read() or read_gaze_files() beforehand",
+                'gaze files were not read yet. please run read() or read_gaze_files() beforehand',
             )
         if len(self.gaze) == 0:
-            raise AttributeError("no files present in gaze attribute")
+            raise AttributeError('no files present in gaze attribute')
         if self.experiment is None:
             raise AttributeError('experiment must be specified for this method.')
 
@@ -208,7 +208,7 @@ class Dataset:
                     pl.Series(name=dva_column_name, values=dva_positions[:, dva_column_id]),
                 )
 
-    def pos2vel(self, method: str = 'smooth', verbose: bool = True) -> None:
+    def pos2vel(self, method: str = 'smooth', verbose: bool = True, **kwargs) -> None:
         """Compute gaze velocites in dva/s from dva coordinates.
 
         This requires an experiment definition and also assumes that the columns 'x_left_dva',
@@ -220,9 +220,11 @@ class Dataset:
         Parameters
         ----------
         method : str
-            Computation method. See :func:`~transforms.pos2vel` for details, default: smooth.
+            Computation method. See :func:`~transforms.pos2vel()` for details, default: smooth.
         verbose : bool
             If True, show progress of computation.
+        **kwargs
+            Additional keyword arguments to be passed to the :func:`~transforms.pos2vel()` method.
 
         Raises
         ------
@@ -232,10 +234,10 @@ class Dataset:
         """
         if self.gaze is None:
             raise AttributeError(
-                "gaze files were not read yet. please run read() or read_gaze_files() beforehand",
+                'gaze files were not read yet. please run read() or read_gaze_files() beforehand',
             )
         if len(self.gaze) == 0:
-            raise AttributeError("no files present in gaze attribute")
+            raise AttributeError('no files present in gaze attribute')
         if self.experiment is None:
             raise AttributeError('experiment must be specified for this method.')
 
@@ -247,7 +249,7 @@ class Dataset:
 
             positions = file_df.select(position_columns)
 
-            velocities = self.experiment.pos2vel(positions.transpose(), method=method)
+            velocities = self.experiment.pos2vel(positions.transpose(), method=method, **kwargs)
 
             for col_id, velocity_column_name in enumerate(velocity_columns):
                 self.gaze[file_id] = self.gaze[file_id].with_columns(
@@ -285,7 +287,7 @@ class Dataset:
         >>> dataset.raw_dirpath  # doctest: +SKIP
         Path('data/CustomDataset/raw')
         """
-        return self.dirpath / "raw"
+        return self.dirpath / 'raw'
 
 
 class PublicDataset(Dataset, metaclass=ABCMeta):
@@ -294,6 +296,7 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
     To implement this abstract base class for a new dataset, the attributes/properties `_mirrors`
     and `_resources` must be implemented.
     """
+
     def __init__(
         self,
         root: str,
@@ -340,7 +343,7 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
                     success = True
 
                 except URLError as error:
-                    print(f"Failed to download (trying next):\n{error}")
+                    print(f'Failed to download (trying next):\n{error}')
                     # downloading the resource, try next mirror
                     continue
 

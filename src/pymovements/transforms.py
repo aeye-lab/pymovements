@@ -6,7 +6,7 @@ from __future__ import annotations
 from typing import Any
 
 import numpy as np
-import scipy
+from scipy.signal import savgol_filter
 
 from pymovements.utils import checks
 
@@ -70,11 +70,11 @@ def pix2deg(
     array([[ 3.07379946, 20.43909054]])
     """
     if arr is None:
-        raise TypeError("arr must not be None")
+        raise TypeError('arr must not be None')
 
-    checks.check_no_zeros(screen_px, "screen_px")
-    checks.check_no_zeros(screen_cm, "screen_px")
-    checks.check_no_zeros(distance_cm, "distance_cm")
+    checks.check_no_zeros(screen_px, 'screen_px')
+    checks.check_no_zeros(screen_cm, 'screen_px')
+    checks.check_no_zeros(distance_cm, 'distance_cm')
 
     arr = np.array(arr)
     screen_px = np.array(screen_px)
@@ -117,10 +117,10 @@ def pix2deg(
     distance_px = distance_cm * (screen_px / screen_cm)
 
     # If pixel coordinate system is not centered, shift pixel coordinate to the center.
-    if origin == "lower left":
+    if origin == 'lower left':
         arr = arr - (screen_px - 1) / 2
-    elif origin != "center":
-        raise ValueError(f"origin {origin} is not supported.")
+    elif origin != 'center':
+        raise ValueError(f'origin {origin} is not supported.')
 
     # 180 / pi transforms arc measure to degrees.
     return np.arctan2(arr, distance_px) * 180 / np.pi
@@ -213,38 +213,38 @@ def pos2vel(
     valid_methods = ['smooth', 'neighbors', 'preceding', 'savitzky_golay']
     if method == 'smooth':
         # center is N - 2
-        moving_avg = arr[4:N] + arr[3:N-1] - arr[1:N-3] - arr[0:N-4]
+        moving_avg = arr[4:N] + arr[3:N - 1] - arr[1:N - 3] - arr[0:N - 4]
         # mean(arr_-2, arr_-1) and mean(arr_1, arr_2) needs division by two
         # window is now 3 samples long (arr_-1.5, arr_0, arr_1+5)
         # we therefore need a divison by three, all in all it's a division by 6
-        v[2:N-2] = moving_avg * sampling_rate / 6
+        v[2:N - 2] = moving_avg * sampling_rate / 6
 
         # for second and second last sample:
         # calculate vocity from preceding and subsequent sample
         v[1] = (arr[2] - arr[0]) * sampling_rate / 2
-        v[N-2] = (arr[N-1] - arr[N-3]) * sampling_rate / 2
+        v[N - 2] = (arr[N - 1] - arr[N - 3]) * sampling_rate / 2
 
         # for first and second sample:
         # calculate velocity from current and neighboring sample
         v[0] = (arr[1] - arr[0]) * sampling_rate / 2
-        v[N-1] = (arr[N-1] - arr[N-2]) * sampling_rate / 2
+        v[N - 1] = (arr[N - 1] - arr[N - 2]) * sampling_rate / 2
 
     elif method == 'neighbors':
         # window size is two, so we need to divide by two
-        v[1:N-1] = (arr[2:N] - arr[0:N-2]) * sampling_rate / 2
+        v[1:N - 1] = (arr[2:N] - arr[0:N - 2]) * sampling_rate / 2
 
     elif method == 'preceding':
-        v[1:N] = (arr[1:N] - arr[0:N-1]) * sampling_rate
+        v[1:N] = (arr[1:N] - arr[0:N - 1]) * sampling_rate
 
     elif method == 'savitzky_golay':
         # transform to velocities
         if arr.ndim == 1:
-            v = scipy.signal.savgol_filter(x=arr, **kwargs)
+            v = savgol_filter(x=arr, deriv=1, **kwargs)
         else:  # we already checked for error cases
 
             for channel_id in range(arr.shape[1]):
-                v[:, channel_id] = scipy.signal.savgol_filter(
-                    x=arr[:, channel_id], **kwargs,
+                v[:, channel_id] = savgol_filter(
+                    x=arr[:, channel_id], deriv=1, **kwargs,
                 )
         v = v * sampling_rate
 
@@ -355,9 +355,9 @@ def cut_into_subsequences(
     n, rest = np.divmod(arr.shape[1], window_size)
 
     if rest > 0 and keep_padded:
-        n_rows = arr.shape[0]*(n+1)
+        n_rows = arr.shape[0] * (n + 1)
     else:
-        n_rows = arr.shape[0]*n
+        n_rows = arr.shape[0] * n
 
     arr_cut = np.nan * np.ones((n_rows, window_size, arr.shape[2]))
 
@@ -365,7 +365,7 @@ def cut_into_subsequences(
     for t in range(0, arr.shape[0]):
         for i in range(0, n):
             # cut out 1000 ms piece of trial t
-            arr_tmp = np.expand_dims(arr[t, i*window_size: (i+1)*window_size, :], axis=0)
+            arr_tmp = np.expand_dims(arr[t, i * window_size: (i + 1) * window_size, :], axis=0)
 
             # concatenate pieces
             arr_cut[idx, :, :] = arr_tmp
@@ -375,13 +375,13 @@ def cut_into_subsequences(
         if rest > 0 and keep_padded:
             # concatenate last one with pad
             start_idx_last_piece = window_size * n
-            len_pad_to_add = window_size-rest
+            len_pad_to_add = window_size - rest
             # piece to pad:
             arr_incomplete = np.expand_dims(arr[t, start_idx_last_piece:arr.shape[1], :], axis=0)
             # padding piece:
-            start_idx_last_piece = window_size * (n-1)
+            start_idx_last_piece = window_size * (n - 1)
             arr_pad = np.expand_dims(
-                arr[t, start_idx_last_piece:start_idx_last_piece+len_pad_to_add, :], axis=0,
+                arr[t, start_idx_last_piece:start_idx_last_piece + len_pad_to_add, :], axis=0,
             )
 
             arr_tmp = np.concatenate((arr_incomplete, arr_pad), axis=1)
@@ -397,7 +397,7 @@ def cut_into_subsequences(
 def downsample(
         arr: np.ndarray,
         factor: int,
-):
+) -> np.ndarray:
     """
     Downsamples array by integer factor.
 
@@ -428,3 +428,25 @@ def downsample(
     select = [i % factor == 0 for i in range(sequence_length)]
 
     return arr[select].copy()
+
+
+def consecutive(arr: np.ndarray) -> list[np.ndarray]:
+    """Split array into groups of consecutive numbers.
+
+    Parameters
+    ----------
+    arr : np.ndarray
+        Array to be split into groups of consecutive numbers.
+
+    Returns
+    -------
+    list[np.ndarray]
+        List of arrays with consecutive numbers.
+
+    Example
+    -------
+    >>> arr = np.array([0, 47, 48, 49, 50, 97, 98, 99])
+    >>> consecutive(arr)
+    [array([0]), array([47, 48, 49, 50]), array([97, 98, 99])]
+    """
+    return np.split(arr, np.where(np.diff(arr) != 1)[0] + 1)
