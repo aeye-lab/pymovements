@@ -39,7 +39,7 @@ class Event:
         ...    onset=5,
         ...    offset=10,
         ... )
-        >>> print(event) # doctest: +NORMALIZE_WHITESPACE
+        >>> print(event) 
         Event(name=custom_event, onset=5, offset=10)
         """
         self.name = name
@@ -104,7 +104,7 @@ class Fixation(Event):
         ...    onset=5,
         ...    offset=10,
         ...    position=(125.1, 852.3),
-        ... ) # doctest: +NORMALIZE_WHITESPACE
+        ... ) 
         >>> print(fixation)
         Fixation(name=fixation, onset=5, offset=10, position=(125.1, 852.3))
         """
@@ -144,7 +144,7 @@ class Saccade(Event):
         ...    onset=8,
         ...    offset=10,
         ... )
-        >>> print(saccade) # doctest: +NORMALIZE_WHITESPACE
+        >>> print(saccade) 
         Saccade(name=saccade, onset=8, offset=10)
         """
 

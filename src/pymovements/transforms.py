@@ -57,7 +57,7 @@ def pix2deg(
     ...    screen_cm=(38.0, 30.0),
     ...    distance_cm=68.0,
     ...    origin='lower left',
-    ... ) # doctest: +NORMALIZE_WHITESPACE
+    ... ) 
     array([[-12.70732231, 8.65963972]])
 
     >>> pix2deg(
@@ -66,7 +66,7 @@ def pix2deg(
     ...    screen_cm=(38.0, 30.0),
     ...    distance_cm=68.0,
     ...    origin='center',
-    ... ) # doctest: +NORMALIZE_WHITESPACE
+    ... ) 
     array([[ 3.07379946, 20.43909054]])
     """
     if arr is None:
@@ -325,7 +325,7 @@ def cut_into_subsequences(
     ...    arr=arr,
     ...    window_size=5,
     ...    keep_padded=False,
-    ... ) # doctest: +NORMALIZE_WHITESPACE
+    ... ) 
     >>> cut_arr.shape # the array is cut into 2 sequences of length 5 with 2 channels
     (2, 5, 2)
 
@@ -337,10 +337,10 @@ def cut_into_subsequences(
     ...    arr=arr,
     ...    window_size=5,
     ...    keep_padded=True,
-    ... ) # doctest: +NORMALIZE_WHITESPACE
+    ... ) 
     >>> cut_arr.shape # the array is cut into 2 sequences of length 5 with 2 channels
     (2, 5, 2)
-    >>> cut_arr # doctest: +NORMALIZE_WHITESPACE
+    >>> cut_arr 
     array([[[1., 1.],
             [1., 1.],
             [1., 1.],
@@ -415,11 +415,11 @@ def downsample(
     Examples
     --------
     >>> arr = np.array([0., 0., 1., 1., 2., 2., 3., 3., 4., 4., 5., 5.])
-    >>> downsample(arr=arr, factor=2) # doctest: +NORMALIZE_WHITESPACE
+    >>> downsample(arr=arr, factor=2) 
     array([0., 1., 2., 3., 4., 5.])
 
     >>> arr2 = np.array([(0., 0.), (1., 1.), (2., 2.), (3., 3.), (4., 4.), (5., 5.)])
-    >>> downsample(arr=arr2, factor=2) # doctest: +NORMALIZE_WHITESPACE
+    >>> downsample(arr=arr2, factor=2) 
     array([[0., 0.],
            [2., 2.],
            [4., 4.]])
