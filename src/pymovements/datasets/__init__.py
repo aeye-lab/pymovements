@@ -17,7 +17,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
 """This module provides access to publicly available datasets."""
 from pymovements.datasets.base import Dataset  # noqa: F401
 from pymovements.datasets.base import PublicDataset  # noqa: F401
