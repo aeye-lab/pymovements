@@ -68,6 +68,7 @@ jobs:
           - flake8
           - pylint
           - mypy
+          - pre-commit
     steps:
       - uses: actions/checkout@v3
         with:
