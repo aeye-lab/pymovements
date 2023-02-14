@@ -26,6 +26,7 @@ repos:
     rev: v1.4.2
     hooks:
     -   id: insert-license
+        exclude_types: [bib, image, markdown, rst, yaml]
 -   repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.0.0
     hooks:
