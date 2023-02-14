@@ -55,7 +55,6 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: .coverage*
 
   check:
     name: check ${{ matrix.tox_env }} (${{ matrix.os }})
