@@ -20,3 +20,9 @@ exclude = ['src/pymovements/plot.py']
 [[tool.mypy.overrides]]
 module = "scipy.*"
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+addopts = "-ra -l -v --doctest-modules"
+doctest_optionflags = "NORMALIZE_WHITESPACE"
+filterwarnings = ['ignore::DeprecationWarning:pkg_resources.*:']
+testpaths = ['tests', 'src']
