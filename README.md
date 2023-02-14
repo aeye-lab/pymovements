@@ -11,6 +11,7 @@
 [![License](https://img.shields.io/pypi/l/pymovements.svg)](https://github.com/aeye-lab/pymovements/blob/master/LICENSE)
 [![Test Status](https://img.shields.io/github/actions/workflow/status/aeye-lab/pymovements/tests.yml?label=tests)](https://github.com/aeye-lab/pymovements/actions/workflows/tests.yml)
 [![Documentation Status](https://readthedocs.org/projects/pymovements/badge/?version=latest)](https://pymovements.readthedocs.io/en/latest/?badge=latest)
+[![codecov](https://codecov.io/github/aeye-lab/pymovements/branch/main/graph/badge.svg?token=QY3NDHAT2C)](https://codecov.io/github/aeye-lab/pymovements)
 [![PyPI downloads/month](https://img.shields.io/pypi/dm/pymovements.svg)](https://pypistats.org/packages/pymovements)
 
 
