@@ -53,6 +53,8 @@ jobs:
         run: tox --skip-pkg-install -e ${{ matrix.tox_env }}
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   check:
     name: check ${{ matrix.tox_env }} (${{ matrix.os }})
