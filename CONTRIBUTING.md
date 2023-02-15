@@ -247,7 +247,7 @@ Make sure:
 ## License
 
 Please note that by contributing to the project you agree that it will be licensed under the
-[License](https://github.com/aeye-lab/pymovements/blob/main/LICENSE) of this project.
+[License](https://github.com/aeye-lab/pymovements/blob/main/LICENSE.txt) of this project.
 
 If you did not write the code yourself, ensure the existing license is compatible and include the
 license information in the contributed files, or obtain permission from the original author to

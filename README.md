@@ -10,7 +10,7 @@
 [![PyPI status](https://img.shields.io/pypi/status/pymovements.svg)](https://pypi.python.org/pypi/pymovements/)
 [![Python version](https://img.shields.io/pypi/pyversions/pymovements.svg)](https://pypi.python.org/pypi/pymovements/)
 ![Operating System](https://img.shields.io/badge/os-linux%20%7C%20macOS%20%7C%20windows-blue)
-[![License](https://img.shields.io/pypi/l/pymovements.svg)](https://github.com/aeye-lab/pymovements/blob/master/LICENSE)
+[![License](https://img.shields.io/pypi/l/pymovements.svg)](https://github.com/aeye-lab/pymovements/blob/master/LICENSE.txt)
 [![Test Status](https://img.shields.io/github/actions/workflow/status/aeye-lab/pymovements/tests.yml?label=tests)](https://github.com/aeye-lab/pymovements/actions/workflows/tests.yml)
 [![Documentation Status](https://readthedocs.org/projects/pymovements/badge/?version=latest)](https://pymovements.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/github/aeye-lab/pymovements/branch/main/graph/badge.svg?token=QY3NDHAT2C)](https://codecov.io/github/aeye-lab/pymovements)
