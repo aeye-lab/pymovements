@@ -256,24 +256,22 @@ def norm(arr: np.ndarray, axis: int | None = None) -> np.ndarray | Any:
 def cut_into_subsequences(
     arr: np.ndarray, window_size: int, keep_padded: bool = True,
 ) -> np.ndarray:
-    """
-    Example: if old seq len was 7700, window_size=1000:
-    Input arr has: 144 x 7700 x n_channels
-    Output arr has: 144*8 x 1000 x n_channels
-    The last piece of each trial 7000-7700 gets padded with first 300 of this piece to be 1000 long
+    """Cut sequence into subsequences of equal length.
 
     Parameters
     ----------
     arr: np.ndarray
-        uncut sequence
+        Input sequence of shape (N, L, C).
     window_size: int
         size of subsequences
     keep_padded: bool
-        If True, last subsequence (which is padded) is kept in the output array.
+        If True, last subsequence (if not of length `window_size`) is kept in the output array and
+        padded with np.nan.
 
     Returns
     -------
     np.ndarray
+        Output sequence with new window length of shape (N', L', C)
     """
     n, rest = np.divmod(arr.shape[1], window_size)
 
@@ -287,30 +285,23 @@ def cut_into_subsequences(
     idx = 0
     for t in range(0, arr.shape[0]):
         for i in range(0, n):
-            # cut out 1000 ms piece of trial t
+            # get part of the sequence with window_size
             arr_tmp = np.expand_dims(arr[t, i * window_size: (i + 1) * window_size, :], axis=0)
 
-            # concatenate pieces
+            # fill row with respective part of the sequence
             arr_cut[idx, :, :] = arr_tmp
 
             idx = idx + 1
 
         if rest > 0 and keep_padded:
-            # concatenate last one with pad
+            # get end point of last part of the sequence
             start_idx_last_piece = window_size * n
-            len_pad_to_add = window_size - rest
-            # piece to pad:
-            arr_incomplete = np.expand_dims(arr[t, start_idx_last_piece:arr.shape[1], :], axis=0)
-            # padding piece:
-            start_idx_last_piece = window_size * (n - 1)
-            arr_pad = np.expand_dims(
-                arr[t, start_idx_last_piece:start_idx_last_piece + len_pad_to_add, :], axis=0,
-            )
 
-            arr_tmp = np.concatenate((arr_incomplete, arr_pad), axis=1)
+            # get last part of sequence which is shorter than window_size
+            arr_incomplete = arr[t, start_idx_last_piece:, :]
 
-            # concatenate last piece of original row t
-            arr_cut[idx, :, :] = arr_tmp
+            # insert last part, remaining samples are already np.nan
+            arr_cut[idx, :rest, :] = arr_incomplete
 
             idx = idx + 1
 
