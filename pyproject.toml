@@ -5,6 +5,11 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+[tool.autoflake]
+in-place = true
+remove-all-unused-imports = true
+ignore-init-module-imports = true
+
 [tool.autopep8]
 max_line_length = 100
 in-place = true
