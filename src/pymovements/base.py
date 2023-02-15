@@ -107,7 +107,7 @@ class Screen:
 
     def pix2deg(
             self,
-            arr: float | list[float] | list[list[float]] | list[tuple[float, float]] | np.ndarray,
+            arr: float | list[float] | list[list[float]] | np.ndarray,
     ) -> np.ndarray:
         """
         Converts pixel screen coordinates to degrees of visual angle.

@@ -315,18 +315,6 @@ def cut_into_subsequences(
 
     Examples
     --------
-    >>> # one sequence of length 10 and 2 channels
-    >>> arr = np.ones((1, 10, 2))
-    >>> arr.shape
-    (1, 10, 2)
-    >>> cut_arr = cut_into_subsequences(
-    ...    arr=arr,
-    ...    window_size=5,
-    ...    keep_padded=False,
-    ... )
-    >>> cut_arr.shape # the array is cut into 2 sequences of length 5 with 2 channels
-    (2, 5, 2)
-
     >>> # one sequence of length 9 and 2 channels
     >>> arr = np.ones((1, 9, 2))
     >>> arr.shape
@@ -334,21 +322,29 @@ def cut_into_subsequences(
     >>> cut_arr = cut_into_subsequences(
     ...    arr=arr,
     ...    window_size=5,
+    ...    keep_padded=False,
+    ... )
+    >>> cut_arr.shape # array cut into 1 sequence of length 5 and 2 channels, the rest is discarded
+    (1, 5, 2)
+
+    >>> # one sequence of length 8 and 2 channels
+    >>> arr = np.ones((1, 8, 2))
+    >>> arr.shape
+    (1, 8, 2)
+    >>> cut_arr = cut_into_subsequences(
+    ...    arr=arr,
+    ...    window_size=5,
     ...    keep_padded=True,
     ... )
     >>> cut_arr.shape # the array is cut into 2 sequences of length 5 with 2 channels
     (2, 5, 2)
-    >>> cut_arr
-    array([[[1., 1.],
-            [1., 1.],
-            [1., 1.],
-            [1., 1.],
-            [1., 1.]],
-           [[1., 1.],
-            [1., 1.],
-            [1., 1.],
-            [1., 1.],
-            [1., 1.]]])
+    >>> cut_arr[-1] # the last instance is completed with nan values to match the window size
+    array([[ 1.,  1.],
+           [ 1.,  1.],
+           [ 1.,  1.],
+           [nan, nan],
+           [nan, nan]])
+
     """
     n, rest = np.divmod(arr.shape[1], window_size)
 
