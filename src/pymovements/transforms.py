@@ -334,10 +334,10 @@ def cut_into_subsequences(
 
     Examples
     --------
-    >>> # one sequence of length 9 and 2 channels
-    >>> arr = np.ones((1, 9, 2))
+    >>> # one sequence of length 8 and 2 channels
+    >>> arr = np.ones((1, 8, 2))
     >>> arr.shape
-    (1, 9, 2)
+    (1, 8, 2)
     >>> cut_arr = cut_into_subsequences(
     ...    arr=arr,
     ...    window_size=5,
