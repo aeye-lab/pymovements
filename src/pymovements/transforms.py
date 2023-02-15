@@ -285,22 +285,22 @@ def cut_into_subsequences(
     idx = 0
     for t in range(0, arr.shape[0]):
         for i in range(0, n):
-            # get piece of respective sequence
+            # get part of the sequence with window_size
             arr_tmp = np.expand_dims(arr[t, i * window_size: (i + 1) * window_size, :], axis=0)
 
-            # fill respective instance with piece
+            # fill row with respective part of the sequence
             arr_cut[idx, :, :] = arr_tmp
 
             idx = idx + 1
 
         if rest > 0 and keep_padded:
-            # concatenate last one with pad
+            # get end point of last part of the sequence
             start_idx_last_piece = window_size * n
 
-            # piece to pad
+            # get last part of sequence which is shorter than window_size
             arr_incomplete = arr[t, start_idx_last_piece:, :]
 
-            # insert last piece, remaining samples are already np.nan
+            # insert last part, remaining samples are already np.nan
             arr_cut[idx, :rest, :] = arr_incomplete
 
             idx = idx + 1
