@@ -22,7 +22,6 @@ This module tests functionality of base event classes.
 """
 from __future__ import annotations
 
-"""This module tests functionality of the IVT algorithm."""
 import numpy as np
 import polars as pl
 import pytest
@@ -31,6 +30,7 @@ from polars.testing import assert_frame_equal
 from pymovements.events.ivt import ivt
 from pymovements.synthetic import step_function
 from pymovements.transforms import pos2vel
+"""This module tests functionality of the IVT algorithm."""
 
 
 @pytest.mark.parametrize(
