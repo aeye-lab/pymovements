@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-This module tests functionality of base event classes.
-"""
+"""This module tests functionality of the IVT algorithm."""
 from __future__ import annotations
 
 import numpy as np
@@ -30,7 +28,6 @@ from polars.testing import assert_frame_equal
 from pymovements.events.ivt import ivt
 from pymovements.synthetic import step_function
 from pymovements.transforms import pos2vel
-"""This module tests functionality of the IVT algorithm."""
 
 
 @pytest.mark.parametrize(
