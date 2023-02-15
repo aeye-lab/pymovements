@@ -6,8 +6,8 @@ from __future__ import annotations
 import numpy as np
 import polars as pl
 
-from pymovements.transforms import norm
 from pymovements.transforms import consecutive
+from pymovements.transforms import norm
 
 
 def ivt(
