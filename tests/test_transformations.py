@@ -4,9 +4,9 @@ Test all functions in pymovements.transforms.
 import numpy as np
 import pytest
 
+from pymovements.transforms import cut_into_subsequences
 from pymovements.transforms import pix2deg
 from pymovements.transforms import pos2vel
-from pymovements.transforms import cut_into_subsequences
 
 
 n_coords = 100
@@ -509,10 +509,12 @@ def test_pos2vel_stepped_input_returns(params, expected_value):
         ),
         pytest.param(
             {'arr': np.ones((1, 11, 2)), 'window_size': 5, 'keep_padded': True},
-            {'value': np.concatenate([
-                np.ones((2, 5, 2)),
-                np.expand_dims(np.concatenate([np.ones((1, 2)), np.ones((4,2))*np.nan]), 0),
-            ])},
+            {
+                'value': np.concatenate([
+                    np.ones((2, 5, 2)),
+                    np.expand_dims(np.concatenate([np.ones((1, 2)), np.ones((4, 2)) * np.nan]), 0),
+                ]),
+            },
             id='length_double_window_size+1_not_keep_padded_returns_three_instances',
         ),
     ],
