@@ -92,8 +92,8 @@ def microsaccades(
     event_df = pl.from_dict(
         {
             'type': 'saccade',
-            'onset': saccades[:, 0],
-            'offset': saccades[:, 1],
+            'onset': saccades[:, 0].tolist(),
+            'offset': saccades[:, 1].tolist(),
         },
     )
     return event_df
