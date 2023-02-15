@@ -22,6 +22,12 @@ repos:
     rev: v0.2.0
     hooks:
     -   id: rm-unneeded-f-str
+-   repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.4.2
+    hooks:
+    -   id: insert-license
+        args: [--use-current-year]
+        exclude_types: [bib, image, json, markdown, rst, toml, yaml]
 -   repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.0.0
     hooks:
