@@ -6,8 +6,8 @@ from __future__ import annotations
 from collections.abc import Sized
 
 import numpy as np
+import polars as pl
 
-from pymovements.events import Saccade
 from pymovements.transforms import consecutive
 
 
@@ -15,9 +15,9 @@ def microsaccades(
     velocities: np.ndarray,
     threshold: np.ndarray | tuple[float] | str = 'engbert2015',
     threshold_factor: float = 6,
-    min_duration: int = 6,
-    min_threshold: float = 1e-10,
-) -> list[Saccade]:
+    minimum_duration: int = 6,
+    minimum_threshold: float = 1e-10,
+) -> pl.DataFrame:
     """Detect micro-saccades from velocity gaze sequence.
 
     This algorithm has a noise-adaptive velocity threshold parameter, which can also be set
@@ -37,16 +37,16 @@ def microsaccades(
         a reference of valid methods. Default: `engbert2015`
     threshold_factor : float
         factor for relative velocity threshold computation. Default: 6
-    min_duration : int
+    minimum_duration : int
         minimal saccade duration in samples. Default: 6
-    min_threshold : float
+    minimum_threshold : float
         minimal threshold value. Raises ValueError if calculated threshold is too low.
         Default: 1e-10
 
     Returns
     -------
-    list[Saccade]
-        List of Saccades
+    pl.DataFrame
+        A dataframe with detected saccades as rows.
 
     Raises
     ------
@@ -61,10 +61,10 @@ def microsaccades(
             raise ValueError('threshold must be either string or two-dimensional')
         threshold = np.array(threshold)
 
-    if (threshold < min_threshold).any():
+    if (threshold < minimum_threshold).any():
         raise ValueError(
             'threshold does not provide enough variance as required by min_threshold'
-            f' ({threshold} < {min_threshold})',
+            f' ({threshold} < {minimum_threshold})',
         )
 
     # Radius of elliptic threshold.
@@ -80,18 +80,23 @@ def microsaccades(
     candidates = consecutive(arr=outside_ellipse_indices)
 
     # Filter all candidates by minimum duration.
-    candidates = [candidate for candidate in candidates if len(candidate) >= min_duration]
+    candidates = [candidate for candidate in candidates if len(candidate) >= minimum_duration]
 
-    # Create saccades from valid candidates.
-    saccades = []
-    for saccade_indices in candidates:
-        saccade = Saccade(
-            onset=saccade_indices[0],
-            offset=saccade_indices[-1],
-        )
-        saccades.append(saccade)
+    # Create saccades from valid candidates. First channel is onset, second channel is offset.
+    saccades = np.array([
+        (candidate_indices[0], candidate_indices[-1])
+        for candidate_indices in candidates
+    ])
 
-    return saccades
+    # Create event dataframe from saccade onset and offsets.
+    event_df = pl.from_dict(
+        {
+            'type': 'saccade',
+            'onset': saccades[:, 0],
+            'offset': saccades[:, 1],
+        },
+    )
+    return event_df
 
 
 def compute_threshold(arr: np.ndarray, method: str = 'engbert2015') -> np.ndarray:
