@@ -102,14 +102,14 @@ def ivt(
 
     # Calculate centroid positions for fixations.
     centroids = [
-        np.mean(positions[fixation[0]:fixation[1]], axis=0, dtype=np.float64)
+        np.mean(positions[fixation[0]:fixation[1]], axis=0, dtype=np.float64).tolist()
         for fixation in fixations
     ]
 
     event_df = pl.from_dict({
         'type': 'fixation',
-        'onset': fixations[:, 0],
-        'offset': fixations[:, 1],
+        'onset': fixations[:, 0].tolist(),
+        'offset': fixations[:, 1].tolist(),
         'position': centroids,
     })
     return event_df
