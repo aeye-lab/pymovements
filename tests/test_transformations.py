@@ -23,8 +23,10 @@ Test all functions in pymovements.transforms.
 import numpy as np
 import pytest
 
+from pymovements.transforms import cut_into_subsequences
 from pymovements.transforms import pix2deg
 from pymovements.transforms import pos2vel
+
 
 n_coords = 100
 screen_px_1d = 100
@@ -504,3 +506,46 @@ def test_pos2vel_stepped_input_returns(params, expected_value):
 
     lpad, rpad = 1, -1
     assert np.allclose(actual_value[lpad:rpad], expected_value[lpad:rpad])
+
+
+@pytest.mark.parametrize(
+    'params, expected',
+    [
+        pytest.param(
+            {'arr': np.ones((1, 10, 2)), 'window_size': 5, 'keep_padded': False},
+            {'value': np.ones((2, 5, 2))},
+            id='length_double_window_size_keep_padded_returns_two_instances',
+        ),
+        pytest.param(
+            {'arr': np.ones((1, 10, 2)), 'window_size': 5, 'keep_padded': True},
+            {'value': np.ones((2, 5, 2))},
+            id='length_double_window_size_not_keep_padded_returns_two_instances',
+        ),
+        pytest.param(
+            {'arr': np.ones((1, 11, 2)), 'window_size': 5, 'keep_padded': False},
+            {'value': np.ones((2, 5, 2))},
+            id='length_double_window_size+1_keep_padded_returns_two_instances',
+        ),
+        pytest.param(
+            {'arr': np.ones((1, 11, 2)), 'window_size': 5, 'keep_padded': True},
+            {
+                'value': np.concatenate([
+                    np.ones((2, 5, 2)),
+                    np.expand_dims(np.concatenate([np.ones((1, 2)), np.ones((4, 2)) * np.nan]), 0),
+                ]),
+            },
+            id='length_double_window_size+1_not_keep_padded_returns_three_instances',
+        ),
+    ],
+)
+def test_cut_into_subsequences(params, expected):
+    if 'exception' in expected:
+        with pytest.raises(expected['exception']):
+            cut_into_subsequences(**params)
+        return
+
+    arr = cut_into_subsequences(**params)
+
+    assert np.array_equal(arr, expected['value'], equal_nan=True), (
+        f"arr = {arr}, expected = {expected['value']}"
+    )

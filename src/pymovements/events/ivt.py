@@ -23,8 +23,9 @@ This module holds the implementation of the ivt algorithm.
 from __future__ import annotations
 
 import numpy as np
+import polars as pl
 
-from pymovements.events import Fixation
+from pymovements.transforms import consecutive
 from pymovements.transforms import norm
 
 
@@ -32,7 +33,8 @@ def ivt(
         positions: list[list[float]] | np.ndarray,
         velocities: list[list[float]] | np.ndarray,
         velocity_threshold: float,
-) -> list[Fixation]:
+        minimum_duration: int,
+) -> pl.DataFrame:
     """
     Identification of fixations based on velocity-threshold
 
@@ -52,11 +54,13 @@ def ivt(
     velocity_threshold: float
         Threshold for a point to be classified as a fixation. If the
         velocity is below the threshold, the point is classified as a fixation.
+    minimum_duration: int
+        Minimum fixation duration in number of samples
 
     Returns
     -------
-    list[Fixation]:
-        List of Fixation events
+    pl.DataFrame
+        A dataframe with detected fixations as rows.
 
     Raises
     ------
@@ -100,30 +104,31 @@ def ivt(
 
     velocity_norm = norm(velocities, axis=1)
 
-    # Map velocities lower than threshold to True and greater equals to False
-    fix_map = velocity_norm < velocity_threshold
+    # Get all indices with velocities outside of ellipse.
+    below_threshold_indices = np.where(velocity_norm < velocity_threshold)[0]
 
-    # Find onsets for group of velocities
-    loc_group_onsets = np.empty(len(positions), dtype=bool)
-    loc_group_onsets[0] = True
-    np.not_equal(fix_map[:-1], fix_map[1:], out=loc_group_onsets[1:])
-    ind_group_onsets = np.nonzero(loc_group_onsets)[0]
+    # Get all fixation candidates by grouping all consecutive indices.
+    candidates = consecutive(arr=below_threshold_indices)
 
-    # Find offsets for group of velocities
-    group_lengths = np.diff(np.append(ind_group_onsets, len(positions)))
-    ind_group_offsets = np.add(ind_group_onsets, group_lengths)
+    # Filter all candidates by minimum duration.
+    candidates = [candidate for candidate in candidates if len(candidate) >= minimum_duration]
 
-    # Stack onsets and offsets and filter out fixation groups
-    groups = np.stack((ind_group_onsets, ind_group_offsets), axis=1)
-    fix_groups = groups[[fix_map[group[0]] == 1 for group in groups]]
+    # Create ficaitons from valid candidates. First channel is onset, second channel is offset.
+    fixations = np.array([
+        (candidate_indices[0], candidate_indices[-1])
+        for candidate_indices in candidates
+    ])
 
-    fixations = []
+    # Calculate centroid positions for fixations.
+    centroids = [
+        np.mean(positions[fixation[0]:fixation[1]], axis=0, dtype=np.float64).tolist()
+        for fixation in fixations
+    ]
 
-    for onset, offset in fix_groups:
-        fixation_points = positions[onset:offset]
-        centroid = np.mean(fixation_points, axis=0, dtype=np.float64)
-        centroid = (centroid[0], centroid[1])
-
-        fixations.append(Fixation(onset, offset, centroid))
-
-    return fixations
+    event_df = pl.from_dict({
+        'type': 'fixation',
+        'onset': fixations[:, 0].tolist(),
+        'offset': fixations[:, 1].tolist(),
+        'position': centroids,
+    })
+    return event_df

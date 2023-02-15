@@ -17,3 +17,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""This module provides access to all submodules."""
+from pymovements import datasets  # noqa: F401
+from pymovements import events  # noqa: F401
+from pymovements import synthetic  # noqa: F401
+from pymovements import utils  # noqa: F401

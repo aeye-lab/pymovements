@@ -5,6 +5,11 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+[tool.autoflake]
+in-place = true
+remove-all-unused-imports = true
+ignore-init-module-imports = true
+
 [tool.autopep8]
 max_line_length = 100
 in-place = true
@@ -20,3 +25,9 @@ exclude = ['src/pymovements/plot.py']
 [[tool.mypy.overrides]]
 module = "scipy.*"
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+addopts = "-ra -l -v --doctest-modules"
+doctest_optionflags = "NORMALIZE_WHITESPACE"
+filterwarnings = ['ignore::DeprecationWarning:pkg_resources.*:']
+testpaths = ['tests', 'src']
