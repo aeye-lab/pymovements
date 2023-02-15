@@ -334,35 +334,41 @@ def cut_into_subsequences(
 
     Examples
     --------
-    >>> # one sequence of length 8 and 2 channels
-    >>> arr = np.ones((1, 8, 2))
-    >>> arr.shape
-    (1, 8, 2)
-    >>> cut_arr = cut_into_subsequences(
-    ...    arr=arr,
-    ...    window_size=5,
-    ...    keep_padded=False,
-    ... )
-    >>> cut_arr.shape # array cut into 1 sequence of length 5 and 2 channels, the rest is discarded
-    (1, 5, 2)
+    We first create an array with `2` channels and a sequence length of `13`.
 
-    >>> # one sequence of length 8 and 2 channels
-    >>> arr = np.ones((1, 8, 2))
+    >>> arr = np.ones((1, 13, 2))
     >>> arr.shape
-    (1, 8, 2)
-    >>> cut_arr = cut_into_subsequences(
+    (1, 13, 2)
+
+    We now cut the original array into three subsequences of length `5`.
+
+    >>> arr_cut = cut_into_subsequences(
     ...    arr=arr,
     ...    window_size=5,
     ...    keep_padded=True,
     ... )
-    >>> cut_arr.shape # the array is cut into 2 sequences of length 5 with 2 channels
-    (2, 5, 2)
-    >>> cut_arr[-1] # the last instance is completed with nan values to match the window size
+    >>> arr_cut.shape
+    (3, 5, 2)
+
+    The last subsequence is padded with `nan` to have a length of `5`.
+
+    >>> arr_cut[-1]
     array([[ 1.,  1.],
            [ 1.,  1.],
            [ 1.,  1.],
            [nan, nan],
            [nan, nan]])
+
+    We can also drop any remaining sequences that would need padding by passing
+    ``keep_padded=False``.
+
+    >>> arr_cut = cut_into_subsequences(
+    ...    arr=arr,
+    ...    window_size=5,
+    ...    keep_padded=False,
+    ... )
+    >>> arr_cut.shape
+    (2, 5, 2)
 
     """
     n, rest = np.divmod(arr.shape[1], window_size)
