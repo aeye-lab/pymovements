@@ -4,8 +4,7 @@ This module holds the implementation for idt algorithm.
 from __future__ import annotations
 
 import numpy as np
-
-from pymovements.events import Fixation
+import polars as pl
 
 
 def dispersion(positions: list[list[float]] | np.ndarray) -> float:
@@ -31,8 +30,8 @@ def dispersion(positions: list[list[float]] | np.ndarray) -> float:
 def idt(
         positions: list[list[float]] | np.ndarray,
         dispersion_threshold: float,
-        duration_threshold: int,
-) -> list[Fixation]:
+        minimum_duration: int,
+) -> pl.DataFrame:
     """
     Fixation identification based on dispersion threshold.
 
@@ -51,13 +50,13 @@ def idt(
         Continuous 2D position time series
     dispersion_threshold: float
         Threshold for dispersion for a group of consecutive samples to be identified as fixation
-    duration_threshold: int
+    minimum_duration: int
         Minimum fixation duration in number of samples
 
     Returns
     -------
-    list[Fixation]:
-        List of Fixation events
+    pl.DataFrame
+        A dataframe with detected fixations as rows.
 
     Raises
     ------
@@ -82,14 +81,14 @@ def idt(
         raise ValueError('dispersion threshold must be greater than 0')
 
     # Check if duration_threshold is greater 0
-    if duration_threshold <= 0:
+    if minimum_duration <= 0:
         raise ValueError('duration threshold must be greater than 0')
 
     fixations = []
 
     # Initialize window over first points to cover the duration threshold
     win_start = 0
-    win_end = duration_threshold
+    win_end = minimum_duration
 
     while win_end < len(positions):
         if dispersion(positions[win_start:win_end]) <= dispersion_threshold:
@@ -103,14 +102,20 @@ def idt(
 
             # Note a fixation at the centroid of the window points
             centroid = np.mean(positions[win_start:win_end], axis=0)
-            centroid = (centroid[0], centroid[1])
 
-            fixations.append(Fixation(win_start, win_end, centroid))
+            fixations.append({
+                'type': 'fixation',
+                'onset': win_start,
+                'offset': win_end,
+                'position': centroid.tolist(),
+            })
 
             # Initialize new window excluding the previous window
             win_start = win_end
-            win_end = win_start + duration_threshold
+            win_end = win_start + minimum_duration
         else:
             win_start += 1
 
-    return fixations
+    event_df = pl.from_dicts(fixations, infer_schema_length=1)
+
+    return event_df
