@@ -60,13 +60,31 @@ def step_function(
 
     Examples
     --------
-        >>> step_function(
-        ...     length=10,
-        ...     steps=[2, 5, 9],
-        ...     values=[1, 2, 3],
-        ...     start_value=0,
-        ... )
-        array([0., 0., 1., 1., 1., 2., 2., 2., 2., 3.])
+    >>> step_function(
+    ...     length=10,
+    ...     steps=[2, 5, 9],
+    ...     values=[1., 2., 3.],
+    ...     start_value=0,
+    ... )
+    array([0., 0., 1., 1., 1., 2., 2., 2., 2., 3.])
+
+    >>> # multi-channel example
+    >>> step_function(
+    ...     length=10,
+    ...     steps=[2, 5],
+    ...     values=[(1., 2.), (3., 4.)],
+    ...     start_value=(11., 22.),
+    ... )
+    array([[11., 22.],
+           [11., 22.],
+           [ 1.,  2.],
+           [ 1.,  2.],
+           [ 1.,  2.],
+           [ 3.,  4.],
+           [ 3.,  4.],
+           [ 3.,  4.],
+           [ 3.,  4.],
+           [ 3.,  4.]])
     """
     # Check that steps and values have equal length.
     if len(steps) != len(values):

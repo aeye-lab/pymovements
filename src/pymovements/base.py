@@ -93,14 +93,16 @@ class Screen:
         >>> screen = Screen(
         ...     width_px=1280,
         ...     height_px=1024,
-        ...     width_cm=38,
-        ...     height_cm=30,
-        ...     distance_cm=68,
+        ...     width_cm=38.0,
+        ...     height_cm=30.0,
+        ...     distance_cm=68.0,
         ...     origin='lower left',
         ... )
-        >>> print(screen)  # doctest: +NORMALIZE_WHITESPACE
-        Screen(width_px=1280, height_px=1024, width_cm=38, height_cm=30, distance_cm=68,
-        origin=lower left, x_max_dva=15.60, y_max_dva=12.43, x_min_dva=-15.60, y_min_dva=-12.43)
+        >>> print(screen)
+        Screen(width_px=1280, height_px=1024, width_cm=38.00,
+        height_cm=30.00, distance_cm=68.00, origin=lower left,
+        x_max_dva=15.60, y_max_dva=12.43, x_min_dva=-15.60,
+        y_min_dva=-12.43)
 
         """
         checks.check_no_zeros(width_px, 'width_px')
@@ -146,14 +148,28 @@ class Screen:
 
         Examples
         --------
+        >>> arr = [(123.0, 865.0)]
         >>> screen = Screen(
         ...     width_px=1280,
         ...     height_px=1024,
-        ...     width_cm=38,
-        ...     height_cm=30,
-        ...     distance_cm=68,
+        ...     width_cm=38.0,
+        ...     height_cm=30.0,
+        ...     distance_cm=68.0,
         ...     origin='lower left',
         ... )
+        >>> screen.pix2deg(arr=arr)
+        array([[-12.70732231, 8.65963972]])
+
+        >>> screen = Screen(
+        ...     width_px=1280,
+        ...     height_px=1024,
+        ...     width_cm=38.0,
+        ...     height_cm=30.0,
+        ...     distance_cm=68.0,
+        ...     origin='center',
+        ... )
+        >>> screen.pix2deg(arr=arr)
+        array([[ 3.07379946, 20.43909054]])
         """
         return pix2deg(
             arr=arr,
@@ -164,6 +180,7 @@ class Screen:
         )
 
 
+@auto_str
 class Experiment:
     """
     Experiment class for holding experiment properties.
@@ -202,6 +219,22 @@ class Experiment:
             Specifies the screen location of the origin of the pixel coordinate system.
         sampling_rate : float
             Sampling rate in Hz
+
+        Examples
+        --------
+        >>> experiment = Experiment(
+        ...     screen_width_px=1280,
+        ...     screen_height_px=1024,
+        ...     screen_width_cm=38,
+        ...     screen_height_cm=30,
+        ...     distance_cm=68,
+        ...     origin='lower left',
+        ...     sampling_rate=1000.0,
+        ... )
+        >>> print(experiment)
+        Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38,
+        height_cm=30, distance_cm=68, origin=lower left, x_max_dva=15.60, y_max_dva=12.43,
+        x_min_dva=-15.60, y_min_dva=-12.43), sampling_rate=1000.00)
 
         """
         self.screen = Screen(
@@ -245,5 +278,27 @@ class Experiment:
             If selected method is invalid, input array is too short for the
             selected method or the sampling rate is below zero
 
+        Examples
+        --------
+        >>> experiment = Experiment(
+        ...     screen_width_px=1280,
+        ...     screen_height_px=1024,
+        ...     screen_width_cm=38,
+        ...     screen_height_cm=30,
+        ...     distance_cm=68,
+        ...     origin='lower left',
+        ...     sampling_rate=1000.0,
+        ... )
+        >>> arr = [[0., 0.], [1., 1.], [2., 2.], [3., 3.], [4., 4.], [5., 5.]]
+        >>> experiment.pos2vel(
+        ...    arr=arr,
+        ...    method="smooth",
+        ... )
+        array([[ 500.,  500.],
+               [1000., 1000.],
+               [1000., 1000.],
+               [1000., 1000.],
+               [1000., 1000.],
+               [ 500.,  500.]])
         """
         return pos2vel(arr=arr, sampling_rate=self.sampling_rate, method=method, **kwargs)

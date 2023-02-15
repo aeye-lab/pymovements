@@ -68,6 +68,25 @@ def pix2deg(
         If distance_cm is zero.
         If origin value is not supported.
 
+    Examples
+    --------
+    >>> pix2deg(
+    ...    arr=[(123.0, 865.0)],
+    ...    screen_px=(1280, 1024),
+    ...    screen_cm=(38.0, 30.0),
+    ...    distance_cm=68.0,
+    ...    origin='lower left',
+    ... )
+    array([[-12.70732231, 8.65963972]])
+
+    >>> pix2deg(
+    ...    arr=[(123.0, 865.0)],
+    ...    screen_px=(1280, 1024),
+    ...    screen_cm=(38.0, 30.0),
+    ...    distance_cm=68.0,
+    ...    origin='center',
+    ... )
+    array([[ 3.07379946, 20.43909054]])
     """
     if arr is None:
         raise TypeError('arr must not be None')
@@ -165,6 +184,20 @@ def pos2vel(
         If selected method is invalid, input array is too short for the
         selected method or the sampling rate is below zero
 
+    Examples
+    --------
+    >>> arr = [(0., 0.), (1., 1.), (2., 2.), (3., 3.), (4., 4.), (5., 5.)]
+    >>> pos2vel(
+    ...    arr=arr,
+    ...    sampling_rate=1000,
+    ...    method="smooth",
+    ... )
+    array([[ 500.,  500.],
+           [1000., 1000.],
+           [1000., 1000.],
+           [1000., 1000.],
+           [1000., 1000.],
+           [ 500.,  500.]])
     """
     if sampling_rate <= 0:
         raise ValueError('sampling_rate needs to be above zero')
@@ -257,6 +290,13 @@ def norm(arr: np.ndarray, axis: int | None = None) -> np.ndarray | Any:
     Returns
     -------
     np.ndarray
+
+    Examples
+    --------
+    >>> arr = np.array([[1., 1., 1., 1., 1., 1.], [1., 1., 1., 1., 1., 1.]])
+    >>> norm(arr=arr)
+    array([1.41421356, 1.41421356, 1.41421356, 1.41421356, 1.41421356,
+           1.41421356])
     """
     if axis is None:
         # for single vector and array of vectors the axis is 0
@@ -291,6 +331,45 @@ def cut_into_subsequences(
     -------
     np.ndarray
         Output sequence with new window length of shape (N', L', C)
+
+    Examples
+    --------
+    We first create an array with `2` channels and a sequence length of `13`.
+
+    >>> arr = np.ones((1, 13, 2))
+    >>> arr.shape
+    (1, 13, 2)
+
+    We now cut the original array into three subsequences of length `5`.
+
+    >>> arr_cut = cut_into_subsequences(
+    ...    arr=arr,
+    ...    window_size=5,
+    ...    keep_padded=True,
+    ... )
+    >>> arr_cut.shape
+    (3, 5, 2)
+
+    The last subsequence is padded with `nan` to have a length of `5`.
+
+    >>> arr_cut[-1]
+    array([[ 1.,  1.],
+           [ 1.,  1.],
+           [ 1.,  1.],
+           [nan, nan],
+           [nan, nan]])
+
+    We can also drop any remaining sequences that would need padding by passing
+    ``keep_padded=False``.
+
+    >>> arr_cut = cut_into_subsequences(
+    ...    arr=arr,
+    ...    window_size=5,
+    ...    keep_padded=False,
+    ... )
+    >>> arr_cut.shape
+    (2, 5, 2)
+
     """
     n, rest = np.divmod(arr.shape[1], window_size)
 
@@ -344,6 +423,18 @@ def downsample(
     Returns
     -------
     np.ndarray
+
+    Examples
+    --------
+    >>> arr = np.array([0., 0., 1., 1., 2., 2., 3., 3., 4., 4., 5., 5.])
+    >>> downsample(arr=arr, factor=2)
+    array([0., 1., 2., 3., 4., 5.])
+
+    >>> arr2 = np.array([(0., 0.), (1., 1.), (2., 2.), (3., 3.), (4., 4.), (5., 5.)])
+    >>> downsample(arr=arr2, factor=2)
+    array([[0., 0.],
+           [2., 2.],
+           [4., 4.]])
     """
     sequence_length = arr.shape[0]
     select = [i % factor == 0 for i in range(sequence_length)]
