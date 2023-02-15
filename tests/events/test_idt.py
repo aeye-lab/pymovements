@@ -17,20 +17,15 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-This module tests functionality of the IDT algorithm
-
-"""
 """This module tests functionality of the IDT algorithm."""
-
-
-
-
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
+
 from pymovements.events.idt import idt
 from pymovements.synthetic import step_function
+
+
 @pytest.mark.parametrize(
     'kwargs, expected_error',
     [
