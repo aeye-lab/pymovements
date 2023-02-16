@@ -19,7 +19,7 @@
 # SOFTWARE.
 """This module provides an interface to the JuDo1000 dataset."""
 from pymovements.base import Experiment
-from pymovements.datasets.base import PublicDataset
+from pymovements.datasets.public_dataset import PublicDataset
 
 
 class JuDo1000(PublicDataset):
