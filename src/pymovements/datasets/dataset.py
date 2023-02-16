@@ -51,7 +51,7 @@ class Dataset:
         experiment : Experiment
             The experiment definition.
         filename_regex : str
-            Regular expression which needs to be matched before trying to read the file. Named
+            Regular expression which needs to be matched before trying to load the file. Named
             groups will appear in the `fileinfo` dataframe.
         filename_regex_dtypes : dict[str, type], optional
             If named groups are present in the `filename_regex`, this makes it possible to cast
@@ -76,17 +76,17 @@ class Dataset:
             custom_read_kwargs = {}
         self._custom_read_kwargs = custom_read_kwargs
 
-    def read(self):
-        """Parse file information and read all gaze files.
+    def load(self):
+        """Parse file information and load all gaze files.
 
         The parsed file information is assigned to the `fileinfo` attribute.
-        All gaze files will be read as dataframes and assigned to the `gaze` attribute.
+        All gaze files will be loaded as dataframes and assigned to the `gaze` attribute.
         """
-        self.fileinfo = self.read_fileinfo()
-        self.gaze = self.read_gaze_files()
+        self.fileinfo = self.infer_fileinfo()
+        self.gaze = self.load_gaze_files()
 
-    def read_fileinfo(self) -> pl.DataFrame:
-        """Parse file information from filepaths and filenames.
+    def infer_fileinfo(self) -> pl.DataFrame:
+        """Infer information from filepaths and filenames.
 
         Returns
         -------
@@ -139,8 +139,8 @@ class Dataset:
 
         return fileinfo_df
 
-    def read_gaze_files(self) -> list[pl.DataFrame]:
-        """Read all available gaze data files.
+    def load_gaze_files(self) -> list[pl.DataFrame]:
+        """Load all available gaze data files.
 
         Returns
         -------
@@ -156,7 +156,7 @@ class Dataset:
 
         if self.fileinfo is None:
             raise AttributeError(
-                'fileinfo was not read yet. please run read() or read_fileinfo() beforehand',
+                'fileinfo was not loaded yet. please run load() or infer_fileinfo() beforehand',
             )
         if len(self.fileinfo) == 0:
             raise AttributeError('no files present in fileinfo attribute')
@@ -201,7 +201,7 @@ class Dataset:
         """
         if self.gaze is None:
             raise AttributeError(
-                'gaze files were not read yet. please run read() or read_gaze_files() beforehand',
+                'gaze files were not loaded yet. please run load() or load_gaze_files() beforehand',
             )
         if len(self.gaze) == 0:
             raise AttributeError('no files present in gaze attribute')
@@ -249,7 +249,7 @@ class Dataset:
         """
         if self.gaze is None:
             raise AttributeError(
-                'gaze files were not read yet. please run read() or read_gaze_files() beforehand',
+                'gaze files were not loaded yet. please run load() or load_gaze_files() beforehand',
             )
         if len(self.gaze) == 0:
             raise AttributeError('no files present in gaze attribute')
