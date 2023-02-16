@@ -19,7 +19,7 @@
 # SOFTWARE.
 """This module provides an interface to the GazeBase dataset."""
 from pymovements.base import Experiment
-from pymovements.datasets.base import PublicDataset
+from pymovements.datasets.public_dataset import PublicDataset
 
 
 class GazeBase(PublicDataset):
