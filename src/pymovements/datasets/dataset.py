@@ -107,7 +107,7 @@ class Dataset:
 
         # Get all filepaths that match regular expression.
         csv_filepaths = get_filepaths(
-            path=self.raw_dirpath,
+            path=self.raw_rootpath,
             regex=filename_regex,
         )
 
@@ -272,7 +272,7 @@ class Dataset:
                 )
 
     @property
-    def dirpath(self) -> Path:
+    def rootpath(self) -> Path:
         """Get the path to the dataset directory.
 
         The dataset path points to a directory in the specified root directory which is named the
@@ -283,23 +283,23 @@ class Dataset:
         >>> class CustomDataset(Dataset):
         ...     pass
         >>> dataset = CustomDataset(root='data')
-        >>> dataset.dirpath  # doctest: +SKIP
+        >>> dataset.rootpath  # doctest: +SKIP
         Path('data/CustomDataset')
         """
         return self.root / self.__class__.__name__
 
     @property
-    def raw_dirpath(self) -> Path:
+    def raw_rootpath(self) -> Path:
         """Get the path to the directory of the raw data.
 
-        The raw data directory path points to a directory named `raw` in the dataset `dirpath`.
+        The raw data directory path points to a directory named `raw` in the dataset `rootpath`.
 
         Example
         -------
         >>> class CustomDataset(Dataset):
         ...     pass
         >>> dataset = CustomDataset(root='data')
-        >>> dataset.raw_dirpath  # doctest: +SKIP
+        >>> dataset.raw_rootpath  # doctest: +SKIP
         Path('data/CustomDataset/raw')
         """
-        return self.dirpath / 'raw'
+        return self.rootpath / 'raw'
