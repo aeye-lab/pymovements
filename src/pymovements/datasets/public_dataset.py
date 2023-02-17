@@ -59,7 +59,7 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
         RuntimeError
             If downloading a resource failed for all given mirrors.
         """
-        self.raw_dirpath.mkdir(parents=True, exist_ok=True)
+        self.raw_rootpath.mkdir(parents=True, exist_ok=True)
 
         for resource in self._resources:
             success = False
@@ -71,9 +71,9 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
                 try:
                     download_and_extract_archive(
                         url=url,
-                        download_dirpath=self.dirpath,
+                        download_dirpath=self.rootpath,
                         download_filename=resource['filename'],
-                        extract_dirpath=self.raw_dirpath,
+                        extract_dirpath=self.raw_rootpath,
                         md5=resource['md5'],
                         recursive=True,
                         remove_finished=remove_finished,
