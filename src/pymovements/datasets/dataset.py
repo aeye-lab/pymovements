@@ -78,12 +78,16 @@ class Dataset:
 
     def load(
             self,
+            preprocessed: bool = False,
             subset: None | dict[str, float | int | str | list[float | int | str]] = None,
     ):
         """Parse file information and load all gaze files.
 
         Parameters
         ----------
+        preprocessed : bool
+            If ``True``, previously saved preprocessed data will be loaded, otherwise raw data will
+            be loaded.
         subset : dict, optional
             If specified, load only a subset of the dataset. All keys in the dictionary must be
             present in the fileinfo dataframe inferred by `infer_fileinfo()`. Values can be either
@@ -93,8 +97,8 @@ class Dataset:
         All gaze files will be loaded as dataframes and assigned to the `gaze` attribute.
         """
         self.fileinfo = self.infer_fileinfo()
-        self.take_subset(subset)
-        self.gaze = self.load_gaze_files()
+        self.take_subset(subset=subset)
+        self.gaze = self.load_gaze_files(preprocessed=preprocessed)
 
     def infer_fileinfo(self) -> pl.DataFrame:
         """Infer information from filepaths and filenames.
@@ -201,8 +205,13 @@ class Dataset:
 
             self.fileinfo = self.fileinfo.filter(pl.col(subset_key).is_in(column_values))
 
-    def load_gaze_files(self) -> list[pl.DataFrame]:
+    def load_gaze_files(self, preprocessed: bool = False) -> list[pl.DataFrame]:
         """Load all available gaze data files.
+
+        Parameters
+        ----------
+        preprocessed : bool
+            If ``True``, saved preprocessed data will be loaded, otherwise raw data will be loaded.
 
         Returns
         -------
@@ -213,20 +222,32 @@ class Dataset:
         ------
         AttributeError
             If `fileinfo` is None or the `fileinfo` dataframe is empty.
+        RuntimeError
+            If file type of gaze file is not supported.
         """
+        self._check_fileinfo()
+
         file_dfs: list[pl.DataFrame] = []
 
-        if self.fileinfo is None:
-            raise AttributeError(
-                'fileinfo was not loaded yet. please run load() or infer_fileinfo() beforehand',
-            )
-        if len(self.fileinfo) == 0:
-            raise AttributeError('no files present in fileinfo attribute')
-
-        # read and preprocess input files
+        # Read and input files.
         for file_id, filepath in enumerate(tqdm(self.fileinfo['filepath'])):
-            file_df = pl.read_csv(filepath, **self._custom_read_kwargs)
+            filepath = Path(filepath)
 
+            if preprocessed:
+                filepath = self._raw_to_preprocessed_filepath(filepath)
+
+            if filepath.suffix == '.csv':
+                file_df = pl.read_csv(filepath, **self._custom_read_kwargs)
+            elif filepath.suffix == '.feather':
+                file_df = pl.read_ipc(filepath)
+            else:
+                raise RuntimeError('data files of type {filepath.suffix} are not supported.')
+
+            # Preprocessed gaze files already have fileinfo.
+            if preprocessed:
+                continue
+
+            # Add fileinfo to dataframe.
             for column in self.fileinfo.columns[::-1]:
                 if column == 'filepath':
                     continue
@@ -278,7 +299,7 @@ class Dataset:
 
             pixel_positions = file_df.select(pix_position_columns)
 
-            dva_positions = self.experiment.screen.pix2deg(pixel_positions.to_numpy().transpose())
+            dva_positions = self.experiment.screen.pix2deg(pixel_positions.to_numpy())
 
             for dva_column_id, dva_column_name in enumerate(dva_position_columns):
                 self.gaze[file_id] = self.gaze[file_id].with_columns(
@@ -327,7 +348,7 @@ class Dataset:
             positions = file_df.select(position_columns)
 
             velocities = self.experiment.pos2vel(
-                positions=positions.to_numpy().transpose(),
+                arr=positions.to_numpy(),
                 method=method,
                 **kwargs,
             )
@@ -336,6 +357,30 @@ class Dataset:
                 self.gaze[file_id] = self.gaze[file_id].with_columns(
                     pl.Series(name=velocity_column_name, values=velocities[:, col_id]),
                 )
+
+    def save(self, verbose: int = 1):
+        """Save preprocessed dataset.
+
+        Data will be saved as feather files to ``Dataset.preprocessed_roothpath`` with the same
+        directory structure as the raw data.
+
+        Parameters
+        ----------
+        verbose : int
+            Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
+        """
+        disable_progressbar = not verbose
+
+        for file_id, gaze_df in enumerate(tqdm(self.gaze, disable=disable_progressbar)):
+            raw_filepath = Path(self.fileinfo[file_id, 'filepath'])
+            preprocessed_filepath = self._raw_to_preprocessed_filepath(raw_filepath)
+
+            preprocessed_filepath.parent.mkdir(parents=True, exist_ok=True)
+
+            if verbose > 2:
+                print('Save file to', preprocessed_filepath)
+
+            gaze_df.write_ipc(preprocessed_filepath)
 
     @property
     def rootpath(self) -> Path:
@@ -355,6 +400,23 @@ class Dataset:
         return self.root / self.__class__.__name__
 
     @property
+    def preprocessed_rootpath(self) -> Path:
+        """Get the path to the directory of the preprocessed gaze data.
+
+        The preprocessed data directory path points to a directory named `preprocessed` in the
+        dataset `rootpath`.
+
+        Example
+        -------
+        >>> class CustomDataset(Dataset):
+        ...     pass
+        >>> dataset = CustomDataset(root='data')
+        >>> dataset.preprocessed_rootpath  # doctest: +SKIP
+        Path('data/CustomDataset/preprocessed')
+        """
+        return self.rootpath / 'preprocessed'
+
+    @property
     def raw_rootpath(self) -> Path:
         """Get the path to the directory of the raw data.
 
@@ -369,3 +431,35 @@ class Dataset:
         Path('data/CustomDataset/raw')
         """
         return self.rootpath / 'raw'
+
+    def _check_fileinfo(self) -> None:
+        """Check if fileinfo attribute is set and there is at least one row present."""
+        if self.fileinfo is None:
+            raise AttributeError(
+                'fileinfo was not loaded yet. please run load() or infer_fileinfo() beforehand',
+            )
+        if len(self.fileinfo) == 0:
+            raise AttributeError('no files present in fileinfo attribute')
+
+    def _raw_to_preprocessed_filepath(self, raw_filepath: Path) -> Path:
+        """Get preprocessed filepath in accordance to filepath of the raw file.
+
+        The preprocessed filepath will point to a feather file.
+
+        Parameters
+        ----------
+        raw_filepath : Path
+            The Path to the raw file.
+
+        Returns
+        -------
+        Path
+            The Path to the preprocessed feather file.
+        """
+        relative_raw_dirpath = raw_filepath.parent.relative_to(self.raw_rootpath)
+        preprocessed_file_dirpath = self.preprocessed_rootpath / relative_raw_dirpath
+
+        # Get new filename for saved feather file.
+        preprocessed_filename = raw_filepath.stem + '.feather'
+
+        return preprocessed_file_dirpath / preprocessed_filename
