@@ -25,11 +25,13 @@ from abc import abstractmethod
 from urllib.error import URLError
 
 from pymovements.datasets.dataset import Dataset
-from pymovements.utils.downloads import download_and_extract_archive
+from pymovements.utils.archives import extract_archive
+from pymovements.utils.downloads import download_file
 
 
 class PublicDataset(Dataset, metaclass=ABCMeta):
-    """Extends the `Dataset` abstract base class with functionality for downloading in extracting.
+    """Extends the `Dataset` base class with functionality for downloading and extracting public
+    datasets.
 
     To implement this abstract base class for a new dataset, the attributes/properties `_mirrors`
     and `_resources` must be implemented.
@@ -39,20 +41,32 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
         self,
         root: str,
         download: bool = False,
+        extract: bool = False,
         remove_finished: bool = False,
         **kwargs,
     ):
-        super().__init__(root=root, **kwargs)
-        if download:
-            self.download(remove_finished=remove_finished)
+        """Initialize dataset.
 
-    def download(self, remove_finished: bool = False) -> None:
-        """Download dataset.
+        If desired, dataset resources will be downloaded and extracted.
 
         Parameters
         ----------
+        download : bool
+            Download all dataset resources.
+        extract : bool
+            Extract dataset archive files.
         remove_finished : bool
             Remove archive files after extraction.
+        """
+        super().__init__(root=root, **kwargs)
+        if download:
+            self.download()
+
+        if extract:
+            self.extract(remove_finished=remove_finished)
+
+    def download(self) -> None:
+        """Download dataset.
 
         Raises
         ------
@@ -69,14 +83,11 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
                 url = f'{mirror}{resource["resource"]}'
 
                 try:
-                    download_and_extract_archive(
+                    download_file(
                         url=url,
-                        download_dirpath=self.rootpath,
-                        download_filename=resource['filename'],
-                        extract_dirpath=self.raw_rootpath,
+                        dirpath=self.rootpath,
+                        filename=resource['filename'],
                         md5=resource['md5'],
-                        recursive=True,
-                        remove_finished=remove_finished,
                     )
                     success = True
 
@@ -92,6 +103,24 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
                 raise RuntimeError(
                     f"downloading resource {resource['resource']} failed for all mirrors.",
                 )
+
+    def extract(self, remove_finished: bool = False) -> None:
+        """Extract dataset archives.
+
+        Parameters
+        ----------
+        remove_finished : bool
+            Remove archive files after extraction.
+        """
+        self.raw_rootpath.mkdir(parents=True, exist_ok=True)
+
+        for resource in self._resources:
+            extract_archive(
+                source_path=self.rootpath / resource['filename'],
+                destination_path=self.raw_rootpath,
+                recursive=True,
+                remove_finished=remove_finished,
+            )
 
     @property
     @abstractmethod
