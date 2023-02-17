@@ -32,6 +32,18 @@ class JuDo1000(PublicDataset):
     screen.
 
     Check the respective `repository <'https://osf.io/download/4wy7s/'>` for details.
+
+    Examples
+    --------
+    Change to ``download=True`` and `extract=True`` for downloading and extracting the dataset.
+
+    >>> dataset = JuDo1000(
+    ...     root='data/',
+    ...     download=False,
+    ...     extract=False,
+    ...     remove_finished=False,
+    ... )
+    >>> dataset.load()  # doctest: +SKIP
     """
     _mirrors = [
         'https://osf.io/download/',

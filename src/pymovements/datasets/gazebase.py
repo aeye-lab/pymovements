@@ -38,6 +38,16 @@ class GazeBase(PublicDataset):
     task (BLG).
 
     Check the respective paper for details :cite:p:`GazeBase`.
+
+    Change to ``download=True`` and `extract=True`` for downloading and extracting the dataset.
+
+    >>> dataset = GazeBase(
+    ...     root='data/',
+    ...     download=False,
+    ...     extract=False,
+    ...     remove_finished=False,
+    ... )
+    >>> dataset.load()  # doctest: +SKIP
     """
     _mirrors = [
         'https://figshare.com/ndownloader/files/',
