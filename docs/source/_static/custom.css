@@ -1,0 +1,71 @@
+/* Newlines (\a) and spaces (\20) before each parameter */
+.sig-param::before {
+    content: "\a\20\20\20\20";
+    white-space: pre;
+}
+
+/* Newline after the last parameter (so the closing bracket is on a new line) */
+dt em.sig-param:last-of-type::after {
+    content: "\a";
+    white-space: pre;
+}
+
+/* Display long method names over multiple lines in navbar. */
+.bd-toc-item {
+    overflow-wrap: break-word;
+}
+
+/* To have colored background of width of the block (instead of width of content) */
+dl.class > dt:first-of-type {
+    display: block !important;
+}
+
+/* Dark & light theme styling */
+html[data-theme="light"] {
+    --pst-color-primary:black;
+    --pst-color-primary-highlight: #ff6391;
+    --pst-color-secondary: #ff6391;
+    --pst-color-target: #f5f5f5,
+    --pst-color-on-background: #ececec;
+    --pst-gradient-sidebar-left: #fffff;
+    --pst-gradient-sidebar-right: #fbfbfb;
+    --pst-color-border: #cccccc;
+    --pst-color-link:var(--pst-color-primary);
+    --pst-color-link-hover:var(--pst-color-primary-highlight);
+    --pst-color-warning: #ff99b7;
+    --pst-color-warning-highlight:var(--pst-color-primary-highlight);
+}
+
+html[data-theme="dark"] {
+    --pst-color-primary:white;
+    --pst-color-primary-highlight: #ff6391;
+    --pst-color-secondary: #ff6391;
+    --pst-color-target: #f5f5f5,
+    --pst-color-on-background: #333333;
+    --pst-gradient-sidebar-left: #121212;
+    --pst-gradient-sidebar-right: #181818;
+    --pst-color-sidebar-nav: #181818;
+    --pst-color-border: #444444;
+    --pst-color-link:var(--pst-color-primary);
+    --pst-color-link-hover:var(--pst-color-primary-highlight);
+}
+
+div.bd-sidebar-primary {
+    background-image: linear-gradient(90deg, var(--pst-gradient-sidebar-left) 0%,
+        var(--pst-gradient-sidebar-right) 100%);
+}
+
+/*
+ We're not currently doing anything meaningful with the right
+ ToC, so hide until there's actually something to put there...
+ */
+div.bd-sidebar-secondary {
+    display: none;
+}
+label.sidebar-toggle.secondary-toggle {
+    display: none !important;
+}
+
+footer.bd-footer{
+    background-color: var(--pst-color-on-background);
+}

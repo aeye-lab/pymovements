@@ -64,7 +64,6 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.extlinks',
     'sphinx_mdinclude',
-    'sphinx_rtd_theme',
     'sphinx_copybutton',
     'sphinxcontrib.datatemplates',
     'sphinxcontrib.bibtex',
@@ -107,15 +106,41 @@ add_module_names = True
 
 # -- Options for HTML output -------------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-#
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'pydata_sphinx_theme'
 
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = []
+html_static_path = ['_static']
+
+html_css_files = [
+    'custom.css',
+]
+
+html_theme_options = {
+    'external_links': [
+        {
+            'name': 'Contributing',
+            'url': 'https://github.com/aeye-lab/pymovements/blob/main/CONTRIBUTING.md',
+        },
+    ],
+    'icon_links': [
+        {
+            'name': 'GitHub',
+            'url': 'https://github.com/aeye-lab/pymovements',
+            'icon': 'fa-brands fa-github',
+        },
+    ],
+    'favicons': [
+        {
+            'rel': 'icon',
+            'sizes': 'any',
+            'type': 'image/svg+xml',
+            'href': 'icon.svg',
+        },
+    ],
+    'logo': {
+        'image_light': 'logo.svg',
+        'image_dark': 'logo.svg',
+    },
+}
 
 
 # -- Options for BibTeX ------------------------------------------------------
