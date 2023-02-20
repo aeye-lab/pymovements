@@ -312,10 +312,10 @@ def norm(arr: np.ndarray, axis: int | None = None) -> np.ndarray | Any:
     return np.linalg.norm(arr, axis=axis)
 
 
-def cut_into_subsequences(
+def split(
     arr: np.ndarray, window_size: int, keep_padded: bool = True,
 ) -> np.ndarray:
-    """Cut sequence into subsequences of equal length.
+    """Split sequence into subsequences of equal length.
 
     Parameters
     ----------
@@ -330,7 +330,7 @@ def cut_into_subsequences(
     Returns
     -------
     np.ndarray
-        Output sequence with new window length of shape (N', L', C)
+        Array of split sequences with new window length of shape (N', L', C)
 
     Examples
     --------
@@ -340,19 +340,19 @@ def cut_into_subsequences(
     >>> arr.shape
     (1, 13, 2)
 
-    We now cut the original array into three subsequences of length `5`.
+    We now split the original array into three subsequences of length `5`.
 
-    >>> arr_cut = cut_into_subsequences(
+    >>> arr_split = split(
     ...    arr=arr,
     ...    window_size=5,
     ...    keep_padded=True,
     ... )
-    >>> arr_cut.shape
+    >>> arr_split.shape
     (3, 5, 2)
 
     The last subsequence is padded with `nan` to have a length of `5`.
 
-    >>> arr_cut[-1]
+    >>> arr_split[-1]
     array([[ 1.,  1.],
            [ 1.,  1.],
            [ 1.,  1.],
@@ -362,12 +362,12 @@ def cut_into_subsequences(
     We can also drop any remaining sequences that would need padding by passing
     ``keep_padded=False``.
 
-    >>> arr_cut = cut_into_subsequences(
+    >>> arr_split = split(
     ...    arr=arr,
     ...    window_size=5,
     ...    keep_padded=False,
     ... )
-    >>> arr_cut.shape
+    >>> arr_split.shape
     (2, 5, 2)
 
     """
@@ -378,32 +378,26 @@ def cut_into_subsequences(
     else:
         n_rows = arr.shape[0] * n
 
-    arr_cut = np.nan * np.ones((n_rows, window_size, arr.shape[2]))
+    arr_split = np.nan * np.ones((n_rows, window_size, arr.shape[2]))
 
     idx = 0
-    for t in range(0, arr.shape[0]):
-        for i in range(0, n):
-            # get part of the sequence with window_size
-            arr_tmp = np.expand_dims(arr[t, i * window_size: (i + 1) * window_size, :], axis=0)
+    for arr_instance in arr:
+        # Create an array of indicies where sequence will be split.
+        split_indices = np.arange(start=window_size, stop=(n + 1) * window_size, step=window_size)
 
-            # fill row with respective part of the sequence
-            arr_cut[idx, :, :] = arr_tmp
+        # The length of the last element in list will be equal to rest.
+        arr_split_list = np.split(arr_instance, split_indices)
 
-            idx = idx + 1
+        # Put the first n elements of split list into output array.
+        arr_split[idx:idx+n] = arr_split_list[:-1]
+        idx += n
 
         if rest > 0 and keep_padded:
-            # get end point of last part of the sequence
-            start_idx_last_piece = window_size * n
+            # Insert last split, remaining padded samples are already np.nan.
+            arr_split[idx, :rest] = arr_split_list[-1]
+            idx += 1
 
-            # get last part of sequence which is shorter than window_size
-            arr_incomplete = arr[t, start_idx_last_piece:, :]
-
-            # insert last part, remaining samples are already np.nan
-            arr_cut[idx, :rest, :] = arr_incomplete
-
-            idx = idx + 1
-
-    return arr_cut
+    return arr_split
 
 
 def downsample(
