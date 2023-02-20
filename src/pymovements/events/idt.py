@@ -111,16 +111,16 @@ def idt(
                 win_end += 1
 
                 # break if we reach end of input data
-                if win_end == len(positions) - 1:
+                if win_end == len(positions):
                     break
 
             # Note a fixation at the centroid of the window points
-            centroid = np.mean(positions[win_start:win_end], axis=0)
+            centroid = np.mean(positions[win_start:win_end - 1], axis=0)
 
             fixations.append({
                 'type': 'fixation',
                 'onset': win_start,
-                'offset': win_end,
+                'offset': win_end - 1,
                 'position': centroid.tolist(),
             })
 

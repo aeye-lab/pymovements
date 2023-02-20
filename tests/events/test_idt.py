@@ -142,7 +142,7 @@ def test_idt_raises_error(kwargs, expected_error):
                     'type': ['fixation'],
                     'onset': [0],
                     'offset': [99],
-                    'position': [(0.0, 0.0)],
+                    'position': [[0.0, 0.0]],
                 },
             ),
             id='constant_position_single_fixation',
@@ -162,8 +162,8 @@ def test_idt_raises_error(kwargs, expected_error):
                 {
                     'type': 'fixation',
                     'onset': [0, 50],
-                    'offset': [50, 99],  # should be [49, 99]
-                    'position': [(0.18, 0.18), (1.0, 1.0)],  # should be: [(0.0, 0.0), (1.0, 1.0)]
+                    'offset': [49, 99],
+                    'position': [[0.0, 0.0], [1.0, 1.0]],
                 },
             ),
             id='three_steps_two_fixations',
@@ -171,6 +171,7 @@ def test_idt_raises_error(kwargs, expected_error):
     ],
 )
 def test_idt_detects_fixations(kwargs, expected):
+    """Test if idt detects fixations."""
     velocities = pos2vel(kwargs['positions'], sampling_rate=10, method='preceding')
     events = idt(velocities=velocities, **kwargs)
 
