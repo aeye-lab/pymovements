@@ -24,7 +24,6 @@ from polars.testing import assert_frame_equal
 
 from pymovements.events.idt import idt
 from pymovements.synthetic import step_function
-from pymovements.transforms import pos2vel
 
 
 @pytest.mark.parametrize(
@@ -171,7 +170,5 @@ def test_idt_raises_error(kwargs, expected_error):
     ],
 )
 def test_idt_detects_fixations(kwargs, expected):
-    velocities = pos2vel(kwargs['positions'], sampling_rate=10, method='preceding')
-    events = idt(velocities=velocities, **kwargs)
-
+    events = idt(**kwargs)
     assert_frame_equal(events, expected)

@@ -25,8 +25,6 @@ from __future__ import annotations
 import numpy as np
 import polars as pl
 
-from pymovements.utils.checks import check_shapes_positions_velocities
-
 
 def dispersion(positions: list[list[float]] | np.ndarray) -> float:
     """
@@ -50,7 +48,6 @@ def dispersion(positions: list[list[float]] | np.ndarray) -> float:
 
 def idt(
         positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
-        velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         dispersion_threshold: float,
         minimum_duration: int,
 ) -> pl.DataFrame:
@@ -70,8 +67,6 @@ def idt(
     ----------
     positions: array-like, shape (N, 2)
         Continuous 2D position time series
-    velocities: array-like, shape (N, 2)
-        Corresponding continuous 2D velocity time series.
     dispersion_threshold: float
         Threshold for dispersion for a group of consecutive samples to be identified as fixation
     minimum_duration: int
@@ -90,9 +85,7 @@ def idt(
         If duration_threshold is not greater than 0
     """
     positions = np.array(positions)
-    velocities = np.array(velocities)
 
-    check_shapes_positions_velocities(positions=positions, velocities=velocities)
     if dispersion_threshold <= 0:
         raise ValueError('dispersion threshold must be greater than 0')
     if minimum_duration <= 0:
