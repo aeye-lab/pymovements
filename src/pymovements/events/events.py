@@ -22,7 +22,38 @@ This module holds all the main Event classes used for event detection.
 """
 from __future__ import annotations
 
+import numpy as np
+import polars as pl
+from typing_extensions import Protocol
+
 from pymovements.utils.decorators import auto_str
+
+
+class EventDetectionCallable(Protocol):
+    """Minimal interface to be implemented by all event detection methods."""
+
+    def __call__(
+            self,
+            positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
+            velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
+            **kwargs,
+    ) -> pl.DataFrame:
+        """Minimal interface to be implemented by all event detection methods.
+
+        Parameters
+        ----------
+        positions: array-like, shape (N, 2)
+            Continuous 2D position time series
+        velocities: array-like, shape (N, 2)
+            Corresponding continuous 2D velocity time series.
+        **kwargs:
+            Additional keyword arguments for the specific event detection method.
+
+        Returns
+        -------
+        pl.DataFrame
+            A dataframe with detected events as rows.
+        """
 
 
 @auto_str
