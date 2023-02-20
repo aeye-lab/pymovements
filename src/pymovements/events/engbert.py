@@ -32,8 +32,8 @@ from pymovements.utils.checks import check_shapes_positions_velocities
 
 
 def microsaccades(
-    positions: list[list[float]] | np.ndarray,
-    velocities: list[list[float]] | np.ndarray,
+    positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
+    velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
     threshold: np.ndarray | tuple[float] | str = 'engbert2015',
     threshold_factor: float = 6,
     minimum_duration: int = 6,
