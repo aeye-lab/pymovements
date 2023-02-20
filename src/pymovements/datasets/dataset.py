@@ -429,7 +429,7 @@ class Dataset:
             else:
                 raise AttributeError(
                     'Either right or left eye columns must be present in gaze data frame.'
-                    f' Available columns are: {self.gaze[0].columns}'
+                    f' Available columns are: {self.gaze[0].columns}',
                 )
 
         position_columns = [f'x_{eye}_dva', f'y_{eye}_dva']
