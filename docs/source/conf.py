@@ -47,11 +47,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath('src'))))
 # -- Project information -----------------------------------------------------
 
 project = 'pymovements'
-copyright = '2022, AEye Lab Universität Potsdam'
-author = 'Daniel Krakowczyk, David R. Reich, Patrick Haller, Paul Prasse, Lena Jäger'
-
-# The full version, including alpha/beta/rc tags
-# release = '0.0.5'
+copyright = '2022-2023 The pymovements Project Authors'
+author = 'The pymovements Project Authors'
 
 
 # -- General configuration ---------------------------------------------------
