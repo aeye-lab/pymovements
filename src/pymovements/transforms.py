@@ -389,7 +389,7 @@ def split(
         arr_split_list = np.split(arr_instance, split_indices)
 
         # Put the first n elements of split list into output array.
-        arr_split[idx:idx+n] = arr_split_list[:-1]
+        arr_split[idx:idx + n] = arr_split_list[:-1]
         idx += n
 
         if rest > 0 and keep_padded:
