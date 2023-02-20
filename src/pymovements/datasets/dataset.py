@@ -393,6 +393,7 @@ class Dataset:
     def detect_events(
             self,
             method: EventDetectionCallable,
+            eye: str = 'auto',
             verbose: bool = True,
             **kwargs,
     ) -> None:
@@ -402,6 +403,10 @@ class Dataset:
         ----------
         method : EventDetectionCallable
             The event detection method to be applied.
+        eye : str
+            Select which eye to choose. Valid options are ``auto``, ``left`` or ``right``. If
+            ``auto`` is passed, ``left`` will only be chosen if the right eye is not available in
+            the gaze data frame.
         verbose : bool
             If ``True``, show progress bar.
         **kwargs :
@@ -415,8 +420,20 @@ class Dataset:
         if len(self.gaze) == 0:
             raise AttributeError('no files present in gaze attribute')
 
-        position_columns = ['x_left_dva', 'y_left_dva']
-        velocity_columns = ['x_left_vel', 'y_left_vel']
+        # Automatically infer eye to use for event detection.
+        if eye == 'auto':
+            if 'x_right_dva' in self.gaze[0].columns:
+                eye = 'right'
+            elif 'x_left_dva' in self.gaze[0].columns:
+                eye = 'left'
+            else:
+                raise AttributeError(
+                    'Either right or left eye columns must be present in gaze data frame.'
+                    f' Available columns are: {self.gaze[0].columns}'
+                )
+
+        position_columns = [f'x_{eye}_dva', f'y_{eye}_dva']
+        velocity_columns = [f'x_{eye}_vel', f'y_{eye}_vel']
 
         disable_progressbar = not verbose
 
