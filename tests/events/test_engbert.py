@@ -32,17 +32,29 @@ from pymovements.synthetic import step_function
     'kwargs, expected',
     [
         pytest.param(
-            {'velocities': np.random.uniform(size=(10, 2)), 'threshold': (1, 1, 1)},
+            {
+                'positions': np.zeros(shape=(10, 2)),
+                'velocities': np.zeros(shape=(10, 2)),
+                'threshold': (1, 1, 1),
+            },
             ValueError,
             id='non_2d_tuple_threshold_raise_value_error',
         ),
         pytest.param(
-            {'velocities': np.random.uniform(size=(10, 2)), 'threshold': (0, 100)},
+            {
+                'positions': np.zeros(shape=(10, 2)),
+                'velocities': np.random.uniform(size=(10, 2)),
+                'threshold': (0, 100),
+            },
             ValueError,
             id='low_variance_yaw_threshold_raise_runtime_error',
         ),
         pytest.param(
-            {'velocities': np.random.uniform(size=(10, 2)), 'threshold': (100, 0)},
+            {
+                'positions': np.zeros(shape=(10, 2)),
+                'velocities': np.random.uniform(size=(10, 2)),
+                'threshold': (100, 0),
+            },
             ValueError,
             id='low_variance_pitch_threshold_raise_runtime_error',
         ),
@@ -58,6 +70,7 @@ def test_microsaccades_raises_error(kwargs, expected):
     [
         pytest.param(
             {
+                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'velocities': step_function(
                     length=100,
                     steps=[40, 50],
@@ -77,6 +90,7 @@ def test_microsaccades_raises_error(kwargs, expected):
         ),
         pytest.param(
             {
+                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'velocities': step_function(
                     length=100,
                     steps=[20, 30, 70, 80],
