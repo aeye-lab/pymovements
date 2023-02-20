@@ -28,6 +28,7 @@ import polars as pl
 from tqdm.auto import tqdm
 
 from pymovements.base import Experiment
+from pymovements.events.events import EventDetectionCallable
 from pymovements.utils.paths import get_filepaths
 
 
@@ -61,6 +62,7 @@ class Dataset:
         """
         self.fileinfo: pl.DataFrame = pl.DataFrame()
         self.gaze: list[pl.DataFrame] = []
+        self.events: list[pl.DataFrame] = []
 
         self.root = Path(root)
 
@@ -78,6 +80,7 @@ class Dataset:
 
     def load(
             self,
+            events: bool = False,
             preprocessed: bool = False,
             subset: None | dict[str, float | int | str | list[float | int | str]] = None,
     ):
@@ -85,9 +88,10 @@ class Dataset:
 
         Parameters
         ----------
+        events : bool
+            If ``True``, load previously saved event data.
         preprocessed : bool
-            If ``True``, previously saved preprocessed data will be loaded, otherwise raw data will
-            be loaded.
+            If ``True``, load previously saved preprocessed data, otherwise load raw data.
         subset : dict, optional
             If specified, load only a subset of the dataset. All keys in the dictionary must be
             present in the fileinfo dataframe inferred by `infer_fileinfo()`. Values can be either
@@ -99,6 +103,9 @@ class Dataset:
         self.fileinfo = self.infer_fileinfo()
         self.take_subset(subset=subset)
         self.gaze = self.load_gaze_files(preprocessed=preprocessed)
+
+        if events:
+            self.events = self.load_event_files()
 
     def infer_fileinfo(self) -> pl.DataFrame:
         """Infer information from filepaths and filenames.
@@ -229,7 +236,7 @@ class Dataset:
 
         file_dfs: list[pl.DataFrame] = []
 
-        # Read and input files.
+        # Read gaze files from fileinfo attribute.
         for file_id, filepath in enumerate(tqdm(self.fileinfo['filepath'])):
             filepath = Path(filepath)
 
@@ -243,12 +250,12 @@ class Dataset:
             else:
                 raise RuntimeError('data files of type {filepath.suffix} are not supported.')
 
-            # Preprocessed gaze files already have fileinfo.
-            if preprocessed:
-                continue
-
-            # Add fileinfo to dataframe.
+            # Add fileinfo columns to dataframe.
             for column in self.fileinfo.columns[::-1]:
+                # Preprocessed data already has fileinfo columns.
+                if preprocessed:
+                    continue
+
                 if column == 'filepath':
                     continue
 
@@ -257,6 +264,35 @@ class Dataset:
                     pl.lit(column_value).alias(column),
                     pl.all(),
                 ])
+
+            file_dfs.append(file_df)
+
+        return file_dfs
+
+    def load_event_files(self) -> list[pl.DataFrame]:
+        """Load all available event files.
+
+        Returns
+        -------
+        list[pl.DataFrame]
+            List of event dataframes.
+
+        Raises
+        ------
+        AttributeError
+            If `fileinfo` is None or the `fileinfo` dataframe is empty.
+        """
+        self._check_fileinfo()
+
+        file_dfs: list[pl.DataFrame] = []
+
+        # read and preprocess input files
+        for _, filepath in enumerate(tqdm(self.fileinfo['filepath'])):
+            filepath = Path(filepath)
+
+            filepath = self._raw_to_event_filepath(filepath)
+
+            file_df = pl.read_ipc(filepath)
 
             file_dfs.append(file_df)
 
@@ -354,8 +390,101 @@ class Dataset:
                     pl.Series(name=velocity_column_name, values=velocities[:, col_id]),
                 )
 
+    def detect_events(
+            self,
+            method: EventDetectionCallable,
+            verbose: bool = True,
+            **kwargs,
+    ) -> None:
+        """Detect events by applying a specific event detection method.
+
+        Parameters
+        ----------
+        method : EventDetectionCallable
+            The event detection method to be applied.
+        verbose : bool
+            If ``True``, show progress bar.
+        **kwargs :
+            Additional keyword arguments to be passed to the event detection method.
+
+        """
+        if self.gaze is None:
+            raise AttributeError(
+                'gaze files were not loaded yet. please run load() or load_gaze_files() beforehand',
+            )
+        if len(self.gaze) == 0:
+            raise AttributeError('no files present in gaze attribute')
+
+        position_columns = ['x_left_dva', 'y_left_dva']
+        velocity_columns = ['x_left_vel', 'y_left_vel']
+
+        disable_progressbar = not verbose
+
+        event_dfs: list[pl.DataFrame] = []
+
+        for gaze_df in tqdm(self.gaze, disable=disable_progressbar):
+
+            positions = gaze_df.select(position_columns).to_numpy()
+            velocities = gaze_df.select(velocity_columns).to_numpy()
+
+            events = method(positions=positions, velocities=velocities, **kwargs)
+            event_dfs.append(events)
+
+        if not self.events:
+            self.events = event_dfs
+            return
+
+        for file_id, event_df in enumerate(event_dfs):
+            self.events[file_id] = pl.concat(
+                [self.events[file_id], event_df],
+                how='diagonal',
+            )
+
     def save(self, verbose: int = 1):
-        """Save preprocessed dataset.
+        """Save preprocessed gaze and event files.
+
+        Data will be saved as feather files to ``Dataset.preprocessed_roothpath`` or
+        ``Dataset.events_roothpath`` with the same directory structure as the raw data.
+
+        Parameters
+        ----------
+        verbose : int
+            Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
+        """
+        if verbose > 2:
+            print('save preprocessed gaze files')
+        self.save_preprocessed(verbose=verbose)
+
+        if verbose > 2:
+            print('save event files')
+        self.save_events(verbose=verbose)
+
+    def save_events(self, verbose: int = 1):
+        """Save events to files.
+
+        Data will be saved as feather files to ``Dataset.events_roothpath`` with the same directory
+        structure as the raw data.
+
+        Parameters
+        ----------
+        verbose : int
+            Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
+        """
+        disable_progressbar = not verbose
+
+        for file_id, event_df in enumerate(tqdm(self.events, disable=disable_progressbar)):
+            raw_filepath = Path(self.fileinfo[file_id, 'filepath'])
+            events_filepath = self._raw_to_event_filepath(raw_filepath)
+
+            events_filepath.parent.mkdir(parents=True, exist_ok=True)
+
+            if verbose > 2:
+                print('Save file to', events_filepath)
+
+            event_df.write_ipc(events_filepath)
+
+    def save_preprocessed(self, verbose: int = 1):
+        """Save preprocessed gaze files.
 
         Data will be saved as feather files to ``Dataset.preprocessed_roothpath`` with the same
         directory structure as the raw data.
@@ -394,6 +523,23 @@ class Dataset:
         Path('data/CustomDataset')
         """
         return self.root / self.__class__.__name__
+
+    @property
+    def events_rootpath(self) -> Path:
+        """Get the path to the directory of the event data.
+
+        The event data directory path points to a directory named `events` in the dataset
+        `rootpath`.
+
+        Example
+        -------
+        >>> class CustomDataset(Dataset):
+        ...     pass
+        >>> dataset = CustomDataset(root='data')
+        >>> dataset.events_rootpath  # doctest: +SKIP
+        Path('data/CustomDataset/events')
+        """
+        return self.rootpath / 'events'
 
     @property
     def preprocessed_rootpath(self) -> Path:
@@ -459,3 +605,26 @@ class Dataset:
         preprocessed_filename = raw_filepath.stem + '.feather'
 
         return preprocessed_file_dirpath / preprocessed_filename
+
+    def _raw_to_event_filepath(self, raw_filepath: Path) -> Path:
+        """Get event filepath in accordance to filepath of the raw file.
+
+        The event filepath will point to a feather file.
+
+        Parameters
+        ----------
+        raw_filepath : Path
+            The Path to the raw file.
+
+        Returns
+        -------
+        Path
+            The Path to the event feather file.
+        """
+        relative_raw_dirpath = raw_filepath.parent.relative_to(self.raw_rootpath)
+        events_file_dirpath = self.events_rootpath / relative_raw_dirpath
+
+        # Get new filename for saved feather file.
+        events_filename = raw_filepath.stem + '.feather'
+
+        return events_file_dirpath / events_filename
