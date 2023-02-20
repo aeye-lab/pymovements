@@ -278,7 +278,7 @@ class Dataset:
 
             pixel_positions = file_df.select(pix_position_columns)
 
-            dva_positions = self.experiment.screen.pix2deg(pixel_positions.to_numpy().transpose())
+            dva_positions = self.experiment.screen.pix2deg(pixel_positions.to_numpy())
 
             for dva_column_id, dva_column_name in enumerate(dva_position_columns):
                 self.gaze[file_id] = self.gaze[file_id].with_columns(
@@ -326,11 +326,7 @@ class Dataset:
 
             positions = file_df.select(position_columns)
 
-            velocities = self.experiment.pos2vel(
-                positions=positions.to_numpy().transpose(),
-                method=method,
-                **kwargs,
-            )
+            velocities = self.experiment.pos2vel(positions.to_numpy(), method=method, **kwargs)
 
             for col_id, velocity_column_name in enumerate(velocity_columns):
                 self.gaze[file_id] = self.gaze[file_id].with_columns(

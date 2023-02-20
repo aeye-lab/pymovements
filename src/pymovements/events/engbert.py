@@ -28,10 +28,12 @@ import numpy as np
 import polars as pl
 
 from pymovements.transforms import consecutive
+from pymovements.utils.checks import check_shapes_positions_velocities
 
 
 def microsaccades(
-    velocities: np.ndarray,
+    positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
+    velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
     threshold: np.ndarray | tuple[float] | str = 'engbert2015',
     threshold_factor: float = 6,
     minimum_duration: int = 6,
@@ -48,6 +50,8 @@ def microsaccades(
 
     Parameters
     ----------
+    positions : np.ndarray, shape (N, 2)
+        x and y positions of N samples in chronological order
     velocities : np.ndarray, shape (N, 2)
         x and y velocities of N samples in chronological order
     threshold : np.ndarray, tuple[float, float] or str
@@ -73,6 +77,11 @@ def microsaccades(
         If `threshold` value is below `min_threshold` value.
         If passed `threshold` is either not two-dimensional or not a supported method.
     """
+    positions = np.array(positions)
+    velocities = np.array(velocities)
+
+    check_shapes_positions_velocities(positions=positions, velocities=velocities)
+
     if isinstance(threshold, str):
         threshold = compute_threshold(velocities, method=threshold)
     else:
