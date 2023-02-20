@@ -11,7 +11,6 @@ Contents
    :maxdepth: 2
 
    getting-started
-   how-to/index
    tutorial/index
    reference/index
    bibliography
