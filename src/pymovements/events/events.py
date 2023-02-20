@@ -34,8 +34,8 @@ class EventDetectionCallable(Protocol):
 
     def __call__(
             self,
-            positions: list[list[float]] | np.ndarray,
-            velocities: list[list[float]] | np.ndarray,
+            positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
+            velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
             **kwargs,
     ) -> pl.DataFrame:
         """Minimal interface to be implemented by all event detection methods.

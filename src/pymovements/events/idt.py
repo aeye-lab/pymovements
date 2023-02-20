@@ -49,8 +49,8 @@ def dispersion(positions: list[list[float]] | np.ndarray) -> float:
 
 
 def idt(
-        positions: list[list[float]] | np.ndarray,
-        velocities: list[list[float]] | np.ndarray,
+        positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
+        velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         dispersion_threshold: float,
         minimum_duration: int,
 ) -> pl.DataFrame:

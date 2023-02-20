@@ -236,7 +236,7 @@ class Dataset:
 
         file_dfs: list[pl.DataFrame] = []
 
-        # read and preprocess input files
+        # Read gaze files from fileinfo attribute.
         for file_id, filepath in enumerate(tqdm(self.fileinfo['filepath'])):
             filepath = Path(filepath)
 
@@ -383,11 +383,7 @@ class Dataset:
 
             positions = file_df.select(position_columns)
 
-            velocities = self.experiment.pos2vel(
-                arr=positions.to_numpy(),
-                method=method,
-                **kwargs,
-            )
+            velocities = self.experiment.pos2vel(positions.to_numpy(), method=method, **kwargs)
 
             for col_id, velocity_column_name in enumerate(velocity_columns):
                 self.gaze[file_id] = self.gaze[file_id].with_columns(
@@ -503,6 +499,8 @@ class Dataset:
         for file_id, gaze_df in enumerate(tqdm(self.gaze, disable=disable_progressbar)):
             raw_filepath = Path(self.fileinfo[file_id, 'filepath'])
             preprocessed_filepath = self._raw_to_preprocessed_filepath(raw_filepath)
+
+            preprocessed_filepath.parent.mkdir(parents=True, exist_ok=True)
 
             if verbose > 2:
                 print('Save file to', preprocessed_filepath)
