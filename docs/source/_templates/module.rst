@@ -75,8 +75,9 @@
    :recursive:
    :template: module.rst
 
-{% for item in modules %}
-{{ item }}
-{%- endfor %}
+    {% for item in modules %}
+    {{ item }}
+    {%- endfor %}
+
 {% endif %}
 {% endblock %}
