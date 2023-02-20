@@ -59,8 +59,8 @@ class Dataset:
         custom_read_kwargs : dict[str, Any], optional
             If specified, these keyword arguments will be passed to the file reading function.
         """
-        self.fileinfo = None
-        self.gaze = None
+        self.fileinfo: pl.DataFrame = pl.DataFrame()
+        self.gaze: list[pl.DataFrame] = []
 
         self.root = Path(root)
 
@@ -76,13 +76,24 @@ class Dataset:
             custom_read_kwargs = {}
         self._custom_read_kwargs = custom_read_kwargs
 
-    def load(self):
+    def load(
+            self,
+            subset: None | dict[str, float | int | str | list[float | int | str]] = None,
+    ):
         """Parse file information and load all gaze files.
+
+        Parameters
+        ----------
+        subset : dict, optional
+            If specified, load only a subset of the dataset. All keys in the dictionary must be
+            present in the fileinfo dataframe inferred by `infer_fileinfo()`. Values can be either
+            float, int , str or a list of these.
 
         The parsed file information is assigned to the `fileinfo` attribute.
         All gaze files will be loaded as dataframes and assigned to the `gaze` attribute.
         """
         self.fileinfo = self.infer_fileinfo()
+        self.take_subset(subset)
         self.gaze = self.load_gaze_files()
 
     def infer_fileinfo(self) -> pl.DataFrame:
@@ -138,6 +149,57 @@ class Dataset:
         fileinfo_df = fileinfo_df.sort(by='filepath')
 
         return fileinfo_df
+
+    def take_subset(
+            self,
+            subset: None | dict[str, float | int | str | list[float | int | str]] = None,
+    ) -> None:
+        """Take a subset of the dataset.
+
+        Calling this method will alter the fileinfo attribute.
+
+        Parameters
+        ----------
+        subset : dict, optional
+            If specified, load only a subset of the dataset. All keys in the dictionary must be
+            present in the fileinfo dataframe inferred by `infer_fileinfo()`. Values can be either
+            float, int , str or a list of these.
+
+        Raises
+        ------
+        ValueError
+            If dictionary key is not a column in the fileinfo dataframe.
+        TypeError
+            If dictionary key or value is not of valid type.
+
+        """
+        if subset is None:
+            return
+
+        for subset_key, subset_value in subset.items():
+            if subset_key not in self.fileinfo.columns:
+                raise ValueError(
+                    f'subset key {subset_key} must be a column in the fileinfo attribute.'
+                    f' Available columns are: {self.fileinfo.columns}',
+                )
+
+            if not isinstance(subset_key, str):
+                raise TypeError(
+                    f'subset keys must be of type str but key {subset_key} is of type'
+                    f' {type(subset_key)}',
+                )
+
+            if isinstance(subset_value, (float, int, str)):
+                column_values = [subset_value]
+            elif isinstance(subset_value, (list, tuple)):
+                column_values = subset_value
+            else:
+                raise TypeError(
+                    f'subset value must be of float, int, str or a list of these but key-value pair'
+                    f'{subset_key}: {subset_value} is of type {type(subset_value)}',
+                )
+
+            self.fileinfo = self.fileinfo.filter(pl.col(subset_key).is_in(column_values))
 
     def load_gaze_files(self) -> list[pl.DataFrame]:
         """Load all available gaze data files.
@@ -216,7 +278,7 @@ class Dataset:
 
             pixel_positions = file_df.select(pix_position_columns)
 
-            dva_positions = self.experiment.screen.pix2deg(pixel_positions.transpose())
+            dva_positions = self.experiment.screen.pix2deg(pixel_positions.to_numpy())
 
             for dva_column_id, dva_column_name in enumerate(dva_position_columns):
                 self.gaze[file_id] = self.gaze[file_id].with_columns(
@@ -264,7 +326,7 @@ class Dataset:
 
             positions = file_df.select(position_columns)
 
-            velocities = self.experiment.pos2vel(positions.transpose(), method=method, **kwargs)
+            velocities = self.experiment.pos2vel(positions.to_numpy(), method=method, **kwargs)
 
             for col_id, velocity_column_name in enumerate(velocity_columns):
                 self.gaze[file_id] = self.gaze[file_id].with_columns(
