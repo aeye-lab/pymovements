@@ -66,6 +66,7 @@ extensions = [
     'sphinx.ext.linkcode',
     'sphinx.ext.mathjax',
     'sphinx.ext.extlinks',
+    'sphinx_mdinclude',
     'sphinx_rtd_theme',
     'sphinx_copybutton',
     'sphinxcontrib.datatemplates',

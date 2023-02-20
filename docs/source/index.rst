@@ -2,14 +2,7 @@
 Welcome to the pymovements documentation!
 =========================================
 
-**pymovements** is a Python library for processing eye tracking data.
-
-This package is available on PyPI and may be installed using:
-
-.. code-block:: console
-
-   $ pip install pymovements
-
+.. mdinclude:: ../../README.md
 
 Contents
 --------
