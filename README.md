@@ -7,6 +7,7 @@
 ---
 
 [![PyPI Latest Release](https://img.shields.io/pypi/v/pymovements.svg)](https://pypi.python.org/pypi/pymovements/)
+[![Conda Latest Release](https://img.shields.io/conda/vn/conda-forge/pymovements)](https://anaconda.org/conda-forge/pymovements)
 [![PyPI status](https://img.shields.io/pypi/status/pymovements.svg)](https://pypi.python.org/pypi/pymovements/)
 [![Python version](https://img.shields.io/pypi/pyversions/pymovements.svg)](https://pypi.python.org/pypi/pymovements/)
 ![Operating System](https://img.shields.io/badge/os-linux%20%7C%20macOS%20%7C%20windows-blue)
@@ -28,15 +29,37 @@ and render plots to visually analyze your results.
 - **Contributing:** https://github.com/aeye-lab/pymovements/blob/main/CONTRIBUTING.md
 - **Bug reports:** https://github.com/aeye-lab/pymovements/issues
 - **PyPI package:** https://pypi.org/project/pymovements
+- **Conda package:** https://anaconda.org/conda-forge/pymovements
 
 
 ## Installation
+
+#### Using pip
 
 pymovements can be installed directly from the PyPI repositories:
 
 ```bash
 pip install pymovements
 ```
+
+#### Using conda
+
+pymovements can be installed from the conda-forge repositories.
+
+If not already done, you will need to add conda-forge to your available channels:
+
+```bash
+conda config --add channels conda-forge
+conda config --set channel_priority strict
+```
+
+You can then install pymovements into you conda environment:
+
+```bash
+conda install -c conda-forge pymovements
+```
+
+#### Development installation
 
 To use the latest development version or to try out tutorials, pymovements may be alternatively
 cloned and installed with

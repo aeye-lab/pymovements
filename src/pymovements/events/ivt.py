@@ -27,11 +27,12 @@ import polars as pl
 
 from pymovements.transforms import consecutive
 from pymovements.transforms import norm
+from pymovements.utils.checks import check_shapes_positions_velocities
 
 
 def ivt(
-        positions: list[list[float]] | np.ndarray,
-        velocities: list[list[float]] | np.ndarray,
+        positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
+        velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         velocity_threshold: float,
         minimum_duration: int,
 ) -> pl.DataFrame:
@@ -74,37 +75,14 @@ def ivt(
     positions = np.array(positions)
     velocities = np.array(velocities)
 
-    # make sure positions and velocities have shape (n, 2)
-    if positions.ndim != 2:
-        raise ValueError('positions need to have shape (N, 2)')
-
-    if positions.shape[1] != 2:
-        raise ValueError('positions need to have shape (N, 2)')
-
-    if velocities.ndim != 2:
-        raise ValueError('velocities need to have shape (N, 2)')
-
-    if velocities.shape[1] != 2:
-        raise ValueError('velocities need to have shape (N, 2)')
-
-    # Check matching shape for positions and velocities
-    if positions.shape != velocities.shape:
-        raise ValueError(
-            f"shape of positions {positions.shape} doesn't match"
-            f'shape of velocities {velocities.shape}',
-        )
-
-    # Check if threshold is None
+    check_shapes_positions_velocities(positions=positions, velocities=velocities)
     if velocity_threshold is None:
-        raise ValueError('velocity threshold is None')
-
-    # Check if threshold is greater 0
+        raise ValueError('velocity threshold must not be None')
     if velocity_threshold <= 0:
         raise ValueError('velocity threshold must be greater than 0')
 
+    # Get all indices with norm-velocities below threshold.
     velocity_norm = norm(velocities, axis=1)
-
-    # Get all indices with velocities outside of ellipse.
     below_threshold_indices = np.where(velocity_norm < velocity_threshold)[0]
 
     # Get all fixation candidates by grouping all consecutive indices.

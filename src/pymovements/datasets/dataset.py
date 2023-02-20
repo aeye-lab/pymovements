@@ -347,11 +347,7 @@ class Dataset:
 
             positions = file_df.select(position_columns)
 
-            velocities = self.experiment.pos2vel(
-                arr=positions.to_numpy(),
-                method=method,
-                **kwargs,
-            )
+            velocities = self.experiment.pos2vel(positions.to_numpy(), method=method, **kwargs)
 
             for col_id, velocity_column_name in enumerate(velocity_columns):
                 self.gaze[file_id] = self.gaze[file_id].with_columns(
