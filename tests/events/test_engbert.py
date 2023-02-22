@@ -25,6 +25,7 @@ from polars.testing import assert_frame_equal
 
 from pymovements.events.engbert import compute_threshold
 from pymovements.events.engbert import microsaccades
+from pymovements.events.events import Saccade
 from pymovements.synthetic import step_function
 
 
@@ -77,6 +78,20 @@ def test_microsaccades_raises_error(kwargs, expected):
                     values=[(9, 9), (0, 0)],
                     start_value=(0, 0),
                 ),
+                'threshold': 10,
+            },
+            pl.DataFrame(schema=Saccade.schema),
+            id='two_steps_one_saccade_high_threshold_no_events',
+        ),
+        pytest.param(
+            {
+                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
+                'velocities': step_function(
+                    length=100,
+                    steps=[40, 50],
+                    values=[(9, 9), (0, 0)],
+                    start_value=(0, 0),
+                ),
                 'threshold': 1e-5,
             },
             pl.DataFrame(
@@ -85,6 +100,7 @@ def test_microsaccades_raises_error(kwargs, expected):
                     'onset': [40],
                     'offset': [49],
                 },
+                schema=Saccade.schema,
             ),
             id='two_steps_one_saccade',
         ),
@@ -105,6 +121,7 @@ def test_microsaccades_raises_error(kwargs, expected):
                     'onset': [20, 70],
                     'offset': [29, 79],
                 },
+                schema=Saccade.schema,
             ),
             id='four_steps_two_saccades',
         ),

@@ -25,6 +25,7 @@ from __future__ import annotations
 import numpy as np
 import polars as pl
 
+from pymovements.events.events import Fixation
 from pymovements.transforms import consecutive
 from pymovements.transforms import norm
 from pymovements.utils.checks import check_shapes_positions_velocities
@@ -103,10 +104,20 @@ def ivt(
         for fixation in fixations
     ]
 
-    event_df = pl.from_dict({
-        'type': 'fixation',
-        'onset': fixations[:, 0].tolist(),
-        'offset': fixations[:, 1].tolist(),
-        'position': centroids,
-    })
+    if len(fixations) > 0:
+        # Create event dataframe.
+        event_df = pl.from_dict(
+            {
+                'type': 'fixation',
+                'onset': fixations[:, 0].tolist(),
+                'offset': fixations[:, 1].tolist(),
+                'position': centroids,
+            },
+            schema=Fixation.schema,
+        )
+
+    else:
+        # Create empty dataframe with correct schema if no events detected.
+        event_df = pl.DataFrame(schema=Fixation.schema)
+
     return event_df
