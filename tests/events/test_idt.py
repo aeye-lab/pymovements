@@ -139,19 +139,7 @@ def test_idt_raises_error(kwargs, expected_error):
                 'dispersion_threshold': 1,
                 'minimum_duration': 10,
             },
-            pl.DataFrame(             # should be: pl.DataFrame(schema=Fixation.schema),
-                {
-                    'type': 'fixation',
-                    'onset': [9, 20, 31, 42, 53, 64, 75, 86, 97],
-                    'offset': [10, 21, 32, 43, 54, 65, 76, 87, 98],
-                    'position': [
-                        [18.0, 18.0], [40.0, 40.0], [62.0, 62.0], [84.0, 84.0],
-                        [106.0, 106.0], [128.0, 128.0], [150.0, 150.0], [172.0, 172.0],
-                        [194.0, 194.0],
-                    ],
-                },
-                schema=Fixation.schema,
-            ),
+            pl.DataFrame(schema=Fixation.schema),
             id='constant_velocity_no_fixation',
         ),
         pytest.param(

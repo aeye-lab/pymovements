@@ -106,8 +106,13 @@ def idt(
     win_end = minimum_duration
 
     while win_end < len(positions):
+
+        # Initialize window over first points to cover the duration threshold.
+        # This automatically extends the window to the specified minimum event duration.
+        win_end = max(win_start + minimum_duration, win_end)
+
         if dispersion(positions[win_start:win_end]) <= dispersion_threshold:
-            # Add additional points to the window until dispersion > threshold
+            # Add additional points to the window until dispersion > threshold.
             while dispersion(positions[win_start:win_end]) < dispersion_threshold:
                 win_end += 1
 
@@ -115,7 +120,7 @@ def idt(
                 if win_end == len(positions):
                     break
 
-            # Note a fixation at the centroid of the window points
+            # Note a fixation at the centroid of the window points.
             centroid = np.mean(positions[win_start:win_end - 1], axis=0)
 
             fixations.append({
@@ -125,10 +130,12 @@ def idt(
                 'position': centroid.tolist(),
             })
 
+            # Remove window points from points.
             # Initialize new window excluding the previous window
             win_start = win_end
-            win_end = win_start + minimum_duration
         else:
+            # Remove first point from points.
+            # Move window start one step further without modifying window end.
             win_start += 1
 
     if len(fixations) > 0:
