@@ -69,7 +69,10 @@ class Event:
         Starting index of event (included).
     offset: int
         Ending index of event (excluded).
+    schema: polars.SchemaDict
+        Schema for event DataFrame.
     """
+    schema: pl.datatypes.SchemaDict = {'type': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64}
 
     def __init__(self, name: str, onset: int, offset: int):
         """
@@ -134,8 +137,12 @@ class Fixation(Event):
         Ending index of event (excluded).
     position: tuple[float, float]
         (x, y) position of fixation
+    schema: polars.SchemaDict
+        Schema for event DataFrame.
     """
     _name = 'fixation'
+
+    schema: pl.datatypes.SchemaDict = {**Event.schema, 'position': pl.List(pl.Float64)}
 
     def __init__(self, onset: int, offset: int, position: tuple[float, float]):
         """
@@ -175,6 +182,8 @@ class Saccade(Event):
         Starting index of event (included).
     offset: int
         Ending index of event (excluded).
+    schema: polars.SchemaDict
+        Schema for event DataFrame.
     """
     _name = 'saccade'
 
