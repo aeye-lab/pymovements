@@ -32,6 +32,7 @@ def step_function(
     steps: list[int],
     values: list[float | tuple[float, ...]],
     start_value: float | tuple[float, ...] = 0,
+    noise: float = 0,
 ) -> np.ndarray:
     """
     Create a synthetic eye gaze by using a simple step function.
@@ -46,6 +47,9 @@ def step_function(
         Array values to set at each step.
     start_value: int
         Array value to start with.
+    noise: float
+        If greater than zero, gaussian noise is scaled according to value and superimposed on the
+        output array.
 
     Returns
     -------
@@ -55,8 +59,8 @@ def step_function(
     Raises
     ------
     ValueError
-        If steps not sorted in ascending order or length of steps not equal to length of values.
-
+        If steps not sorted in ascending order or length of steps not equal to length of values. If
+        noise is negative.
 
     Examples
     --------
@@ -97,6 +101,9 @@ def step_function(
     if sorted(steps) != steps:
         raise ValueError('steps must be sorted in ascending order.')
 
+    if noise < 0:
+        raise ValueError('noise must not be less than zero')
+
     # Infer number of channels from values.
     if isinstance(values[0], (int, float)):
         n_channels = 1
@@ -135,5 +142,9 @@ def step_function(
 
     # Set value for each step until the end.
     arr[steps[-1]:] = values[-1]
+
+    # Add noise if desired.
+    if noise > 0:
+        arr += np.random.normal(loc=0.0, scale=noise, size=arr.shape)
 
     return arr
