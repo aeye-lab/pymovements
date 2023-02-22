@@ -1,9 +1,74 @@
 [build-system]
 requires = [
   "setuptools>=42",
+  "setuptools-git-versioning<2",
   "wheel"
 ]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "pymovements"
+description = "A python package for processing eye movement data"
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "MIT License"}
+maintainers = [
+  {name = "Daniel Krakowczyk", email = "daniel.krakowczyk@uni-potsdam.de"}
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: MacOS :: MacOS X",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Scientific/Engineering",
+  "Typing :: Typed"
+]
+dependencies = [
+  "matplotlib>=3.0.0",
+  "numpy>=1.10.0",
+  "pandas>1.0.0",
+  "polars>=0.15.0",
+  "pyarrow>=4.0.0",
+  "scipy>=1.5.4",
+  "tqdm>=4.0.0",
+  "typing_extensions>=4.0.0"
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+docs = [
+  "ipykernel>=6.13.0",
+  "nbsphinx>=0.8.8",
+  "pandoc",
+  "pybtex",
+  "pydata-sphinx-theme>=0.12",
+  "sphinx>=6.0.0",
+  "sphinx-copybutton>=0.4.0",
+  "sphinx_mdinclude>=0.5.0",
+  "sphinxcontrib.datatemplates>=0.9.0",
+  "sphinxcontrib.bibtex>=2.4.1"
+]
+test = [
+  "pybtex",
+  "pytest>=6.0.0",
+  "pytest-cov>=4.0.0",
+  "types-tqdm"
+]
+
+[project.urls]
+Homepage = "https://github.com/aeye-lab/pymovements"
+"Source Code" = "https://github.com/aeye-lab/pymovements"
+Documentation = "https://pymovements.readthedocs.io/en/stable"
+"Bug Tracker" = "https://github.com/aeye-lab/pymovements/issues"
+Changelog = "https://github.com/aeye-lab/pymovements/releases"
 
 [tool.autoflake]
 in-place = true
@@ -31,3 +96,6 @@ addopts = "-ra -l -v --doctest-modules"
 doctest_optionflags = "NORMALIZE_WHITESPACE"
 filterwarnings = ['ignore::DeprecationWarning:pkg_resources.*:']
 testpaths = ['tests', 'src']
+
+[tool.setuptools-git-versioning]
+enabled = true
