@@ -18,10 +18,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """This module tests functionality of the IDT algorithm."""
+import numpy as np
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
+from pymovements.events.events import Fixation
 from pymovements.events.idt import idt
 from pymovements.synthetic import step_function
 from pymovements.transforms import pos2vel
@@ -133,6 +135,27 @@ def test_idt_raises_error(kwargs, expected_error):
     [
         pytest.param(
             {
+                'positions': np.stack([np.arange(0, 200, 2), np.arange(0, 200, 2)], axis=1),
+                'dispersion_threshold': 1,
+                'minimum_duration': 10,
+            },
+            pl.DataFrame(             # should be: pl.DataFrame(schema=Fixation.schema),
+                {
+                    'type': 'fixation',
+                    'onset': [9, 20, 31, 42, 53, 64, 75, 86, 97],
+                    'offset': [10, 21, 32, 43, 54, 65, 76, 87, 98],
+                    'position': [
+                        [18.0, 18.0], [40.0, 40.0], [62.0, 62.0], [84.0, 84.0],
+                        [106.0, 106.0], [128.0, 128.0], [150.0, 150.0], [172.0, 172.0],
+                        [194.0, 194.0],
+                    ],
+                },
+                schema=Fixation.schema,
+            ),
+            id='constant_velocity_no_fixation',
+        ),
+        pytest.param(
+            {
                 'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
@@ -144,6 +167,7 @@ def test_idt_raises_error(kwargs, expected_error):
                     'offset': [99],
                     'position': [[0.0, 0.0]],
                 },
+                schema=Fixation.schema,
             ),
             id='constant_position_single_fixation',
         ),
@@ -165,6 +189,7 @@ def test_idt_raises_error(kwargs, expected_error):
                     'offset': [49, 99],
                     'position': [[0.0, 0.0], [1.0, 1.0]],
                 },
+                schema=Fixation.schema,
             ),
             id='three_steps_two_fixations',
         ),

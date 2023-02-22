@@ -27,6 +27,7 @@ from collections.abc import Sized
 import numpy as np
 import polars as pl
 
+from pymovements.events.events import Saccade
 from pymovements.transforms import consecutive
 from pymovements.utils.checks import check_shapes_positions_velocities
 
@@ -116,14 +117,21 @@ def microsaccades(
         for candidate_indices in candidates
     ])
 
-    # Create event dataframe from saccade onset and offsets.
-    event_df = pl.from_dict(
-        {
-            'type': 'saccade',
-            'onset': saccades[:, 0].tolist(),
-            'offset': saccades[:, 1].tolist(),
-        },
-    )
+    if len(saccades) > 0:
+        # Create event dataframe.
+        event_df = pl.from_dict(
+            {
+                'type': 'saccade',
+                'onset': saccades[:, 0].tolist(),
+                'offset': saccades[:, 1].tolist(),
+            },
+            schema=Saccade.schema,
+        )
+
+    else:
+        # Create empty dataframe with correct schema if no events detected.
+        event_df = pl.DataFrame(schema=Saccade.schema)
+
     return event_df
 
 

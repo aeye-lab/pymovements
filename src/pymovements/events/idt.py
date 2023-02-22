@@ -25,6 +25,7 @@ from __future__ import annotations
 import numpy as np
 import polars as pl
 
+from pymovements.events.events import Fixation
 from pymovements.utils.checks import check_shapes_positions_velocities
 
 
@@ -130,6 +131,12 @@ def idt(
         else:
             win_start += 1
 
-    event_df = pl.from_dicts(fixations, infer_schema_length=1)
+    if len(fixations) > 0:
+        # Create event dataframe.
+        event_df = pl.from_dicts(fixations, schema=Fixation.schema)
+
+    else:
+        # Create empty dataframe with correct schema if no events detected.
+        event_df = pl.DataFrame(schema=Fixation.schema)
 
     return event_df

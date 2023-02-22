@@ -25,6 +25,7 @@ import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
+from pymovements.events.events import Fixation
 from pymovements.events.ivt import ivt
 from pymovements.synthetic import step_function
 from pymovements.transforms import pos2vel
@@ -166,6 +167,15 @@ def test_ivt_raise_error(kwargs, expected_error):
     [
         pytest.param(
             {
+                'positions': np.stack([np.arange(0, 200, 2), np.arange(0, 200, 2)], axis=1),
+                'velocity_threshold': 1,
+                'minimum_duration': 10,
+            },
+            pl.DataFrame(schema=Fixation.schema),
+            id='constant_velocity_no_fixation',
+        ),
+        pytest.param(
+            {
                 'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'velocity_threshold': 1,
                 'minimum_duration': 1,
@@ -177,6 +187,7 @@ def test_ivt_raise_error(kwargs, expected_error):
                     'offset': [99],
                     'position': [(0.0, 0.0)],
                 },
+                schema=Fixation.schema,
             ),
             id='constant_position_single_fixation',
         ),
@@ -198,12 +209,13 @@ def test_ivt_raise_error(kwargs, expected_error):
                     'offset': [48, 99],
                     'position': [(0.0, 0.0), (1.0, 1.0)],
                 },
+                schema=Fixation.schema,
             ),
             id='three_steps_two_fixations',
         ),
     ],
 )
-def test_idt_detects_fixations(kwargs, expected):
+def test_ivt_detects_fixations(kwargs, expected):
     velocities = pos2vel(kwargs['positions'], sampling_rate=10, method='preceding')
     events = ivt(velocities=velocities, **kwargs)
 
