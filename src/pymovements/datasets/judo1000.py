@@ -31,11 +31,11 @@ class JuDo1000(PublicDataset):
     pixel coordinates. Participants are instructed to watch a random jumping dot on a computer
     screen.
 
-    Check the respective `repository <'https://osf.io/download/4wy7s/'>` for details.
+    Check the respective `repository <https://osf.io/5zpvk/>`_ for details.
 
     Examples
     --------
-    Change to ``download=True`` and `extract=True`` for downloading and extracting the dataset.
+    Change to ``download=True`` and ``extract=True`` for downloading and extracting the dataset.
 
     >>> dataset = JuDo1000(
     ...     root='data/',

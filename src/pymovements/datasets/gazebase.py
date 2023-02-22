@@ -39,7 +39,7 @@ class GazeBase(PublicDataset):
 
     Check the respective paper for details :cite:p:`GazeBase`.
 
-    Change to ``download=True`` and `extract=True`` for downloading and extracting the dataset.
+    Change to ``download=True`` and ``extract=True`` for downloading and extracting the dataset.
 
     >>> dataset = GazeBase(
     ...     root='data/',
