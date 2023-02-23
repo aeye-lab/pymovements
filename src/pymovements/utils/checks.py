@@ -77,17 +77,16 @@ def check_shapes_positions_velocities(positions: np.ndarray, velocities: np.ndar
     ------
     ValueError
         If positions or velocities are not of shape ``(N, 2)`` or the shape is not equal for both.
-
     """
     # make sure positions and velocities have shape (N, 2)
     if positions.ndim != 2 or positions.shape[1] != 2:
-        raise ValueError(f'positions must have shape (N, 2) but have shape ({positions.shape})')
+        raise ValueError(f'positions must have shape (N, 2) but have shape {positions.shape}')
     if velocities.ndim != 2 or velocities.shape[1] != 2:
-        raise ValueError(f'velocities must have shape (N, 2) but have shape ({velocities.shape})')
+        raise ValueError(f'velocities must have shape (N, 2) but have shape {velocities.shape}')
 
     # Check matching shape for positions and velocities
     if positions.shape != velocities.shape:
         raise ValueError(
-            f"shape of positions {positions.shape} doesn't match"
-            f'shape of velocities {velocities.shape}',
+            f'shape of positions {positions.shape} does not match'
+            f' shape of velocities {velocities.shape}',
         )
