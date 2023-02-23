@@ -410,7 +410,8 @@ class Dataset:
             ``auto`` is passed, ``left`` will only be chosen if the right eye is not available in
             the gaze data frame.
         clear : bool
-            If ``True``, event DataFrame will be cleared before event detection.
+            If ``True``, event DataFrame will be overwritten with new DataFrame instead of being
+             merged into the existing one.
         verbose : bool
             If ``True``, show progress bar.
         **kwargs :
