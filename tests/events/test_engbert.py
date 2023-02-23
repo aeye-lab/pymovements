@@ -125,6 +125,27 @@ def test_microsaccades_raises_error(kwargs, expected):
             ),
             id='four_steps_two_saccades',
         ),
+        pytest.param(
+            {
+                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
+                'velocities': step_function(
+                    length=100,
+                    steps=[20,25,28, 30, 70, 80],
+                    values=[(9, 9), (np.nan, np.nan), (9,9),(0, 0), (9, 9), (0, 0)],
+                    start_value=(0, 0),
+                ),
+                'threshold': 1,
+            },
+            pl.DataFrame(
+                {
+                    'type': 'saccade',
+                    'onset': [20, 70],
+                    'offset': [29, 79],
+                },
+                schema=Saccade.schema,
+            ),
+            id='two_saccades_nan',
+        ),
     ],
 )
 def test_microsaccades_detects_saccades(kwargs, expected):

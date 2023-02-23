@@ -83,8 +83,10 @@ def ivt(
         raise ValueError('velocity threshold must be greater than 0')
 
     # Get all indices with norm-velocities below threshold.
+    # candidates are all values with np.nan
     velocity_norm = norm(velocities, axis=1)
-    below_threshold_indices = np.where(velocity_norm < velocity_threshold)[0]
+    below_threshold_indices = np.where(np.logical_or(velocity_norm < velocity_threshold,
+                                                     np.isnan(velocity_norm)))[0]
 
     # Get all fixation candidates by grouping all consecutive indices.
     candidates = consecutive(arr=below_threshold_indices)
@@ -99,8 +101,9 @@ def ivt(
     ])
 
     # Calculate centroid positions for fixations.
+    # the mean is computed using all values except np.nan
     centroids = [
-        np.mean(positions[fixation[0]:fixation[1]], axis=0, dtype=np.float64).tolist()
+        np.nanmean(positions[fixation[0]:fixation[1]], axis=0, dtype=np.float64).tolist()
         for fixation in fixations
     ]
 

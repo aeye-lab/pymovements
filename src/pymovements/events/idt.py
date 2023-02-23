@@ -46,7 +46,7 @@ def dispersion(positions: list[list[float]] | np.ndarray) -> float:
     dispersion: float
         Dispersion of the group of points.
     """
-    return sum(np.max(positions, axis=0) - np.min(positions, axis=0))
+    return sum(np.nanmax(positions, axis=0) - np.nanmin(positions, axis=0))
 
 
 def idt(
@@ -110,7 +110,7 @@ def idt(
         # Initialize window over first points to cover the duration threshold.
         # This automatically extends the window to the specified minimum event duration.
         win_end = max(win_start + minimum_duration, win_end)
-
+        
         if dispersion(positions[win_start:win_end]) <= dispersion_threshold:
             # Add additional points to the window until dispersion > threshold.
             while dispersion(positions[win_start:win_end]) < dispersion_threshold:
@@ -121,7 +121,8 @@ def idt(
                     break
 
             # Note a fixation at the centroid of the window points.
-            centroid = np.mean(positions[win_start:win_end - 1], axis=0)
+            # the mean is computed using all values except np.nan
+            centroid = np.nanmean(positions[win_start:win_end - 1], axis=0)
 
             fixations.append({
                 'type': 'fixation',

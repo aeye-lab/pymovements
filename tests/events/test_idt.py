@@ -181,6 +181,23 @@ def test_idt_raises_error(kwargs, expected_error):
             ),
             id='three_steps_two_fixations',
         ),
+        pytest.param(
+            {
+                'positions': np.array([[0,0],[np.nan,np.nan],[np.nan,np.nan],[0,0],[1,1],[1,1],[1,1]]),
+                'dispersion_threshold': 1,
+                'minimum_duration': 1,
+            },
+            pl.DataFrame(
+                {
+                    'type': 'fixation',
+                    'onset': [0, 5],
+                    'offset': [4, 6],
+                    'position': [(0.0, 0.0), (1.0, 1.0)],
+                },
+                schema=Fixation.schema,
+            ),
+            id='two_fixations_nan',
+        ),
     ],
 )
 def test_idt_detects_fixations(kwargs, expected):

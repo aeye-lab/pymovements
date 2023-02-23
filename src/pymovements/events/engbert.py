@@ -102,8 +102,9 @@ def microsaccades(
     # If value is greater than 1, point lies outside the ellipse.
     outside_ellipse = np.greater(np.sum(np.power(velocities / radius, 2), axis=1), 1)
 
-    # Get all indices with velocities outside of ellipse.
-    outside_ellipse_indices = np.where(outside_ellipse)[0]
+    # Get all indices with velocities outside of ellipse or with np.nan.
+    outside_ellipse_indices = np.where(np.logical_or(outside_ellipse,
+                                            np.isnan(velocities[:,0])))[0]
 
     # Get all saccade candidates by grouping all consecutive indices.
     candidates = consecutive(arr=outside_ellipse_indices)

@@ -212,6 +212,23 @@ def test_ivt_raise_error(kwargs, expected_error):
                 schema=Fixation.schema,
             ),
             id='three_steps_two_fixations',
+        ),        
+        pytest.param(
+            {
+                'positions': np.array([[0,0],[np.nan,np.nan],[np.nan,np.nan],[0,0],[1,1],[1,1],[1,1]]),
+                'velocity_threshold': 1,
+                'minimum_duration': 1,
+            },
+            pl.DataFrame(
+                {
+                    'type': 'fixation',
+                    'onset': [0, 5],
+                    'offset': [3, 6],
+                    'position': [(0.0, 0.0), (1.0, 1.0)],
+                },
+                schema=Fixation.schema,
+            ),
+            id='two_fixations_nan',
         ),
     ],
 )

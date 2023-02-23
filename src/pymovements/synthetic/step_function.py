@@ -129,13 +129,16 @@ def step_function(
             raise ValueError(
                 'start_value must be scalar or must have same number of channels as values.',
             )
-
+    
     # Initialize output array with start value.
     if n_channels == 1:
         arr = np.ones(length) * start_value
     else:
         arr = np.tile(start_value, (length, 1))
-
+    
+    # change type of elements to float32, to allow np.nan
+    arr = np.array(arr,dtype=np.float32)
+        
     # Iterate through all steps except the last.
     for begin, end, value in zip(steps[:-1], steps[1:], values[:-1]):
         arr[begin:end] = value
