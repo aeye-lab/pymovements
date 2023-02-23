@@ -121,7 +121,7 @@ class Dataset:
         AttributeError
             If no regular expression for parsing filenames is defined.
         RuntimeError
-            If an error occured during matching filenames.
+            If an error occured during matching filenames or no files have been found.
         """
         if self._filename_regex is not None:
             filename_regex = re.compile(self._filename_regex)
@@ -135,7 +135,7 @@ class Dataset:
         )
 
         # Parse fileinfo from filenames.
-        fileinfo_records: list[dict[str, Any]] = []
+        fileinfo_dicts: list[dict[str, Any]] = []
         for filepath in csv_filepaths:
 
             # All csv_filepaths already match the filename_regex.
@@ -148,16 +148,19 @@ class Dataset:
                 )
 
             # We use the groupdict of the match as a base and add the filepath.
-            fileinfo_record = match.groupdict()
+            fileinfo_dict = match.groupdict()
 
             for fileinfo_key, fileinfo_dtype in self._filename_regex_dtypes.items():
-                fileinfo_record[fileinfo_key] = fileinfo_dtype(fileinfo_record[fileinfo_key])
+                fileinfo_dict[fileinfo_key] = fileinfo_dtype(fileinfo_dict[fileinfo_key])
 
-            fileinfo_record['filepath'] = str(filepath)
-            fileinfo_records.append(fileinfo_record)
+            fileinfo_dict['filepath'] = str(filepath)
+            fileinfo_dicts.append(fileinfo_dict)
+
+        if len(fileinfo_dicts) == 0:
+            raise RuntimeError('no matching files found')
 
         # Create dataframe from all fileinfo records.
-        fileinfo_df = pl.from_dicts(dicts=fileinfo_records, infer_schema_length=1)
+        fileinfo_df = pl.from_dicts(dicts=fileinfo_dicts, infer_schema_length=1)
         fileinfo_df = fileinfo_df.sort(by='filepath')
 
         return fileinfo_df
