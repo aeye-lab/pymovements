@@ -548,17 +548,30 @@ class Dataset:
     def rootpath(self) -> Path:
         """Get the path to the dataset directory.
 
-        The dataset path points to a directory in the specified root directory which is named the
-        same as the respective class.
+        The dataset path points to a directory in the specified root directory.
+        In case a subclass of ``Dataset`` is being used, it points to a subdirectory which is named
+        after the respective class name.
 
         Example
         -------
+
+        If the base `Dataset` class is used, rootpath directly points to the specified ``root``
+        during initialization:
+        >>> dataset = Dataset(root='/path/to/your/dataset')
+        >>> dataset.rootpath  # doctest: +SKIP
+        Path('/path/to/your/dataset')
+
+        If a subclass of the `Dataset` class is used, the rootpath is a directory in the specified
+        ``root`` during initialization. The subdirectory is named after the class name.
         >>> class CustomDataset(Dataset):
         ...     pass
         >>> dataset = CustomDataset(root='data')
         >>> dataset.rootpath  # doctest: +SKIP
         Path('data/CustomDataset')
+
         """
+        if self.__class__.__name__ == 'Dataset':
+            return self.root
         return self.root / self.__class__.__name__
 
     @property
