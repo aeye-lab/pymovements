@@ -130,8 +130,8 @@ def test_microsaccades_raises_error(kwargs, expected):
                 'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'velocities': step_function(
                     length=100,
-                    steps=[20,25,28, 30, 70, 80],
-                    values=[(9, 9), (np.nan, np.nan), (9,9),(0, 0), (9, 9), (0, 0)],
+                    steps=[20, 25, 28, 30, 70, 80],
+                    values=[(9, 9), (np.nan, np.nan), (9, 9), (0, 0), (9, 9), (0, 0)],
                     start_value=(0, 0),
                 ),
                 'threshold': 1,

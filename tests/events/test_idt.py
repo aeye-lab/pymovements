@@ -183,7 +183,7 @@ def test_idt_raises_error(kwargs, expected_error):
         ),
         pytest.param(
             {
-                'positions': np.array([[0,0],[np.nan,np.nan],[np.nan,np.nan],[0,0],[1,1],[1,1],[1,1]]),
+                'positions': np.array([[0, 0], [np.nan, np.nan], [np.nan, np.nan], [0, 0], [1, 1], [1, 1], [1, 1]]),
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
             },

@@ -100,8 +100,8 @@ from pymovements.synthetic import step_function
             id='negative_noise_raises_value_error',
         ),
         pytest.param(
-            {'length': 4, 'steps': [2], 'values': [(np.nan,np.nan)], 'start_value': (0, 0)},
-            {'dimension': (4,2)},
+            {'length': 4, 'steps': [2], 'values': [(np.nan, np.nan)], 'start_value': (0, 0)},
+            {'dimension': (4, 2)},
             id='length_5_2_nan_value',
         ),
     ],
