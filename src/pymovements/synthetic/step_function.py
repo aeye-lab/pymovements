@@ -70,7 +70,7 @@ def step_function(
     ...     values=[1., 2., 3.],
     ...     start_value=0,
     ... )
-    array([0., 0., 1., 1., 1., 2., 2., 2., 2., 3.])
+    array([0., 0., 1., 1., 1., 2., 2., 2., 2., 3.], dtype=float32)
 
     >>> # multi-channel example
     >>> step_function(
