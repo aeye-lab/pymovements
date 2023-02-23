@@ -94,6 +94,11 @@ from pymovements.synthetic import step_function
             {'exception': ValueError},
             id='number_of_channels_unequal_start_value_channels_raises_value_error',
         ),
+        pytest.param(
+            {'length': 0, 'steps': [0], 'values': [0], 'noise': -1},
+            {'exception': ValueError},
+            id='negative_noise_raises_value_error',
+        ),
     ],
 )
 def test_step_function(params, expected):
@@ -104,3 +109,41 @@ def test_step_function(params, expected):
 
     arr = step_function(**params)
     assert np.array_equal(arr, expected['value']), f"arr = {arr}, expected = {expected['value']}"
+
+
+@pytest.mark.parametrize(
+    'params',
+    [
+        pytest.param(
+            {'length': 10, 'steps': [0], 'values': [1], 'start_value': 0, 'noise': 0.1},
+            id='length_10_with_step_at_start',
+        ),
+        pytest.param(
+            {'length': 10, 'steps': [5], 'values': [0], 'start_value': 1, 'noise': 0.1},
+            id='length_10_start_value_1_step_5_to_0',
+        ),
+        pytest.param(
+            {
+                'length': 100,
+                'steps': [10, 50, 90],
+                'values': [1, 0, 20],
+                'start_value': 0,
+                'noise': 0.1,
+            },
+            id='length_100_3_steps',
+        ),
+    ],
+)
+def test_step_function_with_noise(params):
+    params_clean = {key: value for key, value in params.items() if key != 'noise'}
+
+    arr_clean = step_function(**params_clean)
+    arr_noise = step_function(**params)
+
+    # First assert that arr is not exactly as the non-noisy output.
+    assert not np.array_equal(arr_clean, arr_noise), (
+        f'arr_clean = {arr_clean} must not be equal to arr_noise = {arr_noise}'
+    )
+
+    # Next check that all noisy values are still close to the clean equivalent.
+    assert np.allclose(arr_clean, arr_noise, atol=params['noise'] * 5)
