@@ -85,8 +85,12 @@ def ivt(
     # Get all indices with norm-velocities below threshold.
     # candidates are all values with np.nan
     velocity_norm = norm(velocities, axis=1)
-    below_threshold_indices = np.where(np.logical_or(velocity_norm < velocity_threshold,
-                                                     np.isnan(velocity_norm)))[0]
+    below_threshold_indices = np.where(
+        np.logical_or(
+            velocity_norm < velocity_threshold,
+            np.isnan(velocity_norm),
+        ),
+    )[0]
 
     # Get all fixation candidates by grouping all consecutive indices.
     candidates = consecutive(arr=below_threshold_indices)
