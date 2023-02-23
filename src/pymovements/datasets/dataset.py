@@ -28,6 +28,7 @@ import polars as pl
 from tqdm.auto import tqdm
 
 from pymovements.base import Experiment
+from pymovements.events.events import Event
 from pymovements.events.events import EventDetectionCallable
 from pymovements.utils.paths import get_filepaths
 
@@ -394,6 +395,7 @@ class Dataset:
             self,
             method: EventDetectionCallable,
             eye: str = 'auto',
+            clear: bool = False,
             verbose: bool = True,
             **kwargs,
     ) -> None:
@@ -407,6 +409,8 @@ class Dataset:
             Select which eye to choose. Valid options are ``auto``, ``left`` or ``right``. If
             ``auto`` is passed, ``left`` will only be chosen if the right eye is not available in
             the gaze data frame.
+        clear : bool
+            If ``True``, event DataFrame will be cleared before event detection.
         verbose : bool
             If ``True``, show progress bar.
         **kwargs :
@@ -447,7 +451,7 @@ class Dataset:
             events = method(positions=positions, velocities=velocities, **kwargs)
             event_dfs.append(events)
 
-        if not self.events:
+        if not self.events or clear:
             self.events = event_dfs
             return
 
@@ -456,6 +460,14 @@ class Dataset:
                 [self.events[file_id], event_df],
                 how='diagonal',
             )
+
+    def clear_events(self) -> None:
+        """Clear event DataFrame."""
+        if len(self.events) == 0:
+            return
+
+        for file_id, _ in enumerate(self.events):
+            self.events[file_id] = pl.DataFrame(schema=Event.schema)
 
     def save(self, verbose: int = 1):
         """Save preprocessed gaze and event files.
