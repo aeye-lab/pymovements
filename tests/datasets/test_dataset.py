@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test all functionality in pymovements.datasets.dataset."""
+from pathlib import Path
+
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
@@ -61,7 +63,6 @@ from pymovements.events.events import Event
     ],
 )
 def test_clear_events(events_init, events_expected):
-    """Test if idt detects fixations."""
     dataset = Dataset(root='data')
     dataset.events = events_init
     dataset.clear_events()
@@ -72,3 +73,87 @@ def test_clear_events(events_init, events_expected):
     else:
         for events_df_result, events_df_expected in zip(dataset.events, events_expected):
             assert_frame_equal(events_df_result, events_df_expected)
+
+
+@pytest.mark.parametrize(
+    'init_kwargs, expected_paths',
+    [
+        pytest.param(
+            {'root': '/data/set/path'},
+            {
+                'root': Path('/data/set/path/'),
+                'path': Path('/data/set/path/'),
+                'raw': Path('/data/set/path/raw'),
+                'preprocessed': Path('/data/set/path/preprocessed'),
+                'events': Path('/data/set/path/events'),
+            },
+        ),
+        pytest.param(
+            {'root': '/data/set/path', 'dataset_dirname': '.'},
+            {
+                'root': Path('/data/set/path/'),
+                'path': Path('/data/set/path/'),
+                'raw': Path('/data/set/path/raw'),
+                'preprocessed': Path('/data/set/path/preprocessed'),
+                'events': Path('/data/set/path/events'),
+            },
+        ),
+        pytest.param(
+            {'root': '/data/set/path', 'dataset_dirname': 'dataset'},
+            {
+                'root': Path('/data/set/path/'),
+                'path': Path('/data/set/path/dataset'),
+                'raw': Path('/data/set/path/dataset/raw'),
+                'preprocessed': Path('/data/set/path/dataset/preprocessed'),
+                'events': Path('/data/set/path/dataset/events'),
+            },
+        ),
+        pytest.param(
+            {
+                'root': '/data/set/path', 'dataset_dirname': 'dataset',
+                'events_dirname': 'custom_events',
+            },
+            {
+                'root': Path('/data/set/path/'),
+                'path': Path('/data/set/path/dataset'),
+                'raw': Path('/data/set/path/dataset/raw'),
+                'preprocessed': Path('/data/set/path/dataset/preprocessed'),
+                'events': Path('/data/set/path/dataset/custom_events'),
+            },
+        ),
+        pytest.param(
+            {
+                'root': '/data/set/path', 'dataset_dirname': 'dataset',
+                'preprocessed_dirname': 'custom_preprocessed',
+            },
+            {
+                'root': Path('/data/set/path/'),
+                'path': Path('/data/set/path/dataset'),
+                'raw': Path('/data/set/path/dataset/raw'),
+                'preprocessed': Path('/data/set/path/dataset/custom_preprocessed'),
+                'events': Path('/data/set/path/dataset/events'),
+            },
+        ),
+        pytest.param(
+            {
+                'root': '/data/set/path', 'dataset_dirname': 'dataset',
+                'raw_dirname': 'custom_raw',
+            },
+            {
+                'root': Path('/data/set/path/'),
+                'path': Path('/data/set/path/dataset'),
+                'raw': Path('/data/set/path/dataset/custom_raw'),
+                'preprocessed': Path('/data/set/path/dataset/preprocessed'),
+                'events': Path('/data/set/path/dataset/events'),
+            },
+        ),
+    ],
+)
+def test_paths(init_kwargs, expected_paths):
+    dataset = Dataset(**init_kwargs)
+
+    assert dataset.root == expected_paths['root']
+    assert dataset.path == expected_paths['path']
+    assert dataset.raw_rootpath == expected_paths['raw']
+    assert dataset.preprocessed_rootpath == expected_paths['preprocessed']
+    assert dataset.events_rootpath == expected_paths['events']

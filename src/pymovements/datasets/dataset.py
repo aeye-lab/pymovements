@@ -35,16 +35,28 @@ from pymovements.utils.paths import get_filepaths
 
 class Dataset:
     """Dataset base class."""
+    # pylint: disable=too-many-instance-attributes
+    # The Dataset class is exceptionally complex and needs many attributes.
 
     def __init__(
-        self,
-        root: str | Path,
-        experiment: Experiment | None = None,
-        filename_regex: str = '.*',
-        filename_regex_dtypes: dict[str, type] | None = None,
-        custom_read_kwargs: dict[str, Any] | None = None,
+            self,
+            root: str | Path,
+            experiment: Experiment | None = None,
+            filename_regex: str = '.*',
+            filename_regex_dtypes: dict[str, type] | None = None,
+            custom_read_kwargs: dict[str, Any] | None = None,
+            dataset_dirname: str = '.',
+            raw_dirname: str = 'raw',
+            preprocessed_dirname: str = 'preprocessed',
+            events_dirname: str = 'events',
     ):
         """Initialize the dataset object.
+
+        You can set up a custom directory structure by populating the particular dirname attributes.
+        See :py:attr:`~pymovements.dataset.Dataset.dataset_dirname`,
+        :py:attr:`~pymovements.dataset.Dataset.raw_dirname`,
+        :py:attr:`~pymovements.dataset.Dataset.preprocessed_dirname` and
+        :py:attr:`~pymovements.dataset.Dataset.events_dirname` for details.
 
         Parameters
         ----------
@@ -60,12 +72,30 @@ class Dataset:
             specific named groups to a particular datatype.
         custom_read_kwargs : dict[str, Any], optional
             If specified, these keyword arguments will be passed to the file reading function.
+        dataset_dirname : str, optional
+            Dataset directory name under root path. Can be `.` if dataset is located in root path.
+            Default: `.`
+        raw_dirname ; str, optional
+            Name of directory under dataset path that contains raw data. Can be `.` if raw data is
+            located in dataset path. We advise the user to keep the original raw data separate from
+            the preprocessed / event data. Default: `raw`
+        preprocessed_dirname : str, optional
+            Name of directory under dataset path that will be used to store preprocessed data. We
+            advise the user to keep the preprocessed data separate from the original raw data.
+            Default: `preprocessed`
+        events_dirname : str, optional
+            Name of directory under dataset path that will be used to store event data. We advise
+            the user to keep the event data separate from the original raw data. Default: `events`
         """
         self.fileinfo: pl.DataFrame = pl.DataFrame()
         self.gaze: list[pl.DataFrame] = []
         self.events: list[pl.DataFrame] = []
 
-        self.root = Path(root)
+        self._root = Path(root)
+        self.dataset_dirname = dataset_dirname
+        self.raw_dirname = raw_dirname
+        self.preprocessed_dirname = preprocessed_dirname
+        self.events_dirname = events_dirname
 
         self.experiment = experiment
 
@@ -545,84 +575,126 @@ class Dataset:
             gaze_df.write_ipc(preprocessed_filepath)
 
     @property
-    def rootpath(self) -> Path:
-        """Get the path to the dataset directory.
+    def path(self) -> Path:
+        """The path to the dataset directory.
 
-        The dataset path points to a directory in the specified root directory.
-        In case a subclass of ``Dataset`` is being used, it points to a subdirectory which is named
-        after the respective class name.
+        The dataset path points to the dataset directory under the root path. Per default the
+        dataset path points to the exact same directory as the root path. Add ``dataset_dirname``
+        to your initialization call to specify an explicit dataset directory in your root path.
 
         Example
         -------
 
-        If the base `Dataset` class is used, rootpath directly points to the specified ``root``
-        during initialization:
-        >>> dataset = Dataset(root='/path/to/your/dataset')
-        >>> dataset.rootpath  # doctest: +SKIP
+        The default behavior is to locate the dataset in the root path without assuming a further
+        dataset directory:
+        >>> dataset = Dataset(root='/path/to/your/dataset', dataset_dirname='.')
+        >>> dataset.path  # doctest: +SKIP
         Path('/path/to/your/dataset')
 
-        If a subclass of the `Dataset` class is used, the rootpath is a directory in the specified
-        ``root`` during initialization. The subdirectory is named after the class name.
-        >>> class CustomDataset(Dataset):
-        ...     pass
-        >>> dataset = CustomDataset(root='data')
-        >>> dataset.rootpath  # doctest: +SKIP
-        Path('data/CustomDataset')
-
+        To locate the dataset you can also specify an explicit dataset directory name in the root
+        path:
+        >>> dataset = Dataset(root='path/to/all/your/datasets/', dataset_dirname='your_dataset')
+        >>> dataset.path  # doctest: +SKIP
+        Path('path/to/all/your/datasets/your_dataset')
         """
-        if self.__class__.__name__ == 'Dataset':
-            return self.root
-        return self.root / self.__class__.__name__
+        return self.root / self.dataset_dirname
+
+    @property
+    def root(self) -> Path:
+        """The root path to your dataset.
+
+        Example
+        -------
+        >>> dataset = Dataset(root='/path/to/your/dataset')
+        >>> dataset.root  # doctest: +SKIP
+        Path('/path/to/your/dataset')
+        """
+        return self._root
 
     @property
     def events_rootpath(self) -> Path:
-        """Get the path to the directory of the event data.
+        """The path to the directory of the event data.
 
-        The event data directory path points to a directory named `events` in the dataset
-        `rootpath`.
+        The path points to the events directory under the root path.
 
         Example
         -------
-        >>> class CustomDataset(Dataset):
-        ...     pass
-        >>> dataset = CustomDataset(root='data')
+
+        >>> dataset = Dataset(root='/path/to/your/datasets/', dataset_dirname='your_dataset')
         >>> dataset.events_rootpath  # doctest: +SKIP
-        Path('data/CustomDataset/events')
+        Path('/path/to/your/datasets/your_dataset/events')
+
+        You can also explicitely specify the event directory name. The default is `events`.
+        >>> dataset = Dataset(
+        ...     root='/path/to/your/datasets/',
+        ...     dataset_dirname='your_dataset',
+        ...     events_dirname='your_events',
+        ... )
+        >>> dataset.events_rootpath  # doctest: +SKIP
+        Path('/path/to/your/datasets/your_dataset/your_events')
         """
-        return self.rootpath / 'events'
+        return self.path / self.events_dirname
 
     @property
     def preprocessed_rootpath(self) -> Path:
-        """Get the path to the directory of the preprocessed gaze data.
+        """The path to the directory of the preprocessed gaze data.
 
-        The preprocessed data directory path points to a directory named `preprocessed` in the
-        dataset `rootpath`.
+        The path points to the preprocessed data directory under the root path.
 
         Example
         -------
-        >>> class CustomDataset(Dataset):
-        ...     pass
-        >>> dataset = CustomDataset(root='data')
+
+        >>> dataset = Dataset(root='/path/to/your/datasets/', dataset_dirname='your_dataset')
         >>> dataset.preprocessed_rootpath  # doctest: +SKIP
-        Path('data/CustomDataset/preprocessed')
+        Path('/path/to/your/datasets/your_dataset/preprocessed')
+
+        You can also explicitely specify the preprocessed directory name. The default is
+        `preprocessed`.
+        >>> dataset = Dataset(
+        ...     root='/path/to/your/datasets/',
+        ...     dataset_dirname='your_dataset',
+        ...     preprocessed_dirname='your_preprocessed_data',
+        ... )
+        >>> dataset.preprocessed_rootpath  # doctest: +SKIP
+        Path('/path/to/your/datasets/your_dataset/your_preprocessed_data')
         """
-        return self.rootpath / 'preprocessed'
+        return self.path / self.preprocessed_dirname
 
     @property
     def raw_rootpath(self) -> Path:
-        """Get the path to the directory of the raw data.
+        """The path to the directory of the raw data.
 
-        The raw data directory path points to a directory named `raw` in the dataset `rootpath`.
+        The path points to the raw data directory under the root path.
 
         Example
         -------
-        >>> class CustomDataset(Dataset):
-        ...     pass
-        >>> dataset = CustomDataset(root='data')
+
+        >>> dataset = Dataset(root='/path/to/your/datasets/', dataset_dirname='your_dataset')
+        >>> dataset.preprocessed_rootpath  # doctest: +SKIP
+        Path('/path/to/your/datasets/your_dataset/raw')
+
+        You can also explicitely specify the preprocessed directory name. The default is `raw`.
+        >>> dataset = Dataset(
+        ...     root='/path/to/your/datasets/',
+        ...     dataset_dirname='your_dataset',
+        ...     raw_dirname='your_raw_data',
+        ... )
         >>> dataset.raw_rootpath  # doctest: +SKIP
-        Path('data/CustomDataset/raw')
+        Path('/path/to/your/datasets/your_dataset/your_raw_data')
+
+        If your raw data is not in a separate directory under the root path then you can also
+        specify `.` as the directory name. We discourage this and advise the user to keep raw data
+        and preprocessed data separated.
+        ... dataset = Dataset(
+        >>> dataset = Dataset(
+        ...     root='/path/to/your/datasets/',
+        ...     dataset_dirname='your_dataset',
+        ...     raw_dirname='.',
+        ... )
+        >>> dataset.raw_rootpath  # doctest: +SKIP
+        Path('/path/to/your/datasets/your_dataset/your_raw_data')
         """
-        return self.rootpath / 'raw'
+        return self.path / self.raw_dirname
 
     def _check_fileinfo(self) -> None:
         """Check if fileinfo attribute is set and there is at least one row present."""
