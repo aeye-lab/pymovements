@@ -181,6 +181,28 @@ screen_cm_2d = [100, 100]
             ValueError,
             id='list_coords_3d_raises_value_error',
         ),
+        pytest.param(
+            {
+                'arr': np.zeros((n_coords, 4)),
+                'screen_px': [1, 1, 1],
+                'screen_cm': [1, 1, 1],
+                'distance_cm': screen_cm_1d,
+                'origin': 'center',
+            },
+            ValueError,
+            id='list_coords_4d_screen_px_not_2d_raises_value_error',
+        ),
+        pytest.param(
+            {
+                'arr': np.zeros((n_coords, 3)),
+                'screen_px': [1, 1, 1],
+                'screen_cm': [1, 1, 1],
+                'distance_cm': screen_cm_1d,
+                'origin': 'center',
+            },
+            ValueError,
+            id='list_coords_4d_screen_cm_not_2d_raises_value_error',
+        ),
     ],
 )
 def test_pix2deg_raises_error(kwargs, expected_error):
