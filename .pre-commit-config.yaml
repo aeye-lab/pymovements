@@ -1,3 +1,6 @@
+ci:
+    skip: [pylint]
+
 repos:
 -   repo: https://github.com/asottile/add-trailing-comma
     rev: v2.4.0
@@ -65,3 +68,29 @@ repos:
     rev: 6.0.0
     hooks:
     -   id: flake8
+- repo: https://github.com/PyCQA/pylint
+  rev: v2.16.2
+  hooks:
+    - id: pylint
+      name: pylint
+      entry: pylint
+      language: system
+      types: [python]
+      files: ^src/
+      args:
+        [
+          '--output-format=parseable',
+          '--rcfile=pylintrc',
+        ]
+    - id: pylint
+      name: pylint-tests-directory
+      entry: pylint
+      language: system
+      types: [python]
+      files: ^tests/
+      args:
+        [
+          '--output-format=parseable',
+          '--disable=missing-class-docstring,missing-function-docstring,protected-access',
+          '--rcfile=pylintrc',
+        ]

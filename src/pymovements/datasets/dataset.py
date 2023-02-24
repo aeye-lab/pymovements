@@ -420,6 +420,10 @@ class Dataset:
         **kwargs :
             Additional keyword arguments to be passed to the event detection method.
 
+        Raises
+        ------
+        AttributeError
+            If gaze files have not been loaded yet or gaze files do not contain the right columns.
         """
         if self.gaze is None:
             raise AttributeError(
