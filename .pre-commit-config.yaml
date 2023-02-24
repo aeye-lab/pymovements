@@ -65,8 +65,7 @@ repos:
     rev: 6.0.0
     hooks:
     -   id: flake8
-- repo: https://github.com/PyCQA/pylint
-  rev: v2.16.2
+- repo: local
   hooks:
     - id: pylint
       name: pylint
