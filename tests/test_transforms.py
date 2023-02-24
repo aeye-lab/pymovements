@@ -194,14 +194,25 @@ screen_cm_2d = [100, 100]
         ),
         pytest.param(
             {
-                'arr': np.zeros((n_coords, 3)),
-                'screen_px': [1, 1, 1],
+                'arr': np.zeros((n_coords, 4)),
+                'screen_px': [1, 1],
                 'screen_cm': [1, 1, 1],
                 'distance_cm': screen_cm_1d,
                 'origin': 'center',
             },
             ValueError,
             id='list_coords_4d_screen_cm_not_2d_raises_value_error',
+        ),
+        pytest.param(
+            {
+                'arr': np.zeros((n_coords, 4)),
+                'screen_px': [1, 1],
+                'screen_cm': [1, 1],
+                'distance_cm': screen_cm_1d,
+                'origin': 'upper right',
+            },
+            ValueError,
+            id='invalid_origin_str_raises_value_error',
         ),
     ],
 )
@@ -388,6 +399,17 @@ def test_pix2deg_raises_error(kwargs, expected_error):
             },
             np.array([[0.0, 0.0]] * n_coords),
             id='nparray_of_zero_coords_2d',
+        ),
+        pytest.param(
+            {
+                'arr': np.array([[0, 0, 0, 0]] * n_coords),
+                'screen_px': screen_px_2d,
+                'screen_cm': screen_cm_2d,
+                'distance_cm': screen_cm_1d,
+                'origin': 'center',
+            },
+            np.array([[0.0, 0.0, 0.0, 0.0]] * n_coords),
+            id='nparray_of_zero_coords_4d',
         ),
     ],
 )
