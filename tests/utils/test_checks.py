@@ -20,11 +20,11 @@
 """
 Test pymovements checks.
 """
-import pytest
 import numpy as np
+import pytest
 
-from pymovements.utils.checks import check_no_zeros
 from pymovements.utils.checks import check_nan_both_channels
+from pymovements.utils.checks import check_no_zeros
 from pymovements.utils.checks import check_shapes_positions_velocities
 
 
@@ -36,8 +36,8 @@ from pymovements.utils.checks import check_shapes_positions_velocities
         pytest.param([1, 2, 3], None, id='non_zero_list_raises_no_error'),
         pytest.param([1, 0, 3], ValueError, id='zero_list_raises_value_error'),
         pytest.param(np.array([1, 2, 3]), None, id='non_zero_np_array_raises_no_error'),
-        pytest.param(np.array([1, 0, 3]), ValueError, id='zero_np_array_raises_value_error')
-    ]
+        pytest.param(np.array([1, 0, 3]), ValueError, id='zero_np_array_raises_value_error'),
+    ],
 )
 def test_check_no_zeros_raises_error(variable, expected_error):
     """
@@ -56,29 +56,29 @@ def test_check_no_zeros_raises_error(variable, expected_error):
         pytest.param(
             np.array([[1, 2], [3, 4]]),
             None,
-            id='no_nans_raises_no_error'
+            id='no_nans_raises_no_error',
         ),
         pytest.param(
             np.array([[1, 2], [np.nan, np.nan]]),
             None,
-            id='nans_same_time_steps_raises_no_error'
+            id='nans_same_time_steps_raises_no_error',
         ),
         pytest.param(
             np.array([[np.nan, 2], [np.nan, 4]]),
             ValueError,
-            id='nans_different_time_steps_raises_value_error'
+            id='nans_different_time_steps_raises_value_error',
         ),
         pytest.param(
             np.array([[np.nan, 2], [3, 4]]),
             ValueError,
-            id='nans_only_left_channel_raises_value_error'
+            id='nans_only_left_channel_raises_value_error',
         ),
         pytest.param(
             np.array([[1, np.nan], [3, 4]]),
             ValueError,
-            id='nans_only_right_channel_raises_value_error'
-        )
-    ]
+            id='nans_only_right_channel_raises_value_error',
+        ),
+    ],
 )
 def test_check_nan_both_channels_raises_error(arr, expected_error):
     """
@@ -102,7 +102,7 @@ def test_check_nan_both_channels_raises_error(arr, expected_error):
                 'velocities': np.array([[1, 2], [3, 4]]),
             },
             None,
-            id='positions_and_velocities_shape_N_2_raises_no_error'
+            id='positions_and_velocities_shape_N_2_raises_no_error',
         ),
         pytest.param(
             {
@@ -110,7 +110,7 @@ def test_check_nan_both_channels_raises_error(arr, expected_error):
                 'velocities': np.array([1, 2, 3, 4]),
             },
             ValueError,
-            id='positions_shape_N_2_velocities_not_shape_N_2_raises_value_error'
+            id='positions_shape_N_2_velocities_not_shape_N_2_raises_value_error',
         ),
         pytest.param(
             {
@@ -118,7 +118,7 @@ def test_check_nan_both_channels_raises_error(arr, expected_error):
                 'velocities': np.array([[1, 2], [3, 4]]),
             },
             ValueError,
-            id='positions_not_shape_N_2_velocities_shape_N_2_raises_value_error'
+            id='positions_not_shape_N_2_velocities_shape_N_2_raises_value_error',
         ),
         pytest.param(
             {
@@ -126,7 +126,7 @@ def test_check_nan_both_channels_raises_error(arr, expected_error):
                 'velocities': np.array([1, 2, 3, 4]),
             },
             ValueError,
-            id='positions_and_velocities_not_shape_N_2_raises_value_error'
+            id='positions_and_velocities_not_shape_N_2_raises_value_error',
         ),
         pytest.param(
             {
@@ -134,9 +134,9 @@ def test_check_nan_both_channels_raises_error(arr, expected_error):
                 'velocities': np.array([[1, 2], [3, 4], [5, 6]]),
             },
             ValueError,
-            id='positions_and_velocities_N_2_but_different_lengths_raises_value_error'
+            id='positions_and_velocities_N_2_but_different_lengths_raises_value_error',
         ),
-    ]
+    ],
 )
 def test_check_shapes_positions_velocities_raises_error(kwargs, expected_error):
     """
