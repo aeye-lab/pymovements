@@ -99,6 +99,10 @@ class Dataset:
 
         self.experiment = experiment
 
+        if filename_regex is None:
+            raise ValueError('filename_regex must not be None')
+        if not isinstance(filename_regex, str):
+            raise TypeError('filename_regex must be of type str')
         self._filename_regex = filename_regex
 
         if filename_regex_dtypes is None:
@@ -151,12 +155,9 @@ class Dataset:
         AttributeError
             If no regular expression for parsing filenames is defined.
         RuntimeError
-            If an error occured during matching filenames or no files have been found.
+            If an error occurred during matching filenames or no files have been found.
         """
-        if self._filename_regex is not None:
-            filename_regex = re.compile(self._filename_regex)
-        else:
-            raise AttributeError('no regular expression for filenames is defined.')
+        filename_regex = re.compile(self._filename_regex)
 
         # Get all filepaths that match regular expression.
         csv_filepaths = get_filepaths(
@@ -171,19 +172,16 @@ class Dataset:
             # All csv_filepaths already match the filename_regex.
             match = filename_regex.match(filepath.name)
 
-            # This actually should never happen but mypy will complain otherwise.
+            # This should never happen but mypy will complain otherwise.
             if match is None:
                 raise RuntimeError(
-                    f'file {filepath} did not match regular expression {self._filename_regex}',
+                    f'file {filepath} did not match regular expression {filename_regex}',
                 )
 
             # We use the groupdict of the match as a base and add the filepath.
             fileinfo_dict = match.groupdict()
 
-            for fileinfo_key, fileinfo_dtype in self._filename_regex_dtypes.items():
-                fileinfo_dict[fileinfo_key] = fileinfo_dtype(fileinfo_dict[fileinfo_key])
-
-            fileinfo_dict['filepath'] = str(filepath)
+            fileinfo_dict['filepath'] = str(filepath.relative_to(self.raw_rootpath))
             fileinfo_dicts.append(fileinfo_dict)
 
         if len(fileinfo_dicts) == 0:
@@ -193,11 +191,18 @@ class Dataset:
         fileinfo_df = pl.from_dicts(dicts=fileinfo_dicts, infer_schema_length=1)
         fileinfo_df = fileinfo_df.sort(by='filepath')
 
+        fileinfo_df = fileinfo_df.with_columns([
+            pl.col(fileinfo_key).cast(fileinfo_dtype)
+            for fileinfo_key, fileinfo_dtype in self._filename_regex_dtypes.items()
+        ])
+
         return fileinfo_df
 
     def take_subset(
             self,
-            subset: None | dict[str, float | int | str | list[float | int | str]] = None,
+            subset: None | dict[
+                str, bool | float | int | str | list[bool | float | int | str],
+            ] = None,
     ) -> None:
         """Take a subset of the dataset.
 
@@ -240,8 +245,8 @@ class Dataset:
                 column_values = subset_value
             else:
                 raise TypeError(
-                    f'subset value must be of float, int, str or a list of these but key-value pair'
-                    f'{subset_key}: {subset_value} is of type {type(subset_value)}',
+                    f'subset value must be of type bool, float, int, str or a list of these but'
+                    f' key-value pair {subset_key}: {subset_value} is of type {type(subset_value)}',
                 )
 
             self.fileinfo = self.fileinfo.filter(pl.col(subset_key).is_in(column_values))
@@ -268,40 +273,42 @@ class Dataset:
         """
         self._check_fileinfo()
 
-        file_dfs: list[pl.DataFrame] = []
+        gaze_dfs: list[pl.DataFrame] = []
 
         # Read gaze files from fileinfo attribute.
         for file_id, filepath in enumerate(tqdm(self.fileinfo['filepath'])):
-            filepath = Path(filepath)
+            filepath = self.raw_rootpath / filepath
 
             if preprocessed:
                 filepath = self._raw_to_preprocessed_filepath(filepath)
 
             if filepath.suffix == '.csv':
-                file_df = pl.read_csv(filepath, **self._custom_read_kwargs)
+                gaze_df = pl.read_csv(filepath, **self._custom_read_kwargs)
             elif filepath.suffix == '.feather':
-                file_df = pl.read_ipc(filepath)
+                gaze_df = pl.read_ipc(filepath)
             else:
                 raise RuntimeError('data files of type {filepath.suffix} are not supported.')
 
             # Add fileinfo columns to dataframe.
             for column in self.fileinfo.columns[::-1]:
-                # Preprocessed data already has fileinfo columns.
-                if preprocessed:
-                    continue
-
                 if column == 'filepath':
                     continue
 
                 column_value = self.fileinfo.select(column)[file_id][0, 0]
-                file_df = file_df.select([
+                gaze_df = gaze_df.select([
                     pl.lit(column_value).alias(column),
                     pl.all(),
                 ])
 
-            file_dfs.append(file_df)
+            # Cast columns from fileinfo according to specification.
+            gaze_df = gaze_df.with_columns([
+                pl.col(fileinfo_key).cast(fileinfo_dtype)
+                for fileinfo_key, fileinfo_dtype in self._filename_regex_dtypes.items()
+            ])
 
-        return file_dfs
+            gaze_dfs.append(gaze_df)
+
+        return gaze_dfs
 
     def load_event_files(self) -> list[pl.DataFrame]:
         """Load all available event files.
@@ -322,7 +329,7 @@ class Dataset:
 
         # read and preprocess input files
         for _, filepath in enumerate(tqdm(self.fileinfo['filepath'])):
-            filepath = Path(filepath)
+            filepath = self.raw_rootpath / Path(filepath)
 
             filepath = self._raw_to_event_filepath(filepath)
 
@@ -543,11 +550,14 @@ class Dataset:
             raw_filepath = Path(self.fileinfo[file_id, 'filepath'])
             events_filepath = self._raw_to_event_filepath(raw_filepath)
 
-            events_filepath.parent.mkdir(parents=True, exist_ok=True)
+            for column in event_df.columns:
+                if column in self.fileinfo.columns:
+                    event_df.drop(column)
 
             if verbose > 2:
                 print('Save file to', events_filepath)
 
+            events_filepath.parent.mkdir(parents=True, exist_ok=True)
             event_df.write_ipc(events_filepath)
 
     def save_preprocessed(self, verbose: int = 1):
@@ -567,11 +577,14 @@ class Dataset:
             raw_filepath = Path(self.fileinfo[file_id, 'filepath'])
             preprocessed_filepath = self._raw_to_preprocessed_filepath(raw_filepath)
 
-            preprocessed_filepath.parent.mkdir(parents=True, exist_ok=True)
+            for column in gaze_df.columns:
+                if column in self.fileinfo.columns:
+                    gaze_df = gaze_df.drop(column)
 
             if verbose > 2:
                 print('Save file to', preprocessed_filepath)
 
+            preprocessed_filepath.parent.mkdir(parents=True, exist_ok=True)
             gaze_df.write_ipc(preprocessed_filepath)
 
     @property
@@ -725,7 +738,9 @@ class Dataset:
         Path
             The Path to the preprocessed feather file.
         """
-        relative_raw_dirpath = raw_filepath.parent.relative_to(self.raw_rootpath)
+        relative_raw_dirpath = raw_filepath.parent
+        relative_raw_dirpath = relative_raw_dirpath.relative_to(self.raw_rootpath)
+
         preprocessed_file_dirpath = self.preprocessed_rootpath / relative_raw_dirpath
 
         # Get new filename for saved feather file.
@@ -748,7 +763,9 @@ class Dataset:
         Path
             The Path to the event feather file.
         """
-        relative_raw_dirpath = raw_filepath.parent.relative_to(self.raw_rootpath)
+        relative_raw_dirpath = raw_filepath.parent
+        relative_raw_dirpath = relative_raw_dirpath.relative_to(self.raw_rootpath)
+
         events_file_dirpath = self.events_rootpath / relative_raw_dirpath
 
         # Get new filename for saved feather file.
