@@ -329,7 +329,7 @@ class Dataset:
 
         # read and preprocess input files
         for _, filepath in enumerate(tqdm(self.fileinfo['filepath'])):
-            filepath = Path(filepath)
+            filepath = self.raw_rootpath / Path(filepath)
 
             filepath = self._raw_to_event_filepath(filepath)
 
@@ -739,11 +739,7 @@ class Dataset:
             The Path to the preprocessed feather file.
         """
         relative_raw_dirpath = raw_filepath.parent
-
-        try:
-            relative_raw_dirpath = relative_raw_dirpath.relative_to(self.raw_rootpath)
-        except ValueError:
-            pass
+        relative_raw_dirpath = relative_raw_dirpath.relative_to(self.raw_rootpath)
 
         preprocessed_file_dirpath = self.preprocessed_rootpath / relative_raw_dirpath
 
@@ -768,11 +764,7 @@ class Dataset:
             The Path to the event feather file.
         """
         relative_raw_dirpath = raw_filepath.parent
-
-        try:
-            relative_raw_dirpath = relative_raw_dirpath.relative_to(self.raw_rootpath)
-        except ValueError:
-            pass
+        relative_raw_dirpath = relative_raw_dirpath.relative_to(self.raw_rootpath)
 
         events_file_dirpath = self.events_rootpath / relative_raw_dirpath
 
