@@ -20,12 +20,32 @@
 """
 Test pymovements checks.
 """
+import pytest
+import numpy as np
+
+from pymovements.utils.checks import check_no_zeros
 
 
-def test_check_no_zeros_exception():
-    # use fixtures: (single variable, list, np.array)
-    # check both valid and invalid inputs with the help of a second variable
+@pytest.mark.parametrize(
+    'variable, expected_error',
+    [
+        # Single variable
+        pytest.param(5, None, id='non_zero_single_variable'),
+        pytest.param(0, ValueError, id='zero_single_variable'),
+        # List
+        pytest.param([1, 2, 3], None, id='non_zero_list'),
+        pytest.param([1, 0, 3], ValueError, id='zero_list'),
+        # Numpy array
+        pytest.param(np.array([1, 2, 3]), None, id='non_zero_np_array'),
+        pytest.param(np.array([1, 0, 3]), ValueError, id='zero_np_array')
+    ]
+)
+def test_check_no_zeros_exception(variable, expected_error):
     """
     Test that check_no_zeros() only raises an Exception iff there are zeros in the input array.
     """
-    return
+    if expected_error is None:
+        check_no_zeros(variable)
+    else:
+        with pytest.raises(expected_error):
+            check_no_zeros(variable)
