@@ -135,8 +135,8 @@ class Dataset:
         The parsed file information is assigned to the `fileinfo` attribute.
         All gaze files will be loaded as dataframes and assigned to the `gaze` attribute.
         """
-        self.fileinfo = self.infer_fileinfo()
-        self.take_subset(subset=subset)
+        fileinfo = self.infer_fileinfo()
+        self.fileinfo = self.take_subset(fileinfo=fileinfo, subset=subset)
         self.gaze = self.load_gaze_files(preprocessed=preprocessed)
 
         if events:
@@ -198,22 +198,30 @@ class Dataset:
 
         return fileinfo_df
 
+    @staticmethod
     def take_subset(
-            self,
+            fileinfo: pl.DataFrame,
             subset: None | dict[
                 str, bool | float | int | str | list[bool | float | int | str],
             ] = None,
-    ) -> None:
+    ) -> pl.DataFrame:
         """Take a subset of the dataset.
 
         Calling this method will alter the fileinfo attribute.
 
         Parameters
         ----------
+        fileinfo : pl.DataFrame
+            File information dataframe.
         subset : dict, optional
-            If specified, load only a subset of the dataset. All keys in the dictionary must be
+            If specified, take a subset of the dataset. All keys in the dictionary must be
             present in the fileinfo dataframe inferred by `infer_fileinfo()`. Values can be either
-            float, int , str or a list of these.
+            bool, float, int , str or a list of these.
+
+        Returns
+        -------
+        pl.DataFrame:
+            Subset of file information dataframe.
 
         Raises
         ------
@@ -224,22 +232,25 @@ class Dataset:
 
         """
         if subset is None:
-            return
+            return fileinfo
+
+        if not isinstance(subset, dict):
+            raise TypeError('subset must be of type dict but is of type {type(dict)}')
 
         for subset_key, subset_value in subset.items():
-            if subset_key not in self.fileinfo.columns:
-                raise ValueError(
-                    f'subset key {subset_key} must be a column in the fileinfo attribute.'
-                    f' Available columns are: {self.fileinfo.columns}',
-                )
-
             if not isinstance(subset_key, str):
                 raise TypeError(
                     f'subset keys must be of type str but key {subset_key} is of type'
                     f' {type(subset_key)}',
                 )
 
-            if isinstance(subset_value, (float, int, str)):
+            if subset_key not in fileinfo.columns:
+                raise ValueError(
+                    f'subset key {subset_key} must be a column in the fileinfo attribute.'
+                    f' Available columns are: {fileinfo.columns}',
+                )
+
+            if isinstance(subset_value, (bool, float, int, str)):
                 column_values = [subset_value]
             elif isinstance(subset_value, (list, tuple)):
                 column_values = subset_value
@@ -249,7 +260,8 @@ class Dataset:
                     f' key-value pair {subset_key}: {subset_value} is of type {type(subset_value)}',
                 )
 
-            self.fileinfo = self.fileinfo.filter(pl.col(subset_key).is_in(column_values))
+            fileinfo = fileinfo.filter(pl.col(subset_key).is_in(column_values))
+        return fileinfo
 
     def load_gaze_files(self, preprocessed: bool = False) -> list[pl.DataFrame]:
         """Load all available gaze data files.
