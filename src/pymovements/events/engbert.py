@@ -30,7 +30,8 @@ import polars as pl
 from pymovements.events.events import Saccade
 from pymovements.transforms import consecutive
 from pymovements.utils.checks import check_shapes_positions_velocities
-from pymovements.utils.filters import filter_candidates_remove_nans, events_split_nans
+from pymovements.utils.filters import events_split_nans
+from pymovements.utils.filters import filter_candidates_remove_nans
 
 
 def microsaccades(
@@ -99,12 +100,12 @@ def microsaccades(
             'threshold does not provide enough variance as required by min_threshold'
             f' ({threshold} < {minimum_threshold})',
         )
-    
+
     # check if np.nan is in data
     flag_contains_nans = False
     if np.sum(np.isnan(velocities)) > 0:
         flag_contains_nans = True
-    
+
     # Radius of elliptic threshold.
     radius = threshold * threshold_factor
 
@@ -121,19 +122,21 @@ def microsaccades(
 
     # Get all saccade candidates by grouping all consecutive indices.
     candidates = consecutive(arr=outside_ellipse_indices)
-    
+
     # Filter np.nan in candidates (delete starting/ending np.nans)
     if flag_contains_nans:
-        candidates = filter_candidates_remove_nans(candidates,
-                      velocities,
-                      )
-        
+        candidates = filter_candidates_remove_nans(
+            candidates,
+            velocities,
+        )
+
         # split events if flag_split_at_nan == True
         if flag_split_at_nan:
-            candidates = events_split_nans(candidates,
-                                           velocities)
-    
-    
+            candidates = events_split_nans(
+                candidates,
+                velocities,
+            )
+
     # Filter all candidates by minimum duration.
     candidates = [candidate for candidate in candidates if len(candidate) >= minimum_duration]
 

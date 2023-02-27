@@ -29,7 +29,8 @@ from pymovements.events.events import Fixation
 from pymovements.transforms import consecutive
 from pymovements.transforms import norm
 from pymovements.utils.checks import check_shapes_positions_velocities
-from pymovements.utils.filters import filter_candidates_remove_nans, events_split_nans
+from pymovements.utils.filters import events_split_nans
+from pymovements.utils.filters import filter_candidates_remove_nans
 
 
 def ivt(
@@ -79,13 +80,12 @@ def ivt(
     """
     positions = np.array(positions)
     velocities = np.array(velocities)
-    
+
     check_shapes_positions_velocities(positions=positions, velocities=velocities)
     if velocity_threshold is None:
         raise ValueError('velocity threshold must not be None')
     if velocity_threshold <= 0:
         raise ValueError('velocity threshold must be greater than 0')
-
 
     # check if np.nan is in data
     flag_contains_nans = False
@@ -107,19 +107,21 @@ def ivt(
 
     # Filter np.nan in candidates (delete starting/ending np.nans)
     if flag_contains_nans:
-        candidates = filter_candidates_remove_nans(candidates,
-                      velocities,
-                      )
-        
+        candidates = filter_candidates_remove_nans(
+            candidates,
+            velocities,
+        )
+
         # split events if flag_split_at_nan == True
         if flag_split_at_nan:
-            candidates = events_split_nans(candidates,
-                                           velocities)
-    
-    
+            candidates = events_split_nans(
+                candidates,
+                velocities,
+            )
+
     # Filter all candidates by minimum duration.
     candidates = [candidate for candidate in candidates if len(candidate) >= minimum_duration]
-    
+
     # Create fixaitons from valid candidates. First channel is onset, second channel is offset.
     fixations = np.array([
         (candidate_indices[0], candidate_indices[-1])

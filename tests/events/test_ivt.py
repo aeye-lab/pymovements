@@ -215,9 +215,13 @@ def test_ivt_raise_error(kwargs, expected_error):
         ),
         pytest.param(
             {
-                'positions': step_function(length=100, steps=[10,20,90],
-                                    values=[(np.nan, np.nan), 
-                                    (0, 0), (np.nan, np.nan)]),
+                'positions': step_function(
+                    length=100, steps=[10, 20, 90],
+                    values=[
+                        (np.nan, np.nan),
+                        (0, 0), (np.nan, np.nan),
+                    ],
+                ),
                 'velocity_threshold': 1,
                 'minimum_duration': 1,
             },
@@ -234,9 +238,13 @@ def test_ivt_raise_error(kwargs, expected_error):
         ),
         pytest.param(
             {
-                'positions': step_function(length=100, steps=[10,20,90],
-                                    values=[(np.nan, np.nan), 
-                                    (0, 0), (np.nan, np.nan)]),
+                'positions': step_function(
+                    length=100, steps=[10, 20, 90],
+                    values=[
+                        (np.nan, np.nan),
+                        (0, 0), (np.nan, np.nan),
+                    ],
+                ),
                 'velocity_threshold': 1,
                 'minimum_duration': 1,
                 'flag_split_at_nan': False,
@@ -251,7 +259,7 @@ def test_ivt_raise_error(kwargs, expected_error):
                 schema=Fixation.schema,
             ),
             id='one_fixations_nan_remove_leading_ending',
-        ),        
+        ),
     ],
 )
 def test_ivt_detects_fixations(kwargs, expected):

@@ -183,9 +183,13 @@ def test_idt_raises_error(kwargs, expected_error):
         ),
         pytest.param(
             {
-                'positions': step_function(length=100, steps=[10,20,90], 
-                                        values=[(np.nan, np.nan), (0, 0), 
-                                        (np.nan, np.nan)]),
+                'positions': step_function(
+                    length=100, steps=[10, 20, 90],
+                    values=[
+                        (np.nan, np.nan), (0, 0),
+                        (np.nan, np.nan),
+                    ],
+                ),
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
             },
@@ -202,9 +206,13 @@ def test_idt_raises_error(kwargs, expected_error):
         ),
         pytest.param(
             {
-                'positions': step_function(length=100, steps=[10,20,90], 
-                                        values=[(np.nan, np.nan), (0, 0), 
-                                        (np.nan, np.nan)]),
+                'positions': step_function(
+                    length=100, steps=[10, 20, 90],
+                    values=[
+                        (np.nan, np.nan), (0, 0),
+                        (np.nan, np.nan),
+                    ],
+                ),
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
                 'flag_split_at_nan': False,

@@ -20,56 +20,64 @@
 """
 Test pymovements filters.
 """
-
 from __future__ import annotations
 
 import numpy as np
-import polars as pl
 import pytest
-from polars.testing import assert_frame_equal
 
-from pymovements.utils.filters import filter_candidates_remove_nans, events_split_nans
+from pymovements.utils.filters import events_split_nans
+from pymovements.utils.filters import filter_candidates_remove_nans
+
 
 @pytest.mark.parametrize(
     'params, expected',
     [
         pytest.param(
             {
-                'candidates': [[0,1,2,3,4],
-                                [5,6,7,8]],
-                'values': np.array([(np.nan, np.nan), (0, 0),
-                       (0, 0), (0, 0),
-                       (np.nan, np.nan),
-                       (np.nan, np.nan),
-                       (0, 0), (0, 0),
-                       (0, 0)]),
+                'candidates': [
+                    [0, 1, 2, 3, 4],
+                    [5, 6, 7, 8],
+                ],
+                'values': np.array([
+                    (np.nan, np.nan), (0, 0),
+                    (0, 0), (0, 0),
+                    (np.nan, np.nan),
+                    (np.nan, np.nan),
+                    (0, 0), (0, 0),
+                    (0, 0),
+                ]),
             },
-            {'values_filter':[[1, 2, 3], [6, 7, 8]]},
+            {'values_filter': [[1, 2, 3], [6, 7, 8]]},
             id='test_filters',
         ),
         pytest.param(
             {
-                'candidates': [[0,1,2,3,4,5,6,7]],
-                'values': np.array([(0, 0),
-                       (0, 0), (0, 0),
-                       (np.nan, np.nan),
-                       (np.nan, np.nan),
-                       (0, 0), (0, 0),
-                       (0, 0)]),
+                'candidates': [[0, 1, 2, 3, 4, 5, 6, 7]],
+                'values': np.array([
+                    (0, 0),
+                    (0, 0), (0, 0),
+                    (np.nan, np.nan),
+                    (np.nan, np.nan),
+                    (0, 0), (0, 0),
+                    (0, 0),
+                ]),
             },
-            {'values_split':[[0, 1, 2], [5, 6, 7]]},
+            {'values_split': [[0, 1, 2], [5, 6, 7]]},
             id='test_events_split',
-        ),        
+        ),
     ],
 )
-
 def test_filters(params, expected):
     if 'values_filter' in expected:
-        results = filter_candidates_remove_nans(params['candidates'],
-                                                            params['values'])
+        results = filter_candidates_remove_nans(
+            params['candidates'],
+            params['values'],
+        )
         assert expected['values_filter'] == results
-    
+
     if 'values_split' in expected:
-        results = events_split_nans(params['candidates'],
-                                                            params['values'])
+        results = events_split_nans(
+            params['candidates'],
+            params['values'],
+        )
         assert expected['values_split'] == results
