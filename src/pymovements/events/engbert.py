@@ -30,8 +30,7 @@ import polars as pl
 from pymovements.events.events import Saccade
 from pymovements.transforms import consecutive
 from pymovements.utils.checks import check_shapes_positions_velocities
-from pymovements.utils.filters import events_split_nans
-from pymovements.utils.filters import filter_candidates_remove_nans
+from pymovements.utils.filters import filter_and_split
 
 
 def microsaccades(
@@ -125,17 +124,10 @@ def microsaccades(
 
     # Filter np.nan in candidates (delete starting/ending np.nans)
     if flag_contains_nans:
-        candidates = filter_candidates_remove_nans(
-            candidates,
-            velocities,
-        )
-
-        # split events if flag_split_at_nan == True
-        if flag_split_at_nan:
-            candidates = events_split_nans(
-                candidates,
-                velocities,
-            )
+        candidates = filter_and_split(
+                            candidates,
+                            velocities,
+                            flag_split_at_nan)
 
     # Filter all candidates by minimum duration.
     candidates = [candidate for candidate in candidates if len(candidate) >= minimum_duration]

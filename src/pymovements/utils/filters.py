@@ -23,13 +23,12 @@ This module holds filter specific funtions.
 from __future__ import annotations
 
 import numpy as np
-
 from pymovements.transforms import consecutive
 
 
 def filter_candidates_remove_nans(
-    candidates: list[list[float]],
-    values: np.ndarray,
+        candidates: list[list[float]],
+        values: np.ndarray,
 ) -> list[list[float]]:
     """
     Filters a list of candidates for an event-detection algorithm
@@ -54,18 +53,17 @@ def filter_candidates_remove_nans(
         start_id = 0
         while np.sum(np.isnan(cand_values[start_id, :])) > 0:
             start_id += 1
-        end_id = len(cand_values) - 1
+        end_id = len(cand_values)-1
         while np.sum(np.isnan(cand_values[end_id, :])) > 0:
             end_id -= 1
         cur_candidate = candidate[start_id:end_id + 1]
-        cur_values = cand_values[start_id:end_id + 1]
         return_candidates.append(cur_candidate)
     return return_candidates
 
 
 def events_split_nans(
-    candidates: list[list[float]],
-    values: np.ndarray,
+        candidates: list[list[float]],
+        values: np.ndarray,
 ) -> list[list[float]]:
     """
     Filters a list of candidates for an event-detection algorithm
@@ -89,8 +87,45 @@ def events_split_nans(
         cur_values = values[candidate]
         nan_candidates = consecutive(arr=np.where(~np.isnan(np.sum(cur_values, axis=1)))[0])
         cand_list = [
-            candidate[candidate_indices[0]:candidate_indices[-1] + 1]
-            for candidate_indices in nan_candidates
-        ]
+                        candidate[candidate_indices[0]:candidate_indices[-1]+1]
+                        for candidate_indices in nan_candidates
+                    ]
         return_candidates += cand_list
     return return_candidates
+
+
+def filter_and_split(
+        candidates: list[list[float]],
+        values: np.ndarray,
+        flag_split_events: bool = True,
+) -> list[list[float]]:
+    """
+    Filters a list of candidates for an event-detection algorithm
+
+    Calls filter_candidates_remove_nans and filter_and_split
+
+    Parameters
+    ----------
+    candidates: list, list of candidates
+        List of candidates; each candidate consists of a list of indices
+    values: array-like, shape (N, 1)
+        Corresponding continuous 1D values time series.
+    flag_split_events: bool
+        Indicator, if we want to split events
+
+    Returns
+    -------
+    list
+        a filtered list of candidates
+    """
+
+    candidates = filter_candidates_remove_nans(candidates,
+                  values,
+                  )
+
+    # split events if flag_split_at_nan == True
+    if flag_split_events:
+        candidates = events_split_nans(candidates,
+                                       values)
+
+    return candidates

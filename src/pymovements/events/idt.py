@@ -146,7 +146,8 @@ def idt(
 
                 # Filter all candidates by minimum duration.
                 tmp_candidates = [
-                    candidate for candidate in tmp_candidates if len(candidate) >= minimum_duration]
+                    candidate for candidate in tmp_candidates if len(candidate) >= minimum_duration
+                ]
 
                 for candidate in tmp_candidates:
                     fixations.append({
