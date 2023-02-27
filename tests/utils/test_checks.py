@@ -25,6 +25,7 @@ import numpy as np
 
 from pymovements.utils.checks import check_no_zeros
 from pymovements.utils.checks import check_nan_both_channels
+from pymovements.utils.checks import check_shapes_positions_velocities
 
 
 @pytest.mark.parametrize(
@@ -40,7 +41,7 @@ from pymovements.utils.checks import check_nan_both_channels
 )
 def test_check_no_zeros_exception(variable, expected_error):
     """
-    Test that check_no_zeros() only raises an Exception iff there are zeros in the input array.
+    Test that check_no_zeros() only raises an Exception if there are zeros in the input array.
     """
     if expected_error is None:
         check_no_zeros(variable)
@@ -79,3 +80,62 @@ def test_check_nan_both_channels(arr, expected_error):
     else:
         with pytest.raises(expected_error):
             check_nan_both_channels(arr)
+
+
+# Test check_shapes_positions_velocities
+@pytest.mark.parametrize(
+    'kwargs, expected_error',
+    [
+        pytest.param(
+            {
+                'positions': np.array([[1, 2], [3, 4]]),
+                'velocities': np.array([[1, 2], [3, 4]]),
+            },
+            None,
+            id='positions_and_velocities_shape_N_2'
+        ),
+        pytest.param(
+            {
+                'positions': np.array([[1, 2], [3, 4]]),
+                'velocities': np.array([1, 2, 3, 4]),
+            },
+            ValueError,
+            id='positions_shape_N_2_velocities_not_shape_N_2'
+        ),
+        pytest.param(
+            {
+                'positions': np.array([1, 2, 3, 4]),
+                'velocities': np.array([[1, 2], [3, 4]]),
+            },
+            ValueError,
+            id='positions_not_shape_N_2_velocities_shape_N_2'
+        ),
+        pytest.param(
+            {
+                'positions': np.array([1, 2, 3, 4]),
+                'velocities': np.array([1, 2, 3, 4]),
+            },
+            ValueError,
+            id='positions_and_velocities_not_shape_N_2'
+        ),
+        pytest.param(
+            {
+                'positions': np.array([[1, 2], [3, 4]]),
+                'velocities': np.array([[1, 2], [3, 4], [5, 6]]),
+            },
+            ValueError,
+            id='positions_and_velocities_N_2_but_different_lengths'
+        ),
+    ]
+)
+def test_check_shapes_positions_velocities(kwargs, expected_error):
+    """
+    Test that check_shapes_positions_velocities() only raises an Exception if
+    the shapes of the positions and velocities are not (N, 2) or if the lengths
+    of the positions and velocities are not equal.
+    """
+    if expected_error is None:
+        check_shapes_positions_velocities(**kwargs)
+    else:
+        with pytest.raises(expected_error):
+            check_shapes_positions_velocities(**kwargs)
