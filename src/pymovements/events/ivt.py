@@ -86,7 +86,6 @@ def ivt(
     if velocity_threshold <= 0:
         raise ValueError('velocity threshold must be greater than 0')
 
-
     # check if np.nan is in data
     flag_contains_nans = False
     if np.sum(np.isnan(velocities)) > 0:
@@ -108,9 +107,10 @@ def ivt(
     # Filter np.nan in candidates (delete starting/ending np.nans)
     if flag_contains_nans:
         candidates = filter_and_split(
-                            candidates,
-                            velocities,
-                            flag_split_at_nan)
+            candidates,
+            velocities,
+            flag_split_at_nan,
+        )
 
     # Filter all candidates by minimum duration.
     candidates = [candidate for candidate in candidates if len(candidate) >= minimum_duration]

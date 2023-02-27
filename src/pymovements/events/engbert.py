@@ -125,9 +125,10 @@ def microsaccades(
     # Filter np.nan in candidates (delete starting/ending np.nans)
     if flag_contains_nans:
         candidates = filter_and_split(
-                            candidates,
-                            velocities,
-                            flag_split_at_nan)
+            candidates,
+            velocities,
+            flag_split_at_nan,
+        )
 
     # Filter all candidates by minimum duration.
     candidates = [candidate for candidate in candidates if len(candidate) >= minimum_duration]
