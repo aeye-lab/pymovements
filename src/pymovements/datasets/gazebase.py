@@ -110,7 +110,7 @@ class GazeBase(PublicDataset):
             download: bool = False,
             extract: bool = False,
             remove_finished: bool = False,
-            dataset_dirname: str = 'JuDo1000',
+            dataset_dirname: str = 'GazeBase',
             downloads_dirname: str = 'downloads',
             raw_dirname: str = 'raw',
             preprocessed_dirname: str = 'preprocessed',
