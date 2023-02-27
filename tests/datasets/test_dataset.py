@@ -29,7 +29,7 @@ from pymovements.datasets.dataset import Dataset
 from pymovements.events.events import Event
 
 
-def create_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):
+def create_raw_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):
     rootpath.mkdir(parents=True, exist_ok=True)
 
     for gaze_df, fileinfo_row in zip(gaze_dfs, fileinfo.to_dicts()):
@@ -40,6 +40,34 @@ def create_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):
                 gaze_df = gaze_df.drop(key)
 
         gaze_df.write_csv(rootpath / filepath)
+
+
+def create_preprocessed_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):
+    rootpath.mkdir(parents=True, exist_ok=True)
+
+    for gaze_df, fileinfo_row in zip(gaze_dfs, fileinfo.to_dicts()):
+        filepath = fileinfo_row['filepath']
+        filepath = filepath.replace('csv', 'feather')
+
+        for key in fileinfo_row.keys():
+            if key in gaze_df.columns:
+                gaze_df = gaze_df.drop(key)
+
+        gaze_df.write_ipc(rootpath / filepath)
+
+
+def create_event_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):
+    rootpath.mkdir(parents=True, exist_ok=True)
+
+    for gaze_df, fileinfo_row in zip(gaze_dfs, fileinfo.to_dicts()):
+        filepath = fileinfo_row['filepath']
+        filepath = filepath.replace('csv', 'feather')
+
+        for key in fileinfo_row.keys():
+            if key in gaze_df.columns:
+                gaze_df = gaze_df.drop(key)
+
+        gaze_df.write_ipc(rootpath / filepath)
 
 
 def mock_toy(rootpath):
@@ -59,12 +87,79 @@ def mock_toy(rootpath):
             {
                 'subject_id': fileinfo_row['subject_id'],
                 'time': np.arange(1000),
+                'x_left_pix': np.zeros(1000),
+                'y_left_pix': np.zeros(1000),
+                'x_right_pix': np.zeros(1000),
+                'y_right_pix': np.zeros(1000),
             },
-            schema={'subject_id': pl.Int64, 'time': pl.Int64},
+            schema={
+                'subject_id': pl.Int64,
+                'time': pl.Int64,
+                'x_left_pix': pl.Float64,
+                'y_left_pix': pl.Float64,
+                'x_right_pix': pl.Float64,
+                'y_right_pix': pl.Float64,
+            },
         )
         gaze_dfs.append(gaze_df)
 
-    create_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath / 'raw')
+    create_raw_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath / 'raw')
+
+    preprocessed_gaze_dfs = []
+    for fileinfo_row in fileinfo.to_dicts():
+        gaze_df = pl.from_dict(
+            {
+                'subject_id': fileinfo_row['subject_id'],
+                'time': np.arange(1000),
+                'x_left_pix': np.zeros(1000),
+                'y_left_pix': np.zeros(1000),
+                'x_right_pix': np.zeros(1000),
+                'y_right_pix': np.zeros(1000),
+                'x_left_dva': np.zeros(1000),
+                'y_left_dva': np.zeros(1000),
+                'x_right_dva': np.zeros(1000),
+                'y_right_dva': np.zeros(1000),
+                'x_left_vel': np.zeros(1000),
+                'y_left_vel': np.zeros(1000),
+                'x_right_vel': np.zeros(1000),
+                'y_right_vel': np.zeros(1000),
+            },
+            schema={
+                'subject_id': pl.Int64,
+                'time': pl.Int64,
+                'x_left_pix': pl.Float64,
+                'y_left_pix': pl.Float64,
+                'x_right_pix': pl.Float64,
+                'y_right_pix': pl.Float64,
+                'x_left_dva': pl.Float64,
+                'y_left_dva': pl.Float64,
+                'x_right_dva': pl.Float64,
+                'y_right_dva': pl.Float64,
+                'x_left_vel': pl.Float64,
+                'y_left_vel': pl.Float64,
+                'x_right_vel': pl.Float64,
+                'y_right_vel': pl.Float64,
+            },
+        )
+        preprocessed_gaze_dfs.append(gaze_df)
+
+    create_preprocessed_gaze_files_from_fileinfo(
+        preprocessed_gaze_dfs, fileinfo, rootpath / 'preprocessed',
+    )
+
+    event_dfs = []
+    for fileinfo_row in fileinfo.to_dicts():
+        event_df = pl.from_dict(
+            {
+                'type': 'saccade',
+                'onset': np.arange(0, 901, 100),
+                'offset': np.arange(10, 911, 100),
+            },
+            schema={'type': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64},
+        )
+        event_dfs.append(event_df)
+
+    create_event_files_from_fileinfo(event_dfs, fileinfo, rootpath / 'events')
 
     return {
         'init_kwargs': {
@@ -73,7 +168,9 @@ def mock_toy(rootpath):
             'filename_regex_dtypes': {'subject_id': pl.Int64},
         },
         'fileinfo': fileinfo,
-        'gaze_dfs': gaze_dfs,
+        'raw_gaze_dfs': gaze_dfs,
+        'preprocessed_gaze_dfs': preprocessed_gaze_dfs,
+        'event_dfs': event_dfs,
     }
 
 
@@ -97,13 +194,31 @@ def test_load_correct_fileinfo(dataset_configuration):
     assert_frame_equal(dataset.fileinfo, expected_fileinfo)
 
 
-def test_load_correct_gaze_dfs(dataset_configuration):
+def test_load_correct_raw_gaze_dfs(dataset_configuration):
     dataset = Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
 
-    expected_gaze_dfs = dataset_configuration['gaze_dfs']
+    expected_gaze_dfs = dataset_configuration['raw_gaze_dfs']
     for result_gaze_df, expected_gaze_df in zip(dataset.gaze, expected_gaze_dfs):
         assert_frame_equal(result_gaze_df, expected_gaze_df)
+
+
+def test_load_correct_preprocessed_gaze_dfs(dataset_configuration):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load(preprocessed=True)
+
+    expected_gaze_dfs = dataset_configuration['preprocessed_gaze_dfs']
+    for result_gaze_df, expected_gaze_df in zip(dataset.gaze, expected_gaze_dfs):
+        assert_frame_equal(result_gaze_df, expected_gaze_df)
+
+
+def test_load_correct_event_dfs(dataset_configuration):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load(events=True)
+
+    expected_event_dfs = dataset_configuration['event_dfs']
+    for result_event_df, expected_event_df in zip(dataset.events, expected_event_dfs):
+        assert_frame_equal(result_event_df, expected_event_df)
 
 
 @pytest.mark.parametrize(

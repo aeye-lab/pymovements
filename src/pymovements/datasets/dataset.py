@@ -291,10 +291,6 @@ class Dataset:
 
             # Add fileinfo columns to dataframe.
             for column in self.fileinfo.columns[::-1]:
-                # Preprocessed data already has fileinfo columns.
-                if preprocessed:
-                    continue
-
                 if column == 'filepath':
                     continue
 
@@ -305,11 +301,10 @@ class Dataset:
                 ])
 
             # Cast columns from fileinfo according to specification.
-            if not preprocessed:
-                gaze_df = gaze_df.with_columns([
-                    pl.col(fileinfo_key).cast(fileinfo_dtype)
-                    for fileinfo_key, fileinfo_dtype in self._filename_regex_dtypes.items()
-                ])
+            gaze_df = gaze_df.with_columns([
+                pl.col(fileinfo_key).cast(fileinfo_dtype)
+                for fileinfo_key, fileinfo_dtype in self._filename_regex_dtypes.items()
+            ])
 
             gaze_dfs.append(gaze_df)
 
@@ -555,11 +550,14 @@ class Dataset:
             raw_filepath = Path(self.fileinfo[file_id, 'filepath'])
             events_filepath = self._raw_to_event_filepath(raw_filepath)
 
-            events_filepath.parent.mkdir(parents=True, exist_ok=True)
+            for column in event_df.columns:
+                if column in self.fileinfo.columns:
+                    event_df.drop(column)
 
             if verbose > 2:
                 print('Save file to', events_filepath)
 
+            events_filepath.parent.mkdir(parents=True, exist_ok=True)
             event_df.write_ipc(events_filepath)
 
     def save_preprocessed(self, verbose: int = 1):
@@ -579,11 +577,14 @@ class Dataset:
             raw_filepath = Path(self.fileinfo[file_id, 'filepath'])
             preprocessed_filepath = self._raw_to_preprocessed_filepath(raw_filepath)
 
-            preprocessed_filepath.parent.mkdir(parents=True, exist_ok=True)
+            for column in gaze_df.columns:
+                if column in self.fileinfo.columns:
+                    gaze_df = gaze_df.drop(column)
 
             if verbose > 2:
                 print('Save file to', preprocessed_filepath)
 
+            preprocessed_filepath.parent.mkdir(parents=True, exist_ok=True)
             gaze_df.write_ipc(preprocessed_filepath)
 
     @property
@@ -737,7 +738,13 @@ class Dataset:
         Path
             The Path to the preprocessed feather file.
         """
-        relative_raw_dirpath = raw_filepath.parent.relative_to(self.raw_rootpath)
+        relative_raw_dirpath = raw_filepath.parent
+
+        try:
+            relative_raw_dirpath = relative_raw_dirpath.relative_to(self.raw_rootpath)
+        except ValueError:
+            pass
+
         preprocessed_file_dirpath = self.preprocessed_rootpath / relative_raw_dirpath
 
         # Get new filename for saved feather file.
@@ -760,7 +767,13 @@ class Dataset:
         Path
             The Path to the event feather file.
         """
-        relative_raw_dirpath = raw_filepath.parent.relative_to(self.raw_rootpath)
+        relative_raw_dirpath = raw_filepath.parent
+
+        try:
+            relative_raw_dirpath = relative_raw_dirpath.relative_to(self.raw_rootpath)
+        except ValueError:
+            pass
+
         events_file_dirpath = self.events_rootpath / relative_raw_dirpath
 
         # Get new filename for saved feather file.
