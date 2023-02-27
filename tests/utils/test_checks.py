@@ -39,7 +39,7 @@ from pymovements.utils.checks import check_shapes_positions_velocities
         pytest.param(np.array([1, 0, 3]), ValueError, id='zero_np_array_raises_value_error')
     ]
 )
-def test_check_no_zeros_exception(variable, expected_error):
+def test_check_no_zeros_raises_error(variable, expected_error):
     """
     Test that check_no_zeros() only raises an Exception if there are zeros in the input array.
     """
@@ -80,7 +80,7 @@ def test_check_no_zeros_exception(variable, expected_error):
         )
     ]
 )
-def test_check_nan_both_channels(arr, expected_error):
+def test_check_nan_both_channels_raises_error(arr, expected_error):
     """
     Test that check_nan_both_channels() only raises an Exception if all nans
     occur at the same time step for both channels.
@@ -138,7 +138,7 @@ def test_check_nan_both_channels(arr, expected_error):
         ),
     ]
 )
-def test_check_shapes_positions_velocities(kwargs, expected_error):
+def test_check_shapes_positions_velocities_raises_error(kwargs, expected_error):
     """
     Test that check_shapes_positions_velocities() only raises an Exception if
     the shapes of the positions and velocities are not (N, 2) or if the lengths
