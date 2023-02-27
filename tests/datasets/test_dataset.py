@@ -222,6 +222,31 @@ def test_load_correct_event_dfs(dataset_configuration):
 
 
 @pytest.mark.parametrize(
+    'subset, fileinfo_idx',
+    [
+        pytest.param(
+            {'subject_id': 1},
+            [0],
+            id='subset_key_not_in_fileinfo',
+        ),
+        pytest.param(
+            {'subject_id': [1, 11, 12]},
+            [0, 2, 3],
+            id='subset_key_not_in_fileinfo',
+        ),
+    ],
+)
+def test_load_subset(subset, fileinfo_idx, dataset_configuration):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load(subset=subset)
+
+    expected_fileinfo = dataset_configuration['fileinfo']
+    expected_fileinfo = expected_fileinfo[fileinfo_idx]
+
+    assert_frame_equal(dataset.fileinfo, expected_fileinfo)
+
+
+@pytest.mark.parametrize(
     'init_kwargs, exception',
     [
         pytest.param(
@@ -242,20 +267,46 @@ def test_init_exceptions(init_kwargs, exception):
 
 
 @pytest.mark.parametrize(
-    'init_kwargs, exception',
+    'init_kwargs, load_kwargs, exception',
     [
         pytest.param(
             {'root': '/not/a/real/path'},
+            {},
             RuntimeError,
             id='no_files_present',
         ),
+        pytest.param(
+            {},
+            {'subset': 1},
+            TypeError,
+            id='subset_no_dict',
+        ),
+        pytest.param(
+            {},
+            {'subset': {1: 1}},
+            TypeError,
+            id='subset_no_str_key',
+        ),
+        pytest.param(
+            {},
+            {'subset': {'unknown': 1}},
+            ValueError,
+            id='subset_key_not_in_fileinfo',
+        ),
+        pytest.param(
+            {},
+            {'subset': {'subject_id': None}},
+            TypeError,
+            id='subset_value_invalid_type',
+        ),
     ],
 )
-def test_load_exceptions(init_kwargs, exception):
+def test_load_exceptions(init_kwargs, load_kwargs, exception, dataset_configuration):
+    init_kwargs = {**dataset_configuration['init_kwargs'], **init_kwargs}
     dataset = Dataset(**init_kwargs)
 
     with pytest.raises(exception):
-        dataset.load()
+        dataset.load(**load_kwargs)
 
 
 @pytest.mark.parametrize(
