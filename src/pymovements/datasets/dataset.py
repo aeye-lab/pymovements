@@ -157,7 +157,7 @@ class Dataset:
             fileinfo_dicts.append(fileinfo_dict)
 
         if len(fileinfo_dicts) == 0:
-            raise RuntimeError('no matching files found')
+            raise RuntimeError(f'no matching files found in {self.raw_rootpath}')
 
         # Create dataframe from all fileinfo records.
         fileinfo_df = pl.from_dicts(dicts=fileinfo_dicts, infer_schema_length=1)
