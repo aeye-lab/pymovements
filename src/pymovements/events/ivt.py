@@ -29,6 +29,7 @@ from pymovements.events.events import Fixation
 from pymovements.transforms import consecutive
 from pymovements.transforms import norm
 from pymovements.utils.checks import check_shapes_positions_velocities
+from pymovements.utils.filters import filter_candidates_remove_nans, events_split_nans
 
 
 def ivt(
@@ -36,6 +37,7 @@ def ivt(
         velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         velocity_threshold: float,
         minimum_duration: int,
+        flag_split_at_nan: bool = True,
 ) -> pl.DataFrame:
     """
     Identification of fixations based on velocity-threshold
@@ -58,6 +60,8 @@ def ivt(
         velocity is below the threshold, the point is classified as a fixation.
     minimum_duration: int
         Minimum fixation duration in number of samples
+    flag_split_at_nan: bool
+        Indicator, whether we want to split events on missing/corrupt value (np.nan)
 
     Returns
     -------
@@ -75,12 +79,18 @@ def ivt(
     """
     positions = np.array(positions)
     velocities = np.array(velocities)
-
+    
     check_shapes_positions_velocities(positions=positions, velocities=velocities)
     if velocity_threshold is None:
         raise ValueError('velocity threshold must not be None')
     if velocity_threshold <= 0:
         raise ValueError('velocity threshold must be greater than 0')
+
+
+    # check if np.nan is in data
+    flag_contains_nans = False
+    if np.sum(np.isnan(velocities)) > 0:
+        flag_contains_nans = True
 
     # Get all indices with norm-velocities below threshold.
     # candidates are all values with np.nan
@@ -95,10 +105,22 @@ def ivt(
     # Get all fixation candidates by grouping all consecutive indices.
     candidates = consecutive(arr=below_threshold_indices)
 
+    # Filter np.nan in candidates (delete starting/ending np.nans)
+    if flag_contains_nans:
+        candidates = filter_candidates_remove_nans(candidates,
+                      velocities,
+                      )
+        
+        # split events if flag_split_at_nan == True
+        if flag_split_at_nan:
+            candidates = events_split_nans(candidates,
+                                           velocities)
+    
+    
     # Filter all candidates by minimum duration.
     candidates = [candidate for candidate in candidates if len(candidate) >= minimum_duration]
-
-    # Create ficaitons from valid candidates. First channel is onset, second channel is offset.
+    
+    # Create fixaitons from valid candidates. First channel is onset, second channel is offset.
     fixations = np.array([
         (candidate_indices[0], candidate_indices[-1])
         for candidate_indices in candidates

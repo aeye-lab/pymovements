@@ -135,6 +135,7 @@ def test_microsaccades_raises_error(kwargs, expected):
                     start_value=(0, 0),
                 ),
                 'threshold': 1,
+                'flag_split_at_nan': False,
             },
             pl.DataFrame(
                 {
@@ -144,7 +145,29 @@ def test_microsaccades_raises_error(kwargs, expected):
                 },
                 schema=Saccade.schema,
             ),
-            id='two_saccades_nan',
+            id='two_saccades_nan_delete_ending_leading_nan',
+        ),
+        pytest.param(
+            {
+                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
+                'velocities': step_function(
+                    length=100,
+                    steps=[20, 25, 28, 30, 70, 80],
+                    values=[(9, 9), (np.nan, np.nan), (9, 9), (0, 0), (9, 9), (0, 0)],
+                    start_value=(0, 0),
+                ),
+                'threshold': 1,
+                'minimum_duration': 1,
+            },
+            pl.DataFrame(
+                {
+                    'type': 'saccade',
+                    'onset': [20, 28, 70],
+                    'offset': [24, 29, 79],
+                },
+                schema=Saccade.schema,
+            ),
+            id='three_saccades_nan_delete_ending_leading_nan',
         ),
     ],
 )

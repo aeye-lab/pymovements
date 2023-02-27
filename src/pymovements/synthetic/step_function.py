@@ -88,7 +88,7 @@ def step_function(
            [ 3.,  4.],
            [ 3.,  4.],
            [ 3.,  4.],
-           [ 3.,  4.]])
+           [ 3.,  4.]], dtype=float32)
     """
     # Check that steps and values have equal length.
     if len(steps) != len(values):

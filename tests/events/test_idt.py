@@ -183,20 +183,42 @@ def test_idt_raises_error(kwargs, expected_error):
         ),
         pytest.param(
             {
-                'positions': np.array([[0, 0], [np.nan, np.nan], [np.nan, np.nan], [0, 0], [1, 1], [1, 1], [1, 1]]),
+                'positions': step_function(length=100, steps=[10,20,90], 
+                                        values=[(np.nan, np.nan), (0, 0), 
+                                        (np.nan, np.nan)]),
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
             },
             pl.DataFrame(
                 {
                     'type': 'fixation',
-                    'onset': [0, 5],
-                    'offset': [4, 6],
-                    'position': [(0.0, 0.0), (1.0, 1.0)],
+                    'onset': [0, 20],
+                    'offset': [9, 89],
+                    'position': [(0.0, 0.0), (0.0, 0.0)],
                 },
                 schema=Fixation.schema,
             ),
-            id='two_fixations_nan',
+            id='two_fixations_nan_delete_leading_ending',
+        ),
+        pytest.param(
+            {
+                'positions': step_function(length=100, steps=[10,20,90], 
+                                        values=[(np.nan, np.nan), (0, 0), 
+                                        (np.nan, np.nan)]),
+                'dispersion_threshold': 1,
+                'minimum_duration': 1,
+                'flag_split_at_nan': False,
+            },
+            pl.DataFrame(
+                {
+                    'type': 'fixation',
+                    'onset': [0],
+                    'offset': [89],
+                    'position': [(0.0, 0.0)],
+                },
+                schema=Fixation.schema,
+            ),
+            id='one_fixation_nan_delete_leading_ending',
         ),
     ],
 )
