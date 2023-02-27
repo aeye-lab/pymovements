@@ -24,18 +24,16 @@ import pytest
 import numpy as np
 
 from pymovements.utils.checks import check_no_zeros
+from pymovements.utils.checks import check_nan_both_channels
 
 
 @pytest.mark.parametrize(
     'variable, expected_error',
     [
-        # Single variable
         pytest.param(5, None, id='non_zero_single_variable'),
         pytest.param(0, ValueError, id='zero_single_variable'),
-        # List
         pytest.param([1, 2, 3], None, id='non_zero_list'),
         pytest.param([1, 0, 3], ValueError, id='zero_list'),
-        # Numpy array
         pytest.param(np.array([1, 2, 3]), None, id='non_zero_np_array'),
         pytest.param(np.array([1, 0, 3]), ValueError, id='zero_np_array')
     ]
@@ -49,3 +47,35 @@ def test_check_no_zeros_exception(variable, expected_error):
     else:
         with pytest.raises(expected_error):
             check_no_zeros(variable)
+
+
+@pytest.mark.parametrize(
+    'arr, expected_error',
+    [
+        pytest.param(
+            np.array([[1, 2], [3, 4]]), None, id='no_nans'
+        ),
+        pytest.param(
+            np.array([[1, 2], [np.nan, np.nan]]), None, id='nans_same_time_steps'
+        ),
+        pytest.param(
+            np.array([[np.nan, 2], [np.nan, 4]]), ValueError, id='nans_different_time_steps'
+        ),
+        pytest.param(
+            np.array([[np.nan, 2], [3, 4]]), ValueError, id='nans_only_left_channel'
+        ),
+        pytest.param(
+            np.array([[1, np.nan], [3, 4]]), ValueError, id='nans_only_right_channel'
+        )
+    ]
+)
+def test_check_nan_both_channels(arr, expected_error):
+    """
+    Test that check_nan_both_channels() only raises an Exception if all nans
+    occur at the same time step for both channels.
+    """
+    if expected_error is None:
+        check_nan_both_channels(arr)
+    else:
+        with pytest.raises(expected_error):
+            check_nan_both_channels(arr)
