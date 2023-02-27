@@ -608,6 +608,11 @@ class Dataset:
         >>> dataset = Dataset(root='/path/to/your/dataset')
         >>> dataset.root  # doctest: +SKIP
         Path('/path/to/your/dataset')
+
+        The root stays unaffected by the dataset directory name:
+        >>> dataset = Dataset(root='/path/to/', dataset_dirname='your_dataset')
+        >>> dataset.root  # doctest: +SKIP
+        Path('/path/to')
         """
         return self._root
 
