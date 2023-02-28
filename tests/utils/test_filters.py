@@ -47,7 +47,7 @@ from pymovements.utils.filters import filter_candidates_remove_nans
                     (0, 0),
                 ]),
             },
-            {'values_filter': [[1, 2, 3], [6, 7, 8]]},
+            {'values_filter': [np.array([1, 2, 3]), np.array([6, 7, 8])]},
             id='test_filters',
         ),
         pytest.param(
@@ -62,7 +62,7 @@ from pymovements.utils.filters import filter_candidates_remove_nans
                     (0, 0),
                 ]),
             },
-            {'values_split': [[0, 1, 2], [5, 6, 7]]},
+            {'values_split': [np.array([0, 1, 2]), np.array([5, 6, 7])]},
             id='test_events_split',
         ),
     ],
@@ -73,11 +73,11 @@ def test_filters(params, expected):
             params['candidates'],
             params['values'],
         )
-        assert expected['values_filter'] == results
+        assert np.all(np.array(expected['values_filter']) == np.array(results))
 
     if 'values_split' in expected:
         results = events_split_nans(
             params['candidates'],
             params['values'],
         )
-        assert expected['values_split'] == results
+        assert np.all(np.array(expected['values_split']) == np.array(results))
