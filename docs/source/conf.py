@@ -142,6 +142,10 @@ html_theme_options = {
     },
 }
 
+# -- Options for juypter notebooks
+
+nbsphinx_execute = 'never'
+
 
 # -- Options for BibTeX ------------------------------------------------------
 
