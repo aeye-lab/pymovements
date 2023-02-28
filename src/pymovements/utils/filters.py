@@ -57,7 +57,7 @@ def filter_candidates_remove_nans(
         start_id = 0
         while np.sum(np.isnan(cand_values[start_id, :])) > 0:
             start_id += 1
-        end_id = len(cand_values)-1
+        end_id = len(cand_values) - 1
         while np.sum(np.isnan(cand_values[end_id, :])) > 0:
             end_id -= 1
         cur_candidate = list(candidate[start_id:end_id + 1])
@@ -94,8 +94,8 @@ def events_split_nans(
         cur_values = values[np.array(candidate)]
         nan_candidates = consecutive(arr=np.where(~np.isnan(np.sum(cur_values, axis=1)))[0])
         cand_list = [
-                        np.array(candidate[candidate_indices[0]:candidate_indices[-1]+1])
-                        for candidate_indices in nan_candidates
+            np.array(candidate[candidate_indices[0]:candidate_indices[-1] + 1])
+            for candidate_indices in nan_candidates
         ]
         return_candidates += cand_list
     return return_candidates
