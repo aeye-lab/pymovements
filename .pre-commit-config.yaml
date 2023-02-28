@@ -25,12 +25,26 @@ repos:
     rev: v0.2.0
     hooks:
     -   id: rm-unneeded-f-str
+-   repo: https://github.com/kynan/nbstripout
+    rev: 0.6.0
+    hooks:
+    -   id: nbstripout
 -   repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.4.2
     hooks:
     -   id: insert-license
         args: [--use-current-year]
-        exclude_types: [bib, css, image, json, markdown, rst, toml, yaml]
+        exclude_types: [bib, css, image, json, jupyter, markdown, rst, toml, yaml]
+-   repo: https://github.com/nbQA-dev/nbQA
+    rev: 1.6.3
+    hooks:
+    -   id: nbqa-autopep8
+    -   id: nbqa-flake8
+        args: ['--builtins=display']
+    -   id: nbqa-isort
+        args: ["--float-to-top"]
+    -   id: nbqa-pyupgrade
+        args: ["--py37-plus"]
 -   repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.0.1
     hooks:
