@@ -151,7 +151,7 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
                 try:
                     download_file(
                         url=url,
-                        dirpath=self.root,
+                        dirpath=self.downloads_rootpath,
                         filename=resource['filename'],
                         md5=resource['md5'],
                     )
