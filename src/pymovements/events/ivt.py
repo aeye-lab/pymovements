@@ -86,7 +86,6 @@ def ivt(
     if velocity_threshold <= 0:
         raise ValueError('velocity threshold must be greater than 0')
 
-
     # Get all indices with norm-velocities below threshold.
     velocity_norm = norm(velocities, axis=1)
     candidate_mask = velocity_norm < velocity_threshold

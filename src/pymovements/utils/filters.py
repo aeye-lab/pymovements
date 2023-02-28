@@ -23,6 +23,7 @@ This module holds filter specific funtions.
 from __future__ import annotations
 
 import numpy as np
+
 from pymovements.transforms import consecutive
 
 
@@ -60,7 +61,7 @@ def filter_candidates_remove_nans(
         while np.sum(np.isnan(cand_values[end_id, :])) > 0:
             end_id -= 1
         cur_candidate = list(candidate[start_id:end_id + 1])
-        return_candidates.append(cur_candidate)
+        return_candidates.append(np.array(cur_candidate))
     return return_candidates
 
 
@@ -93,8 +94,8 @@ def events_split_nans(
         cur_values = values[np.array(candidate)]
         nan_candidates = consecutive(arr=np.where(~np.isnan(np.sum(cur_values, axis=1)))[0])
         cand_list = [
-                        list(candidate[candidate_indices[0]:candidate_indices[-1]+1])
+                        np.array(candidate[candidate_indices[0]:candidate_indices[-1]+1])
                         for candidate_indices in nan_candidates
-                    ]
+        ]
         return_candidates += cand_list
     return return_candidates
