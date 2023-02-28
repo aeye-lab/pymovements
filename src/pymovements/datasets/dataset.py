@@ -371,14 +371,8 @@ class Dataset:
             If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
             if experiment is None.
         """
-        if self.gaze is None:
-            raise AttributeError(
-                'gaze files were not loaded yet. please run load() or load_gaze_files() beforehand',
-            )
-        if len(self.gaze) == 0:
-            raise AttributeError('no files present in gaze attribute')
-        if self.experiment is None:
-            raise AttributeError('experiment must be specified for this method.')
+        self._check_gaze_dataframe()
+        self._check_experiment()
 
         disable_progressbar = not verbose
 
@@ -388,7 +382,9 @@ class Dataset:
 
             pixel_positions = file_df.select(pix_position_columns)
 
-            dva_positions = self.experiment.screen.pix2deg(pixel_positions.to_numpy())
+            dva_positions = self.experiment.screen.pix2deg(  # type: ignore[union-attr]
+                pixel_positions.to_numpy(),
+            )
 
             for dva_column_id, dva_column_name in enumerate(dva_position_columns):
                 self.gaze[file_id] = self.gaze[file_id].with_columns(
@@ -419,14 +415,8 @@ class Dataset:
             If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
             if experiment is None.
         """
-        if self.gaze is None:
-            raise AttributeError(
-                'gaze files were not loaded yet. please run load() or load_gaze_files() beforehand',
-            )
-        if len(self.gaze) == 0:
-            raise AttributeError('no files present in gaze attribute')
-        if self.experiment is None:
-            raise AttributeError('experiment must be specified for this method.')
+        self._check_gaze_dataframe()
+        self._check_experiment()
 
         disable_progressbar = not verbose
 
@@ -436,7 +426,9 @@ class Dataset:
 
             positions = file_df.select(position_columns)
 
-            velocities = self.experiment.pos2vel(positions.to_numpy(), method=method, **kwargs)
+            velocities = self.experiment.pos2vel(  # type: ignore[union-attr]
+                positions.to_numpy(), method=method, **kwargs,
+            )
 
             for col_id, velocity_column_name in enumerate(velocity_columns):
                 self.gaze[file_id] = self.gaze[file_id].with_columns(
@@ -474,12 +466,7 @@ class Dataset:
         AttributeError
             If gaze files have not been loaded yet or gaze files do not contain the right columns.
         """
-        if self.gaze is None:
-            raise AttributeError(
-                'gaze files were not loaded yet. please run load() or load_gaze_files() beforehand',
-            )
-        if len(self.gaze) == 0:
-            raise AttributeError('no files present in gaze attribute')
+        self._check_gaze_dataframe()
 
         # Automatically infer eye to use for event detection.
         if eye == 'auto':
@@ -734,6 +721,18 @@ class Dataset:
             )
         if len(self.fileinfo) == 0:
             raise AttributeError('no files present in fileinfo attribute')
+
+    def _check_gaze_dataframe(self) -> None:
+        """Check if gaze attribute is set and there is at least one gaze dataframe available."""
+        if self.gaze is None:
+            raise AttributeError('gaze files were not loaded yet. please run load() beforehand')
+        if len(self.gaze) == 0:
+            raise AttributeError('no files present in gaze attribute')
+
+    def _check_experiment(self) -> None:
+        """Check if experiment attribute has been set."""
+        if self.experiment is None:
+            raise AttributeError('experiment must be specified for this method to work.')
 
     def _raw_to_preprocessed_filepath(self, raw_filepath: Path) -> Path:
         """Get preprocessed filepath in accordance to filepath of the raw file.
