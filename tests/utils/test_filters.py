@@ -65,7 +65,6 @@ from pymovements.utils.filters import filter_candidates_remove_nans
             {'values_split': [[0, 1, 2], [5, 6, 7]]},
             id='test_events_split',
         ),
-
     ],
 )
 def test_filters(params, expected):
