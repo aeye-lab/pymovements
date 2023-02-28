@@ -30,7 +30,7 @@ from tqdm.auto import tqdm
 from pymovements.base import Experiment
 from pymovements.events.events import Event
 from pymovements.events.events import EventDetectionCallable
-from pymovements.utils.paths import get_filepaths
+from pymovements.utils.paths import match_filepaths
 
 
 class Dataset:
@@ -171,32 +171,12 @@ class Dataset:
         RuntimeError
             If an error occurred during matching filenames or no files have been found.
         """
-        filename_regex = re.compile(self._filename_regex)
-
         # Get all filepaths that match regular expression.
-        csv_filepaths = get_filepaths(
+        fileinfo_dicts = match_filepaths(
             path=self.raw_rootpath,
-            regex=filename_regex,
+            regex=re.compile(self._filename_regex),
+            relative=True,
         )
-
-        # Parse fileinfo from filenames.
-        fileinfo_dicts: list[dict[str, Any]] = []
-        for filepath in csv_filepaths:
-
-            # All csv_filepaths already match the filename_regex.
-            match = filename_regex.match(filepath.name)
-
-            # This should never happen but mypy will complain otherwise.
-            if match is None:
-                raise RuntimeError(
-                    f'file {filepath} did not match regular expression {filename_regex}',
-                )
-
-            # We use the groupdict of the match as a base and add the filepath.
-            fileinfo_dict = match.groupdict()
-
-            fileinfo_dict['filepath'] = str(filepath.relative_to(self.raw_rootpath))
-            fileinfo_dicts.append(fileinfo_dict)
 
         if len(fileinfo_dicts) == 0:
             raise RuntimeError(f'no matching files found in {self.raw_rootpath}')
