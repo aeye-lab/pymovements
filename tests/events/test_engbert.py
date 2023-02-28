@@ -135,7 +135,7 @@ def test_microsaccades_raises_error(kwargs, expected):
                     start_value=(0, 0),
                 ),
                 'threshold': 1,
-                'flag_split_at_nan': False,
+                'include_nan': True,
             },
             pl.DataFrame(
                 {

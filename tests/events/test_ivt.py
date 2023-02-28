@@ -247,7 +247,7 @@ def test_ivt_raise_error(kwargs, expected_error):
                 ),
                 'velocity_threshold': 1,
                 'minimum_duration': 1,
-                'flag_split_at_nan': False,
+                'include_nan': True,
             },
             pl.DataFrame(
                 {

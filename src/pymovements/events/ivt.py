@@ -29,7 +29,7 @@ from pymovements.events.events import Fixation
 from pymovements.transforms import consecutive
 from pymovements.transforms import norm
 from pymovements.utils.checks import check_shapes_positions_velocities
-from pymovements.utils.filters import filter_and_split
+from pymovements.utils.filters import filter_candidates_remove_nans
 
 
 def ivt(
@@ -37,7 +37,7 @@ def ivt(
         velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         velocity_threshold: float,
         minimum_duration: int,
-        flag_split_at_nan: bool = True,
+        include_nan: bool = False,
 ) -> pl.DataFrame:
     """
     Identification of fixations based on velocity-threshold
@@ -60,7 +60,7 @@ def ivt(
         velocity is below the threshold, the point is classified as a fixation.
     minimum_duration: int
         Minimum fixation duration in number of samples
-    flag_split_at_nan: bool
+    include_nan: bool
         Indicator, whether we want to split events on missing/corrupt value (np.nan)
 
     Returns
@@ -86,31 +86,26 @@ def ivt(
     if velocity_threshold <= 0:
         raise ValueError('velocity threshold must be greater than 0')
 
-
-    # check if np.nan is in data
-    flag_contains_nans = False
-    if np.sum(np.isnan(velocities)) > 0:
-        flag_contains_nans = True
-
     # Get all indices with norm-velocities below threshold.
-    # candidates are all values with np.nan
     velocity_norm = norm(velocities, axis=1)
-    below_threshold_indices = np.where(
-        np.logical_or(
-            velocity_norm < velocity_threshold,
-            np.isnan(velocity_norm),
-        ),
-    )[0]
+    candidate_mask = velocity_norm < velocity_threshold
+
+    # Add nans to candidates if desired.
+    if include_nan:
+        candidate_mask = np.logical_or(candidate_mask, np.isnan(velocities).any(axis=1))
+
+    # Get indices of true values in candidate mask.
+    candidate_ind = np.where(candidate_mask)[0]
 
     # Get all fixation candidates by grouping all consecutive indices.
-    candidates = consecutive(arr=below_threshold_indices)
+    candidates = consecutive(arr=candidate_ind)
 
     # Filter np.nan in candidates (delete starting/ending np.nans)
-    if flag_contains_nans:
-        candidates = filter_and_split(
-                            candidates,
-                            velocities,
-                            flag_split_at_nan)
+    if include_nan:
+        candidates = filter_candidates_remove_nans(
+            candidates,
+            velocities,
+        )
 
     # Filter all candidates by minimum duration.
     candidates = [candidate for candidate in candidates if len(candidate) >= minimum_duration]

@@ -215,7 +215,7 @@ def test_idt_raises_error(kwargs, expected_error):
                 ),
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
-                'flag_split_at_nan': False,
+                'include_nan': True,
             },
             pl.DataFrame(
                 {

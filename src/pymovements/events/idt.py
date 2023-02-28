@@ -56,7 +56,7 @@ def idt(
         velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         dispersion_threshold: float,
         minimum_duration: int,
-        flag_split_at_nan: bool = True,
+        include_nan: bool = False,
 ) -> pl.DataFrame:
     """
     Fixation identification based on dispersion threshold.
@@ -80,7 +80,7 @@ def idt(
         Threshold for dispersion for a group of consecutive samples to be identified as fixation
     minimum_duration: int
         Minimum fixation duration in number of samples
-    flag_split_at_nan: bool
+    include_nan: bool
         Indicator, whether we want to split events on missing/corrupt value (np.nan)
 
     Returns
@@ -131,14 +131,14 @@ def idt(
 
             # check for np.nan values
             if np.sum(np.isnan(positions[win_start:win_end - 1])) > 0:
-                tmp_candidates = [np.arange(win_start, win_end - 1, 1).tolist()]
+                tmp_candidates = [np.array(np.arange(win_start, win_end - 1, 1).tolist())]
                 tmp_values = positions[win_start:win_end - 1, :]
                 tmp_candidates = filter_candidates_remove_nans(
                     candidates=tmp_candidates,
                     values=tmp_values,
                 )
-                # split events if flag_split_at_nan == True
-                if flag_split_at_nan:
+                # split events if include_nan == False
+                if not include_nan:
                     tmp_candidates = events_split_nans(
                         tmp_candidates,
                         values=tmp_values,
