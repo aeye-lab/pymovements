@@ -25,8 +25,11 @@ import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
+from pymovements.base import Experiment
 from pymovements.datasets.dataset import Dataset
+from pymovements.events.engbert import microsaccades
 from pymovements.events.events import Event
+from pymovements.events.events import Saccade
 
 
 def create_raw_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):
@@ -164,6 +167,15 @@ def mock_toy(rootpath):
     return {
         'init_kwargs': {
             'root': rootpath,
+            'experiment': Experiment(
+                screen_width_px=1280,
+                screen_height_px=1024,
+                screen_width_cm=38,
+                screen_height_cm=30.2,
+                distance_cm=68,
+                origin='lower left',
+                sampling_rate=1000,
+            ),
             'filename_regex': r'(?P<subject_id>\d+).csv',
             'filename_regex_dtypes': {'subject_id': pl.Int64},
         },
@@ -309,6 +321,87 @@ def test_load_exceptions(init_kwargs, load_kwargs, exception, dataset_configurat
         dataset.load(**load_kwargs)
 
 
+def test_pix2deg(dataset_configuration):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+
+    original_schema = dataset.gaze[0].schema
+
+    dataset.pix2deg()
+
+    expected_schema = {
+        **original_schema,
+        'x_left_dva': pl.Float64,
+        'y_left_dva': pl.Float64,
+        'x_right_dva': pl.Float64,
+        'y_right_dva': pl.Float64,
+    }
+
+    for result_gaze_df in dataset.gaze:
+        assert result_gaze_df.schema == expected_schema
+
+
+def test_pos2vel(dataset_configuration):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+
+    original_schema = dataset.gaze[0].schema
+
+    dataset.pos2vel()
+
+    expected_schema = {
+        **original_schema,
+        'x_left_vel': pl.Float64,
+        'y_left_vel': pl.Float64,
+        'x_right_vel': pl.Float64,
+        'y_right_vel': pl.Float64,
+    }
+
+    for result_gaze_df in dataset.gaze:
+        assert result_gaze_df.schema == expected_schema
+
+
+@pytest.mark.parametrize(
+    'detect_event_kwargs',
+    [
+        pytest.param(
+            {
+                'method': microsaccades,
+                'threshold': 1,
+                'eye': 'auto',
+            },
+            id='1',
+        ),
+        pytest.param(
+            {
+                'method': microsaccades,
+                'threshold': 1,
+                'eye': 'left',
+            },
+            id='2',
+        ),
+        pytest.param(
+            {
+                'method': microsaccades,
+                'threshold': 1,
+                'eye': 'right',
+            },
+            id='3',
+        ),
+    ],
+)
+def test_detect_events(detect_event_kwargs, dataset_configuration):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+    dataset.pos2vel()
+    dataset.detect_events(**detect_event_kwargs)
+
+    for result_event_df in dataset.events:
+        assert result_event_df.schema == Saccade.schema
+
+
 @pytest.mark.parametrize(
     'events_init, events_expected',
     [
@@ -438,3 +531,41 @@ def test_paths(init_kwargs, expected_paths):
     assert dataset.raw_rootpath == expected_paths['raw']
     assert dataset.preprocessed_rootpath == expected_paths['preprocessed']
     assert dataset.events_rootpath == expected_paths['events']
+
+
+@pytest.mark.parametrize(
+    'new_fileinfo, exception',
+    [
+        pytest.param(None, AttributeError),
+        pytest.param([], AttributeError),
+    ],
+)
+def test_check_fileinfo(new_fileinfo, exception):
+    dataset = Dataset('data')
+
+    dataset.fileinfo = new_fileinfo
+
+    with pytest.raises(exception):
+        dataset._check_fileinfo()
+
+
+@pytest.mark.parametrize(
+    'new_gaze, exception',
+    [
+        pytest.param(None, AttributeError),
+        pytest.param([], AttributeError),
+    ],
+)
+def test_check_gaze_dataframe(new_gaze, exception):
+    dataset = Dataset('data')
+
+    dataset.gaze = new_gaze
+
+    with pytest.raises(exception):
+        dataset._check_gaze_dataframe()
+
+
+def test_check_experiment():
+    dataset = Dataset('data')
+    with pytest.raises(AttributeError):
+        dataset._check_experiment()
