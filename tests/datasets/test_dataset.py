@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test all functionality in pymovements.datasets.dataset."""
+import shutil
 from pathlib import Path
 
 import numpy as np
@@ -447,6 +448,128 @@ def test_clear_events(events_init, events_expected):
     else:
         for events_df_result, events_df_expected in zip(dataset.events, events_expected):
             assert_frame_equal(events_df_result, events_df_expected)
+
+
+@pytest.mark.parametrize(
+    'detect_event_kwargs, events_dirname, expected_save_dirpath',
+    [
+        pytest.param(
+            {'method': microsaccades, 'threshold': 1, 'eye': 'auto'},
+            None,
+            'events',
+            id='none_dirname',
+        ),
+        pytest.param(
+            {'method': microsaccades, 'threshold': 1, 'eye': 'auto'},
+            'events_test',
+            'events_test',
+            id='explicit_dirname',
+        ),
+    ],
+)
+def test_save_events(
+    detect_event_kwargs, events_dirname, expected_save_dirpath,
+    dataset_configuration,
+):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+    dataset.pos2vel()
+    dataset.detect_events(**detect_event_kwargs)
+
+    if events_dirname is None:
+        events_dirname = 'events'
+    shutil.rmtree(dataset.path / Path(events_dirname), ignore_errors=True)
+    shutil.rmtree(dataset.path / Path(expected_save_dirpath), ignore_errors=True)
+    dataset.save_events(events_dirname)
+
+    assert (dataset.path / expected_save_dirpath).is_dir(), (
+        f'data was not written to {dataset.path / Path(expected_save_dirpath)}'
+    )
+
+
+@pytest.mark.parametrize(
+    'preprocessed_dirname, expected_save_dirpath',
+    [
+        pytest.param(
+            None,
+            'preprocessed',
+            id='none_dirname',
+        ),
+        pytest.param(
+            'preprocessed_test',
+            'preprocessed_test',
+            id='explicit_dirname',
+        ),
+    ],
+)
+def test_save_preprocessed(preprocessed_dirname, expected_save_dirpath, dataset_configuration):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+    dataset.pos2vel()
+
+    if preprocessed_dirname is None:
+        preprocessed_dirname = 'preprocessed'
+    shutil.rmtree(dataset.path / Path(preprocessed_dirname), ignore_errors=True)
+    shutil.rmtree(dataset.path / Path(expected_save_dirpath), ignore_errors=True)
+    dataset.save_preprocessed(preprocessed_dirname)
+
+    assert (dataset.path / expected_save_dirpath).is_dir(), (
+        f'data was not written to {dataset.path / Path(expected_save_dirpath)}'
+    )
+
+
+@pytest.mark.parametrize(
+    'expected_save_preprocessed_path, expected_save_events_path, save_kwargs',
+    [
+        pytest.param(
+            'preprocessed',
+            'events',
+            {},
+            id='none_dirname',
+        ),
+        pytest.param(
+            'preprocessed_test',
+            'events',
+            {'preprocessed_dirname': 'preprocessed_test'},
+            id='none_dirname',
+        ),
+        pytest.param(
+            'preprocessed',
+            'events_test',
+            {'events_dirname': 'events_test'},
+            id='none_dirname',
+        ),
+    ],
+)
+def test_save(
+    expected_save_preprocessed_path, expected_save_events_path,
+    save_kwargs, dataset_configuration,
+):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+    dataset.pos2vel()
+
+    detect_events_kwargs = {'method': microsaccades, 'threshold': 1, 'eye': 'auto'}
+    dataset.detect_events(**detect_events_kwargs)
+
+    preprocessed_dirname = save_kwargs.get('preprocessed_dirname', 'preprocessed')
+    events_dirname = save_kwargs.get('events_dirname', 'events')
+
+    shutil.rmtree(dataset.path / Path(preprocessed_dirname), ignore_errors=True)
+    shutil.rmtree(dataset.path / Path(expected_save_preprocessed_path), ignore_errors=True)
+    shutil.rmtree(dataset.path / Path(events_dirname), ignore_errors=True)
+    shutil.rmtree(dataset.path / Path(expected_save_events_path), ignore_errors=True)
+    dataset.save(preprocessed_dirname, events_dirname)
+
+    assert (dataset.path / Path(expected_save_preprocessed_path)).is_dir(), (
+        f'data was not written to {dataset.path / Path(expected_save_events_path)}'
+    )
+    assert (dataset.path / Path(expected_save_events_path)).is_dir(), (
+        f'data was not written to {dataset.path / Path(expected_save_events_path)}'
+    )
 
 
 @pytest.mark.parametrize(
