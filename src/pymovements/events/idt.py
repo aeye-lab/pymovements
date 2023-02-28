@@ -131,17 +131,16 @@ def idt(
 
             # check for np.nan values
             if np.sum(np.isnan(positions[win_start:win_end - 1])) > 0:
-                tmp_candidates = [np.array(np.arange(win_start, win_end - 1, 1).tolist())]
-                tmp_values = positions[win_start:win_end - 1, :]
+                tmp_candidates = [np.arange(win_start, win_end - 1, 1)]
                 tmp_candidates = filter_candidates_remove_nans(
-                    candidates=tmp_candidates,
-                    values=tmp_values,
+                    candidates = tmp_candidates,
+                    values = positions,
                 )
                 # split events if include_nan == False
                 if not include_nan:
                     tmp_candidates = events_split_nans(
-                        tmp_candidates,
-                        values=tmp_values,
+                        candidates = tmp_candidates,
+                        values = positions,
                     )
 
                 # Filter all candidates by minimum duration.
