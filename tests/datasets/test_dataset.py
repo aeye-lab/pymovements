@@ -596,6 +596,12 @@ def test_save_preprocessed(preprocessed_dirname, expected_save_dirpath, dataset_
             id='none_dirname',
         ),
         pytest.param(
+            'preprocessed',
+            'events',
+            {'verbose': 2},
+            id='verbose_equals_2',
+        ),
+        pytest.param(
             'preprocessed_test',
             'events',
             {'preprocessed_dirname': 'preprocessed_test'},
@@ -628,7 +634,7 @@ def test_save(
     shutil.rmtree(dataset.path / Path(expected_save_preprocessed_path), ignore_errors=True)
     shutil.rmtree(dataset.path / Path(events_dirname), ignore_errors=True)
     shutil.rmtree(dataset.path / Path(expected_save_events_path), ignore_errors=True)
-    dataset.save(preprocessed_dirname, events_dirname)
+    dataset.save(**save_kwargs)
 
     assert (dataset.path / Path(expected_save_preprocessed_path)).is_dir(), (
         f'data was not written to {dataset.path / Path(expected_save_events_path)}'
