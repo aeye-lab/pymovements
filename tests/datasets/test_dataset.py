@@ -30,7 +30,9 @@ from pymovements.base import Experiment
 from pymovements.datasets.dataset import Dataset
 from pymovements.events.engbert import microsaccades
 from pymovements.events.events import Event
+from pymovements.events.events import Fixation
 from pymovements.events.events import Saccade
+from pymovements.events.ivt import ivt
 
 
 def create_raw_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):
@@ -417,6 +419,54 @@ def test_detect_events(detect_event_kwargs, dataset_configuration):
 
     for result_event_df in dataset.events:
         assert result_event_df.schema == Saccade.schema
+
+
+@pytest.mark.parametrize(
+    'detect_event_kwargs_1, detect_event_kwargs_2, expected_schema',
+    [
+        pytest.param(
+            {
+                'method': microsaccades,
+                'threshold': 1,
+                'eye': 'auto',
+            },
+            {
+                'method': microsaccades,
+                'threshold': 1,
+                'eye': 'auto',
+            },
+            Saccade.schema,
+            id='two-saccade-runs',
+        ),
+        pytest.param(
+            {
+                'method': microsaccades,
+                'threshold': 1,
+                'eye': 'left',
+            },
+            {
+                'method': ivt,
+                'velocity_threshold': 1,
+                'minimum_duration': 1,
+            },
+            {**Saccade.schema, **Fixation.schema},
+            id='one-saccade-one-fixation-run',
+        ),
+    ],
+)
+def test_detect_events_multiple_calls(
+    detect_event_kwargs_1, detect_event_kwargs_2,
+    expected_schema, dataset_configuration,
+):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+    dataset.pos2vel()
+    dataset.detect_events(**detect_event_kwargs_1)
+    dataset.detect_events(**detect_event_kwargs_2)
+
+    for result_event_df in dataset.events:
+        assert result_event_df.schema == expected_schema
 
 
 @pytest.mark.parametrize(
