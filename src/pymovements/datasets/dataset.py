@@ -311,7 +311,8 @@ class Dataset:
         gaze_dfs: list[pl.DataFrame] = []
 
         # Read gaze files from fileinfo attribute.
-        for file_id, filepath in enumerate(tqdm(self.fileinfo['filepath'])):
+        for fileinfo in tqdm(self.fileinfo.to_dicts()):
+            filepath = Path(fileinfo['filepath'])
             filepath = self.raw_rootpath / filepath
 
             if preprocessed:
@@ -327,21 +328,7 @@ class Dataset:
                 raise RuntimeError(f'data files of type {filepath.suffix} are not supported')
 
             # Add fileinfo columns to dataframe.
-            for column in self.fileinfo.columns[::-1]:
-                if column == 'filepath':
-                    continue
-
-                column_value = self.fileinfo.select(column)[file_id][0, 0]
-                gaze_df = gaze_df.select([
-                    pl.lit(column_value).alias(column),
-                    pl.all(),
-                ])
-
-            # Cast columns from fileinfo according to specification.
-            gaze_df = gaze_df.with_columns([
-                pl.col(fileinfo_key).cast(fileinfo_dtype)
-                for fileinfo_key, fileinfo_dtype in self._filename_regex_dtypes.items()
-            ])
+            gaze_df = self._add_fileinfo(gaze_df, fileinfo)
 
             gaze_dfs.append(gaze_df)
 
@@ -370,19 +357,22 @@ class Dataset:
         """
         self._check_fileinfo()
 
-        file_dfs: list[pl.DataFrame] = []
+        event_dfs: list[pl.DataFrame] = []
 
         # read and preprocess input files
-        for _, filepath in enumerate(tqdm(self.fileinfo['filepath'])):
-            filepath = self.raw_rootpath / Path(filepath)
+        for fileinfo in tqdm(self.fileinfo.to_dicts()):
+            filepath = Path(fileinfo['filepath'])
+            filepath = self.raw_rootpath / filepath
 
             filepath = self._raw_to_event_filepath(filepath, events_dirname=events_dirname)
+            event_df = pl.read_ipc(filepath)
 
-            file_df = pl.read_ipc(filepath)
+            # Add fileinfo columns to dataframe.
+            event_df = self._add_fileinfo(event_df, fileinfo)
 
-            file_dfs.append(file_df)
+            event_dfs.append(event_df)
 
-        return file_dfs
+        return event_dfs
 
     def pix2deg(self, verbose: bool = True) -> None:
         """Compute gaze positions in degrees of visual angle from pixel coordinates.
@@ -520,13 +510,17 @@ class Dataset:
 
         event_dfs: list[pl.DataFrame] = []
 
-        for gaze_df in tqdm(self.gaze, disable=disable_progressbar):
+        for gaze_df, fileinfo in tqdm(
+                zip(self.gaze, self.fileinfo.to_dicts()), disable=disable_progressbar,
+        ):
 
             positions = gaze_df.select(position_columns).to_numpy()
             velocities = gaze_df.select(velocity_columns).to_numpy()
 
-            events = method(positions=positions, velocities=velocities, **kwargs)
-            event_dfs.append(events)
+            event_df = method(positions=positions, velocities=velocities, **kwargs)
+            event_df = self._add_fileinfo(event_df, fileinfo)
+
+            event_dfs.append(event_df)
 
         if not self.events or clear:
             self.events = event_dfs
@@ -860,3 +854,34 @@ class Dataset:
         events_filename = raw_filepath.stem + '.feather'
 
         return events_file_dirpath / events_filename
+
+    def _add_fileinfo(self, df: pl.DataFrame, fileinfo: dict[str, Any]) -> pl.DataFrame:
+        """Add columns from fileinfo to dataframe.
+
+        Parameters
+        ----------
+        df : pl.DataFrame
+            Base dataframe to add fileinfo to.
+        fileinfo : dict[str, Any]
+            Dictionary of fileinfo row.
+
+        Returns
+        -------
+        pl.DataFrame:
+            Dataframe with added columns from fileinfo dictionary keys.
+        """
+
+        df = df.select(
+            [
+                pl.lit(value).alias(column)
+                for column, value in fileinfo.items()
+                if column != 'filepath'
+            ] + [pl.all()],
+        )
+
+        # Cast columns from fileinfo according to specification.
+        df = df.with_columns([
+            pl.col(fileinfo_key).cast(fileinfo_dtype)
+            for fileinfo_key, fileinfo_dtype in self._filename_regex_dtypes.items()
+        ])
+        return df
