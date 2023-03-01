@@ -97,10 +97,14 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      - name: Install pandoc
+        uses: r-lib/actions/setup-pandoc@v2
+        with:
+          pandoc-version: '2.19.2'
       - name: Install base python for tox
         uses: actions/setup-python@v4
         with:
-          python-version: "3.9"
+          python-version: "3.7"
       - name: Install tox
         run: python -m pip install tox
       - name: Setup test environment

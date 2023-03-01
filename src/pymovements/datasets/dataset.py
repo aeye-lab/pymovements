@@ -35,16 +35,28 @@ from pymovements.utils.paths import get_filepaths
 
 class Dataset:
     """Dataset base class."""
+    # pylint: disable=too-many-instance-attributes
+    # The Dataset class is exceptionally complex and needs many attributes.
 
     def __init__(
-        self,
-        root: str | Path,
-        experiment: Experiment | None = None,
-        filename_regex: str = '.*',
-        filename_regex_dtypes: dict[str, type] | None = None,
-        custom_read_kwargs: dict[str, Any] | None = None,
+            self,
+            root: str | Path,
+            experiment: Experiment | None = None,
+            filename_regex: str = '.*',
+            filename_regex_dtypes: dict[str, type] | None = None,
+            custom_read_kwargs: dict[str, Any] | None = None,
+            dataset_dirname: str = '.',
+            raw_dirname: str = 'raw',
+            preprocessed_dirname: str = 'preprocessed',
+            events_dirname: str = 'events',
     ):
         """Initialize the dataset object.
+
+        You can set up a custom directory structure by populating the particular dirname attributes.
+        See :py:attr:`~pymovements.dataset.Dataset.dataset_dirname`,
+        :py:attr:`~pymovements.dataset.Dataset.raw_dirname`,
+        :py:attr:`~pymovements.dataset.Dataset.preprocessed_dirname` and
+        :py:attr:`~pymovements.dataset.Dataset.events_dirname` for details.
 
         Parameters
         ----------
@@ -60,15 +72,37 @@ class Dataset:
             specific named groups to a particular datatype.
         custom_read_kwargs : dict[str, Any], optional
             If specified, these keyword arguments will be passed to the file reading function.
+        dataset_dirname : str, optional
+            Dataset directory name under root path. Can be `.` if dataset is located in root path.
+            Default: `.`
+        raw_dirname ; str, optional
+            Name of directory under dataset path that contains raw data. Can be `.` if raw data is
+            located in dataset path. We advise the user to keep the original raw data separate from
+            the preprocessed / event data. Default: `raw`
+        preprocessed_dirname : str, optional
+            Name of directory under dataset path that will be used to store preprocessed data. We
+            advise the user to keep the preprocessed data separate from the original raw data.
+            Default: `preprocessed`
+        events_dirname : str, optional
+            Name of directory under dataset path that will be used to store event data. We advise
+            the user to keep the event data separate from the original raw data. Default: `events`
         """
         self.fileinfo: pl.DataFrame = pl.DataFrame()
         self.gaze: list[pl.DataFrame] = []
         self.events: list[pl.DataFrame] = []
 
-        self.root = Path(root)
+        self._root = Path(root)
+        self.dataset_dirname = dataset_dirname
+        self.raw_dirname = raw_dirname
+        self.preprocessed_dirname = preprocessed_dirname
+        self.events_dirname = events_dirname
 
         self.experiment = experiment
 
+        if filename_regex is None:
+            raise ValueError('filename_regex must not be None')
+        if not isinstance(filename_regex, str):
+            raise TypeError('filename_regex must be of type str')
         self._filename_regex = filename_regex
 
         if filename_regex_dtypes is None:
@@ -84,6 +118,8 @@ class Dataset:
             events: bool = False,
             preprocessed: bool = False,
             subset: None | dict[str, float | int | str | list[float | int | str]] = None,
+            events_dirname: str | None = None,
+            preprocessed_dirname: str | None = None,
     ):
         """Parse file information and load all gaze files.
 
@@ -97,16 +133,28 @@ class Dataset:
             If specified, load only a subset of the dataset. All keys in the dictionary must be
             present in the fileinfo dataframe inferred by `infer_fileinfo()`. Values can be either
             float, int , str or a list of these.
+        events_dirname : str
+            One-time usage of an alternative directory name to save data relative to
+            :py:meth:`pymovements.Dataset.path`.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.events_rootpath`.
+        preprocessed_dirname : str
+            One-time usage of an alternative directory name to save data relative to
+            :py:meth:`pymovements.Dataset.path`.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
 
         The parsed file information is assigned to the `fileinfo` attribute.
         All gaze files will be loaded as dataframes and assigned to the `gaze` attribute.
         """
-        self.fileinfo = self.infer_fileinfo()
-        self.take_subset(subset=subset)
-        self.gaze = self.load_gaze_files(preprocessed=preprocessed)
+        fileinfo = self.infer_fileinfo()
+        self.fileinfo = self.take_subset(fileinfo=fileinfo, subset=subset)
+        self.gaze = self.load_gaze_files(
+            preprocessed=preprocessed, preprocessed_dirname=preprocessed_dirname,
+        )
 
         if events:
-            self.events = self.load_event_files()
+            self.events = self.load_event_files(events_dirname=events_dirname)
 
     def infer_fileinfo(self) -> pl.DataFrame:
         """Infer information from filepaths and filenames.
@@ -121,12 +169,9 @@ class Dataset:
         AttributeError
             If no regular expression for parsing filenames is defined.
         RuntimeError
-            If an error occured during matching filenames or no files have been found.
+            If an error occurred during matching filenames or no files have been found.
         """
-        if self._filename_regex is not None:
-            filename_regex = re.compile(self._filename_regex)
-        else:
-            raise AttributeError('no regular expression for filenames is defined.')
+        filename_regex = re.compile(self._filename_regex)
 
         # Get all filepaths that match regular expression.
         csv_filepaths = get_filepaths(
@@ -141,44 +186,56 @@ class Dataset:
             # All csv_filepaths already match the filename_regex.
             match = filename_regex.match(filepath.name)
 
-            # This actually should never happen but mypy will complain otherwise.
+            # This should never happen but mypy will complain otherwise.
             if match is None:
                 raise RuntimeError(
-                    f'file {filepath} did not match regular expression {self._filename_regex}',
+                    f'file {filepath} did not match regular expression {filename_regex}',
                 )
 
             # We use the groupdict of the match as a base and add the filepath.
             fileinfo_dict = match.groupdict()
 
-            for fileinfo_key, fileinfo_dtype in self._filename_regex_dtypes.items():
-                fileinfo_dict[fileinfo_key] = fileinfo_dtype(fileinfo_dict[fileinfo_key])
-
-            fileinfo_dict['filepath'] = str(filepath)
+            fileinfo_dict['filepath'] = str(filepath.relative_to(self.raw_rootpath))
             fileinfo_dicts.append(fileinfo_dict)
 
         if len(fileinfo_dicts) == 0:
-            raise RuntimeError('no matching files found')
+            raise RuntimeError(f'no matching files found in {self.raw_rootpath}')
 
         # Create dataframe from all fileinfo records.
         fileinfo_df = pl.from_dicts(dicts=fileinfo_dicts, infer_schema_length=1)
         fileinfo_df = fileinfo_df.sort(by='filepath')
 
+        fileinfo_df = fileinfo_df.with_columns([
+            pl.col(fileinfo_key).cast(fileinfo_dtype)
+            for fileinfo_key, fileinfo_dtype in self._filename_regex_dtypes.items()
+        ])
+
         return fileinfo_df
 
+    @staticmethod
     def take_subset(
-            self,
-            subset: None | dict[str, float | int | str | list[float | int | str]] = None,
-    ) -> None:
+            fileinfo: pl.DataFrame,
+            subset: None | dict[
+                str, bool | float | int | str | list[bool | float | int | str],
+            ] = None,
+    ) -> pl.DataFrame:
         """Take a subset of the dataset.
 
         Calling this method will alter the fileinfo attribute.
 
         Parameters
         ----------
+        fileinfo : pl.DataFrame
+            File information dataframe.
         subset : dict, optional
-            If specified, load only a subset of the dataset. All keys in the dictionary must be
+            If specified, take a subset of the dataset. All keys in the dictionary must be
             present in the fileinfo dataframe inferred by `infer_fileinfo()`. Values can be either
-            float, int , str or a list of these.
+            bool, float, int , str or a list of these.
+
+        Returns
+        -------
+        pl.DataFrame:
+            Subset of file information dataframe.
 
         Raises
         ------
@@ -189,40 +246,53 @@ class Dataset:
 
         """
         if subset is None:
-            return
+            return fileinfo
+
+        if not isinstance(subset, dict):
+            raise TypeError(f'subset must be of type dict but is of type {type(subset)}')
 
         for subset_key, subset_value in subset.items():
-            if subset_key not in self.fileinfo.columns:
-                raise ValueError(
-                    f'subset key {subset_key} must be a column in the fileinfo attribute.'
-                    f' Available columns are: {self.fileinfo.columns}',
-                )
-
             if not isinstance(subset_key, str):
                 raise TypeError(
                     f'subset keys must be of type str but key {subset_key} is of type'
                     f' {type(subset_key)}',
                 )
 
-            if isinstance(subset_value, (float, int, str)):
+            if subset_key not in fileinfo.columns:
+                raise ValueError(
+                    f'subset key {subset_key} must be a column in the fileinfo attribute.'
+                    f' Available columns are: {fileinfo.columns}',
+                )
+
+            if isinstance(subset_value, (bool, float, int, str)):
                 column_values = [subset_value]
             elif isinstance(subset_value, (list, tuple)):
                 column_values = subset_value
             else:
                 raise TypeError(
-                    f'subset value must be of float, int, str or a list of these but key-value pair'
-                    f'{subset_key}: {subset_value} is of type {type(subset_value)}',
+                    f'subset value must be of type bool, float, int, str or a list of these but'
+                    f' key-value pair {subset_key}: {subset_value} is of type {type(subset_value)}',
                 )
 
-            self.fileinfo = self.fileinfo.filter(pl.col(subset_key).is_in(column_values))
+            fileinfo = fileinfo.filter(pl.col(subset_key).is_in(column_values))
+        return fileinfo
 
-    def load_gaze_files(self, preprocessed: bool = False) -> list[pl.DataFrame]:
+    def load_gaze_files(
+            self,
+            preprocessed: bool = False,
+            preprocessed_dirname: str | None = None,
+    ) -> list[pl.DataFrame]:
         """Load all available gaze data files.
 
         Parameters
         ----------
         preprocessed : bool
             If ``True``, saved preprocessed data will be loaded, otherwise raw data will be loaded.
+        preprocessed_dirname : str
+            One-time usage of an alternative directory name to save data relative to
+            :py:meth:`pymovements.Dataset.path`.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
 
         Returns
         -------
@@ -238,43 +308,55 @@ class Dataset:
         """
         self._check_fileinfo()
 
-        file_dfs: list[pl.DataFrame] = []
+        gaze_dfs: list[pl.DataFrame] = []
 
         # Read gaze files from fileinfo attribute.
         for file_id, filepath in enumerate(tqdm(self.fileinfo['filepath'])):
-            filepath = Path(filepath)
+            filepath = self.raw_rootpath / filepath
 
             if preprocessed:
-                filepath = self._raw_to_preprocessed_filepath(filepath)
+                filepath = self._raw_to_preprocessed_filepath(
+                    filepath, preprocessed_dirname=preprocessed_dirname,
+                )
 
             if filepath.suffix == '.csv':
-                file_df = pl.read_csv(filepath, **self._custom_read_kwargs)
+                gaze_df = pl.read_csv(filepath, **self._custom_read_kwargs)
             elif filepath.suffix == '.feather':
-                file_df = pl.read_ipc(filepath)
+                gaze_df = pl.read_ipc(filepath)
             else:
-                raise RuntimeError('data files of type {filepath.suffix} are not supported.')
+                raise RuntimeError(f'data files of type {filepath.suffix} are not supported')
 
             # Add fileinfo columns to dataframe.
             for column in self.fileinfo.columns[::-1]:
-                # Preprocessed data already has fileinfo columns.
-                if preprocessed:
-                    continue
-
                 if column == 'filepath':
                     continue
 
                 column_value = self.fileinfo.select(column)[file_id][0, 0]
-                file_df = file_df.select([
+                gaze_df = gaze_df.select([
                     pl.lit(column_value).alias(column),
                     pl.all(),
                 ])
 
-            file_dfs.append(file_df)
+            # Cast columns from fileinfo according to specification.
+            gaze_df = gaze_df.with_columns([
+                pl.col(fileinfo_key).cast(fileinfo_dtype)
+                for fileinfo_key, fileinfo_dtype in self._filename_regex_dtypes.items()
+            ])
 
-        return file_dfs
+            gaze_dfs.append(gaze_df)
 
-    def load_event_files(self) -> list[pl.DataFrame]:
+        return gaze_dfs
+
+    def load_event_files(self, events_dirname: str | None = None) -> list[pl.DataFrame]:
         """Load all available event files.
+
+        Parameters
+        ----------
+        events_dirname : str
+            One-time usage of an alternative directory name to save data relative to
+            :py:meth:`pymovements.Dataset.path`.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.events_rootpath`.
 
         Returns
         -------
@@ -292,9 +374,9 @@ class Dataset:
 
         # read and preprocess input files
         for _, filepath in enumerate(tqdm(self.fileinfo['filepath'])):
-            filepath = Path(filepath)
+            filepath = self.raw_rootpath / Path(filepath)
 
-            filepath = self._raw_to_event_filepath(filepath)
+            filepath = self._raw_to_event_filepath(filepath, events_dirname=events_dirname)
 
             file_df = pl.read_ipc(filepath)
 
@@ -322,14 +404,8 @@ class Dataset:
             If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
             if experiment is None.
         """
-        if self.gaze is None:
-            raise AttributeError(
-                'gaze files were not loaded yet. please run load() or load_gaze_files() beforehand',
-            )
-        if len(self.gaze) == 0:
-            raise AttributeError('no files present in gaze attribute')
-        if self.experiment is None:
-            raise AttributeError('experiment must be specified for this method.')
+        self._check_gaze_dataframe()
+        self._check_experiment()
 
         disable_progressbar = not verbose
 
@@ -339,7 +415,9 @@ class Dataset:
 
             pixel_positions = file_df.select(pix_position_columns)
 
-            dva_positions = self.experiment.screen.pix2deg(pixel_positions.to_numpy())
+            dva_positions = self.experiment.screen.pix2deg(  # type: ignore[union-attr]
+                pixel_positions.to_numpy(),
+            )
 
             for dva_column_id, dva_column_name in enumerate(dva_position_columns):
                 self.gaze[file_id] = self.gaze[file_id].with_columns(
@@ -370,14 +448,8 @@ class Dataset:
             If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
             if experiment is None.
         """
-        if self.gaze is None:
-            raise AttributeError(
-                'gaze files were not loaded yet. please run load() or load_gaze_files() beforehand',
-            )
-        if len(self.gaze) == 0:
-            raise AttributeError('no files present in gaze attribute')
-        if self.experiment is None:
-            raise AttributeError('experiment must be specified for this method.')
+        self._check_gaze_dataframe()
+        self._check_experiment()
 
         disable_progressbar = not verbose
 
@@ -387,7 +459,9 @@ class Dataset:
 
             positions = file_df.select(position_columns)
 
-            velocities = self.experiment.pos2vel(positions.to_numpy(), method=method, **kwargs)
+            velocities = self.experiment.pos2vel(  # type: ignore[union-attr]
+                positions.to_numpy(), method=method, **kwargs,
+            )
 
             for col_id, velocity_column_name in enumerate(velocity_columns):
                 self.gaze[file_id] = self.gaze[file_id].with_columns(
@@ -420,13 +494,12 @@ class Dataset:
         **kwargs :
             Additional keyword arguments to be passed to the event detection method.
 
+        Raises
+        ------
+        AttributeError
+            If gaze files have not been loaded yet or gaze files do not contain the right columns.
         """
-        if self.gaze is None:
-            raise AttributeError(
-                'gaze files were not loaded yet. please run load() or load_gaze_files() beforehand',
-            )
-        if len(self.gaze) == 0:
-            raise AttributeError('no files present in gaze attribute')
+        self._check_gaze_dataframe()
 
         # Automatically infer eye to use for event detection.
         if eye == 'auto':
@@ -473,7 +546,12 @@ class Dataset:
         for file_id, _ in enumerate(self.events):
             self.events[file_id] = pl.DataFrame(schema=Event.schema)
 
-    def save(self, verbose: int = 1):
+    def save(
+            self,
+            events_dirname: str | None = None,
+            preprocessed_dirname: str | None = None,
+            verbose: int = 1,
+    ):
         """Save preprocessed gaze and event files.
 
         Data will be saved as feather files to ``Dataset.preprocessed_roothpath`` or
@@ -481,18 +559,21 @@ class Dataset:
 
         Parameters
         ----------
+        events_dirname : str
+            One-time usage of an alternative directory name to save data relative to dataset path.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.events_rootpath`.
+        preprocessed_dirname : str
+            One-time usage of an alternative directory name to save data relative to dataset path.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
         verbose : int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
         """
-        if verbose > 2:
-            print('save preprocessed gaze files')
-        self.save_preprocessed(verbose=verbose)
+        self.save_events(events_dirname, verbose=verbose)
+        self.save_preprocessed(preprocessed_dirname, verbose=verbose)
 
-        if verbose > 2:
-            print('save event files')
-        self.save_events(verbose=verbose)
-
-    def save_events(self, verbose: int = 1):
+    def save_events(self, events_dirname: str | None = None, verbose: int = 1):
         """Save events to files.
 
         Data will be saved as feather files to ``Dataset.events_roothpath`` with the same directory
@@ -500,23 +581,32 @@ class Dataset:
 
         Parameters
         ----------
+        events_dirname : str
+            One-time usage of an alternative directory name to save data relative to dataset path.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.events_rootpath`.
         verbose : int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
         """
         disable_progressbar = not verbose
 
         for file_id, event_df in enumerate(tqdm(self.events, disable=disable_progressbar)):
-            raw_filepath = Path(self.fileinfo[file_id, 'filepath'])
-            events_filepath = self._raw_to_event_filepath(raw_filepath)
+            raw_filepath = self.raw_rootpath / Path(self.fileinfo[file_id, 'filepath'])
+            events_filepath = self._raw_to_event_filepath(
+                raw_filepath, events_dirname=events_dirname,
+            )
 
-            events_filepath.parent.mkdir(parents=True, exist_ok=True)
+            for column in event_df.columns:
+                if column in self.fileinfo.columns:
+                    event_df.drop(column)
 
-            if verbose > 2:
+            if verbose >= 2:
                 print('Save file to', events_filepath)
 
+            events_filepath.parent.mkdir(parents=True, exist_ok=True)
             event_df.write_ipc(events_filepath)
 
-    def save_preprocessed(self, verbose: int = 1):
+    def save_preprocessed(self, preprocessed_dirname: str | None = None, verbose: int = 1):
         """Save preprocessed gaze files.
 
         Data will be saved as feather files to ``Dataset.preprocessed_roothpath`` with the same
@@ -524,88 +614,157 @@ class Dataset:
 
         Parameters
         ----------
+        preprocessed_dirname : str
+            One-time usage of an alternative directory name to save data relative to dataset path.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
         verbose : int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
         """
         disable_progressbar = not verbose
 
         for file_id, gaze_df in enumerate(tqdm(self.gaze, disable=disable_progressbar)):
-            raw_filepath = Path(self.fileinfo[file_id, 'filepath'])
-            preprocessed_filepath = self._raw_to_preprocessed_filepath(raw_filepath)
+            raw_filepath = self.raw_rootpath / Path(self.fileinfo[file_id, 'filepath'])
+            preprocessed_filepath = self._raw_to_preprocessed_filepath(
+                raw_filepath, preprocessed_dirname=preprocessed_dirname,
+            )
 
-            preprocessed_filepath.parent.mkdir(parents=True, exist_ok=True)
+            for column in gaze_df.columns:
+                if column in self.fileinfo.columns:
+                    gaze_df = gaze_df.drop(column)
 
-            if verbose > 2:
+            if verbose >= 2:
                 print('Save file to', preprocessed_filepath)
 
+            preprocessed_filepath.parent.mkdir(parents=True, exist_ok=True)
             gaze_df.write_ipc(preprocessed_filepath)
 
     @property
-    def rootpath(self) -> Path:
-        """Get the path to the dataset directory.
+    def path(self) -> Path:
+        """The path to the dataset directory.
 
-        The dataset path points to a directory in the specified root directory which is named the
-        same as the respective class.
+        The dataset path points to the dataset directory under the root path. Per default the
+        dataset path points to the exact same directory as the root path. Add ``dataset_dirname``
+        to your initialization call to specify an explicit dataset directory in your root path.
 
         Example
         -------
-        >>> class CustomDataset(Dataset):
-        ...     pass
-        >>> dataset = CustomDataset(root='data')
-        >>> dataset.rootpath  # doctest: +SKIP
-        Path('data/CustomDataset')
+
+        The default behavior is to locate the dataset in the root path without assuming a further
+        dataset directory:
+        >>> dataset = Dataset(root='/path/to/your/dataset', dataset_dirname='.')
+        >>> dataset.path  # doctest: +SKIP
+        Path('/path/to/your/dataset')
+
+        To locate the dataset you can also specify an explicit dataset directory name in the root
+        path:
+        >>> dataset = Dataset(root='path/to/all/your/datasets/', dataset_dirname='your_dataset')
+        >>> dataset.path  # doctest: +SKIP
+        Path('path/to/all/your/datasets/your_dataset')
         """
-        return self.root / self.__class__.__name__
+        return self.root / self.dataset_dirname
+
+    @property
+    def root(self) -> Path:
+        """The root path to your dataset.
+
+        Example
+        -------
+        >>> dataset = Dataset(root='/path/to/your/dataset')
+        >>> dataset.root  # doctest: +SKIP
+        Path('/path/to/your/dataset')
+
+        The root stays unaffected by the dataset directory name:
+        >>> dataset = Dataset(root='/path/to/', dataset_dirname='your_dataset')
+        >>> dataset.root  # doctest: +SKIP
+        Path('/path/to')
+        """
+        return self._root
 
     @property
     def events_rootpath(self) -> Path:
-        """Get the path to the directory of the event data.
+        """The path to the directory of the event data.
 
-        The event data directory path points to a directory named `events` in the dataset
-        `rootpath`.
+        The path points to the events directory under the root path.
 
         Example
         -------
-        >>> class CustomDataset(Dataset):
-        ...     pass
-        >>> dataset = CustomDataset(root='data')
+
+        >>> dataset = Dataset(root='/path/to/your/datasets/', dataset_dirname='your_dataset')
         >>> dataset.events_rootpath  # doctest: +SKIP
-        Path('data/CustomDataset/events')
+        Path('/path/to/your/datasets/your_dataset/events')
+
+        You can also explicitely specify the event directory name. The default is `events`.
+        >>> dataset = Dataset(
+        ...     root='/path/to/your/datasets/',
+        ...     dataset_dirname='your_dataset',
+        ...     events_dirname='your_events',
+        ... )
+        >>> dataset.events_rootpath  # doctest: +SKIP
+        Path('/path/to/your/datasets/your_dataset/your_events')
         """
-        return self.rootpath / 'events'
+        return self.path / self.events_dirname
 
     @property
     def preprocessed_rootpath(self) -> Path:
-        """Get the path to the directory of the preprocessed gaze data.
+        """The path to the directory of the preprocessed gaze data.
 
-        The preprocessed data directory path points to a directory named `preprocessed` in the
-        dataset `rootpath`.
+        The path points to the preprocessed data directory under the root path.
 
         Example
         -------
-        >>> class CustomDataset(Dataset):
-        ...     pass
-        >>> dataset = CustomDataset(root='data')
+
+        >>> dataset = Dataset(root='/path/to/your/datasets/', dataset_dirname='your_dataset')
         >>> dataset.preprocessed_rootpath  # doctest: +SKIP
-        Path('data/CustomDataset/preprocessed')
+        Path('/path/to/your/datasets/your_dataset/preprocessed')
+
+        You can also explicitely specify the preprocessed directory name. The default is
+        `preprocessed`.
+        >>> dataset = Dataset(
+        ...     root='/path/to/your/datasets/',
+        ...     dataset_dirname='your_dataset',
+        ...     preprocessed_dirname='your_preprocessed_data',
+        ... )
+        >>> dataset.preprocessed_rootpath  # doctest: +SKIP
+        Path('/path/to/your/datasets/your_dataset/your_preprocessed_data')
         """
-        return self.rootpath / 'preprocessed'
+        return self.path / self.preprocessed_dirname
 
     @property
     def raw_rootpath(self) -> Path:
-        """Get the path to the directory of the raw data.
+        """The path to the directory of the raw data.
 
-        The raw data directory path points to a directory named `raw` in the dataset `rootpath`.
+        The path points to the raw data directory under the root path.
 
         Example
         -------
-        >>> class CustomDataset(Dataset):
-        ...     pass
-        >>> dataset = CustomDataset(root='data')
+
+        >>> dataset = Dataset(root='/path/to/your/datasets/', dataset_dirname='your_dataset')
+        >>> dataset.preprocessed_rootpath  # doctest: +SKIP
+        Path('/path/to/your/datasets/your_dataset/raw')
+
+        You can also explicitely specify the preprocessed directory name. The default is `raw`.
+        >>> dataset = Dataset(
+        ...     root='/path/to/your/datasets/',
+        ...     dataset_dirname='your_dataset',
+        ...     raw_dirname='your_raw_data',
+        ... )
         >>> dataset.raw_rootpath  # doctest: +SKIP
-        Path('data/CustomDataset/raw')
+        Path('/path/to/your/datasets/your_dataset/your_raw_data')
+
+        If your raw data is not in a separate directory under the root path then you can also
+        specify `.` as the directory name. We discourage this and advise the user to keep raw data
+        and preprocessed data separated.
+        ... dataset = Dataset(
+        >>> dataset = Dataset(
+        ...     root='/path/to/your/datasets/',
+        ...     dataset_dirname='your_dataset',
+        ...     raw_dirname='.',
+        ... )
+        >>> dataset.raw_rootpath  # doctest: +SKIP
+        Path('/path/to/your/datasets/your_dataset/your_raw_data')
         """
-        return self.rootpath / 'raw'
+        return self.path / self.raw_dirname
 
     def _check_fileinfo(self) -> None:
         """Check if fileinfo attribute is set and there is at least one row present."""
@@ -616,7 +775,23 @@ class Dataset:
         if len(self.fileinfo) == 0:
             raise AttributeError('no files present in fileinfo attribute')
 
-    def _raw_to_preprocessed_filepath(self, raw_filepath: Path) -> Path:
+    def _check_gaze_dataframe(self) -> None:
+        """Check if gaze attribute is set and there is at least one gaze dataframe available."""
+        if self.gaze is None:
+            raise AttributeError('gaze files were not loaded yet. please run load() beforehand')
+        if len(self.gaze) == 0:
+            raise AttributeError('no files present in gaze attribute')
+
+    def _check_experiment(self) -> None:
+        """Check if experiment attribute has been set."""
+        if self.experiment is None:
+            raise AttributeError('experiment must be specified for this method to work.')
+
+    def _raw_to_preprocessed_filepath(
+            self,
+            raw_filepath: Path,
+            preprocessed_dirname: str | None = None,
+    ) -> Path:
         """Get preprocessed filepath in accordance to filepath of the raw file.
 
         The preprocessed filepath will point to a feather file.
@@ -625,21 +800,33 @@ class Dataset:
         ----------
         raw_filepath : Path
             The Path to the raw file.
+        preprocessed_dirname : str
+            One-time usage of an alternative directory name to save data relative to
+            :py:meth:`pymovements.Dataset.path`.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
 
         Returns
         -------
         Path
             The Path to the preprocessed feather file.
         """
-        relative_raw_dirpath = raw_filepath.parent.relative_to(self.raw_rootpath)
-        preprocessed_file_dirpath = self.preprocessed_rootpath / relative_raw_dirpath
+        relative_raw_dirpath = raw_filepath.parent
+        relative_raw_dirpath = relative_raw_dirpath.relative_to(self.raw_rootpath)
+
+        if preprocessed_dirname is None:
+            preprocessed_rootpath = self.preprocessed_rootpath
+        else:
+            preprocessed_rootpath = self.path / preprocessed_dirname
+
+        preprocessed_file_dirpath = preprocessed_rootpath / relative_raw_dirpath
 
         # Get new filename for saved feather file.
         preprocessed_filename = raw_filepath.stem + '.feather'
 
         return preprocessed_file_dirpath / preprocessed_filename
 
-    def _raw_to_event_filepath(self, raw_filepath: Path) -> Path:
+    def _raw_to_event_filepath(self, raw_filepath: Path, events_dirname: str | None = None) -> Path:
         """Get event filepath in accordance to filepath of the raw file.
 
         The event filepath will point to a feather file.
@@ -648,14 +835,26 @@ class Dataset:
         ----------
         raw_filepath : Path
             The Path to the raw file.
+        events_dirname : str
+            One-time usage of an alternative directory name to save data relative to
+            :py:meth:`pymovements.Dataset.path`.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.events_rootpath`.
 
         Returns
         -------
         Path
             The Path to the event feather file.
         """
-        relative_raw_dirpath = raw_filepath.parent.relative_to(self.raw_rootpath)
-        events_file_dirpath = self.events_rootpath / relative_raw_dirpath
+        relative_raw_dirpath = raw_filepath.parent
+        relative_raw_dirpath = relative_raw_dirpath.relative_to(self.raw_rootpath)
+
+        if events_dirname is None:
+            events_rootpath = self.events_rootpath
+        else:
+            events_rootpath = self.path / events_dirname
+
+        events_file_dirpath = events_rootpath / relative_raw_dirpath
 
         # Get new filename for saved feather file.
         events_filename = raw_filepath.stem + '.feather'

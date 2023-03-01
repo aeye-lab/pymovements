@@ -30,6 +30,7 @@ import polars as pl
 from pymovements.events.events import Saccade
 from pymovements.transforms import consecutive
 from pymovements.utils.checks import check_shapes_positions_velocities
+from pymovements.utils.filters import filter_candidates_remove_nans
 
 
 def microsaccades(
@@ -39,6 +40,7 @@ def microsaccades(
     threshold_factor: float = 6,
     minimum_duration: int = 6,
     minimum_threshold: float = 1e-10,
+    include_nan: bool = False,
 ) -> pl.DataFrame:
     """Detect micro-saccades from velocity gaze sequence.
 
@@ -66,6 +68,8 @@ def microsaccades(
     minimum_threshold : float
         minimal threshold value. Raises ValueError if calculated threshold is too low.
         Default: 1e-10
+    include_nan: bool
+        Indicator, whether we want to split events on missing/corrupt value (np.nan)
 
     Returns
     -------
@@ -100,13 +104,24 @@ def microsaccades(
     radius = threshold * threshold_factor
 
     # If value is greater than 1, point lies outside the ellipse.
-    outside_ellipse = np.greater(np.sum(np.power(velocities / radius, 2), axis=1), 1)
+    candidate_mask = np.greater(np.sum(np.power(velocities / radius, 2), axis=1), 1)
 
-    # Get all indices with velocities outside of ellipse.
-    outside_ellipse_indices = np.where(outside_ellipse)[0]
+    # Add nans to candidates if desired.
+    if include_nan:
+        candidate_mask = np.logical_or(candidate_mask, np.isnan(velocities).any(axis=1))
+
+    # Get indices of true values in candidate mask.
+    candidate_indices = np.where(candidate_mask)[0]
 
     # Get all saccade candidates by grouping all consecutive indices.
-    candidates = consecutive(arr=outside_ellipse_indices)
+    candidates = consecutive(arr=candidate_indices)
+
+    # Filter np.nan in candidates (delete starting/ending np.nans)
+    if include_nan:
+        candidates = filter_candidates_remove_nans(
+            candidates,
+            velocities,
+        )
 
     # Filter all candidates by minimum duration.
     candidates = [candidate for candidate in candidates if len(candidate) >= minimum_duration]

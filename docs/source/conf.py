@@ -137,10 +137,14 @@ html_theme_options = {
         },
     ],
     'logo': {
-        'image_light': 'logo.svg',
-        'image_dark': 'logo.svg',
+        'image_light': 'https://raw.githubusercontent.com/aeye-lab/pymovements/main/docs/source/_static/logo.svg',  # noqa: E501
+        'image_dark': 'https://raw.githubusercontent.com/aeye-lab/pymovements/main/docs/source/_static/logo.svg',  # noqa: E501
     },
 }
+
+# -- Options for juypter notebooks
+
+nbsphinx_execute = 'never'
 
 
 # -- Options for BibTeX ------------------------------------------------------

@@ -70,7 +70,7 @@ def step_function(
     ...     values=[1., 2., 3.],
     ...     start_value=0,
     ... )
-    array([0., 0., 1., 1., 1., 2., 2., 2., 2., 3.])
+    array([0., 0., 1., 1., 1., 2., 2., 2., 2., 3.], dtype=float32)
 
     >>> # multi-channel example
     >>> step_function(
@@ -88,7 +88,7 @@ def step_function(
            [ 3.,  4.],
            [ 3.,  4.],
            [ 3.,  4.],
-           [ 3.,  4.]])
+           [ 3.,  4.]], dtype=float32)
     """
     # Check that steps and values have equal length.
     if len(steps) != len(values):
@@ -135,6 +135,9 @@ def step_function(
         arr = np.ones(length) * start_value
     else:
         arr = np.tile(start_value, (length, 1))
+
+    # change type of elements to float32, to allow np.nan
+    arr = np.array(arr, dtype=np.float32)
 
     # Iterate through all steps except the last.
     for begin, end, value in zip(steps[:-1], steps[1:], values[:-1]):

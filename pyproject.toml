@@ -50,7 +50,7 @@ docs = [
   "pandoc",
   "pybtex",
   "pydata-sphinx-theme>=0.12",
-  "sphinx>=6.0.0",
+  "sphinx>=5.3.0",
   "sphinx-copybutton>=0.4.0",
   "sphinx_mdinclude>=0.5.0",
   "sphinxcontrib.datatemplates>=0.9.0",

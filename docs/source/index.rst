@@ -9,6 +9,6 @@ Welcome to the pymovements documentation!
    :maxdepth: 2
 
    getting-started
-   tutorial/index
+   tutorials/index
    reference/index
    bibliography
