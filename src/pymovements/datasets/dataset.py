@@ -600,7 +600,7 @@ class Dataset:
                 if column in self.fileinfo.columns:
                     event_df.drop(column)
 
-            if verbose > 2:
+            if verbose >= 2:
                 print('Save file to', events_filepath)
 
             events_filepath.parent.mkdir(parents=True, exist_ok=True)
@@ -633,7 +633,7 @@ class Dataset:
                 if column in self.fileinfo.columns:
                     gaze_df = gaze_df.drop(column)
 
-            if verbose > 2:
+            if verbose >= 2:
                 print('Save file to', preprocessed_filepath)
 
             preprocessed_filepath.parent.mkdir(parents=True, exist_ok=True)
