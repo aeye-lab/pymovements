@@ -575,13 +575,17 @@ def test_pos2vel_stepped_input_returns(params, expected_value):
         pytest.param(
             {'method': 'savitzky_golay', 'window_length': 7, 'polyorder': 2, 'sampling_rate': 1},
             np.concatenate([
-                np.array([[0.71428571, 0.71428571],
-                          [0.80952381, 0.80952381],
-                          [0.9047619, 0.9047619]]),
+                np.array([
+                    [0.71428571, 0.71428571],
+                    [0.80952381, 0.80952381],
+                    [0.9047619, 0.9047619],
+                ]),
                 np.ones((94, 2)),
-                np.array([[0.9047619, 0.9047619],
-                          [0.80952381, 0.80952381],
-                          [0.71428571, 0.71428571]]),
+                np.array([
+                    [0.9047619, 0.9047619],
+                    [0.80952381, 0.80952381],
+                    [0.71428571, 0.71428571],
+                ]),
             ]),
             id='method_savitzky_golay_linear_velocity_2d_input',
         ),
