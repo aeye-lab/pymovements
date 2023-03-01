@@ -66,6 +66,7 @@ cloned and installed with
 
 ```bash
 git clone https://github.com/aeye-lab/pymovements.git
+pip install --upgrade pip
 pip install -e ./pymovements
 ```
 
