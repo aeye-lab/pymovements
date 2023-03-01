@@ -307,6 +307,12 @@ def norm(arr: np.ndarray, axis: int | None = None) -> np.ndarray | Any:
     -------
     np.ndarray
 
+    Raises
+    ------
+    ValueError
+        If no axis is given but the array dimensions are lager than 3.
+        In that case the axis cannot be inferred.
+
     Examples
     --------
     >>> arr = np.array([[1., 1., 1., 1., 1., 1.], [1., 1., 1., 1., 1., 1.]])
