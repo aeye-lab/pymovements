@@ -377,11 +377,9 @@ class Dataset:
     def pix2deg(self, verbose: bool = True) -> None:
         """Compute gaze positions in degrees of visual angle from pixel coordinates.
 
-        This requires an experiment definition and also assumes that the columns 'x_left_pix',
-         'y_left_pix', 'x_right_pix' and 'y_right_pix' are available in the gaze dataframe.
+        This method requires a properly initialized :py:attr:`~.Dataset.experiment` attribute.
 
-        After success, the gaze dataframe is extended by the columns 'x_left_dva', 'y_left_dva',
-        'x_right_dva' and, 'y_right_dva'.
+        After success, the gaze dataframe is extended by the resulting dva columns.
 
         Parameters
         ----------
@@ -399,29 +397,29 @@ class Dataset:
 
         disable_progressbar = not verbose
 
-        for file_id, file_df in enumerate(tqdm(self.gaze, disable=disable_progressbar)):
-            pix_position_columns = ['x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix']
-            dva_position_columns = ['x_left_dva', 'y_left_dva', 'x_right_dva', 'y_right_dva']
+        pix_position_columns = self.pix_position_columns
+        dva_position_columns = self._pixel_to_dva_position_columns(pix_position_columns)
 
+        for file_id, file_df in enumerate(tqdm(self.gaze, disable=disable_progressbar)):
             pixel_positions = file_df.select(pix_position_columns)
 
             dva_positions = self.experiment.screen.pix2deg(  # type: ignore[union-attr]
                 pixel_positions.to_numpy(),
             )
 
-            for dva_column_id, dva_column_name in enumerate(dva_position_columns):
-                self.gaze[file_id] = self.gaze[file_id].with_columns(
-                    pl.Series(name=dva_column_name, values=dva_positions[:, dva_column_id]),
-                )
+            self.gaze[file_id] = self.gaze[file_id].with_columns(
+                [
+                    pl.Series(name=dva_column_name, values=dva_positions[:, dva_column_id])
+                    for dva_column_id, dva_column_name in enumerate(dva_position_columns)
+                ],
+            )
 
     def pos2vel(self, method: str = 'smooth', verbose: bool = True, **kwargs) -> None:
         """Compute gaze velocites in dva/s from dva coordinates.
 
-        This requires an experiment definition and also assumes that the columns 'x_left_dva',
-         'y_left_dva', 'x_right_dva' and 'y_right_dva' are available in the gaze dataframe.
+        This method requires a properly initialized :py:attr:`~.Dataset.experiment` attribute.
 
-        After success, the gaze dataframe is extended by the columns 'x_left_vel', 'y_left_vel',
-        'x_right_vel' and, 'y_right_vel'.
+        After success, the gaze dataframe is extended by the resulting velocity columns.
 
         Parameters
         ----------
@@ -443,6 +441,9 @@ class Dataset:
 
         disable_progressbar = not verbose
 
+        position_columns = self.dva_position_columns
+        velocity_columns = self._position_to_velocity_columns(position_columns)
+
         for file_id, file_df in enumerate(tqdm(self.gaze, disable=disable_progressbar)):
             position_columns = ['x_left_dva', 'y_left_dva', 'x_right_dva', 'y_right_dva']
             velocity_columns = ['x_left_vel', 'y_left_vel', 'x_right_vel', 'y_right_vel']
@@ -453,10 +454,12 @@ class Dataset:
                 positions.to_numpy(), method=method, **kwargs,
             )
 
-            for col_id, velocity_column_name in enumerate(velocity_columns):
-                self.gaze[file_id] = self.gaze[file_id].with_columns(
-                    pl.Series(name=velocity_column_name, values=velocities[:, col_id]),
-                )
+            self.gaze[file_id] = self.gaze[file_id].with_columns(
+                [
+                    pl.Series(name=velocity_column_name, values=velocities[:, column_id])
+                    for column_id, velocity_column_name in enumerate(velocity_columns)
+                ],
+            )
 
     def detect_events(
             self,
@@ -473,9 +476,9 @@ class Dataset:
         method : EventDetectionCallable
             The event detection method to be applied.
         eye : str
-            Select which eye to choose. Valid options are ``auto``, ``left`` or ``right``. If
-            ``auto`` is passed, ``left`` will only be chosen if the right eye is not available in
-            the gaze data frame.
+            Select which eye to choose. Valid options are ``auto``, ``left``, ``right`` or ``eye``.
+            If ``auto`` is passed, eye is inferred in the order ``['right', 'left', 'eye']`` from
+            the available :py:attr:`~.Dataset.gaze` dataframe columns.
         clear : bool
             If ``True``, event DataFrame will be overwritten with new DataFrame instead of being
              merged into the existing one.
@@ -497,6 +500,8 @@ class Dataset:
                 eye = 'right'
             elif 'x_left_dva' in self.gaze[0].columns:
                 eye = 'left'
+            elif 'x_eye_dva' in self.gaze[0].columns:
+                eye = 'eye'
             else:
                 raise AttributeError(
                     'Either right or left eye columns must be present in gaze data frame.'
@@ -505,6 +510,13 @@ class Dataset:
 
         position_columns = [f'x_{eye}_dva', f'y_{eye}_dva']
         velocity_columns = [f'x_{eye}_vel', f'y_{eye}_vel']
+
+        if not set(position_columns).issubset(set(self.gaze[0].columns)):
+            raise AttributeError(
+                f'{eye} eye specified but required columns are not available in gaze dataframe.'
+                f' required columns: {position_columns}'
+                f', available columns: {self.gaze[0].columns}',
+            )
 
         disable_progressbar = not verbose
 
@@ -760,6 +772,33 @@ class Dataset:
         """
         return self.path / self.raw_dirname
 
+    @property
+    def pix_position_columns(self) -> list[str]:
+        """Get pixel position columns for this dataset."""
+        pix_position_columns = [
+            'x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix', 'x_eye_pix', 'y_eye_pix',
+        ]
+        pix_position_columns = list(set(pix_position_columns) & set(self.gaze[0].columns))
+        return pix_position_columns
+
+    @property
+    def dva_position_columns(self) -> list[str]:
+        """Get dva position columns for this dataset."""
+        dva_position_columns = [
+            'x_left_dva', 'y_left_dva', 'x_right_dva', 'y_right_dva', 'x_eye_dva', 'y_eye_dva',
+        ]
+        dva_position_columns = list(set(dva_position_columns) & set(self.gaze[0].columns))
+        return dva_position_columns
+
+    @property
+    def velocity_columns(self) -> list[str]:
+        """Get velocity columns for this dataset."""
+        velocity_columns = [
+            'x_left_vel', 'y_left_vel', 'x_right_vel', 'y_right_vel', 'x_eye_vel', 'y_eye_vel',
+        ]
+        velocity_columns = list(set(velocity_columns) & set(self.gaze[0].columns))
+        return velocity_columns
+
     def _check_fileinfo(self) -> None:
         """Check if fileinfo attribute is set and there is at least one row present."""
         if self.fileinfo is None:
@@ -854,6 +893,22 @@ class Dataset:
         events_filename = raw_filepath.stem + '.feather'
 
         return events_file_dirpath / events_filename
+
+    def _pixel_to_dva_position_columns(self, columns: list[str]) -> list[str]:
+        """Get corresponding dva position columns from pixel position columns."""
+        return [
+            column.replace('_pix', '_dva')
+            for column in columns
+            if column.endswith('_pix')
+        ]
+
+    def _position_to_velocity_columns(self, columns: list[str]) -> list[str]:
+        """Get corresponding velocity columns from dva position columns."""
+        return [
+            column.replace('_dva', '_vel')
+            for column in columns
+            if column.endswith('_dva')
+        ]
 
     def _add_fileinfo(self, df: pl.DataFrame, fileinfo: dict[str, Any]) -> pl.DataFrame:
         """Add columns from fileinfo to dataframe.
