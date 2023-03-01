@@ -564,6 +564,35 @@ def test_detect_events_multiple_calls(
         assert result_event_df.schema == expected_schema
 
 
+def test_detect_events_attribute_error(dataset_configuration):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+
+    try:
+        dataset.gaze[0] = dataset.gaze[0].drop('x_left_dva')
+    except BaseException:
+        pass
+
+    try:
+        dataset.gaze[0] = dataset.gaze[0].drop('x_right_dva')
+    except BaseException:
+        pass
+
+    try:
+        dataset.gaze[0] = dataset.gaze[0].drop('x_eye_dva')
+    except BaseException:
+        pass
+
+    detect_event_kwargs = {
+        'method': microsaccades,
+        'threshold': 1,
+        'eye': 'auto',
+    }
+
+    with pytest.raises(AttributeError):
+        dataset.detect_events(**detect_event_kwargs)
+
+
 @pytest.mark.parametrize(
     'events_init, events_expected',
     [
