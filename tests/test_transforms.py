@@ -209,7 +209,7 @@ screen_cm_2d = [100, 100]
                 'screen_px': screen_px_2d,
                 'screen_cm': screen_px_2d,
                 'distance_cm': screen_cm_1d,
-                'origin': 'upper right',
+                'origin': 'invalid',
             },
             ValueError,
             id='invalid_origin_str_raises_value_error',
@@ -475,7 +475,7 @@ def test_pix2deg_returns(kwargs, expected_value):
                 'method': 'smooth',
             },
             ValueError,
-            id='wrong_dimensions_input_arr',
+            id='wrong_dimensions_input_arr_raises_value_error',
         ),
         pytest.param(
             {
@@ -484,7 +484,7 @@ def test_pix2deg_returns(kwargs, expected_value):
                 'kwargs': {},
             },
             ValueError,
-            id='kwargs_passed_but_method_not_savitzky_golay',
+            id='kwargs_passed_but_method_not_savitzky_golay_raises_value_error',
         ),
     ],
 )
@@ -591,7 +591,7 @@ def test_pos2vel_stepped_input_returns(params, expected_value):
         ),
     ],
 )
-def test_pos2vel_stepped_input_returns_savitzky_golay(params, expected_value):
+def test_pos2vel_2d_stepped_input_returns(params, expected_value):
     N = 100
     x = np.linspace(0, N - 2, N // 2)
     x = np.repeat(x, 4)
@@ -646,7 +646,7 @@ def test_norm(params, expected_value):
         pytest.param(
             {'arr': np.ones((2, 2, 5, 5)), 'axis': None},
             ValueError,
-            id='4_dim_array_no_axis_raises_exception',
+            id='4_dim_array_no_axis_raises_value_error',
         ),
     ],
 )
