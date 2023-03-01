@@ -104,10 +104,6 @@ def idt(
     if minimum_duration <= 0:
         raise ValueError('minimum duration must be greater than 0')
 
-    # check if np.nan is in data
-    if np.sum(np.isnan(positions)) > 0:
-        pass
-
     fixations = []
 
     # Initialize window over first points to cover the duration threshold

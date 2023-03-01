@@ -110,7 +110,7 @@ def ivt(
     # Filter all candidates by minimum duration.
     candidates = [candidate for candidate in candidates if len(candidate) >= minimum_duration]
 
-    # Create fixaitons from valid candidates. First channel is onset, second channel is offset.
+    # Create fixations from valid candidates. First channel is onset, second channel is offset.
     fixations = np.array([
         (candidate_indices[0], candidate_indices[-1])
         for candidate_indices in candidates
