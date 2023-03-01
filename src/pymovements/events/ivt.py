@@ -29,6 +29,7 @@ from pymovements.events.events import Fixation
 from pymovements.transforms import consecutive
 from pymovements.transforms import norm
 from pymovements.utils.checks import check_shapes_positions_velocities
+from pymovements.utils.filters import filter_candidates_remove_nans
 
 
 def ivt(
@@ -36,6 +37,7 @@ def ivt(
         velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         velocity_threshold: float,
         minimum_duration: int,
+        include_nan: bool = False,
 ) -> pl.DataFrame:
     """
     Identification of fixations based on velocity-threshold
@@ -58,6 +60,8 @@ def ivt(
         velocity is below the threshold, the point is classified as a fixation.
     minimum_duration: int
         Minimum fixation duration in number of samples
+    include_nan: bool
+        Indicator, whether we want to split events on missing/corrupt value (np.nan)
 
     Returns
     -------
@@ -84,23 +88,38 @@ def ivt(
 
     # Get all indices with norm-velocities below threshold.
     velocity_norm = norm(velocities, axis=1)
-    below_threshold_indices = np.where(velocity_norm < velocity_threshold)[0]
+    candidate_mask = velocity_norm < velocity_threshold
+
+    # Add nans to candidates if desired.
+    if include_nan:
+        candidate_mask = np.logical_or(candidate_mask, np.isnan(velocities).any(axis=1))
+
+    # Get indices of true values in candidate mask.
+    candidate_ind = np.where(candidate_mask)[0]
 
     # Get all fixation candidates by grouping all consecutive indices.
-    candidates = consecutive(arr=below_threshold_indices)
+    candidates = consecutive(arr=candidate_ind)
+
+    # Filter np.nan in candidates (delete starting/ending np.nans)
+    if include_nan:
+        candidates = filter_candidates_remove_nans(
+            candidates,
+            velocities,
+        )
 
     # Filter all candidates by minimum duration.
     candidates = [candidate for candidate in candidates if len(candidate) >= minimum_duration]
 
-    # Create ficaitons from valid candidates. First channel is onset, second channel is offset.
+    # Create fixations from valid candidates. First channel is onset, second channel is offset.
     fixations = np.array([
         (candidate_indices[0], candidate_indices[-1])
         for candidate_indices in candidates
     ])
 
     # Calculate centroid positions for fixations.
+    # the mean is computed using all values except np.nan
     centroids = [
-        np.mean(positions[fixation[0]:fixation[1]], axis=0, dtype=np.float64).tolist()
+        np.nanmean(positions[fixation[0]:fixation[1]], axis=0, dtype=np.float64).tolist()
         for fixation in fixations
     ]
 

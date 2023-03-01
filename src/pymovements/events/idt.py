@@ -27,6 +27,8 @@ import polars as pl
 
 from pymovements.events.events import Fixation
 from pymovements.utils.checks import check_shapes_positions_velocities
+from pymovements.utils.filters import events_split_nans
+from pymovements.utils.filters import filter_candidates_remove_nans
 
 
 def dispersion(positions: list[list[float]] | np.ndarray) -> float:
@@ -46,7 +48,7 @@ def dispersion(positions: list[list[float]] | np.ndarray) -> float:
     dispersion: float
         Dispersion of the group of points.
     """
-    return sum(np.max(positions, axis=0) - np.min(positions, axis=0))
+    return sum(np.nanmax(positions, axis=0) - np.nanmin(positions, axis=0))
 
 
 def idt(
@@ -54,6 +56,7 @@ def idt(
         velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         dispersion_threshold: float,
         minimum_duration: int,
+        include_nan: bool = False,
 ) -> pl.DataFrame:
     """
     Fixation identification based on dispersion threshold.
@@ -77,6 +80,8 @@ def idt(
         Threshold for dispersion for a group of consecutive samples to be identified as fixation
     minimum_duration: int
         Minimum fixation duration in number of samples
+    include_nan: bool
+        Indicator, whether we want to split events on missing/corrupt value (np.nan)
 
     Returns
     -------
@@ -120,15 +125,44 @@ def idt(
                 if win_end == len(positions):
                     break
 
-            # Note a fixation at the centroid of the window points.
-            centroid = np.mean(positions[win_start:win_end - 1], axis=0)
+            # check for np.nan values
+            if np.sum(np.isnan(positions[win_start:win_end - 1])) > 0:
+                tmp_candidates = [np.arange(win_start, win_end - 1, 1)]
+                tmp_candidates = filter_candidates_remove_nans(
+                    candidates=tmp_candidates,
+                    values=positions,
+                )
+                # split events if include_nan == False
+                if not include_nan:
+                    tmp_candidates = events_split_nans(
+                        candidates=tmp_candidates,
+                        values=positions,
+                    )
 
-            fixations.append({
-                'type': 'fixation',
-                'onset': win_start,
-                'offset': win_end - 1,
-                'position': centroid.tolist(),
-            })
+                # Filter all candidates by minimum duration.
+                tmp_candidates = [
+                    candidate for candidate in tmp_candidates if len(candidate) >= minimum_duration
+                ]
+
+                for candidate in tmp_candidates:
+                    fixations.append({
+                        'type': 'fixation',
+                        'onset': candidate[0],
+                        'offset': candidate[-1],
+                        'position': np.nanmean(positions[candidate], axis=0).tolist(),
+                    })
+
+            else:
+                # Note a fixation at the centroid of the window points.
+                # the mean is computed using all values except np.nan
+                centroid = np.nanmean(positions[win_start:win_end - 1], axis=0)
+
+                fixations.append({
+                    'type': 'fixation',
+                    'onset': win_start,
+                    'offset': win_end - 1,
+                    'position': centroid.tolist(),
+                })
 
             # Remove window points from points.
             # Initialize new window excluding the previous window
