@@ -22,3 +22,4 @@ from pymovements.datasets.dataset import Dataset  # noqa: F401
 from pymovements.datasets.gazebase import GazeBase  # noqa: F401
 from pymovements.datasets.judo1000 import JuDo1000  # noqa: F401
 from pymovements.datasets.public_dataset import PublicDataset  # noqa: F401
+from pymovements.datasets.toy_dataset import ToyDataset  # noqa: F401
