@@ -249,7 +249,7 @@ class Dataset:
             return fileinfo
 
         if not isinstance(subset, dict):
-            raise TypeError('subset must be of type dict but is of type {type(dict)}')
+            raise TypeError(f'subset must be of type dict but is of type {type(subset)}')
 
         for subset_key, subset_value in subset.items():
             if not isinstance(subset_key, str):
@@ -324,7 +324,7 @@ class Dataset:
             elif filepath.suffix == '.feather':
                 gaze_df = pl.read_ipc(filepath)
             else:
-                raise RuntimeError('data files of type {filepath.suffix} are not supported.')
+                raise RuntimeError(f'data files of type {filepath.suffix} are not supported')
 
             # Add fileinfo columns to dataframe.
             for column in self.fileinfo.columns[::-1]:
@@ -570,12 +570,7 @@ class Dataset:
         verbose : int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
         """
-        if verbose > 2:
-            print('save event files')
         self.save_events(events_dirname, verbose=verbose)
-
-        if verbose > 2:
-            print('save preprocessed gaze files')
         self.save_preprocessed(preprocessed_dirname, verbose=verbose)
 
     def save_events(self, events_dirname: str | None = None, verbose: int = 1):

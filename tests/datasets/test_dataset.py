@@ -74,13 +74,13 @@ def create_event_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):
         gaze_df.write_ipc(rootpath / filepath)
 
 
-def mock_toy(rootpath):
+def mock_toy(rootpath, raw_fileformat='csv'):
     subject_ids = list(range(1, 21))
 
     fileinfo = pl.DataFrame(data={'subject_id': subject_ids}, schema={'subject_id': pl.Int64})
 
     fileinfo = fileinfo.with_columns([
-        pl.format('{}.csv', 'subject_id').alias('filepath'),
+        pl.format('{}.' + raw_fileformat, 'subject_id').alias('filepath'),
     ])
 
     fileinfo = fileinfo.sort(by='filepath')
@@ -177,7 +177,7 @@ def mock_toy(rootpath):
                 origin='lower left',
                 sampling_rate=1000,
             ),
-            'filename_regex': r'(?P<subject_id>\d+).csv',
+            'filename_regex': r'(?P<subject_id>\d+).' + raw_fileformat,
             'filename_regex_dtypes': {'subject_id': pl.Int64},
         },
         'fileinfo': fileinfo,
@@ -192,7 +192,9 @@ def fixture_dataset(request, tmp_path):
     rootpath = tmp_path
 
     if request.param == 'Toy':
-        dataset_dict = mock_toy(rootpath)
+        dataset_dict = mock_toy(rootpath, raw_fileformat='csv')
+    elif request.param == 'ToyMat':
+        dataset_dict = mock_toy(rootpath, raw_fileformat='mat')
     else:
         raise ValueError(f'{request.param} not supported as dataset mock')
 
@@ -320,6 +322,20 @@ def test_load_exceptions(init_kwargs, load_kwargs, exception, dataset_configurat
 
     with pytest.raises(exception):
         dataset.load(**load_kwargs)
+
+
+@pytest.mark.parametrize(
+    'exception',
+    [
+        pytest.param(RuntimeError, id='matlab_dataset'),
+    ],
+)
+@pytest.mark.parametrize('dataset_configuration', ['ToyMat'], indirect=['dataset_configuration'])
+def test_load_mat_file_exception(exception, dataset_configuration):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+
+    with pytest.raises(exception):
+        dataset.load()
 
 
 def test_pix2deg(dataset_configuration):
