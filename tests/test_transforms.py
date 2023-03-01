@@ -23,10 +23,10 @@ Test all functions in pymovements.transforms.
 import numpy as np
 import pytest
 
+from pymovements.transforms import norm
 from pymovements.transforms import pix2deg
 from pymovements.transforms import pos2vel
 from pymovements.transforms import split
-
 
 n_coords = 100
 screen_px_1d = 100
@@ -184,8 +184,8 @@ screen_cm_2d = [100, 100]
         pytest.param(
             {
                 'arr': np.zeros((n_coords, 4)),
-                'screen_px': [1, 1, 1],
-                'screen_cm': [1, 1, 1],
+                'screen_px': screen_px_1d,
+                'screen_cm': screen_px_2d,
                 'distance_cm': screen_cm_1d,
                 'origin': 'center',
             },
@@ -195,8 +195,8 @@ screen_cm_2d = [100, 100]
         pytest.param(
             {
                 'arr': np.zeros((n_coords, 4)),
-                'screen_px': [1, 1],
-                'screen_cm': [1, 1, 1],
+                'screen_px': screen_px_2d,
+                'screen_cm': screen_cm_1d,
                 'distance_cm': screen_cm_1d,
                 'origin': 'center',
             },
@@ -206,8 +206,8 @@ screen_cm_2d = [100, 100]
         pytest.param(
             {
                 'arr': np.zeros((n_coords, 4)),
-                'screen_px': [1, 1],
-                'screen_cm': [1, 1],
+                'screen_px': screen_px_2d,
+                'screen_cm': screen_px_2d,
                 'distance_cm': screen_cm_1d,
                 'origin': 'upper right',
             },
@@ -402,7 +402,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
         ),
         pytest.param(
             {
-                'arr': np.array([[0, 0, 0, 0]] * n_coords),
+                'arr': np.array([[0.0, 0.0, 0.0, 0.0]] * n_coords),
                 'screen_px': screen_px_2d,
                 'screen_cm': screen_cm_2d,
                 'distance_cm': screen_cm_1d,
@@ -468,6 +468,23 @@ def test_pix2deg_returns(kwargs, expected_value):
             },
             ValueError,
             id='invalid_method_raises_value_error',
+        ),
+        pytest.param(
+            {
+                'arr': np.ones((3, 3, 3)),
+                'method': 'smooth',
+            },
+            ValueError,
+            id='wrong_dimensions_input_arr',
+        ),
+        pytest.param(
+            {
+                'arr': np.ones(10),
+                'method': 'smooth',
+                'kwargs': {},
+            },
+            ValueError,
+            id='kwargs_passed_but_method_not_savitzky_golay',
         ),
     ],
 )
@@ -550,6 +567,84 @@ def test_pos2vel_stepped_input_returns(params, expected_value):
 
     lpad, rpad = 1, -1
     assert np.allclose(actual_value[lpad:rpad], expected_value[lpad:rpad])
+
+
+@pytest.mark.parametrize(
+    'params, expected_value',
+    [
+        pytest.param(
+            {'method': 'savitzky_golay', 'window_length': 7, 'polyorder': 2, 'sampling_rate': 1},
+            np.concatenate([
+                np.array([[0.71428571, 0.71428571], [0.80952381, 0.80952381], [0.9047619, 0.9047619]]),
+                np.ones((94, 2)),
+                np.array([[0.9047619, 0.9047619], [0.80952381, 0.80952381], [0.71428571, 0.71428571]]),
+            ]),
+            id='method_savitzky_golay_linear_velocity_2d_input',
+        ),
+    ],
+)
+def test_pos2vel_stepped_input_returns_savitzky_golay(params, expected_value):
+    N = 100
+    x = np.linspace(0, N - 2, N // 2)
+    x = np.repeat(x, 4)
+    x = np.reshape(x, (100, 2))
+
+    actual_value = pos2vel(x, **params)
+
+    lpad, rpad = 1, -1
+    assert np.allclose(actual_value[lpad:rpad], expected_value[lpad:rpad])
+
+
+@pytest.mark.parametrize(
+    'params, expected_value',
+    [
+        pytest.param(
+            {'arr': np.ones((2, 2, 5)), 'axis': None},
+            np.array([
+                [1.41421356, 1.41421356, 1.41421356, 1.41421356, 1.41421356],
+                [1.41421356, 1.41421356, 1.41421356, 1.41421356, 1.41421356],
+            ]),
+            id='3_dim_array_no_axis',
+        ),
+        pytest.param(
+            {'arr': np.ones((2, 5)), 'axis': None},
+            np.array([[1.41421356, 1.41421356, 1.41421356, 1.41421356, 1.41421356]]),
+            id='2_dim_array_no_axis',
+        ),
+        pytest.param(
+            {'arr': np.ones((2, 2, 2, 2)), 'axis': 2},
+            np.array([
+                [
+                    [1.41421356, 1.41421356],
+                    [1.41421356, 1.41421356],
+                ],
+                [
+                    [1.41421356, 1.41421356],
+                    [1.41421356, 1.41421356],
+                ],
+            ]),
+            id='4_dim_array_with_axis',
+        ),
+    ],
+)
+def test_norm(params, expected_value):
+    actual_value = norm(**params)
+    assert np.allclose(actual_value, expected_value)
+
+
+@pytest.mark.parametrize(
+    'params, expected_error',
+    [
+        pytest.param(
+            {'arr': np.ones((2, 2, 5, 5)), 'axis': None},
+            ValueError,
+            id='4_dim_array_no_axis_raises_exception',
+        ),
+    ],
+)
+def test_norm_raises_exception(params, expected_error):
+    with pytest.raises(expected_error):
+        norm(**params)
 
 
 @pytest.mark.parametrize(

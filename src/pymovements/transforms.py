@@ -87,6 +87,22 @@ def pix2deg(
     ...    origin='center',
     ... )
     array([[ 3.07379946, 20.43909054]])
+
+    If the eye-movement of both eyes was recorded, the input array must contain
+    first the x- and y-coordinates of one eye and then the x- and y-coordinates
+    of the other eye as shown in the example below.
+
+    >>> x_left, y_left = 123.0, 865.0
+    >>> x_right, y_right = 183.0, 865.0
+    >>> arr = [(x_left, y_left, x_right, y_right)]
+    >>> pix2deg(
+    ...    arr=arr,
+    ...    screen_px=(1280, 1024),
+    ...    screen_cm=(38.0, 30.0),
+    ...    distance_cm=68.0,
+    ...    origin='center',
+    ... )
+    array([[ 3.07379946, 20.43909054,  4.56790364, 20.43909054]])
     """
     if arr is None:
         raise TypeError('arr must not be None')
@@ -308,6 +324,14 @@ def norm(arr: np.ndarray, axis: int | None = None) -> np.ndarray | Any:
         # shape is assumed to be (n_batches, 2, sequence_length)
         elif arr.ndim == 3:
             axis = 1
+
+        else:
+            raise ValueError(
+                f'Axis can not be inferred in case of more than 3 '
+                f'input array dimensions (arr.shape={arr.shape}).'
+                f' Either reduce the number of input array '
+                f'dimensions or specify `axis` explicitly.',
+            )
 
     return np.linalg.norm(arr, axis=axis)
 
