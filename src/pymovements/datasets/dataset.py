@@ -118,6 +118,8 @@ class Dataset:
             events: bool = False,
             preprocessed: bool = False,
             subset: None | dict[str, float | int | str | list[float | int | str]] = None,
+            events_dirname: str | None = None,
+            preprocessed_dirname: str | None = None,
     ):
         """Parse file information and load all gaze files.
 
@@ -131,16 +133,28 @@ class Dataset:
             If specified, load only a subset of the dataset. All keys in the dictionary must be
             present in the fileinfo dataframe inferred by `infer_fileinfo()`. Values can be either
             float, int , str or a list of these.
+        events_dirname : str
+            One-time usage of an alternative directory name to save data relative to
+            :py:meth:`pymovements.Dataset.path`.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.events_rootpath`.
+        preprocessed_dirname : str
+            One-time usage of an alternative directory name to save data relative to
+            :py:meth:`pymovements.Dataset.path`.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
 
         The parsed file information is assigned to the `fileinfo` attribute.
         All gaze files will be loaded as dataframes and assigned to the `gaze` attribute.
         """
         fileinfo = self.infer_fileinfo()
         self.fileinfo = self.take_subset(fileinfo=fileinfo, subset=subset)
-        self.gaze = self.load_gaze_files(preprocessed=preprocessed)
+        self.gaze = self.load_gaze_files(
+            preprocessed=preprocessed, preprocessed_dirname=preprocessed_dirname,
+        )
 
         if events:
-            self.events = self.load_event_files()
+            self.events = self.load_event_files(events_dirname=events_dirname)
 
     def infer_fileinfo(self) -> pl.DataFrame:
         """Infer information from filepaths and filenames.
@@ -263,13 +277,22 @@ class Dataset:
             fileinfo = fileinfo.filter(pl.col(subset_key).is_in(column_values))
         return fileinfo
 
-    def load_gaze_files(self, preprocessed: bool = False) -> list[pl.DataFrame]:
+    def load_gaze_files(
+            self,
+            preprocessed: bool = False,
+            preprocessed_dirname: str | None = None,
+    ) -> list[pl.DataFrame]:
         """Load all available gaze data files.
 
         Parameters
         ----------
         preprocessed : bool
             If ``True``, saved preprocessed data will be loaded, otherwise raw data will be loaded.
+        preprocessed_dirname : str
+            One-time usage of an alternative directory name to save data relative to
+            :py:meth:`pymovements.Dataset.path`.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
 
         Returns
         -------
@@ -292,7 +315,9 @@ class Dataset:
             filepath = self.raw_rootpath / filepath
 
             if preprocessed:
-                filepath = self._raw_to_preprocessed_filepath(filepath)
+                filepath = self._raw_to_preprocessed_filepath(
+                    filepath, preprocessed_dirname=preprocessed_dirname,
+                )
 
             if filepath.suffix == '.csv':
                 gaze_df = pl.read_csv(filepath, **self._custom_read_kwargs)
@@ -322,8 +347,16 @@ class Dataset:
 
         return gaze_dfs
 
-    def load_event_files(self) -> list[pl.DataFrame]:
+    def load_event_files(self, events_dirname: str | None = None) -> list[pl.DataFrame]:
         """Load all available event files.
+
+        Parameters
+        ----------
+        events_dirname : str
+            One-time usage of an alternative directory name to save data relative to
+            :py:meth:`pymovements.Dataset.path`.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.events_rootpath`.
 
         Returns
         -------
@@ -343,7 +376,7 @@ class Dataset:
         for _, filepath in enumerate(tqdm(self.fileinfo['filepath'])):
             filepath = self.raw_rootpath / Path(filepath)
 
-            filepath = self._raw_to_event_filepath(filepath)
+            filepath = self._raw_to_event_filepath(filepath, events_dirname=events_dirname)
 
             file_df = pl.read_ipc(filepath)
 
@@ -513,7 +546,12 @@ class Dataset:
         for file_id, _ in enumerate(self.events):
             self.events[file_id] = pl.DataFrame(schema=Event.schema)
 
-    def save(self, verbose: int = 1):
+    def save(
+            self,
+            events_dirname: str | None = None,
+            preprocessed_dirname: str | None = None,
+            verbose: int = 1,
+    ):
         """Save preprocessed gaze and event files.
 
         Data will be saved as feather files to ``Dataset.preprocessed_roothpath`` or
@@ -521,18 +559,26 @@ class Dataset:
 
         Parameters
         ----------
+        events_dirname : str
+            One-time usage of an alternative directory name to save data relative to dataset path.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.events_rootpath`.
+        preprocessed_dirname : str
+            One-time usage of an alternative directory name to save data relative to dataset path.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
         verbose : int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
         """
         if verbose > 2:
-            print('save preprocessed gaze files')
-        self.save_preprocessed(verbose=verbose)
+            print('save event files')
+        self.save_events(events_dirname, verbose=verbose)
 
         if verbose > 2:
-            print('save event files')
-        self.save_events(verbose=verbose)
+            print('save preprocessed gaze files')
+        self.save_preprocessed(preprocessed_dirname, verbose=verbose)
 
-    def save_events(self, verbose: int = 1):
+    def save_events(self, events_dirname: str | None = None, verbose: int = 1):
         """Save events to files.
 
         Data will be saved as feather files to ``Dataset.events_roothpath`` with the same directory
@@ -540,14 +586,20 @@ class Dataset:
 
         Parameters
         ----------
+        events_dirname : str
+            One-time usage of an alternative directory name to save data relative to dataset path.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.events_rootpath`.
         verbose : int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
         """
         disable_progressbar = not verbose
 
         for file_id, event_df in enumerate(tqdm(self.events, disable=disable_progressbar)):
-            raw_filepath = Path(self.fileinfo[file_id, 'filepath'])
-            events_filepath = self._raw_to_event_filepath(raw_filepath)
+            raw_filepath = self.raw_rootpath / Path(self.fileinfo[file_id, 'filepath'])
+            events_filepath = self._raw_to_event_filepath(
+                raw_filepath, events_dirname=events_dirname,
+            )
 
             for column in event_df.columns:
                 if column in self.fileinfo.columns:
@@ -559,7 +611,7 @@ class Dataset:
             events_filepath.parent.mkdir(parents=True, exist_ok=True)
             event_df.write_ipc(events_filepath)
 
-    def save_preprocessed(self, verbose: int = 1):
+    def save_preprocessed(self, preprocessed_dirname: str | None = None, verbose: int = 1):
         """Save preprocessed gaze files.
 
         Data will be saved as feather files to ``Dataset.preprocessed_roothpath`` with the same
@@ -567,14 +619,20 @@ class Dataset:
 
         Parameters
         ----------
+        preprocessed_dirname : str
+            One-time usage of an alternative directory name to save data relative to dataset path.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
         verbose : int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
         """
         disable_progressbar = not verbose
 
         for file_id, gaze_df in enumerate(tqdm(self.gaze, disable=disable_progressbar)):
-            raw_filepath = Path(self.fileinfo[file_id, 'filepath'])
-            preprocessed_filepath = self._raw_to_preprocessed_filepath(raw_filepath)
+            raw_filepath = self.raw_rootpath / Path(self.fileinfo[file_id, 'filepath'])
+            preprocessed_filepath = self._raw_to_preprocessed_filepath(
+                raw_filepath, preprocessed_dirname=preprocessed_dirname,
+            )
 
             for column in gaze_df.columns:
                 if column in self.fileinfo.columns:
@@ -734,7 +792,11 @@ class Dataset:
         if self.experiment is None:
             raise AttributeError('experiment must be specified for this method to work.')
 
-    def _raw_to_preprocessed_filepath(self, raw_filepath: Path) -> Path:
+    def _raw_to_preprocessed_filepath(
+            self,
+            raw_filepath: Path,
+            preprocessed_dirname: str | None = None,
+    ) -> Path:
         """Get preprocessed filepath in accordance to filepath of the raw file.
 
         The preprocessed filepath will point to a feather file.
@@ -743,6 +805,11 @@ class Dataset:
         ----------
         raw_filepath : Path
             The Path to the raw file.
+        preprocessed_dirname : str
+            One-time usage of an alternative directory name to save data relative to
+            :py:meth:`pymovements.Dataset.path`.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
 
         Returns
         -------
@@ -752,14 +819,19 @@ class Dataset:
         relative_raw_dirpath = raw_filepath.parent
         relative_raw_dirpath = relative_raw_dirpath.relative_to(self.raw_rootpath)
 
-        preprocessed_file_dirpath = self.preprocessed_rootpath / relative_raw_dirpath
+        if preprocessed_dirname is None:
+            preprocessed_rootpath = self.preprocessed_rootpath
+        else:
+            preprocessed_rootpath = self.path / preprocessed_dirname
+
+        preprocessed_file_dirpath = preprocessed_rootpath / relative_raw_dirpath
 
         # Get new filename for saved feather file.
         preprocessed_filename = raw_filepath.stem + '.feather'
 
         return preprocessed_file_dirpath / preprocessed_filename
 
-    def _raw_to_event_filepath(self, raw_filepath: Path) -> Path:
+    def _raw_to_event_filepath(self, raw_filepath: Path, events_dirname: str | None = None) -> Path:
         """Get event filepath in accordance to filepath of the raw file.
 
         The event filepath will point to a feather file.
@@ -768,6 +840,11 @@ class Dataset:
         ----------
         raw_filepath : Path
             The Path to the raw file.
+        events_dirname : str
+            One-time usage of an alternative directory name to save data relative to
+            :py:meth:`pymovements.Dataset.path`.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.events_rootpath`.
 
         Returns
         -------
@@ -777,7 +854,12 @@ class Dataset:
         relative_raw_dirpath = raw_filepath.parent
         relative_raw_dirpath = relative_raw_dirpath.relative_to(self.raw_rootpath)
 
-        events_file_dirpath = self.events_rootpath / relative_raw_dirpath
+        if events_dirname is None:
+            events_rootpath = self.events_rootpath
+        else:
+            events_rootpath = self.path / events_dirname
+
+        events_file_dirpath = events_rootpath / relative_raw_dirpath
 
         # Get new filename for saved feather file.
         events_filename = raw_filepath.stem + '.feather'
