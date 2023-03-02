@@ -94,9 +94,9 @@ def fixture_archive(request, tmp_path):
 
     # write tmp filepath
     filepath = rootpath / 'test.file'
-    if extension in ['zip', 'tar']:
+    if extension in {'zip', 'tar'}:
         filepath.write_text('test')
-    if compression in ['bz2', 'xz', 'tbz', 'tbz2', 'tgz', 'gz'] and extension is None:
+    if compression in {'bz2', 'xz', 'tbz', 'tbz2', 'tgz', 'gz'} and extension is None:
         filepath.write_bytes(b'test')
 
     # declare archive path
@@ -125,11 +125,11 @@ def fixture_archive(request, tmp_path):
 
     elif (
         (compression is not None and extension == 'tar') or
-        (compression in ['tbz', 'tbz2', 'tgz'])
+        (compression in {'tbz', 'tbz2', 'tgz'})
     ):
-        if compression in ['tbz', 'tbz2']:
+        if compression in {'tbz', 'tbz2'}:
             compression = 'bz2'
-        if compression in ['tgz']:
+        if compression in {'tgz'}:
             compression = 'gz'
         with tarfile.TarFile.open(archive_path, f'w:{compression}') as fp:
             fp.add(filepath)
