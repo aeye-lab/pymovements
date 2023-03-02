@@ -157,11 +157,12 @@ def mock_toy(rootpath, raw_fileformat='csv'):
     for fileinfo_row in fileinfo.to_dicts():
         event_df = pl.from_dict(
             {
+                'subject_id': fileinfo_row['subject_id'],
                 'type': 'saccade',
                 'onset': np.arange(0, 901, 100),
                 'offset': np.arange(10, 911, 100),
             },
-            schema={'type': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64},
+            schema={'subject_id': pl.Int64, 'type': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64},
         )
         event_dfs.append(event_df)
 
@@ -417,8 +418,9 @@ def test_detect_events(detect_event_kwargs, dataset_configuration):
     dataset.pos2vel()
     dataset.detect_events(**detect_event_kwargs)
 
+    expected_schema = {'subject_id': pl.Int64, **Saccade.schema}
     for result_event_df in dataset.events:
-        assert result_event_df.schema == Saccade.schema
+        assert result_event_df.schema == expected_schema
 
 
 @pytest.mark.parametrize(
@@ -435,7 +437,7 @@ def test_detect_events(detect_event_kwargs, dataset_configuration):
                 'threshold': 1,
                 'eye': 'auto',
             },
-            Saccade.schema,
+            {'subject_id': pl.Int64, **Saccade.schema},
             id='two-saccade-runs',
         ),
         pytest.param(
@@ -449,7 +451,7 @@ def test_detect_events(detect_event_kwargs, dataset_configuration):
                 'velocity_threshold': 1,
                 'minimum_duration': 1,
             },
-            {**Saccade.schema, **Fixation.schema},
+            {'subject_id': pl.Int64, **Saccade.schema, **Fixation.schema},
             id='one-saccade-one-fixation-run',
         ),
     ],
