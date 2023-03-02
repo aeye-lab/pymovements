@@ -33,18 +33,24 @@ from pymovements.utils.checks import check_shapes_positions_velocities
     [
         pytest.param(5, None, '', id='non_zero_single_variable_raises_no_error'),
         pytest.param(
-            0, ValueError,
-            'variable must not be zero', id='zero_single_variable_raises_value_error',
+            0,
+            ValueError,
+            'variable must not be zero',
+            id='zero_single_variable_raises_value_error',
         ),
         pytest.param([1, 2, 3], None, '', id='non_zero_list_raises_no_error'),
         pytest.param(
-            [1, 0, 3], ValueError,
-            'each component in variable must not be zero', id='zero_list_raises_value_error',
+            [1, 0, 3],
+            ValueError,
+            'each component in variable must not be zero',
+            id='zero_list_raises_value_error',
         ),
         pytest.param(np.array([1, 2, 3]), None, '', id='non_zero_np_array_raises_no_error'),
         pytest.param(
-            np.array([1, 0, 3]), ValueError,
-            'each component in variable must not be zero', id='zero_np_array_raises_value_error',
+            np.array([1, 0, 3]),
+            ValueError,
+            'each component in variable must not be zero',
+            id='zero_np_array_raises_value_error',
         ),
     ],
 )
