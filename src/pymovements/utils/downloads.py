@@ -34,13 +34,13 @@ USER_AGENT: str = 'aeye-lab/pymovements'
 
 
 def download_and_extract_archive(
-    url: str,
-    download_dirpath: Path,
-    download_filename: str,
-    extract_dirpath: Path | None = None,
-    md5: str | None = None,
-    recursive: bool = True,
-    remove_finished: bool = False,
+        url: str,
+        download_dirpath: Path,
+        download_filename: str,
+        extract_dirpath: Path | None = None,
+        md5: str | None = None,
+        recursive: bool = True,
+        remove_finished: bool = False,
 ) -> None:
     """Download and extract archive file.
 
@@ -87,11 +87,11 @@ def download_and_extract_archive(
 
 
 def download_file(
-    url: str,
-    dirpath: Path,
-    filename: str,
-    md5: str | None = None,
-    max_redirect_hops: int = 3,
+        url: str,
+        dirpath: Path,
+        filename: str,
+        md5: str | None = None,
+        max_redirect_hops: int = 3,
 ) -> Path:
     """Download a file from a URL and place it in root.
 
@@ -153,10 +153,7 @@ def download_file(
     return filepath
 
 
-def _get_redirected_url(
-    url: str,
-    max_hops: int = 3,
-) -> str:
+def _get_redirected_url(url: str, max_hops: int = 3) -> str:
     """Get redirected URL.
 
     Parameters
@@ -215,10 +212,7 @@ class _DownloadProgressBar(tqdm):
         return self.update(b * bsize - self.n)  # also sets self.n = b * bsize
 
 
-def _download_url(
-    url: str,
-    destination: Path,
-):
+def _download_url(url: str, destination: Path):
     """Download file from URL and save to destination.
 
     Parameters
@@ -233,10 +227,7 @@ def _download_url(
         t.total = t.n
 
 
-def _check_integrity(
-    filepath: Path,
-    md5: str | None = None,
-) -> bool:
+def _check_integrity(filepath: Path, md5: str | None = None) -> bool:
     """Check file integrity by MD5 checksum.
 
     Parameters
@@ -261,10 +252,7 @@ def _check_integrity(
     return file_md5 == md5
 
 
-def _calculate_md5(
-    filepath: Path,
-    chunk_size: int = 1024 * 1024,
-) -> str:
+def _calculate_md5(filepath: Path, chunk_size: int = 1024 * 1024) -> str:
     """Calculate MD5 checksum.
 
     Parameters
