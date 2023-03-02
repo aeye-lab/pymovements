@@ -169,6 +169,20 @@ def test_microsaccades_raises_error(kwargs, expected):
             ),
             id='three_saccades_nan_delete_ending_leading_nan',
         ),
+        pytest.param(
+            {
+                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
+                'velocities': step_function(
+                    length=100,
+                    steps=[40, 50],
+                    values=[(9, 9), (0, 0)],
+                    start_value=(0, 0),
+                ),
+                'threshold': 'std',
+            },
+            pl.DataFrame(schema=Saccade.schema),
+            id='string_based_threshold',
+        ),
     ],
 )
 def test_microsaccades_detects_saccades(kwargs, expected):
@@ -215,7 +229,6 @@ def test_compute_threshold(params, expected):
     if 'exception' in expected:
         with pytest.raises(expected['exception']):
             compute_threshold(arr=v, **params)
-        return
-
-    result = compute_threshold(arr=v, **params)
-    assert np.allclose(result, expected['value'])
+    else:
+        result = compute_threshold(arr=v, **params)
+        assert np.allclose(result, expected['value'])
