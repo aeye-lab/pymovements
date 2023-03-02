@@ -65,6 +65,16 @@ from pymovements.utils.filters import filter_candidates_remove_nans
             {'values_split': [np.array([0, 1, 2]), np.array([5, 6, 7])]},
             id='test_events_split',
         ),
+        pytest.param(
+            {'candidates': [[]], 'values': np.array([(0, 0)])},
+            {'values_filter': []},
+            id='test_no_candidates_in_array',
+        ),
+        pytest.param(
+            {'candidates': [[]], 'values': np.array([(np.nan, np.nan)])},
+            {'values_split': []},
+            id='test_no_candidates_in_array_nan',
+        ),
     ],
 )
 def test_filters(params, expected):
