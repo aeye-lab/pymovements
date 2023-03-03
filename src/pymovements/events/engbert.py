@@ -27,7 +27,7 @@ from collections.abc import Sized
 import numpy as np
 import polars as pl
 
-from pymovements.events.events import Saccade
+from pymovements.events.events import EventDataFrame
 from pymovements.transforms import consecutive
 from pymovements.utils.checks import check_shapes_positions_velocities
 from pymovements.utils.filters import filter_candidates_remove_nans
@@ -126,27 +126,13 @@ def microsaccades(
     # Filter all candidates by minimum duration.
     candidates = [candidate for candidate in candidates if len(candidate) >= minimum_duration]
 
-    # Create saccades from valid candidates. First channel is onset, second channel is offset.
-    saccades = np.array([
-        (candidate_indices[0], candidate_indices[-1])
-        for candidate_indices in candidates
-    ])
+    # Onset of each event candidate is first index in candidate indices.
+    onsets = [candidate_indices[0] for candidate_indices in candidates]
+    # Offset of each event candidate is last event in candidate indices.
+    offsets = [candidate_indices[-1] for candidate_indices in candidates]
 
-    if len(saccades) > 0:
-        # Create event dataframe.
-        event_df = pl.from_dict(
-            {
-                'type': 'saccade',
-                'onset': saccades[:, 0].tolist(),
-                'offset': saccades[:, 1].tolist(),
-            },
-            schema=Saccade.schema,
-        )
-
-    else:
-        # Create empty dataframe with correct schema if no events detected.
-        event_df = pl.DataFrame(schema=Saccade.schema)
-
+    # Create event dataframe from onsets and offsets.
+    event_df = EventDataFrame(name='saccade', onsets=onsets, offsets=offsets)
     return event_df
 
 

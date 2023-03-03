@@ -23,9 +23,8 @@ This module holds the implementation of the ivt algorithm.
 from __future__ import annotations
 
 import numpy as np
-import polars as pl
 
-from pymovements.events.events import Fixation
+from pymovements.events.events import EventDataFrame
 from pymovements.transforms import consecutive
 from pymovements.transforms import norm
 from pymovements.utils.checks import check_shapes_positions_velocities
@@ -38,7 +37,7 @@ def ivt(
         velocity_threshold: float,
         minimum_duration: int,
         include_nan: bool = False,
-) -> pl.DataFrame:
+) -> EventDataFrame:
     """
     Identification of fixations based on velocity-threshold
 
@@ -110,33 +109,11 @@ def ivt(
     # Filter all candidates by minimum duration.
     candidates = [candidate for candidate in candidates if len(candidate) >= minimum_duration]
 
-    # Create fixations from valid candidates. First channel is onset, second channel is offset.
-    fixations = np.array([
-        (candidate_indices[0], candidate_indices[-1])
-        for candidate_indices in candidates
-    ])
+    # Onset of each event candidate is first index in candidate indices.
+    onsets = [candidate_indices[0] for candidate_indices in candidates]
+    # Offset of each event candidate is last event in candidate indices.
+    offsets = [candidate_indices[-1] for candidate_indices in candidates]
 
-    # Calculate centroid positions for fixations.
-    # the mean is computed using all values except np.nan
-    centroids = [
-        np.nanmean(positions[fixation[0]:fixation[1]], axis=0, dtype=np.float64).tolist()
-        for fixation in fixations
-    ]
-
-    if len(fixations) > 0:
-        # Create event dataframe.
-        event_df = pl.from_dict(
-            {
-                'type': 'fixation',
-                'onset': fixations[:, 0].tolist(),
-                'offset': fixations[:, 1].tolist(),
-                'position': centroids,
-            },
-            schema=Fixation.schema,
-        )
-
-    else:
-        # Create empty dataframe with correct schema if no events detected.
-        event_df = pl.DataFrame(schema=Fixation.schema)
-
+    # Create event dataframe from onsets and offsets.
+    event_df = EventDataFrame(name='fixation', onsets=onsets, offsets=offsets)
     return event_df

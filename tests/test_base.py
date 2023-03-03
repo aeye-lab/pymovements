@@ -20,30 +20,40 @@
 """
 Test pymovements base classes.
 """
+import polars as pl
+import pytest
+
+from pymovements.base import DataFrame
 
 
-def test_screen_attributes():
-    """Test correct attribute saving."""
-    return
+def test_dataframe_is_polars_dataframe():
+    assert issubclass(DataFrame, pl.DataFrame)
 
 
-def test_screen_attribute_exceptions():
-    """Test correct exception raising for initialization parameters."""
-    return
+def test_dataframe_does_not_override_method():
+    expected_msg_substrings = (
+        'InvalidDataFrame', 'must not override', 'DataFrame', 'method', 'apply',
+    )
+
+    with pytest.raises(Exception) as excinfo:
+        class InvalidDataFrame(DataFrame):  # pylint: disable=unused-variable
+            def apply(self):  # pylint: disable=arguments-differ
+                pass
+
+    msg, = excinfo.value.args
+    for msg_substring in expected_msg_substrings:
+        assert msg_substring in msg
 
 
-# use three fixtures (single tuple, list of lists, np.array)
-def test_screen_pix2deg_equals_transforms_pix2deg():
-    """Test output from Screen.pix2deg equals transforms.pix2deg"""
-    return
+def test_dataframe_does_not_override_attribute():
+    expected_msg_substrings = (
+        'InvalidDataFrame', 'must not override', 'DataFrame', 'attribute', '_accessors',
+    )
 
+    with pytest.raises(Exception) as excinfo:
+        class InvalidDataFrame(DataFrame):  # pylint: disable=unused-variable
+            _accessors = None
 
-# use three fixtures (single float, list of floats, np.array)
-def test_screen_pix2deg_dimension_exception():
-    """Test if ValueError on 1-dimensional data is being raised."""
-    return
-
-
-def test_experiment_attributes():
-    """Test correct attribute saving."""
-    return
+    msg, = excinfo.value.args
+    for msg_substring in expected_msg_substrings:
+        assert msg_substring in msg
