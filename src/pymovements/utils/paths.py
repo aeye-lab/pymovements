@@ -84,7 +84,7 @@ def match_filepaths(
         regex: re.Pattern,
         relative: bool = True,
         relative_anchor: Path | None = None,
-):
+) -> list[dict[str, str]]:
     """Traverse path and match regular expression.
 
     Parameters
@@ -103,10 +103,15 @@ def match_filepaths(
     -------
     list[dict[str, str]]
         Each entry contains the match group dictionary of the regular expression.
+
+    Raises
+    ------
+    ValueError
+        If ``path`` does not point to a directory.
     """
     path = Path(path)
     if not path.is_dir():
-        return []
+        raise ValueError(f'path must point to a directory, but points to a file (path = {path})')
 
     if relative and relative_anchor is None:
         relative_anchor = path
