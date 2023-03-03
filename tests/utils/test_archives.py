@@ -29,6 +29,7 @@ import zipfile
 
 import pytest
 
+from pymovements.utils.archives import _decompress
 from pymovements.utils.archives import _ZIP_COMPRESSION_MAP
 from pymovements.utils.archives import extract_archive
 
@@ -281,3 +282,10 @@ def test_extract_unnsupported_archive_destination_path_not_None(
     msg, = excinfo.value.args
     assert msg == """Unsupported archive type: '.jpg'.
 Supported suffixes are: '['.tar', '.zip']'."""
+
+
+def test_decompress_unknown_compression_suffix():
+    with pytest.raises(RuntimeError) as excinfo:
+        _decompress(pathlib.Path('test.zip.zip'))
+    msg, = excinfo.value.args
+    assert msg == "Couldn't detect a compression from suffix .zip."
