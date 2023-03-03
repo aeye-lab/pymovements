@@ -19,6 +19,7 @@
 # SOFTWARE.
 """Test all functionality in pymovements.datasets.dataset."""
 import shutil
+import unittest
 from pathlib import Path
 
 import numpy as np
@@ -76,7 +77,7 @@ def create_event_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):
         gaze_df.write_ipc(rootpath / filepath)
 
 
-def mock_toy(rootpath, raw_fileformat='csv'):
+def mock_toy(rootpath, raw_fileformat, eyes):
     subject_ids = list(range(1, 21))
 
     fileinfo = pl.DataFrame(data={'subject_id': subject_ids}, schema={'subject_id': pl.Int64})
@@ -89,24 +90,73 @@ def mock_toy(rootpath, raw_fileformat='csv'):
 
     gaze_dfs = []
     for fileinfo_row in fileinfo.to_dicts():
-        gaze_df = pl.from_dict(
-            {
-                'subject_id': fileinfo_row['subject_id'],
-                'time': np.arange(1000),
-                'x_left_pix': np.zeros(1000),
-                'y_left_pix': np.zeros(1000),
-                'x_right_pix': np.zeros(1000),
-                'y_right_pix': np.zeros(1000),
-            },
-            schema={
-                'subject_id': pl.Int64,
-                'time': pl.Int64,
-                'x_left_pix': pl.Float64,
-                'y_left_pix': pl.Float64,
-                'x_right_pix': pl.Float64,
-                'y_right_pix': pl.Float64,
-            },
-        )
+        if eyes == 'both':
+            gaze_df = pl.from_dict(
+                {
+                    'subject_id': fileinfo_row['subject_id'],
+                    'time': np.arange(1000),
+                    'x_left_pix': np.zeros(1000),
+                    'y_left_pix': np.zeros(1000),
+                    'x_right_pix': np.zeros(1000),
+                    'y_right_pix': np.zeros(1000),
+                },
+                schema={
+                    'subject_id': pl.Int64,
+                    'time': pl.Int64,
+                    'x_left_pix': pl.Float64,
+                    'y_left_pix': pl.Float64,
+                    'x_right_pix': pl.Float64,
+                    'y_right_pix': pl.Float64,
+                },
+            )
+        elif eyes == 'left':
+            gaze_df = pl.from_dict(
+                {
+                    'subject_id': fileinfo_row['subject_id'],
+                    'time': np.arange(1000),
+                    'x_left_pix': np.zeros(1000),
+                    'y_left_pix': np.zeros(1000),
+                },
+                schema={
+                    'subject_id': pl.Int64,
+                    'time': pl.Int64,
+                    'x_left_pix': pl.Float64,
+                    'y_left_pix': pl.Float64,
+                },
+            )
+        elif eyes == 'right':
+            gaze_df = pl.from_dict(
+                {
+                    'subject_id': fileinfo_row['subject_id'],
+                    'time': np.arange(1000),
+                    'x_right_pix': np.zeros(1000),
+                    'y_right_pix': np.zeros(1000),
+                },
+                schema={
+                    'subject_id': pl.Int64,
+                    'time': pl.Int64,
+                    'x_right_pix': pl.Float64,
+                    'y_right_pix': pl.Float64,
+                },
+            )
+        elif eyes == 'eye':
+            gaze_df = pl.from_dict(
+                {
+                    'subject_id': fileinfo_row['subject_id'],
+                    'time': np.arange(1000),
+                    'x_eye_pix': np.zeros(1000),
+                    'y_eye_pix': np.zeros(1000),
+                },
+                schema={
+                    'subject_id': pl.Int64,
+                    'time': pl.Int64,
+                    'x_eye_pix': pl.Float64,
+                    'y_eye_pix': pl.Float64,
+                },
+            )
+        else:
+            raise ValueError(f'invalid value for eyes: {eyes}')
+
         gaze_dfs.append(gaze_df)
 
     create_raw_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath / 'raw')
@@ -187,17 +237,24 @@ def mock_toy(rootpath, raw_fileformat='csv'):
         'raw_gaze_dfs': gaze_dfs,
         'preprocessed_gaze_dfs': preprocessed_gaze_dfs,
         'event_dfs': event_dfs,
+        'eyes': eyes,
     }
 
 
-@pytest.fixture(name='dataset_configuration', params=['Toy'])
+@pytest.fixture(name='dataset_configuration', params=['ToyMono', 'ToyBino', 'ToyLeft', 'ToyRight'])
 def fixture_dataset(request, tmp_path):
     rootpath = tmp_path
 
-    if request.param == 'Toy':
-        dataset_dict = mock_toy(rootpath, raw_fileformat='csv')
+    if request.param == 'ToyBino':
+        dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='both')
+    elif request.param == 'ToyMono':
+        dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='eye')
+    elif request.param == 'ToyLeft':
+        dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='left')
+    elif request.param == 'ToyRight':
+        dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='right')
     elif request.param == 'ToyMat':
-        dataset_dict = mock_toy(rootpath, raw_fileformat='mat')
+        dataset_dict = mock_toy(rootpath, raw_fileformat='mat', eyes='both')
     else:
         raise ValueError(f'{request.param} not supported as dataset mock')
 
@@ -349,15 +406,16 @@ def test_pix2deg(dataset_configuration):
 
     dataset.pix2deg()
 
-    expected_schema = {
-        **original_schema,
-        'x_left_dva': pl.Float64,
-        'y_left_dva': pl.Float64,
-        'x_right_dva': pl.Float64,
-        'y_right_dva': pl.Float64,
-    }
+    dva_schema = {}
+    for column_name in original_schema.keys():
+        if column_name.endswith('_pix'):
+            dva_column_name = column_name.replace('_pix', '_dva')
+            dva_schema[dva_column_name] = original_schema[column_name]
+    expected_schema = {**original_schema, **dva_schema}
 
     for result_gaze_df in dataset.gaze:
+        print(result_gaze_df.schema)
+        print(expected_schema)
         assert result_gaze_df.schema == expected_schema
 
 
@@ -370,13 +428,12 @@ def test_pos2vel(dataset_configuration):
 
     dataset.pos2vel()
 
-    expected_schema = {
-        **original_schema,
-        'x_left_vel': pl.Float64,
-        'y_left_vel': pl.Float64,
-        'x_right_vel': pl.Float64,
-        'y_right_vel': pl.Float64,
-    }
+    vel_schema = {}
+    for column_name in original_schema.keys():
+        if column_name.endswith('_pix'):
+            vel_column_name = column_name.replace('_pix', '_vel')
+            vel_schema[vel_column_name] = original_schema[column_name]
+    expected_schema = {**original_schema, **vel_schema}
 
     for result_gaze_df in dataset.gaze:
         assert result_gaze_df.schema == expected_schema
@@ -391,27 +448,11 @@ def test_pos2vel(dataset_configuration):
                 'threshold': 1,
                 'eye': 'auto',
             },
-            id='1',
-        ),
-        pytest.param(
-            {
-                'method': microsaccades,
-                'threshold': 1,
-                'eye': 'left',
-            },
-            id='2',
-        ),
-        pytest.param(
-            {
-                'method': microsaccades,
-                'threshold': 1,
-                'eye': 'right',
-            },
-            id='3',
+            id='microsaccades',
         ),
     ],
 )
-def test_detect_events(detect_event_kwargs, dataset_configuration):
+def test_detect_events_auto_eye(detect_event_kwargs, dataset_configuration):
     dataset = Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
@@ -421,6 +462,61 @@ def test_detect_events(detect_event_kwargs, dataset_configuration):
     expected_schema = {'subject_id': pl.Int64, **Saccade.schema}
     for result_event_df in dataset.events:
         assert result_event_df.schema == expected_schema
+
+
+@pytest.mark.parametrize(
+    'detect_event_kwargs',
+    [
+        pytest.param(
+            {
+                'method': microsaccades,
+                'threshold': 1,
+                'eye': 'left',
+            },
+            id='left',
+        ),
+        pytest.param(
+            {
+                'method': microsaccades,
+                'threshold': 1,
+                'eye': 'right',
+            },
+            id='right',
+        ),
+        pytest.param(
+            {
+                'method': microsaccades,
+                'threshold': 1,
+                'eye': 'eye',
+            },
+            id='eye',
+        ),
+    ],
+)
+def test_detect_events_explicit_eye(detect_event_kwargs, dataset_configuration):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+    dataset.pos2vel()
+
+    dataset_eyes = dataset_configuration['eyes']
+
+    exception = None
+    if dataset_eyes != detect_event_kwargs['eye']:
+        if dataset_eyes != 'both' or detect_event_kwargs['eye'] == 'eye':
+            exception = AttributeError
+
+    if exception is None:
+        dataset.detect_events(**detect_event_kwargs)
+
+        expected_schema = {'subject_id': pl.Int64, **Saccade.schema}
+
+        for result_event_df in dataset.events:
+            assert result_event_df.schema == expected_schema
+
+    else:
+        with pytest.raises(exception):
+            dataset.detect_events(**detect_event_kwargs)
 
 
 @pytest.mark.parametrize(
@@ -444,7 +540,7 @@ def test_detect_events(detect_event_kwargs, dataset_configuration):
             {
                 'method': microsaccades,
                 'threshold': 1,
-                'eye': 'left',
+                'eye': 'auto',
             },
             {
                 'method': ivt,
@@ -469,6 +565,35 @@ def test_detect_events_multiple_calls(
 
     for result_event_df in dataset.events:
         assert result_event_df.schema == expected_schema
+
+
+def test_detect_events_attribute_error(dataset_configuration):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+
+    try:
+        dataset.gaze[0] = dataset.gaze[0].drop('x_left_dva')
+    except BaseException:
+        pass
+
+    try:
+        dataset.gaze[0] = dataset.gaze[0].drop('x_right_dva')
+    except BaseException:
+        pass
+
+    try:
+        dataset.gaze[0] = dataset.gaze[0].drop('x_eye_dva')
+    except BaseException:
+        pass
+
+    detect_event_kwargs = {
+        'method': microsaccades,
+        'threshold': 1,
+        'eye': 'auto',
+    }
+
+    with pytest.raises(AttributeError):
+        dataset.detect_events(**detect_event_kwargs)
 
 
 @pytest.mark.parametrize(
@@ -766,3 +891,13 @@ def test_check_experiment():
     dataset = Dataset('data')
     with pytest.raises(AttributeError):
         dataset._check_experiment()
+
+
+@pytest.mark.parametrize('dataset_configuration', ['ToyBino'], indirect=['dataset_configuration'])
+def test_velocity_columns(dataset_configuration):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load(preprocessed=True)
+
+    expected_velocity_columns = ['x_left_vel', 'y_left_vel', 'x_right_vel', 'y_right_vel']
+    case = unittest.TestCase()
+    case.assertCountEqual(dataset.velocity_columns, expected_velocity_columns)
