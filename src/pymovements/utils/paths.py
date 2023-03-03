@@ -131,7 +131,9 @@ def match_filepaths(
 
                 filepath = childpath
                 if relative:
-                    filepath = filepath.relative_to(relative_anchor)  # type: ignore[arg-type]
+                    # mypy is unaware that 'relative_anchor' can never be None (l.116)
+                    assert relative_anchor is not None
+                    filepath = filepath.relative_to(relative_anchor)
 
                 match_dict['filepath'] = str(filepath)
                 match_dicts.append(match_dict)
