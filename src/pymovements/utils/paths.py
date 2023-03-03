@@ -77,3 +77,64 @@ def get_filepaths(
                 continue
             filepaths.append(childpath)
     return filepaths
+
+
+def match_filepaths(
+        path: str | Path,
+        regex: re.Pattern,
+        relative: bool = True,
+        relative_anchor: Path | None = None,
+) -> list[dict[str, str]]:
+    """Traverse path and match regular expression.
+
+    Parameters
+    ----------
+    path: str | Path
+        Root path to be traversed.
+    regex: re.Pattern, optional
+        Regular expression filenames will be matched against.
+    relative: bool
+        If True, specify filepath as relative to root path.
+    relative_anchor: Path, optional
+        Specifies root path in case of ``relative == True``. If None, ``path`` will be chosen
+        as `relative_anchor` for recursive calls.
+
+    Returns
+    -------
+    list[dict[str, str]]
+        Each entry contains the match group dictionary of the regular expression.
+
+    Raises
+    ------
+    ValueError
+        If ``path`` does not point to a directory.
+    """
+    path = Path(path)
+    if not path.is_dir():
+        raise ValueError(f'path must point to a directory, but points to a file (path = {path})')
+
+    if relative and relative_anchor is None:
+        relative_anchor = path
+
+    match_dicts: list[dict[str, str]] = []
+    for childpath in path.iterdir():
+        if childpath.is_dir():
+            recursive_results = match_filepaths(
+                path=childpath, regex=regex,
+                relative=relative, relative_anchor=relative_anchor,
+            )
+            match_dicts.extend(recursive_results)
+        else:
+            match = regex.match(childpath.name)
+            if match is not None:
+                match_dict = match.groupdict()
+
+                filepath = childpath
+                if relative:
+                    if relative_anchor is None:
+                        relative_anchor = path
+                    filepath = filepath.relative_to(relative_anchor)
+
+                match_dict['filepath'] = str(filepath)
+                match_dicts.append(match_dict)
+    return match_dicts
