@@ -348,9 +348,9 @@ class Dataset:
             event_df = pl.read_ipc(filepath)
 
             # Add fileinfo columns to dataframe.
-            event_df = EventDataFrame(self._add_fileinfo(event_df, fileinfo))
+            event_df = self._add_fileinfo(event_df, fileinfo)
 
-            event_dfs.append(event_df)
+            event_dfs.append(EventDataFrame(event_df))
 
         return event_dfs
 
@@ -507,7 +507,7 @@ class Dataset:
             velocities = gaze_df.select(velocity_columns).to_numpy()
 
             event_df = method(positions=positions, velocities=velocities, **kwargs)
-            event_df = EventDataFrame(self._add_fileinfo(event_df, fileinfo))
+            event_df.frame = self._add_fileinfo(event_df.frame, fileinfo)
 
             event_dfs.append(event_df)
 
@@ -516,11 +516,9 @@ class Dataset:
             return
 
         for file_id, event_df in enumerate(event_dfs):
-            self.events[file_id] = EventDataFrame(
-                pl.concat(
-                    [self.events[file_id], event_df],
-                    how='diagonal',
-                ),
+            self.events[file_id].frame = pl.concat(
+                [self.events[file_id].frame, event_df.frame],
+                how='diagonal',
             )
 
     def clear_events(self) -> None:
@@ -581,15 +579,17 @@ class Dataset:
                 raw_filepath, events_dirname=events_dirname,
             )
 
-            for column in event_df.columns:
+            event_df_out = event_df.frame.clone()
+
+            for column in event_df_out.columns:
                 if column in self.fileinfo.columns:
-                    event_df = event_df.drop(column)
+                    event_df_out = event_df_out.drop(column)
 
             if verbose >= 2:
                 print('Save file to', events_filepath)
 
             events_filepath.parent.mkdir(parents=True, exist_ok=True)
-            event_df.write_ipc(events_filepath)
+            event_df_out.write_ipc(events_filepath)
 
     def save_preprocessed(self, preprocessed_dirname: str | None = None, verbose: int = 1):
         """Save preprocessed gaze files.

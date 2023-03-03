@@ -291,7 +291,7 @@ def test_load_correct_event_dfs(dataset_configuration):
 
     expected_event_dfs = dataset_configuration['event_dfs']
     for result_event_df, expected_event_df in zip(dataset.events, expected_event_dfs):
-        assert_frame_equal(result_event_df, expected_event_df)
+        assert_frame_equal(result_event_df.frame, expected_event_df)
 
 
 @pytest.mark.parametrize(
@@ -637,7 +637,7 @@ def test_clear_events(events_init, events_expected):
 
     else:
         for events_df_result, events_df_expected in zip(dataset.events, events_expected):
-            assert_frame_equal(events_df_result, events_df_expected)
+            assert_frame_equal(events_df_result.frame, events_df_expected.frame)
 
 
 @pytest.mark.parametrize(

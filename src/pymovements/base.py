@@ -23,7 +23,6 @@ This module holds the base classes Screen and Experiment.
 from __future__ import annotations
 
 import numpy as np
-import polars as pl
 
 from pymovements.transforms import pix2deg
 from pymovements.transforms import pos2vel
@@ -303,14 +302,3 @@ class Experiment:
                [ 500.,  500.]])
         """
         return pos2vel(arr=arr, sampling_rate=self.sampling_rate, method=method, **kwargs)
-
-
-class DataFrame(pl.DataFrame, metaclass=checks.PreventOverridePolarsDataFrame):
-    """DataFrame class.
-
-    This is a subclass from :py:class:`polars.DataFrame` inheriting all it's functionality.
-
-    The :py:class:`~pymovements.DataFrame` class is necessary to make sure that any further subclass
-    never overwrites any original functionality from :py:class:`polars.DataFrame` with its over 150
-    attributes and methods.
-    """
