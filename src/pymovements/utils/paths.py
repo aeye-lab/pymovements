@@ -131,9 +131,7 @@ def match_filepaths(
 
                 filepath = childpath
                 if relative:
-                    if relative_anchor is None:
-                        relative_anchor = path
-                    filepath = filepath.relative_to(relative_anchor)
+                    filepath = filepath.relative_to(relative_anchor)  # type: ignore[arg-type]
 
                 match_dict['filepath'] = str(filepath)
                 match_dicts.append(match_dict)
