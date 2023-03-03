@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 The pymovements Project Authors
+# Copyright (c) 2023 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,12 +17,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides access to all submodules."""
-from pymovements import datasets  # noqa: F401
-from pymovements import events  # noqa: F401
-from pymovements import gaze  # noqa: F401
-from pymovements import plotting  # noqa: F401
-from pymovements import synthetic  # noqa: F401
-from pymovements import utils  # noqa: F401
-from pymovements.base import Experiment  # noqa: F401
-from pymovements.base import Screen  # noqa: F401
+
+"""This module holds gaze time series related functionality."""
+from pymovements.gaze.gaze_dataframe import GazeDataFrame  # noqa: F401
+from pymovements.gaze import transforms  # noqa: F401
+
+__all__ = [
+    'GazeDataFrame',
+    'transforms',
+]

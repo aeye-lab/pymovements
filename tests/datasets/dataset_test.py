@@ -137,19 +137,19 @@ def mock_toy(rootpath, raw_fileformat, eyes):
                     'y_right_pix': pl.Float64,
                 },
             )
-        elif eyes == 'eye':
+        elif eyes == 'none':
             gaze_df = pl.from_dict(
                 {
                     'subject_id': fileinfo_row['subject_id'],
                     'time': np.arange(1000),
-                    'x_eye_pix': np.zeros(1000),
-                    'y_eye_pix': np.zeros(1000),
+                    'x_pix': np.zeros(1000),
+                    'y_pix': np.zeros(1000),
                 },
                 schema={
                     'subject_id': pl.Int64,
                     'time': pl.Int64,
-                    'x_eye_pix': pl.Float64,
-                    'y_eye_pix': pl.Float64,
+                    'x_pix': pl.Float64,
+                    'y_pix': pl.Float64,
                 },
             )
         else:
@@ -246,7 +246,7 @@ def fixture_dataset(request, tmp_path):
     if request.param == 'ToyBino':
         dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='both')
     elif request.param == 'ToyMono':
-        dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='eye')
+        dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='none')
     elif request.param == 'ToyLeft':
         dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='left')
     elif request.param == 'ToyRight':
@@ -273,7 +273,7 @@ def test_load_correct_raw_gaze_dfs(dataset_configuration):
 
     expected_gaze_dfs = dataset_configuration['raw_gaze_dfs']
     for result_gaze_df, expected_gaze_df in zip(dataset.gaze, expected_gaze_dfs):
-        assert_frame_equal(result_gaze_df, expected_gaze_df)
+        assert_frame_equal(result_gaze_df.frame, expected_gaze_df)
 
 
 def test_load_correct_preprocessed_gaze_dfs(dataset_configuration):
@@ -282,7 +282,7 @@ def test_load_correct_preprocessed_gaze_dfs(dataset_configuration):
 
     expected_gaze_dfs = dataset_configuration['preprocessed_gaze_dfs']
     for result_gaze_df, expected_gaze_df in zip(dataset.gaze, expected_gaze_dfs):
-        assert_frame_equal(result_gaze_df, expected_gaze_df)
+        assert_frame_equal(result_gaze_df.frame, expected_gaze_df)
 
 
 def test_load_correct_event_dfs(dataset_configuration):
@@ -412,7 +412,7 @@ def test_pix2deg(dataset_configuration):
     dva_schema = {}
     for column_name in original_schema.keys():
         if column_name.endswith('_pix'):
-            dva_column_name = column_name.replace('_pix', '_dva')
+            dva_column_name = column_name.replace('_pix', '_pos')
             dva_schema[dva_column_name] = original_schema[column_name]
     expected_schema = {**original_schema, **dva_schema}
 
@@ -946,4 +946,6 @@ def test_velocity_columns(dataset_configuration):
 
     expected_velocity_columns = ['x_left_vel', 'y_left_vel', 'x_right_vel', 'y_right_vel']
     case = unittest.TestCase()
-    case.assertCountEqual(dataset.velocity_columns, expected_velocity_columns)
+
+    for gaze_df in dataset.gaze:
+        case.assertCountEqual(gaze_df.velocity_columns, expected_velocity_columns)

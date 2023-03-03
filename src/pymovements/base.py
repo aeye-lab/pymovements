@@ -24,13 +24,12 @@ from __future__ import annotations
 
 import numpy as np
 
-from pymovements.transforms import pix2deg
-from pymovements.transforms import pos2vel
+from pymovements.gaze import transforms
 from pymovements.utils import checks
-from pymovements.utils.decorators import auto_str
+from pymovements.utils import decorators
 
 
-@auto_str
+@decorators.auto_str
 class Screen:
     """
     Screen class for holding screen properties and transforming pixel
@@ -119,10 +118,22 @@ class Screen:
         self.origin = origin
 
         # calculate screen boundary coordinates in degrees of visual angle
-        self.x_max_dva = pix2deg(width_px - 1, width_px, width_cm, distance_cm, origin=origin)
-        self.y_max_dva = pix2deg(height_px - 1, height_px, height_cm, distance_cm, origin=origin)
-        self.x_min_dva = pix2deg(0, width_px, width_cm, distance_cm, origin=origin)
-        self.y_min_dva = pix2deg(0, height_px, height_cm, distance_cm, origin=origin)
+        self.x_max_dva = transforms.pix2deg(
+            width_px - 1,
+            screen_px=width_px, screen_cm=width_cm, distance_cm=distance_cm, origin=origin,
+        )
+        self.y_max_dva = transforms.pix2deg(
+            height_px - 1,
+            screen_px=height_px, screen_cm=height_cm, distance_cm=distance_cm, origin=origin,
+        )
+        self.x_min_dva = transforms.pix2deg(
+            0,
+            screen_px=width_px, screen_cm=width_cm, distance_cm=distance_cm, origin=origin,
+        )
+        self.y_min_dva = transforms.pix2deg(
+            0,
+            screen_px=height_px, screen_cm=height_cm, distance_cm=distance_cm, origin=origin,
+        )
 
     def pix2deg(
             self,
@@ -171,7 +182,7 @@ class Screen:
         >>> screen.pix2deg(arr=arr)
         array([[ 3.07379946, 20.43909054]])
         """
-        return pix2deg(
+        return transforms.pix2deg(
             arr=arr,
             screen_px=(self.width_px, self.height_px),
             screen_cm=(self.width_cm, self.height_cm),
@@ -180,7 +191,7 @@ class Screen:
         )
 
 
-@auto_str
+@decorators.auto_str
 class Experiment:
     """
     Experiment class for holding experiment properties.
@@ -301,4 +312,6 @@ class Experiment:
                [1000., 1000.],
                [ 500.,  500.]])
         """
-        return pos2vel(arr=arr, sampling_rate=self.sampling_rate, method=method, **kwargs)
+        return transforms.pos2vel(
+            arr=arr, sampling_rate=self.sampling_rate, method=method, **kwargs,
+        )

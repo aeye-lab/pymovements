@@ -25,8 +25,8 @@ from __future__ import annotations
 import numpy as np
 
 from pymovements.events.events import EventDataFrame
-from pymovements.transforms import consecutive
-from pymovements.transforms import norm
+from pymovements.gaze.transforms import consecutive
+from pymovements.gaze.transforms import norm
 from pymovements.utils import checks
 from pymovements.utils.filters import filter_candidates_remove_nans
 
