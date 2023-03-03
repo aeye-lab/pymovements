@@ -687,6 +687,49 @@ def test_save_events(
 
 
 @pytest.mark.parametrize(
+    'detect_event_kwargs, events_dirname, expected_save_dirpath',
+    [
+        pytest.param(
+            {'method': microsaccades, 'threshold': 1, 'eye': 'auto'},
+            None,
+            'events',
+            id='none_dirname',
+        ),
+        pytest.param(
+            {'method': microsaccades, 'threshold': 1, 'eye': 'auto'},
+            'events_test',
+            'events_test',
+            id='explicit_dirname',
+        ),
+    ],
+)
+def test_load_previously_saved_events(
+    detect_event_kwargs, events_dirname, expected_save_dirpath,
+    dataset_configuration,
+):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+    dataset.pos2vel()
+    dataset.detect_events(**detect_event_kwargs)
+
+    # We must not overwrite the original variable as it's needed in the end.
+    if events_dirname is None:
+        events_dirname_ = 'events'
+    else:
+        events_dirname_ = events_dirname
+
+    shutil.rmtree(dataset.path / Path(events_dirname_), ignore_errors=True)
+    shutil.rmtree(dataset.path / Path(expected_save_dirpath), ignore_errors=True)
+    dataset.save_events(events_dirname)
+
+    dataset.events = []
+
+    dataset.load(events=True, events_dirname=events_dirname)
+    assert dataset.events
+
+
+@pytest.mark.parametrize(
     'preprocessed_dirname, expected_save_dirpath',
     [
         pytest.param(

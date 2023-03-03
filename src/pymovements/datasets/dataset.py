@@ -581,7 +581,7 @@ class Dataset:
 
             for column in event_df.columns:
                 if column in self.fileinfo.columns:
-                    event_df.drop(column)
+                    event_df = event_df.drop(column)
 
             if verbose >= 2:
                 print('Save file to', events_filepath)
