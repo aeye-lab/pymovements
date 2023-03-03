@@ -35,10 +35,10 @@ from pymovements.utils.paths import get_filepaths
 
 
 def extract_archive(
-    source_path: Path,
-    destination_path: Path | None = None,
-    recursive: bool = True,
-    remove_finished: bool = False,
+        source_path: Path,
+        destination_path: Path | None = None,
+        recursive: bool = True,
+        remove_finished: bool = False,
 ) -> Path:
     """Extract an archive.
     The archive type and a possible compression is automatically detected from the file name.
@@ -124,16 +124,10 @@ def _extract_tar(
         archive.extractall(destination_path)
 
 
-_ZIP_COMPRESSION_MAP: dict[str, int] = {
-    '.bz2': zipfile.ZIP_BZIP2,
-    '.xz': zipfile.ZIP_LZMA,
-}
-
-
 def _extract_zip(
-    source_path: Path,
-    destination_path: Path,
-    compression: str | None,
+        source_path: Path,
+        destination_path: Path,
+        compression: str | None,
 ) -> None:
     """Extract a zip archive.
 
@@ -166,6 +160,11 @@ _COMPRESSED_FILE_OPENERS: dict[str, Callable[..., IO]] = {
     '.bz2': bz2.open,
     '.gz': gzip.open,
     '.xz': lzma.open,
+}
+
+_ZIP_COMPRESSION_MAP: dict[str, int] = {
+    '.bz2': zipfile.ZIP_BZIP2,
+    '.xz': zipfile.ZIP_LZMA,
 }
 
 
@@ -213,8 +212,13 @@ def _detect_file_type(filepath: Path) -> tuple[str | None, str | None]:
             suffix2 = suffixes[-2]
 
             # Check if the second last suffix refers to an archive type.
-            if suffix2 in _ARCHIVE_EXTRACTORS:
-                return suffix2, suffix
+            if suffix2 not in _ARCHIVE_EXTRACTORS:
+                raise RuntimeError(
+                    f"Unsupported archive type: '{suffix2}'.\n"
+                    f"Supported suffixes are: '{sorted(set(_ARCHIVE_EXTRACTORS))}'.",
+                )
+            # We detected a compressed archive file (e.g. tar.gz).
+            return suffix2, suffix
 
         # We detected a single compressed file not an archive.
         return None, suffix
@@ -230,9 +234,9 @@ def _detect_file_type(filepath: Path) -> tuple[str | None, str | None]:
 
 
 def _decompress(
-    source_path: Path,
-    destination_path: Path | None = None,
-    remove_finished: bool = False,
+        source_path: Path,
+        destination_path: Path | None = None,
+        remove_finished: bool = False,
 ) -> Path:
     r"""Decompress a file.
 
