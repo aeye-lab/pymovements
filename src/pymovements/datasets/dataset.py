@@ -445,9 +445,6 @@ class Dataset:
         velocity_columns = self._position_to_velocity_columns(position_columns)
 
         for file_id, file_df in enumerate(tqdm(self.gaze, disable=disable_progressbar)):
-            position_columns = ['x_left_dva', 'y_left_dva', 'x_right_dva', 'y_right_dva']
-            velocity_columns = ['x_left_vel', 'y_left_vel', 'x_right_vel', 'y_right_vel']
-
             positions = file_df.select(position_columns)
 
             velocities = self.experiment.pos2vel(  # type: ignore[union-attr]

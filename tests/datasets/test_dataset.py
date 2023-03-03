@@ -19,6 +19,7 @@
 # SOFTWARE.
 """Test all functionality in pymovements.datasets.dataset."""
 import shutil
+import unittest
 from pathlib import Path
 
 import numpy as np
@@ -508,8 +509,10 @@ def test_detect_events_explicit_eye(detect_event_kwargs, dataset_configuration):
     if exception is None:
         dataset.detect_events(**detect_event_kwargs)
 
+        expected_schema = {'subject_id': pl.Int64, **Saccade.schema}
+
         for result_event_df in dataset.events:
-            assert result_event_df.schema == Saccade.schema
+            assert result_event_df.schema == expected_schema
 
     else:
         with pytest.raises(exception):
@@ -888,3 +891,13 @@ def test_check_experiment():
     dataset = Dataset('data')
     with pytest.raises(AttributeError):
         dataset._check_experiment()
+
+
+@pytest.mark.parametrize('dataset_configuration', ['ToyBino'], indirect=['dataset_configuration'])
+def test_velocity_columns(dataset_configuration):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load(preprocessed=True)
+
+    expected_velocity_columns = ['x_left_vel', 'y_left_vel', 'x_right_vel', 'y_right_vel']
+    case = unittest.TestCase()
+    case.assertCountEqual(dataset.velocity_columns, expected_velocity_columns)
