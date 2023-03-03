@@ -345,12 +345,6 @@ def test_init_exceptions(init_kwargs, exception):
     'init_kwargs, load_kwargs, exception',
     [
         pytest.param(
-            {'root': '/not/a/real/path'},
-            {},
-            RuntimeError,
-            id='no_files_present',
-        ),
-        pytest.param(
             {},
             {'subset': 1},
             TypeError,
@@ -382,6 +376,17 @@ def test_load_exceptions(init_kwargs, load_kwargs, exception, dataset_configurat
 
     with pytest.raises(exception):
         dataset.load(**load_kwargs)
+
+
+def test_load_no_files_raises_exception(dataset_configuration):
+    init_kwargs = {**dataset_configuration['init_kwargs']}
+    dataset = Dataset(**init_kwargs)
+
+    shutil.rmtree(dataset.raw_rootpath, ignore_errors=True)
+    dataset.raw_rootpath.mkdir()
+
+    with pytest.raises(RuntimeError):
+        dataset.load()
 
 
 @pytest.mark.parametrize(

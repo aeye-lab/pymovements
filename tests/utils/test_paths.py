@@ -23,6 +23,7 @@ Test pymovements paths.
 import pathlib
 import re
 import unittest
+from pathlib import Path
 
 import pytest
 
@@ -123,21 +124,21 @@ def test_get_filepaths_expected_output(
             re.compile('.*'),
             ['tmp_dir'],
             ['foo.txt'],
-            [{'filepath': 'tmp_dir/foo.txt'}],
+            [{'filepath': str(Path('tmp_dir/foo.txt'))}],
             id='match_all_no_groups_single_file',
         ),
         pytest.param(
             re.compile('.*'),
             ['tmp_dir'],
             ['foo.txt', 'bar.py'],
-            [{'filepath': 'tmp_dir/foo.txt'}, {'filepath': 'tmp_dir/bar.py'}],
+            [{'filepath': str(Path('tmp_dir/foo.txt'))}, {'filepath': str(Path('tmp_dir/bar.py'))}],
             id='match_all_no_groups_two_files',
         ),
         pytest.param(
             re.compile('foo'),
             ['tmp_dir'],
             ['foo.txt', 'bar.py'],
-            [{'filepath': 'tmp_dir/foo.txt'}],
+            [{'filepath': str(Path('tmp_dir/foo.txt'))}],
             id='match_substring_single_file_out_of_two_no_groups',
         ),
         pytest.param(
@@ -145,8 +146,8 @@ def test_get_filepaths_expected_output(
             ['a'],
             ['123_456.ext', '456_789.ext'],
             [
-                {'foo': '123', 'bar': '456', 'filepath': 'a/123_456.ext'},
-                {'foo': '456', 'bar': '789', 'filepath': 'a/456_789.ext'},
+                {'foo': '123', 'bar': '456', 'filepath': str(Path('a/123_456.ext'))},
+                {'foo': '456', 'bar': '789', 'filepath': str(Path('a/456_789.ext'))},
             ],
             id='match_groups_two_files',
         ),
