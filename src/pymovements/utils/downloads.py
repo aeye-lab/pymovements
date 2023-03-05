@@ -77,6 +77,8 @@ def download_and_extract_archive(
     if extract_dirpath is None:
         extract_dirpath = download_dirpath
 
+    # mypy is unaware that 'extract_dirpath' can never be None (l.77)
+    assert extract_dirpath is not None
     print(f'Extracting {archive_path.name} to {extract_dirpath}')
     extract_archive(
         source_path=archive_path,
@@ -148,7 +150,7 @@ def download_file(
 
     # check integrity of downloaded file
     if not _check_integrity(filepath=filepath, md5=md5):
-        raise RuntimeError(f"File {'filepath'} not found or download corrupted.")
+        raise RuntimeError(f'File {filepath} not found or download corrupted.')
 
     return filepath
 
