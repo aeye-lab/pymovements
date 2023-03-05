@@ -26,7 +26,7 @@ import hashlib
 import urllib.request
 from pathlib import Path
 
-from tqdm.auto import tqdm
+import tqdm.auto
 
 from pymovements.utils.archives import extract_archive
 
@@ -187,7 +187,7 @@ def _get_redirected_url(url: str, max_hops: int = 3) -> str:
     )
 
 
-class _DownloadProgressBar(tqdm):
+class _DownloadProgressBar(tqdm.auto.tqdm):
     """Progress bar for downloads.
 
     Provides `update_to(n)` which uses `tqdm.update(delta_n)`.
