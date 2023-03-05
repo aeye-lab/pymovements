@@ -28,11 +28,11 @@ import numpy as np
 
 
 def step_function(
-    length: int,
-    steps: list[int],
-    values: list[float | tuple[float, ...]],
-    start_value: float | tuple[float, ...] = 0,
-    noise: float = 0,
+        length: int,
+        steps: list[int],
+        values: list[float | tuple[float, ...]],
+        start_value: float | tuple[float, ...] = 0,
+        noise: float = 0,
 ) -> np.ndarray:
     """
     Create a synthetic eye gaze by using a simple step function.

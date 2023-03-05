@@ -62,13 +62,13 @@ class Screen:
     """
 
     def __init__(
-        self,
-        width_px: int,
-        height_px: int,
-        width_cm: float,
-        height_cm: float,
-        distance_cm: float,
-        origin: str,
+            self,
+            width_px: int,
+            height_px: int,
+            width_cm: float,
+            height_cm: float,
+            distance_cm: float,
+            origin: str,
     ):
         """
         Initializes Screen.
@@ -195,9 +195,9 @@ class Experiment:
     """
 
     def __init__(
-        self, screen_width_px: int, screen_height_px: int,
-        screen_width_cm: float, screen_height_cm: float,
-        distance_cm: float, origin: str, sampling_rate: float,
+            self, screen_width_px: int, screen_height_px: int,
+            screen_width_cm: float, screen_height_cm: float,
+            distance_cm: float, origin: str, sampling_rate: float,
     ):
         """
         Initializes Experiment.
@@ -248,10 +248,10 @@ class Experiment:
         self.sampling_rate = sampling_rate
 
     def pos2vel(
-        self,
-        arr: list[float] | list[list[float]] | np.ndarray,
-        method: str = 'smooth',
-        **kwargs,
+            self,
+            arr: list[float] | list[list[float]] | np.ndarray,
+            method: str = 'smooth',
+            **kwargs,
     ) -> np.ndarray:
         """Compute velocity time series from 2-dimensional position time series.
 

@@ -558,8 +558,8 @@ def test_detect_events_explicit_eye(detect_event_kwargs, dataset_configuration):
     ],
 )
 def test_detect_events_multiple_calls(
-    detect_event_kwargs_1, detect_event_kwargs_2,
-    expected_schema, dataset_configuration,
+        detect_event_kwargs_1, detect_event_kwargs_2,
+        expected_schema, dataset_configuration,
 ):
     dataset = Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
@@ -666,8 +666,10 @@ def test_clear_events(events_init, events_expected):
     ],
 )
 def test_save_events(
-    detect_event_kwargs, events_dirname, expected_save_dirpath,
-    dataset_configuration,
+        detect_event_kwargs,
+        events_dirname,
+        expected_save_dirpath,
+        dataset_configuration,
 ):
     dataset = Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
@@ -704,8 +706,10 @@ def test_save_events(
     ],
 )
 def test_load_previously_saved_events(
-    detect_event_kwargs, events_dirname, expected_save_dirpath,
-    dataset_configuration,
+        detect_event_kwargs,
+        events_dirname,
+        expected_save_dirpath,
+        dataset_configuration,
 ):
     dataset = Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
@@ -791,8 +795,10 @@ def test_save_preprocessed(preprocessed_dirname, expected_save_dirpath, dataset_
     ],
 )
 def test_save(
-    expected_save_preprocessed_path, expected_save_events_path,
-    save_kwargs, dataset_configuration,
+        expected_save_preprocessed_path,
+        expected_save_events_path,
+        save_kwargs,
+        dataset_configuration,
 ):
     dataset = Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()

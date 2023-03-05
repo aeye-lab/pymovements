@@ -72,20 +72,20 @@ default_segmentdata_twoslope = {
 
 
 def traceplot(
-    x: np.ndarray,
-    y: np.ndarray,
-    cval: np.ndarray | None = None,
-    cmap: colors.Colormap | None = None,
-    cmap_norm: colors.Normalize | str | None = None,
-    cmap_segmentdata: dict[str, list[list[float]]] | None = None,
-    cbar_label: str | None = None,
-    show_cbar: bool = False,
-    padding: float | None = None,
-    pad_factor: float | None = 0.05,
-    figsize: tuple[int, int] = (15, 5),
-    title: str | None = None,
-    savepath: str | None = None,
-    show: bool = True,
+        x: np.ndarray,
+        y: np.ndarray,
+        cval: np.ndarray | None = None,
+        cmap: colors.Colormap | None = None,
+        cmap_norm: colors.Normalize | str | None = None,
+        cmap_segmentdata: dict[str, list[list[float]]] | None = None,
+        cbar_label: str | None = None,
+        show_cbar: bool = False,
+        padding: float | None = None,
+        pad_factor: float | None = 0.05,
+        figsize: tuple[int, int] = (15, 5),
+        title: str | None = None,
+        savepath: str | None = None,
+        show: bool = True,
 ) -> None:
     """
     Plot eye gaze trace from positional data.
@@ -214,20 +214,20 @@ def traceplot(
 
 
 def tsplot(
-    arr: np.ndarray,
-    channel_names: list[str] | None = None,
-    xlabel: str | None = None,
-    rotate_ylabels: bool = True,
-    share_y: bool = True,
-    zero_centered_yaxis: bool = True,
-    line_color: tuple[int, int, int] | str = 'k',
-    line_width: int = 1,
-    show_grid: bool = True,
-    show_yticks: bool = True,
-    figsize: tuple[int, int] = (15, 5),
-    title: str | None = None,
-    savepath: str | None = None,
-    show: bool = True,
+        arr: np.ndarray,
+        channel_names: list[str] | None = None,
+        xlabel: str | None = None,
+        rotate_ylabels: bool = True,
+        share_y: bool = True,
+        zero_centered_yaxis: bool = True,
+        line_color: tuple[int, int, int] | str = 'k',
+        line_width: int = 1,
+        show_grid: bool = True,
+        show_yticks: bool = True,
+        figsize: tuple[int, int] = (15, 5),
+        title: str | None = None,
+        savepath: str | None = None,
+        show: bool = True,
 ) -> None:
     """
     Plot time series with each channel getting a separate subplot.
