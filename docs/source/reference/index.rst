@@ -11,7 +11,7 @@
     pymovements.base
     pymovements.datasets
     pymovements.events
-    pymovements.plot
+    pymovements.plotting
     pymovements.synthetic
     pymovements.transforms
     pymovements.utils
