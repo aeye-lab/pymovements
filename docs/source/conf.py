@@ -63,8 +63,9 @@ extensions = [
     'sphinx.ext.linkcode',
     'sphinx.ext.mathjax',
     'sphinx.ext.extlinks',
-    'sphinx_mdinclude',
     'sphinx_copybutton',
+    'sphinx_favicon',
+    'sphinx_mdinclude',
     'sphinxcontrib.datatemplates',
     'sphinxcontrib.bibtex',
     'nbsphinx',
@@ -128,19 +129,17 @@ html_theme_options = {
             'icon': 'fa-brands fa-github',
         },
     ],
-    'favicons': [
-        {
-            'rel': 'icon',
-            'sizes': 'any',
-            'type': 'image/svg+xml',
-            'href': 'icon.svg',
-        },
-    ],
     'logo': {
         'image_light': 'https://raw.githubusercontent.com/aeye-lab/pymovements/main/docs/source/_static/logo.svg',  # noqa: E501
         'image_dark': 'https://raw.githubusercontent.com/aeye-lab/pymovements/main/docs/source/_static/logo.svg',  # noqa: E501
     },
 }
+
+# -- Options for favicons
+
+favicons = [
+    {'href': 'icon.svg'},
+]
 
 # -- Options for juypter notebooks
 
