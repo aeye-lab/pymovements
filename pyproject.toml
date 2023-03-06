@@ -82,6 +82,26 @@ in-place = true
 recursive = true
 aggressive = 1
 
+[tool.coverage.paths]
+source = [
+  '{toxworkdir}/src/pymovements',
+  '*/.tox/*/lib/python*/site-packages/pymovements',
+  '*/src/pymovements'
+]
+
+[tool.coverage.report]
+skip_covered = true
+show_missing = true
+
+[tool.coverage.run]
+parallel = true
+branch = true
+omit = [
+  'docs/*',
+  'src/pymovements/plotting/*',
+  'tests/*'
+]
+
 [tool.doc8]
 max-line-length = 100
 
