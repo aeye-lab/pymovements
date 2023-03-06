@@ -187,7 +187,9 @@ def _get_redirected_url(url: str, max_hops: int = 3) -> str:
     )
 
 
-class _DownloadProgressBar(tqdm):
+# have to ignore pylint since tqdm 2.45.0 broke incosistent-mro
+# https://github.com/tqdm/tqdm/blob/0bb91857eca0d4aea08f66cf1c8949abe0cd6b7a/tqdm/auto.py#L27
+class _DownloadProgressBar(tqdm):  # pylint: disable=inconsistent-mro
     """Progress bar for downloads.
 
     Provides `update_to(n)` which uses `tqdm.update(delta_n)`.
