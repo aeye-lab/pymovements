@@ -77,7 +77,6 @@ def download_and_extract_archive(
     if extract_dirpath is None:
         extract_dirpath = download_dirpath
 
-    # mypy is unaware that 'extract_dirpath' can never be None (l.77)
     print(f'Extracting {archive_path.name} to {extract_dirpath}')
     extract_archive(
         source_path=archive_path,
