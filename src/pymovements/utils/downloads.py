@@ -148,7 +148,7 @@ def download_file(
 
     # check integrity of downloaded file
     if not _check_integrity(filepath=filepath, md5=md5):
-        raise RuntimeError(f"File {'filepath'} not found or download corrupted.")
+        raise RuntimeError(f'File {filepath} not found or download corrupted.')
 
     return filepath
 
