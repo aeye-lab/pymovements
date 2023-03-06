@@ -22,61 +22,53 @@ Test pymovements utils downloads.
 """
 import hashlib
 import os.path
-import tarfile
-from pathlib import Path
 from unittest import mock
 
 import pytest
 
-from pymovements.utils.archives import extract_archive
 from pymovements.utils.downloads import _DownloadProgressBar
 from pymovements.utils.downloads import _get_redirected_url
 from pymovements.utils.downloads import download_and_extract_archive
 from pymovements.utils.downloads import download_file
 
 
-@pytest.fixture(name='test_dir')
-def test_dir_fixture(tmp_path):
-    yield Path(tmp_path)
-
-
-def test_download_file(test_dir):
+def test_download_file(tmp_path):
     url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
     filename = 'pymovements-0.4.0.tar.gz'
     md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
 
-    filepath = download_file(url, test_dir, filename, md5)
+    filepath = download_file(url, tmp_path, filename, md5)
 
     assert filepath.exists()
     assert filepath.name == filename
-    assert filepath.parent == test_dir
+    assert filepath.parent == tmp_path
 
     with open(filepath, 'rb') as f:
         file_bytes = f.read()
         assert hashlib.md5(file_bytes).hexdigest() == md5
 
 
-def test_download_file_md5_None(test_dir):
+def test_download_file_md5_None(tmp_path):
     url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
     filename = 'pymovements-0.4.0.tar.gz'
 
-    filepath = download_file(url, test_dir, filename)
+    filepath = download_file(url, tmp_path, filename)
 
     assert filepath.exists()
     assert filepath.name == filename
-    assert filepath.parent == test_dir
+    assert filepath.parent == tmp_path
 
 
-def test_download_file_404(test_dir):
+def test_download_file_404(tmp_path):
     url = 'http://github.com/aeye-lab/pymovement/archive/refs/tags/v0.4.0.tar.gz'
     filename = 'pymovements-0.4.0.tar.gz'
     md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
 
     with pytest.raises(OSError):
-        download_file(url, test_dir, filename, md5)
+        download_file(url, tmp_path, filename, md5)
 
 
-def test_download_file_https_failure(test_dir):
+def test_download_file_https_failure(tmp_path):
     url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
     filename = 'pymovements-0.4.0.tar.gz'
     md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
@@ -86,10 +78,10 @@ def test_download_file_https_failure(test_dir):
         side_effect=OSError(),
     ):
         with pytest.raises(OSError):
-            download_file(url, test_dir, filename, md5)
+            download_file(url, tmp_path, filename, md5)
 
 
-def test_download_file_http_failure(test_dir):
+def test_download_file_http_failure(tmp_path):
     url = 'http://example.com/'
     filename = 'pymovements-0.4.0.tar.gz'
     md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
@@ -99,19 +91,19 @@ def test_download_file_http_failure(test_dir):
         side_effect=OSError(),
     ):
         with pytest.raises(OSError):
-            download_file(url, test_dir, filename, md5)
+            download_file(url, tmp_path, filename, md5)
 
 
-def test_download_file_with_invalid_md5(test_dir):
+def test_download_file_with_invalid_md5(tmp_path):
     url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
     filename = 'pymovements-0.4.0.tar.gz'
     md5 = '00000000000000000000000000000000'
 
     with pytest.raises(RuntimeError) as excinfo:
-        download_file(url, test_dir, filename, md5)
+        download_file(url, tmp_path, filename, md5)
 
     msg, = excinfo.value.args
-    assert msg == f"File {os.path.join(test_dir, 'pymovements-0.4.0.tar.gz')} "\
+    assert msg == f"File {os.path.join(tmp_path, 'pymovements-0.4.0.tar.gz')} "\
         'not found or download corrupted.'
 
 
@@ -199,17 +191,6 @@ def test_download_and_extract_archive_invalid_md5(tmp_path):
     msg, = excinfo.value.args
     assert msg == f"File {os.path.join(tmp_path, 'pymovements-0.4.0.tar.gz')} "\
         'not found or download corrupted.'
-
-
-def test_extract_archive(tmp_path):
-    archive_path = tmp_path / 'test_archive.tar.gz'
-    with tarfile.open(archive_path, 'w:gz') as tar:
-        tar.add(__file__, arcname='test.py')
-
-    extract_dirpath = tmp_path / 'extracted'
-    extract_archive(archive_path, extract_dirpath)
-    assert extract_dirpath.exists()
-    assert (extract_dirpath / 'test.py').exists()
 
 
 def test__DownloadProgressBar_tsize_not_None():
