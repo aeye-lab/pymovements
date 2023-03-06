@@ -46,8 +46,8 @@ class EventDataFrame:
             self,
             data: pl.DataFrame | None = None,
             name: str | list[str] | None = None,
-            onsets: list[int] | None = None,
-            offsets: list[int] | None = None,
+            onsets: list[int] | np.ndarray | None = None,
+            offsets: list[int] | np.ndarray | None = None,
     ):
         """Initialize an :py:class:`pymovements.events.event_dataframe.EventDataFrame`.
 
@@ -181,6 +181,8 @@ class EventDetectionCallable(Protocol):
             self,
             positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
             velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
+            timesteps: list[int] | np.ndarray | None = None,
+            minimum_duration: int = 0,
             **kwargs,
     ) -> EventDataFrame:
         """Minimal interface to be implemented by all event detection methods.
@@ -191,6 +193,12 @@ class EventDetectionCallable(Protocol):
             Continuous 2D position time series
         velocities: array-like, shape (N, 2)
             Corresponding continuous 2D velocity time series.
+        timesteps: array-like, shape (N, )
+            Corresponding continuous 1D timestep time series. If None, sample based timesteps are
+            assumed.
+        minimum_duration: int
+            Minimum event duration. The duration is specified in the units used in ``timesteps``.
+            If ``timesteps`` is None, then ``minimum_duration`` is specified in numbers of samples.
         **kwargs:
             Additional keyword arguments for the specific event detection method.
 

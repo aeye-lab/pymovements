@@ -27,15 +27,16 @@ import numpy as np
 from pymovements.events.events import EventDataFrame
 from pymovements.transforms import consecutive
 from pymovements.transforms import norm
-from pymovements.utils.checks import check_shapes_positions_velocities
+from pymovements.utils import checks
 from pymovements.utils.filters import filter_candidates_remove_nans
 
 
 def ivt(
         positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
-        velocity_threshold: float,
-        minimum_duration: int,
+        timesteps: list[int] | np.ndarray | None = None,
+        minimum_duration: int = 100,
+        velocity_threshold: float = 20.0,
         include_nan: bool = False,
 ) -> EventDataFrame:
     """
@@ -45,7 +46,7 @@ def ivt(
     the given velocity threshold. Consecutive fixation points are merged into
     one fixation.
 
-    The implementation is based on the description and pseudocode
+    The implementation and its default parameter values are based on the description and pseudocode
     from Salvucci and Goldberg :cite:p:`SalvucciGoldberg2000`.
 
     Parameters
@@ -54,11 +55,15 @@ def ivt(
         Continuous 2D position time series.
     velocities: array-like, shape (N, 2)
         Corresponding continuous 2D velocity time series.
+    timesteps: array-like, shape (N, )
+        Corresponding continuous 1D timestep time series. If None, sample based timesteps are
+        assumed.
+    minimum_duration: int
+        Minimum fixation duration. The duration is specified in the units used in ``timesteps``.
+         If ``timesteps`` is None, then ``minimum_duration`` is specified in numbers of samples.
     velocity_threshold: float
         Threshold for a point to be classified as a fixation. If the
         velocity is below the threshold, the point is classified as a fixation.
-    minimum_duration: int
-        Minimum fixation duration in number of samples
     include_nan: bool
         Indicator, whether we want to split events on missing/corrupt value (np.nan)
 
@@ -79,11 +84,16 @@ def ivt(
     positions = np.array(positions)
     velocities = np.array(velocities)
 
-    check_shapes_positions_velocities(positions=positions, velocities=velocities)
+    checks.check_shapes_positions_velocities(positions=positions, velocities=velocities)
     if velocity_threshold is None:
         raise ValueError('velocity threshold must not be None')
     if velocity_threshold <= 0:
         raise ValueError('velocity threshold must be greater than 0')
+
+    if timesteps is None:
+        timesteps = np.arange(len(velocities), dtype=np.int64)
+    timesteps = np.array(timesteps)
+    checks.check_is_length_matching(velocities=velocities, timesteps=timesteps)
 
     # Get all indices with norm-velocities below threshold.
     velocity_norm = norm(velocities, axis=1)
@@ -94,25 +104,25 @@ def ivt(
         candidate_mask = np.logical_or(candidate_mask, np.isnan(velocities).any(axis=1))
 
     # Get indices of true values in candidate mask.
-    candidate_ind = np.where(candidate_mask)[0]
+    candidate_indices = np.where(candidate_mask)[0]
 
     # Get all fixation candidates by grouping all consecutive indices.
-    candidates = consecutive(arr=candidate_ind)
+    candidates = consecutive(arr=candidate_indices)
 
-    # Filter np.nan in candidates (delete starting/ending np.nans)
+    # Remove leading and trailing nan values from candidates.
     if include_nan:
-        candidates = filter_candidates_remove_nans(
-            candidates,
-            velocities,
-        )
+        candidates = filter_candidates_remove_nans(candidates=candidates, values=velocities)
 
     # Filter all candidates by minimum duration.
-    candidates = [candidate for candidate in candidates if len(candidate) >= minimum_duration]
+    candidates = [
+        candidate for candidate in candidates
+        if timesteps[candidate[-1]] - timesteps[candidate[0]] >= minimum_duration
+    ]
 
     # Onset of each event candidate is first index in candidate indices.
-    onsets = [candidate_indices[0] for candidate_indices in candidates]
+    onsets = timesteps[[candidate_indices[0] for candidate_indices in candidates]].flatten()
     # Offset of each event candidate is last event in candidate indices.
-    offsets = [candidate_indices[-1] for candidate_indices in candidates]
+    offsets = timesteps[[candidate_indices[-1] for candidate_indices in candidates]].flatten()
 
     # Create event dataframe from onsets and offsets.
     event_df = EventDataFrame(name='fixation', onsets=onsets, offsets=offsets)

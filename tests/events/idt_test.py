@@ -211,6 +211,20 @@ def test_idt_raises_error(kwargs, expected_error):
             ),
             id='one_fixation_nan_delete_leading_ending',
         ),
+        pytest.param(
+            {
+                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
+                'timesteps': np.arange(1000, 1100, dtype=int),
+                'dispersion_threshold': 1,
+                'minimum_duration': 1,
+            },
+            EventDataFrame(
+                name='fixation',
+                onsets=[1000],
+                offsets=[1099],
+            ),
+            id='constant_position_single_fixation_with_timesteps',
+        ),
     ],
 )
 def test_idt_detects_fixations(kwargs, expected):
