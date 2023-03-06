@@ -28,7 +28,7 @@ import polars as pl
 from tqdm.auto import tqdm
 
 from pymovements.base import Experiment
-from pymovements.events.events import Event
+from pymovements.events.events import EventDataFrame
 from pymovements.events.events import EventDetectionCallable
 from pymovements.utils.paths import match_filepaths
 
@@ -89,7 +89,7 @@ class Dataset:
         """
         self.fileinfo: pl.DataFrame = pl.DataFrame()
         self.gaze: list[pl.DataFrame] = []
-        self.events: list[pl.DataFrame] = []
+        self.events: list[EventDataFrame] = []
 
         self._root = Path(root)
         self.dataset_dirname = dataset_dirname
@@ -314,7 +314,7 @@ class Dataset:
 
         return gaze_dfs
 
-    def load_event_files(self, events_dirname: str | None = None) -> list[pl.DataFrame]:
+    def load_event_files(self, events_dirname: str | None = None) -> list[EventDataFrame]:
         """Load all available event files.
 
         Parameters
@@ -327,7 +327,7 @@ class Dataset:
 
         Returns
         -------
-        list[pl.DataFrame]
+        list[EventDataFrame]
             List of event dataframes.
 
         Raises
@@ -337,7 +337,7 @@ class Dataset:
         """
         self._check_fileinfo()
 
-        event_dfs: list[pl.DataFrame] = []
+        event_dfs: list[EventDataFrame] = []
 
         # read and preprocess input files
         for fileinfo in tqdm(self.fileinfo.to_dicts()):
@@ -348,7 +348,7 @@ class Dataset:
             event_df = pl.read_ipc(filepath)
 
             # Add fileinfo columns to dataframe.
-            event_df = self._add_fileinfo(event_df, fileinfo)
+            event_df = EventDataFrame(self._add_fileinfo(event_df, fileinfo))
 
             event_dfs.append(event_df)
 
@@ -497,7 +497,7 @@ class Dataset:
 
         disable_progressbar = not verbose
 
-        event_dfs: list[pl.DataFrame] = []
+        event_dfs: list[EventDataFrame] = []
 
         for gaze_df, fileinfo in tqdm(
                 zip(self.gaze, self.fileinfo.to_dicts()), disable=disable_progressbar,
@@ -507,7 +507,7 @@ class Dataset:
             velocities = gaze_df.select(velocity_columns).to_numpy()
 
             event_df = method(positions=positions, velocities=velocities, **kwargs)
-            event_df = self._add_fileinfo(event_df, fileinfo)
+            event_df = EventDataFrame(self._add_fileinfo(event_df, fileinfo))
 
             event_dfs.append(event_df)
 
@@ -516,9 +516,11 @@ class Dataset:
             return
 
         for file_id, event_df in enumerate(event_dfs):
-            self.events[file_id] = pl.concat(
-                [self.events[file_id], event_df],
-                how='diagonal',
+            self.events[file_id] = EventDataFrame(
+                pl.concat(
+                    [self.events[file_id], event_df],
+                    how='diagonal',
+                ),
             )
 
     def clear_events(self) -> None:
@@ -527,7 +529,7 @@ class Dataset:
             return
 
         for file_id, _ in enumerate(self.events):
-            self.events[file_id] = pl.DataFrame(schema=Event.schema)
+            self.events[file_id] = EventDataFrame()
 
     def save(
             self,

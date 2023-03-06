@@ -20,9 +20,14 @@
 """
 This module holds basic checks which will be reused in other modules.
 """
+from __future__ import annotations
+
 from typing import Any
 
 import numpy as np
+import polars as pl
+
+from pymovements import exceptions
 
 
 def check_no_zeros(variable: Any, name: str = 'variable') -> None:
@@ -90,3 +95,137 @@ def check_shapes_positions_velocities(positions: np.ndarray, velocities: np.ndar
             f'shape of positions {positions.shape} does not match'
             f' shape of velocities {velocities.shape}',
         )
+
+
+def check_two_kwargs(**kwargs) -> None:
+    """Check if exactly two keyword arguments are given.
+
+    Parameters
+    ----------
+    kwargs
+        Keyword argument dictionary.
+
+    Raises
+    ------
+    ValueError
+        If number of keyword arguments is not 2.
+    """
+    if len(kwargs) != 2:
+        raise ValueError('there must be exactly two keyword arguments in kwargs')
+
+
+def check_is_mutual_exclusive(**kwargs) -> None:
+    """Check if at most one of two values is not None.
+
+    Parameters
+    ----------
+    kwargs
+        Keyword argument dictionary with 2 keyword arguments.
+
+    Raises
+    ------
+    ValueError
+        If more than one value is not None, or if number of keyword arguments is not 2.
+
+    """
+    check_two_kwargs(**kwargs)
+
+    key_1, key_2 = (key for _, key in zip(range(2), kwargs.keys()))
+    value_1 = kwargs[key_1]
+    value_2 = kwargs[key_2]
+
+    if (value_1 is not None) and (value_2 is not None):
+        raise ValueError(
+            f'The arguments "{key_1}" and "{key_2}" are mutually exclusive.',
+        )
+
+
+def check_is_none_is_mutual(**kwargs) -> None:
+    """Check if two values are either both None or both have a value.
+
+    Parameters
+    ----------
+    kwargs
+        Keyword argument dictionary with 2 keyword arguments.
+
+    Raises
+    ------
+    ValueError
+        If exclusively one of the keyword argument values is None, or if number of keyword arguments
+        is not 2.
+
+    """
+    check_two_kwargs(**kwargs)
+
+    key_1, key_2 = (key for _, key in zip(range(2), kwargs.keys()))
+    value_1 = kwargs[key_1]
+    value_2 = kwargs[key_2]
+
+    if not (value_1 is None) == (value_2 is None):
+        raise ValueError(
+            f'The arguments "{key_1}" and "{key_2}" must be either both None or both not None.',
+        )
+
+
+def check_is_length_matching(**kwargs) -> None:
+    """Check if two sequences are of equal length.
+
+    Parameters
+    ----------
+    kwargs
+        Keyword argument dictionary with 2 keyword arguments. Both values must be sequences.
+
+    Raises
+    ------
+    ValueError
+        If both sequences are of equal length , or if number of keyword arguments is not 2.
+    """
+    check_two_kwargs(**kwargs)
+
+    key_1, key_2 = (key for _, key in zip(range(2), kwargs.keys()))
+    value_1 = kwargs[key_1]
+    value_2 = kwargs[key_2]
+
+    if not len(value_1) == len(value_2):
+        raise ValueError(f'The sequences "{key_1}" and "{key_2}" must be of equal length.')
+
+
+class PreventOverridePolarsDataFrame(type):
+    """This metaclass prevents a class from overriding any attributes or functions of a
+    :py:class:`polars.DataFrame`.
+    """
+    _valid_override = {'__doc__', '__init__', '__module__'}
+
+    @staticmethod
+    def _check_methods(class_attributes: dict[str, Any], class_name: str):
+        """Check for intersection between an attribute dictionary and attributes of
+        :py:class:`polars.DataFrame`.
+
+        Parameters
+        ----------
+        class_attributes:
+            Dictionary of class attributes.
+        class_name:
+            Name of class.
+
+        Raises
+        ------
+        PolarsDataFrameOverride
+            If class attributes intersect with attributes of :py:class:`polars.DataFrame`.
+        """
+
+        dataframe_methods = set(pl.DataFrame.__dict__.keys())
+        class_methods = set(class_attributes.keys())
+        intersection = dataframe_methods & class_methods
+        intersection = intersection - PreventOverridePolarsDataFrame._valid_override
+
+        if intersection:
+            raise exceptions.PolarsDataFrameOverride(
+                f'class {class_name} must not override polars.DataFrame attribute/method: '
+                f"'{', '.join(intersection)}'",
+            )
+
+    def __new__(mcs, name, bases, mapping, **kwargs):
+        mcs._check_methods(mapping, name)
+        class_object = super().__new__(mcs, name, bases, mapping, **kwargs)
+        return class_object

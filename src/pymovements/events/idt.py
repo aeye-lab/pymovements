@@ -23,9 +23,8 @@ This module holds the implementation for idt algorithm.
 from __future__ import annotations
 
 import numpy as np
-import polars as pl
 
-from pymovements.events.events import Fixation
+from pymovements.events.events import EventDataFrame
 from pymovements.utils.checks import check_shapes_positions_velocities
 from pymovements.utils.filters import events_split_nans
 from pymovements.utils.filters import filter_candidates_remove_nans
@@ -57,7 +56,7 @@ def idt(
         dispersion_threshold: float,
         minimum_duration: int,
         include_nan: bool = False,
-) -> pl.DataFrame:
+) -> EventDataFrame:
     """
     Fixation identification based on dispersion threshold.
 
@@ -104,7 +103,8 @@ def idt(
     if minimum_duration <= 0:
         raise ValueError('minimum duration must be greater than 0')
 
-    fixations = []
+    onsets = []
+    offsets = []
 
     # Initialize window over first points to cover the duration threshold
     win_start = 0
@@ -143,26 +143,15 @@ def idt(
                 tmp_candidates = [
                     candidate for candidate in tmp_candidates if len(candidate) >= minimum_duration
                 ]
-
                 for candidate in tmp_candidates:
-                    fixations.append({
-                        'type': 'fixation',
-                        'onset': candidate[0],
-                        'offset': candidate[-1],
-                        'position': np.nanmean(positions[candidate], axis=0).tolist(),
-                    })
+                    onsets.append(candidate[0])
+                    offsets.append(candidate[-1])
 
             else:
                 # Note a fixation at the centroid of the window points.
-                # the mean is computed using all values except np.nan
-                centroid = np.nanmean(positions[win_start:win_end - 1], axis=0)
 
-                fixations.append({
-                    'type': 'fixation',
-                    'onset': win_start,
-                    'offset': win_end - 1,
-                    'position': centroid.tolist(),
-                })
+                onsets.append(win_start)
+                offsets.append(win_end - 1)
 
             # Remove window points from points.
             # Initialize new window excluding the previous window
@@ -172,12 +161,5 @@ def idt(
             # Move window start one step further without modifying window end.
             win_start += 1
 
-    if len(fixations) > 0:
-        # Create event dataframe.
-        event_df = pl.from_dicts(fixations, schema=Fixation.schema)
-
-    else:
-        # Create empty dataframe with correct schema if no events detected.
-        event_df = pl.DataFrame(schema=Fixation.schema)
-
+    event_df = EventDataFrame(name='fixation', onsets=onsets, offsets=offsets)
     return event_df

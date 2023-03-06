@@ -19,11 +19,10 @@
 # SOFTWARE.
 """This module tests functionality of the IDT algorithm."""
 import numpy as np
-import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
-from pymovements.events.events import Fixation
+from pymovements.events.events import EventDataFrame
 from pymovements.events.idt import idt
 from pymovements.synthetic import step_function
 from pymovements.transforms import pos2vel
@@ -139,7 +138,7 @@ def test_idt_raises_error(kwargs, expected_error):
                 'dispersion_threshold': 1,
                 'minimum_duration': 10,
             },
-            pl.DataFrame(schema=Fixation.schema),
+            EventDataFrame(),
             id='constant_velocity_no_fixation',
         ),
         pytest.param(
@@ -148,14 +147,10 @@ def test_idt_raises_error(kwargs, expected_error):
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
             },
-            pl.DataFrame(
-                {
-                    'type': ['fixation'],
-                    'onset': [0],
-                    'offset': [99],
-                    'position': [[0.0, 0.0]],
-                },
-                schema=Fixation.schema,
+            EventDataFrame(
+                name='fixation',
+                onsets=[0],
+                offsets=[99],
             ),
             id='constant_position_single_fixation',
         ),
@@ -170,14 +165,10 @@ def test_idt_raises_error(kwargs, expected_error):
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
             },
-            pl.DataFrame(
-                {
-                    'type': 'fixation',
-                    'onset': [0, 50],
-                    'offset': [49, 99],
-                    'position': [[0.0, 0.0], [1.0, 1.0]],
-                },
-                schema=Fixation.schema,
+            EventDataFrame(
+                name='fixation',
+                onsets=[0, 50],
+                offsets=[49, 99],
             ),
             id='three_steps_two_fixations',
         ),
@@ -193,14 +184,10 @@ def test_idt_raises_error(kwargs, expected_error):
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
             },
-            pl.DataFrame(
-                {
-                    'type': 'fixation',
-                    'onset': [0, 20],
-                    'offset': [9, 89],
-                    'position': [(0.0, 0.0), (0.0, 0.0)],
-                },
-                schema=Fixation.schema,
+            EventDataFrame(
+                name='fixation',
+                onsets=[0, 20],
+                offsets=[9, 89],
             ),
             id='two_fixations_nan_delete_leading_ending',
         ),
@@ -217,14 +204,10 @@ def test_idt_raises_error(kwargs, expected_error):
                 'minimum_duration': 1,
                 'include_nan': True,
             },
-            pl.DataFrame(
-                {
-                    'type': 'fixation',
-                    'onset': [0],
-                    'offset': [89],
-                    'position': [(0.0, 0.0)],
-                },
-                schema=Fixation.schema,
+            EventDataFrame(
+                name='fixation',
+                onsets=[0],
+                offsets=[89],
             ),
             id='one_fixation_nan_delete_leading_ending',
         ),

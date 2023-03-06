@@ -23,9 +23,7 @@ Test pymovements checks.
 import numpy as np
 import pytest
 
-from pymovements.utils.checks import check_nan_both_channels
-from pymovements.utils.checks import check_no_zeros
-from pymovements.utils.checks import check_shapes_positions_velocities
+from pymovements.utils import checks
 
 
 @pytest.mark.parametrize(
@@ -59,10 +57,10 @@ def test_check_no_zeros_raises_error(variable, expected_error, expected_err_msg)
     Test that check_no_zeros() only raises an Exception if there are zeros in the input array.
     """
     if expected_error is None:
-        check_no_zeros(variable)
+        checks.check_no_zeros(variable)
     else:
         with pytest.raises(expected_error) as excinfo:
-            check_no_zeros(variable)
+            checks.check_no_zeros(variable)
         msg, = excinfo.value.args
         assert msg == expected_err_msg
 
@@ -108,10 +106,10 @@ def test_check_nan_both_channels_raises_error(arr, expected_error, expected_err_
     occur at the same time step for both channels.
     """
     if expected_error is None:
-        check_nan_both_channels(arr)
+        checks.check_nan_both_channels(arr)
     else:
         with pytest.raises(expected_error) as excinfo:
-            check_nan_both_channels(arr)
+            checks.check_nan_both_channels(arr)
         msg, = excinfo.value.args
         assert msg == expected_err_msg
 
@@ -175,9 +173,48 @@ def test_check_shapes_positions_velocities_raises_error(kwargs, expected_error, 
     of the positions and velocities are not equal.
     """
     if expected_error is None:
-        check_shapes_positions_velocities(**kwargs)
+        checks.check_shapes_positions_velocities(**kwargs)
     else:
         with pytest.raises(expected_error) as excinfo:
-            check_shapes_positions_velocities(**kwargs)
+            checks.check_shapes_positions_velocities(**kwargs)
         msg, = excinfo.value.args
         assert msg == expected_err_msg
+
+
+def test_class_does_not_override_dataframe_method():
+    expected_msg_substrings = (
+        'TestDataFrame', 'must not override', 'attribute', 'schema',
+    )
+
+    with pytest.raises(Exception) as excinfo:
+        class TestDataFrame(metaclass=checks.PreventOverridePolarsDataFrame):
+            schema = None
+        TestDataFrame()
+
+    msg, = excinfo.value.args
+    for msg_substring in expected_msg_substrings:
+        assert msg_substring in msg
+
+
+def test_childclass_does_not_override_dataframe_method():
+    expected_msg_substrings = (
+        'Child', 'must not override', 'attribute', 'shape',
+    )
+
+    class Parent(metaclass=checks.PreventOverridePolarsDataFrame):
+        test_attribute = None
+
+    with pytest.raises(Exception) as excinfo:
+        class Child(Parent):
+            test_attribute = True
+            shape = 1
+        Child()
+
+    msg, = excinfo.value.args
+    for msg_substring in expected_msg_substrings:
+        assert msg_substring in msg
+
+
+def test_check_two_kwargs_with_three_kwargs_raises_value_error() -> None:
+    with pytest.raises(ValueError):
+        checks.check_two_kwargs(a=1, b=2, c=3)

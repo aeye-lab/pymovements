@@ -30,9 +30,7 @@ from polars.testing import assert_frame_equal
 from pymovements.base import Experiment
 from pymovements.datasets.dataset import Dataset
 from pymovements.events.engbert import microsaccades
-from pymovements.events.events import Event
-from pymovements.events.events import Fixation
-from pymovements.events.events import Saccade
+from pymovements.events.events import EventDataFrame
 from pymovements.events.ivt import ivt
 
 
@@ -208,11 +206,11 @@ def mock_toy(rootpath, raw_fileformat, eyes):
         event_df = pl.from_dict(
             {
                 'subject_id': fileinfo_row['subject_id'],
-                'type': 'saccade',
+                'name': 'saccade',
                 'onset': np.arange(0, 901, 100),
                 'offset': np.arange(10, 911, 100),
             },
-            schema={'subject_id': pl.Int64, 'type': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64},
+            schema={'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64},
         )
         event_dfs.append(event_df)
 
@@ -464,7 +462,7 @@ def test_detect_events_auto_eye(detect_event_kwargs, dataset_configuration):
     dataset.pos2vel()
     dataset.detect_events(**detect_event_kwargs)
 
-    expected_schema = {'subject_id': pl.Int64, **Saccade.schema}
+    expected_schema = {'subject_id': pl.Int64, **EventDataFrame._minimal_schema}
     for result_event_df in dataset.events:
         assert result_event_df.schema == expected_schema
 
@@ -514,7 +512,7 @@ def test_detect_events_explicit_eye(detect_event_kwargs, dataset_configuration):
     if exception is None:
         dataset.detect_events(**detect_event_kwargs)
 
-        expected_schema = {'subject_id': pl.Int64, **Saccade.schema}
+        expected_schema = {'subject_id': pl.Int64, **EventDataFrame._minimal_schema}
 
         for result_event_df in dataset.events:
             assert result_event_df.schema == expected_schema
@@ -538,7 +536,7 @@ def test_detect_events_explicit_eye(detect_event_kwargs, dataset_configuration):
                 'threshold': 1,
                 'eye': 'auto',
             },
-            {'subject_id': pl.Int64, **Saccade.schema},
+            {'subject_id': pl.Int64, **EventDataFrame._minimal_schema},
             id='two-saccade-runs',
         ),
         pytest.param(
@@ -552,7 +550,7 @@ def test_detect_events_explicit_eye(detect_event_kwargs, dataset_configuration):
                 'velocity_threshold': 1,
                 'minimum_duration': 1,
             },
-            {'subject_id': pl.Int64, **Saccade.schema, **Fixation.schema},
+            {'subject_id': pl.Int64, **EventDataFrame._minimal_schema},
             id='one-saccade-one-fixation-run',
         ),
     ],
@@ -610,27 +608,21 @@ def test_detect_events_attribute_error(dataset_configuration):
             id='empty_list_stays_empty_list',
         ),
         pytest.param(
-            [pl.DataFrame(schema=Event.schema)],
-            [pl.DataFrame(schema=Event.schema)],
+            [EventDataFrame()],
+            [EventDataFrame()],
             id='empty_df_stays_empty_df',
         ),
         pytest.param(
-            [pl.DataFrame({'type': ['event'], 'onset': [0], 'offset': [99]}, schema=Event.schema)],
-            [pl.DataFrame(schema=Event.schema)],
+            [EventDataFrame(name='event', onsets=[0], offsets=[99])],
+            [EventDataFrame()],
             id='single_instance_filled_df_gets_cleared_to_empty_df',
         ),
         pytest.param(
             [
-                pl.DataFrame(
-                    {'type': ['event'], 'onset': [0], 'offset': [99]},
-                    schema=Event.schema,
-                ),
-                pl.DataFrame(
-                    {'type': ['event'], 'onset': [0], 'offset': [99]},
-                    schema=Event.schema,
-                ),
+                EventDataFrame(name='event', onsets=[0], offsets=[99]),
+                EventDataFrame(name='event', onsets=[0], offsets=[99]),
             ],
-            [pl.DataFrame(schema=Event.schema), pl.DataFrame(schema=Event.schema)],
+            [EventDataFrame(), EventDataFrame()],
             id='two_instance_filled_df_gets_cleared_to_two_empty_dfs',
         ),
     ],
