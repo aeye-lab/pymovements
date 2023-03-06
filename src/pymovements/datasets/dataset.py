@@ -507,7 +507,7 @@ class Dataset:
             velocities = gaze_df.select(velocity_columns).to_numpy()
 
             event_df = method(positions=positions, velocities=velocities, **kwargs)
-            event_df = self._add_fileinfo(event_df, fileinfo)
+            event_df = EventDataFrame(self._add_fileinfo(event_df, fileinfo))
 
             event_dfs.append(event_df)
 
