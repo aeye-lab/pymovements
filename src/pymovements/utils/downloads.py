@@ -271,7 +271,7 @@ def _calculate_md5(filepath: Path, chunk_size: int = 1024 * 1024) -> str:
     # Setting the `usedforsecurity` flag does not change anything about the functionality, but
     # indicates that we are not using the MD5 checksum for cryptography.
     # This enables its usage in restricted environments like FIPS without raising an error.
-    file_md5 = hashlib.new('md5', usedforsecurity=False)  # type: ignore[call-arg]
+    file_md5 = hashlib.new('md5', usedforsecurity=False)
 
     with open(filepath, 'rb') as f:
         for chunk in iter(lambda: f.read(chunk_size), b''):
