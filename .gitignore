@@ -48,6 +48,8 @@ pip-delete-this-directory.txt
 docs/build
 docs/doctree*
 docs/source/reference/pymovements.*.rst
+docs/source/tutorials/data
+
 # Testing
 .tox
 .coverage
