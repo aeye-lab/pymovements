@@ -145,7 +145,7 @@ functionality. We try to keep our code coverage close to 100%.
 It is possible to limit the scope of testing to specific environments and files, for example, to
 only test transformations using the Python 3.7 environment use:
 ```bash
-tox -e py37 tests/test_transforms.py
+tox -e py37 tests/transforms_test.py
 ```
 
 
