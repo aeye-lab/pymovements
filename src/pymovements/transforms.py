@@ -343,7 +343,9 @@ def norm(arr: np.ndarray, axis: int | None = None) -> np.ndarray | Any:
 
 
 def split(
-    arr: np.ndarray, window_size: int, keep_padded: bool = True,
+        arr: np.ndarray,
+        window_size: int,
+        keep_padded: bool = True,
 ) -> np.ndarray:
     """Split sequence into subsequences of equal length.
 

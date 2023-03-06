@@ -34,13 +34,13 @@ from pymovements.utils.filters import filter_candidates_remove_nans
 
 
 def microsaccades(
-    positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
-    velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
-    threshold: np.ndarray | tuple[float] | str = 'engbert2015',
-    threshold_factor: float = 6,
-    minimum_duration: int = 6,
-    minimum_threshold: float = 1e-10,
-    include_nan: bool = False,
+        positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
+        velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
+        threshold: np.ndarray | tuple[float] | str = 'engbert2015',
+        threshold_factor: float = 6,
+        minimum_duration: int = 6,
+        minimum_threshold: float = 1e-10,
+        include_nan: bool = False,
 ) -> pl.DataFrame:
     """Detect micro-saccades from velocity gaze sequence.
 

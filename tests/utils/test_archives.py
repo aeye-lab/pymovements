@@ -216,7 +216,9 @@ def test_extract_archive_destination_path_None(recursive, remove_finished, archi
     ],
 )
 def test_extract_unsupported_archive_destination_path_None(
-    recursive, remove_finished, unsupported_archive,
+        recursive,
+        remove_finished,
+        unsupported_archive,
 ):
     with pytest.raises(RuntimeError) as excinfo:
         extract_archive(
@@ -269,7 +271,10 @@ def test_extract_archive_destination_path_not_None(recursive, remove_finished, a
     ],
 )
 def test_extract_unnsupported_archive_destination_path_not_None(
-        recursive, remove_finished, unsupported_archive, tmp_path,
+        recursive,
+        remove_finished,
+        unsupported_archive,
+        tmp_path,
 ):
     destination_path = tmp_path / pathlib.Path('tmpfoo')
     with pytest.raises(RuntimeError) as excinfo:
