@@ -54,7 +54,7 @@ class EventDataFrame(DataFrame):
 
         Parameters
         ----------
-        dataframe: pl.DataFrame
+        data: pl.DataFrame
             A dataframe to be transformed to a polars dataframe. This argument is mutually
             exclusive with all the other arguments.
         name: str
@@ -75,31 +75,8 @@ class EventDataFrame(DataFrame):
             checks.check_is_mutual_exclusive(data=data, offsets=offsets)
             checks.check_is_mutual_exclusive(data=data, name=name)
 
+            data = self._add_minimal_schema_columns(data)
             data_dict = data.to_dict()
-
-            # Add name column if it is missing.
-            if 'name' not in data_dict:
-                length = 0
-                for dict_value in data_dict.values():
-                    length = len(dict_value)
-                    break
-                data_dict['name'] = pl.Series([] * length, dtype=pl.Utf8)
-
-            # Add onset column if it is missing.
-            if 'onset' not in data_dict:
-                length = 0
-                for dict_value in data_dict.values():
-                    length = len(dict_value)
-                    break
-                data_dict['onset'] = pl.Series([] * length, dtype=pl.Int64)
-
-            # Add offset column if it is missing.
-            if 'offset' not in data_dict:
-                length = 0
-                for dict_value in data_dict.values():
-                    length = len(dict_value)
-                    break
-                data_dict['offset'] = pl.Series([] * length, dtype=pl.Int64)
 
         else:
             # Make sure that if either onsets or offsets is None, the other one is None too.
@@ -133,6 +110,20 @@ class EventDataFrame(DataFrame):
                 }
 
         super().__init__(data=data_dict, schema_overrides=self._minimal_schema)
+
+    def _add_minimal_schema_columns(self, df: pl.DataFrame) -> pl.DataFrame:
+        """Add minimal schema columns to :py:class:`polars.DataFrame` if they are missing."""
+        if len(df) == 0:
+            return pl.DataFrame(schema={**self._minimal_schema, **df.schema})
+
+        df = df.select(
+            [
+                pl.lit(None).cast(column_type).alias(column_name)
+                for column_name, column_type in self._minimal_schema.items()
+                if column_name not in df.columns
+            ] + [pl.all()],
+        )
+        return df
 
 
 class EventDetectionCallable(Protocol):
