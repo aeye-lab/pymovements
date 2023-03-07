@@ -36,7 +36,7 @@ screen_cm_2d = [100, 100]
 
 
 @pytest.mark.parametrize(
-    'kwargs, expected_error',
+explicetly    'kwargs, expected_error, exp_err_msg',
     [
         pytest.param(
             {
@@ -47,6 +47,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             TypeError,
+            'arr must not be None',
             id='none_coords_raises_type_error',
         ),
         pytest.param(
@@ -58,6 +59,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             TypeError,
+            "unsupported operand type(s) for /: 'NoneType' and 'int'",
             id='none_screen_px_raises_type_error',
         ),
         pytest.param(
@@ -69,6 +71,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             TypeError,
+            "unsupported operand type(s) for /: 'int' and 'NoneType'",
             id='none_screen_cm_raises_type_error',
         ),
         pytest.param(
@@ -80,6 +83,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             TypeError,
+            "unsupported operand type(s) for *: 'NoneType' and 'float'",
             id='none_distance_cm_raises_type_error',
         ),
         pytest.param(
@@ -91,6 +95,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             ValueError,
+            'screen_px must not be zero',
             id='zero_screen_px_raises_value_error',
         ),
         pytest.param(
@@ -102,6 +107,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             ValueError,
+            'screen_cm must not be zero',
             id='zero_screen_cm_raises_value_error',
         ),
         pytest.param(
@@ -113,6 +119,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             ValueError,
+            'distance_cm must not be zero',
             id='zero_distance_cm_raises_value_error',
         ),
         pytest.param(
@@ -124,6 +131,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             ValueError,
+            'Number of dimensions of arr must be either 0, 1 or 2 (arr.ndim: 3)',
             id='rank_3_tensor_raises_value_error',
         ),
         pytest.param(
@@ -135,6 +143,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             ValueError,
+            'arr is 2-dimensional, but screen_px is not',
             id='list_coords_2d_screen_px_1d_raises_value_error',
         ),
         pytest.param(
@@ -146,6 +155,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             ValueError,
+            'arr is 2-dimensional, but screen_cm is not',
             id='list_coords_2d_screen_cm_1d_raises_value_error',
         ),
         pytest.param(
@@ -157,6 +167,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             ValueError,
+            'arr is 1-dimensional, but screen_px is not',
             id='list_coords_1d_screen_px_2d_raises_value_error',
         ),
         pytest.param(
@@ -168,6 +179,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             ValueError,
+            'arr is 1-dimensional, but screen_cm is not',
             id='list_coords_1d_screen_cm_2d_raises_value_error',
         ),
         pytest.param(
@@ -179,6 +191,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             ValueError,
+            'Last coord dimension must have length 1, 2 or 4. (arr.shape: (100, 3))',
             id='list_coords_3d_raises_value_error',
         ),
         pytest.param(
@@ -190,6 +203,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             ValueError,
+            'arr is 4-dimensional, but screen_px is not 2-dimensional',
             id='list_coords_4d_screen_px_not_2d_raises_value_error',
         ),
         pytest.param(
@@ -201,6 +215,7 @@ screen_cm_2d = [100, 100]
                 'origin': 'center',
             },
             ValueError,
+            'arr is 4-dimensional, but screen_cm is not 2-dimensional',
             id='list_coords_4d_screen_cm_not_2d_raises_value_error',
         ),
         pytest.param(
@@ -212,13 +227,16 @@ screen_cm_2d = [100, 100]
                 'origin': 'invalid',
             },
             ValueError,
+            'origin invalid is not supported.',
             id='invalid_origin_str_raises_value_error',
         ),
     ],
 )
-def test_pix2deg_raises_error(kwargs, expected_error):
-    with pytest.raises(expected_error):
+def test_pix2deg_raises_error(kwargs, expected_error, exp_err_msg):
+    with pytest.raises(expected_error) as error_info:
         pix2deg(**kwargs)
+    actual_msg, = error_info.value.args
+    assert actual_msg == exp_err_msg
 
 
 @pytest.mark.parametrize(
@@ -419,7 +437,7 @@ def test_pix2deg_returns(kwargs, expected_value):
 
 
 @pytest.mark.parametrize(
-    'kwargs, expected_error',
+    'kwargs, expected_error, exp_err_msg',
     [
         pytest.param(
             {
@@ -427,6 +445,7 @@ def test_pix2deg_returns(kwargs, expected_value):
                 'sampling_rate': 0,
             },
             ValueError,
+            'sampling_rate needs to be above zero',
             id='sampling_rate_zero_raises_value_error',
         ),
         pytest.param(
@@ -435,6 +454,7 @@ def test_pix2deg_returns(kwargs, expected_value):
                 'sampling_rate': -1,
             },
             ValueError,
+            'sampling_rate needs to be above zero',
             id='sampling_rate_less_zero_raises_value_error',
         ),
         pytest.param(
@@ -443,6 +463,7 @@ def test_pix2deg_returns(kwargs, expected_value):
                 'method': 'smooth',
             },
             ValueError,
+            'arr has to have at least 6 elements for method "smooth"',
             id='list_length_below_six_method_smooth_raises_value_error',
         ),
         pytest.param(
@@ -451,6 +472,7 @@ def test_pix2deg_returns(kwargs, expected_value):
                 'method': 'neighbors',
             },
             ValueError,
+            'arr has to have at least 3 elements for method "neighbors"',
             id='list_length_below_three_method_neighbors_raises_value_error',
         ),
         pytest.param(
@@ -459,6 +481,7 @@ def test_pix2deg_returns(kwargs, expected_value):
                 'method': 'preceding',
             },
             ValueError,
+            'arr has to have at least 2 elements for method "preceding"',
             id='list_length_below_two_method_preceding_raises_value_error',
         ),
         pytest.param(
@@ -467,6 +490,8 @@ def test_pix2deg_returns(kwargs, expected_value):
                 'method': 'invalid',
             },
             ValueError,
+            "Method needs to be in ['smooth', 'neighbors', 'preceding', 'savitzky_golay'] "
+            "(is: invalid)",
             id='invalid_method_raises_value_error',
         ),
         pytest.param(
@@ -475,6 +500,7 @@ def test_pix2deg_returns(kwargs, expected_value):
                 'method': 'smooth',
             },
             ValueError,
+            'arr needs to have 1 or 2 dimensions (arr dimensions are: 3)',
             id='wrong_dimensions_input_arr_raises_value_error',
         ),
         pytest.param(
@@ -484,13 +510,16 @@ def test_pix2deg_returns(kwargs, expected_value):
                 'kwargs': {},
             },
             ValueError,
+            "selected method doesn't support any additional kwargs",
             id='kwargs_passed_but_method_not_savitzky_golay_raises_value_error',
         ),
     ],
 )
-def test_pos2vel_raises_error(kwargs, expected_error):
-    with pytest.raises(expected_error):
+def test_pos2vel_raises_error(kwargs, expected_error, exp_err_msg):
+    with pytest.raises(expected_error) as error_info:
         pos2vel(**kwargs)
+    actual_err_msg, = error_info.value.args
+    assert actual_err_msg == exp_err_msg
 
 
 @pytest.mark.parametrize(
@@ -641,18 +670,23 @@ def test_norm(params, expected_value):
 
 
 @pytest.mark.parametrize(
-    'params, expected_error',
+    'params, expected_error, exp_err_msg',
     [
         pytest.param(
             {'arr': np.ones((2, 2, 5, 5)), 'axis': None},
             ValueError,
+            'Axis can not be inferred in case of more than 3 input array dimensions '
+            '(arr.shape=(2, 2, 5, 5)). Either reduce the number of input array dimensions '
+            'or specify `axis` explicitly.',
             id='4_dim_array_no_axis_raises_value_error',
         ),
     ],
 )
-def test_norm_raises_exception(params, expected_error):
-    with pytest.raises(expected_error):
+def test_norm_raises_exception(params, expected_error, exp_err_msg):
+    with pytest.raises(expected_error) as error_info:
         norm(**params)
+    actual_msg, = error_info.value.args
+    assert actual_msg == exp_err_msg
 
 
 @pytest.mark.parametrize(

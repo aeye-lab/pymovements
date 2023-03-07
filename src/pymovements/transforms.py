@@ -108,7 +108,7 @@ def pix2deg(
         raise TypeError('arr must not be None')
 
     checks.check_no_zeros(screen_px, 'screen_px')
-    checks.check_no_zeros(screen_cm, 'screen_px')
+    checks.check_no_zeros(screen_cm, 'screen_cm')
     checks.check_no_zeros(distance_cm, 'distance_cm')
 
     arr = np.array(arr)
@@ -223,7 +223,7 @@ def pos2vel(
 
     if arr.ndim not in [1, 2]:
         raise ValueError(
-            'arr needs to have 1 or 2 dimensions (are: {arr.ndim = })',
+            f'arr needs to have 1 or 2 dimensions (arr dimensions are: {arr.ndim})',
         )
     if method == 'smooth' and arr.shape[0] < 6:
         raise ValueError(
