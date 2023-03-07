@@ -36,7 +36,7 @@ screen_cm_2d = [100, 100]
 
 
 @pytest.mark.parametrize(
-'kwargs, expected_error, exp_err_msg',
+    'kwargs, expected_error, exp_err_msg',
     [
         pytest.param(
             {
@@ -491,7 +491,7 @@ def test_pix2deg_returns(kwargs, expected_value):
             },
             ValueError,
             "Method needs to be in ['smooth', 'neighbors', 'preceding', 'savitzky_golay'] "
-            "(is: invalid)",
+            '(is: invalid)',
             id='invalid_method_raises_value_error',
         ),
         pytest.param(
