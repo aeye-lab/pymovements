@@ -234,6 +234,7 @@ def test_idt_detects_fixations(kwargs, expected):
 
     assert_frame_equal(events.frame, expected.frame)
 
+
 @pytest.mark.parametrize(
     ('kwargs', 'exception', 'msg_substrings'),
     [
