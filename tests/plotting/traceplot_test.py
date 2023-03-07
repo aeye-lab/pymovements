@@ -17,13 +17,14 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Test traceplot."""
 from unittest.mock import Mock
 
 import matplotlib.colors
-import matplotlib.figure as figure
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
+from matplotlib import figure
 
 from pymovements.plotting import traceplot
 

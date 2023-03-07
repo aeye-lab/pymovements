@@ -124,6 +124,11 @@ def tsplot(
 
         ax.plot(t, x_channel, color=line_color, linewidth=line_width)
 
+        if not share_y:
+            y_pad_factor = 1.1
+            ylim_abs = np.nanmax(np.abs(arr[channel_id]))
+            ylims = -ylim_abs * y_pad_factor, ylim_abs * y_pad_factor
+
         ax.set_xlim(xlims)
         ax.set_ylim(ylims)
 

@@ -17,12 +17,13 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Test tsplot."""
 from unittest.mock import Mock
 
-import matplotlib.figure as figure
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
+from matplotlib import figure
 
 from pymovements.plotting import tsplot
 
@@ -40,6 +41,13 @@ def arr_fixture():
     'kwargs',
     [
         pytest.param({}, id='no_kwargs'),
+        pytest.param({'share_y': False}, id='share_y_false'),
+        pytest.param({'show_yticks': False}, id='show_yticks_false'),
+        pytest.param({'channel_names': ['foo', 'bar']}, id='channel_names'),
+        pytest.param(
+            {'channel_names': ['foo', 'bar'], 'rotate_ylabels': False},
+            id='channel_names_no_rotate',
+        ),
     ],
 )
 def test_tsplot_show(arr, kwargs, monkeypatch):
@@ -61,3 +69,21 @@ def test_tsplot_save(arr, monkeypatch, tmp_path):
     monkeypatch.setattr(figure.Figure, 'savefig', mock)
     tsplot(arr, show=False, savepath=str(tmp_path / 'test.svg'))
     mock.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    ('kwargs', 'exception'),
+    [
+        pytest.param(
+            {'arr': np.ones((1000, 3, 3))},
+            ValueError,
+            id='3_dim_input',
+        ),
+    ],
+)
+def test_tsplot_exceptions(kwargs, exception, monkeypatch):
+    mock = Mock()
+    monkeypatch.setattr(plt, 'show', mock)
+
+    with pytest.raises(exception):
+        tsplot(**kwargs)
