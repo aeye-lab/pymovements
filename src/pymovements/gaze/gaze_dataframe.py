@@ -24,7 +24,7 @@ from typing import Any
 
 import polars as pl
 
-from pymovements.gaze.base import Experiment
+from pymovements.gaze.experiment import Experiment
 
 
 class GazeDataFrame:

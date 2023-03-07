@@ -31,7 +31,7 @@ from pymovements.datasets.dataset import Dataset
 from pymovements.events.engbert import microsaccades
 from pymovements.events.events import EventDataFrame
 from pymovements.events.ivt import ivt
-from pymovements.gaze.base import Experiment
+from pymovements.gaze.experiment import Experiment
 
 
 def create_raw_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):

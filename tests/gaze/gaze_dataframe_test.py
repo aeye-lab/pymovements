@@ -22,7 +22,7 @@ import numpy as np
 import polars as pl
 import pytest
 
-from pymovements.gaze.base import Experiment
+from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
 
 

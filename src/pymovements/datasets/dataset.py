@@ -30,7 +30,7 @@ from tqdm.auto import tqdm
 from pymovements.events.events import EventDataFrame
 from pymovements.events.events import EventDetectionCallable
 from pymovements.gaze import GazeDataFrame
-from pymovements.gaze.base import Experiment
+from pymovements.gaze.experiment import Experiment
 from pymovements.utils.paths import match_filepaths
 
 
