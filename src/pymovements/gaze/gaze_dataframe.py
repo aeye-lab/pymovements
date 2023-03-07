@@ -20,8 +20,6 @@
 """Module for the GazeDataFrame."""
 from __future__ import annotations
 
-from typing import Any
-
 import polars as pl
 
 from pymovements.gaze.experiment import Experiment
@@ -151,12 +149,6 @@ class GazeDataFrame:
     def schema(self) -> pl.datatypes.SchemaDict:
         """Schema of event dataframe."""
         return self.frame.schema
-
-    def __len__(self) -> int:
-        return self.frame.__len__()
-
-    def __getitem__(self, *args, **kwargs) -> Any:
-        return self.frame.__getitem__(*args, **kwargs)
 
     @property
     def columns(self) -> list[str]:
