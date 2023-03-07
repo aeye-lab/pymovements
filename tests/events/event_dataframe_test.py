@@ -235,3 +235,10 @@ def test_event_dataframe_add_property_has_expected_result(
     event_df.add_property(**property_kwargs)
 
     assert_frame_equal(event_df.frame, expected_df.frame)
+
+
+def test_event_dataframe_columns_same_as_frame():
+    init_kwargs = {'onsets': [0], 'offsets': [1]}
+    event_df = EventDataFrame(**init_kwargs)
+
+    assert event_df.columns == event_df.frame.columns
