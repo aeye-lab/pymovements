@@ -22,6 +22,7 @@ import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
+from pymovements import exceptions
 from pymovements.events.events import EventDataFrame
 
 
@@ -29,10 +30,6 @@ from pymovements.events.events import EventDataFrame
 def fixture_dataset():
     schema = {'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64}
     yield schema
-
-
-def test_event_dataframe_is_polars_dataframe():
-    assert issubclass(EventDataFrame, pl.DataFrame)
 
 
 @pytest.mark.parametrize(
@@ -182,4 +179,59 @@ def test_event_dataframe_init_expected(args, kwargs, expected_df_data, minimal_s
     event_df = EventDataFrame(*args, **kwargs)
 
     expected_df = pl.DataFrame(data=expected_df_data, schema=minimal_schema)
-    assert_frame_equal(event_df, expected_df)
+    assert_frame_equal(event_df.frame, expected_df)
+
+
+@pytest.mark.parametrize(
+    ('init_kwargs', 'property_kwargs', 'exception', 'msg_substrings'),
+    [
+        pytest.param(
+            {},
+            {'property_name': 'foo'},
+            exceptions.InvalidProperty,
+            ('foo', 'invalid', 'valid', 'duration'),
+            id='invalid_property',
+        ),
+    ],
+)
+def test_event_dataframe_add_property_raises_exceptions(
+        init_kwargs, property_kwargs, exception, msg_substrings,
+):
+    event_df = EventDataFrame(**init_kwargs)
+
+    with pytest.raises(exception) as excinfo:
+        event_df.add_property(**property_kwargs)
+
+    msg, = excinfo.value.args
+    for msg_substring in msg_substrings:
+        assert msg_substring.lower() in msg.lower()
+
+
+@pytest.mark.parametrize(
+    ('init_kwargs', 'property_kwargs', 'expected_df'),
+    [
+        pytest.param(
+            {'onsets': [0], 'offsets': [1]},
+            {'property_name': 'duration'},
+            EventDataFrame(pl.DataFrame({'name': '', 'onset': 0, 'offset': 1, 'duration': 1})),
+            id='single_event_duration_property',
+        ),
+        pytest.param(
+            {'onsets': [0, 100], 'offsets': [1, 111]},
+            {'property_name': 'duration'},
+            EventDataFrame(
+                pl.DataFrame(
+                    {'name': ['', ''], 'onset': [0, 100], 'offset': [1, 111], 'duration': [1, 11]},
+                ),
+            ),
+            id='two_events_duration_property',
+        ),
+    ],
+)
+def test_event_dataframe_add_property_has_expected_result(
+        init_kwargs, property_kwargs, expected_df,
+):
+    event_df = EventDataFrame(**init_kwargs)
+    event_df.add_property(**property_kwargs)
+
+    assert_frame_equal(event_df.frame, expected_df.frame)

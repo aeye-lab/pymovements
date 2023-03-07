@@ -23,16 +23,18 @@ This module holds all the main Event classes used for event detection.
 from __future__ import annotations
 
 from collections.abc import Sequence
+from typing import Any
 
 import numpy as np
 import polars as pl
 from typing_extensions import Protocol
 
-from pymovements.base import DataFrame
+from pymovements import exceptions
+from pymovements.events import event_properties
 from pymovements.utils import checks
 
 
-class EventDataFrame(DataFrame):
+class EventDataFrame:
     """A DataFrame for event data.
 
     Each row has at least an event name with its onset and offset specified.
@@ -109,7 +111,53 @@ class EventDataFrame(DataFrame):
                     'offset': pl.Series([], dtype=pl.Int64),
                 }
 
-        super().__init__(data=data_dict, schema_overrides=self._minimal_schema)
+        self.frame = pl.DataFrame(data=data_dict, schema_overrides=self._minimal_schema)
+
+    def add_property(self, property_name: str) -> EventDataFrame:
+        """Add an event property column to the event dataframe.
+
+        Parameters
+        ----------
+        property_name: str
+            The name of the property
+
+        Returns
+        -------
+        EventDataFrame
+            Reference to ``self`` to enable method chaining.
+
+        Raises
+        ------
+        InvalidProperty
+            If ``property_name`` is not a valid property. See
+            :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
+        """
+        property_expression = event_properties.PROPERTIES.get(property_name, None)
+
+        if property_expression is None:
+            valid_properties = list(event_properties.PROPERTIES.keys())
+            raise exceptions.InvalidProperty(
+                property_name=property_name, valid_properties=valid_properties,
+            )
+
+        self.frame = self.frame.select([pl.all(), property_expression()])
+        return self
+
+    @property
+    def schema(self) -> pl.datatypes.SchemaDict:
+        """Schema of event dataframe."""
+        return self.frame.schema
+
+    def __len__(self) -> int:
+        return self.frame.__len__()
+
+    def __getitem__(self, *args, **kwargs) -> Any:
+        return self.frame.__getitem__(*args, **kwargs)
+
+    @property
+    def columns(self) -> list[str]:
+        """List of column names."""
+        return self.frame.columns
 
     def _add_minimal_schema_columns(self, df: pl.DataFrame) -> pl.DataFrame:
         """Add minimal schema columns to :py:class:`polars.DataFrame` if they are missing."""

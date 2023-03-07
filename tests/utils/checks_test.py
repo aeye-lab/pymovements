@@ -181,40 +181,6 @@ def test_check_shapes_positions_velocities_raises_error(kwargs, expected_error, 
         assert msg == expected_err_msg
 
 
-def test_class_does_not_override_dataframe_method():
-    expected_msg_substrings = (
-        'TestDataFrame', 'must not override', 'attribute', 'schema',
-    )
-
-    with pytest.raises(Exception) as excinfo:
-        class TestDataFrame(metaclass=checks.PreventOverridePolarsDataFrame):
-            schema = None
-        TestDataFrame()
-
-    msg, = excinfo.value.args
-    for msg_substring in expected_msg_substrings:
-        assert msg_substring in msg
-
-
-def test_childclass_does_not_override_dataframe_method():
-    expected_msg_substrings = (
-        'Child', 'must not override', 'attribute', 'shape',
-    )
-
-    class Parent(metaclass=checks.PreventOverridePolarsDataFrame):
-        test_attribute = None
-
-    with pytest.raises(Exception) as excinfo:
-        class Child(Parent):
-            test_attribute = True
-            shape = 1
-        Child()
-
-    msg, = excinfo.value.args
-    for msg_substring in expected_msg_substrings:
-        assert msg_substring in msg
-
-
 def test_check_two_kwargs_with_three_kwargs_raises_value_error() -> None:
     with pytest.raises(ValueError):
         checks.check_two_kwargs(a=1, b=2, c=3)

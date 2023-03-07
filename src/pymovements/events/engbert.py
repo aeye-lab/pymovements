@@ -25,7 +25,6 @@ from __future__ import annotations
 from collections.abc import Sized
 
 import numpy as np
-import polars as pl
 
 from pymovements.events.events import EventDataFrame
 from pymovements.transforms import consecutive
@@ -41,7 +40,7 @@ def microsaccades(
         minimum_duration: int = 6,
         minimum_threshold: float = 1e-10,
         include_nan: bool = False,
-) -> pl.DataFrame:
+) -> EventDataFrame:
     """Detect micro-saccades from velocity gaze sequence.
 
     This algorithm has a noise-adaptive velocity threshold parameter, which can also be set

@@ -17,18 +17,27 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Exceptions module."""
+"""This module holds all supported event properties."""
 from __future__ import annotations
 
+from collections.abc import Callable
 
-class InvalidProperty(Exception):
-    """Raised if requested property is invalid."""
-
-    def __init__(self, property_name: str, valid_properties: list[str]):
-        message = f"property '{property_name}' is invalid. Valid properties are: {valid_properties}"
-        super().__init__(message)
+import polars as pl
 
 
-class MissingColumns(Exception):
-    """Raised if expected columns are not available in the particular
-    :py:class:`polars.DataFrame`."""
+PROPERTIES: dict[str, Callable] = {}
+
+
+def register_property(function: Callable) -> Callable:
+    """Register a function as a valid property."""
+    PROPERTIES[function.__name__] = function
+    return function
+
+
+@register_property
+def duration() -> pl.Expr:
+    """Duration of an event.
+
+    The duration is defined as the difference between offset time and onset time.
+    """
+    return (pl.col('offset') - pl.col('onset')).alias('duration')

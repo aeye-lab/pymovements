@@ -218,4 +218,4 @@ def test_idt_detects_fixations(kwargs, expected):
     velocities = pos2vel(kwargs['positions'], sampling_rate=10, method='preceding')
     events = idt(velocities=velocities, **kwargs)
 
-    assert_frame_equal(events, expected)
+    assert_frame_equal(events.frame, expected.frame)

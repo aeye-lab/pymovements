@@ -177,7 +177,7 @@ def test_microsaccades_detects_saccades(kwargs, expected):
 
     print(events)
     print(expected)
-    assert_frame_equal(events, expected)
+    assert_frame_equal(events.frame, expected.frame)
 
 
 @pytest.mark.parametrize(
