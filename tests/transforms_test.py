@@ -36,7 +36,7 @@ screen_cm_2d = [100, 100]
 
 
 @pytest.mark.parametrize(
-explicetly    'kwargs, expected_error, exp_err_msg',
+'kwargs, expected_error, exp_err_msg',
     [
         pytest.param(
             {
