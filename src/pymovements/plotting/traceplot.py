@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """
-This module holds all plotting functions.
+This module holds the tracepot.
 """
 from __future__ import annotations
 
@@ -141,10 +141,10 @@ def traceplot(
         cval = np.zeros(n)
         show_cbar = False
 
-    if cmap_norm is None:
-        cval_max = np.nanmax(np.abs(cval))
-        cval_min = np.nanmin(cval)
+    cval_max = np.nanmax(np.abs(cval))
+    cval_min = np.nanmin(cval)
 
+    if cmap_norm is None:
         if cval_max and cval_min < 0:
             cmap_norm = 'twoslope'
         elif cval_max:
