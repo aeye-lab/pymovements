@@ -510,6 +510,7 @@ class Dataset:
             event_df = method(
                 positions=positions, velocities=velocities, timesteps=timesteps, **kwargs,
             )
+
             event_df.frame = self._add_fileinfo(event_df.frame, fileinfo)
 
             event_dfs.append(event_df)
