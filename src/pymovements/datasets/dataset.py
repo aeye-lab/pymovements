@@ -27,10 +27,10 @@ from typing import Any
 import polars as pl
 from tqdm.auto import tqdm
 
-from pymovements.base import Experiment
 from pymovements.events.events import EventDataFrame
 from pymovements.events.events import EventDetectionCallable
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
+from pymovements.gaze import GazeDataFrame
+from pymovements.gaze.base import Experiment
 from pymovements.utils.paths import match_filepaths
 
 

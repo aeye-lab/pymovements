@@ -24,5 +24,3 @@ from pymovements import gaze  # noqa: F401
 from pymovements import plotting  # noqa: F401
 from pymovements import synthetic  # noqa: F401
 from pymovements import utils  # noqa: F401
-from pymovements.base import Experiment  # noqa: F401
-from pymovements.base import Screen  # noqa: F401

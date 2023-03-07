@@ -18,14 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Module for the GazeDataFrame."""
-
 from __future__ import annotations
 
 from typing import Any
 
 import polars as pl
 
-import pymovements
+from pymovements.gaze.base import Experiment
 
 
 class GazeDataFrame:
@@ -50,7 +49,7 @@ class GazeDataFrame:
     def __init__(
             self,
             data: pl.DataFrame | None = None,
-            experiment: pymovements.Experiment | None = None,
+            experiment: Experiment | None = None,
     ):
         """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
 

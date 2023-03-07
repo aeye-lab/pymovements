@@ -27,11 +27,11 @@ import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
-from pymovements.base import Experiment
 from pymovements.datasets.dataset import Dataset
 from pymovements.events.engbert import microsaccades
 from pymovements.events.events import EventDataFrame
 from pymovements.events.ivt import ivt
+from pymovements.gaze.base import Experiment
 
 
 def create_raw_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):
@@ -933,10 +933,14 @@ def test_check_gaze_dataframe(new_gaze, exception):
         dataset._check_gaze_dataframe()
 
 
-def test_check_experiment():
-    dataset = Dataset('data')
+@pytest.mark.parametrize('dataset_configuration', ['ToyBino'], indirect=['dataset_configuration'])
+def test_check_experiment(dataset_configuration):
+    dataset_configuration['init_kwargs'].pop('experiment')
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+
     with pytest.raises(AttributeError):
-        dataset._check_experiment()
+        dataset.gaze[0]._check_experiment()
 
 
 @pytest.mark.parametrize('dataset_configuration', ['ToyBino'], indirect=['dataset_configuration'])
