@@ -233,3 +233,39 @@ def test_idt_detects_fixations(kwargs, expected):
     events = idt(velocities=velocities, **kwargs)
 
     assert_frame_equal(events.frame, expected.frame)
+
+@pytest.mark.parametrize(
+    ('kwargs', 'exception', 'msg_substrings'),
+    [
+        pytest.param(
+            {
+                'positions': step_function(length=10, steps=[0], values=[(0, 0)]),
+                'timesteps': np.concatenate([
+                    np.arange(0, 5, dtype=int), np.arange(7, 12, dtype=int),
+                ]),
+                'dispersion_threshold': 1,
+                'minimum_duration': 1,
+            },
+            ValueError, ('interval', 'timesteps', 'constant'),
+            id='non_constant_timesteps_interval',
+        ),
+        pytest.param(
+            {
+                'positions': step_function(length=10, steps=[0], values=[(0, 0)]),
+                'timesteps': np.arange(0, 30, step=3, dtype=int),
+                'dispersion_threshold': 1,
+                'minimum_duration': 2,
+            },
+            ValueError, ('interval', 'timesteps', 'divisible', 'minimum_duration'),
+            id='minimum_duration_not_divisible_by_timesteps_interval',
+        ),
+    ],
+)
+def test_idt_timesteps_exceptions(kwargs, exception, msg_substrings):
+    velocities = pos2vel(kwargs['positions'], sampling_rate=10, method='preceding')
+    with pytest.raises(exception) as excinfo:
+        idt(velocities=velocities, **kwargs)
+
+    msg, = excinfo.value.args
+    for msg_substring in msg_substrings:
+        assert msg_substring.lower() in msg.lower()
