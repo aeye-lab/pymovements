@@ -28,7 +28,6 @@ import numpy as np
 from matplotlib import colors
 from matplotlib.collections import LineCollection
 
-
 default_segmentdata = {
     'red': [
         [0.0, 0.0, 0.0],
@@ -101,7 +100,7 @@ def traceplot(
     cmap: matplotlib.colors.Colormap, optional
         color map for line color values
     cmap_norm: matplotlib.colors.Normalize, str, optional
-        normalization for color values
+        normalization for color values. str value is only supported for Python >=3.8.
     cmap_segmentdata: dict, optional
         color map segmentation to build color map
     cbar_label: str, optional
@@ -124,7 +123,9 @@ def traceplot(
     Raises
     ------
     ValueError
-        If length of x and y coordinates do not match.
+        If length of x and y coordinates do not match or if ``cmap_norm`` is of type ``str``
+        although
+
     """
 
     if len(x) != len(y):
@@ -173,6 +174,17 @@ def traceplot(
         )
     elif cmap_norm == 'nonorm':
         cmap_norm = matplotlib.colors.NoNorm()
+
+    elif isinstance(cmap_norm, str):
+        # pylint: disable=protected-access
+        scale_class = matplotlib.scale._scale_mapping.get(cmap_norm, None)
+
+        if scale_class is None:
+            raise ValueError(f'cmap_norm string {cmap_norm} is not supported')
+
+        cmap_norm = matplotlib.colors.make_norm_from_scale(scale_class)(
+            matplotlib.colors.Normalize,
+        )()
 
     # Create a set of line segments so that we can color them individually
     # This creates the points as a N x 1 x 2 array so that we can stack points

@@ -104,6 +104,16 @@ def test_traceplot_save(args, monkeypatch, tmp_path):
             ValueError,
             id='different_lengths',
         ),
+        pytest.param(
+            {
+                'x': np.arange(-100, 100),
+                'y': np.arange(-100, 100),
+                'cval': np.arange(0, 200),
+                'cmap_norm': 'invalid',
+            },
+            ValueError,
+            id='cmap_norm_unsupported',
+        ),
     ],
 )
 def test_traceplot_exceptions(kwargs, exception, monkeypatch):
