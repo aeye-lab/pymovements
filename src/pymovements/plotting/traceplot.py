@@ -100,7 +100,7 @@ def traceplot(
     cmap: matplotlib.colors.Colormap, optional
         color map for line color values
     cmap_norm: matplotlib.colors.Normalize, str, optional
-        normalization for color values. str value is only supported for Python >=3.8.
+        normalization for color values.
     cmap_segmentdata: dict, optional
         color map segmentation to build color map
     cbar_label: str, optional
