@@ -24,7 +24,6 @@ from abc import ABCMeta
 from abc import abstractmethod
 from pathlib import Path
 from typing import Any
-from urllib.error import URLError
 
 from pymovements.base import Experiment
 from pymovements.datasets.dataset import Dataset
@@ -157,7 +156,7 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
                     )
                     success = True
 
-                except URLError as error:
+                except (OSError, RuntimeError) as error:
                     print(f'Failed to download (trying next):\n{error}')
                     # downloading the resource, try next mirror
                     continue
