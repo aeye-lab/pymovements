@@ -125,7 +125,8 @@ def test_dataset_download(tmp_path):
     class CustomPublicDataset(PublicDataset):
         _mirrors = [
             'https://github.com/aeye-lab/pymovements/archive/refs/tags/',
-            'https://github.com/aeye-lab/pymovements/archive/refs/tags/']
+            'https://github.com/aeye-lab/pymovements/archive/refs/tags/',
+        ]
         _resources = [
             {
                 'resource': 'v0.4.0.tar.gz',
@@ -148,7 +149,7 @@ def test_dataset_download(tmp_path):
 )
 def fixture_archive(tmp_path):
     rootpath = tmp_path
-    compression, extension = 'tar', 'gz'
+    compression, extension = 'gz', 'tar'
 
     # write tmp filepath
     filepath = rootpath / 'test.file'
@@ -175,5 +176,3 @@ def test_dataset_extract(tmp_path, single_archive):
         ]
 
     CustomPublicDataset(root=tmp_path, extract=True, dataset_dirname='', downloads_dirname='')
-
-
