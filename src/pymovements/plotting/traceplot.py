@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """
-This module holds the tracepot.
+This module holds the traceplot.
 """
 from __future__ import annotations
 

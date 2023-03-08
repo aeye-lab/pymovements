@@ -57,6 +57,13 @@ def test_tsplot_show(arr, kwargs, monkeypatch):
     mock.assert_called_once()
 
 
+def test_tsplot_1d(monkeypatch):
+    mock = Mock()
+    monkeypatch.setattr(plt, 'show', mock)
+    tsplot(np.arange(-100, 100))
+    mock.assert_called_once()
+
+
 def test_tsplot_noshow(arr, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)

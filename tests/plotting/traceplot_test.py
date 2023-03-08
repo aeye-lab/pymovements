@@ -63,13 +63,14 @@ def args_fixture():
             id='cmap_norm_linear',
         ),
         pytest.param(
+            {'cval': np.arange(0, 200), 'cmap_norm': matplotlib.colors.NoNorm()},
+            id='cmap_norm_class',
+        ),
+        pytest.param(
             {'cmap': matplotlib.colors.LinearSegmentedColormap(name='test', segmentdata={})},
             id='cmap_class',
         ),
-        pytest.param(
-            {'cmap_segmentdata': {}},
-            id='cmap_class',
-        ),
+        pytest.param({'cmap_segmentdata': {}}, id='cmap_segmentdata'),
         pytest.param({'padding': 0.1}, id='padding'),
         pytest.param({'cval': np.arange(0, 200), 'show_cbar': True}, id='show_cbar_true'),
         pytest.param({'cval': np.arange(0, 200), 'show_cbar': False}, id='show_cbar_false'),
