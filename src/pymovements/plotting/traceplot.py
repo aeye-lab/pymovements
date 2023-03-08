@@ -182,9 +182,8 @@ def traceplot(
         if scale_class is None:
             raise ValueError(f'cmap_norm string {cmap_norm} is not supported')
 
-        cmap_norm = matplotlib.colors.make_norm_from_scale(scale_class)(
-            matplotlib.colors.Normalize,
-        )()
+        norm_class = matplotlib.colors.make_norm_from_scale(scale_class)
+        cmap_norm = norm_class(matplotlib.colors.Normalize)()
 
     # Create a set of line segments so that we can color them individually
     # This creates the points as a N x 1 x 2 array so that we can stack points
