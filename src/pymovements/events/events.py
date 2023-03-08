@@ -51,9 +51,6 @@ class EventDataFrame:
     ):
         """Initialize an :py:class:`pymovements.events.event_dataframe.EventDataFrame`.
 
-        This is a subclass of :py:class:`polars.DataFrame` with additional functionality tailored to
-        gaze events.
-
         Parameters
         ----------
         data: pl.DataFrame

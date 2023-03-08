@@ -22,8 +22,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pymovements.base import Experiment
 from pymovements.datasets.public_dataset import PublicDataset
+from pymovements.gaze.experiment import Experiment
 
 
 class ToyDataset(PublicDataset):
