@@ -27,6 +27,7 @@ from typing import Any
 import polars as pl
 from tqdm.auto import tqdm
 
+from pymovements.events.event_processing import EventGazeProcessor
 from pymovements.events.events import EventDataFrame
 from pymovements.events.events import EventDetectionCallable
 from pymovements.gaze import GazeDataFrame
@@ -496,6 +497,39 @@ class Dataset:
                 [self.events[file_id].frame, event_df.frame],
                 how='diagonal',
             )
+
+    def compute_event_properties(
+            self,
+            event_properties: str | list[str],
+            verbose: bool = True,
+    ) -> None:
+        """Calculate an event property for and add it as a column to the event dataframe.
+
+        Parameters
+        ----------
+        event_properties:
+            The event properties to compute.
+        verbose : bool
+            If ``True``, show progress bar.
+
+        Raises
+        ------
+        InvalidProperty
+            If ``property_name`` is not a valid property. See
+            :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
+        """
+        processor = EventGazeProcessor(event_properties)
+
+        identifier_columns = [column for column in self.fileinfo.columns if column != 'filepath']
+
+        disable_progressbar = not verbose
+        for events, gaze in tqdm(zip(self.events, self.gaze), disable=disable_progressbar):
+            new_properties = processor.process(events, gaze, identifiers=identifier_columns)
+
+            new_properties = new_properties.drop(identifier_columns)
+            new_properties = new_properties.drop(['name', 'onset', 'offset'])
+
+            events.add_event_properties(new_properties)
 
     def clear_events(self) -> None:
         """Clear event DataFrame."""

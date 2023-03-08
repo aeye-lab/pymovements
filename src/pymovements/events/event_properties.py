@@ -25,19 +25,94 @@ from collections.abc import Callable
 import polars as pl
 
 
-PROPERTIES: dict[str, Callable] = {}
+EVENT_PROPERTIES: dict[str, Callable] = {}
 
 
-def register_property(function: Callable) -> Callable:
+def register_event_property(function: Callable) -> Callable:
     """Register a function as a valid property."""
-    PROPERTIES[function.__name__] = function
+    EVENT_PROPERTIES[function.__name__] = function
     return function
 
 
-@register_property
+@register_event_property
 def duration() -> pl.Expr:
     """Duration of an event.
 
     The duration is defined as the difference between offset time and onset time.
     """
-    return (pl.col('offset') - pl.col('onset')).alias('duration')
+    return pl.col('offset') - pl.col('onset')
+
+
+@register_event_property
+def peak_velocity(velocity_columns: tuple[str, str] = ('x_vel', 'y_vel')) -> pl.Expr:
+    """Peak velocity of an event.
+
+    Parameters
+    ----------
+    velocity_columns
+        The column names of the pitch and yaw velocity components.
+
+    Raises
+    ------
+    TypeError
+        If velocity_columns not of type tuple, velocity_columns not of length 2, or elements of
+        velocity_columns not of type str.
+    """
+    if not isinstance(velocity_columns, tuple):
+        raise TypeError(
+            'velocity_columns must be of type tuple[str, str]'
+            f' but is of type {type(velocity_columns).__name__}',
+        )
+    if len(velocity_columns) != 2:
+        raise TypeError(
+            f'velocity_columns must be of length of 2 but is of length {len(velocity_columns)}',
+        )
+    if not all(isinstance(velocity_column, str) for velocity_column in velocity_columns):
+        raise TypeError(
+            'velocity_columns must be of type tuple[str, str] but is '
+            f'tuple[{type(velocity_columns[0]).__name__}, {type(velocity_columns[1]).__name__}]',
+        )
+
+    x_velocity = velocity_columns[0]
+    y_velocity = velocity_columns[1]
+
+    return (pl.col(x_velocity).pow(2) + pl.col(y_velocity).pow(2)).sqrt().max()
+
+
+@register_event_property
+def dispersion(position_columns: tuple[str, str] = ('x_pos', 'y_pos')) -> pl.Expr:
+    """Dispersion of an event.
+
+    Parameters
+    ----------
+    position_columns
+        The column names of the pitch and yaw position components.
+
+    Raises
+    ------
+    TypeError
+        If position_columns not of type tuple, position_columns not of length 2, or elements of
+        position_columns not of type str.
+    """
+    if not isinstance(position_columns, tuple):
+        raise TypeError(
+            'position_columns must be of type tuple[str, str]'
+            f' but is of type {type(position_columns).__name__}',
+        )
+    if len(position_columns) != 2:
+        raise TypeError(
+            f'position_columns must be of length of 2 but is of length {len(position_columns)}',
+        )
+    if not all(isinstance(velocity_column, str) for velocity_column in position_columns):
+        raise TypeError(
+            'position_columns must be of type tuple[str, str] but is '
+            f'tuple[{type(position_columns[0]).__name__}, {type(position_columns[1]).__name__}]',
+        )
+
+    x_position = position_columns[0]
+    y_position = position_columns[1]
+
+    return (
+        (pl.col(x_position).max() - pl.col(x_position).min())
+        + (pl.col(y_position).max() - pl.col(y_position).min())
+    )
