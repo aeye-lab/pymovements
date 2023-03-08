@@ -151,7 +151,6 @@ def test_dataset_extract(tmp_path):
     with tarfile.TarFile.open(archive_path, f'w:{compression}') as fp:
         fp.add(filepath)
 
-
     class CustomPublicDataset(PublicDataset):
         _mirrors = []
         _resources = [
