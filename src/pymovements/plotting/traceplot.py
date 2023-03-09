@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """
-This module holds all plotting functions.
+This module holds the traceplot.
 """
 from __future__ import annotations
 
@@ -27,7 +27,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import colors
 from matplotlib.collections import LineCollection
-
 
 default_segmentdata = {
     'red': [
@@ -101,7 +100,7 @@ def traceplot(
     cmap: matplotlib.colors.Colormap, optional
         color map for line color values
     cmap_norm: matplotlib.colors.Normalize, str, optional
-        normalization for color values
+        normalization for color values.
     cmap_segmentdata: dict, optional
         color map segmentation to build color map
     cbar_label: str, optional
@@ -124,7 +123,8 @@ def traceplot(
     Raises
     ------
     ValueError
-        If length of x and y coordinates do not match.
+        If length of x and y coordinates do not match or if ``cmap_norm`` is unknown.
+
     """
 
     if len(x) != len(y):
@@ -141,10 +141,10 @@ def traceplot(
         cval = np.zeros(n)
         show_cbar = False
 
-    if cmap_norm is None:
-        cval_max = np.nanmax(np.abs(cval))
-        cval_min = np.nanmin(cval)
+    cval_max = np.nanmax(np.abs(cval))
+    cval_min = np.nanmin(cval)
 
+    if cmap_norm is None:
         if cval_max and cval_min < 0:
             cmap_norm = 'twoslope'
         elif cval_max:
@@ -173,6 +173,16 @@ def traceplot(
         )
     elif cmap_norm == 'nonorm':
         cmap_norm = matplotlib.colors.NoNorm()
+
+    elif isinstance(cmap_norm, str):
+        # pylint: disable=protected-access
+        scale_class = matplotlib.scale._scale_mapping.get(cmap_norm, None)
+
+        if scale_class is None:
+            raise ValueError(f'cmap_norm string {cmap_norm} is not supported')
+
+        norm_class = matplotlib.colors.make_norm_from_scale(scale_class)
+        cmap_norm = norm_class(matplotlib.colors.Normalize)()
 
     # Create a set of line segments so that we can color them individually
     # This creates the points as a N x 1 x 2 array so that we can stack points
