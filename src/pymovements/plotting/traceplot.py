@@ -123,7 +123,7 @@ def traceplot(
     Raises
     ------
     ValueError
-        If length of x and y coordinates do not match.
+        If length of x and y coordinates do not match or if ``cmap_norm`` is unknown.
 
     """
 
