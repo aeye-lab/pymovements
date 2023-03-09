@@ -42,7 +42,7 @@ class EventProcessor:
     """
 
     def __init__(self, event_properties: str | list[str]):
-        """Initialize extractor with event property definitions.
+        """Initialize processor with event property definitions.
 
         Parameters
         ----------
@@ -104,7 +104,7 @@ class EventGazeProcessor:
     """
 
     def __init__(self, event_properties: str | list[str]):
-        """Initialize extractor with event property definitions.
+        """Initialize processor with event property definitions.
 
         Parameters
         ----------
