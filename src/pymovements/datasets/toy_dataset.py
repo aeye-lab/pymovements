@@ -89,6 +89,7 @@ class ToyDataset(PublicDataset):
         'sep': '\t',
         'columns': list(_column_map.keys()),
         'new_columns': list(_column_map.values()),
+        'null_values': '-32768.00',
     }
 
     def __init__(
