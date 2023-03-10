@@ -58,25 +58,12 @@ def peak_velocity(velocity_columns: tuple[str, str] = ('x_vel', 'y_vel')) -> pl.
         If velocity_columns not of type tuple, velocity_columns not of length 2, or elements of
         velocity_columns not of type str.
     """
-    if not isinstance(velocity_columns, tuple):
-        raise TypeError(
-            'velocity_columns must be of type tuple[str, str]'
-            f' but is of type {type(velocity_columns).__name__}',
-        )
-    if len(velocity_columns) != 2:
-        raise TypeError(
-            f'velocity_columns must be of length of 2 but is of length {len(velocity_columns)}',
-        )
-    if not all(isinstance(velocity_column, str) for velocity_column in velocity_columns):
-        raise TypeError(
-            'velocity_columns must be of type tuple[str, str] but is '
-            f'tuple[{type(velocity_columns[0]).__name__}, {type(velocity_columns[1]).__name__}]',
-        )
+    _check_velocity_columns(velocity_columns)
 
-    x_velocity = velocity_columns[0]
-    y_velocity = velocity_columns[1]
+    x_velocity = pl.col(velocity_columns[0])
+    y_velocity = pl.col(velocity_columns[1])
 
-    return (pl.col(x_velocity).pow(2) + pl.col(y_velocity).pow(2)).sqrt().max()
+    return (x_velocity.pow(2) + y_velocity.pow(2)).sqrt().max()
 
 
 @register_event_property
@@ -94,6 +81,68 @@ def dispersion(position_columns: tuple[str, str] = ('x_pos', 'y_pos')) -> pl.Exp
         If position_columns not of type tuple, position_columns not of length 2, or elements of
         position_columns not of type str.
     """
+    _check_position_columns(position_columns)
+
+    x_position = pl.col(position_columns[0])
+    y_position = pl.col(position_columns[1])
+
+    return x_position.max() - x_position.min() + y_position.max() - y_position.min()
+
+
+@register_event_property
+def amplitude(position_columns: tuple[str, str] = ('x_pos', 'y_pos')) -> pl.Expr:
+    """Amplitude of an event.
+
+    Parameters
+    ----------
+    position_columns
+        The column names of the pitch and yaw position components.
+
+    Raises
+    ------
+    TypeError
+        If position_columns not of type tuple, position_columns not of length 2, or elements of
+        position_columns not of type str.
+    """
+    _check_position_columns(position_columns)
+
+    x_position = pl.col(position_columns[0])
+    y_position = pl.col(position_columns[1])
+
+    return (
+        (x_position.max() - x_position.min()).pow(2)
+        + (y_position.max() - y_position.min()).pow(2)
+    ).sqrt()
+
+
+@register_event_property
+def disposition(position_columns: tuple[str, str] = ('x_pos', 'y_pos')) -> pl.Expr:
+    """Disposition of an event.
+
+    Parameters
+    ----------
+    position_columns
+        The column names of the pitch and yaw position components.
+
+    Raises
+    ------
+    TypeError
+        If position_columns not of type tuple, position_columns not of length 2, or elements of
+        position_columns not of type str.
+    """
+    _check_position_columns(position_columns)
+
+    x_position = pl.col(position_columns[0])
+    y_position = pl.col(position_columns[1])
+
+    return (
+        (x_position.head(n=1) - x_position.reverse().head(n=1)).pow(2)
+        + (y_position.head(n=1) - y_position.reverse().head(n=1)).pow(2)
+    ).sqrt()
+
+
+def _check_position_columns(position_columns: tuple[str, str]) -> None:
+    """Check if position_columns is of type tuple[str, str]."""
     if not isinstance(position_columns, tuple):
         raise TypeError(
             'position_columns must be of type tuple[str, str]'
@@ -109,10 +158,20 @@ def dispersion(position_columns: tuple[str, str] = ('x_pos', 'y_pos')) -> pl.Exp
             f'tuple[{type(position_columns[0]).__name__}, {type(position_columns[1]).__name__}]',
         )
 
-    x_position = position_columns[0]
-    y_position = position_columns[1]
 
-    return (
-        (pl.col(x_position).max() - pl.col(x_position).min())
-        + (pl.col(y_position).max() - pl.col(y_position).min())
-    )
+def _check_velocity_columns(velocity_columns: tuple[str, str]) -> None:
+    """Check if velocity_columns is of type tuple[str, str]."""
+    if not isinstance(velocity_columns, tuple):
+        raise TypeError(
+            'velocity_columns must be of type tuple[str, str]'
+            f' but is of type {type(velocity_columns).__name__}',
+        )
+    if len(velocity_columns) != 2:
+        raise TypeError(
+            f'velocity_columns must be of length of 2 but is of length {len(velocity_columns)}',
+        )
+    if not all(isinstance(velocity_column, str) for velocity_column in velocity_columns):
+        raise TypeError(
+            'velocity_columns must be of type tuple[str, str] but is '
+            f'tuple[{type(velocity_columns[0]).__name__}, {type(velocity_columns[1]).__name__}]',
+        )
