@@ -122,6 +122,7 @@ class Dataset:
             subset: None | dict[str, float | int | str | list[float | int | str]] = None,
             events_dirname: str | None = None,
             preprocessed_dirname: str | None = None,
+            extension: str = 'feather',
     ):
         """Parse file information and load all gaze files.
 
@@ -144,7 +145,9 @@ class Dataset:
             One-time usage of an alternative directory name to save data relative to
             :py:meth:`pymovements.Dataset.path`.
             This argument is used only for this single call and does not alter
-            :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
+            :py:meth:`pymovements.Dataset.preprocessed_rootpath`.        
+        extension:
+            extension specifies the fileformat to store the data
 
         The parsed file information is assigned to the `fileinfo` attribute.
         All gaze files will be loaded as dataframes and assigned to the `gaze` attribute.
@@ -153,10 +156,13 @@ class Dataset:
         self.fileinfo = self.take_subset(fileinfo=fileinfo, subset=subset)
         self.gaze = self.load_gaze_files(
             preprocessed=preprocessed, preprocessed_dirname=preprocessed_dirname,
+            extension=extension,
         )
 
         if events:
-            self.events = self.load_event_files(events_dirname=events_dirname)
+            self.events = self.load_event_files(events_dirname=events_dirname,
+                                                extension=extension,
+                                                )
 
     def infer_fileinfo(self) -> pl.DataFrame:
         """Infer information from filepaths and filenames.
@@ -263,6 +269,7 @@ class Dataset:
             self,
             preprocessed: bool = False,
             preprocessed_dirname: str | None = None,
+            extension: str = 'feather',
     ) -> list[GazeDataFrame]:
         """Load all available gaze data files.
 
@@ -275,6 +282,8 @@ class Dataset:
             :py:meth:`pymovements.Dataset.path`.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
+        extension:
+            extension specifies the fileformat to store the data
 
         Returns
         -------
@@ -300,10 +309,11 @@ class Dataset:
             if preprocessed:
                 filepath = self._raw_to_preprocessed_filepath(
                     filepath, preprocessed_dirname=preprocessed_dirname,
+                    extension=extension,
                 )
 
             if filepath.suffix == '.csv':
-                gaze_df = pl.read_csv(filepath, **self._custom_read_kwargs)
+                gaze_df = pl.read_csv(filepath)
             elif filepath.suffix == '.feather':
                 gaze_df = pl.read_ipc(filepath)
             else:
@@ -316,7 +326,10 @@ class Dataset:
 
         return gaze_dfs
 
-    def load_event_files(self, events_dirname: str | None = None) -> list[EventDataFrame]:
+    def load_event_files(self, 
+                events_dirname: str | None = None,
+                extension: str = 'feather',
+                ) -> list[EventDataFrame]:
         """Load all available event files.
 
         Parameters
@@ -326,6 +339,8 @@ class Dataset:
             :py:meth:`pymovements.Dataset.path`.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.events_rootpath`.
+        extension:
+            extension specifies the fileformat to store the data
 
         Returns
         -------
@@ -346,8 +361,13 @@ class Dataset:
             filepath = Path(fileinfo['filepath'])
             filepath = self.raw_rootpath / filepath
 
-            filepath = self._raw_to_event_filepath(filepath, events_dirname=events_dirname)
-            event_df = pl.read_ipc(filepath)
+            filepath = self._raw_to_event_filepath(filepath, events_dirname=events_dirname,
+                                                    extension=extension,)
+
+            if extension == 'feather':
+                event_df = pl.read_ipc(filepath)
+            elif extension == 'csv':
+                event_df = pl.read_csv(filepath)
 
             # Add fileinfo columns to dataframe.
             event_df = self._add_fileinfo(event_df, fileinfo)
@@ -544,10 +564,11 @@ class Dataset:
             events_dirname: str | None = None,
             preprocessed_dirname: str | None = None,
             verbose: int = 1,
+            extension: str = 'feather'
     ):
         """Save preprocessed gaze and event files.
 
-        Data will be saved as feather files to ``Dataset.preprocessed_roothpath`` or
+        Data will be saved as feather/csv files to ``Dataset.preprocessed_roothpath`` or
         ``Dataset.events_roothpath`` with the same directory structure as the raw data.
 
         Parameters
@@ -562,11 +583,15 @@ class Dataset:
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
         verbose : int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
+        extension:
+            extension specifies the fileformat to store the data
         """
-        self.save_events(events_dirname, verbose=verbose)
-        self.save_preprocessed(preprocessed_dirname, verbose=verbose)
+        self.save_events(events_dirname, verbose=verbose, extension=extension)
+        self.save_preprocessed(preprocessed_dirname, verbose=verbose, extension=extension)
 
-    def save_events(self, events_dirname: str | None = None, verbose: int = 1):
+    def save_events(self, events_dirname: str | None = None,
+                    verbose: int = 1,
+                    extension: str = 'feather'):
         """Save events to files.
 
         Data will be saved as feather files to ``Dataset.events_roothpath`` with the same directory
@@ -580,6 +605,8 @@ class Dataset:
             :py:meth:`pymovements.Dataset.events_rootpath`.
         verbose : int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
+        extension:
+            extension specifies the fileformat to store the data
         """
         disable_progressbar = not verbose
 
@@ -587,6 +614,7 @@ class Dataset:
             raw_filepath = self.raw_rootpath / Path(self.fileinfo[file_id, 'filepath'])
             events_filepath = self._raw_to_event_filepath(
                 raw_filepath, events_dirname=events_dirname,
+                extension=extension,
             )
 
             event_df_out = event_df.frame.clone()
@@ -598,9 +626,14 @@ class Dataset:
                 print('Save file to', events_filepath)
 
             events_filepath.parent.mkdir(parents=True, exist_ok=True)
-            event_df_out.write_ipc(events_filepath)
+            if extension == 'feather':
+                event_df_out.write_ipc(events_filepath)
+            elif extension == 'csv':
+                event_df_out.write_csv(events_filepath)
 
-    def save_preprocessed(self, preprocessed_dirname: str | None = None, verbose: int = 1):
+    def save_preprocessed(self, preprocessed_dirname: str | None = None,
+                          verbose: int = 1,
+                          extension: str = 'feather'):
         """Save preprocessed gaze files.
 
         Data will be saved as feather files to ``Dataset.preprocessed_roothpath`` with the same
@@ -614,6 +647,8 @@ class Dataset:
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
         verbose : int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
+        extension:
+            extension specifies the fileformat to store the data
         """
         disable_progressbar = not verbose
 
@@ -621,6 +656,7 @@ class Dataset:
             raw_filepath = self.raw_rootpath / Path(self.fileinfo[file_id, 'filepath'])
             preprocessed_filepath = self._raw_to_preprocessed_filepath(
                 raw_filepath, preprocessed_dirname=preprocessed_dirname,
+                extension=extension,
             )
 
             gaze_df_out = gaze_df.frame.clone()
@@ -632,7 +668,10 @@ class Dataset:
                 print('Save file to', preprocessed_filepath)
 
             preprocessed_filepath.parent.mkdir(parents=True, exist_ok=True)
-            gaze_df_out.write_ipc(preprocessed_filepath)
+            if extension == 'feather':
+                gaze_df_out.write_ipc(preprocessed_filepath)
+            elif extension == 'csv':
+                gaze_df_out.write_csv(preprocessed_filepath)
 
     @property
     def path(self) -> Path:
@@ -781,6 +820,7 @@ class Dataset:
             self,
             raw_filepath: Path,
             preprocessed_dirname: str | None = None,
+            extension: str = 'feather'
     ) -> Path:
         """Get preprocessed filepath in accordance to filepath of the raw file.
 
@@ -795,6 +835,8 @@ class Dataset:
             :py:meth:`pymovements.Dataset.path`.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
+        extension:
+            extension specifies the fileformat to store the data
 
         Returns
         -------
@@ -812,14 +854,17 @@ class Dataset:
         preprocessed_file_dirpath = preprocessed_rootpath / relative_raw_dirpath
 
         # Get new filename for saved feather file.
-        preprocessed_filename = raw_filepath.stem + '.feather'
+        preprocessed_filename = raw_filepath.stem + '.' + extension
 
         return preprocessed_file_dirpath / preprocessed_filename
 
-    def _raw_to_event_filepath(self, raw_filepath: Path, events_dirname: str | None = None) -> Path:
+    def _raw_to_event_filepath(self,
+                            raw_filepath: Path,
+                            events_dirname: str | None = None,
+                            extension: str = 'feather') -> Path:
         """Get event filepath in accordance to filepath of the raw file.
 
-        The event filepath will point to a feather file.
+        The event filepath will point to file with the specified extension.
 
         Parameters
         ----------
@@ -830,6 +875,8 @@ class Dataset:
             :py:meth:`pymovements.Dataset.path`.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.events_rootpath`.
+        extension:
+            extension specifies the fileformat to store the data
 
         Returns
         -------
@@ -847,7 +894,7 @@ class Dataset:
         events_file_dirpath = events_rootpath / relative_raw_dirpath
 
         # Get new filename for saved feather file.
-        events_filename = raw_filepath.stem + '.feather'
+        events_filename = raw_filepath.stem + '.' + extension
 
         return events_file_dirpath / events_filename
 
