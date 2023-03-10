@@ -24,6 +24,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 from pathlib import Path
 from typing import Any
+from urllib.error import URLError
 
 from pymovements.datasets.dataset import Dataset
 from pymovements.gaze.experiment import Experiment
@@ -156,7 +157,8 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
                     )
                     success = True
 
-                except (OSError, RuntimeError) as error:
+                # pylint: disable=overlapping-except
+                except (URLError, OSError, RuntimeError) as error:
                     print(f'Failed to download (trying next):\n{error}')
                     # downloading the resource, try next mirror
                     continue
