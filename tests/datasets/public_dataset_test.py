@@ -17,7 +17,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
 """Test all functionality in pymovements.datasets.public_dataset."""
 import tarfile
 from pathlib import Path
@@ -59,14 +58,14 @@ def custom_dataset(tmp_path):
             {
                 'resource': 'test.gz.tar',
                 'filename': 'test.gz.tar',
-                'md5': '52bbf03a7c50ee7152ccb9d357c2bb30'
-            }
+                'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+            },
         ]
 
     return CustomPublicDataset(
         root=tmp_path,
         dataset_dirname='',
-        downloads_dirname=''
+        downloads_dirname='',
     )
 
 
@@ -137,8 +136,8 @@ def test_dataset_download_fails(mock_download_file, tmp_path, dataset):
             url='https://example.com/test.gz.tar',
             dirpath=tmp_path,
             filename='test.gz.tar',
-            md5='52bbf03a7c50ee7152ccb9d357c2bb30'
-        )
+            md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+        ),
     ])
 
 
@@ -154,8 +153,8 @@ def test_dataset_download_file_not_found(mock_download_file, tmp_path, dataset):
             url='https://example.com/test.gz.tar',
             dirpath=tmp_path,
             filename='test.gz.tar',
-            md5='52bbf03a7c50ee7152ccb9d357c2bb30'
-        )
+            md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+        ),
     ])
 
 
@@ -170,8 +169,8 @@ def test_dataset_download(mock_download_file, tmp_path, dataset):
             url='https://example.com/test.gz.tar',
             dirpath=tmp_path,
             filename='test.gz.tar',
-            md5='52bbf03a7c50ee7152ccb9d357c2bb30'
-        )
+            md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+        ),
     ])
 
 
@@ -179,7 +178,7 @@ def test_dataset_download(mock_download_file, tmp_path, dataset):
 def test_dataset_extract_remove_finished_true(
         mock_extract_archive,
         tmp_path,
-        dataset
+        dataset,
 ):
     mock_extract_archive.return_value = 'path'
 
@@ -191,7 +190,7 @@ def test_dataset_extract_remove_finished_true(
             destination_path=tmp_path / 'raw',
             recursive=True,
             remove_finished=True,
-        )
+        ),
     ])
 
 
@@ -199,7 +198,7 @@ def test_dataset_extract_remove_finished_true(
 def test_dataset_extract_remove_finished_false(
         mock_extract_archive,
         tmp_path,
-        dataset
+        dataset,
 ):
     mock_extract_archive.return_value = 'path'
 
@@ -211,7 +210,7 @@ def test_dataset_extract_remove_finished_false(
             destination_path=tmp_path / 'raw',
             recursive=True,
             remove_finished=False,
-        )
+        ),
     ])
 
 
@@ -227,8 +226,8 @@ def test_custom_dataset_download_extract(mock_extract, mock_download, tmp_path):
             {
                 'resource': 'test.gz.tar',
                 'filename': 'test.gz.tar',
-                'md5': '52bbf03a7c50ee7152ccb9d357c2bb30'
-            }
+                'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+            },
         ]
 
     CustomPublicDataset(root=tmp_path, download=True)
