@@ -27,11 +27,12 @@ import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
-from pymovements.base import Experiment
+from pymovements import exceptions
 from pymovements.datasets.dataset import Dataset
 from pymovements.events.engbert import microsaccades
 from pymovements.events.events import EventDataFrame
 from pymovements.events.ivt import ivt
+from pymovements.gaze.experiment import Experiment
 
 
 def create_raw_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):
@@ -137,19 +138,19 @@ def mock_toy(rootpath, raw_fileformat, eyes):
                     'y_right_pix': pl.Float64,
                 },
             )
-        elif eyes == 'eye':
+        elif eyes == 'none':
             gaze_df = pl.from_dict(
                 {
                     'subject_id': fileinfo_row['subject_id'],
                     'time': np.arange(1000),
-                    'x_eye_pix': np.zeros(1000),
-                    'y_eye_pix': np.zeros(1000),
+                    'x_pix': np.zeros(1000),
+                    'y_pix': np.zeros(1000),
                 },
                 schema={
                     'subject_id': pl.Int64,
                     'time': pl.Int64,
-                    'x_eye_pix': pl.Float64,
-                    'y_eye_pix': pl.Float64,
+                    'x_pix': pl.Float64,
+                    'y_pix': pl.Float64,
                 },
             )
         else:
@@ -207,10 +208,17 @@ def mock_toy(rootpath, raw_fileformat, eyes):
             {
                 'subject_id': fileinfo_row['subject_id'],
                 'name': 'saccade',
-                'onset': np.arange(0, 901, 100),
-                'offset': np.arange(10, 911, 100),
+                'onset': np.arange(0, 100, 10),
+                'offset': np.arange(5, 105, 10),
+                'duration': np.array([5] * 10),
             },
-            schema={'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64},
+            schema={
+                'subject_id': pl.Int64,
+                'name': pl.Utf8,
+                'onset': pl.Int64,
+                'offset': pl.Int64,
+                'duration': pl.Int64,
+            },
         )
         event_dfs.append(event_df)
 
@@ -246,7 +254,7 @@ def fixture_dataset(request, tmp_path):
     if request.param == 'ToyBino':
         dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='both')
     elif request.param == 'ToyMono':
-        dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='eye')
+        dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='none')
     elif request.param == 'ToyLeft':
         dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='left')
     elif request.param == 'ToyRight':
@@ -273,7 +281,7 @@ def test_load_correct_raw_gaze_dfs(dataset_configuration):
 
     expected_gaze_dfs = dataset_configuration['raw_gaze_dfs']
     for result_gaze_df, expected_gaze_df in zip(dataset.gaze, expected_gaze_dfs):
-        assert_frame_equal(result_gaze_df, expected_gaze_df)
+        assert_frame_equal(result_gaze_df.frame, expected_gaze_df)
 
 
 def test_load_correct_preprocessed_gaze_dfs(dataset_configuration):
@@ -282,7 +290,7 @@ def test_load_correct_preprocessed_gaze_dfs(dataset_configuration):
 
     expected_gaze_dfs = dataset_configuration['preprocessed_gaze_dfs']
     for result_gaze_df, expected_gaze_df in zip(dataset.gaze, expected_gaze_dfs):
-        assert_frame_equal(result_gaze_df, expected_gaze_df)
+        assert_frame_equal(result_gaze_df.frame, expected_gaze_df)
 
 
 def test_load_correct_event_dfs(dataset_configuration):
@@ -291,7 +299,7 @@ def test_load_correct_event_dfs(dataset_configuration):
 
     expected_event_dfs = dataset_configuration['event_dfs']
     for result_event_df, expected_event_df in zip(dataset.events, expected_event_dfs):
-        assert_frame_equal(result_event_df, expected_event_df)
+        assert_frame_equal(result_event_df.frame, expected_event_df)
 
 
 @pytest.mark.parametrize(
@@ -412,7 +420,7 @@ def test_pix2deg(dataset_configuration):
     dva_schema = {}
     for column_name in original_schema.keys():
         if column_name.endswith('_pix'):
-            dva_column_name = column_name.replace('_pix', '_dva')
+            dva_column_name = column_name.replace('_pix', '_pos')
             dva_schema[dva_column_name] = original_schema[column_name]
     expected_schema = {**original_schema, **dva_schema}
 
@@ -462,7 +470,9 @@ def test_detect_events_auto_eye(detect_event_kwargs, dataset_configuration):
     dataset.pos2vel()
     dataset.detect_events(**detect_event_kwargs)
 
-    expected_schema = {'subject_id': pl.Int64, **EventDataFrame._minimal_schema}
+    expected_schema = {
+        'subject_id': pl.Int64, **EventDataFrame._minimal_schema, 'duration': pl.Int64,
+    }
     for result_event_df in dataset.events:
         assert result_event_df.schema == expected_schema
 
@@ -512,7 +522,9 @@ def test_detect_events_explicit_eye(detect_event_kwargs, dataset_configuration):
     if exception is None:
         dataset.detect_events(**detect_event_kwargs)
 
-        expected_schema = {'subject_id': pl.Int64, **EventDataFrame._minimal_schema}
+        expected_schema = {
+            'subject_id': pl.Int64, **EventDataFrame._minimal_schema, 'duration': pl.Int64,
+        }
 
         for result_event_df in dataset.events:
             assert result_event_df.schema == expected_schema
@@ -536,7 +548,7 @@ def test_detect_events_explicit_eye(detect_event_kwargs, dataset_configuration):
                 'threshold': 1,
                 'eye': 'auto',
             },
-            {'subject_id': pl.Int64, **EventDataFrame._minimal_schema},
+            {'subject_id': pl.Int64, **EventDataFrame._minimal_schema, 'duration': pl.Int64},
             id='two-saccade-runs',
         ),
         pytest.param(
@@ -550,7 +562,7 @@ def test_detect_events_explicit_eye(detect_event_kwargs, dataset_configuration):
                 'velocity_threshold': 1,
                 'minimum_duration': 1,
             },
-            {'subject_id': pl.Int64, **EventDataFrame._minimal_schema},
+            {'subject_id': pl.Int64, **EventDataFrame._minimal_schema, 'duration': pl.Int64},
             id='one-saccade-one-fixation-run',
         ),
     ],
@@ -637,7 +649,7 @@ def test_clear_events(events_init, events_expected):
 
     else:
         for events_df_result, events_df_expected in zip(dataset.events, events_expected):
-            assert_frame_equal(events_df_result, events_df_expected)
+            assert_frame_equal(events_df_result.frame, events_df_expected.frame)
 
 
 @pytest.mark.parametrize(
@@ -933,10 +945,14 @@ def test_check_gaze_dataframe(new_gaze, exception):
         dataset._check_gaze_dataframe()
 
 
-def test_check_experiment():
-    dataset = Dataset('data')
+@pytest.mark.parametrize('dataset_configuration', ['ToyBino'], indirect=['dataset_configuration'])
+def test_check_experiment(dataset_configuration):
+    dataset_configuration['init_kwargs'].pop('experiment')
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+
     with pytest.raises(AttributeError):
-        dataset._check_experiment()
+        dataset.gaze[0]._check_experiment()
 
 
 @pytest.mark.parametrize('dataset_configuration', ['ToyBino'], indirect=['dataset_configuration'])
@@ -946,4 +962,98 @@ def test_velocity_columns(dataset_configuration):
 
     expected_velocity_columns = ['x_left_vel', 'y_left_vel', 'x_right_vel', 'y_right_vel']
     case = unittest.TestCase()
-    case.assertCountEqual(dataset.velocity_columns, expected_velocity_columns)
+
+    for gaze_df in dataset.gaze:
+        case.assertCountEqual(gaze_df.velocity_columns, expected_velocity_columns)
+
+
+@pytest.mark.parametrize(
+    ('property_kwargs', 'exception', 'msg_substrings'),
+    [
+        pytest.param(
+            {'event_properties': 'foo'},
+            exceptions.InvalidProperty,
+            ('foo', 'invalid', 'valid', 'peak_velocity'),
+            id='invalid_property',
+        ),
+    ],
+)
+def test_event_dataframe_add_property_raises_exceptions(
+        dataset_configuration, property_kwargs, exception, msg_substrings,
+):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load(preprocessed=True, events=True)
+
+    with pytest.raises(exception) as excinfo:
+        dataset.compute_event_properties(**property_kwargs)
+
+    msg, = excinfo.value.args
+    for msg_substring in msg_substrings:
+        assert msg_substring.lower() in msg.lower()
+
+
+@pytest.mark.parametrize(
+    'property_kwargs',
+    [
+        pytest.param({'event_properties': 'peak_velocity'}, id='peak_velocity'),
+    ],
+)
+def test_event_dataframe_add_property_has_expected_height(dataset_configuration, property_kwargs):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load(preprocessed=True, events=True)
+
+    expected_heights = [len(event_df) for event_df in dataset.events]
+
+    dataset.compute_event_properties(**property_kwargs)
+
+    for events_df, expected_height in zip(dataset.events, expected_heights):
+        assert events_df.frame.height == expected_height
+
+
+@pytest.mark.parametrize(
+    ('property_kwargs', 'expected_schema'),
+    [
+        pytest.param(
+            {'event_properties': 'peak_velocity'},
+            {
+                'subject_id': pl.Int64,
+                **EventDataFrame._minimal_schema,
+                'duration': pl.Int64,
+                'peak_velocity': pl.Float64,
+            },
+            id='single_event_peak_velocity',
+        ),
+    ],
+)
+def test_event_dataframe_add_property_has_expected_schema(
+        dataset_configuration, property_kwargs, expected_schema,
+):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load(preprocessed=True, events=True)
+
+    dataset.compute_event_properties(**property_kwargs)
+
+    for events_df in dataset.events:
+        assert events_df.frame.schema == expected_schema
+
+
+@pytest.mark.parametrize(
+    ('property_kwargs', 'expected_property_columns'),
+    [
+        pytest.param(
+            {'event_properties': 'peak_velocity'},
+            ['peak_velocity'],
+            id='single_event_peak_velocity',
+        ),
+    ],
+)
+def test_event_dataframe_add_property_effect_property_columns(
+        dataset_configuration, property_kwargs, expected_property_columns,
+):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load(preprocessed=True, events=True)
+
+    dataset.compute_event_properties(**property_kwargs)
+
+    for events_df in dataset.events:
+        assert events_df.event_property_columns == expected_property_columns

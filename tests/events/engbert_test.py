@@ -170,6 +170,25 @@ def test_microsaccades_raises_error(kwargs, expected):
             EventDataFrame(),
             id='string_based_threshold',
         ),
+        pytest.param(
+            {
+                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
+                'velocities': step_function(
+                    length=100,
+                    steps=[40, 50],
+                    values=[(9, 9), (0, 0)],
+                    start_value=(0, 0),
+                ),
+                'timesteps': np.arange(1000, 1100, dtype=int),
+                'threshold': 1e-5,
+            },
+            EventDataFrame(
+                name='saccade',
+                onsets=[1040],
+                offsets=[1049],
+            ),
+            id='two_steps_one_saccade_timesteps',
+        ),
     ],
 )
 def test_microsaccades_detects_saccades(kwargs, expected):
@@ -177,7 +196,7 @@ def test_microsaccades_detects_saccades(kwargs, expected):
 
     print(events)
     print(expected)
-    assert_frame_equal(events, expected)
+    assert_frame_equal(events.frame, expected.frame)
 
 
 @pytest.mark.parametrize(

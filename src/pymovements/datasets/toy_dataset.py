@@ -22,8 +22,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pymovements.base import Experiment
 from pymovements.datasets.public_dataset import PublicDataset
+from pymovements.gaze.experiment import Experiment
 
 
 class ToyDataset(PublicDataset):
@@ -89,6 +89,7 @@ class ToyDataset(PublicDataset):
         'sep': '\t',
         'columns': list(_column_map.keys()),
         'new_columns': list(_column_map.values()),
+        'null_values': '-32768.00',
     }
 
     def __init__(

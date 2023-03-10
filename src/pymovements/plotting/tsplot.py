@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """
-This module holds all plotting functions.
+This module holds the time series plot.
 """
 from __future__ import annotations
 
@@ -119,10 +119,19 @@ def tsplot(
         ylims = -ylim_abs * y_pad_factor, ylim_abs * y_pad_factor
 
     for channel_id in range(n_channels):
-        ax = axs[channel_id]
+        if n_channels == 1:
+            ax = axs
+        else:
+            ax = axs[channel_id]
+
         x_channel = arr[channel_id, :]
 
         ax.plot(t, x_channel, color=line_color, linewidth=line_width)
+
+        if not share_y:
+            y_pad_factor = 1.1
+            ylim_abs = np.nanmax(np.abs(arr[channel_id]))
+            ylims = -ylim_abs * y_pad_factor, ylim_abs * y_pad_factor
 
         ax.set_xlim(xlims)
         ax.set_ylim(ylims)
@@ -161,7 +170,10 @@ def tsplot(
     # print x label on last used (bottom) axis
     ax.set_xlabel(xlabel)
 
-    axs[0].set_title(title)
+    if n_channels == 1:
+        ax.set_title(title)
+    else:
+        axs[0].set_title(title)
 
     if savepath is not None:
         fig.savefig(savepath)

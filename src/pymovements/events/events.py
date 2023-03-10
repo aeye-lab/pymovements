@@ -23,16 +23,17 @@ This module holds all the main Event classes used for event detection.
 from __future__ import annotations
 
 from collections.abc import Sequence
+from typing import Any
 
 import numpy as np
 import polars as pl
 from typing_extensions import Protocol
 
-from pymovements.base import DataFrame
+from pymovements.events.event_properties import duration
 from pymovements.utils import checks
 
 
-class EventDataFrame(DataFrame):
+class EventDataFrame:
     """A DataFrame for event data.
 
     Each row has at least an event name with its onset and offset specified.
@@ -44,13 +45,10 @@ class EventDataFrame(DataFrame):
             self,
             data: pl.DataFrame | None = None,
             name: str | list[str] | None = None,
-            onsets: list[int] | None = None,
-            offsets: list[int] | None = None,
+            onsets: list[int] | np.ndarray | None = None,
+            offsets: list[int] | np.ndarray | None = None,
     ):
         """Initialize an :py:class:`pymovements.events.event_dataframe.EventDataFrame`.
-
-        This is a subclass of :py:class:`polars.DataFrame` with additional functionality tailored to
-        gaze events.
 
         Parameters
         ----------
@@ -75,8 +73,14 @@ class EventDataFrame(DataFrame):
             checks.check_is_mutual_exclusive(data=data, offsets=offsets)
             checks.check_is_mutual_exclusive(data=data, name=name)
 
+            data = data.clone()
             data = self._add_minimal_schema_columns(data)
             data_dict = data.to_dict()
+
+            self._additional_columns = [
+                column_name for column_name in data_dict.keys()
+                if column_name not in self._minimal_schema
+            ]
 
         else:
             # Make sure that if either onsets or offsets is None, the other one is None too.
@@ -109,7 +113,47 @@ class EventDataFrame(DataFrame):
                     'offset': pl.Series([], dtype=pl.Int64),
                 }
 
-        super().__init__(data=data_dict, schema_overrides=self._minimal_schema)
+        self.frame = pl.DataFrame(data=data_dict, schema_overrides=self._minimal_schema)
+        if 'duration' not in self.frame.columns:
+            self._add_duration_property()
+
+    @property
+    def schema(self) -> pl.datatypes.SchemaDict:
+        """Schema of event dataframe."""
+        return self.frame.schema
+
+    def __len__(self) -> int:
+        return self.frame.__len__()
+
+    def __getitem__(self, *args, **kwargs) -> Any:
+        return self.frame.__getitem__(*args, **kwargs)
+
+    @property
+    def columns(self) -> list[str]:
+        """List of column names."""
+        return self.frame.columns
+
+    def _add_duration_property(self):
+        """Adds duration property column to dataframe."""
+        self.frame = self.frame.select([pl.all(), duration().alias('duration')])
+
+    def add_event_properties(self, event_properties: pl.DataFrame) -> None:
+        """Add new event properties into dataframe.
+
+        Parameters
+        ----------
+        event_properties
+            Dataframe with new event properties.
+        """
+        self.frame = self.frame.select([pl.all(), *event_properties])
+
+    @property
+    def event_property_columns(self) -> list[str]:
+        """Event property columns for this dataframe."""
+        event_property_columns = set(self.frame.columns)
+        event_property_columns -= set(list(self._minimal_schema.keys()))
+        event_property_columns -= set(self._additional_columns)
+        return list(event_property_columns)
 
     def _add_minimal_schema_columns(self, df: pl.DataFrame) -> pl.DataFrame:
         """Add minimal schema columns to :py:class:`polars.DataFrame` if they are missing."""
@@ -133,6 +177,8 @@ class EventDetectionCallable(Protocol):
             self,
             positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
             velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
+            timesteps: list[int] | np.ndarray | None = None,
+            minimum_duration: int = 0,
             **kwargs,
     ) -> EventDataFrame:
         """Minimal interface to be implemented by all event detection methods.
@@ -143,6 +189,12 @@ class EventDetectionCallable(Protocol):
             Continuous 2D position time series
         velocities: array-like, shape (N, 2)
             Corresponding continuous 2D velocity time series.
+        timesteps: array-like, shape (N, )
+            Corresponding continuous 1D timestep time series. If None, sample based timesteps are
+            assumed.
+        minimum_duration: int
+            Minimum event duration. The duration is specified in the units used in ``timesteps``.
+            If ``timesteps`` is None, then ``minimum_duration`` is specified in numbers of samples.
         **kwargs:
             Additional keyword arguments for the specific event detection method.
 

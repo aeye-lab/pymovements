@@ -98,7 +98,6 @@ parallel = true
 branch = true
 omit = [
   'docs/*',
-  'src/pymovements/plotting/*',
   'tests/*'
 ]
 

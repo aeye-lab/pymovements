@@ -26,7 +26,7 @@ repos:
     hooks:
     -   id: rm-unneeded-f-str
 -   repo: https://github.com/kynan/nbstripout
-    rev: 0.6.0
+    rev: 0.6.1
     hooks:
     -   id: nbstripout
 -   repo: https://github.com/Lucas-C/pre-commit-hooks
@@ -68,7 +68,7 @@ repos:
     -   id: requirements-txt-fixer
     -   id: trailing-whitespace
 -   repo: https://github.com/pre-commit/mirrors-autopep8
-    rev: v2.0.1
+    rev: v2.0.2
     hooks:
     -   id: autopep8
 -   repo: https://github.com/PyCQA/autoflake
@@ -84,7 +84,7 @@ repos:
     hooks:
     -   id: flake8
 - repo: https://github.com/PyCQA/pylint
-  rev: v2.16.2
+  rev: v2.16.4
   hooks:
     - id: pylint
       name: pylint

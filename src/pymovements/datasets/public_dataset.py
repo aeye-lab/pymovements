@@ -25,8 +25,8 @@ from abc import abstractmethod
 from pathlib import Path
 from typing import Any
 
-from pymovements.base import Experiment
 from pymovements.datasets.dataset import Dataset
+from pymovements.gaze.experiment import Experiment
 from pymovements.utils.archives import extract_archive
 from pymovements.utils.downloads import download_file
 

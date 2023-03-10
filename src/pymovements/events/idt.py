@@ -25,7 +25,7 @@ from __future__ import annotations
 import numpy as np
 
 from pymovements.events.events import EventDataFrame
-from pymovements.utils.checks import check_shapes_positions_velocities
+from pymovements.utils import checks
 from pymovements.utils.filters import events_split_nans
 from pymovements.utils.filters import filter_candidates_remove_nans
 
@@ -53,8 +53,9 @@ def dispersion(positions: list[list[float]] | np.ndarray) -> float:
 def idt(
         positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
-        dispersion_threshold: float,
-        minimum_duration: int,
+        timesteps: list[int] | np.ndarray | None = None,
+        minimum_duration: int = 100,
+        dispersion_threshold: float = 1.0,
         include_nan: bool = False,
 ) -> EventDataFrame:
     """
@@ -66,7 +67,7 @@ def idt(
     If the dispersion is below the threshold, the window represents a fixation,
     and the window is expanded until the dispersion is above threshold.
 
-    The implementation is based on the description and pseudocode
+    The implementation and its default parameter values are based on the description and pseudocode
     from Salvucci and Goldberg :cite:p:`SalvucciGoldberg2000`.
 
     Parameters
@@ -75,10 +76,14 @@ def idt(
         Continuous 2D position time series
     velocities: array-like, shape (N, 2)
         Corresponding continuous 2D velocity time series.
+    timesteps: array-like, shape (N, )
+        Corresponding continuous 1D timestep time series. If None, sample based timesteps are
+        assumed.
+    minimum_duration: int
+        Minimum fixation duration. The duration is specified in the units used in ``timesteps``.
+         If ``timesteps`` is None, then ``minimum_duration`` is specified in numbers of samples.
     dispersion_threshold: float
         Threshold for dispersion for a group of consecutive samples to be identified as fixation
-    minimum_duration: int
-        Minimum fixation duration in number of samples
     include_nan: bool
         Indicator, whether we want to split events on missing/corrupt value (np.nan)
 
@@ -96,8 +101,13 @@ def idt(
     """
     positions = np.array(positions)
     velocities = np.array(velocities)
+    checks.check_shapes_positions_velocities(positions=positions, velocities=velocities)
 
-    check_shapes_positions_velocities(positions=positions, velocities=velocities)
+    if timesteps is None:
+        timesteps = np.arange(len(velocities), dtype=np.int64)
+    timesteps = np.array(timesteps)
+    checks.check_is_length_matching(velocities=velocities, timesteps=timesteps)
+
     if dispersion_threshold <= 0:
         raise ValueError('dispersion threshold must be greater than 0')
     if minimum_duration <= 0:
@@ -106,15 +116,28 @@ def idt(
     onsets = []
     offsets = []
 
+    # Infer minimum duration in number of samples.
+    # This implementation is currently very restrictive.
+    # It requires that the interval between timesteps is constant.
+    # It requires that the minimum duration is divisible by the constant interval between timesteps.
+    timesteps_diff = np.diff(timesteps)
+    if not np.all(timesteps_diff == timesteps_diff[0]):
+        raise ValueError('interval between timesteps must be constant')
+    if not minimum_duration % timesteps_diff[0] == 0:
+        raise ValueError(
+            'minimum_duration must be divisible by the constant interval between timesteps',
+        )
+    minimum_sample_duration = minimum_duration // timesteps_diff[0]
+
     # Initialize window over first points to cover the duration threshold
     win_start = 0
-    win_end = minimum_duration
+    win_end = minimum_sample_duration
 
     while win_end < len(positions):
 
         # Initialize window over first points to cover the duration threshold.
         # This automatically extends the window to the specified minimum event duration.
-        win_end = max(win_start + minimum_duration, win_end)
+        win_end = max(win_start + minimum_sample_duration, win_end)
 
         if dispersion(positions[win_start:win_end]) <= dispersion_threshold:
             # Add additional points to the window until dispersion > threshold.
@@ -141,17 +164,18 @@ def idt(
 
                 # Filter all candidates by minimum duration.
                 tmp_candidates = [
-                    candidate for candidate in tmp_candidates if len(candidate) >= minimum_duration
+                    candidate for candidate in tmp_candidates
+                    if len(candidate) >= minimum_sample_duration
                 ]
                 for candidate in tmp_candidates:
-                    onsets.append(candidate[0])
-                    offsets.append(candidate[-1])
+                    onsets.append(timesteps[candidate[0]])
+                    offsets.append(timesteps[candidate[-1]])
 
             else:
                 # Note a fixation at the centroid of the window points.
 
-                onsets.append(win_start)
-                offsets.append(win_end - 1)
+                onsets.append(timesteps[win_start])
+                offsets.append(timesteps[win_end - 1])
 
             # Remove window points from points.
             # Initialize new window excluding the previous window
@@ -161,5 +185,9 @@ def idt(
             # Move window start one step further without modifying window end.
             win_start += 1
 
-    event_df = EventDataFrame(name='fixation', onsets=onsets, offsets=offsets)
+    # Create proper flat numpy arrays.
+    onsets_arr = np.array(onsets).flatten()
+    offsets_arr = np.array(offsets).flatten()
+
+    event_df = EventDataFrame(name='fixation', onsets=onsets_arr, offsets=offsets_arr)
     return event_df

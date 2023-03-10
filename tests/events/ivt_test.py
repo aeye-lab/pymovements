@@ -26,8 +26,8 @@ from polars.testing import assert_frame_equal
 
 from pymovements.events.events import EventDataFrame
 from pymovements.events.ivt import ivt
+from pymovements.gaze.transforms import pos2vel
 from pymovements.synthetic import step_function
-from pymovements.transforms import pos2vel
 
 
 @pytest.mark.parametrize(
@@ -243,10 +243,24 @@ def test_ivt_raise_error(kwargs, expected_error):
             ),
             id='one_fixation_nan_remove_leading_ending',
         ),
+        pytest.param(
+            {
+                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
+                'timesteps': np.arange(1000, 1100, dtype=int),
+                'velocity_threshold': 1,
+                'minimum_duration': 1,
+            },
+            EventDataFrame(
+                name='fixation',
+                onsets=[1000],
+                offsets=[1099],
+            ),
+            id='constant_position_single_fixation_with_timesteps',
+        ),
     ],
 )
 def test_ivt_detects_fixations(kwargs, expected):
     velocities = pos2vel(kwargs['positions'], sampling_rate=10, method='preceding')
     events = ivt(velocities=velocities, **kwargs)
 
-    assert_frame_equal(events, expected)
+    assert_frame_equal(events.frame, expected.frame)

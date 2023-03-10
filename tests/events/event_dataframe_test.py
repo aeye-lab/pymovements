@@ -25,14 +25,10 @@ from polars.testing import assert_frame_equal
 from pymovements.events.events import EventDataFrame
 
 
-@pytest.fixture(name='minimal_schema')
+@pytest.fixture(name='expected_schema_after_init')
 def fixture_dataset():
-    schema = {'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64}
+    schema = {'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64, 'duration': pl.Int64}
     yield schema
-
-
-def test_event_dataframe_is_polars_dataframe():
-    assert issubclass(EventDataFrame, pl.DataFrame)
 
 
 @pytest.mark.parametrize(
@@ -93,9 +89,9 @@ def test_event_dataframe_init_exceptions(kwargs, exception, msg_substrings):
         pytest.param([], {'onsets': [0, 2], 'offsets': [1, 3]}, id='dict_with_two_events_kwarg'),
     ],
 )
-def test_event_dataframe_init_minimal_schema(args, kwargs, minimal_schema):
+def test_event_dataframe_init_expected_schema(args, kwargs, expected_schema_after_init):
     event_df = EventDataFrame(*args, **kwargs)
-    assert event_df.schema == minimal_schema
+    assert event_df.schema == expected_schema_after_init
 
 
 @pytest.mark.parametrize(
@@ -153,7 +149,7 @@ def test_event_dataframe_init_has_correct_names(args, kwargs, expected_names):
     [
         pytest.param(
             [], {'onsets': [0], 'offsets': [1]},
-            {'name': [''], 'onset': [0], 'offset': [1]},
+            {'name': [''], 'onset': [0], 'offset': [1], 'duration': [1]},
             id='no_arg_dict_with_single_event_kwarg',
         ),
         pytest.param(
@@ -163,23 +159,30 @@ def test_event_dataframe_init_has_correct_names(args, kwargs, expected_names):
         ),
         pytest.param(
             [], {'name': 'bar', 'onsets': [0], 'offsets': [1]},
-            {'name': ['bar'], 'onset': [0], 'offset': [1]},
+            {'name': ['bar'], 'onset': [0], 'offset': [1], 'duration': [1]},
             id='dict_with_single_named_event',
         ),
         pytest.param(
             [], {'name': 'bar', 'onsets': [0, 2], 'offsets': [1, 3]},
-            {'name': ['bar', 'bar'], 'onset': [0, 2], 'offset': [1, 3]},
+            {'name': ['bar', 'bar'], 'onset': [0, 2], 'offset': [1, 3], 'duration': [1, 1]},
             id='dict_with_two_events_same_name',
         ),
         pytest.param(
-            [], {'name': ['foo', 'bar'], 'onsets': [0, 2], 'offsets': [1, 3]},
-            {'name': ['foo', 'bar'], 'onset': [0, 2], 'offset': [1, 3]},
+            [], {'name': ['foo', 'bar'], 'onsets': [0, 2], 'offsets': [1, 4]},
+            {'name': ['foo', 'bar'], 'onset': [0, 2], 'offset': [1, 4], 'duration': [1, 2]},
             id='dict_with_two_differently_named_events',
         ),
     ],
 )
-def test_event_dataframe_init_expected(args, kwargs, expected_df_data, minimal_schema):
+def test_event_dataframe_init_expected(args, kwargs, expected_df_data, expected_schema_after_init):
     event_df = EventDataFrame(*args, **kwargs)
 
-    expected_df = pl.DataFrame(data=expected_df_data, schema=minimal_schema)
-    assert_frame_equal(event_df, expected_df)
+    expected_df = pl.DataFrame(data=expected_df_data, schema=expected_schema_after_init)
+    assert_frame_equal(event_df.frame, expected_df)
+
+
+def test_event_dataframe_columns_same_as_frame():
+    init_kwargs = {'onsets': [0], 'offsets': [1]}
+    event_df = EventDataFrame(**init_kwargs)
+
+    assert event_df.columns == event_df.frame.columns
