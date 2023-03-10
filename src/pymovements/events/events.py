@@ -29,8 +29,7 @@ import numpy as np
 import polars as pl
 from typing_extensions import Protocol
 
-from pymovements import exceptions
-from pymovements.events import event_properties
+from pymovements.events.event_properties import duration
 from pymovements.utils import checks
 
 
@@ -74,8 +73,14 @@ class EventDataFrame:
             checks.check_is_mutual_exclusive(data=data, offsets=offsets)
             checks.check_is_mutual_exclusive(data=data, name=name)
 
+            data = data.clone()
             data = self._add_minimal_schema_columns(data)
             data_dict = data.to_dict()
+
+            self._additional_columns = [
+                column_name for column_name in data_dict.keys()
+                if column_name not in self._minimal_schema
+            ]
 
         else:
             # Make sure that if either onsets or offsets is None, the other one is None too.
@@ -109,36 +114,8 @@ class EventDataFrame:
                 }
 
         self.frame = pl.DataFrame(data=data_dict, schema_overrides=self._minimal_schema)
-
-    def add_property(self, property_name: str) -> EventDataFrame:
-        """Add an event property column to the event dataframe.
-
-        Parameters
-        ----------
-        property_name: str
-            The name of the property
-
-        Returns
-        -------
-        EventDataFrame
-            Reference to ``self`` to enable method chaining.
-
-        Raises
-        ------
-        InvalidProperty
-            If ``property_name`` is not a valid property. See
-            :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
-        """
-        property_expression = event_properties.PROPERTIES.get(property_name, None)
-
-        if property_expression is None:
-            valid_properties = list(event_properties.PROPERTIES.keys())
-            raise exceptions.InvalidProperty(
-                property_name=property_name, valid_properties=valid_properties,
-            )
-
-        self.frame = self.frame.select([pl.all(), property_expression()])
-        return self
+        if 'duration' not in self.frame.columns:
+            self._add_duration_property()
 
     @property
     def schema(self) -> pl.datatypes.SchemaDict:
@@ -155,6 +132,28 @@ class EventDataFrame:
     def columns(self) -> list[str]:
         """List of column names."""
         return self.frame.columns
+
+    def _add_duration_property(self):
+        """Adds duration property column to dataframe."""
+        self.frame = self.frame.select([pl.all(), duration().alias('duration')])
+
+    def add_event_properties(self, event_properties: pl.DataFrame) -> None:
+        """Add new event properties into dataframe.
+
+        Parameters
+        ----------
+        event_properties
+            Dataframe with new event properties.
+        """
+        self.frame = self.frame.select([pl.all(), *event_properties])
+
+    @property
+    def event_property_columns(self) -> list[str]:
+        """Event property columns for this dataframe."""
+        event_property_columns = set(self.frame.columns)
+        event_property_columns -= set(list(self._minimal_schema.keys()))
+        event_property_columns -= set(self._additional_columns)
+        return list(event_property_columns)
 
     def _add_minimal_schema_columns(self, df: pl.DataFrame) -> pl.DataFrame:
         """Add minimal schema columns to :py:class:`polars.DataFrame` if they are missing."""

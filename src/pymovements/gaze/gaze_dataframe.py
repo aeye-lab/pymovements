@@ -44,6 +44,12 @@ class GazeDataFrame:
         'x_right_pos', 'y_right_pos',
     ]
 
+    _valid_velocity_columns = [
+        'x_vel', 'y_vel',
+        'x_left_vel', 'y_left_vel',
+        'x_right_vel', 'y_right_vel',
+    ]
+
     def __init__(
             self,
             data: pl.DataFrame | None = None,
@@ -158,12 +164,7 @@ class GazeDataFrame:
     @property
     def velocity_columns(self) -> list[str]:
         """Velocity columns (in degrees of visual angle per second) of dataframe."""
-        velocity_columns = [
-            'x_vel', 'y_vel',
-            'x_left_vel', 'y_left_vel',
-            'x_right_vel', 'y_right_vel',
-        ]
-        velocity_columns = list(set(velocity_columns) & set(self.frame.columns))
+        velocity_columns = list(set(self._valid_velocity_columns) & set(self.frame.columns))
         return velocity_columns
 
     @property
