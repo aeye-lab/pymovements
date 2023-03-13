@@ -18,36 +18,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test all functionality in pymovements.datasets.public_dataset."""
-import tarfile
 from pathlib import Path
 from unittest import mock
 
 import pytest
 
 from pymovements.datasets.public_dataset import PublicDataset
-
-
-@pytest.fixture(
-    name='single_archive',
-    params=[
-        ('gz', 'tar'),
-    ],
-    autouse=True,
-)
-def fixture_archive(tmp_path):
-    rootpath = tmp_path
-    compression, extension = 'gz', 'tar'
-
-    # write tmp filepath
-    filepath = rootpath / 'test.file'
-    filepath.write_text('test')
-
-    archive_path = rootpath / f'test.{extension}.{compression}'
-
-    with tarfile.TarFile.open(archive_path, f'w:{compression}') as fp:
-        fp.add(filepath)
-
-    yield archive_path
 
 
 @pytest.fixture(name='dataset')
