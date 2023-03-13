@@ -184,7 +184,7 @@ class Dataset:
             raise RuntimeError(f'no matching files found in {self.raw_rootpath}')
 
         # Create dataframe from all fileinfo records.
-        fileinfo_df = pl.from_dicts(dicts=fileinfo_dicts, infer_schema_length=1)
+        fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
         fileinfo_df = fileinfo_df.sort(by='filepath')
 
         fileinfo_df = fileinfo_df.with_columns([
