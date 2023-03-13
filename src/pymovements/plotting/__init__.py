@@ -24,4 +24,5 @@ from pymovements.plotting.tsplot import tsplot  # noqa: F401
 __all__ = [
     'traceplot',
     'tsplot',
+    'main_sequence_plot',
 ]
