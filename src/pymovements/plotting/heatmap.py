@@ -20,28 +20,29 @@
 """
 Heatmap module.
 """
-
-from pymovements.gaze import GazeDataFrame
-
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import colors
 
+from pymovements.gaze import GazeDataFrame
 
-def heatmap(gaze: GazeDataFrame,
-            position_columns: tuple[str, str] = ('x_pix', 'y_pix'),
-            gridsize=(10, 10),
-            cmap: colors.Colormap | str = 'jet',
-            interpolation: str = 'gaussian',
-            origin: str = 'lower',
-            figsize: tuple[float, float] = (15, 10),
-            cbar_label: str | None = None,
-            show_cbar: bool = True,
-            title: str | None = None,
-            xlabel: str | None = None,
-            ylabel: str | None = None,
-            show: bool = True,
-            savepath: str | None = None) -> plt.Figure:
+
+def heatmap(
+    gaze: GazeDataFrame,
+    position_columns: tuple[str, str] = ('x_pix', 'y_pix'),
+    gridsize=(10, 10),
+    cmap: colors.Colormap | str = 'jet',
+    interpolation: str = 'gaussian',
+    origin: str = 'lower',
+    figsize: tuple[float, float] = (15, 10),
+    cbar_label: str | None = None,
+    show_cbar: bool = True,
+    title: str | None = None,
+    xlabel: str | None = None,
+    ylabel: str | None = None,
+    show: bool = True,
+    savepath: str | None = None,
+) -> plt.Figure:
     """Plot a heatmap of gaze data.
 
     The heatmap displays the distribution of gaze positions across the experiment screen,
@@ -131,7 +132,7 @@ def heatmap(gaze: GazeDataFrame,
         cmap=cmap,
         origin=origin,
         interpolation=interpolation,
-        extent=[x_edges[0], x_edges[-1], y_edges[0], y_edges[-1]]
+        extent=[x_edges[0], x_edges[-1], y_edges[0], y_edges[-1]],
     )
 
     # Set the plot title and axis labels

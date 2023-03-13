@@ -18,9 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """This module holds all plotting related functionality."""
+from pymovements.plotting.heatmap import heatmap  # noqa: F401
 from pymovements.plotting.traceplot import traceplot  # noqa: F401
 from pymovements.plotting.tsplot import tsplot  # noqa: F401
-from pymovements.plotting.heatmap import heatmap  # noqa: F401
 
 __all__ = [
     'heatmap',
