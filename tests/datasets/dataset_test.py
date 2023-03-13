@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test all functionality in pymovements.datasets.dataset."""
+import os
 import shutil
 import unittest
 from pathlib import Path
@@ -788,17 +789,23 @@ def test_save_preprocessed(preprocessed_dirname, expected_save_dirpath, dataset_
             'preprocessed_test',
             'events',
             {'preprocessed_dirname': 'preprocessed_test'},
-            id='none_dirname',
+            id='explicit_prepocessed_dirname',
         ),
         pytest.param(
             'preprocessed',
             'events_test',
             {'events_dirname': 'events_test'},
-            id='none_dirname',
+            id='explicit_events_dirname',
+        ),
+        pytest.param(
+            'preprocessed',
+            'events',
+            {'extension': 'csv'},
+            id='extension_equals_csv',
         ),
     ],
 )
-def test_save(
+def test_save_creates_correct_directory(
         expected_save_preprocessed_path,
         expected_save_events_path,
         save_kwargs,
@@ -822,10 +829,68 @@ def test_save(
     dataset.save(**save_kwargs)
 
     assert (dataset.path / Path(expected_save_preprocessed_path)).is_dir(), (
-        f'data was not written to {dataset.path / Path(expected_save_events_path)}'
+        f'data was not written to {dataset.path / Path(expected_save_preprocessed_path)}'
     )
     assert (dataset.path / Path(expected_save_events_path)).is_dir(), (
         f'data was not written to {dataset.path / Path(expected_save_events_path)}'
+    )
+
+
+@pytest.mark.parametrize(
+    'expected_save_preprocessed_path, expected_save_events_path, save_kwargs',
+    [
+        pytest.param(
+            'preprocessed',
+            'events',
+            {'extension': 'feather'},
+            id='extension_equals_feather',
+        ),
+        pytest.param(
+            'preprocessed',
+            'events',
+            {'extension': 'csv'},
+            id='extension_equals_csv',
+        ),
+    ],
+)
+def test_save_files_have_correct_extension(
+        expected_save_preprocessed_path,
+        expected_save_events_path,
+        save_kwargs,
+        dataset_configuration,
+):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+    dataset.pos2vel()
+
+    detect_events_kwargs = {'method': microsaccades, 'threshold': 1, 'eye': 'auto'}
+    dataset.detect_events(**detect_events_kwargs)
+
+    preprocessed_dirname = save_kwargs.get('preprocessed_dirname', 'preprocessed')
+    events_dirname = save_kwargs.get('events_dirname', 'events')
+    extension = save_kwargs.get('extension', 'feather')
+
+    shutil.rmtree(dataset.path / Path(preprocessed_dirname), ignore_errors=True)
+    shutil.rmtree(dataset.path / Path(expected_save_preprocessed_path), ignore_errors=True)
+    shutil.rmtree(dataset.path / Path(events_dirname), ignore_errors=True)
+    shutil.rmtree(dataset.path / Path(expected_save_events_path), ignore_errors=True)
+    dataset.save(**save_kwargs)
+
+    preprocessed_dir = dataset.path / Path(expected_save_preprocessed_path)
+    preprocessed_file_list = os.listdir(preprocessed_dir)
+    extension_list = [a.endswith(extension) for a in preprocessed_file_list]
+    extension_sum = sum(extension_list)
+    assert extension_sum == len(preprocessed_file_list), (
+        f'not all preprocessed files created have correct extension {extension}'
+    )
+
+    events_dir = dataset.path / Path(expected_save_events_path)
+    events_file_list = os.listdir(events_dir)
+    extension_list = [a.endswith(extension) for a in events_file_list]
+    extension_sum = sum(extension_list)
+    assert extension_sum == len(events_file_list), (
+        f'not all events files created have correct extension {extension}'
     )
 
 

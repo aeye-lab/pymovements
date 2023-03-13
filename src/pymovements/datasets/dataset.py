@@ -145,7 +145,7 @@ class Dataset:
             One-time usage of an alternative directory name to save data relative to
             :py:meth:`pymovements.Dataset.path`.
             This argument is used only for this single call and does not alter
-            :py:meth:`pymovements.Dataset.preprocessed_rootpath`.        
+            :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
         extension:
             extension specifies the fileformat to store the data
 
@@ -160,9 +160,10 @@ class Dataset:
         )
 
         if events:
-            self.events = self.load_event_files(events_dirname=events_dirname,
-                                                extension=extension,
-                                                )
+            self.events = self.load_event_files(
+                events_dirname=events_dirname,
+                extension=extension,
+            )
 
     def infer_fileinfo(self) -> pl.DataFrame:
         """Infer information from filepaths and filenames.
@@ -313,7 +314,10 @@ class Dataset:
                 )
 
             if filepath.suffix == '.csv':
-                gaze_df = pl.read_csv(filepath)
+                if preprocessed:
+                    gaze_df = pl.read_csv(filepath)
+                else:
+                    gaze_df = pl.read_csv(filepath, **self._custom_read_kwargs)
             elif filepath.suffix == '.feather':
                 gaze_df = pl.read_ipc(filepath)
             else:
@@ -326,10 +330,11 @@ class Dataset:
 
         return gaze_dfs
 
-    def load_event_files(self, 
-                events_dirname: str | None = None,
-                extension: str = 'feather',
-                ) -> list[EventDataFrame]:
+    def load_event_files(
+        self,
+        events_dirname: str | None = None,
+        extension: str = 'feather',
+    ) -> list[EventDataFrame]:
         """Load all available event files.
 
         Parameters
@@ -361,8 +366,10 @@ class Dataset:
             filepath = Path(fileinfo['filepath'])
             filepath = self.raw_rootpath / filepath
 
-            filepath = self._raw_to_event_filepath(filepath, events_dirname=events_dirname,
-                                                    extension=extension,)
+            filepath = self._raw_to_event_filepath(
+                filepath, events_dirname=events_dirname,
+                extension=extension,
+            )
 
             if extension == 'feather':
                 event_df = pl.read_ipc(filepath)
@@ -564,7 +571,7 @@ class Dataset:
             events_dirname: str | None = None,
             preprocessed_dirname: str | None = None,
             verbose: int = 1,
-            extension: str = 'feather'
+            extension: str = 'feather',
     ):
         """Save preprocessed gaze and event files.
 
@@ -589,9 +596,11 @@ class Dataset:
         self.save_events(events_dirname, verbose=verbose, extension=extension)
         self.save_preprocessed(preprocessed_dirname, verbose=verbose, extension=extension)
 
-    def save_events(self, events_dirname: str | None = None,
-                    verbose: int = 1,
-                    extension: str = 'feather'):
+    def save_events(
+        self, events_dirname: str | None = None,
+        verbose: int = 1,
+        extension: str = 'feather',
+    ):
         """Save events to files.
 
         Data will be saved as feather files to ``Dataset.events_roothpath`` with the same directory
@@ -631,9 +640,11 @@ class Dataset:
             elif extension == 'csv':
                 event_df_out.write_csv(events_filepath)
 
-    def save_preprocessed(self, preprocessed_dirname: str | None = None,
-                          verbose: int = 1,
-                          extension: str = 'feather'):
+    def save_preprocessed(
+        self, preprocessed_dirname: str | None = None,
+        verbose: int = 1,
+        extension: str = 'feather',
+    ):
         """Save preprocessed gaze files.
 
         Data will be saved as feather files to ``Dataset.preprocessed_roothpath`` with the same
@@ -820,7 +831,7 @@ class Dataset:
             self,
             raw_filepath: Path,
             preprocessed_dirname: str | None = None,
-            extension: str = 'feather'
+            extension: str = 'feather',
     ) -> Path:
         """Get preprocessed filepath in accordance to filepath of the raw file.
 
@@ -858,10 +869,12 @@ class Dataset:
 
         return preprocessed_file_dirpath / preprocessed_filename
 
-    def _raw_to_event_filepath(self,
-                            raw_filepath: Path,
-                            events_dirname: str | None = None,
-                            extension: str = 'feather') -> Path:
+    def _raw_to_event_filepath(
+        self,
+        raw_filepath: Path,
+        events_dirname: str | None = None,
+        extension: str = 'feather',
+    ) -> Path:
         """Get event filepath in accordance to filepath of the raw file.
 
         The event filepath will point to file with the specified extension.
