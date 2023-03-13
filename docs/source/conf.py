@@ -37,6 +37,7 @@ import pkg_resources
 from pybtex.plugin import register_plugin
 from pybtex.style.formatting.plain import Style as PlainStyle
 from pybtex.style.labels import BaseLabelStyle
+from sphinx.ext import autodoc
 
 # add relative source path to python path
 sys.path.insert(0, os.path.abspath('src'))
@@ -80,6 +81,7 @@ def setup(app):
     app.add_config_value('REVISION', 'master', 'env')
     app.add_config_value('generated_path', '_generated', 'env')
     app.connect('config-inited', config_inited_handler)
+    app.add_autodocumenter(SimpleDocumenter)
 
 
 # Add any paths that contain templates here, relative to this directory.
@@ -146,8 +148,21 @@ favicons = [
 nbsphinx_execute = 'auto'
 
 
-# -- Options for BibTeX ------------------------------------------------------
+# -- Options for sphinx modules
 
+
+class SimpleDocumenter(autodoc.ModuleDocumenter):
+    objtype = 'simple'
+
+    # do not indent the content
+    content_indent = ''
+
+    # do not add a header to the docstring
+    def add_directive_header(self, sig):
+        pass
+
+
+# -- Options for BibTeX ------------------------------------------------------
 bibtex_bibfiles = ['bibliography.bib']
 bibtex_default_style = 'author_year_style'
 bibtex_reference_style = 'author_year'
