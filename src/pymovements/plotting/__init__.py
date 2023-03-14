@@ -28,9 +28,9 @@
     pymovements.plotting.tsplot
     pymovements.plotting.main_sequence_plot
 """
+from pymovements.plotting.main_sequence_plot import main_sequence_plot  # noqa: F401
 from pymovements.plotting.traceplot import traceplot  # noqa: F401
 from pymovements.plotting.tsplot import tsplot  # noqa: F401
-from pymovements.plotting.main_sequence_plot import main_sequence_plot  # noqa: F401
 
 __all__ = [
     'traceplot',
