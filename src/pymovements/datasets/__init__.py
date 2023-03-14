@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """This module provides access to publicly available datasets."""
+from __future__ import annotations
+
 from pymovements.datasets.dataset import Dataset  # noqa: F401
 from pymovements.datasets.gazebase import GazeBase  # noqa: F401
 from pymovements.datasets.judo1000 import JuDo1000  # noqa: F401

@@ -20,6 +20,8 @@
 """
 This module tests functionality of the synthetic eye gaze step function.
 """
+from __future__ import annotations
+
 import numpy as np
 import pytest
 

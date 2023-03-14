@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test all functionality in pymovements.datasets.public_dataset."""
+from __future__ import annotations
+
 from pathlib import Path
 from unittest import mock
 

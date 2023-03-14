@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """This module holds gaze time series related functionality."""
+from __future__ import annotations
+
 from pymovements.gaze import transforms  # noqa: F401
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze_dataframe import GazeDataFrame  # noqa: F401

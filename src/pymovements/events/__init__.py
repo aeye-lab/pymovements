@@ -20,6 +20,8 @@
 """
 This module holds all event related functionality.
 """
+from __future__ import annotations
+
 from pymovements.events.engbert import microsaccades  # noqa: F401
 from pymovements.events.events import EventDetectionCallable  # noqa: F401
 from pymovements.events.idt import idt  # noqa: F401

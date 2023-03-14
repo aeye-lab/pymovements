@@ -20,6 +20,8 @@
 """
 Test pymovements paths.
 """
+from __future__ import annotations
+
 import pathlib
 import re
 import unittest

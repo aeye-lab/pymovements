@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """This module provides access to all submodules."""
+from __future__ import annotations
+
 from pymovements import datasets  # noqa: F401
 from pymovements import events  # noqa: F401
 from pymovements import gaze  # noqa: F401

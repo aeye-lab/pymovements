@@ -20,4 +20,6 @@
 """
 This module holds functionality for generating synthetic eye gaze data.
 """
+from __future__ import annotations
+
 from pymovements.synthetic.step_function import step_function  # noqa: F401

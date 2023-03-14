@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """This module provides access to all utility functions."""
+from __future__ import annotations
+
 from pymovements.utils import archives  # noqa: F401
 from pymovements.utils import checks  # noqa: F401
 from pymovements.utils import decorators  # noqa: F401

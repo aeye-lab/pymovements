@@ -20,6 +20,8 @@
 """
 Test pymovements utils downloads.
 """
+from __future__ import annotations
+
 import hashlib
 import os.path
 from unittest import mock

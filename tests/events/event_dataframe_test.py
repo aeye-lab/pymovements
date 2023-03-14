@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Tests pymovements.events.events.EventDataFrame."""
+from __future__ import annotations
+
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal

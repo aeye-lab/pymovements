@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """This module holds all plotting related functionality."""
+from __future__ import annotations
+
 from pymovements.plotting.traceplot import traceplot  # noqa: F401
 from pymovements.plotting.tsplot import tsplot  # noqa: F401
 
