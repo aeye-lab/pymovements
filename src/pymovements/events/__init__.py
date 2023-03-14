@@ -17,10 +17,53 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""This module holds all event related functionality.
+
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+   :template: class.rst
+
+    pymovements.events.EventDataFrame
+    pymovements.events.EventDetectionCallable
+
+.. rubric:: Processing
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+    pymovements.events.EventProcessor
+    pymovements.events.EventGazeProcessor
+
+.. rubric:: Detection Methods
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+    pymovements.events.idt
+    pymovements.events.ivt
+    pymovements.events.microsaccades
+
+.. rubric:: Event Properties
+
+.. autosummary::
+    :toctree:
+    :recursive:
+
+    pymovements.events.event_properties.duration
+    pymovements.events.event_properties.dispersion
+    pymovements.events.event_properties.disposition
+    pymovements.events.event_properties.amplitude
+    pymovements.events.event_properties.peak_velocity
 """
-This module holds all event related functionality.
-"""
-from pymovements.events.engbert import microsaccades  # noqa: F401
+from pymovements.events.detection.engbert import microsaccades  # noqa: F401
+from pymovements.events.detection.idt import idt  # noqa: F401
+from pymovements.events.detection.ivt import ivt  # noqa: F401
+from pymovements.events.event_processing import EventGazeProcessor  # noqa: F401
+from pymovements.events.event_processing import EventProcessor  # noqa: F401
+from pymovements.events.events import EventDataFrame  # noqa: F401
 from pymovements.events.events import EventDetectionCallable  # noqa: F401
-from pymovements.events.idt import idt  # noqa: F401
-from pymovements.events.ivt import ivt  # noqa: F401

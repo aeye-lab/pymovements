@@ -20,6 +20,8 @@
 """
 This module holds utils for developers and is not part of the user API.
 """
+from __future__ import annotations
+
 from typing import Any
 
 

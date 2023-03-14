@@ -157,7 +157,8 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
                     )
                     success = True
 
-                except URLError as error:
+                # pylint: disable=overlapping-except
+                except (URLError, OSError, RuntimeError) as error:
                     print(f'Failed to download (trying next):\n{error}')
                     # downloading the resource, try next mirror
                     continue

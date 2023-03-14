@@ -30,9 +30,9 @@ from polars.testing import assert_frame_equal
 
 from pymovements import exceptions
 from pymovements.datasets.dataset import Dataset
-from pymovements.events.engbert import microsaccades
+from pymovements.events.detection.engbert import microsaccades
+from pymovements.events.detection.ivt import ivt
 from pymovements.events.events import EventDataFrame
-from pymovements.events.ivt import ivt
 from pymovements.gaze.experiment import Experiment
 
 

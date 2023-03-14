@@ -17,7 +17,14 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-This module holds functionality for generating synthetic eye gaze data.
+"""This module holds functionality for generating synthetic eye gaze data.
+
+.. rubric:: Functions
+
+.. autosummary::
+   :toctree:
+
+    pymovements.synthetic.step_function
+
 """
 from pymovements.synthetic.step_function import step_function  # noqa: F401
