@@ -426,11 +426,9 @@ def test_load_events_exceptions(init_kwargs, load_kwargs, exception, dataset_con
         dataset.load()
         dataset.pix2deg()
         dataset.pos2vel()
-        dataset.detect_events(
-            method=ivt,
-            velocity_threshold=45,
-            minimum_duration=55,
-        )
+        dataset.detect_events(method=ivt,
+                              velocity_threshold=45,
+                              minimum_duration=55)
         dataset.save_events()
         dataset.load_event_files(**load_kwargs)
 
@@ -454,11 +452,9 @@ def test_save_events_exceptions(init_kwargs, save_kwargs, exception, dataset_con
         dataset.load()
         dataset.pix2deg()
         dataset.pos2vel()
-        dataset.detect_events(
-            method=ivt,
-            velocity_threshold=45,
-            minimum_duration=55,
-        )
+        dataset.detect_events(method=ivt,
+                              velocity_threshold=45,
+                              minimum_duration=55)
         dataset.save_events(**save_kwargs)
 
 
@@ -806,7 +802,7 @@ def test_save_events(
         ),
     ],
 )
-def test_load_previously_saved_events(
+def test_load_previously_saved_events_gaze(
         detect_event_kwargs,
         events_dirname,
         expected_save_dirpath,
@@ -828,10 +824,11 @@ def test_load_previously_saved_events(
     shutil.rmtree(dataset.path / Path(events_dirname_), ignore_errors=True)
     shutil.rmtree(dataset.path / Path(expected_save_dirpath), ignore_errors=True)
     dataset.save_events(events_dirname, **load_save_kwargs)
+    dataset.save_preprocessed(**load_save_kwargs)
 
     dataset.events = []
 
-    dataset.load(events=True, events_dirname=events_dirname, **load_save_kwargs)
+    dataset.load(events=True, preprocessed=True, events_dirname=events_dirname, **load_save_kwargs)
     assert dataset.events
 
 
