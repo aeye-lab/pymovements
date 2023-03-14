@@ -10,3 +10,4 @@ These How-Tos provide detailed guides to implement the most important use cases 
     :maxdepth: 1
 
     dataset
+    plots
