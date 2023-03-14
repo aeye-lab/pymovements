@@ -17,17 +17,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
 from __future__ import annotations
 
-import warnings
 
 import matplotlib.pyplot as plt
 import polars as pl
 from polars import ColumnNotFoundError
-
-from pymovements.events.event_processing import EventProcessor
-from pymovements.events.events import EventDataFrame
 
 
 def main_sequence_plot(
@@ -38,12 +33,12 @@ def main_sequence_plot(
         show: bool = True,
 ) -> None:
     """
-    Plots the saccade main sequence
+    Plots the saccade main sequence.
 
     Parameters
     ----------
     data:
-        Data frame
+        Data frame. It must contain columns "peak_velocity" and "amplitude".
     figsize: tuple
         Figure size.
     title: str, optional
@@ -52,64 +47,44 @@ def main_sequence_plot(
         If given, figure will be saved to this path.
     show: bool
         If True, figure will be shown.
+
     Raises
     ------
-
-
-    Exmples
-    -------
-
+    KeyError
+        If the input dataframe has no 'amplitude' and/or 'peak_velocity' column.
+        Those are needed to create the plot.
     """
 
     try:
         peak_velocities = data['peak_velocity'].to_list()
     except ColumnNotFoundError:
-        warnings.warn("The input dataframe you provided does not contain "
-                      "the saccade peak velocities. "
-                      "We are trying to compute them now.")
-
-        try:
-            # check whether the columns we need to calculate the peak velocities
-            # are in the df
-            _ = data['x_vel', 'y_vel']
-            events = EventDataFrame(data)
-            processor = EventProcessor('peak_velocity')
-
-            property_result = processor.process(events)
-            peak_velocities = property_result['peak_velocity'].to_list()
-
-        except ColumnNotFoundError:
-            raise Warning()
+        raise KeyError(
+            'The input dataframe you provided does not contain '
+            'the saccade peak velocities which are needed to create '
+            'the main sequence plot. ',
+        )
 
     try:
         amplitudes = data['amplitude'].to_list()
     except ColumnNotFoundError:
-        warnings.warn("The input dataframe you provided does not contain "
-                      "the saccade amplitudes. "
-                      "We are trying to compute them now.")
-
-        try:
-            # check whether the columns we need to calculate the amplitude
-            # are in the df
-            _ = data['x_pos', 'y_pos']
-            events = EventDataFrame(data)
-            processor = EventProcessor('amplitude')
-
-            property_result = processor.process(events)
-            amplitudes = property_result['amplitude'].to_list()
-
-        except ColumnNotFoundError:
-            raise Warning()
+        raise KeyError(
+            'The input dataframe you provided does not contain '
+            'the saccade amplitudes which are needed to create '
+            'the main sequence plot. ',
+        )
 
     fig = plt.figure(figsize=figsize)
 
     plt.scatter(amplitudes, peak_velocities)
 
     plt.title(title)
+    plt.xlabel('Amplitude')
+    plt.ylabel('Peak Velocity')
 
     if savepath is not None:
         fig.savefig(savepath)
 
     if show:
         plt.show()
+
     plt.close(fig)
