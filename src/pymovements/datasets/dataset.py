@@ -147,7 +147,8 @@ class Dataset:
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
         extension:
-            extension specifies the fileformat to store the data
+            Specifies the file format for loading data. Valid options are: `csv`, `feather`.
+            :Default: `feather`.
 
         The parsed file information is assigned to the `fileinfo` attribute.
         All gaze files will be loaded as dataframes and assigned to the `gaze` attribute.
@@ -284,7 +285,8 @@ class Dataset:
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
         extension:
-            extension specifies the fileformat to store the data
+            Specifies the file format for loading data. Valid options are: `csv`, `feather`.
+            :Default: `feather`.
 
         Returns
         -------
@@ -345,7 +347,8 @@ class Dataset:
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.events_rootpath`.
         extension:
-            extension specifies the fileformat to store the data
+            Specifies the file format for loading data. Valid options are: `csv`, `feather`.
+            :Default: `feather`.
 
         Returns
         -------
@@ -356,6 +359,8 @@ class Dataset:
         ------
         AttributeError
             If `fileinfo` is None or the `fileinfo` dataframe is empty.
+        ValueError
+            If extension is not in list of valid extensions.
         """
         self._check_fileinfo()
 
@@ -375,6 +380,12 @@ class Dataset:
                 event_df = pl.read_ipc(filepath)
             elif extension == 'csv':
                 event_df = pl.read_csv(filepath)
+            else:
+                valid_extensions = ['csv', 'feather']
+                raise ValueError(
+                    f'unsupported file format "{extension}".'
+                    f'Supported formats are: {valid_extensions}',
+                )
 
             # Add fileinfo columns to dataframe.
             event_df = self._add_fileinfo(event_df, fileinfo)
@@ -615,7 +626,13 @@ class Dataset:
         verbose : int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
         extension:
-            extension specifies the fileformat to store the data
+            Specifies the file format for loading data. Valid options are: `csv`, `feather`.
+            :Default: `feather`.
+
+        Raises
+        ------
+        ValueError
+            If extension is not in list of valid extensions.
         """
         disable_progressbar = not verbose
 
@@ -639,6 +656,12 @@ class Dataset:
                 event_df_out.write_ipc(events_filepath)
             elif extension == 'csv':
                 event_df_out.write_csv(events_filepath)
+            else:
+                valid_extensions = ['csv', 'feather']
+                raise ValueError(
+                    f'unsupported file format "{extension}".'
+                    f'Supported formats are: {valid_extensions}',
+                )
 
     def save_preprocessed(
         self, preprocessed_dirname: str | None = None,
@@ -659,7 +682,13 @@ class Dataset:
         verbose : int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
         extension:
-            extension specifies the fileformat to store the data
+            Specifies the file format for loading data. Valid options are: `csv`, `feather`.
+            :Default: `feather`.
+
+        Raises
+        ------
+        ValueError
+            If extension is not in list of valid extensions.
         """
         disable_progressbar = not verbose
 
@@ -683,6 +712,12 @@ class Dataset:
                 gaze_df_out.write_ipc(preprocessed_filepath)
             elif extension == 'csv':
                 gaze_df_out.write_csv(preprocessed_filepath)
+            else:
+                valid_extensions = ['csv', 'feather']
+                raise ValueError(
+                    f'unsupported file format "{extension}".'
+                    f'Supported formats are: {valid_extensions}',
+                )
 
     @property
     def path(self) -> Path:
