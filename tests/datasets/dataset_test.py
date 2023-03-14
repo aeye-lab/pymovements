@@ -426,9 +426,11 @@ def test_load_events_exceptions(init_kwargs, load_kwargs, exception, dataset_con
         dataset.load()
         dataset.pix2deg()
         dataset.pos2vel()
-        dataset.detect_events(method=ivt,
-                              velocity_threshold=45,
-                              minimum_duration=55)
+        dataset.detect_events(
+            method=ivt,
+            velocity_threshold=45,
+            minimum_duration=55,
+        )
         dataset.save_events()
         dataset.load_event_files(**load_kwargs)
 
@@ -452,9 +454,11 @@ def test_save_events_exceptions(init_kwargs, save_kwargs, exception, dataset_con
         dataset.load()
         dataset.pix2deg()
         dataset.pos2vel()
-        dataset.detect_events(method=ivt,
-                              velocity_threshold=45,
-                              minimum_duration=55)
+        dataset.detect_events(
+            method=ivt,
+            velocity_threshold=45,
+            minimum_duration=55,
+        )
         dataset.save_events(**save_kwargs)
 
 
