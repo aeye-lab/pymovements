@@ -5,7 +5,6 @@
 .. autosummary::
     :toctree:
     :nosignatures:
-    :recursive:
     :template: module.rst
 
     pymovements.datasets
