@@ -122,7 +122,7 @@ def test_main_sequence_plot_not_show(input_df, show, monkeypatch):
         ),
     ],
 )
-def test_main_sequence_plot_not_show_plot(input_df, expected_error, error_msg, monkeypatch):
+def test_main_sequence_plot_not_show_plot(input_df, expected_error, error_msg):
 
     with pytest.raises(expected_error) as actual_error:
         main_sequence_plot(input_df)

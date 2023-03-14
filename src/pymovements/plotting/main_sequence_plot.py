@@ -17,8 +17,11 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from __future__ import annotations
+"""
+This module holds the main sequence plot.
+"""
 
+from __future__ import annotations
 
 import matplotlib.pyplot as plt
 import polars as pl
@@ -57,29 +60,29 @@ def main_sequence_plot(
 
     try:
         peak_velocities = data['peak_velocity'].to_list()
-    except ColumnNotFoundError:
+    except ColumnNotFoundError as exc:
         raise KeyError(
             'The input dataframe you provided does not contain '
             'the saccade peak velocities which are needed to create '
             'the main sequence plot. ',
-        )
+        ) from exc
 
     try:
         amplitudes = data['amplitude'].to_list()
-    except ColumnNotFoundError:
+    except ColumnNotFoundError as exc:
         raise KeyError(
             'The input dataframe you provided does not contain '
             'the saccade amplitudes which are needed to create '
             'the main sequence plot. ',
-        )
+        ) from exc
 
     fig = plt.figure(figsize=figsize)
 
-    plt.scatter(amplitudes, peak_velocities)
+    plt.scatter(amplitudes, peak_velocities, color='purple', alpha=0.5)
 
     plt.title(title)
-    plt.xlabel('Amplitude')
-    plt.ylabel('Peak Velocity')
+    plt.xlabel('Amplitude [dva]')
+    plt.ylabel('Peak Velocity [dva/s]')
 
     if savepath is not None:
         fig.savefig(savepath)
