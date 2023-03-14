@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 The pymovements Project Authors
+# Copyright (c) 2023 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,29 +17,3 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides access to dataset classes.
-
-.. rubric:: Classes
-
-.. autosummary::
-   :toctree:
-   :template: class.rst
-
-    pymovements.datasets.Dataset
-    pymovements.datasets.PublicDataset
-
-.. rubric:: Public Datasets
-
-.. autosummary::
-   :toctree:
-   :template: class.rst
-
-    pymovements.datasets.ToyDataset
-    pymovements.datasets.GazeBase
-    pymovements.datasets.JuDo1000
-"""
-from pymovements.datasets.dataset import Dataset  # noqa: F401
-from pymovements.datasets.gazebase import GazeBase  # noqa: F401
-from pymovements.datasets.judo1000 import JuDo1000  # noqa: F401
-from pymovements.datasets.public_dataset import PublicDataset  # noqa: F401
-from pymovements.datasets.toy_dataset import ToyDataset  # noqa: F401

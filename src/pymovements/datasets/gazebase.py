@@ -92,11 +92,11 @@ class GazeBase(PublicDataset):
 
     _column_map = {
         'n': 'time',
-        'x': 'x_left_dva',
-        'y': 'y_left_dva',
+        'x': 'x_left_pos',
+        'y': 'y_left_pos',
         'val': 'validity',
-        'xT': 'x_target_dva',
-        'yT': 'y_target_dva',
+        'xT': 'x_target_pos',
+        'yT': 'y_target_pos',
     }
 
     _read_csv_kwargs = {

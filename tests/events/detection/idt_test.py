@@ -22,8 +22,8 @@ import numpy as np
 import pytest
 from polars.testing import assert_frame_equal
 
+from pymovements.events.detection.idt import idt
 from pymovements.events.events import EventDataFrame
-from pymovements.events.idt import idt
 from pymovements.gaze.transforms import pos2vel
 from pymovements.synthetic import step_function
 

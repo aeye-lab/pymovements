@@ -17,7 +17,30 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module holds gaze time series related functionality."""
+"""This module holds gaze time series related functionality.
+
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :template: class.rst
+
+    pymovements.gaze.Experiment
+    pymovements.gaze.Screen
+    pymovements.gaze.GazeDataFrame
+
+.. rubric:: Transformations
+
+.. autosummary::
+   :toctree:
+
+   pymovements.gaze.transforms.pix2deg
+   pymovements.gaze.transforms.pos2vel
+   pymovements.gaze.transforms.norm
+   pymovements.gaze.transforms.split
+   pymovements.gaze.transforms.downsample
+   pymovements.gaze.transforms.consecutive
+"""
 from pymovements.gaze import transforms  # noqa: F401
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze_dataframe import GazeDataFrame  # noqa: F401

@@ -16,7 +16,14 @@ repos:
     rev: v3.9.0
     hooks:
     -   id: reorder-python-imports
-        args: [--application-directories=src]
+        args: [--application-directories=src, --py37-plus]
+-   repo: https://github.com/asottile/reorder_python_imports
+    rev: v3.9.0
+    hooks:
+    -   id: reorder-python-imports
+        files: ^src/
+        exclude: __init__.py
+        args: [--application-directories=src, --add-import, 'from __future__ import annotations']
 -   repo: https://github.com/pappasam/toml-sort
     rev: v0.22.4
     hooks:
@@ -46,7 +53,7 @@ repos:
     -   id: nbqa-pyupgrade
         args: ["--py37-plus"]
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.0.1
+    rev: v1.1.1
     hooks:
     -   id: mypy
         additional_dependencies: [types-all]
@@ -72,7 +79,7 @@ repos:
     hooks:
     -   id: autopep8
 -   repo: https://github.com/PyCQA/autoflake
-    rev: v2.0.1
+    rev: v2.0.2
     hooks:
     -   id: autoflake
 -   repo: https://github.com/PyCQA/doc8
@@ -84,7 +91,7 @@ repos:
     hooks:
     -   id: flake8
 - repo: https://github.com/PyCQA/pylint
-  rev: v2.16.4
+  rev: v2.17.0
   hooks:
     - id: pylint
       name: pylint
