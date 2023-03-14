@@ -22,8 +22,8 @@ import numpy as np
 import pytest
 from polars.testing import assert_frame_equal
 
-from pymovements.events.engbert import compute_threshold
-from pymovements.events.engbert import microsaccades
+from pymovements.events.detection.engbert import compute_threshold
+from pymovements.events.detection.engbert import microsaccades
 from pymovements.events.events import EventDataFrame
 from pymovements.synthetic import step_function
 
