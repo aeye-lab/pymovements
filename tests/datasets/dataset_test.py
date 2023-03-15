@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test all functionality in pymovements.datasets.dataset."""
+import os
 import shutil
 import unittest
 from pathlib import Path
@@ -29,9 +30,9 @@ from polars.testing import assert_frame_equal
 
 from pymovements import exceptions
 from pymovements.datasets.dataset import Dataset
-from pymovements.events.engbert import microsaccades
+from pymovements.events.detection.engbert import microsaccades
+from pymovements.events.detection.ivt import ivt
 from pymovements.events.events import EventDataFrame
-from pymovements.events.ivt import ivt
 from pymovements.gaze.experiment import Experiment
 
 
@@ -384,6 +385,83 @@ def test_load_exceptions(init_kwargs, load_kwargs, exception, dataset_configurat
         dataset.load(**load_kwargs)
 
 
+@pytest.mark.parametrize(
+    'init_kwargs, save_kwargs, exception',
+    [
+        pytest.param(
+            {},
+            {'extension': 'invalid'},
+            ValueError,
+            id='wrong_extension_save_gaze',
+        ),
+    ],
+)
+def test_save_gaze_exceptions(init_kwargs, save_kwargs, exception, dataset_configuration):
+    init_kwargs = {**dataset_configuration['init_kwargs'], **init_kwargs}
+    dataset = Dataset(**init_kwargs)
+
+    with pytest.raises(exception):
+        dataset.load()
+        dataset.pix2deg()
+        dataset.pos2vel()
+        dataset.save_preprocessed(**save_kwargs)
+
+
+@pytest.mark.parametrize(
+    'init_kwargs, load_kwargs, exception',
+    [
+        pytest.param(
+            {},
+            {'extension': 'invalid'},
+            ValueError,
+            id='wrong_extension_load_events',
+        ),
+    ],
+)
+def test_load_events_exceptions(init_kwargs, load_kwargs, exception, dataset_configuration):
+    init_kwargs = {**dataset_configuration['init_kwargs'], **init_kwargs}
+    dataset = Dataset(**init_kwargs)
+
+    with pytest.raises(exception):
+        dataset.load()
+        dataset.pix2deg()
+        dataset.pos2vel()
+        dataset.detect_events(
+            method=ivt,
+            velocity_threshold=45,
+            minimum_duration=55,
+        )
+        dataset.save_events()
+        dataset.load_event_files(**load_kwargs)
+
+
+@pytest.mark.parametrize(
+    'init_kwargs, save_kwargs, exception',
+    [
+        pytest.param(
+            {},
+            {'extension': 'invalid'},
+            ValueError,
+            id='wrong_extension_events',
+        ),
+    ],
+)
+def test_save_events_exceptions(init_kwargs, save_kwargs, exception, dataset_configuration):
+    init_kwargs = {**dataset_configuration['init_kwargs'], **init_kwargs}
+    dataset = Dataset(**init_kwargs)
+
+    with pytest.raises(exception):
+        dataset.load()
+        dataset.pix2deg()
+        dataset.pos2vel()
+        dataset.detect_events(
+            method=ivt,
+            velocity_threshold=45,
+            minimum_duration=55,
+        )
+        dataset.save_events(**save_kwargs)
+
+
 def test_load_no_files_raises_exception(dataset_configuration):
     init_kwargs = {**dataset_configuration['init_kwargs']}
     dataset = Dataset(**init_kwargs)
@@ -653,19 +731,28 @@ def test_clear_events(events_init, events_expected):
 
 
 @pytest.mark.parametrize(
-    'detect_event_kwargs, events_dirname, expected_save_dirpath',
+    'detect_event_kwargs, events_dirname, expected_save_dirpath, save_kwargs',
     [
         pytest.param(
             {'method': microsaccades, 'threshold': 1, 'eye': 'auto'},
             None,
             'events',
+            {},
             id='none_dirname',
         ),
         pytest.param(
             {'method': microsaccades, 'threshold': 1, 'eye': 'auto'},
             'events_test',
             'events_test',
+            {},
             id='explicit_dirname',
+        ),
+        pytest.param(
+            {'method': microsaccades, 'threshold': 1, 'eye': 'auto'},
+            None,
+            'events',
+            {'extension': 'csv'},
+            id='save_events_extension_csv',
         ),
     ],
 )
@@ -673,6 +760,7 @@ def test_save_events(
         detect_event_kwargs,
         events_dirname,
         expected_save_dirpath,
+        save_kwargs,
         dataset_configuration,
 ):
     dataset = Dataset(**dataset_configuration['init_kwargs'])
@@ -685,7 +773,7 @@ def test_save_events(
         events_dirname = 'events'
     shutil.rmtree(dataset.path / Path(events_dirname), ignore_errors=True)
     shutil.rmtree(dataset.path / Path(expected_save_dirpath), ignore_errors=True)
-    dataset.save_events(events_dirname)
+    dataset.save_events(events_dirname, **save_kwargs)
 
     assert (dataset.path / expected_save_dirpath).is_dir(), (
         f'data was not written to {dataset.path / Path(expected_save_dirpath)}'
@@ -693,26 +781,36 @@ def test_save_events(
 
 
 @pytest.mark.parametrize(
-    'detect_event_kwargs, events_dirname, expected_save_dirpath',
+    'detect_event_kwargs, events_dirname, expected_save_dirpath, load_save_kwargs',
     [
         pytest.param(
             {'method': microsaccades, 'threshold': 1, 'eye': 'auto'},
             None,
             'events',
+            {},
             id='none_dirname',
         ),
         pytest.param(
             {'method': microsaccades, 'threshold': 1, 'eye': 'auto'},
             'events_test',
             'events_test',
+            {},
             id='explicit_dirname',
+        ),
+        pytest.param(
+            {'method': microsaccades, 'threshold': 1, 'eye': 'auto'},
+            None,
+            'events',
+            {'extension': 'csv'},
+            id='load_events_extension_csv',
         ),
     ],
 )
-def test_load_previously_saved_events(
+def test_load_previously_saved_events_gaze(
         detect_event_kwargs,
         events_dirname,
         expected_save_dirpath,
+        load_save_kwargs,
         dataset_configuration,
 ):
     dataset = Dataset(**dataset_configuration['init_kwargs'])
@@ -729,11 +827,12 @@ def test_load_previously_saved_events(
 
     shutil.rmtree(dataset.path / Path(events_dirname_), ignore_errors=True)
     shutil.rmtree(dataset.path / Path(expected_save_dirpath), ignore_errors=True)
-    dataset.save_events(events_dirname)
+    dataset.save_events(events_dirname, **load_save_kwargs)
+    dataset.save_preprocessed(**load_save_kwargs)
 
     dataset.events = []
 
-    dataset.load(events=True, events_dirname=events_dirname)
+    dataset.load(events=True, preprocessed=True, events_dirname=events_dirname, **load_save_kwargs)
     assert dataset.events
 
 
@@ -788,17 +887,23 @@ def test_save_preprocessed(preprocessed_dirname, expected_save_dirpath, dataset_
             'preprocessed_test',
             'events',
             {'preprocessed_dirname': 'preprocessed_test'},
-            id='none_dirname',
+            id='explicit_prepocessed_dirname',
         ),
         pytest.param(
             'preprocessed',
             'events_test',
             {'events_dirname': 'events_test'},
-            id='none_dirname',
+            id='explicit_events_dirname',
+        ),
+        pytest.param(
+            'preprocessed',
+            'events',
+            {'extension': 'csv'},
+            id='extension_equals_csv',
         ),
     ],
 )
-def test_save(
+def test_save_creates_correct_directory(
         expected_save_preprocessed_path,
         expected_save_events_path,
         save_kwargs,
@@ -822,10 +927,68 @@ def test_save(
     dataset.save(**save_kwargs)
 
     assert (dataset.path / Path(expected_save_preprocessed_path)).is_dir(), (
-        f'data was not written to {dataset.path / Path(expected_save_events_path)}'
+        f'data was not written to {dataset.path / Path(expected_save_preprocessed_path)}'
     )
     assert (dataset.path / Path(expected_save_events_path)).is_dir(), (
         f'data was not written to {dataset.path / Path(expected_save_events_path)}'
+    )
+
+
+@pytest.mark.parametrize(
+    'expected_save_preprocessed_path, expected_save_events_path, save_kwargs',
+    [
+        pytest.param(
+            'preprocessed',
+            'events',
+            {'extension': 'feather'},
+            id='extension_equals_feather',
+        ),
+        pytest.param(
+            'preprocessed',
+            'events',
+            {'extension': 'csv'},
+            id='extension_equals_csv',
+        ),
+    ],
+)
+def test_save_files_have_correct_extension(
+        expected_save_preprocessed_path,
+        expected_save_events_path,
+        save_kwargs,
+        dataset_configuration,
+):
+    dataset = Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+    dataset.pos2vel()
+
+    detect_events_kwargs = {'method': microsaccades, 'threshold': 1, 'eye': 'auto'}
+    dataset.detect_events(**detect_events_kwargs)
+
+    preprocessed_dirname = save_kwargs.get('preprocessed_dirname', 'preprocessed')
+    events_dirname = save_kwargs.get('events_dirname', 'events')
+    extension = save_kwargs.get('extension', 'feather')
+
+    shutil.rmtree(dataset.path / Path(preprocessed_dirname), ignore_errors=True)
+    shutil.rmtree(dataset.path / Path(expected_save_preprocessed_path), ignore_errors=True)
+    shutil.rmtree(dataset.path / Path(events_dirname), ignore_errors=True)
+    shutil.rmtree(dataset.path / Path(expected_save_events_path), ignore_errors=True)
+    dataset.save(**save_kwargs)
+
+    preprocessed_dir = dataset.path / Path(expected_save_preprocessed_path)
+    preprocessed_file_list = os.listdir(preprocessed_dir)
+    extension_list = [a.endswith(extension) for a in preprocessed_file_list]
+    extension_sum = sum(extension_list)
+    assert extension_sum == len(preprocessed_file_list), (
+        f'not all preprocessed files created have correct extension {extension}'
+    )
+
+    events_dir = dataset.path / Path(expected_save_events_path)
+    events_file_list = os.listdir(events_dir)
+    extension_list = [a.endswith(extension) for a in events_file_list]
+    extension_sum = sum(extension_list)
+    assert extension_sum == len(events_file_list), (
+        f'not all events files created have correct extension {extension}'
     )
 
 
