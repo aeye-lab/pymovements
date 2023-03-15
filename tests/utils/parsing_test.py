@@ -26,8 +26,8 @@ import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
-from pymovements.utils.asc2csv import process_asc2csv
-from pymovements.utils.asc2csv import scolor
+from pymovements.utils.parsing import process_asc2csv
+from pymovements.utils.parsing import scolor
 
 
 ASC_TEXT = r"""\
