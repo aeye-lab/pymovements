@@ -16,6 +16,7 @@
 [![Documentation Status](https://readthedocs.org/projects/pymovements/badge/?version=latest)](https://pymovements.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/github/aeye-lab/pymovements/branch/main/graph/badge.svg?token=QY3NDHAT2C)](https://app.codecov.io/gh/aeye-lab/pymovements)
 [![PyPI downloads/month](https://img.shields.io/pypi/dm/pymovements.svg)](https://pypistats.org/packages/pymovements)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/aeye-lab/pymovements/HEAD?labpath=docs%2Fsource%2Ftutorials)
 
 
 pymovements is an open-source python package for processing eye movement data. It provides a simple
