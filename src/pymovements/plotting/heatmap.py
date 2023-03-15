@@ -121,8 +121,8 @@ def heatmap(
         raise ValueError('Position columns must be in pixels or degrees')
 
     # Define the grid and bin the gaze data
-    x_bins = np.linspace(xmin, xmax, num=gridsize[0])
-    y_bins = np.linspace(ymin, ymax, num=gridsize[1])
+    x_bins = np.linspace(xmin, xmax, num=gridsize[0]).astype(int)
+    y_bins = np.linspace(ymin, ymax, num=gridsize[1]).astype(int)
 
     # Bin the gaze data
     heatmap_value, x_edges, y_edges = np.histogram2d(x, y, bins=[x_bins, y_bins])
