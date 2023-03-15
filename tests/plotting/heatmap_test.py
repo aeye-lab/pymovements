@@ -23,14 +23,13 @@ from unittest.mock import Mock
 import matplotlib.colors
 import matplotlib.pyplot as plt
 import numpy as np
+import polars as pl
 import pytest
 from matplotlib import figure
-import polars as pl
 from polars import ColumnNotFoundError
 
 from pymovements.gaze import Experiment
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
-
 from pymovements.plotting import heatmap
 
 
@@ -42,7 +41,7 @@ def fixture_experiment():
 # Fixture for x and y position columns
 @pytest.fixture(
     name='column_names_fixture',
-    params=[('x_pos', 'y_pos'), ('x_pix', 'y_pix')]
+    params=[('x_pos', 'y_pos'), ('x_pix', 'y_pix')],
 )
 def fixture_column_names(request):
     return request.param
@@ -54,8 +53,8 @@ def args_fixture(experiment_fixture, column_names_fixture):
     df = pl.DataFrame(
         {
             column_names_fixture[0]: np.arange(0, 100),
-            column_names_fixture[1]: np.arange(0, 100)
-        }
+            column_names_fixture[1]: np.arange(0, 100),
+        },
     )
 
     # Init a GazeDataFrame
@@ -65,54 +64,54 @@ def args_fixture(experiment_fixture, column_names_fixture):
 
 
 @pytest.mark.parametrize(
-    "kwargs",
+    'kwargs',
     [
         pytest.param(
-            {'cmap': 'jet'}, id='str_cmap'
+            {'cmap': 'jet'}, id='str_cmap',
         ),
         pytest.param(
-            {'cmap': matplotlib.colors.ListedColormap(['red', 'blue', 'green'])}, id='custom_cmap'
+            {'cmap': matplotlib.colors.ListedColormap(['red', 'blue', 'green'])}, id='custom_cmap',
         ),
         pytest.param(
-            {'gridsize': (10, 10)}, id='default_gridsize'
+            {'gridsize': (10, 10)}, id='default_gridsize',
         ),
         pytest.param(
-            {'gridsize': (15, 20)}, id='custom_gridsize'
+            {'gridsize': (15, 20)}, id='custom_gridsize',
         ),
         pytest.param(
-            {'interpolation': 'gaussian'}, id='default_interpolation'
+            {'interpolation': 'gaussian'}, id='default_interpolation',
         ),
         pytest.param(
-            {'interpolation': 'bilinear'}, id='custom_interpolation'
+            {'interpolation': 'bilinear'}, id='custom_interpolation',
         ),
         pytest.param(
-            {'origin': 'lower'}, id='default_origin'
+            {'origin': 'lower'}, id='default_origin',
         ),
         pytest.param(
-            {'origin': 'upper'}, id='custom_origin'
+            {'origin': 'upper'}, id='custom_origin',
         ),
         pytest.param(
             {
                 'title': None,
                 'xlabel': None,
                 'ylabel': None,
-                'cbar_label': None
-            }, id='default_labels'
+                'cbar_label': None,
+            }, id='default_labels',
         ),
         pytest.param(
             {
-                'title': "Custom Title",
-                'xlabel': "Custom X Label",
-                'ylabel': "Custom Y Label",
-                'cbar_label': "Custom Colorbar Label"
+                'title': 'Custom Title',
+                'xlabel': 'Custom X Label',
+                'ylabel': 'Custom Y Label',
+                'cbar_label': 'Custom Colorbar Label',
             },
-            id='custom_labels'
+            id='custom_labels',
         ),
         pytest.param(
-            {'show_cbar': True}, id='show_cbar_true'
+            {'show_cbar': True}, id='show_cbar_true',
         ),
         pytest.param(
-            {'show_cbar': False}, id='show_cbar_false'
+            {'show_cbar': False}, id='show_cbar_false',
         ),
     ],
 )
@@ -146,8 +145,8 @@ def test_heatmap_no_experiment_property():
     df = pl.DataFrame(
         {
             'x_pix': np.arange(0, 100),
-            'y_pix': np.arange(0, 100)
-        }
+            'y_pix': np.arange(0, 100),
+        },
     )
 
     gdf = GazeDataFrame(data=df, experiment=None)
