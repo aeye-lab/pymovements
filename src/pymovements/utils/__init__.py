@@ -30,6 +30,7 @@
     pymovements.utils.decorators
     pymovements.utils.downloads
     pymovements.utils.filters
+    pymovements.utils.parsing
     pymovements.utils.paths
 """
 from pymovements.utils import archives  # noqa: F401
