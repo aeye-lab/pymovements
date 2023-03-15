@@ -17,7 +17,21 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides access to all utility functions."""
+"""This module provides access to all utility functions.
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: module.rst
+
+    pymovements.utils.archives
+    pymovements.utils.checks
+    pymovements.utils.decorators
+    pymovements.utils.downloads
+    pymovements.utils.filters
+    pymovements.utils.paths
+"""
 from pymovements.utils import archives  # noqa: F401
 from pymovements.utils import asc2csv  # noqa: F401
 from pymovements.utils import checks  # noqa: F401
