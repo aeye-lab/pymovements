@@ -88,7 +88,8 @@ def heatmap(
     ------
     ValueError
         If the position columns are not in pixels or degrees
-
+    ValueError
+        If the experiment property of the GazeDataFrame is None
     Returns
     -------
     plt.Figure
@@ -98,6 +99,13 @@ def heatmap(
     # Extract x and y positions from the gaze dataframe
     x = gaze.frame[position_columns[0]]
     y = gaze.frame[position_columns[1]]
+
+    # Check if experiment properties are available
+    if not gaze.experiment:
+        raise ValueError(
+            'Experiment property of GazeDataFrame is None. '
+            'GazeDataFrame must be associated with an experiment.'
+        )
 
     # Get experiment screen properties
     screen = gaze.experiment.screen
