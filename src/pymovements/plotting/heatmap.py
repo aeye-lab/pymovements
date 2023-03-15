@@ -104,7 +104,7 @@ def heatmap(
     if not gaze.experiment:
         raise ValueError(
             'Experiment property of GazeDataFrame is None. '
-            'GazeDataFrame must be associated with an experiment.'
+            'GazeDataFrame must be associated with an experiment.',
         )
 
     # Get experiment screen properties
