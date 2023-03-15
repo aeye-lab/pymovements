@@ -49,7 +49,7 @@ docs/build
 docs/doctree*
 docs/source/reference/pymovements.*.rst
 docs/source/tutorials/data
-docs/source/tutorials/.ipynb_checkpoints
+.ipynb_checkpoints
 
 # Testing
 .tox
