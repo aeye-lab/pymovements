@@ -110,15 +110,13 @@ def heatmap(
     # Get experiment screen properties
     screen = gaze.experiment.screen
 
-    # check if gaze data is in pixels or degrees
+    # Use screen properties to define the grid or degrees of visual angle
     if 'pix' in position_columns[0] and 'pix' in position_columns[1]:
         xmin, xmax = 0, screen.width_px
         ymin, ymax = 0, screen.height_px
-    elif 'pos' in position_columns[0] and 'pos' in position_columns[1]:
+    else:
         xmin, xmax = int(screen.x_min_dva), int(screen.x_max_dva)
         ymin, ymax = int(screen.y_min_dva), int(screen.y_max_dva)
-    else:
-        raise ValueError('Position columns must be in pixels or degrees')
 
     # Define the grid and bin the gaze data
     x_bins = np.linspace(xmin, xmax, num=gridsize[0]).astype(int)
