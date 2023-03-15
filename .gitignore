@@ -49,6 +49,7 @@ docs/build
 docs/doctree*
 docs/source/reference/pymovements.*.rst
 docs/source/tutorials/data
+.ipynb_checkpoints
 
 # Testing
 .tox
