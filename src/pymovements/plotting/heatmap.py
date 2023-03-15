@@ -115,8 +115,8 @@ def heatmap(
         xmin, xmax = 0, screen.width_px
         ymin, ymax = 0, screen.height_px
     elif 'pos' in position_columns[0] and 'pos' in position_columns[1]:
-        xmin, xmax = screen.x_min_dva, screen.x_max_dva
-        ymin, ymax = screen.y_min_dva, screen.y_max_dva
+        xmin, xmax = int(screen.x_min_dva), int(screen.x_max_dva)
+        ymin, ymax = int(screen.y_min_dva), int(screen.y_max_dva)
     else:
         raise ValueError('Position columns must be in pixels or degrees')
 
@@ -125,20 +125,20 @@ def heatmap(
     y_bins = np.linspace(ymin, ymax, num=gridsize[1])
 
     # Bin the gaze data
-    heatmap, x_edges, y_edges = np.histogram2d(x, y, bins=[x_bins, y_bins])
+    heatmap_value, x_edges, y_edges = np.histogram2d(x, y, bins=[x_bins, y_bins])
 
     # Transpose to match the orientation of the screen
-    heatmap = heatmap.T
+    heatmap_value = heatmap_value.T
 
     # Convert heatmap values from sample count to seconds
-    heatmap /= gaze.experiment.sampling_rate
+    heatmap_value /= gaze.experiment.sampling_rate
 
     # Create the plot
     fig, ax = plt.subplots(figsize=figsize)
 
     # Plot the heatmap
     heatmap_plot = ax.imshow(
-        heatmap,
+        heatmap_value,
         cmap=cmap,
         origin=origin,
         interpolation=interpolation,
