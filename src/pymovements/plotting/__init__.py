@@ -17,7 +17,19 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module holds all plotting related functionality."""
+"""This module holds all plotting related functionality.
+
+.. rubric:: Functions
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+    pymovements.plotting.heatmap
+    pymovements.plotting.main_sequence_plot
+    pymovements.plotting.traceplot
+    pymovements.plotting.tsplot
+"""
 from pymovements.plotting.heatmap import heatmap  # noqa: F401
 from pymovements.plotting.main_sequence_plot import main_sequence_plot  # noqa: F401
 from pymovements.plotting.traceplot import traceplot  # noqa: F401
