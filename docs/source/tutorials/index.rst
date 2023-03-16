@@ -11,6 +11,7 @@ These How-Tos provide detailed guides to implement the most important use cases 
 
     pymovements-in-10-minutes
     public-datasets
+    local-dataset
     preprocessing-raw-data
     saving-loading-preprocessed
     detecting-events
