@@ -32,7 +32,7 @@ dataset = pm$datasets$ToyDataset(root='testdata', download=TRUE)
 
 
 
-##### Related handy functions:
+#### Related handy functions:
 
 Load a python shell in R.
 ```r
