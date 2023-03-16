@@ -19,3 +19,4 @@ These How-Tos provide detailed guides to implement the most important use cases 
     saving-loading-events
     plot-main-sequence
     heatmap
+    R-tutorial
