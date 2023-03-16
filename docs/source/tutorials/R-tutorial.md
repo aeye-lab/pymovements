@@ -1,4 +1,4 @@
-# How to use pymovements in R:
+# How to use pymovements in R
 
 Install the R-package **reticulate** for interoperability between Python and R.
 ```r
