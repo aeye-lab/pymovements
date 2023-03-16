@@ -15,7 +15,7 @@ Install pymovements, if you haven't yet.
 py_install("pymovements")
 ```
 
-Import pymovements as `pm.
+Import pymovements as `pm`.
 ```r
 pm <- import("pymovements")
 ```
