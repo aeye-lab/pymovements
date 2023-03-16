@@ -135,10 +135,10 @@ def test_dataset_download_file_not_found(mock_download_file, tmp_path, dataset):
 
 
 @mock.patch('pymovements.datasets.public_dataset.download_file')
-def test_dataset_download(mock_download_file, tmp_path, dataset):
+def test_dataset_download_no_extract(mock_download_file, tmp_path, dataset):
     mock_download_file.return_value = 'path'
 
-    dataset.download()
+    dataset.download(extract=False)
 
     mock_download_file.assert_has_calls([
         mock.call(
@@ -190,9 +190,9 @@ def test_dataset_extract_remove_finished_false(
     ])
 
 
-@mock.patch('pymovements.datasets.public_dataset.PublicDataset.download')
-@mock.patch('pymovements.datasets.public_dataset.PublicDataset.extract')
-def test_custom_dataset_download_extract(mock_extract, mock_download, tmp_path):
+@mock.patch('pymovements.datasets.public_dataset.download_file')
+@mock.patch('pymovements.datasets.public_dataset.extract_archive')
+def test_custom_dataset_download_default_extract(mock_extract, mock_download, tmp_path):
     mock_extract.return_value = None
     mock_download.return_value = None
 
@@ -206,8 +206,7 @@ def test_custom_dataset_download_extract(mock_extract, mock_download, tmp_path):
             },
         ]
 
-    CustomPublicDataset(root=tmp_path, download=True)
-    CustomPublicDataset(root=tmp_path, extract=True)
+    CustomPublicDataset(root=tmp_path).download()
 
     mock_download.assert_called_once()
     mock_extract.assert_called_once()
