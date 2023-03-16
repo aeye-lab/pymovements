@@ -1,4 +1,4 @@
-How to use pymovements in R:
+# How to use pymovements in R:
 
 Install the R-package **reticulate** for interoperability between Python and R.
 ```r
@@ -31,7 +31,7 @@ dataset = pm$datasets$ToyDataset(root='testdata', download=TRUE)
 
 
 
-### Related handy functions:
+##### Related handy functions:
 
 Load a python shell in R.
 ```r
