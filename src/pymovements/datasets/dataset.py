@@ -123,8 +123,11 @@ class Dataset:
             events_dirname: str | None = None,
             preprocessed_dirname: str | None = None,
             extension: str = 'feather',
-    ):
+    ) -> Dataset:
         """Parse file information and load all gaze files.
+
+        The parsed file information is assigned to the `fileinfo` attribute.
+        All gaze files will be loaded as dataframes and assigned to the `gaze` attribute.
 
         Parameters
         ----------
@@ -150,8 +153,10 @@ class Dataset:
             Specifies the file format for loading data. Valid options are: `csv`, `feather`.
             :Default: `feather`.
 
-        The parsed file information is assigned to the `fileinfo` attribute.
-        All gaze files will be loaded as dataframes and assigned to the `gaze` attribute.
+        Returns
+        -------
+        Dataset
+            Returns self, useful for method cascading.
         """
         fileinfo = self.infer_fileinfo()
         self.fileinfo = self.take_subset(fileinfo=fileinfo, subset=subset)
@@ -165,6 +170,8 @@ class Dataset:
                 events_dirname=events_dirname,
                 extension=extension,
             )
+
+        return self
 
     def infer_fileinfo(self) -> pl.DataFrame:
         """Infer information from filepaths and filenames.
@@ -394,7 +401,7 @@ class Dataset:
 
         return event_dfs
 
-    def pix2deg(self, verbose: bool = True) -> None:
+    def pix2deg(self, verbose: bool = True) -> Dataset:
         """Compute gaze positions in degrees of visual angle from pixel coordinates.
 
         This method requires a properly initialized :py:attr:`~.Dataset.experiment` attribute.
@@ -411,6 +418,11 @@ class Dataset:
         AttributeError
             If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
             if experiment is None.
+
+        Returns
+        -------
+        Dataset
+            Returns self, useful for method cascading.
         """
         self._check_gaze_dataframe()
 
@@ -418,7 +430,9 @@ class Dataset:
         for gaze_df in tqdm(self.gaze, disable=disable_progressbar):
             gaze_df.pix2deg()
 
-    def pos2vel(self, method: str = 'smooth', verbose: bool = True, **kwargs) -> None:
+        return self
+
+    def pos2vel(self, method: str = 'smooth', verbose: bool = True, **kwargs) -> Dataset:
         """Compute gaze velocites in dva/s from dva coordinates.
 
         This method requires a properly initialized :py:attr:`~.Dataset.experiment` attribute.
@@ -439,12 +453,19 @@ class Dataset:
         AttributeError
             If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
             if experiment is None.
+
+        Returns
+        -------
+        Dataset
+            Returns self, useful for method cascading.
         """
         self._check_gaze_dataframe()
 
         disable_progressbar = not verbose
         for gaze_df in tqdm(self.gaze, disable=disable_progressbar):
             gaze_df.pos2vel(method=method, **kwargs)
+
+        return self
 
     def detect_events(
             self,
@@ -453,7 +474,7 @@ class Dataset:
             clear: bool = False,
             verbose: bool = True,
             **kwargs,
-    ) -> None:
+    ) -> Dataset:
         """Detect events by applying a specific event detection method.
 
         Parameters
@@ -476,6 +497,11 @@ class Dataset:
         ------
         AttributeError
             If gaze files have not been loaded yet or gaze files do not contain the right columns.
+
+        Returns
+        -------
+        Dataset
+            Returns self, useful for method cascading.
         """
         self._check_gaze_dataframe()
 
@@ -528,19 +554,20 @@ class Dataset:
 
         if not self.events or clear:
             self.events = event_dfs
-            return
+            return self
 
         for file_id, event_df in enumerate(event_dfs):
             self.events[file_id].frame = pl.concat(
                 [self.events[file_id].frame, event_df.frame],
                 how='diagonal',
             )
+        return self
 
     def compute_event_properties(
             self,
             event_properties: str | list[str],
             verbose: bool = True,
-    ) -> None:
+    ) -> Dataset:
         """Calculate an event property for and add it as a column to the event dataframe.
 
         Parameters
@@ -555,6 +582,11 @@ class Dataset:
         InvalidProperty
             If ``property_name`` is not a valid property. See
             :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
+
+        Returns
+        -------
+        Dataset
+            Returns self, useful for method cascading.
         """
         processor = EventGazeProcessor(event_properties)
 
@@ -569,13 +601,23 @@ class Dataset:
 
             events.add_event_properties(new_properties)
 
-    def clear_events(self) -> None:
-        """Clear event DataFrame."""
+        return self
+
+    def clear_events(self) -> Dataset:
+        """Clear event DataFrame.
+
+        Returns
+        -------
+        Dataset
+            Returns self, useful for method cascading.
+        """
         if len(self.events) == 0:
-            return
+            return self
 
         for file_id, _ in enumerate(self.events):
             self.events[file_id] = EventDataFrame()
+
+        return self
 
     def save(
             self,
@@ -583,7 +625,7 @@ class Dataset:
             preprocessed_dirname: str | None = None,
             verbose: int = 1,
             extension: str = 'feather',
-    ):
+    ) -> Dataset:
         """Save preprocessed gaze and event files.
 
         Data will be saved as feather/csv files to ``Dataset.preprocessed_roothpath`` or
@@ -603,15 +645,21 @@ class Dataset:
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
         extension:
             extension specifies the fileformat to store the data
+
+        Returns
+        -------
+        Dataset
+            Returns self, useful for method cascading.
         """
         self.save_events(events_dirname, verbose=verbose, extension=extension)
         self.save_preprocessed(preprocessed_dirname, verbose=verbose, extension=extension)
+        return self
 
     def save_events(
         self, events_dirname: str | None = None,
         verbose: int = 1,
         extension: str = 'feather',
-    ):
+    ) -> Dataset:
         """Save events to files.
 
         Data will be saved as feather files to ``Dataset.events_roothpath`` with the same directory
@@ -633,6 +681,11 @@ class Dataset:
         ------
         ValueError
             If extension is not in list of valid extensions.
+
+        Returns
+        -------
+        Dataset
+            Returns self, useful for method cascading.
         """
         disable_progressbar = not verbose
 
@@ -662,12 +715,13 @@ class Dataset:
                     f'unsupported file format "{extension}".'
                     f'Supported formats are: {valid_extensions}',
                 )
+        return self
 
     def save_preprocessed(
         self, preprocessed_dirname: str | None = None,
         verbose: int = 1,
         extension: str = 'feather',
-    ):
+    ) -> Dataset:
         """Save preprocessed gaze files.
 
         Data will be saved as feather files to ``Dataset.preprocessed_roothpath`` with the same
@@ -689,6 +743,11 @@ class Dataset:
         ------
         ValueError
             If extension is not in list of valid extensions.
+
+        Returns
+        -------
+        Dataset
+            Returns self, useful for method cascading.
         """
         disable_progressbar = not verbose
 
@@ -718,6 +777,7 @@ class Dataset:
                     f'unsupported file format "{extension}".'
                     f'Supported formats are: {valid_extensions}',
                 )
+        return self
 
     @property
     def path(self) -> Path:
