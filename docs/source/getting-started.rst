@@ -64,3 +64,10 @@
             :shadow:
 
             pymovements-in-10-minutes
+
+
+
+.. toctree::
+   :hidden:
+
+   advanced-installation
