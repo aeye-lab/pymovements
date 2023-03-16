@@ -64,6 +64,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.extlinks',
     'sphinx_copybutton',
+    'sphinx_design',
     'sphinx_favicon',
     'sphinx_mdinclude',
     'sphinxcontrib.datatemplates',

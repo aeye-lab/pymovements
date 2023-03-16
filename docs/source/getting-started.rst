@@ -3,22 +3,71 @@
 ================
 
 
-Install
--------
+.. grid::
+    :gutter: 5
 
-pymovements can be installed directly from PyPI:
+    .. grid-item-card::
 
-.. code-block:: console
+        **Working with pip?**
+        ^^^^^^^^^^^^^^^^^^^^^
 
-   pip install pymovements
+        *pymovements* can be installed via pip from `PyPI <https://pypi.org/project/pymovements>`__:
 
-To  use the latest development version or to try out examples, pymovements may be
-alternatively cloned and installed with
+        ++++++
 
-.. code-block:: console
+        .. code-block:: bash
 
-   git clone https://github.com/aeye-lab/pymovements.git
-   pip install -e ./pymovements
+            pip install pymovements
 
-Basic Usage
------------
+    .. grid-item-card::
+
+        **Prefer conda?**
+        ^^^^^^^^^^^^^^^^^
+
+        *pymovements* is part of the `conda-forge <https://anaconda.org/conda-forge/pymovements>`__
+        repository and can be installed with Anaconda or Miniconda:
+
+        ++++++
+
+        .. code-block:: bash
+
+            conda install -c conda-forge pymovements
+
+|
+
+.. grid::
+    :gutter: 5
+
+    .. grid-item-card::
+
+        **Advanced installation?**
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+        Installing a specific version? Installing from source?
+        Check the advanced installation page.
+
+        .. button-link:: advanced-installation.rst
+            :color: primary
+            :shadow:
+
+            Installation Guide
+
+    .. grid-item-card::
+
+        **Already installed?**
+        ^^^^^^^^^^^^^^^^^^^^^^
+
+        Get familiar with *pymovements* by working through this beginner tutorial:
+
+        .. button-link:: tutorials/pymovements-in-10-minutes.html
+            :color: primary
+            :shadow:
+
+            pymovements-in-10-minutes
+
+
+
+.. toctree::
+   :hidden:
+
+   advanced-installation

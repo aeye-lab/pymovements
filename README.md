@@ -33,43 +33,16 @@ and render plots to visually analyze your results.
 - **Conda package:** https://anaconda.org/conda-forge/pymovements
 
 
-## Installation
+## Getting Started
 
-#### Using pip
+Check out our guide on how to install *pymovements* and get started here:
+[Installation](https://pymovements.readthedocs.io/en/stable/getting-started.html)
 
-pymovements can be installed directly from the PyPI repositories:
+We provide a range of tutorial aimed at beginners:
+[Tutorials](https://pymovements.readthedocs.io/en/stable/tutorials/index.html)
 
-```bash
-pip install pymovements
-```
-
-#### Using conda
-
-pymovements can be installed from the conda-forge repositories.
-
-If not already done, you will need to add conda-forge to your available channels:
-
-```bash
-conda config --add channels conda-forge
-conda config --set channel_priority strict
-```
-
-You can then install pymovements into you conda environment:
-
-```bash
-conda install -c conda-forge pymovements
-```
-
-#### Development installation
-
-To use the latest development version or to try out tutorials, pymovements may be alternatively
-cloned and installed with
-
-```bash
-git clone https://github.com/aeye-lab/pymovements.git
-pip install --upgrade pip
-pip install -e ./pymovements
-```
+The complete reference of the package can be found here:
+[API Reference](https://pymovements.readthedocs.io/en/stable/reference/index.html)
 
 
 ## Contributing
@@ -90,7 +63,9 @@ following BibTex entry:
 
 ```bibtex
 @misc{pymovements,
-  author = {Krakowczyk, Daniel and Reich, David R. and Chwastek, Jakob, Prasse, Paul and Jäger, Lena},
+  author = {Krakowczyk, Daniel G. and Reich, David R. and Chwastek, Jakob and Süss, Assunta
+   and Prasse, Paul and Jakobi, Deborah N. and Turuta, Oleksii and Kasprowski, Paweł
+   and Jäger, Lena A.},
   title = {pymovements: A Python Package for Processing Eye Movement Data},
   year = {2023},
   publisher = {GitHub},
