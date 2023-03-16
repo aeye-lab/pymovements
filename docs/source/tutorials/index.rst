@@ -17,4 +17,5 @@ These How-Tos provide detailed guides to implement the most important use cases 
     event-properties
     saving-loading-events
     plot-main-sequence
+    heatmap
     R-tutorial
