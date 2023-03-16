@@ -24,3 +24,6 @@ from pymovements import gaze  # noqa: F401
 from pymovements import plotting  # noqa: F401
 from pymovements import synthetic  # noqa: F401
 from pymovements import utils  # noqa: F401
+from pymovements.datasets import Dataset  # noqa: F401
+from pymovements.datasets import PublicDataset  # noqa: F401
+from pymovements.datasets import PublicDatasetDefinition  # noqa: F401

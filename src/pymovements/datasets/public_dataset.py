@@ -21,7 +21,8 @@
 from __future__ import annotations
 
 from abc import ABCMeta
-from abc import abstractmethod
+from dataclasses import dataclass
+from dataclasses import field
 from pathlib import Path
 from typing import Any
 from urllib.error import URLError
@@ -30,6 +31,67 @@ from pymovements.datasets.dataset import Dataset
 from pymovements.gaze.experiment import Experiment
 from pymovements.utils.archives import extract_archive
 from pymovements.utils.downloads import download_file
+
+PUBLIC_DATASETS: dict[str, type[PublicDatasetDefinition]] = {}
+
+
+def register_public_dataset(cls: type[PublicDatasetDefinition]) -> type[PublicDatasetDefinition]:
+    """Register a public dataset definition."""
+    PUBLIC_DATASETS[cls.__name__] = cls
+    return cls
+
+
+@dataclass
+class PublicDatasetDefinition:
+    """Definition to initialize a :py:class:`~pymovements.PublicDataset`.
+
+    Attributes
+    ----------
+    mirrors: tuple[str, ...]
+        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
+
+    resources: tuple[dict[str, str], ...]
+        A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
+        - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
+        - `filename`: The filename under which the file is saved as.
+        - `md5`: The MD5 checksum of the respective file.
+
+    experiment : Experiment
+        The experiment definition.
+
+    filename_regex : str
+        Regular expression which will be matched before trying to load the file. Namedgroups will
+        appear in the `fileinfo` dataframe.
+
+    filename_regex_dtypes : dict[str, type], optional
+        If named groups are present in the `filename_regex`, this makes it possible to cast specific
+        named groups to a particular datatype.
+
+    custom_read_kwargs : dict[str, Any], optional
+        If specified, these keyword arguments will be passed to the file reading function.
+    """
+    mirrors: tuple[str, ...] = field(default_factory=tuple)
+
+    resources: tuple[dict[str, str], ...] = field(default_factory=tuple)
+
+    experiment: Experiment | None = None
+
+    filename_regex: str = '.*'
+
+    filename_regex_dtypes: dict[str, type] = field(default_factory=dict)
+
+    custom_read_kwargs: dict[str, Any] = field(default_factory=dict)
+
+    name: str = field(init=False)
+
+    column_map: dict[str, str] = field(default_factory=dict)
+
+    def __post_init__(self):
+        self.name = self.__class__.__name__
+
+        if len(self.column_map) > 0:
+            self.custom_read_kwargs['columns'] = list(self.column_map.keys())
+            self.custom_read_kwargs['new_columns'] = list(self.column_map.values())
 
 
 class PublicDataset(Dataset, metaclass=ABCMeta):
@@ -42,11 +104,9 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
 
     def __init__(
             self,
+            definition: str | PublicDatasetDefinition | type[PublicDatasetDefinition],
+            *,
             root: str | Path,
-            experiment: Experiment | None = None,
-            filename_regex: str = '.*',
-            filename_regex_dtypes: dict[str, type] | None = None,
-            custom_read_kwargs: dict[str, Any] | None = None,
             dataset_dirname: str | None = None,
             downloads_dirname: str = 'downloads',
             raw_dirname: str = 'raw',
@@ -54,12 +114,6 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
             events_dirname: str = 'events',
     ):
         """Initialize the public dataset object.
-
-        If desired, dataset resources are downloaded with ``download=True`` and extracted with
-        ``extract=True``. To save space on your device you can remove the archive files after
-        successful extraction with ``remove_finished=True``.
-
-        Downloaded archives are automatically checked for integrity by comparing MD5 checksums.
 
         You can set up a custom directory structure by populating the particular dirname attributes.
         See :py:attr:`~pymovements.dataset.PublicDataset.dataset_dirname`,
@@ -72,18 +126,6 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
         ----------
         root : str, Path
             Path to the root directory of the dataset.
-        download : bool
-            Download all dataset resources.
-        experiment : Experiment
-            The experiment definition.
-        filename_regex : str
-            Regular expression which needs to be matched before trying to load the file. Named
-            groups will appear in the `fileinfo` dataframe.
-        filename_regex_dtypes : dict[str, type], optional
-            If named groups are present in the `filename_regex`, this makes it possible to cast
-            specific named groups to a particular datatype.
-        custom_read_kwargs : dict[str, Any], optional
-            If specified, these keyword arguments will be passed to the file reading function.
         dataset_dirname : str, optional
             Dataset directory name under root path. Can be `.` if dataset is located in root path.
             Default: `.`
@@ -101,20 +143,28 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
             Name of directory under dataset path that will be used to store event data. We advise
             the user to keep the event data separate from the original raw data. Default: `events`
         """
+        if isinstance(definition, str):
+            definition = PUBLIC_DATASETS[definition]()
+
+        if isinstance(definition, type):
+            definition = definition()
+
         if dataset_dirname is None:
-            dataset_dirname = self.__class__.__name__
+            dataset_dirname = definition.name
 
         super().__init__(
             root=root,
-            experiment=experiment,
-            filename_regex=filename_regex,
-            filename_regex_dtypes=filename_regex_dtypes,
-            custom_read_kwargs=custom_read_kwargs,
+            experiment=definition.experiment,
+            filename_regex=definition.filename_regex,
+            filename_regex_dtypes=definition.filename_regex_dtypes,
+            custom_read_kwargs=definition.custom_read_kwargs,
             dataset_dirname=dataset_dirname,
             raw_dirname=raw_dirname,
             preprocessed_dirname=preprocessed_dirname,
             events_dirname=events_dirname,
         )
+        self.mirrors = definition.mirrors
+        self.resources = definition.resources
         self.downloads_dirname = downloads_dirname
 
     def download(self, *, extract: bool = True, remove_finished: bool = False) -> Dataset:
@@ -122,6 +172,8 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
 
         This downloads all resources of the dataset. Per default this also extracts all archives
         into :py:meth:`Dataset.raw_rootpath`,
+        To save space on your device you can remove the archive files after
+        successful extraction with ``remove_finished=True``.
 
         If a corresponding file already exists in the local system, its checksum is calculated and
         checked against the expected checksum.
@@ -148,10 +200,10 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
         """
         self.raw_rootpath.mkdir(parents=True, exist_ok=True)
 
-        for resource in self._resources:
+        for resource in self.resources:
             success = False
 
-            for mirror in self._mirrors:
+            for mirror in self.mirrors:
 
                 url = f'{mirror}{resource["resource"]}'
 
@@ -198,7 +250,7 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
         """
         self.raw_rootpath.mkdir(parents=True, exist_ok=True)
 
-        for resource in self._resources:
+        for resource in self.resources:
             extract_archive(
                 source_path=self.downloads_rootpath / resource['filename'],
                 destination_path=self.raw_rootpath,
@@ -206,28 +258,6 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
                 remove_finished=remove_finished,
             )
         return self
-
-    @property
-    @abstractmethod
-    def _mirrors(self):
-        """This attribute/property must provide a list of mirrors of the dataset.
-
-        Each entry should be of type `str` and end with a '/'.
-        """
-
-    @property
-    @abstractmethod
-    def _resources(self):
-        """This attribute must provide a list of dataset resources.
-
-        Each list entry should be a dictionary with the following keys:
-
-        - resource: The url suffix of the resource. This will be concatenated with the mirror.
-        - filename: The filename under which the file is saved as.
-        - md5: The MD5 checksum of the respective file.
-
-        All values should be of type string.
-        """
 
     @property
     def path(self) -> Path:
@@ -239,9 +269,9 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
         Example
         -------
         Let's define a custom class first with one mirror and one resource.
-        >>> class CustomPublicDataset(PublicDataset):
-        ...     _mirrors = ['https://www.example.com/']
-        ...     _resources = [
+        >>> class CustomPublicDataset(PublicDatasetDefinition):
+        ...     mirrors = ['https://www.example.com/']
+        ...     resources = [
         ...         {
         ...             'resource': 'relative_path_to_resource',
         ...             'filename': 'example_dataset.zip',
@@ -251,12 +281,13 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
 
         The default behaviour is to locate the data set in a directory under the root path with the
         same name as the class name:
-        >>> dataset = CustomPublicDataset(root='/path/to/all/your/datasets')
+        >>> dataset = PublicDataset(CustomPublicDataset, root='/path/to/all/your/datasets')
         >>> dataset.path  # doctest: +SKIP
         Path('/path/to/all/your/datasets/CustomPublicDataset')
 
         You can specify an explicit dataset directory name:
-        >>> dataset = CustomPublicDataset(
+        >>> dataset = PublicDataset(
+        ...     CustomPublicDataset,
         ...     root='/path/to/all/your/datasets',
         ...     dataset_dirname='custom_dataset',
         ... )
@@ -264,7 +295,11 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
         Path('/path/to/all/your/datasets/custom_dataset')
 
         You can specify to use the root path to be the actual dataset directory:
-        >>> dataset = CustomPublicDataset(root='/path/to/your/dataset', dataset_dirname='.')
+        >>> dataset = PublicDataset(
+        ...     CustomPublicDataset,
+        ...     root='/path/to/your/datasets/',
+        ...     dataset_dirname='.',
+        ... )
         >>> dataset.path  # doctest: +SKIP
         Path('/path/to/your/dataset')
         """
@@ -279,22 +314,23 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
         Example
         -------
         Let's define a custom class first with one mirror and one resource.
-        >>> class CustomPublicDataset(PublicDataset):
-        ...     _mirrors = ['https://www.example.com/']
-        ...     _resources = [
+        >>> class CustomPublicDataset(PublicDatasetDefinition):
+        ...     mirrors: tuple[str] = ('https://www.example.com/', )
+        ...     resources: tuple[dict[str, str]] = (
         ...         {
         ...             'resource': 'relative_path_to_resource',
         ...             'filename': 'example_dataset.zip',
         ...             'md5': 'md5md5md5md5md5md5md5md5md5md5md',
         ...         },
-        ...     ]
+        ...     )
 
-        >>> dataset = CustomPublicDataset(root='/path/to/your/datasets/')
+        >>> dataset = PublicDataset(CustomPublicDataset, root='/path/to/your/datasets/')
         >>> dataset.downloads_rootpath  # doctest: +SKIP
         Path('/path/to/your/datasets/CustomPublicDataset/downloads')
 
         You can also explicitely specify the preprocessed directory name. The default is `raw`.
-        >>> dataset = CustomPublicDataset(
+        >>> dataset = PublicDataset(
+        ...     CustomPublicDataset,
         ...     root='/path/to/your/datasets/',
         ...     dataset_dirname='your_dataset',
         ...     downloads_dirname='your_raw_data',
@@ -306,7 +342,8 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
         specify `.` as the directory name. We discourage this and advise the user to keep raw data
         and preprocessed data separated.
         ... dataset = Dataset(
-        >>> dataset = CustomPublicDataset(
+        >>> dataset = PublicDataset(
+        ...     CustomPublicDataset,
         ...     root='/path/to/your/datasets/',
         ...     dataset_dirname='your_dataset',
         ...     raw_dirname='.',

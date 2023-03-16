@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 The pymovements Project Authors
+# Copyright (c) 2023 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,32 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides access to dataset classes.
-
-.. rubric:: Classes
-
-.. autosummary::
-   :toctree:
-   :template: class.rst
-
-    pymovements.datasets.Dataset
-    pymovements.datasets.PublicDataset
-    pymovements.datasets.PublicDatasetDefinition
-
-.. rubric:: Public Dataset Definitions
-
-.. autosummary::
-   :toctree:
-   :template: class.rst
-
-    pymovements.datasets.definitions.ToyDataset
-    pymovements.datasets.definitions.GazeBase
-    pymovements.datasets.definitions.JuDo1000
-"""
-from pymovements.datasets import definitions  # noqa:F401
-from pymovements.datasets.dataset import Dataset  # noqa: F401
-from pymovements.datasets.definitions import GazeBase  # noqa: F401
-from pymovements.datasets.definitions import JuDo1000  # noqa: F401
-from pymovements.datasets.definitions import ToyDataset  # noqa: F401
-from pymovements.datasets.public_dataset import PublicDataset  # noqa: F401
-from pymovements.datasets.public_dataset import PublicDatasetDefinition  # noqa: F401
+"""This module holds all dataset definitions."""
+from pymovements.datasets.definitions.gazebase import GazeBase  # noqa: F401
+from pymovements.datasets.definitions.judo1000 import JuDo1000  # noqa: F401
+from pymovements.datasets.definitions.toy_dataset import ToyDataset  # noqa: F401
