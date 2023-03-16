@@ -22,9 +22,10 @@ pm <- import("pymovements")
 
 Now pymovements should appear as `pm` under values in your environment
 
-Access functions and data within python modules and classes via the $ operator
+Access functions and data within python modules and classes via the `$` operator
 
-To test, you can proceed with the "Working with Datasets" tutorial, for example download the ToyDataset
+To test, you can proceed with the "pymovements in 10 minutes" tutorial,
+for example this is how you download the ToyDataset:
 ```r
 dataset = pm$datasets$ToyDataset(root='testdata', download=TRUE)
 ```
