@@ -27,9 +27,15 @@ Access functions and data within python modules and classes via the `$` operator
 To test, you can proceed with the "pymovements in 10 minutes" tutorial,
 for example this is how you download the ToyDataset:
 ```r
-dataset = pm$datasets$ToyDataset(root='testdata', download=TRUE)
+dataset = pm$datasets$ToyDataset(root='data_directory')
+dataset$download()
 ```
 
+Now let's load in the dataset into R and display the found files:
+```r
+dataset$load()
+dataset$fileinfo
+```
 
 
 #### Related handy functions:

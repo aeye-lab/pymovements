@@ -39,14 +39,11 @@ class JuDo1000(PublicDataset):
 
     Examples
     --------
-    Change to ``download=True`` and ``extract=True`` for downloading and extracting the dataset.
+    This will initialize your :py:class:`pymovements.PublicDataset` object, download its resources
+    and load the data into memory.
 
-    >>> dataset = JuDo1000(
-    ...     root='data/',
-    ...     download=False,
-    ...     extract=False,
-    ...     remove_finished=False,
-    ... )
+    >>> dataset = JuDo1000(root='data/')
+    >>> dataset.download()  # doctest: +SKIP
     >>> dataset.load()  # doctest: +SKIP
     """
     # pylint: disable=similarities
@@ -100,9 +97,6 @@ class JuDo1000(PublicDataset):
     def __init__(
             self,
             root: str | Path,
-            download: bool = False,
-            extract: bool = False,
-            remove_finished: bool = False,
             dataset_dirname: str = 'JuDo1000',
             downloads_dirname: str = 'downloads',
             raw_dirname: str = 'raw',
@@ -128,12 +122,6 @@ class JuDo1000(PublicDataset):
         ----------
         root : str, Path
             Path to the root directory of the dataset.
-        download : bool
-            Download all dataset resources.
-        extract : bool
-            Extract dataset archive files.
-        remove_finished : bool
-            Remove archive files after extraction.
         dataset_dirname : str, optional
             Dataset directory name under root path. Can be `.` if dataset is located in root path.
             Default: `.`
@@ -153,9 +141,6 @@ class JuDo1000(PublicDataset):
         """
         super().__init__(
             root=root,
-            download=download,
-            extract=extract,
-            remove_finished=remove_finished,
             experiment=self._experiment,
             filename_regex=self._filename_regex,
             filename_regex_dtypes=self._filename_regex_dtypes,

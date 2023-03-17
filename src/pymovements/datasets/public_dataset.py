@@ -43,9 +43,6 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
     def __init__(
             self,
             root: str | Path,
-            download: bool = False,
-            extract: bool = False,
-            remove_finished: bool = False,
             experiment: Experiment | None = None,
             filename_regex: str = '.*',
             filename_regex_dtypes: dict[str, type] | None = None,
@@ -77,10 +74,6 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
             Path to the root directory of the dataset.
         download : bool
             Download all dataset resources.
-        extract : bool
-            Extract dataset archive files.
-        remove_finished : bool
-            Remove archive files after extraction.
         experiment : Experiment
             The experiment definition.
         filename_regex : str
@@ -122,22 +115,36 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
             preprocessed_dirname=preprocessed_dirname,
             events_dirname=events_dirname,
         )
-
         self.downloads_dirname = downloads_dirname
 
-        if download:
-            self.download()
-
-        if extract:
-            self.extract(remove_finished=remove_finished)
-
-    def download(self) -> None:
+    def download(self, *, extract: bool = True, remove_finished: bool = False) -> Dataset:
         """Download dataset.
+
+        This downloads all resources of the dataset. Per default this also extracts all archives
+        into :py:meth:`Dataset.raw_rootpath`,
+
+        If a corresponding file already exists in the local system, its checksum is calculated and
+        checked against the expected checksum.
+        Downloading will be evaded if the integrity of the existing file can be verified.
+        If the existing file does not match the expected checksum it is overwritten with the
+        downloaded new file.
+
+        Parameters
+        ----------
+        extract : bool
+            Extract dataset archive files.
+        remove_finished : bool
+            Remove archive files after extraction.
 
         Raises
         ------
         RuntimeError
             If downloading a resource failed for all given mirrors.
+
+        Returns
+        -------
+        PublicDataset
+            Returns self, useful for method cascading.
         """
         self.raw_rootpath.mkdir(parents=True, exist_ok=True)
 
@@ -171,13 +178,23 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
                     f"downloading resource {resource['resource']} failed for all mirrors.",
                 )
 
-    def extract(self, remove_finished: bool = False) -> None:
+        if extract:
+            self.extract(remove_finished=remove_finished)
+
+        return self
+
+    def extract(self, remove_finished: bool = False) -> Dataset:
         """Extract dataset archives.
 
         Parameters
         ----------
         remove_finished : bool
             Remove archive files after extraction.
+
+        Returns
+        -------
+        PublicDataset
+            Returns self, useful for method cascading.
         """
         self.raw_rootpath.mkdir(parents=True, exist_ok=True)
 
@@ -188,6 +205,7 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
                 recursive=True,
                 remove_finished=remove_finished,
             )
+        return self
 
     @property
     @abstractmethod
