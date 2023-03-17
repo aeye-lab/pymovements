@@ -138,7 +138,7 @@ def check_is_mutual_exclusive(**kwargs) -> None:
 
 
 def check_is_none_is_mutual(
-    **kwargs: None,
+    **kwargs: None | list[int] | np.ndarray,
 ) -> None:
     """Check if two values are either both None or both have a value.
 
