@@ -125,7 +125,7 @@ class EventDataFrame:
     def __len__(self) -> int:
         return self.frame.__len__()
 
-    def __getitem__(self, *args, **kwargs) -> Any:
+    def __getitem__(self, *args: str, **kwargs: str) -> Any:
         return self.frame.__getitem__(*args, **kwargs)
 
     @property
@@ -133,7 +133,7 @@ class EventDataFrame:
         """List of column names."""
         return self.frame.columns
 
-    def _add_duration_property(self):
+    def _add_duration_property(self) -> None:
         """Adds duration property column to dataframe."""
         self.frame = self.frame.select([pl.all(), duration().alias('duration')])
 
@@ -179,7 +179,7 @@ class EventDetectionCallable(Protocol):
             velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
             timesteps: list[int] | np.ndarray | None = None,
             minimum_duration: int = 0,
-            **kwargs,
+            **kwargs: int | str | float,
     ) -> EventDataFrame:
         """Minimal interface to be implemented by all event detection methods.
 
