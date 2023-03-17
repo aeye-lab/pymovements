@@ -123,6 +123,12 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = "tests.*"
 check_untyped_defs = false
+disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+module = "docs.*"
+check_untyped_defs = false
+disallow_untyped_defs = false
 
 [tool.pytest.ini_options]
 addopts = "-ra -l -v --doctest-modules"
