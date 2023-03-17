@@ -197,10 +197,10 @@ class _DownloadProgressBar(tqdm):  # pylint: disable=inconsistent-mro
     Reference: https://github.com/tqdm/tqdm#hooks-and-callbacks
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any):
         super().__init__(unit='B', unit_scale=True, unit_divisor=1024, miniters=1, **kwargs)
 
-    def update_to(self, b=1, bsize=1, tsize=None):
+    def update_to(self, b: int | None = 1, bsize int | None = 1, tsize None | int = None) -> int:
         """
         b  : int, optional
             Number of blocks transferred so far [default: 1].
@@ -214,7 +214,7 @@ class _DownloadProgressBar(tqdm):  # pylint: disable=inconsistent-mro
         return self.update(b * bsize - self.n)  # also sets self.n = b * bsize
 
 
-def _download_url(url: str, destination: Path):
+def _download_url(url: str, destination: Path) -> None:
     """Download file from URL and save to destination.
 
     Parameters
