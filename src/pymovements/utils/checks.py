@@ -95,7 +95,9 @@ def check_shapes_positions_velocities(positions: np.ndarray, velocities: np.ndar
         )
 
 
-def check_two_kwargs(**kwargs) -> None:
+def check_two_kwargs(
+        **kwargs: Any,
+) -> None:
     """Check if exactly two keyword arguments are given.
 
     Parameters
