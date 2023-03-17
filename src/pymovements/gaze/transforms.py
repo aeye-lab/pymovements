@@ -165,7 +165,7 @@ def pos2vel(
         arr: list[float] | list[list[float]] | np.ndarray,
         sampling_rate: float = 1000,
         method: str = 'smooth',
-        **kwargs,
+        **kwargs: int | float | str,
 ) -> np.ndarray:
     """Compute velocity time series from 2-dimensional position time series.
 

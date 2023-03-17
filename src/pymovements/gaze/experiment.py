@@ -98,7 +98,7 @@ class Experiment:
             self,
             arr: list[float] | list[list[float]] | np.ndarray,
             method: str = 'smooth',
-            **kwargs,
+            **kwargs: int | float | str,
     ) -> np.ndarray:
         """Compute velocity time series from 2-dimensional position time series.
 

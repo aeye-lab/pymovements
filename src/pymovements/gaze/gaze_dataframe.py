@@ -107,7 +107,7 @@ class GazeDataFrame:
             ],
         )
 
-    def pos2vel(self, method: str = 'smooth', **kwargs) -> None:
+    def pos2vel(self, method: str = 'smooth', **kwargs: int | float | str) -> None:
         """Compute gaze velocites in dva/s from dva position coordinates.
 
         This method requires a properly initialized :py:attr:`~.GazeDataFrame.experiment` attribute.
