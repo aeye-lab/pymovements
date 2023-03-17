@@ -172,7 +172,8 @@ def check_is_none_is_mutual(
 
 
 def check_is_length_matching(
-        **kwargs: np.ndarray | list[list[float]] | list[tuple[float, float]] | list[str] | list[int] | None,
+        **kwargs: np.ndarray | list[list[float]] | list[tuple[float, float]] |
+        list[str] | list[int] | None,
 ) -> None:
     """Check if two sequences are of equal length.
 

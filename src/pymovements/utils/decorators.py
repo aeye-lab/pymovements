@@ -25,16 +25,16 @@ from __future__ import annotations
 from typing import Any
 
 
-def auto_str(cls):
+def auto_str(cls: Any) -> str:
     """
     Automatically generate __str__() to include all arguments. Can be used as a decorator.
     """
-    def shorten(value: Any):
+    def shorten(value: Any) -> str:
         if isinstance(value, float):
             value = f'{value:.2f}'
         return value
 
-    def __str__(self):
+    def __str__(self: Any) -> str:
         attributes = ', '.join(f'{key}={shorten(value)}' for key, value in vars(self).items())
         return f'{type(self).__name__}({attributes})'
 

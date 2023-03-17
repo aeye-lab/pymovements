@@ -25,6 +25,7 @@ from __future__ import annotations
 import hashlib
 import urllib.request
 from pathlib import Path
+from typing import Any
 
 from tqdm.auto import tqdm
 
@@ -200,7 +201,7 @@ class _DownloadProgressBar(tqdm):  # pylint: disable=inconsistent-mro
     def __init__(self, **kwargs: Any):
         super().__init__(unit='B', unit_scale=True, unit_divisor=1024, miniters=1, **kwargs)
 
-    def update_to(self, b: int | None = 1, bsize int | None = 1, tsize None | int = None) -> int:
+    def update_to(self, b: int = 1, bsize: int = 1, tsize: None | int = None) -> bool | None:
         """
         b  : int, optional
             Number of blocks transferred so far [default: 1].
