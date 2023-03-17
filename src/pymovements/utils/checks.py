@@ -25,6 +25,7 @@ from __future__ import annotations
 from typing import Any
 
 import numpy as np
+import polars as pl
 
 
 def check_no_zeros(variable: Any, name: str = 'variable') -> None:
@@ -111,7 +112,9 @@ def check_two_kwargs(**kwargs) -> None:
         raise ValueError('there must be exactly two keyword arguments in kwargs')
 
 
-def check_is_mutual_exclusive(**kwargs) -> None:
+def check_is_mutual_exclusive(
+        **kwargs: None | str | list[str] | list[int] | np.ndarray | pl.DataFrame,
+) -> None:
     """Check if at most one of two values is not None.
 
     Parameters
@@ -138,7 +141,7 @@ def check_is_mutual_exclusive(**kwargs) -> None:
 
 
 def check_is_none_is_mutual(
-    **kwargs: None | list[int] | np.ndarray,
+        **kwargs: None | list[int] | np.ndarray,
 ) -> None:
     """Check if two values are either both None or both have a value.
 
