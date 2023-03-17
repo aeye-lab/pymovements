@@ -137,7 +137,9 @@ def check_is_mutual_exclusive(**kwargs) -> None:
         )
 
 
-def check_is_none_is_mutual(**kwargs) -> None:
+def check_is_none_is_mutual(
+    **kwargs: None,
+) -> None:
     """Check if two values are either both None or both have a value.
 
     Parameters
@@ -164,7 +166,9 @@ def check_is_none_is_mutual(**kwargs) -> None:
         )
 
 
-def check_is_length_matching(**kwargs) -> None:
+def check_is_length_matching(
+        **kwargs: np.ndarray | list[list[float]] | list[tuple[float, float]] | list[str] | list[int] | None,
+) -> None:
     """Check if two sequences are of equal length.
 
     Parameters
@@ -182,6 +186,11 @@ def check_is_length_matching(**kwargs) -> None:
     key_1, key_2 = (key for _, key in zip(range(2), kwargs.keys()))
     value_1 = kwargs[key_1]
     value_2 = kwargs[key_2]
+
+    # mypy does not understand value_1 and value_2 can't be None
+    # see pymovements.events.detection.* for specific checks
+    assert value_1 is not None
+    assert value_2 is not None
 
     if not len(value_1) == len(value_2):
         raise ValueError(f'The sequences "{key_1}" and "{key_2}" must be of equal length.')
