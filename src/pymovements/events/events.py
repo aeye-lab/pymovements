@@ -118,7 +118,7 @@ class EventDataFrame:
             self._add_duration_property()
 
     @property
-    def schema(self) -> pl.datatypes.SchemaDict:
+    def schema(self) -> pl.type_aliases.SchemaDict:
         """Schema of event dataframe."""
         return self.frame.schema
 
