@@ -25,7 +25,7 @@ repos:
         exclude: __init__.py
         args: [--application-directories=src, --add-import, 'from __future__ import annotations']
 -   repo: https://github.com/pappasam/toml-sort
-    rev: v0.22.4
+    rev: v0.23.0
     hooks:
     -   id: toml-sort-fix
 -   repo: https://github.com/dannysepler/rm_unneeded_f_str
@@ -43,7 +43,7 @@ repos:
         args: [--use-current-year]
         exclude_types: [bib, css, image, json, jupyter, markdown, rst, toml, yaml]
 -   repo: https://github.com/nbQA-dev/nbQA
-    rev: 1.6.3
+    rev: 1.6.4
     hooks:
     -   id: nbqa-autopep8
     -   id: nbqa-flake8
