@@ -192,6 +192,6 @@ def process_asc2csv(
                     ),
                 )
 
-    df.write_csv(csv_file_name, sep='\t')
+    df.write_csv(csv_file_name, separator='\t')
     print(f'{status_clr}{status_msg}{scolor.end}', flush=True)
     return df
