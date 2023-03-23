@@ -54,6 +54,7 @@ def test_tsplot_show(arr, kwargs, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
     tsplot(arr, **kwargs)
+    plt.close()
     mock.assert_called_once()
 
 
@@ -61,6 +62,7 @@ def test_tsplot_1d(monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
     tsplot(np.arange(-100, 100))
+    plt.close()
     mock.assert_called_once()
 
 
@@ -68,6 +70,7 @@ def test_tsplot_noshow(arr, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
     tsplot(arr, show=False)
+    plt.close()
     mock.assert_not_called()
 
 
@@ -75,6 +78,7 @@ def test_tsplot_save(arr, monkeypatch, tmp_path):
     mock = Mock()
     monkeypatch.setattr(figure.Figure, 'savefig', mock)
     tsplot(arr, show=False, savepath=str(tmp_path / 'test.svg'))
+    plt.close()
     mock.assert_called_once()
 
 

@@ -80,6 +80,7 @@ def test_traceplot_show(args, kwargs, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
     traceplot(*args, **kwargs)
+    plt.close()
     mock.assert_called_once()
 
 
@@ -87,6 +88,7 @@ def test_traceplot_noshow(args, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
     traceplot(*args, show=False)
+    plt.close()
     mock.assert_not_called()
 
 
@@ -94,6 +96,7 @@ def test_traceplot_save(args, monkeypatch, tmp_path):
     mock = Mock()
     monkeypatch.setattr(figure.Figure, 'savefig', mock)
     traceplot(*args, show=False, savepath=str(tmp_path / 'test.svg'))
+    plt.close()
     mock.assert_called_once()
 
 

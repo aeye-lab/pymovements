@@ -119,6 +119,7 @@ def test_heatmap_show(args, kwargs, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
     heatmap(**args, **kwargs)
+    plt.close()
     mock.assert_called_once()
 
 
@@ -126,6 +127,7 @@ def test_heatmap_noshow(args, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
     heatmap(**args, show=False)
+    plt.close()
     mock.assert_not_called()
 
 
@@ -133,6 +135,7 @@ def test_heatmap_save(args, monkeypatch, tmp_path):
     mock = Mock()
     monkeypatch.setattr(figure.Figure, 'savefig', mock)
     heatmap(**args, show=False, savepath=str(tmp_path / 'test.svg'))
+    plt.close()
     mock.assert_called_once()
 
 
