@@ -47,10 +47,13 @@ class PublicDatasetDefinition:
 
     Attributes
     ----------
-    mirrors: tuple[str, ...]
+    name : str
+        The name of the dataset.
+
+    mirrors : tuple[str, ...]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources: tuple[dict[str, str], ...]
+    resources : tuple[dict[str, str], ...]
         A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -66,6 +69,9 @@ class PublicDatasetDefinition:
     filename_regex_dtypes : dict[str, type], optional
         If named groups are present in the `filename_regex`, this makes it possible to cast specific
         named groups to a particular datatype.
+
+    column_map : dict[str, str]
+        The keys are the columns to read, the values are the names to which they should be renamed.
 
     custom_read_kwargs : dict[str, Any], optional
         If specified, these keyword arguments will be passed to the file reading function.
@@ -95,8 +101,8 @@ class PublicDatasetDefinition:
 
 
 class PublicDataset(Dataset, metaclass=ABCMeta):
-    """Extends the `Dataset` base class with functionality for downloading and extracting public
-    datasets.
+    """Extends the :py:class:`~pymovements.Dataset` base class with functionality for downloading
+    and extracting public datasets.
 
     To implement this abstract base class for a new dataset, the attributes/properties `_mirrors`
     and `_resources` must be implemented.

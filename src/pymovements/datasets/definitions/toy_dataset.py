@@ -39,19 +39,58 @@ class ToyDataset(PublicDatasetDefinition):
 
     The participant is instructed to read 4 texts with 5 screens each.
 
+    Attributes
+    ----------
+    name : str
+        The name of the dataset.
+
+    mirrors : tuple[str, ...]
+        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
+
+    resources : tuple[dict[str, str], ...]
+        A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
+        - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
+        - `filename`: The filename under which the file is saved as.
+        - `md5`: The MD5 checksum of the respective file.
+
+    experiment : Experiment
+        The experiment definition.
+
+    filename_regex : str
+        Regular expression which will be matched before trying to load the file. Namedgroups will
+        appear in the `fileinfo` dataframe.
+
+    filename_regex_dtypes : dict[str, type], optional
+        If named groups are present in the `filename_regex`, this makes it possible to cast specific
+        named groups to a particular datatype.
+
+    column_map : dict[str, str]
+        The keys are the columns to read, the values are the names to which they should be renamed.
+
+    custom_read_kwargs : dict[str, Any], optional
+        If specified, these keyword arguments will be passed to the file reading function.
+
     Examples
     --------
-    This will initialize your :py:class:`pymovements.PublicDataset` object, download its resources
-    and load the data into memory.
+    Initialize your :py:class:`~pymovements.PublicDataset` object with the
+    :py:class:`~pymovements.ToyDataset` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.datasets.PublicDataset(ToyDataset, root='data/')
-    >>> dataset.download()  # doctest: +SKIP
-    >>> dataset.load()  # doctest: +SKIP
+    >>> dataset = pm.PublicDataset("ToyDataset", root='data/')
+
+    Download the dataset resources resources:
+
+    >>> dataset.download()# doctest: +SKIP
+
+    Load the data into memory:
+
+    >>> dataset.load()# doctest: +SKIP
     """
     # pylint: disable=similarities
-    # The PublicDataset child classes potentially share code chunks for definitions.
+    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+
+    name: str = 'ToyDataset'
 
     mirrors: tuple[str, ...] = (
         'http://github.com/aeye-lab/pymovements-toy-dataset/zipball/',
