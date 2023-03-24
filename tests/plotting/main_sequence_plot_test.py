@@ -36,6 +36,8 @@ from pymovements.plotting.main_sequence_plot import main_sequence_plot
                 {
                     'amplitude': [1.0, 1.0, 2.0, 2.0, 3.0, 4.0],
                     'peak_velocity': [10.0, 11.0, 12.0, 11.0, 13.0, 13.0],
+                    'name': ['saccade' for _ in range(6)],
+
                 },
             ),
             True,
@@ -59,6 +61,8 @@ def test_main_sequence_plot_show_plot(input_df, show, monkeypatch):
                 {
                     'amplitude': np.arange(100),
                     'peak_velocity': np.linspace(10, 50, num=100),
+                    'name': ['saccade' for _ in range(100)],
+
                 },
             ),
             id='save_path',
@@ -81,6 +85,7 @@ def test_main_sequence_plot_save_path(input_df, monkeypatch):
                 {
                     'amplitude': np.arange(100),
                     'peak_velocity': np.linspace(10, 50, num=100),
+                    'name': ['saccade' for _ in range(100)],
                 },
             ),
             False,
@@ -103,6 +108,8 @@ def test_main_sequence_plot_not_show(input_df, show, monkeypatch):
             pl.DataFrame(
                 {
                     'peak_velocity': np.linspace(10, 50, num=100),
+                    'name': ['saccade' for _ in range(100)],
+
                 },
             ),
             KeyError,
@@ -115,6 +122,7 @@ def test_main_sequence_plot_not_show(input_df, show, monkeypatch):
             pl.DataFrame(
                 {
                     'amplitude': np.arange(100),
+                    'name': ['saccade' for _ in range(100)],
                 },
             ),
             KeyError,
@@ -123,10 +131,21 @@ def test_main_sequence_plot_not_show(input_df, show, monkeypatch):
             'the main sequence plot. ',
             id='peak_velocity_missing',
         ),
+        pytest.param(
+            pl.DataFrame(
+                {
+                    'amplitude': [1.0, 1.0],
+                    'peak_velocity': [10.0, 11.0],
+                    'name': ['fixation', 'fixation'],
+                },
+            ),
+            ValueError,
+            'There are no saccades in the dataframe.',
+            id='no_saccades_in_event_df',
+        ),
     ],
 )
 def test_main_sequence_plot_not_show_plot(input_df, expected_error, error_msg):
-
     with pytest.raises(expected_error) as actual_error:
         main_sequence_plot(input_df)
 

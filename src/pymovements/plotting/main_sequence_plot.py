@@ -55,10 +55,17 @@ def main_sequence_plot(
     KeyError
         If the input dataframe has no 'amplitude' and/or 'peak_velocity' column.
         Those are needed to create the plot.
+    ValueError
+        If the event dataframe does not contain any saccades.
     """
+    saccades = data.filter(pl.col('name') == 'saccade')
+
+    if saccades.is_empty():
+        raise ValueError('There are no saccades in the event dataframe. '
+                         'Make sure you can the saccades detection algorithm and saved the events.')
 
     try:
-        peak_velocities = data['peak_velocity'].to_list()
+        peak_velocities = saccades['peak_velocity'].to_list()
     except ColumnNotFoundError as exc:
         raise KeyError(
             'The input dataframe you provided does not contain '
@@ -67,7 +74,7 @@ def main_sequence_plot(
         ) from exc
 
     try:
-        amplitudes = data['amplitude'].to_list()
+        amplitudes = saccades['amplitude'].to_list()
     except ColumnNotFoundError as exc:
         raise KeyError(
             'The input dataframe you provided does not contain '
