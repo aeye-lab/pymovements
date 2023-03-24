@@ -22,7 +22,8 @@ from pathlib import Path
 
 import pytest
 
-from pymovements.datasets.judo1000 import JuDo1000
+from pymovements.datasets.definitions.judo1000 import JuDo1000
+from pymovements.datasets.public_dataset import PublicDataset
 
 
 @pytest.mark.parametrize(
@@ -63,7 +64,7 @@ from pymovements.datasets.judo1000 import JuDo1000
     ],
 )
 def test_paths(init_kwargs, expected_paths):
-    dataset = JuDo1000(**init_kwargs)
+    dataset = PublicDataset(JuDo1000, **init_kwargs)
 
     assert dataset.root == expected_paths['root']
     assert dataset.path == expected_paths['path']

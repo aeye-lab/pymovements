@@ -22,7 +22,8 @@ from pathlib import Path
 
 import pytest
 
-from pymovements.datasets.toy_dataset import ToyDataset
+from pymovements.datasets.definitions.toy_dataset import ToyDataset
+from pymovements.datasets.public_dataset import PublicDataset
 
 
 @pytest.mark.parametrize(
@@ -63,7 +64,7 @@ from pymovements.datasets.toy_dataset import ToyDataset
     ],
 )
 def test_paths(init_kwargs, expected_paths):
-    dataset = ToyDataset(**init_kwargs)
+    dataset = PublicDataset(ToyDataset, **init_kwargs)
 
     assert dataset.root == expected_paths['root']
     assert dataset.path == expected_paths['path']
