@@ -293,8 +293,10 @@ def pos2vel(
 
 
 def norm(arr: np.ndarray, axis: int | None = None) -> np.ndarray | Any:
-    """
-    Takes the norm sqrt(x^2 + y^2).
+    r"""Takes the norm of an array.
+
+    The norm is defined by :math:`\sqrt{x^2 + y^2}` with :math:`x` being the yaw component and
+    :math:`y` being the pitch component of a coordinate.
 
     Parameters
     ----------
