@@ -47,6 +47,7 @@ def test_main_sequence_plot_show_plot(input_df, show, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
     main_sequence_plot(input_df, show=show)
+    plt.close()
     mock.assert_called_once()
 
 
@@ -68,6 +69,7 @@ def test_main_sequence_plot_save_path(input_df, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt.Figure, 'savefig', mock)
     main_sequence_plot(input_df, show=False, savepath='mock')
+    plt.close()
     mock.assert_called_once()
 
 
@@ -90,6 +92,7 @@ def test_main_sequence_plot_not_show(input_df, show, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
     main_sequence_plot(input_df, show=show)
+    plt.close()
     mock.assert_not_called()
 
 
