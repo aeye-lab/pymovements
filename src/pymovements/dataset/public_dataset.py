@@ -21,83 +21,14 @@
 from __future__ import annotations
 
 from abc import ABCMeta
-from dataclasses import dataclass
-from dataclasses import field
 from pathlib import Path
-from typing import Any
 from urllib.error import URLError
 
-from pymovements.datasets.dataset import Dataset
-from pymovements.gaze.experiment import Experiment
+from pymovements.dataset.dataset import Dataset
+from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.utils.archives import extract_archive
 from pymovements.utils.downloads import download_file
-
-PUBLIC_DATASETS: dict[str, type[PublicDatasetDefinition]] = {}
-
-
-def register_public_dataset(cls: type[PublicDatasetDefinition]) -> type[PublicDatasetDefinition]:
-    """Register a public dataset definition."""
-    PUBLIC_DATASETS[cls.__name__] = cls
-    return cls
-
-
-@dataclass
-class PublicDatasetDefinition:
-    """Definition to initialize a :py:class:`~pymovements.PublicDataset`.
-
-    Attributes
-    ----------
-    name : str
-        The name of the dataset.
-
-    mirrors : tuple[str, ...]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
-
-    resources : tuple[dict[str, str], ...]
-        A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
-        - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
-        - `filename`: The filename under which the file is saved as.
-        - `md5`: The MD5 checksum of the respective file.
-
-    experiment : Experiment
-        The experiment definition.
-
-    filename_regex : str
-        Regular expression which will be matched before trying to load the file. Namedgroups will
-        appear in the `fileinfo` dataframe.
-
-    filename_regex_dtypes : dict[str, type], optional
-        If named groups are present in the `filename_regex`, this makes it possible to cast specific
-        named groups to a particular datatype.
-
-    column_map : dict[str, str]
-        The keys are the columns to read, the values are the names to which they should be renamed.
-
-    custom_read_kwargs : dict[str, Any], optional
-        If specified, these keyword arguments will be passed to the file reading function.
-    """
-    mirrors: tuple[str, ...] = field(default_factory=tuple)
-
-    resources: tuple[dict[str, str], ...] = field(default_factory=tuple)
-
-    experiment: Experiment | None = None
-
-    filename_regex: str = '.*'
-
-    filename_regex_dtypes: dict[str, type] = field(default_factory=dict)
-
-    custom_read_kwargs: dict[str, Any] = field(default_factory=dict)
-
-    name: str = field(init=False)
-
-    column_map: dict[str, str] = field(default_factory=dict)
-
-    def __post_init__(self):
-        self.name = self.__class__.__name__
-
-        if len(self.column_map) > 0:
-            self.custom_read_kwargs['columns'] = list(self.column_map.keys())
-            self.custom_read_kwargs['new_columns'] = list(self.column_map.values())
 
 
 class PublicDataset(Dataset, metaclass=ABCMeta):
@@ -110,7 +41,7 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
 
     def __init__(
             self,
-            definition: str | PublicDatasetDefinition | type[PublicDatasetDefinition],
+            definition: str | DatasetDefinition | type[DatasetDefinition],
             *,
             root: str | Path,
             dataset_dirname: str | None = None,
@@ -150,7 +81,7 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
             the user to keep the event data separate from the original raw data. Default: `events`
         """
         if isinstance(definition, str):
-            definition = PUBLIC_DATASETS[definition]()
+            definition = DatasetLibrary.get(definition)()
 
         if isinstance(definition, type):
             definition = definition()
@@ -196,6 +127,8 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
 
         Raises
         ------
+        AttributeError
+            If number of mirrors or number of resources specified for dataset is zero.
         RuntimeError
             If downloading a resource failed for all given mirrors.
 
@@ -204,6 +137,12 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
         PublicDataset
             Returns self, useful for method cascading.
         """
+        if len(self.mirrors) == 0:
+            raise AttributeError('number of mirrors must not be zero to download dataset')
+
+        if len(self.resources) == 0:
+            raise AttributeError('number of resources must not be zero to download dataset')
+
         self.raw_rootpath.mkdir(parents=True, exist_ok=True)
 
         for resource in self.resources:
@@ -275,7 +214,7 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
         Example
         -------
         Let's define a custom class first with one mirror and one resource.
-        >>> class CustomPublicDataset(PublicDatasetDefinition):
+        >>> class CustomPublicDataset(DatasetDefinition):
         ...     mirrors = ['https://www.example.com/']
         ...     resources = [
         ...         {
@@ -303,7 +242,7 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
         You can specify to use the root path to be the actual dataset directory:
         >>> dataset = PublicDataset(
         ...     CustomPublicDataset,
-        ...     root='/path/to/your/datasets/',
+        ...     root='/path/to/your/dataset/',
         ...     dataset_dirname='.',
         ... )
         >>> dataset.path  # doctest: +SKIP
@@ -320,7 +259,7 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
         Example
         -------
         Let's define a custom class first with one mirror and one resource.
-        >>> class CustomPublicDataset(PublicDatasetDefinition):
+        >>> class CustomPublicDataset(DatasetDefinition):
         ...     mirrors: tuple[str] = ('https://www.example.com/', )
         ...     resources: tuple[dict[str, str]] = (
         ...         {

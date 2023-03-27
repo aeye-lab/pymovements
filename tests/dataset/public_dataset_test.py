@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test all functionality in pymovements.datasets.public_dataset."""
+"""Test all functionality in pymovements.dataset.public_dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -26,16 +26,18 @@ from unittest import mock
 
 import pytest
 
-from pymovements.datasets.public_dataset import PublicDataset
-from pymovements.datasets.public_dataset import PublicDatasetDefinition
-from pymovements.datasets.public_dataset import register_public_dataset
+from pymovements.dataset import DatasetDefinition
+from pymovements.dataset import PublicDataset
+from pymovements.dataset import register_dataset
 
 
 @pytest.fixture(name='dataset_definition')
 def dataset_definition_fixture():
     @dataclass
-    @register_public_dataset
-    class CustomPublicDataset(PublicDatasetDefinition):
+    @register_dataset
+    class CustomPublicDataset(DatasetDefinition):
+        name: str = 'CustomPublicDataset'
+
         mirrors: tuple[str, ...] = (
             'https://example.com/',
             'https://another_example.com/',
@@ -97,7 +99,7 @@ def test_paths(init_kwargs, expected_paths, dataset_definition):
     assert dataset.downloads_rootpath == expected_paths['download']
 
 
-@mock.patch('pymovements.datasets.public_dataset.download_file')
+@mock.patch('pymovements.dataset.public_dataset.download_file')
 def test_dataset_download_both_mirrors_fail(mock_download_file, tmp_path, dataset_definition):
     mock_download_file.side_effect = OSError()
 
@@ -122,7 +124,7 @@ def test_dataset_download_both_mirrors_fail(mock_download_file, tmp_path, datase
     ])
 
 
-@mock.patch('pymovements.datasets.public_dataset.download_file')
+@mock.patch('pymovements.dataset.public_dataset.download_file')
 def test_dataset_download_first_mirror_fails(mock_download_file, tmp_path, dataset_definition):
     mock_download_file.side_effect = [OSError(), None]
 
@@ -145,7 +147,7 @@ def test_dataset_download_first_mirror_fails(mock_download_file, tmp_path, datas
     ])
 
 
-@mock.patch('pymovements.datasets.public_dataset.download_file')
+@mock.patch('pymovements.dataset.public_dataset.download_file')
 def test_dataset_download_file_not_found(mock_download_file, tmp_path, dataset_definition):
     mock_download_file.side_effect = RuntimeError()
 
@@ -164,7 +166,7 @@ def test_dataset_download_file_not_found(mock_download_file, tmp_path, dataset_d
     ])
 
 
-@mock.patch('pymovements.datasets.public_dataset.download_file')
+@mock.patch('pymovements.dataset.public_dataset.download_file')
 def test_dataset_download_no_extract(mock_download_file, tmp_path, dataset_definition):
     mock_download_file.return_value = 'path'
 
@@ -181,7 +183,7 @@ def test_dataset_download_no_extract(mock_download_file, tmp_path, dataset_defin
     ])
 
 
-@mock.patch('pymovements.datasets.public_dataset.extract_archive')
+@mock.patch('pymovements.dataset.public_dataset.extract_archive')
 def test_dataset_extract_remove_finished_true(
         mock_extract_archive,
         tmp_path,
@@ -202,7 +204,7 @@ def test_dataset_extract_remove_finished_true(
     ])
 
 
-@mock.patch('pymovements.datasets.public_dataset.extract_archive')
+@mock.patch('pymovements.dataset.public_dataset.extract_archive')
 def test_dataset_extract_remove_finished_false(
         mock_extract_archive,
         tmp_path,
@@ -223,8 +225,8 @@ def test_dataset_extract_remove_finished_false(
     ])
 
 
-@mock.patch('pymovements.datasets.public_dataset.download_file')
-@mock.patch('pymovements.datasets.public_dataset.extract_archive')
+@mock.patch('pymovements.dataset.public_dataset.download_file')
+@mock.patch('pymovements.dataset.public_dataset.extract_archive')
 def test_dataset_download_default_extract(
         mock_extract, mock_download, tmp_path, dataset_definition,
 ):
@@ -235,6 +237,55 @@ def test_dataset_download_default_extract(
 
     mock_download.assert_called_once()
     mock_extract.assert_called_once()
+
+
+def test_dataset_download_no_mirrors_raises_exception(tmp_path):
+    @dataclass
+    @register_dataset
+    class NoMirrorsDefinition(DatasetDefinition):
+        name: str = 'CustomPublicDataset'
+
+        mirrors: tuple[str, ...] = ()
+
+        resources: tuple[dict[str, str], ...] = (
+            {
+                'resource': 'test.gz.tar',
+                'filename': 'test.gz.tar',
+                'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+            },
+        )
+
+    with pytest.raises(AttributeError) as excinfo:
+        PublicDataset(NoMirrorsDefinition, root=tmp_path).download()
+
+    msg, = excinfo.value.args
+
+    expected_substrings = ['number', 'mirrors', 'zero', 'download']
+    for substring in expected_substrings:
+        assert substring in msg
+
+
+def test_dataset_download_no_resources_raises_exception(tmp_path):
+    @dataclass
+    @register_dataset
+    class NoResourcesDefinition(DatasetDefinition):
+        name: str = 'CustomPublicDataset'
+
+        mirrors: tuple[str, ...] = (
+            'https://example.com/',
+            'https://another_example.com/',
+        )
+
+        resources: tuple[dict[str, str], ...] = ()
+
+    with pytest.raises(AttributeError) as excinfo:
+        PublicDataset(NoResourcesDefinition, root=tmp_path).download()
+
+    msg, = excinfo.value.args
+
+    expected_substrings = ['number', 'resources', 'zero', 'download']
+    for substring in expected_substrings:
+        assert substring in msg
 
 
 def test_public_dataset_registered_correct_attributes(tmp_path, dataset_definition):

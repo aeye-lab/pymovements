@@ -18,38 +18,39 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test public dataset definitions"""
+from __future__ import annotations
+
 import pytest
 
-from pymovements.datasets import definitions
-from pymovements.datasets.public_dataset import PUBLIC_DATASETS
+import pymovements as pm
 
 
 @pytest.mark.parametrize(
     ('definition_class', 'dataset_name'),
     [
-        pytest.param(definitions.ToyDataset, 'ToyDataset', id='ToyDataset'),
-        pytest.param(definitions.GazeBase, 'GazeBase', id='GazeBase'),
-        pytest.param(definitions.JuDo1000, 'JuDo1000', id='JuDo1000'),
+        pytest.param(pm.datasets.ToyDataset, 'ToyDataset', id='ToyDataset'),
+        pytest.param(pm.datasets.GazeBase, 'GazeBase', id='GazeBase'),
+        pytest.param(pm.datasets.JuDo1000, 'JuDo1000', id='JuDo1000'),
     ],
 )
 def test_public_dataset_registered(definition_class, dataset_name):
-    assert dataset_name in PUBLIC_DATASETS
-    assert PUBLIC_DATASETS[dataset_name] == definition_class
-    assert PUBLIC_DATASETS[dataset_name]().name == dataset_name
+    assert dataset_name in pm.DatasetLibrary.definitions
+    assert pm.DatasetLibrary.get(dataset_name) == definition_class
+    assert pm.DatasetLibrary.get(dataset_name)().name == dataset_name
 
 
 @pytest.mark.parametrize(
     'dataset_definition_class',
     [
-        pytest.param(definitions.ToyDataset, id='ToyDataset'),
-        pytest.param(definitions.GazeBase, id='GazeBase'),
-        pytest.param(definitions.JuDo1000, id='JuDo1000'),
+        pytest.param(pm.datasets.ToyDataset, id='ToyDataset'),
+        pytest.param(pm.datasets.GazeBase, id='GazeBase'),
+        pytest.param(pm.datasets.JuDo1000, id='JuDo1000'),
     ],
 )
 def test_public_dataset_registered_correct_attributes(dataset_definition_class):
     dataset_definition = dataset_definition_class()
 
-    registered_definition = PUBLIC_DATASETS[dataset_definition.name]()
+    registered_definition = pm.DatasetLibrary.get(dataset_definition.name)()
 
     assert dataset_definition.mirrors == registered_definition.mirrors
     assert dataset_definition.resources == registered_definition.resources

@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test all functionality in pymovements.datasets.dataset."""
+"""Test all functionality in pymovements.dataset.dataset."""
 import os
 import shutil
 import unittest
@@ -29,7 +29,7 @@ import pytest
 from polars.testing import assert_frame_equal
 
 from pymovements import exceptions
-from pymovements.datasets.dataset import Dataset
+from pymovements.dataset.dataset import Dataset
 from pymovements.events.detection.engbert import microsaccades
 from pymovements.events.detection.ivt import ivt
 from pymovements.events.events import EventDataFrame
