@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import re
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -29,6 +30,7 @@ from tqdm.auto import tqdm
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import DatasetLibrary
+from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events.event_processing import EventGazeProcessor
 from pymovements.events.events import EventDataFrame
 from pymovements.events.events import EventDetectionCallable
@@ -41,42 +43,18 @@ class Dataset:
 
     def __init__(
             self,
-            definition: str | DatasetDefinition | type[DatasetDefinition] = DatasetDefinition,
-            *,
-            root: str | Path,
-            dataset_dirname: str | None = '.',
-            raw_dirname: str = 'raw',
-            preprocessed_dirname: str = 'preprocessed',
-            events_dirname: str = 'events',
+            definition: str | DatasetDefinition | type[DatasetDefinition],
+            path: str | Path | DatasetPaths | None,
     ):
         """Initialize the dataset object.
-
-        You can set up a custom directory structure by populating the particular dirname attributes.
-        See :py:attr:`~pymovements.dataset.Dataset.dataset_dirname`,
-        :py:attr:`~pymovements.dataset.Dataset.raw_dirname`,
-        :py:attr:`~pymovements.dataset.Dataset.preprocessed_dirname` and
-        :py:attr:`~pymovements.dataset.Dataset.events_dirname` for details.
 
         Parameters
         ----------
         definition : str, DatasetDefinition
             Dataset definition to initialize dataset with.
-        root : str, Path
-            Path to the root directory of the dataset.
-        dataset_dirname : str, optional
-            Dataset directory name under root path. Can be `.` if dataset is located in root path.
-            Default: `.`
-        raw_dirname ; str, optional
-            Name of directory under dataset path that contains raw data. Can be `.` if raw data is
-            located in dataset path. We advise the user to keep the original raw data separate from
-            the preprocessed / event data. Default: `raw`
-        preprocessed_dirname : str, optional
-            Name of directory under dataset path that will be used to store preprocessed data. We
-            advise the user to keep the preprocessed data separate from the original raw data.
-            Default: `preprocessed`
-        events_dirname : str, optional
-            Name of directory under dataset path that will be used to store event data. We advise
-            the user to keep the event data separate from the original raw data. Default: `events`
+        path : DatasetPaths, optional
+            Path to the dataset directory. You can set up a custom directory structure by passing a
+            :py:class:`~pymovements.DatasetPaths` instance.
         """
         self.fileinfo: pl.DataFrame = pl.DataFrame()
         self.gaze: list[GazeDataFrame] = []
@@ -84,20 +62,18 @@ class Dataset:
 
         if isinstance(definition, str):
             definition = DatasetLibrary.get(definition)()
-
         if isinstance(definition, type):
             definition = definition()
+        self.definition = deepcopy(definition)
 
-        if dataset_dirname is None:
-            dataset_dirname = definition.name
-
-        self.definition = definition
-
-        self._root = Path(root)
-        self.dataset_dirname = dataset_dirname
-        self.raw_dirname = raw_dirname
-        self.preprocessed_dirname = preprocessed_dirname
-        self.events_dirname = events_dirname
+        if path is None:
+            self.paths = DatasetPaths()
+        elif isinstance(path, (str, Path)):
+            self.paths = DatasetPaths(root=path, dataset='.')
+        else:
+            self.paths = deepcopy(path)
+        # Fill dataset directory name with dataset definition name if specified.
+        self.paths.fill_name(self.definition.name)
 
     def load(
             self,
@@ -174,13 +150,13 @@ class Dataset:
         """
         # Get all filepaths that match regular expression.
         fileinfo_dicts = match_filepaths(
-            path=self.raw_rootpath,
+            path=self.paths.raw,
             regex=re.compile(self.definition.filename_regex),
             relative=True,
         )
 
         if len(fileinfo_dicts) == 0:
-            raise RuntimeError(f'no matching files found in {self.raw_rootpath}')
+            raise RuntimeError(f'no matching files found in {self.paths.raw}')
 
         # Create dataframe from all fileinfo records.
         fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
@@ -298,10 +274,10 @@ class Dataset:
         # Read gaze files from fileinfo attribute.
         for fileinfo in tqdm(self.fileinfo.to_dicts()):
             filepath = Path(fileinfo['filepath'])
-            filepath = self.raw_rootpath / filepath
+            filepath = self.paths.raw / filepath
 
             if preprocessed:
-                filepath = self._raw_to_preprocessed_filepath(
+                filepath = self.paths.get_preprocessed_filepath(
                     filepath, preprocessed_dirname=preprocessed_dirname,
                     extension=extension,
                 )
@@ -360,9 +336,9 @@ class Dataset:
         # read and preprocess input files
         for fileinfo in tqdm(self.fileinfo.to_dicts()):
             filepath = Path(fileinfo['filepath'])
-            filepath = self.raw_rootpath / filepath
+            filepath = self.paths.raw / filepath
 
-            filepath = self._raw_to_event_filepath(
+            filepath = self.paths.raw_to_event_filepath(
                 filepath, events_dirname=events_dirname,
                 extension=extension,
             )
@@ -674,8 +650,8 @@ class Dataset:
         disable_progressbar = not verbose
 
         for file_id, event_df in enumerate(tqdm(self.events, disable=disable_progressbar)):
-            raw_filepath = self.raw_rootpath / Path(self.fileinfo[file_id, 'filepath'])
-            events_filepath = self._raw_to_event_filepath(
+            raw_filepath = self.paths.raw / Path(self.fileinfo[file_id, 'filepath'])
+            events_filepath = self.paths.raw_to_event_filepath(
                 raw_filepath, events_dirname=events_dirname,
                 extension=extension,
             )
@@ -736,8 +712,8 @@ class Dataset:
         disable_progressbar = not verbose
 
         for file_id, gaze_df in enumerate(tqdm(self.gaze, disable=disable_progressbar)):
-            raw_filepath = self.raw_rootpath / Path(self.fileinfo[file_id, 'filepath'])
-            preprocessed_filepath = self._raw_to_preprocessed_filepath(
+            raw_filepath = self.paths.raw / Path(self.fileinfo[file_id, 'filepath'])
+            preprocessed_filepath = self.paths.get_preprocessed_filepath(
                 raw_filepath, preprocessed_dirname=preprocessed_dirname,
                 extension=extension,
             )
@@ -774,121 +750,28 @@ class Dataset:
         Example
         -------
 
-        The default behavior is to locate the dataset in the root path without assuming a further
-        dataset directory:
-        >>> dataset = Dataset(root='/path/to/your/dataset', dataset_dirname='.')
-        >>> dataset.path  # doctest: +SKIP
-        Path('/path/to/your/dataset')
+        By passing a `str` or a `Path` as `path` during initialization you can explicitly set the
+        directory path of the dataset:
+        >>> import pymovements as pm
+        >>>
+        >>> dataset = pm.Dataset("ToyDataset", path='path/to/your/dataset')
+        >>> print(dataset.path)
+        path/to/your/dataset
 
-        To locate the dataset you can also specify an explicit dataset directory name in the root
-        path:
-        >>> dataset = Dataset(root='path/to/all/your/datasets/', dataset_dirname='your_dataset')
-        >>> dataset.path  # doctest: +SKIP
-        Path('path/to/all/your/datasets/your_dataset')
+        If you just want to specify the root directory path which holds all your local datasets, you
+        can create pass a :py:class:`~pymovements.DatasetPaths` object and set the `root`:
+        >>> paths = pm.DatasetPaths(root='path/to/your/common/root/')
+        >>> dataset = pm.Dataset("ToyDataset", path=paths)
+        >>> print(dataset.path)
+        path/to/your/common/root/ToyDataset
+
+        You can also specify an alternative dataset directory name:
+        >>> paths = pm.DatasetPaths(root='path/to/your/common/root/', dataset='my_dataset')
+        >>> dataset = pm.Dataset("ToyDataset", path=paths)
+        >>> print(dataset.path)
+        path/to/your/common/root/my_dataset
         """
-        return self.root / self.dataset_dirname
-
-    @property
-    def root(self) -> Path:
-        """The root path to your dataset.
-
-        Example
-        -------
-        >>> dataset = Dataset(root='/path/to/your/dataset')
-        >>> dataset.root  # doctest: +SKIP
-        Path('/path/to/your/dataset')
-
-        The root stays unaffected by the dataset directory name:
-        >>> dataset = Dataset(root='/path/to/', dataset_dirname='your_dataset')
-        >>> dataset.root  # doctest: +SKIP
-        Path('/path/to')
-        """
-        return self._root
-
-    @property
-    def events_rootpath(self) -> Path:
-        """The path to the directory of the event data.
-
-        The path points to the events directory under the root path.
-
-        Example
-        -------
-
-        >>> dataset = Dataset(root='/path/to/your/datasets/', dataset_dirname='your_dataset')
-        >>> dataset.events_rootpath  # doctest: +SKIP
-        Path('/path/to/your/datasets/your_dataset/events')
-
-        You can also explicitely specify the event directory name. The default is `events`.
-        >>> dataset = Dataset(
-        ...     root='/path/to/your/datasets/',
-        ...     dataset_dirname='your_dataset',
-        ...     events_dirname='your_events',
-        ... )
-        >>> dataset.events_rootpath  # doctest: +SKIP
-        Path('/path/to/your/datasets/your_dataset/your_events')
-        """
-        return self.path / self.events_dirname
-
-    @property
-    def preprocessed_rootpath(self) -> Path:
-        """The path to the directory of the preprocessed gaze data.
-
-        The path points to the preprocessed data directory under the root path.
-
-        Example
-        -------
-
-        >>> dataset = Dataset(root='/path/to/your/datasets/', dataset_dirname='your_dataset')
-        >>> dataset.preprocessed_rootpath  # doctest: +SKIP
-        Path('/path/to/your/datasets/your_dataset/preprocessed')
-
-        You can also explicitely specify the preprocessed directory name. The default is
-        `preprocessed`.
-        >>> dataset = Dataset(
-        ...     root='/path/to/your/datasets/',
-        ...     dataset_dirname='your_dataset',
-        ...     preprocessed_dirname='your_preprocessed_data',
-        ... )
-        >>> dataset.preprocessed_rootpath  # doctest: +SKIP
-        Path('/path/to/your/datasets/your_dataset/your_preprocessed_data')
-        """
-        return self.path / self.preprocessed_dirname
-
-    @property
-    def raw_rootpath(self) -> Path:
-        """The path to the directory of the raw data.
-
-        The path points to the raw data directory under the root path.
-
-        Example
-        -------
-
-        >>> dataset = Dataset(root='/path/to/your/datasets/', dataset_dirname='your_dataset')
-        >>> dataset.preprocessed_rootpath  # doctest: +SKIP
-        Path('/path/to/your/datasets/your_dataset/raw')
-
-        You can also explicitely specify the preprocessed directory name. The default is `raw`.
-        >>> dataset = Dataset(
-        ...     root='/path/to/your/datasets/',
-        ...     dataset_dirname='your_dataset',
-        ...     raw_dirname='your_raw_data',
-        ... )
-        >>> dataset.raw_rootpath  # doctest: +SKIP
-        Path('/path/to/your/datasets/your_dataset/your_raw_data')
-
-        If your raw data is not in a separate directory under the root path then you can also
-        specify `.` as the directory name. We discourage this and advise the user to keep raw data
-        and preprocessed data separated.
-        ... dataset = Dataset(
-        >>> dataset = Dataset(
-        ...     root='/path/to/your/datasets/',
-        ...     dataset_dirname='your_dataset',
-        ...     raw_dirname='.',
-        ... )
-        >>> dataset.raw_rootpath  # doctest: +SKIP
-        Path('/path/to/your/datasets/your_dataset/your_raw_data')
-        """
-        return self.path / self.raw_dirname
+        return self.paths.dataset
 
     def _check_fileinfo(self) -> None:
         """Check if fileinfo attribute is set and there is at least one row present."""
@@ -905,90 +788,6 @@ class Dataset:
             raise AttributeError('gaze files were not loaded yet. please run load() beforehand')
         if len(self.gaze) == 0:
             raise AttributeError('no files present in gaze attribute')
-
-    def _raw_to_preprocessed_filepath(
-            self,
-            raw_filepath: Path,
-            preprocessed_dirname: str | None = None,
-            extension: str = 'feather',
-    ) -> Path:
-        """Get preprocessed filepath in accordance to filepath of the raw file.
-
-        The preprocessed filepath will point to a feather file.
-
-        Parameters
-        ----------
-        raw_filepath : Path
-            The Path to the raw file.
-        preprocessed_dirname : str
-            One-time usage of an alternative directory name to save data relative to
-            :py:meth:`pymovements.Dataset.path`.
-            This argument is used only for this single call and does not alter
-            :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
-        extension:
-            extension specifies the fileformat to store the data
-
-        Returns
-        -------
-        Path
-            The Path to the preprocessed feather file.
-        """
-        relative_raw_dirpath = raw_filepath.parent
-        relative_raw_dirpath = relative_raw_dirpath.relative_to(self.raw_rootpath)
-
-        if preprocessed_dirname is None:
-            preprocessed_rootpath = self.preprocessed_rootpath
-        else:
-            preprocessed_rootpath = self.path / preprocessed_dirname
-
-        preprocessed_file_dirpath = preprocessed_rootpath / relative_raw_dirpath
-
-        # Get new filename for saved feather file.
-        preprocessed_filename = raw_filepath.stem + '.' + extension
-
-        return preprocessed_file_dirpath / preprocessed_filename
-
-    def _raw_to_event_filepath(
-        self,
-        raw_filepath: Path,
-        events_dirname: str | None = None,
-        extension: str = 'feather',
-    ) -> Path:
-        """Get event filepath in accordance to filepath of the raw file.
-
-        The event filepath will point to file with the specified extension.
-
-        Parameters
-        ----------
-        raw_filepath : Path
-            The Path to the raw file.
-        events_dirname : str
-            One-time usage of an alternative directory name to save data relative to
-            :py:meth:`pymovements.Dataset.path`.
-            This argument is used only for this single call and does not alter
-            :py:meth:`pymovements.Dataset.events_rootpath`.
-        extension:
-            extension specifies the fileformat to store the data
-
-        Returns
-        -------
-        Path
-            The Path to the event feather file.
-        """
-        relative_raw_dirpath = raw_filepath.parent
-        relative_raw_dirpath = relative_raw_dirpath.relative_to(self.raw_rootpath)
-
-        if events_dirname is None:
-            events_rootpath = self.events_rootpath
-        else:
-            events_rootpath = self.path / events_dirname
-
-        events_file_dirpath = events_rootpath / relative_raw_dirpath
-
-        # Get new filename for saved feather file.
-        events_filename = raw_filepath.stem + '.' + extension
-
-        return events_file_dirpath / events_filename
 
     def _add_fileinfo(self, df: pl.DataFrame, fileinfo: dict[str, Any]) -> pl.DataFrame:
         """Add columns from fileinfo to dataframe.

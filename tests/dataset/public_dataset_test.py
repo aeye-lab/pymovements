@@ -26,16 +26,14 @@ from unittest import mock
 
 import pytest
 
-from pymovements.dataset import DatasetDefinition
-from pymovements.dataset import PublicDataset
-from pymovements.dataset import register_dataset
+import pymovements as pm
 
 
 @pytest.fixture(name='dataset_definition')
 def dataset_definition_fixture():
     @dataclass
-    @register_dataset
-    class CustomPublicDataset(DatasetDefinition):
+    @pm.register_dataset
+    class CustomPublicDataset(pm.DatasetDefinition):
         name: str = 'CustomPublicDataset'
 
         mirrors: tuple[str, ...] = (
@@ -55,55 +53,69 @@ def dataset_definition_fixture():
 
 
 @pytest.mark.parametrize(
-    'init_kwargs, expected_paths',
+    'init_path, expected_paths',
     [
         pytest.param(
-            {'root': '/data/set/path'},
+            '/data/set/path',
             {
-                'root': Path('/data/set/path/'),
-                'path': Path('/data/set/path/CustomPublicDataset'),
-                'download': Path('/data/set/path/CustomPublicDataset/downloads'),
+                'root': Path('/data/set/path'),
+                'dataset': Path('/data/set/path'),
+                'downloads': Path('/data/set/path/downloads'),
             },
+            id='no_paths',
         ),
         pytest.param(
-            {'root': '/data/set/path', 'dataset_dirname': '.'},
+            pm.DatasetPaths(root='/data/set/path'),
             {
                 'root': Path('/data/set/path/'),
-                'path': Path('/data/set/path/'),
-                'download': Path('/data/set/path/downloads'),
+                'dataset': Path('/data/set/path/CustomPublicDataset'),
+                'downloads': Path('/data/set/path/CustomPublicDataset/downloads'),
             },
+            id='no_paths',
         ),
         pytest.param(
-            {'root': '/data/set/path', 'dataset_dirname': 'dataset'},
+            pm.DatasetPaths(root='/data/set/path', dataset='.'),
             {
                 'root': Path('/data/set/path/'),
-                'path': Path('/data/set/path/dataset'),
-                'download': Path('/data/set/path/dataset/downloads'),
+                'dataset': Path('/data/set/path/'),
+                'downloads': Path('/data/set/path/downloads'),
             },
+            id='dataset_dot',
         ),
         pytest.param(
-            {'root': '/data/set/path', 'downloads_dirname': 'custom_download_dirname'},
+            pm.DatasetPaths(root='/data/set/path', dataset='dataset'),
             {
                 'root': Path('/data/set/path/'),
-                'path': Path('/data/set/path/CustomPublicDataset'),
-                'download': Path('/data/set/path/CustomPublicDataset/custom_download_dirname'),
+                'dataset': Path('/data/set/path/dataset'),
+                'downloads': Path('/data/set/path/dataset/downloads'),
             },
+            id='explicit_dataset_dirname',
+        ),
+        pytest.param(
+            pm.DatasetPaths(root='/data/set/path', downloads='custom_downloads'),
+            {
+                'root': Path('/data/set/path/'),
+                'dataset': Path('/data/set/path/CustomPublicDataset'),
+                'downloads': Path('/data/set/path/CustomPublicDataset/custom_downloads'),
+            },
+            id='explicit_download_dirname',
         ),
     ],
 )
-def test_paths(init_kwargs, expected_paths, dataset_definition):
-    dataset = PublicDataset(dataset_definition, **init_kwargs)
+def test_paths(init_path, expected_paths, dataset_definition):
+    dataset = pm.PublicDataset(dataset_definition, path=init_path)
 
-    assert dataset.root == expected_paths['root']
-    assert dataset.path == expected_paths['path']
-    assert dataset.downloads_rootpath == expected_paths['download']
+    assert dataset.paths.root == expected_paths['root']
+    assert dataset.paths.dataset == expected_paths['dataset']
+    assert dataset.paths.downloads == expected_paths['downloads']
 
 
 @mock.patch('pymovements.dataset.public_dataset.download_file')
 def test_dataset_download_both_mirrors_fail(mock_download_file, tmp_path, dataset_definition):
     mock_download_file.side_effect = OSError()
 
-    dataset = PublicDataset(dataset_definition, root=tmp_path, dataset_dirname='.')
+    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
+    dataset = pm.PublicDataset(dataset_definition, path=paths)
 
     with pytest.raises(RuntimeError):
         dataset.download()
@@ -128,7 +140,8 @@ def test_dataset_download_both_mirrors_fail(mock_download_file, tmp_path, datase
 def test_dataset_download_first_mirror_fails(mock_download_file, tmp_path, dataset_definition):
     mock_download_file.side_effect = [OSError(), None]
 
-    dataset = PublicDataset(dataset_definition, root=tmp_path, dataset_dirname='.')
+    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
+    dataset = pm.PublicDataset(dataset_definition, path=paths)
     dataset.download(extract=False)
 
     mock_download_file.assert_has_calls([
@@ -151,7 +164,8 @@ def test_dataset_download_first_mirror_fails(mock_download_file, tmp_path, datas
 def test_dataset_download_file_not_found(mock_download_file, tmp_path, dataset_definition):
     mock_download_file.side_effect = RuntimeError()
 
-    dataset = PublicDataset(dataset_definition, root=tmp_path, dataset_dirname='.')
+    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
+    dataset = pm.PublicDataset(dataset_definition, path=paths)
 
     with pytest.raises(RuntimeError):
         dataset.download()
@@ -170,7 +184,8 @@ def test_dataset_download_file_not_found(mock_download_file, tmp_path, dataset_d
 def test_dataset_download_no_extract(mock_download_file, tmp_path, dataset_definition):
     mock_download_file.return_value = 'path'
 
-    dataset = PublicDataset(dataset_definition, root=tmp_path, dataset_dirname='.')
+    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
+    dataset = pm.PublicDataset(dataset_definition, path=paths)
     dataset.download(extract=False)
 
     mock_download_file.assert_has_calls([
@@ -191,7 +206,8 @@ def test_dataset_extract_remove_finished_true(
 ):
     mock_extract_archive.return_value = 'path'
 
-    dataset = PublicDataset(dataset_definition, root=tmp_path, dataset_dirname='.')
+    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
+    dataset = pm.PublicDataset(dataset_definition, path=paths)
     dataset.extract(remove_finished=True)
 
     mock_extract_archive.assert_has_calls([
@@ -212,7 +228,8 @@ def test_dataset_extract_remove_finished_false(
 ):
     mock_extract_archive.return_value = 'path'
 
-    dataset = PublicDataset(dataset_definition, root=tmp_path, dataset_dirname='.')
+    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
+    dataset = pm.PublicDataset(dataset_definition, path=paths)
     dataset.extract()
 
     mock_extract_archive.assert_has_calls([
@@ -233,7 +250,7 @@ def test_dataset_download_default_extract(
     mock_extract.return_value = None
     mock_download.return_value = None
 
-    PublicDataset(dataset_definition, root=tmp_path).download()
+    pm.PublicDataset(dataset_definition, path=tmp_path).download()
 
     mock_download.assert_called_once()
     mock_extract.assert_called_once()
@@ -241,8 +258,7 @@ def test_dataset_download_default_extract(
 
 def test_dataset_download_no_mirrors_raises_exception(tmp_path):
     @dataclass
-    @register_dataset
-    class NoMirrorsDefinition(DatasetDefinition):
+    class NoMirrorsDefinition(pm.DatasetDefinition):
         name: str = 'CustomPublicDataset'
 
         mirrors: tuple[str, ...] = ()
@@ -256,7 +272,7 @@ def test_dataset_download_no_mirrors_raises_exception(tmp_path):
         )
 
     with pytest.raises(AttributeError) as excinfo:
-        PublicDataset(NoMirrorsDefinition, root=tmp_path).download()
+        pm.PublicDataset(NoMirrorsDefinition, path=tmp_path).download()
 
     msg, = excinfo.value.args
 
@@ -267,8 +283,7 @@ def test_dataset_download_no_mirrors_raises_exception(tmp_path):
 
 def test_dataset_download_no_resources_raises_exception(tmp_path):
     @dataclass
-    @register_dataset
-    class NoResourcesDefinition(DatasetDefinition):
+    class NoResourcesDefinition(pm.DatasetDefinition):
         name: str = 'CustomPublicDataset'
 
         mirrors: tuple[str, ...] = (
@@ -279,7 +294,7 @@ def test_dataset_download_no_resources_raises_exception(tmp_path):
         resources: tuple[dict[str, str], ...] = ()
 
     with pytest.raises(AttributeError) as excinfo:
-        PublicDataset(NoResourcesDefinition, root=tmp_path).download()
+        pm.PublicDataset(NoResourcesDefinition, path=tmp_path).download()
 
     msg, = excinfo.value.args
 
@@ -289,7 +304,7 @@ def test_dataset_download_no_resources_raises_exception(tmp_path):
 
 
 def test_public_dataset_registered_correct_attributes(tmp_path, dataset_definition):
-    dataset = PublicDataset('CustomPublicDataset', root=tmp_path)
+    dataset = pm.PublicDataset('CustomPublicDataset', path=tmp_path)
 
     assert dataset.definition.mirrors == dataset_definition.mirrors
     assert dataset.definition.resources == dataset_definition.resources
