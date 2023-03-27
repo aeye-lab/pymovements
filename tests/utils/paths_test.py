@@ -176,6 +176,17 @@ def test_match_filepaths_not_relative(tmp_path):
     case.assertCountEqual(result_dicts, expected_dicts)
 
 
+def test_match_filepaths_not_exists_raises_value_error(tmp_path):
+    filepath = tmp_path / 'not_existing'
+
+    with pytest.raises(ValueError) as excinfo:
+        match_filepaths(path=filepath, regex=re.compile('.*'))
+    msg, = excinfo.value.args
+
+    assert 'not exist' in msg
+    assert str(filepath) in msg
+
+
 def test_match_filepaths_no_directory_raises_value_error(tmp_path):
     create_directory(tmp_path, ['tmp_dir'], ['foo.txt'])
     filepath = tmp_path / 'tmp_dir' / 'foo.txt'
