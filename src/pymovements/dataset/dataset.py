@@ -27,27 +27,24 @@ from typing import Any
 import polars as pl
 from tqdm.auto import tqdm
 
+from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.events.event_processing import EventGazeProcessor
 from pymovements.events.events import EventDataFrame
 from pymovements.events.events import EventDetectionCallable
 from pymovements.gaze import GazeDataFrame
-from pymovements.gaze.experiment import Experiment
 from pymovements.utils.paths import match_filepaths
 
 
 class Dataset:
     """Dataset base class."""
-    # pylint: disable=too-many-instance-attributes
-    # The Dataset class is exceptionally complex and needs many attributes.
 
     def __init__(
             self,
+            definition: str | DatasetDefinition | type[DatasetDefinition] = DatasetDefinition,
+            *,
             root: str | Path,
-            experiment: Experiment | None = None,
-            filename_regex: str = '.*',
-            filename_regex_dtypes: dict[str, type] | None = None,
-            custom_read_kwargs: dict[str, Any] | None = None,
-            dataset_dirname: str = '.',
+            dataset_dirname: str | None = '.',
             raw_dirname: str = 'raw',
             preprocessed_dirname: str = 'preprocessed',
             events_dirname: str = 'events',
@@ -62,18 +59,10 @@ class Dataset:
 
         Parameters
         ----------
+        definition : str, DatasetDefinition
+            Dataset definition to initialize dataset with.
         root : str, Path
             Path to the root directory of the dataset.
-        experiment : Experiment
-            The experiment definition.
-        filename_regex : str
-            Regular expression which needs to be matched before trying to load the file. Named
-            groups will appear in the `fileinfo` dataframe.
-        filename_regex_dtypes : dict[str, type], optional
-            If named groups are present in the `filename_regex`, this makes it possible to cast
-            specific named groups to a particular datatype.
-        custom_read_kwargs : dict[str, Any], optional
-            If specified, these keyword arguments will be passed to the file reading function.
         dataset_dirname : str, optional
             Dataset directory name under root path. Can be `.` if dataset is located in root path.
             Default: `.`
@@ -93,27 +82,22 @@ class Dataset:
         self.gaze: list[GazeDataFrame] = []
         self.events: list[EventDataFrame] = []
 
+        if isinstance(definition, str):
+            definition = DatasetLibrary.get(definition)()
+
+        if isinstance(definition, type):
+            definition = definition()
+
+        if dataset_dirname is None:
+            dataset_dirname = definition.name
+
+        self.definition = definition
+
         self._root = Path(root)
         self.dataset_dirname = dataset_dirname
         self.raw_dirname = raw_dirname
         self.preprocessed_dirname = preprocessed_dirname
         self.events_dirname = events_dirname
-
-        self.experiment = experiment
-
-        if filename_regex is None:
-            raise ValueError('filename_regex must not be None')
-        if not isinstance(filename_regex, str):
-            raise TypeError('filename_regex must be of type str')
-        self._filename_regex = filename_regex
-
-        if filename_regex_dtypes is None:
-            filename_regex_dtypes = {}
-        self._filename_regex_dtypes = filename_regex_dtypes
-
-        if custom_read_kwargs is None:
-            custom_read_kwargs = {}
-        self._custom_read_kwargs = custom_read_kwargs
 
     def load(
             self,
@@ -191,7 +175,7 @@ class Dataset:
         # Get all filepaths that match regular expression.
         fileinfo_dicts = match_filepaths(
             path=self.raw_rootpath,
-            regex=re.compile(self._filename_regex),
+            regex=re.compile(self.definition.filename_regex),
             relative=True,
         )
 
@@ -204,7 +188,7 @@ class Dataset:
 
         fileinfo_df = fileinfo_df.with_columns([
             pl.col(fileinfo_key).cast(fileinfo_dtype)
-            for fileinfo_key, fileinfo_dtype in self._filename_regex_dtypes.items()
+            for fileinfo_key, fileinfo_dtype in self.definition.filename_regex_dtypes.items()
         ])
 
         return fileinfo_df
@@ -326,7 +310,7 @@ class Dataset:
                 if preprocessed:
                     gaze_df = pl.read_csv(filepath)
                 else:
-                    gaze_df = pl.read_csv(filepath, **self._custom_read_kwargs)
+                    gaze_df = pl.read_csv(filepath, **self.definition.custom_read_kwargs)
             elif filepath.suffix == '.feather':
                 gaze_df = pl.read_ipc(filepath)
             else:
@@ -335,7 +319,7 @@ class Dataset:
             # Add fileinfo columns to dataframe.
             gaze_df = self._add_fileinfo(gaze_df, fileinfo)
 
-            gaze_dfs.append(GazeDataFrame(gaze_df, experiment=self.experiment))
+            gaze_dfs.append(GazeDataFrame(gaze_df, experiment=self.definition.experiment))
 
         return gaze_dfs
 
@@ -1033,6 +1017,6 @@ class Dataset:
         # Cast columns from fileinfo according to specification.
         df = df.with_columns([
             pl.col(fileinfo_key).cast(fileinfo_dtype)
-            for fileinfo_key, fileinfo_dtype in self._filename_regex_dtypes.items()
+            for fileinfo_key, fileinfo_dtype in self.definition.filename_regex_dtypes.items()
         ])
         return df

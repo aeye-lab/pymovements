@@ -62,7 +62,7 @@ class DatasetDefinition:
     custom_read_kwargs : dict[str, Any], optional
         If specified, these keyword arguments will be passed to the file reading function.
     """
-    name: str = field(init=False)
+    name: str = '.'
 
     mirrors: tuple[str, ...] = field(default_factory=tuple)
 
@@ -79,8 +79,6 @@ class DatasetDefinition:
     column_map: dict[str, str] = field(default_factory=dict)
 
     def __post_init__(self):
-        self.name = self.__class__.__name__
-
         if len(self.column_map) > 0:
             self.custom_read_kwargs['columns'] = list(self.column_map.keys())
             self.custom_read_kwargs['new_columns'] = list(self.column_map.values())

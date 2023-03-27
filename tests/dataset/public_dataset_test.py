@@ -291,9 +291,9 @@ def test_dataset_download_no_resources_raises_exception(tmp_path):
 def test_public_dataset_registered_correct_attributes(tmp_path, dataset_definition):
     dataset = PublicDataset('CustomPublicDataset', root=tmp_path)
 
-    assert dataset.mirrors == dataset_definition.mirrors
-    assert dataset.resources == dataset_definition.resources
-    assert dataset.experiment == dataset_definition.experiment
-    assert dataset._filename_regex == dataset_definition.filename_regex
-    assert dataset._filename_regex_dtypes == dataset_definition.filename_regex_dtypes
-    assert dataset._custom_read_kwargs == dataset_definition.custom_read_kwargs
+    assert dataset.definition.mirrors == dataset_definition.mirrors
+    assert dataset.definition.resources == dataset_definition.resources
+    assert dataset.definition.experiment == dataset_definition.experiment
+    assert dataset.definition.filename_regex == dataset_definition.filename_regex
+    assert dataset.definition.filename_regex_dtypes == dataset_definition.filename_regex_dtypes
+    assert dataset.definition.custom_read_kwargs == dataset_definition.custom_read_kwargs
