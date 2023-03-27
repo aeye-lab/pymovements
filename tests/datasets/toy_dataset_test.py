@@ -17,13 +17,13 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test all functionality in pymovements.datasets.judo1000."""
+"""Test all functionality in pymovements.dataset.judo1000."""
 from pathlib import Path
 
 import pytest
 
-from pymovements.datasets.definitions.toy_dataset import ToyDataset
-from pymovements.datasets.public_dataset import PublicDataset
+from pymovements.dataset.public_dataset import PublicDataset
+from pymovements.datasets import ToyDataset
 
 
 @pytest.mark.parametrize(

@@ -12,4 +12,6 @@
     pymovements.gaze
     pymovements.plotting
     pymovements.synthetic
+    pymovements.experiment
+    pymovements.screen
     pymovements.utils

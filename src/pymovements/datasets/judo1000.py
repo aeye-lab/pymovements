@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2022-2023 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,27 +17,29 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides an interface to the pymovements example toy dataset."""
+"""This module provides an interface to the JuDo1000 dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
 from dataclasses import field
 
-from pymovements.datasets.public_dataset import PublicDatasetDefinition
-from pymovements.datasets.public_dataset import register_public_dataset
+from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.dataset_library import register_dataset
 from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
-@register_public_dataset
-class ToyDataset(PublicDatasetDefinition):
-    """Example toy dataset.
+@register_dataset
+class JuDo1000(DatasetDefinition):
+    """JuDo1000 dataset :cite:p:`JuDo1000`.
 
-    This dataset includes monocular eye tracking data from a single participants in a single
-    session. Eye movements are recorded at a sampling frequency of 1000 Hz using an EyeLink Portable
-    Duo video-based eye tracker and are provided as pixel coordinates.
+    This dataset includes binocular eye tracking data from 150 participants in four sessions with an
+    interval of at least one week between two sessions. Eye movements are recorded at a sampling
+    frequency of 1000 Hz using an EyeLink Portable Duo video-based eye tracker and are provided as
+    pixel coordinates. Participants are instructed to watch a random jumping dot on a computer
+    screen.
 
-    The participant is instructed to read 4 texts with 5 screens each.
+    Check the respective `repository <https://osf.io/5zpvk/>`_ for details.
 
     Attributes
     ----------
@@ -73,11 +75,11 @@ class ToyDataset(PublicDatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.ToyDataset` definition:
+    :py:class:`~pymovements.JuDo1000` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.PublicDataset("ToyDataset", root='data/')
+    >>> dataset = pm.PublicDataset("JuDo1000", root='data/')
 
     Download the dataset resources resources:
 
@@ -90,17 +92,17 @@ class ToyDataset(PublicDatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'ToyDataset'
+    name: str = 'JuDo1000'
 
     mirrors: tuple[str, ...] = (
-        'http://github.com/aeye-lab/pymovements-toy-dataset/zipball/',
+        'https://osf.io/download/',
     )
 
     resources: tuple[dict[str, str], ...] = (
         {
-            'resource': '6cb5d663317bf418cec0c9abe1dde5085a8a8ebd/',
-            'filename': 'pymovements-toy-dataset.zip',
-            'md5': '4da622457637a8181d86601fe17f3aa8',
+            'resource': '4wy7s/',
+            'filename': 'JuDo1000.zip',
+            'md5': 'b8b9e5bb65b78d6f2bd260451cdd89f8',
         },
     )
 
@@ -114,26 +116,29 @@ class ToyDataset(PublicDatasetDefinition):
         sampling_rate=1000,
     )
 
-    filename_regex: str = r'trial_(?P<text_id>\d+)_(?P<page_id>\d+).csv'
+    filename_regex: str = r'(?P<subject_id>\d+)_(?P<session_id>\d+).csv'
 
     filename_regex_dtypes: dict[str, type] = field(
         default_factory=lambda: {
-            'text_id': int,
-            'page_id': int,
+            'subject_id': int,
+            'session_id': int,
         },
     )
 
     column_map: dict[str, str] = field(
         default_factory=lambda: {
-            'timestamp': 'time',
-            'x': 'x_right_pix',
-            'y': 'y_right_pix',
+            'trialId': 'trial_id',
+            'pointId': 'point_id',
+            'time': 'time',
+            'x_left': 'x_left_pix',
+            'y_left': 'y_left_pix',
+            'x_right': 'x_right_pix',
+            'y_right': 'y_right_pix',
         },
     )
 
     custom_read_kwargs: dict[str, str] = field(
         default_factory=lambda: {
             'separator': '\t',
-            'null_values': '-32768.00',
         },
     )

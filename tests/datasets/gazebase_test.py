@@ -17,13 +17,13 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test all functionality in pymovements.datasets.gazebase."""
+"""Test all functionality in pymovements.dataset.gazebase."""
 from pathlib import Path
 
 import pytest
 
-from pymovements.datasets.definitions.gazebase import GazeBase
-from pymovements.datasets.public_dataset import PublicDataset
+from pymovements.dataset.public_dataset import PublicDataset
+from pymovements.datasets import GazeBase
 
 
 @pytest.mark.parametrize(

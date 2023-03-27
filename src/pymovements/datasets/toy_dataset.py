@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 The pymovements Project Authors
+# Copyright (c) 2023 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,36 +17,27 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides an interface to the GazeBase dataset."""
+"""This module provides an interface to the pymovements example toy dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
 from dataclasses import field
-from typing import Any
 
-from pymovements.datasets.public_dataset import PublicDatasetDefinition
-from pymovements.datasets.public_dataset import register_public_dataset
+from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.dataset_library import register_dataset
 from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
-@register_public_dataset
-class GazeBase(PublicDatasetDefinition):
-    """GazeBase dataset :cite:p:`GazeBase`.
+@register_dataset
+class ToyDataset(DatasetDefinition):
+    """Example toy dataset.
 
-    This dataset includes monocular (left eye) eye tracking data from 322 participants captured over
-    a period of 37 months. Participants attended up to 9 rounds during this time frame, with each
-    round consisting of two contiguous sessions.
+    This dataset includes monocular eye tracking data from a single participants in a single
+    session. Eye movements are recorded at a sampling frequency of 1000 Hz using an EyeLink Portable
+    Duo video-based eye tracker and are provided as pixel coordinates.
 
-    Eye movements are recorded at a sampling frequency of 1000 Hz using an EyeLink 1000 video-based
-    eye tracker and are provided as positional data in degrees of visual angle.
-
-    In each of the two sessions per round, participants are instructed to complete a series of
-    tasks, including a fixation task (FIX), a horizontal saccade task (HSS), a random saccade task
-    (RAN), a reading task (TEX), two free viewing video tasks (VD1 and VD2) and a gaze-driven gaming
-    task (BLG).
-
-    Check the respective paper for details :cite:p:`GazeBase`.
+    The participant is instructed to read 4 texts with 5 screens each.
 
     Attributes
     ----------
@@ -82,11 +73,11 @@ class GazeBase(PublicDatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.GazeBase` definition:
+    :py:class:`~pymovements.ToyDataset` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.PublicDataset("GazeBase", root='data/')
+    >>> dataset = pm.PublicDataset("ToyDataset", root='data/')
 
     Download the dataset resources resources:
 
@@ -99,53 +90,50 @@ class GazeBase(PublicDatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'GazeBase'
+    name: str = 'ToyDataset'
 
-    mirrors: tuple[str] = (
-        'https://figshare.com/ndownloader/files/',
+    mirrors: tuple[str, ...] = (
+        'http://github.com/aeye-lab/pymovements-toy-dataset/zipball/',
     )
 
-    resources: tuple[dict[str, str]] = (
+    resources: tuple[dict[str, str], ...] = (
         {
-            'resource': '27039812',
-            'filename': 'GazeBase_v2_0.zip',
-            'md5': 'cb7eb895fb48f8661decf038ab998c9a',
+            'resource': '6cb5d663317bf418cec0c9abe1dde5085a8a8ebd/',
+            'filename': 'pymovements-toy-dataset.zip',
+            'md5': '4da622457637a8181d86601fe17f3aa8',
         },
     )
 
     experiment: Experiment = Experiment(
-        screen_width_px=1680,
-        screen_height_px=1050,
-        screen_width_cm=47.4,
-        screen_height_cm=29.7,
-        distance_cm=55,
+        screen_width_px=1280,
+        screen_height_px=1024,
+        screen_width_cm=38,
+        screen_height_cm=30.2,
+        distance_cm=68,
         origin='lower left',
         sampling_rate=1000,
     )
 
-    filename_regex: str = (
-        r'S_(?P<round_id>\d)(?P<subject_id>\d+)'
-        r'_S(?P<session_id>\d+)'
-        r'_(?P<task_name>.+).csv'
-    )
+    filename_regex: str = r'trial_(?P<text_id>\d+)_(?P<page_id>\d+).csv'
 
     filename_regex_dtypes: dict[str, type] = field(
         default_factory=lambda: {
-            'round_id': int,
-            'subject_id': int,
-            'session_id': int,
+            'text_id': int,
+            'page_id': int,
         },
     )
 
     column_map: dict[str, str] = field(
         default_factory=lambda: {
-            'n': 'time',
-            'x': 'x_left_pos',
-            'y': 'y_left_pos',
-            'val': 'validity',
-            'xT': 'x_target_pos',
-            'yT': 'y_target_pos',
+            'timestamp': 'time',
+            'x': 'x_right_pix',
+            'y': 'y_right_pix',
         },
     )
 
-    custom_read_kwargs: dict[str, Any] = field(default_factory=dict)
+    custom_read_kwargs: dict[str, str] = field(
+        default_factory=lambda: {
+            'separator': '\t',
+            'null_values': '-32768.00',
+        },
+    )

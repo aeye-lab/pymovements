@@ -17,7 +17,32 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module holds all dataset definitions."""
-from pymovements.datasets.definitions.gazebase import GazeBase  # noqa: F401
-from pymovements.datasets.definitions.judo1000 import JuDo1000  # noqa: F401
-from pymovements.datasets.definitions.toy_dataset import ToyDataset  # noqa: F401
+"""Test dataset library."""
+import pymovements as pm
+
+
+def test_add_single_defintion():
+    class CustomDatasetDefinition(pm.DatasetDefinition):
+        name: str = 'CustomDatasetDefinition'
+
+    pm.DatasetLibrary.add(CustomDatasetDefinition)
+    definition = pm.DatasetLibrary.get('CustomDatasetDefinition')
+
+    assert definition == CustomDatasetDefinition
+
+
+def test_add_two_defintions():
+    class CustomDatasetDefinition1(pm.DatasetDefinition):
+        name: str = 'CustomDatasetDefinition1'
+
+    class CustomDatasetDefinition2(pm.DatasetDefinition):
+        name: str = 'CustomDatasetDefinition2'
+
+    pm.DatasetLibrary.add(CustomDatasetDefinition1)
+    pm.DatasetLibrary.add(CustomDatasetDefinition2)
+
+    definition1 = pm.DatasetLibrary.get('CustomDatasetDefinition1')
+    definition2 = pm.DatasetLibrary.get('CustomDatasetDefinition2')
+
+    assert definition1 == CustomDatasetDefinition1
+    assert definition2 == CustomDatasetDefinition2
