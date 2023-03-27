@@ -42,7 +42,7 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
     def __init__(
             self,
             definition: str | DatasetDefinition | type[DatasetDefinition],
-            path: str | Path | DatasetPaths | None,
+            path: str | Path | DatasetPaths,
     ):
         """Initialize the public dataset object.
 

@@ -44,7 +44,7 @@ class Dataset:
     def __init__(
             self,
             definition: str | DatasetDefinition | type[DatasetDefinition],
-            path: str | Path | DatasetPaths | None,
+            path: str | Path | DatasetPaths,
     ):
         """Initialize the dataset object.
 
@@ -66,9 +66,7 @@ class Dataset:
             definition = definition()
         self.definition = deepcopy(definition)
 
-        if path is None:
-            self.paths = DatasetPaths()
-        elif isinstance(path, (str, Path)):
+        if isinstance(path, (str, Path)):
             self.paths = DatasetPaths(root=path, dataset='.')
         else:
             self.paths = deepcopy(path)
