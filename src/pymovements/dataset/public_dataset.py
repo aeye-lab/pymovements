@@ -26,7 +26,6 @@ from urllib.error import URLError
 
 from pymovements.dataset.dataset import Dataset
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.utils.archives import extract_archive
 from pymovements.utils.downloads import download_file
 
@@ -61,6 +60,8 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
 
         Parameters
         ----------
+        definition : str, DatasetDefinition
+            Dataset definition to initialize dataset with.
         root : str, Path
             Path to the root directory of the dataset.
         dataset_dirname : str, optional
@@ -80,28 +81,14 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
             Name of directory under dataset path that will be used to store event data. We advise
             the user to keep the event data separate from the original raw data. Default: `events`
         """
-        if isinstance(definition, str):
-            definition = DatasetLibrary.get(definition)()
-
-        if isinstance(definition, type):
-            definition = definition()
-
-        if dataset_dirname is None:
-            dataset_dirname = definition.name
-
         super().__init__(
+            definition=definition,
             root=root,
-            experiment=definition.experiment,
-            filename_regex=definition.filename_regex,
-            filename_regex_dtypes=definition.filename_regex_dtypes,
-            custom_read_kwargs=definition.custom_read_kwargs,
             dataset_dirname=dataset_dirname,
             raw_dirname=raw_dirname,
             preprocessed_dirname=preprocessed_dirname,
             events_dirname=events_dirname,
         )
-        self.mirrors = definition.mirrors
-        self.resources = definition.resources
         self.downloads_dirname = downloads_dirname
 
     def download(self, *, extract: bool = True, remove_finished: bool = False) -> Dataset:
@@ -137,18 +124,18 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
         PublicDataset
             Returns self, useful for method cascading.
         """
-        if len(self.mirrors) == 0:
+        if len(self.definition.mirrors) == 0:
             raise AttributeError('number of mirrors must not be zero to download dataset')
 
-        if len(self.resources) == 0:
+        if len(self.definition.resources) == 0:
             raise AttributeError('number of resources must not be zero to download dataset')
 
         self.raw_rootpath.mkdir(parents=True, exist_ok=True)
 
-        for resource in self.resources:
+        for resource in self.definition.resources:
             success = False
 
-            for mirror in self.mirrors:
+            for mirror in self.definition.mirrors:
 
                 url = f'{mirror}{resource["resource"]}'
 
@@ -195,7 +182,7 @@ class PublicDataset(Dataset, metaclass=ABCMeta):
         """
         self.raw_rootpath.mkdir(parents=True, exist_ok=True)
 
-        for resource in self.resources:
+        for resource in self.definition.resources:
             extract_archive(
                 source_path=self.downloads_rootpath / resource['filename'],
                 destination_path=self.raw_rootpath,

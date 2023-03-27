@@ -30,6 +30,7 @@ from polars.testing import assert_frame_equal
 
 from pymovements import exceptions
 from pymovements.dataset.dataset import Dataset
+from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.events.detection.engbert import microsaccades
 from pymovements.events.detection.ivt import ivt
 from pymovements.events.events import EventDataFrame
@@ -225,20 +226,24 @@ def mock_toy(rootpath, raw_fileformat, eyes):
 
     create_event_files_from_fileinfo(event_dfs, fileinfo, rootpath / 'events')
 
+    dataset_definition = DatasetDefinition(
+        experiment=Experiment(
+            screen_width_px=1280,
+            screen_height_px=1024,
+            screen_width_cm=38,
+            screen_height_cm=30.2,
+            distance_cm=68,
+            origin='lower left',
+            sampling_rate=1000,
+        ),
+        filename_regex=r'(?P<subject_id>\d+).' + raw_fileformat,
+        filename_regex_dtypes={'subject_id': pl.Int64},
+    )
+
     return {
         'init_kwargs': {
+            'definition': dataset_definition,
             'root': rootpath,
-            'experiment': Experiment(
-                screen_width_px=1280,
-                screen_height_px=1024,
-                screen_width_cm=38,
-                screen_height_cm=30.2,
-                distance_cm=68,
-                origin='lower left',
-                sampling_rate=1000,
-            ),
-            'filename_regex': r'(?P<subject_id>\d+).' + raw_fileformat,
-            'filename_regex_dtypes': {'subject_id': pl.Int64},
         },
         'fileinfo': fileinfo,
         'raw_gaze_dfs': gaze_dfs,
@@ -326,26 +331,6 @@ def test_load_subset(subset, fileinfo_idx, dataset_configuration):
     expected_fileinfo = expected_fileinfo[fileinfo_idx]
 
     assert_frame_equal(dataset.fileinfo, expected_fileinfo)
-
-
-@pytest.mark.parametrize(
-    'init_kwargs, exception',
-    [
-        pytest.param(
-            {'root': 'data', 'filename_regex': None},
-            ValueError,
-            id='filename_regex_none_value',
-        ),
-        pytest.param(
-            {'root': 'data', 'filename_regex': 1},
-            TypeError,
-            id='filename_regex_wrong_type',
-        ),
-    ],
-)
-def test_init_exceptions(init_kwargs, exception):
-    with pytest.raises(exception):
-        Dataset(**init_kwargs)
 
 
 @pytest.mark.parametrize(
@@ -718,7 +703,7 @@ def test_detect_events_attribute_error(dataset_configuration):
     ],
 )
 def test_clear_events(events_init, events_expected):
-    dataset = Dataset(root='data')
+    dataset = Dataset('ToyDataset', root='data')
     dataset.events = events_init
     dataset.clear_events()
 
@@ -1067,7 +1052,7 @@ def test_save_files_have_correct_extension(
     ],
 )
 def test_paths(init_kwargs, expected_paths):
-    dataset = Dataset(**init_kwargs)
+    dataset = Dataset('ToyDataset', **init_kwargs)
 
     assert dataset.root == expected_paths['root']
     assert dataset.path == expected_paths['path']
@@ -1084,7 +1069,7 @@ def test_paths(init_kwargs, expected_paths):
     ],
 )
 def test_check_fileinfo(new_fileinfo, exception):
-    dataset = Dataset('data')
+    dataset = Dataset('ToyDataset', root='data')
 
     dataset.fileinfo = new_fileinfo
 
@@ -1100,7 +1085,7 @@ def test_check_fileinfo(new_fileinfo, exception):
     ],
 )
 def test_check_gaze_dataframe(new_gaze, exception):
-    dataset = Dataset('data')
+    dataset = Dataset('ToyDataset', root='data')
 
     dataset.gaze = new_gaze
 
@@ -1110,7 +1095,7 @@ def test_check_gaze_dataframe(new_gaze, exception):
 
 @pytest.mark.parametrize('dataset_configuration', ['ToyBino'], indirect=['dataset_configuration'])
 def test_check_experiment(dataset_configuration):
-    dataset_configuration['init_kwargs'].pop('experiment')
+    dataset_configuration['init_kwargs']['definition'].experiment = None
     dataset = Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
 
