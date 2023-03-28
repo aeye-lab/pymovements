@@ -52,7 +52,8 @@ def test_main_sequence_plot_show_plot(input_df, show, monkeypatch):
     monkeypatch.setattr(plt, 'show', mock_show)
     monkeypatch.setattr(plt, 'scatter', mock_scatter)
 
-    main_sequence_plot(input_df, show=show, savepath='mock')
+    main_sequence_plot(input_df, show=show)
+    plt.close()
 
     mock_scatter.assert_called_with(
         [1.0, 1.0, 2.0, 2.0, 3.0, 4.0],
@@ -85,7 +86,8 @@ def test_main_sequence_plot_filter_out_fixations(input_df, monkeypatch):
 
     monkeypatch.setattr(plt, 'scatter', mock_scatter)
 
-    main_sequence_plot(input_df, show=False, savepath='mock')
+    main_sequence_plot(input_df, show=False)
+    plt.close()
 
     mock_scatter.assert_called_with(
         [1.0, 1.0, 2.0, 2.0, 3.0],
