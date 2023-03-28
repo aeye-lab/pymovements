@@ -22,50 +22,58 @@ from pathlib import Path
 
 import pytest
 
-from pymovements.dataset.public_dataset import PublicDataset
-from pymovements.datasets import JuDo1000
+import pymovements as pm
 
 
 @pytest.mark.parametrize(
-    'init_kwargs, expected_paths',
+    'init_path, expected_paths',
     [
         pytest.param(
-            {'root': '/data/set/path'},
+            '/data/set/path',
             {
                 'root': Path('/data/set/path/'),
-                'path': Path('/data/set/path/JuDo1000'),
-                'download': Path('/data/set/path/JuDo1000/downloads'),
-            },
-        ),
-        pytest.param(
-            {'root': '/data/set/path', 'dataset_dirname': '.'},
-            {
-                'root': Path('/data/set/path/'),
-                'path': Path('/data/set/path/'),
+                'dataset': Path('/data/set/path/'),
                 'download': Path('/data/set/path/downloads'),
             },
         ),
         pytest.param(
-            {'root': '/data/set/path', 'dataset_dirname': 'dataset'},
+            pm.DatasetPaths(root='/data/set/path'),
             {
                 'root': Path('/data/set/path/'),
-                'path': Path('/data/set/path/dataset'),
+                'dataset': Path('/data/set/path/JuDo1000'),
+                'download': Path('/data/set/path/JuDo1000/downloads'),
+            },
+        ),
+        pytest.param(
+            pm.DatasetPaths(root='/data/set/path', dataset='.'),
+            {
+                'root': Path('/data/set/path/'),
+                'dataset': Path('/data/set/path/'),
+                'download': Path('/data/set/path/downloads'),
+            },
+        ),
+        pytest.param(
+            pm.DatasetPaths(root='/data/set/path', dataset='dataset'),
+            {
+                'root': Path('/data/set/path/'),
+                'dataset': Path('/data/set/path/dataset'),
                 'download': Path('/data/set/path/dataset/downloads'),
             },
         ),
         pytest.param(
-            {'root': '/data/set/path', 'downloads_dirname': 'custom_download_dirname'},
+            pm.DatasetPaths(root='/data/set/path', downloads='custom_downloads'),
             {
                 'root': Path('/data/set/path/'),
-                'path': Path('/data/set/path/JuDo1000'),
-                'download': Path('/data/set/path/JuDo1000/custom_download_dirname'),
+                'dataset': Path('/data/set/path/JuDo1000'),
+                'download': Path('/data/set/path/JuDo1000/custom_downloads'),
             },
         ),
     ],
 )
-def test_paths(init_kwargs, expected_paths):
-    dataset = PublicDataset(JuDo1000, **init_kwargs)
+def test_paths(init_path, expected_paths):
+    dataset = pm.PublicDataset(pm.datasets.JuDo1000, path=init_path)
 
-    assert dataset.root == expected_paths['root']
-    assert dataset.path == expected_paths['path']
-    assert dataset.downloads_rootpath == expected_paths['download']
+    assert dataset.paths.root == expected_paths['root']
+    assert dataset.path == expected_paths['dataset']
+    assert dataset.paths.dataset == expected_paths['dataset']
+    assert dataset.paths.downloads == expected_paths['download']

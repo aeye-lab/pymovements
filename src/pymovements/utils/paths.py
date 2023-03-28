@@ -110,8 +110,12 @@ def match_filepaths(
         If ``path`` does not point to a directory.
     """
     path = Path(path)
+
+    if not path.exists():
+        raise ValueError(f'path does not exist (path = {path})')
+
     if not path.is_dir():
-        raise ValueError(f'path must point to a directory, but points to a file (path = {path})')
+        raise ValueError(f'path must point to a directory (path = {path})')
 
     if relative and relative_anchor is None:
         relative_anchor = path
