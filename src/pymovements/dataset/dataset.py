@@ -20,14 +20,13 @@
 """This module provides the base dataset class."""
 from __future__ import annotations
 
-import re
 from copy import deepcopy
 from pathlib import Path
-from typing import Any
 
 import polars as pl
 from tqdm.auto import tqdm
 
+from pymovements.dataset import dataset_files
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_paths import DatasetPaths
@@ -35,7 +34,6 @@ from pymovements.events.event_processing import EventGazeProcessor
 from pymovements.events.events import EventDataFrame
 from pymovements.events.events import EventDetectionCallable
 from pymovements.gaze import GazeDataFrame
-from pymovements.utils.paths import match_filepaths
 
 
 class Dataset:
@@ -95,7 +93,7 @@ class Dataset:
             If ``True``, load previously saved preprocessed data, otherwise load raw data.
         subset : dict, optional
             If specified, load only a subset of the dataset. All keys in the dictionary must be
-            present in the fileinfo dataframe inferred by `infer_fileinfo()`. Values can be either
+            present in the fileinfo dataframe inferred by `scan()`. Values can be either
             float, int , str or a list of these.
         events_dirname : str
             One-time usage of an alternative directory name to save data relative to
@@ -116,28 +114,29 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
-        fileinfo = self.infer_fileinfo()
-        self.fileinfo = self.take_subset(fileinfo=fileinfo, subset=subset)
-        self.gaze = self.load_gaze_files(
+        self.scan()
+        self.fileinfo = dataset_files.take_subset(fileinfo=self.fileinfo, subset=subset)
+
+        self.load_gaze_files(
             preprocessed=preprocessed, preprocessed_dirname=preprocessed_dirname,
             extension=extension,
         )
 
         if events:
-            self.events = self.load_event_files(
+            self.load_event_files(
                 events_dirname=events_dirname,
                 extension=extension,
             )
 
         return self
 
-    def infer_fileinfo(self) -> pl.DataFrame:
+    def scan(self) -> Dataset:
         """Infer information from filepaths and filenames.
 
         Returns
         -------
-        pl.DataFrame :
-            File information dataframe.
+        Dataset
+            Returns self, useful for method cascading.
 
         Raises
         ------
@@ -146,98 +145,15 @@ class Dataset:
         RuntimeError
             If an error occurred during matching filenames or no files have been found.
         """
-        # Get all filepaths that match regular expression.
-        fileinfo_dicts = match_filepaths(
-            path=self.paths.raw,
-            regex=re.compile(self.definition.filename_regex),
-            relative=True,
-        )
-
-        if len(fileinfo_dicts) == 0:
-            raise RuntimeError(f'no matching files found in {self.paths.raw}')
-
-        # Create dataframe from all fileinfo records.
-        fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
-        fileinfo_df = fileinfo_df.sort(by='filepath')
-
-        fileinfo_df = fileinfo_df.with_columns([
-            pl.col(fileinfo_key).cast(fileinfo_dtype)
-            for fileinfo_key, fileinfo_dtype in self.definition.filename_regex_dtypes.items()
-        ])
-
-        return fileinfo_df
-
-    @staticmethod
-    def take_subset(
-            fileinfo: pl.DataFrame,
-            subset: None | dict[
-                str, bool | float | int | str | list[bool | float | int | str],
-            ] = None,
-    ) -> pl.DataFrame:
-        """Take a subset of the dataset.
-
-        Calling this method will alter the fileinfo attribute.
-
-        Parameters
-        ----------
-        fileinfo : pl.DataFrame
-            File information dataframe.
-        subset : dict, optional
-            If specified, take a subset of the dataset. All keys in the dictionary must be
-            present in the fileinfo dataframe inferred by `infer_fileinfo()`. Values can be either
-            bool, float, int , str or a list of these.
-
-        Returns
-        -------
-        pl.DataFrame:
-            Subset of file information dataframe.
-
-        Raises
-        ------
-        ValueError
-            If dictionary key is not a column in the fileinfo dataframe.
-        TypeError
-            If dictionary key or value is not of valid type.
-
-        """
-        if subset is None:
-            return fileinfo
-
-        if not isinstance(subset, dict):
-            raise TypeError(f'subset must be of type dict but is of type {type(subset)}')
-
-        for subset_key, subset_value in subset.items():
-            if not isinstance(subset_key, str):
-                raise TypeError(
-                    f'subset keys must be of type str but key {subset_key} is of type'
-                    f' {type(subset_key)}',
-                )
-
-            if subset_key not in fileinfo.columns:
-                raise ValueError(
-                    f'subset key {subset_key} must be a column in the fileinfo attribute.'
-                    f' Available columns are: {fileinfo.columns}',
-                )
-
-            if isinstance(subset_value, (bool, float, int, str)):
-                column_values = [subset_value]
-            elif isinstance(subset_value, (list, tuple)):
-                column_values = subset_value
-            else:
-                raise TypeError(
-                    f'subset value must be of type bool, float, int, str or a list of these but'
-                    f' key-value pair {subset_key}: {subset_value} is of type {type(subset_value)}',
-                )
-
-            fileinfo = fileinfo.filter(pl.col(subset_key).is_in(column_values))
-        return fileinfo
+        self.fileinfo = dataset_files.scan_dataset(definition=self.definition, paths=self.paths)
+        return self
 
     def load_gaze_files(
             self,
             preprocessed: bool = False,
             preprocessed_dirname: str | None = None,
             extension: str = 'feather',
-    ) -> list[GazeDataFrame]:
+    ) -> Dataset:
         """Load all available gaze data files.
 
         Parameters
@@ -255,8 +171,8 @@ class Dataset:
 
         Returns
         -------
-        list[GazeDataFrame]
-            List of gaze dataframes.
+        Dataset
+            Returns self, useful for method cascading.
 
         Raises
         ------
@@ -266,42 +182,21 @@ class Dataset:
             If file type of gaze file is not supported.
         """
         self._check_fileinfo()
-
-        gaze_dfs: list[GazeDataFrame] = []
-
-        # Read gaze files from fileinfo attribute.
-        for fileinfo in tqdm(self.fileinfo.to_dicts()):
-            filepath = Path(fileinfo['filepath'])
-            filepath = self.paths.raw / filepath
-
-            if preprocessed:
-                filepath = self.paths.get_preprocessed_filepath(
-                    filepath, preprocessed_dirname=preprocessed_dirname,
-                    extension=extension,
-                )
-
-            if filepath.suffix == '.csv':
-                if preprocessed:
-                    gaze_df = pl.read_csv(filepath)
-                else:
-                    gaze_df = pl.read_csv(filepath, **self.definition.custom_read_kwargs)
-            elif filepath.suffix == '.feather':
-                gaze_df = pl.read_ipc(filepath)
-            else:
-                raise RuntimeError(f'data files of type {filepath.suffix} are not supported')
-
-            # Add fileinfo columns to dataframe.
-            gaze_df = self._add_fileinfo(gaze_df, fileinfo)
-
-            gaze_dfs.append(GazeDataFrame(gaze_df, experiment=self.definition.experiment))
-
-        return gaze_dfs
+        self.gaze = dataset_files.load_gaze_files(
+            definition=self.definition,
+            fileinfo=self.fileinfo,
+            paths=self.paths,
+            preprocessed=preprocessed,
+            preprocessed_dirname=preprocessed_dirname,
+            extension=extension,
+        )
+        return self
 
     def load_event_files(
         self,
         events_dirname: str | None = None,
         extension: str = 'feather',
-    ) -> list[EventDataFrame]:
+    ) -> Dataset:
         """Load all available event files.
 
         Parameters
@@ -328,36 +223,14 @@ class Dataset:
             If extension is not in list of valid extensions.
         """
         self._check_fileinfo()
-
-        event_dfs: list[EventDataFrame] = []
-
-        # read and preprocess input files
-        for fileinfo in tqdm(self.fileinfo.to_dicts()):
-            filepath = Path(fileinfo['filepath'])
-            filepath = self.paths.raw / filepath
-
-            filepath = self.paths.raw_to_event_filepath(
-                filepath, events_dirname=events_dirname,
-                extension=extension,
-            )
-
-            if extension == 'feather':
-                event_df = pl.read_ipc(filepath)
-            elif extension == 'csv':
-                event_df = pl.read_csv(filepath)
-            else:
-                valid_extensions = ['csv', 'feather']
-                raise ValueError(
-                    f'unsupported file format "{extension}".'
-                    f'Supported formats are: {valid_extensions}',
-                )
-
-            # Add fileinfo columns to dataframe.
-            event_df = self._add_fileinfo(event_df, fileinfo)
-
-            event_dfs.append(EventDataFrame(event_df))
-
-        return event_dfs
+        self.events = dataset_files.load_event_files(
+            definition=self.definition,
+            fileinfo=self.fileinfo,
+            paths=self.paths,
+            events_dirname=events_dirname,
+            extension=extension,
+        )
+        return self
 
     def pix2deg(self, verbose: bool = True) -> Dataset:
         """Compute gaze positions in degrees of visual angle from pixel coordinates.
@@ -495,7 +368,7 @@ class Dataset:
 
         event_dfs: list[EventDataFrame] = []
 
-        for gaze_df, fileinfo in tqdm(
+        for gaze_df, fileinfo_row in tqdm(
                 zip(self.gaze, self.fileinfo.to_dicts()), disable=disable_progressbar,
         ):
 
@@ -507,7 +380,11 @@ class Dataset:
                 positions=positions, velocities=velocities, timesteps=timesteps, **kwargs,
             )
 
-            event_df.frame = self._add_fileinfo(event_df.frame, fileinfo)
+            event_df.frame = dataset_files.add_fileinfo(
+                definition=self.definition,
+                df=event_df.frame,
+                fileinfo=fileinfo_row,
+            )
             event_dfs.append(event_df)
 
         if not self.events or clear:
@@ -614,9 +491,10 @@ class Dataset:
         return self
 
     def save_events(
-        self, events_dirname: str | None = None,
-        verbose: int = 1,
-        extension: str = 'feather',
+            self,
+            events_dirname: str | None = None,
+            verbose: int = 1,
+            extension: str = 'feather',
     ) -> Dataset:
         """Save events to files.
 
@@ -645,40 +523,21 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
-        disable_progressbar = not verbose
-
-        for file_id, event_df in enumerate(tqdm(self.events, disable=disable_progressbar)):
-            raw_filepath = self.paths.raw / Path(self.fileinfo[file_id, 'filepath'])
-            events_filepath = self.paths.raw_to_event_filepath(
-                raw_filepath, events_dirname=events_dirname,
-                extension=extension,
-            )
-
-            event_df_out = event_df.frame.clone()
-            for column in event_df_out.columns:
-                if column in self.fileinfo.columns:
-                    event_df_out = event_df_out.drop(column)
-
-            if verbose >= 2:
-                print('Save file to', events_filepath)
-
-            events_filepath.parent.mkdir(parents=True, exist_ok=True)
-            if extension == 'feather':
-                event_df_out.write_ipc(events_filepath)
-            elif extension == 'csv':
-                event_df_out.write_csv(events_filepath)
-            else:
-                valid_extensions = ['csv', 'feather']
-                raise ValueError(
-                    f'unsupported file format "{extension}".'
-                    f'Supported formats are: {valid_extensions}',
-                )
+        dataset_files.save_events(
+            events=self.events,
+            fileinfo=self.fileinfo,
+            paths=self.paths,
+            events_dirname=events_dirname,
+            verbose=verbose,
+            extension=extension,
+        )
         return self
 
     def save_preprocessed(
-        self, preprocessed_dirname: str | None = None,
-        verbose: int = 1,
-        extension: str = 'feather',
+            self,
+            preprocessed_dirname: str | None = None,
+            verbose: int = 1,
+            extension: str = 'feather',
     ) -> Dataset:
         """Save preprocessed gaze files.
 
@@ -707,34 +566,14 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
-        disable_progressbar = not verbose
-
-        for file_id, gaze_df in enumerate(tqdm(self.gaze, disable=disable_progressbar)):
-            raw_filepath = self.paths.raw / Path(self.fileinfo[file_id, 'filepath'])
-            preprocessed_filepath = self.paths.get_preprocessed_filepath(
-                raw_filepath, preprocessed_dirname=preprocessed_dirname,
-                extension=extension,
-            )
-
-            gaze_df_out = gaze_df.frame.clone()
-            for column in gaze_df.columns:
-                if column in self.fileinfo.columns:
-                    gaze_df_out = gaze_df_out.drop(column)
-
-            if verbose >= 2:
-                print('Save file to', preprocessed_filepath)
-
-            preprocessed_filepath.parent.mkdir(parents=True, exist_ok=True)
-            if extension == 'feather':
-                gaze_df_out.write_ipc(preprocessed_filepath)
-            elif extension == 'csv':
-                gaze_df_out.write_csv(preprocessed_filepath)
-            else:
-                valid_extensions = ['csv', 'feather']
-                raise ValueError(
-                    f'unsupported file format "{extension}".'
-                    f'Supported formats are: {valid_extensions}',
-                )
+        dataset_files.save_preprocessed(
+            gaze=self.gaze,
+            fileinfo=self.fileinfo,
+            paths=self.paths,
+            preprocessed_dirname=preprocessed_dirname,
+            verbose=verbose,
+            extension=extension,
+        )
         return self
 
     @property
@@ -775,7 +614,7 @@ class Dataset:
         """Check if fileinfo attribute is set and there is at least one row present."""
         if self.fileinfo is None:
             raise AttributeError(
-                'fileinfo was not loaded yet. please run load() or infer_fileinfo() beforehand',
+                'fileinfo was not loaded yet. please run load() or scan() beforehand',
             )
         if len(self.fileinfo) == 0:
             raise AttributeError('no files present in fileinfo attribute')
@@ -786,34 +625,3 @@ class Dataset:
             raise AttributeError('gaze files were not loaded yet. please run load() beforehand')
         if len(self.gaze) == 0:
             raise AttributeError('no files present in gaze attribute')
-
-    def _add_fileinfo(self, df: pl.DataFrame, fileinfo: dict[str, Any]) -> pl.DataFrame:
-        """Add columns from fileinfo to dataframe.
-
-        Parameters
-        ----------
-        df : pl.DataFrame
-            Base dataframe to add fileinfo to.
-        fileinfo : dict[str, Any]
-            Dictionary of fileinfo row.
-
-        Returns
-        -------
-        pl.DataFrame:
-            Dataframe with added columns from fileinfo dictionary keys.
-        """
-
-        df = df.select(
-            [
-                pl.lit(value).alias(column)
-                for column, value in fileinfo.items()
-                if column != 'filepath'
-            ] + [pl.all()],
-        )
-
-        # Cast columns from fileinfo according to specification.
-        df = df.with_columns([
-            pl.col(fileinfo_key).cast(fileinfo_dtype)
-            for fileinfo_key, fileinfo_dtype in self.definition.filename_regex_dtypes.items()
-        ])
-        return df
