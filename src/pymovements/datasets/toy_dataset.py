@@ -77,7 +77,7 @@ class ToyDataset(DatasetDefinition):
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.PublicDataset("ToyDataset", path='data/ToyDataset')
+    >>> dataset = pm.Dataset("ToyDataset", path='data/ToyDataset')
 
     Download the dataset resources resources:
 

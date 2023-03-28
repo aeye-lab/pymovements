@@ -71,7 +71,7 @@ import pymovements as pm
     ],
 )
 def test_paths(init_path, expected_paths):
-    dataset = pm.PublicDataset(pm.datasets.ToyDataset, path=init_path)
+    dataset = pm.Dataset(pm.datasets.ToyDataset, path=init_path)
 
     assert dataset.paths.root == expected_paths['root']
     assert dataset.path == expected_paths['dataset']
