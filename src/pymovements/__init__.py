@@ -27,6 +27,7 @@ from pymovements import utils  # noqa: F401
 from pymovements.dataset import Dataset  # noqa: F401
 from pymovements.dataset import DatasetDefinition  # noqa: F401
 from pymovements.dataset import DatasetLibrary  # noqa: F401
+from pymovements.dataset import DatasetPaths  # noqa: F401
 from pymovements.dataset import PublicDataset  # noqa: F401
 from pymovements.dataset import register_dataset  # noqa: F401
 from pymovements.gaze.experiment import Experiment  # noqa: F401

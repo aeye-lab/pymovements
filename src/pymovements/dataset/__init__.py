@@ -28,10 +28,12 @@
     pymovements.dataset.Dataset
     pymovements.dataset.DatasetDefinition
     pymovements.dataset.DatasetLibrary
+    pymovements.dataset.DatasetPaths
     pymovements.dataset.PublicDataset
 """
 from pymovements.dataset.dataset import Dataset  # noqa: F401
 from pymovements.dataset.dataset_definition import DatasetDefinition  # noqa: F401
 from pymovements.dataset.dataset_library import DatasetLibrary  # noqa: F401
 from pymovements.dataset.dataset_library import register_dataset  # noqa: F401
+from pymovements.dataset.dataset_paths import DatasetPaths  # noqa: F401
 from pymovements.dataset.public_dataset import PublicDataset  # noqa: F401
