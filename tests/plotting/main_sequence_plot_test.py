@@ -140,7 +140,8 @@ def test_main_sequence_plot_not_show(input_df, show, monkeypatch):
                 },
             ),
             ValueError,
-            'There are no saccades in the event dataframe. Please make sure you ran a saccade detection algorithm. '
+            'There are no saccades in the event dataframe. '
+            'Please make sure you ran a saccade detection algorithm. '
             'The event name should be stored in a colum called "name".',
             id='no_saccades_in_event_df',
         ),
