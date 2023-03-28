@@ -46,11 +46,53 @@ from pymovements.plotting.main_sequence_plot import main_sequence_plot
     ],
 )
 def test_main_sequence_plot_show_plot(input_df, show, monkeypatch):
-    mock = Mock()
-    monkeypatch.setattr(plt, 'show', mock)
-    main_sequence_plot(input_df, show=show)
-    plt.close()
-    mock.assert_called_once()
+    mock_show = Mock()
+    mock_scatter = Mock()
+
+    monkeypatch.setattr(plt, 'show', mock_show)
+    monkeypatch.setattr(plt, 'scatter', mock_scatter)
+
+    main_sequence_plot(input_df, show=show, savepath='mock')
+
+    mock_scatter.assert_called_with(
+        [1.0, 1.0, 2.0, 2.0, 3.0, 4.0],
+        [10.0, 11.0, 12.0, 11.0, 13.0, 13.0],
+        color='purple',
+        alpha=0.5,
+    )
+
+    mock_show.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    'input_df',
+    [
+        pytest.param(
+            pl.DataFrame(
+                {
+                    'amplitude': [1.0, 1.0, 2.0, 2.0, 3.0, 4.0],
+                    'peak_velocity': [10.0, 11.0, 12.0, 11.0, 13.0, 13.0],
+                    'name': ['saccade' for _ in range(5)] + ['fixation'],
+
+                },
+            ),
+            id='filter_out_fixations',
+        ),
+    ],
+)
+def test_main_sequence_plot_filter_out_fixations(input_df, monkeypatch):
+    mock_scatter = Mock()
+
+    monkeypatch.setattr(plt, 'scatter', mock_scatter)
+
+    main_sequence_plot(input_df, show=False, savepath='mock')
+
+    mock_scatter.assert_called_with(
+        [1.0, 1.0, 2.0, 2.0, 3.0],
+        [10.0, 11.0, 12.0, 11.0, 13.0],
+        color='purple',
+        alpha=0.5,
+    )
 
 
 @pytest.mark.parametrize(
@@ -70,11 +112,11 @@ def test_main_sequence_plot_show_plot(input_df, show, monkeypatch):
     ],
 )
 def test_main_sequence_plot_save_path(input_df, monkeypatch):
-    mock = Mock()
-    monkeypatch.setattr(plt.Figure, 'savefig', mock)
+    mock_function = Mock()
+    monkeypatch.setattr(plt.Figure, 'savefig', mock_function)
     main_sequence_plot(input_df, show=False, savepath='mock')
     plt.close()
-    mock.assert_called_once()
+    mock_function.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -94,11 +136,11 @@ def test_main_sequence_plot_save_path(input_df, monkeypatch):
     ],
 )
 def test_main_sequence_plot_not_show(input_df, show, monkeypatch):
-    mock = Mock()
-    monkeypatch.setattr(plt, 'show', mock)
+    mock_function = Mock()
+    monkeypatch.setattr(plt, 'show', mock_function)
     main_sequence_plot(input_df, show=show)
     plt.close()
-    mock.assert_not_called()
+    mock_function.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -147,7 +189,7 @@ def test_main_sequence_plot_not_show(input_df, show, monkeypatch):
         ),
     ],
 )
-def test_main_sequence_plot_not_show_plot(input_df, expected_error, error_msg):
+def test_main_sequence_plot_error(input_df, expected_error, error_msg):
     with pytest.raises(expected_error) as actual_error:
         main_sequence_plot(input_df)
 
