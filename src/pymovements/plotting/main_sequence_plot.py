@@ -58,11 +58,15 @@ def main_sequence_plot(
     ValueError
         If the event dataframe does not contain any saccades.
     """
-    saccades = data.filter(pl.col('name') == 'saccade')
+    event_col_name = 'name'
+    saccades = data.filter(pl.col(event_col_name) == 'saccade')
 
     if saccades.is_empty():
-        raise ValueError('There are no saccades in the event dataframe. '
-                         'Make sure you can the saccades detection algorithm and saved the events.')
+        raise ValueError(
+            'There are no saccades in the event dataframe. '
+            'Please make sure you ran a saccade detection algorithm. '
+            f'The event name should be stored in a colum called "{event_col_name}".',
+        )
 
     try:
         peak_velocities = saccades['peak_velocity'].to_list()
