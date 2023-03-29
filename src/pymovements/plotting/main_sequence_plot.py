@@ -26,9 +26,11 @@ import matplotlib.pyplot as plt
 import polars as pl
 from polars import ColumnNotFoundError
 
+from pymovements.events import EventDataFrame
+
 
 def main_sequence_plot(
-        data: pl.DataFrame,
+        event_df: EventDataFrame,
         figsize: tuple[int, int] = (15, 5),
         title: str | None = None,
         savepath: str | None = None,
@@ -39,8 +41,8 @@ def main_sequence_plot(
 
     Parameters
     ----------
-    data:
-        Data frame. It must contain columns "peak_velocity" and "amplitude".
+    event_df:
+        Event dataframe. It must contain columns "peak_velocity" and "amplitude".
     figsize: tuple
         Figure size.
     title: str, optional
@@ -59,7 +61,7 @@ def main_sequence_plot(
         If the event dataframe does not contain any saccades.
     """
     event_col_name = 'name'
-    saccades = data.filter(pl.col(event_col_name) == 'saccade')
+    saccades = event_df.frame.filter(pl.col(event_col_name) == 'saccade')
 
     if saccades.is_empty():
         raise ValueError(
