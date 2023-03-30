@@ -17,27 +17,19 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides an interface to the pymovements example toy dataset."""
+"""DatasetDefinition module."""
 from __future__ import annotations
 
 from dataclasses import dataclass
 from dataclasses import field
+from typing import Any
 
-from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.dataset_library import register_dataset
 from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
-@register_dataset
-class ToyDataset(DatasetDefinition):
-    """Example toy dataset.
-
-    This dataset includes monocular eye tracking data from a single participants in a single
-    session. Eye movements are recorded at a sampling frequency of 1000 Hz using an EyeLink Portable
-    Duo video-based eye tracker and are provided as pixel coordinates.
-
-    The participant is instructed to read 4 texts with 5 screens each.
+class DatasetDefinition:
+    """Definition to initialize a :py:class:`~pymovements.Dataset`.
 
     Attributes
     ----------
@@ -69,71 +61,24 @@ class ToyDataset(DatasetDefinition):
 
     custom_read_kwargs : dict[str, Any], optional
         If specified, these keyword arguments will be passed to the file reading function.
-
-    Examples
-    --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.ToyDataset` definition:
-
-    >>> import pymovements as pm
-    >>>
-    >>> dataset = pm.Dataset("ToyDataset", path='data/ToyDataset')
-
-    Download the dataset resources resources:
-
-    >>> dataset.download()# doctest: +SKIP
-
-    Load the data into memory:
-
-    >>> dataset.load()# doctest: +SKIP
     """
-    # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    name: str = '.'
 
-    name: str = 'ToyDataset'
+    mirrors: tuple[str, ...] = field(default_factory=tuple)
 
-    mirrors: tuple[str, ...] = (
-        'http://github.com/aeye-lab/pymovements-toy-dataset/zipball/',
-    )
+    resources: tuple[dict[str, str], ...] = field(default_factory=tuple)
 
-    resources: tuple[dict[str, str], ...] = (
-        {
-            'resource': '6cb5d663317bf418cec0c9abe1dde5085a8a8ebd/',
-            'filename': 'pymovements-toy-dataset.zip',
-            'md5': '4da622457637a8181d86601fe17f3aa8',
-        },
-    )
+    experiment: Experiment | None = None
 
-    experiment: Experiment = Experiment(
-        screen_width_px=1280,
-        screen_height_px=1024,
-        screen_width_cm=38,
-        screen_height_cm=30.2,
-        distance_cm=68,
-        origin='lower left',
-        sampling_rate=1000,
-    )
+    filename_regex: str = '.*'
 
-    filename_regex: str = r'trial_(?P<text_id>\d+)_(?P<page_id>\d+).csv'
+    filename_regex_dtypes: dict[str, type] = field(default_factory=dict)
 
-    filename_regex_dtypes: dict[str, type] = field(
-        default_factory=lambda: {
-            'text_id': int,
-            'page_id': int,
-        },
-    )
+    custom_read_kwargs: dict[str, Any] = field(default_factory=dict)
 
-    column_map: dict[str, str] = field(
-        default_factory=lambda: {
-            'timestamp': 'time',
-            'x': 'x_right_pix',
-            'y': 'y_right_pix',
-        },
-    )
+    column_map: dict[str, str] = field(default_factory=dict)
 
-    custom_read_kwargs: dict[str, str] = field(
-        default_factory=lambda: {
-            'separator': '\t',
-            'null_values': '-32768.00',
-        },
-    )
+    def __post_init__(self):
+        if len(self.column_map) > 0:
+            self.custom_read_kwargs['columns'] = list(self.column_map.keys())
+            self.custom_read_kwargs['new_columns'] = list(self.column_map.values())

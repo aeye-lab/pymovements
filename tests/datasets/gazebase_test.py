@@ -17,54 +17,63 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test all functionality in pymovements.datasets.gazebase."""
+"""Test all functionality in pymovements.dataset.gazebase."""
 from pathlib import Path
 
 import pytest
 
-from pymovements.datasets.gazebase import GazeBase
+import pymovements as pm
 
 
 @pytest.mark.parametrize(
-    'init_kwargs, expected_paths',
+    'init_path, expected_paths',
     [
         pytest.param(
-            {'root': '/data/set/path'},
+            '/data/set/path',
             {
                 'root': Path('/data/set/path/'),
-                'path': Path('/data/set/path/GazeBase'),
-                'download': Path('/data/set/path/GazeBase/downloads'),
-            },
-        ),
-        pytest.param(
-            {'root': '/data/set/path', 'dataset_dirname': '.'},
-            {
-                'root': Path('/data/set/path/'),
-                'path': Path('/data/set/path/'),
+                'dataset': Path('/data/set/path/'),
                 'download': Path('/data/set/path/downloads'),
             },
         ),
         pytest.param(
-            {'root': '/data/set/path', 'dataset_dirname': 'dataset'},
+            pm.DatasetPaths(root='/data/set/path'),
             {
                 'root': Path('/data/set/path/'),
-                'path': Path('/data/set/path/dataset'),
+                'dataset': Path('/data/set/path/GazeBase'),
+                'download': Path('/data/set/path/GazeBase/downloads'),
+            },
+        ),
+        pytest.param(
+            pm.DatasetPaths(root='/data/set/path', dataset='.'),
+            {
+                'root': Path('/data/set/path/'),
+                'dataset': Path('/data/set/path/'),
+                'download': Path('/data/set/path/downloads'),
+            },
+        ),
+        pytest.param(
+            pm.DatasetPaths(root='/data/set/path', dataset='dataset'),
+            {
+                'root': Path('/data/set/path/'),
+                'dataset': Path('/data/set/path/dataset'),
                 'download': Path('/data/set/path/dataset/downloads'),
             },
         ),
         pytest.param(
-            {'root': '/data/set/path', 'downloads_dirname': 'custom_download_dirname'},
+            pm.DatasetPaths(root='/data/set/path', downloads='custom_downloads'),
             {
                 'root': Path('/data/set/path/'),
-                'path': Path('/data/set/path/GazeBase'),
-                'download': Path('/data/set/path/GazeBase/custom_download_dirname'),
+                'dataset': Path('/data/set/path/GazeBase'),
+                'download': Path('/data/set/path/GazeBase/custom_downloads'),
             },
         ),
     ],
 )
-def test_paths(init_kwargs, expected_paths):
-    dataset = GazeBase(**init_kwargs)
+def test_paths(init_path, expected_paths):
+    dataset = pm.Dataset(pm.datasets.GazeBase, path=init_path)
 
-    assert dataset.root == expected_paths['root']
-    assert dataset.path == expected_paths['path']
-    assert dataset.downloads_rootpath == expected_paths['download']
+    assert dataset.paths.root == expected_paths['root']
+    assert dataset.path == expected_paths['dataset']
+    assert dataset.paths.dataset == expected_paths['dataset']
+    assert dataset.paths.downloads == expected_paths['download']

@@ -17,17 +17,21 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides access to all submodules."""
-from pymovements import datasets  # noqa: F401
-from pymovements import events  # noqa: F401
-from pymovements import gaze  # noqa: F401
-from pymovements import plotting  # noqa: F401
-from pymovements import synthetic  # noqa: F401
-from pymovements import utils  # noqa: F401
-from pymovements.dataset import Dataset  # noqa: F401
-from pymovements.dataset import DatasetDefinition  # noqa: F401
-from pymovements.dataset import DatasetLibrary  # noqa: F401
-from pymovements.dataset import DatasetPaths  # noqa: F401
-from pymovements.dataset import register_dataset  # noqa: F401
-from pymovements.gaze.experiment import Experiment  # noqa: F401
-from pymovements.gaze.screen import Screen  # noqa: F401
+"""This module provides access to dataset classes.
+
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :template: class.rst
+
+    pymovements.dataset.Dataset
+    pymovements.dataset.DatasetDefinition
+    pymovements.dataset.DatasetLibrary
+    pymovements.dataset.DatasetPaths
+"""
+from pymovements.dataset.dataset import Dataset  # noqa: F401
+from pymovements.dataset.dataset_definition import DatasetDefinition  # noqa: F401
+from pymovements.dataset.dataset_library import DatasetLibrary  # noqa: F401
+from pymovements.dataset.dataset_library import register_dataset  # noqa: F401
+from pymovements.dataset.dataset_paths import DatasetPaths  # noqa: F401
