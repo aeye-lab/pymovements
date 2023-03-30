@@ -25,6 +25,7 @@ import polars as pl
 import pytest
 from matplotlib import pyplot as plt
 
+from pymovements.events import EventDataFrame
 from pymovements.plotting.main_sequence_plot import main_sequence_plot
 
 
@@ -32,11 +33,15 @@ from pymovements.plotting.main_sequence_plot import main_sequence_plot
     ('input_df', 'show'),
     [
         pytest.param(
-            pl.DataFrame(
-                {
-                    'amplitude': [1.0, 1.0, 2.0, 2.0, 3.0, 4.0],
-                    'peak_velocity': [10.0, 11.0, 12.0, 11.0, 13.0, 13.0],
-                },
+            EventDataFrame(
+                pl.DataFrame(
+                    {
+                        'amplitude': [1.0, 1.0, 2.0, 2.0, 3.0, 4.0],
+                        'peak_velocity': [10.0, 11.0, 12.0, 11.0, 13.0, 13.0],
+                        'name': ['saccade' for _ in range(6)],
+
+                    },
+                ),
             ),
             True,
             id='show_plot',
@@ -44,44 +49,97 @@ from pymovements.plotting.main_sequence_plot import main_sequence_plot
     ],
 )
 def test_main_sequence_plot_show_plot(input_df, show, monkeypatch):
-    mock = Mock()
-    monkeypatch.setattr(plt, 'show', mock)
+    mock_show = Mock()
+    mock_scatter = Mock()
+
+    monkeypatch.setattr(plt, 'show', mock_show)
+    monkeypatch.setattr(plt, 'scatter', mock_scatter)
+
     main_sequence_plot(input_df, show=show)
     plt.close()
-    mock.assert_called_once()
+
+    mock_scatter.assert_called_with(
+        [1.0, 1.0, 2.0, 2.0, 3.0, 4.0],
+        [10.0, 11.0, 12.0, 11.0, 13.0, 13.0],
+        color='purple',
+        alpha=0.5,
+    )
+
+    mock_show.assert_called_once()
 
 
 @pytest.mark.parametrize(
     'input_df',
     [
         pytest.param(
-            pl.DataFrame(
-                {
-                    'amplitude': np.arange(100),
-                    'peak_velocity': np.linspace(10, 50, num=100),
-                },
+            EventDataFrame(
+                pl.DataFrame(
+                    {
+                        'amplitude': [1.0, 1.0, 2.0, 2.0, 3.0, 4.0],
+                        'peak_velocity': [10.0, 11.0, 12.0, 11.0, 13.0, 13.0],
+                        'name': ['saccade' for _ in range(5)] + ['fixation'],
+
+                    },
+                ),
+            ),
+            id='filter_out_fixations',
+        ),
+    ],
+)
+def test_main_sequence_plot_filter_out_fixations(input_df, monkeypatch):
+    mock_scatter = Mock()
+
+    monkeypatch.setattr(plt, 'scatter', mock_scatter)
+
+    main_sequence_plot(input_df, show=False)
+    plt.close()
+
+    mock_scatter.assert_called_with(
+        [1.0, 1.0, 2.0, 2.0, 3.0],
+        [10.0, 11.0, 12.0, 11.0, 13.0],
+        color='purple',
+        alpha=0.5,
+    )
+
+
+@pytest.mark.parametrize(
+    'input_df',
+    [
+        pytest.param(
+            EventDataFrame(
+                pl.DataFrame(
+                    {
+                        'amplitude': np.arange(100),
+                        'peak_velocity': np.linspace(10, 50, num=100),
+                        'name': ['saccade' for _ in range(100)],
+
+                    },
+                ),
             ),
             id='save_path',
         ),
     ],
 )
 def test_main_sequence_plot_save_path(input_df, monkeypatch):
-    mock = Mock()
-    monkeypatch.setattr(plt.Figure, 'savefig', mock)
+    mock_function = Mock()
+    monkeypatch.setattr(plt.Figure, 'savefig', mock_function)
     main_sequence_plot(input_df, show=False, savepath='mock')
     plt.close()
-    mock.assert_called_once()
+    mock_function.assert_called_once()
 
 
 @pytest.mark.parametrize(
     ('input_df', 'show'),
     [
         pytest.param(
-            pl.DataFrame(
-                {
-                    'amplitude': np.arange(100),
-                    'peak_velocity': np.linspace(10, 50, num=100),
-                },
+            EventDataFrame(
+                pl.DataFrame(
+                    {
+                        'amplitude': np.arange(100),
+                        'peak_velocity': np.linspace(10, 50, num=100),
+                        'name': ['saccade' for _ in range(100)],
+                    },
+                ),
             ),
             False,
             id='do_not_show_plot',
@@ -89,21 +147,25 @@ def test_main_sequence_plot_save_path(input_df, monkeypatch):
     ],
 )
 def test_main_sequence_plot_not_show(input_df, show, monkeypatch):
-    mock = Mock()
-    monkeypatch.setattr(plt, 'show', mock)
+    mock_function = Mock()
+    monkeypatch.setattr(plt, 'show', mock_function)
     main_sequence_plot(input_df, show=show)
     plt.close()
-    mock.assert_not_called()
+    mock_function.assert_not_called()
 
 
 @pytest.mark.parametrize(
     ('input_df', 'expected_error', 'error_msg'),
     [
         pytest.param(
-            pl.DataFrame(
-                {
-                    'peak_velocity': np.linspace(10, 50, num=100),
-                },
+            EventDataFrame(
+                pl.DataFrame(
+                    {
+                        'peak_velocity': np.linspace(10, 50, num=100),
+                        'name': ['saccade' for _ in range(100)],
+
+                    },
+                ),
             ),
             KeyError,
             'The input dataframe you provided does not contain '
@@ -112,10 +174,13 @@ def test_main_sequence_plot_not_show(input_df, show, monkeypatch):
             id='amplitude_missing',
         ),
         pytest.param(
-            pl.DataFrame(
-                {
-                    'amplitude': np.arange(100),
-                },
+            EventDataFrame(
+                pl.DataFrame(
+                    {
+                        'amplitude': np.arange(100),
+                        'name': ['saccade' for _ in range(100)],
+                    },
+                ),
             ),
             KeyError,
             'The input dataframe you provided does not contain '
@@ -123,10 +188,25 @@ def test_main_sequence_plot_not_show(input_df, show, monkeypatch):
             'the main sequence plot. ',
             id='peak_velocity_missing',
         ),
+        pytest.param(
+            EventDataFrame(
+                pl.DataFrame(
+                    {
+                        'amplitude': [1.0, 1.0],
+                        'peak_velocity': [10.0, 11.0],
+                        'name': ['fixation', 'fixation'],
+                    },
+                ),
+            ),
+            ValueError,
+            'There are no saccades in the event dataframe. '
+            'Please make sure you ran a saccade detection algorithm. '
+            'The event name should be stored in a colum called "name".',
+            id='no_saccades_in_event_df',
+        ),
     ],
 )
-def test_main_sequence_plot_not_show_plot(input_df, expected_error, error_msg):
-
+def test_main_sequence_plot_error(input_df, expected_error, error_msg):
     with pytest.raises(expected_error) as actual_error:
         main_sequence_plot(input_df)
 
