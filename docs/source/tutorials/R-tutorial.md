@@ -27,7 +27,7 @@ Access functions and data within python modules and classes via the `$` operator
 To test, you can proceed with the "pymovements in 10 minutes" tutorial,
 for example this is how you download the ToyDataset:
 ```r
-dataset = pm$PublicDataset('ToyDataset', path='data/ToyDataset')
+dataset = pm$Dataset('ToyDataset', path='data/ToyDataset')
 dataset$download()
 ```
 

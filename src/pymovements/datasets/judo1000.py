@@ -79,7 +79,7 @@ class JuDo1000(DatasetDefinition):
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.PublicDataset("JuDo1000", path='data/JuDo1000')
+    >>> dataset = pm.Dataset("JuDo1000", path='data/JuDo1000')
 
     Download the dataset resources resources:
 

@@ -211,7 +211,7 @@ class DatasetPaths:
         directory which holds all datasets with sub-directories using the registered dataset names.
         ... dataset = Dataset(
         >>> paths = pm.DatasetPaths(root='/path/to/your/dataset/', dataset='.')
-        >>> dataset = pm.PublicDataset("ToyDataset", path=paths)
+        >>> dataset = pm.Dataset("ToyDataset", path=paths)
         >>> dataset.path# doctest: +SKIP
         Path('/path/to/your/dataset')
         """
@@ -245,7 +245,7 @@ class DatasetPaths:
 
         >>> import pymovements as pm
         >>>
-        >>> dataset = pm.PublicDataset("ToyDataset", path='/path/to/your/dataset/')
+        >>> dataset = pm.Dataset("ToyDataset", path='/path/to/your/dataset/')
         >>> dataset.paths.events# doctest: +SKIP
         Path('/path/to/your/dataset/events')
 
@@ -259,7 +259,7 @@ class DatasetPaths:
         This way you can also explicitely specify the events directory name. The default is
         `events`.
         >>> paths = pm.DatasetPaths(root='/path/to/your/datasets/', events='my_events')
-        >>> dataset = pm.PublicDataset("ToyDataset", path=paths)
+        >>> dataset = pm.Dataset("ToyDataset", path=paths)
         >>> dataset.paths.events# doctest: +SKIP
         Path('/path/to/your/datasets/ToyDataset/my_events')
         """
@@ -276,7 +276,7 @@ class DatasetPaths:
 
         >>> import pymovements as pm
         >>>
-        >>> dataset = pm.PublicDataset("ToyDataset", path='/path/to/your/dataset/')
+        >>> dataset = pm.Dataset("ToyDataset", path='/path/to/your/dataset/')
         >>> dataset.paths.preprocessed# doctest: +SKIP
         Path('/path/to/your/dataset/preprocessed')
 
@@ -292,7 +292,7 @@ class DatasetPaths:
         >>> paths = pm.DatasetPaths(
         ...     root='/path/to/your/datasets/', preprocessed='my_preprocessed_data',
         ... )
-        >>> dataset = pm.PublicDataset("ToyDataset", path=paths)
+        >>> dataset = pm.Dataset("ToyDataset", path=paths)
         >>> dataset.paths.preprocessed# doctest: +SKIP
         Path('/path/to/your/datasets/ToyDataset/my_preprocessed_data')
         """
@@ -309,7 +309,7 @@ class DatasetPaths:
 
         >>> import pymovements as pm
         >>>
-        >>> dataset = pm.PublicDataset("ToyDataset", path='/path/to/your/dataset/')
+        >>> dataset = pm.Dataset("ToyDataset", path='/path/to/your/dataset/')
         >>> dataset.paths.raw# doctest: +SKIP
         Path('/path/to/your/dataset/raw')
 
@@ -322,7 +322,7 @@ class DatasetPaths:
 
         This way you can also explicitely specify the raw directory name. The default is `raw`.
         >>> paths = pm.DatasetPaths(root='/path/to/your/datasets/', raw='my_raw')
-        >>> dataset = pm.PublicDataset("ToyDataset", path=paths)
+        >>> dataset = pm.Dataset("ToyDataset", path=paths)
         >>> dataset.paths.raw# doctest: +SKIP
         Path('/path/to/your/datasets/ToyDataset/my_raw')
 
@@ -331,7 +331,7 @@ class DatasetPaths:
         and preprocessed data separated.
         ... dataset = Dataset(
         >>> paths = pm.DatasetPaths(root='/path/to/your/datasets/', raw='.')
-        >>> dataset = pm.PublicDataset("ToyDataset", path=paths)
+        >>> dataset = pm.Dataset("ToyDataset", path=paths)
         >>> dataset.paths.raw# doctest: +SKIP
         Path('/path/to/your/datasets/ToyDataset')
         """
@@ -347,7 +347,7 @@ class DatasetPaths:
         -------
         >>> import pymovements as pm
         >>>
-        >>> dataset = pm.PublicDataset("ToyDataset", path='/path/to/your/dataset/')
+        >>> dataset = pm.Dataset("ToyDataset", path='/path/to/your/dataset/')
         >>> dataset.paths.downloads# doctest: +SKIP
         Path('/path/to/your/dataset/downloads')
 
@@ -361,7 +361,7 @@ class DatasetPaths:
         This way you can also explicitely specify the download directory name. The default is
         `downloads`.
         >>> paths = pm.DatasetPaths(root='/path/to/your/datasets/', downloads='my_downloads')
-        >>> dataset = pm.PublicDataset("ToyDataset", path=paths)
+        >>> dataset = pm.Dataset("ToyDataset", path=paths)
         >>> dataset.paths.downloads# doctest: +SKIP
         Path('/path/to/your/datasets/ToyDataset/my_downloads')
         """
