@@ -86,7 +86,7 @@ class GazeBase(DatasetDefinition):
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.PublicDataset("GazeBase", path='data/GazeBase')
+    >>> dataset = pm.Dataset("GazeBase", path='data/GazeBase')
 
     Download the dataset resources resources:
 

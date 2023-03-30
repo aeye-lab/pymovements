@@ -26,6 +26,7 @@ from pathlib import Path
 import polars as pl
 from tqdm.auto import tqdm
 
+from pymovements.dataset import dataset_download
 from pymovements.dataset import dataset_files
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import DatasetLibrary
@@ -573,6 +574,67 @@ class Dataset:
             preprocessed_dirname=preprocessed_dirname,
             verbose=verbose,
             extension=extension,
+        )
+        return self
+
+    def download(self, *, extract: bool = True, remove_finished: bool = False) -> Dataset:
+        """Download dataset resources.
+
+        This downloads all resources of the dataset. Per default this also extracts all archives
+        into :py:meth:`Dataset.paths.raw`,
+        To save space on your device you can remove the archive files after
+        successful extraction with ``remove_finished=True``.
+
+        If a corresponding file already exists in the local system, its checksum is calculated and
+        checked against the expected checksum.
+        Downloading will be evaded if the integrity of the existing file can be verified.
+        If the existing file does not match the expected checksum it is overwritten with the
+        downloaded new file.
+
+        Parameters
+        ----------
+        extract : bool
+            Extract dataset archive files.
+        remove_finished : bool
+            Remove archive files after extraction.
+
+        Raises
+        ------
+        AttributeError
+            If number of mirrors or number of resources specified for dataset is zero.
+        RuntimeError
+            If downloading a resource failed for all given mirrors.
+
+        Returns
+        -------
+        PublicDataset
+            Returns self, useful for method cascading.
+        """
+        dataset_download.download_dataset(
+            definition=self.definition,
+            paths=self.paths,
+            extract=extract,
+            remove_finished=remove_finished,
+        )
+        return self
+
+    def extract(self, remove_finished: bool = False) -> Dataset:
+        """Extract downloaded dataset archive files.
+
+        Parameters
+        ----------
+        remove_finished : bool
+            Remove archive files after extraction.
+
+        Returns
+        -------
+        PublicDataset
+            Returns self, useful for method cascading.
+        """
+        dataset_download.extract_dataset(
+            definition=self.definition,
+            paths=self.paths,
+            remove_finished=remove_finished,
         )
         return self
 
