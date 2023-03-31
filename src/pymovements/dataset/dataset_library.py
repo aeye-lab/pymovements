@@ -27,12 +27,12 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 
 
 class DatasetLibrary:
-    """Provides access by name to :py:class:`~pymovements.DatasetDefinition`s.
+    """Provides access by name to :py:class:`~pymovements.DatasetDefinition`.
 
     Attributes
     ----------
     definitions:
-        Dictionary of :py:class:`~pymovements.DatasetDefinition`s.
+        Dictionary of :py:class:`~pymovements.DatasetDefinition`.
     """
 
     definitions: dict[str, type[DatasetDefinition]] = {}
