@@ -297,6 +297,15 @@ def test_idt_detects_fixations(kwargs, expected):
             TypeError, ('timesteps', 'int'),
             id='constant_position_single_fixation_with_timesteps_float_with_fractions',
         ),
+        pytest.param(
+            {
+                'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
+                'dispersion_threshold': 1,
+                'minimum_duration': 1,
+            },
+            ValueError, ('minimum_duration', '2'),
+            id='minimum_duration_1_sample',
+        ),
     ],
 )
 def test_idt_timesteps_exceptions(kwargs, exception, msg_substrings):
