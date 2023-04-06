@@ -7,6 +7,7 @@
     :nosignatures:
     :template: module.rst
 
+    pymovements.dataset
     pymovements.datasets
     pymovements.events
     pymovements.gaze
