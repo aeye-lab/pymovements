@@ -157,6 +157,8 @@ def idt(
         # This automatically extends the window to the specified minimum event duration.
         win_end = max(win_start + minimum_sample_duration, win_end)
         win_end = min(win_end, len(timesteps))
+        if win_end - win_start < minimum_sample_duration:
+            break
 
         if dispersion(positions[win_start:win_end]) <= dispersion_threshold:
             # Add additional points to the window until dispersion > threshold.

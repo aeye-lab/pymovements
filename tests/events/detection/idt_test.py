@@ -309,13 +309,3 @@ def test_idt_timesteps_exceptions(kwargs, exception, msg_substrings):
     msg, = excinfo.value.args
     for msg_substring in msg_substrings:
         assert msg_substring.lower() in msg.lower()
-
-
-@pytest.mark.line_profile.with_args(pm.events.idt)
-def test_bug(tmp_path):
-    assert tmp_path
-    dataset = pm.Dataset('ToyDataset', path='data/ToyDataset')
-    dataset.load()
-    dataset.pix2deg()
-    dataset.pos2vel('smooth')
-    dataset.detect_events(pm.events.idt)
