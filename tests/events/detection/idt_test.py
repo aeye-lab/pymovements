@@ -113,7 +113,7 @@ import pymovements as pm
                 'positions': [[1, 2], [1, 2]],
                 'velocities': [[1, 2], [1, 2]],
                 'dispersion_threshold': 1,
-                'minimum_duration': 1.0,
+                'minimum_duration': 1.1,
             },
             TypeError,
             id='duration_threshold_not_integer_raises_type_error',
@@ -236,6 +236,20 @@ def test_idt_raises_error(kwargs, expected_error):
             ),
             id='constant_position_single_fixation_with_timesteps_extra_dim',
         ),
+        pytest.param(
+            {
+                'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
+                'timesteps': np.arange(1000, 1100, dtype=float),
+                'dispersion_threshold': 1,
+                'minimum_duration': 1,
+            },
+            pm.events.EventDataFrame(
+                name='fixation',
+                onsets=[1000],
+                offsets=[1099],
+            ),
+            id='constant_position_single_fixation_with_timesteps_float',
+        ),
     ],
 )
 def test_idt_detects_fixations(kwargs, expected):
@@ -272,6 +286,16 @@ def test_idt_detects_fixations(kwargs, expected):
             },
             ValueError, ('interval', 'timesteps', 'divisible', 'minimum_duration'),
             id='minimum_duration_not_divisible_by_timesteps_interval',
+        ),
+        pytest.param(
+            {
+                'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
+                'timesteps': np.linspace(0, 1, 100),
+                'dispersion_threshold': 1,
+                'minimum_duration': 1,
+            },
+            TypeError, ('timesteps', 'int'),
+            id='constant_position_single_fixation_with_timesteps_float_with_fractions',
         ),
     ],
 )

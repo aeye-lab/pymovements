@@ -94,6 +94,8 @@ def idt(
 
     Raises
     ------
+    TypeError
+        If minimum_duration is not of type ``int`` or timesteps
     ValueError
         If positions is not shaped (N, 2)
         If dispersion_threshold is not greater than 0
@@ -106,12 +108,24 @@ def idt(
     if timesteps is None:
         timesteps = np.arange(len(velocities), dtype=np.int64)
     timesteps = np.array(timesteps).flatten()
+
+    # Check that timesteps are integers or are floats without a fractional part.
+    timesteps_int = timesteps.astype(int)
+    if np.any((timesteps - timesteps_int) != 0):
+        raise TypeError('timesteps must be of type int')
+    timesteps = timesteps_int
+
     checks.check_is_length_matching(velocities=velocities, timesteps=timesteps)
 
     if dispersion_threshold <= 0:
-        raise ValueError('dispersion threshold must be greater than 0')
+        raise ValueError('dispersion_threshold must be greater than 0')
     if minimum_duration <= 0:
-        raise ValueError('minimum duration must be greater than 0')
+        raise ValueError('minimum_duration must be greater than 0')
+    if not isinstance(minimum_duration, int):
+        raise TypeError(
+            'minimum_duration must be of type int'
+            f' but is of type {type(minimum_duration)}',
+        )
 
     onsets = []
     offsets = []
@@ -127,7 +141,7 @@ def idt(
         raise ValueError(
             'minimum_duration must be divisible by the constant interval between timesteps',
         )
-    minimum_sample_duration = minimum_duration // timesteps_diff[0]
+    minimum_sample_duration = int(minimum_duration // timesteps_diff[0])
 
     # Initialize window over first points to cover the duration threshold
     win_start = 0
