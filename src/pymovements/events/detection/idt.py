@@ -105,7 +105,7 @@ def idt(
 
     if timesteps is None:
         timesteps = np.arange(len(velocities), dtype=np.int64)
-    timesteps = np.array(timesteps)
+    timesteps = np.array(timesteps).flatten()
     checks.check_is_length_matching(velocities=velocities, timesteps=timesteps)
 
     if dispersion_threshold <= 0:
