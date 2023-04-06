@@ -142,7 +142,7 @@ def test_idt_raises_error(kwargs, expected_error):
             {
                 'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
                 'dispersion_threshold': 1,
-                'minimum_duration': 1,
+                'minimum_duration': 2,
             },
             pm.events.EventDataFrame(
                 name='fixation',
@@ -160,7 +160,7 @@ def test_idt_raises_error(kwargs, expected_error):
                     start_value=(0, 0),
                 ),
                 'dispersion_threshold': 1,
-                'minimum_duration': 1,
+                'minimum_duration': 2,
             },
             pm.events.EventDataFrame(
                 name='fixation',
@@ -179,7 +179,7 @@ def test_idt_raises_error(kwargs, expected_error):
                     ],
                 ),
                 'dispersion_threshold': 1,
-                'minimum_duration': 1,
+                'minimum_duration': 2,
             },
             pm.events.EventDataFrame(
                 name='fixation',
@@ -198,7 +198,7 @@ def test_idt_raises_error(kwargs, expected_error):
                     ],
                 ),
                 'dispersion_threshold': 1,
-                'minimum_duration': 1,
+                'minimum_duration': 2,
                 'include_nan': True,
             },
             pm.events.EventDataFrame(
@@ -213,7 +213,7 @@ def test_idt_raises_error(kwargs, expected_error):
                 'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
                 'timesteps': np.arange(1000, 1100, dtype=int),
                 'dispersion_threshold': 1,
-                'minimum_duration': 1,
+                'minimum_duration': 2,
             },
             pm.events.EventDataFrame(
                 name='fixation',
@@ -227,7 +227,7 @@ def test_idt_raises_error(kwargs, expected_error):
                 'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
                 'timesteps': np.reshape(np.arange(1000, 1100, dtype=int), (100, 1)),
                 'dispersion_threshold': 1,
-                'minimum_duration': 1,
+                'minimum_duration': 2,
             },
             pm.events.EventDataFrame(
                 name='fixation',
@@ -241,7 +241,7 @@ def test_idt_raises_error(kwargs, expected_error):
                 'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
                 'timesteps': np.arange(1000, 1100, dtype=float),
                 'dispersion_threshold': 1,
-                'minimum_duration': 1,
+                'minimum_duration': 2,
             },
             pm.events.EventDataFrame(
                 name='fixation',
@@ -311,6 +311,7 @@ def test_idt_timesteps_exceptions(kwargs, exception, msg_substrings):
         assert msg_substring.lower() in msg.lower()
 
 
+@pytest.mark.line_profile.with_args(pm.events.idt)
 def test_bug(tmp_path):
     assert tmp_path
     dataset = pm.Dataset('ToyDataset', path='data/ToyDataset')
