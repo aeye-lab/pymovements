@@ -46,7 +46,7 @@ repos:
     hooks:
     -   id: insert-license
         args: [--use-current-year]
-        exclude_types: [bib, css, image, json, jupyter, markdown, rst, toml, yaml]
+        types: [python]
 -   repo: https://github.com/nbQA-dev/nbQA
     rev: 1.6.4
     hooks:
