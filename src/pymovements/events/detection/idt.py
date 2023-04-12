@@ -149,9 +149,7 @@ def idt(
     win_start = 0
     win_end = minimum_sample_duration
 
-    while win_end <= len(timesteps):
-        if win_start == len(timesteps):
-            break
+    while win_start < len(timesteps) and win_end <= len(timesteps):
 
         # Initialize window over first points to cover the duration threshold.
         # This automatically extends the window to the specified minimum event duration.
