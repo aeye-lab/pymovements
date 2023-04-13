@@ -42,6 +42,7 @@
    pymovements.gaze.transforms.consecutive
 """
 from pymovements.gaze import transforms  # noqa: F401
+from pymovements.gaze import transforms_polars  # noqa: F401
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze_dataframe import GazeDataFrame  # noqa: F401
 from pymovements.gaze.screen import Screen
@@ -52,4 +53,5 @@ __all__ = [
     'GazeDataFrame',
     'Screen',
     'transforms',
+    'transforms_polars',
 ]
