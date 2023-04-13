@@ -125,7 +125,7 @@ class EventDataFrame:
     def __len__(self) -> int:
         return self.frame.__len__()
 
-    def __getitem__(self, *args: str, **kwargs: str) -> Any:
+    def __getitem__(self, *args: Any, **kwargs: Any) -> Any:
         return self.frame.__getitem__(*args, **kwargs)
 
     @property
