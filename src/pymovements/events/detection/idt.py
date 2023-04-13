@@ -94,6 +94,8 @@ def idt(
 
     Raises
     ------
+    TypeError
+        If minimum_duration is not of type ``int`` or timesteps
     ValueError
         If positions is not shaped (N, 2)
         If dispersion_threshold is not greater than 0
@@ -105,13 +107,25 @@ def idt(
 
     if timesteps is None:
         timesteps = np.arange(len(velocities), dtype=np.int64)
-    timesteps = np.array(timesteps)
+    timesteps = np.array(timesteps).flatten()
+
+    # Check that timesteps are integers or are floats without a fractional part.
+    timesteps_int = timesteps.astype(int)
+    if np.any((timesteps - timesteps_int) != 0):
+        raise TypeError('timesteps must be of type int')
+    timesteps = timesteps_int
+
     checks.check_is_length_matching(velocities=velocities, timesteps=timesteps)
 
     if dispersion_threshold <= 0:
-        raise ValueError('dispersion threshold must be greater than 0')
+        raise ValueError('dispersion_threshold must be greater than 0')
     if minimum_duration <= 0:
-        raise ValueError('minimum duration must be greater than 0')
+        raise ValueError('minimum_duration must be greater than 0')
+    if not isinstance(minimum_duration, int):
+        raise TypeError(
+            'minimum_duration must be of type int'
+            f' but is of type {type(minimum_duration)}',
+        )
 
     onsets = []
     offsets = []
@@ -127,26 +141,31 @@ def idt(
         raise ValueError(
             'minimum_duration must be divisible by the constant interval between timesteps',
         )
-    minimum_sample_duration = minimum_duration // timesteps_diff[0]
+    minimum_sample_duration = int(minimum_duration // timesteps_diff[0])
+    if minimum_sample_duration < 2:
+        raise ValueError('minimum_duration must be longer than the equivalent of 2 samples')
 
     # Initialize window over first points to cover the duration threshold
     win_start = 0
     win_end = minimum_sample_duration
 
-    while win_end < len(positions):
+    while win_start < len(timesteps) and win_end <= len(timesteps):
 
         # Initialize window over first points to cover the duration threshold.
         # This automatically extends the window to the specified minimum event duration.
         win_end = max(win_start + minimum_sample_duration, win_end)
+        win_end = min(win_end, len(timesteps))
+        if win_end - win_start < minimum_sample_duration:
+            break
 
         if dispersion(positions[win_start:win_end]) <= dispersion_threshold:
             # Add additional points to the window until dispersion > threshold.
             while dispersion(positions[win_start:win_end]) < dispersion_threshold:
-                win_end += 1
-
                 # break if we reach end of input data
-                if win_end == len(positions):
+                if win_end == len(timesteps):
                     break
+
+                win_end += 1
 
             # check for np.nan values
             if np.sum(np.isnan(positions[win_start:win_end - 1])) > 0:
