@@ -23,9 +23,12 @@ This module holds utils for developers and is not part of the user API.
 from __future__ import annotations
 
 from typing import Any
+from typing import TypeVar
+
+ClassT = TypeVar('ClassT')
 
 
-def auto_str(cls: Any) -> str:
+def auto_str(cls: type[ClassT]) -> type[ClassT]:
     """
     Automatically generate __str__() to include all arguments. Can be used as a decorator.
     """
@@ -38,5 +41,6 @@ def auto_str(cls: Any) -> str:
         attributes = ', '.join(f'{key}={shorten(value)}' for key, value in vars(self).items())
         return f'{type(self).__name__}({attributes})'
 
-    cls.__str__ = __str__
+    # for type ignore see: https://github.com/python/mypy/issues/3951#issuecomment-329183108
+    cls.__str__ = __str__  # type: ignore
     return cls
