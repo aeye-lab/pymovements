@@ -185,3 +185,23 @@ def check_is_length_matching(**kwargs) -> None:
 
     if not len(value_1) == len(value_2):
         raise ValueError(f'The sequences "{key_1}" and "{key_2}" must be of equal length.')
+
+
+def check_is_int(**kwargs: Any) -> None:
+    for key, value in kwargs.items():
+        if not isinstance(value, int):
+            raise TypeError(
+                f"'{key}' must be of type 'int' but is of type '{type(value).__name__}'",
+            )
+
+
+def check_is_greater_than_zero(**kwargs: float | int) -> None:
+    for key, value in kwargs.items():
+        if value < 1:
+            raise ValueError(f"'{key}' must be greater than zero but is {value}")
+
+
+def check_is_positive_value(**kwargs: float | int) -> None:
+    for key, value in kwargs.items():
+        if value < 0:
+            raise ValueError(f"'{key}' must not be negative but is {value}")

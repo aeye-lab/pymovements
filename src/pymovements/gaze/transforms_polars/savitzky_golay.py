@@ -22,61 +22,12 @@ Transforms module.
 """
 from __future__ import annotations
 
-from collections.abc import Iterable
 from typing import Any
 
-import numpy as np
 import polars as pl
 import scipy
 
-
-def center_origin(
-        *,
-        screen_px: int,
-        origin: str,
-        pixel_column: str = 'pixel',
-) -> pl.Expr:
-
-    if origin == 'center':
-        centered_pixels = pl.col(pixel_column)
-
-    elif origin == 'lower left':
-        centered_pixels = pl.col(pixel_column) - ((screen_px - 1) / 2)
-
-    else:
-        supported_origins = ['center', 'lower left']
-        raise ValueError(
-            f'value `{origin}` for argument `origin` is invalid. '
-            f' Valid values are: {supported_origins}',
-        )
-
-    # If the sequence is empty, just forward sequence.
-    return pl.when(pl.all().len() == 0).then(pl.all()).otherwise(centered_pixels)
-
-
-def pix2deg(
-        *,
-        screen_px: int,
-        screen_cm: float,
-        distance_cm: float,
-        origin: str,
-        pixel_column: str = 'pixel',
-        position_column: str = 'position',
-) -> pl.Expr:
-    _check_screen_scalar(screen_px=screen_px, screen_cm=screen_cm, distance_cm=distance_cm)
-
-    centered_pixels = center_origin(screen_px=screen_px, origin=origin, pixel_column=pixel_column)
-
-    # Compute eye-to-screen-distance in pixel units.
-    distance_px = distance_cm * (screen_px / screen_cm)
-
-    # Compute positions as radians using arctan2.
-    radians = pl.map([centered_pixels], lambda s: np.arctan2(s[0], distance_px))
-
-    # 180 / pi transforms radians to degrees.
-    degrees = radians * (180 / np.pi)
-
-    return degrees.alias(position_column)
+from pymovements.utils import checks
 
 
 def savitzky_golay(
@@ -177,105 +128,14 @@ def savitzky_golay(
     )
 
 
-def pos2vel(
-        *,
-        sampling_rate: float,
-        method: str,
-        window_length: int | None = None,
-        degree: int | None = None,
-        padding: str | float | int | None = 'nearest',
-) -> pl.Expr:
-
-    if method == 'neighbors':
-        preceding_neighbor = pl.all().shift(periods=1)
-        succeeding_neighbor = pl.all().shift(periods=-1)
-        return (succeeding_neighbor - preceding_neighbor) * (sampling_rate / 2)
-
-    if method == 'preceding':
-        return pl.all().diff(n=1, null_behavior='ignore') * sampling_rate
-
-    if method == 'smooth':
-        # Center of window is period 0 and will be filled.
-        # mean(arr_-2, arr_-1) and mean(arr_1, arr_2) needs division by two
-        # window is now 3 samples long (arr_-1.5, arr_0, arr_1+5)
-        # we therefore need a divison by three, all in all it's a division by 6
-        return (
-            pl.all().shift(periods=-2) + pl.all().shift(periods=-1)
-            - pl.all().shift(periods=1) - pl.all().shift(periods=2)
-        ) * (sampling_rate / 6)
-
-    if method == 'savitzky_golay':
-        if window_length is None:
-            raise TypeError("'window_length' must not be none for method 'savitzky_golay'")
-        if degree is None:
-            raise TypeError("'degree' must not be none for method 'savitzky_golay'")
-
-        return savitzky_golay(
-            window_length=window_length,
-            degree=degree,
-            sampling_rate=sampling_rate,
-            padding=padding,
-            derivative=1,
-        )
-
-
-def pos2acc(
-        *,
-        sampling_rate: float,
-        window_length: int,
-        degree: int,
-        padding: str | float | int | None = 'nearest',
-) -> pl.Expr:
-    return savitzky_golay(
-        window_length=window_length,
-        degree=degree,
-        sampling_rate=sampling_rate,
-        padding=padding,
-        derivative=2,
-    )
-
-
-def downsample(
-        factor: int,
-        *,
-        column: str | Iterable[str] = '*',
-) -> pl.Expr:
-    _check_downsample_factor(factor)
-
-    return pl.col(column).take_every(n=factor)
-
-
-def norm(
-        columns: tuple[str, str],
-) -> pl.Expr:
-    x = pl.col(columns[0])
-    y = pl.col(columns[1])
-    return (x.pow(2) + y.pow(2)).sqrt()
-
-
-def _check_screen_scalar(**kwargs: Any) -> None:
-    for key, value in kwargs.items():
-
-        if not isinstance(value, (int, float)):
-            raise TypeError(
-                f'`{key}` must be of type int or float but is of type {type(value)}',
-            )
-
-        if value == 0:
-            raise ValueError(f'`{key}` must not be zero')
-
-        if value < 0:
-            raise ValueError(f'`{key}` must not be negative, but is {value}')
-
-
 def _check_window_length(window_length: Any) -> None:
-    _check_is_int(window_length=window_length)
-    _check_is_greater_than_zero(degree=window_length)
+    checks.check_is_int(window_length=window_length)
+    checks.check_is_greater_than_zero(degree=window_length)
 
 
 def _check_degree(degree: Any, window_length: int) -> None:
-    _check_is_int(degree=degree)
-    _check_is_greater_than_zero(degree=degree)
+    checks.check_is_int(degree=degree)
+    checks.check_is_greater_than_zero(degree=degree)
 
     if degree >= window_length:
         raise ValueError("'degree' must be less than 'window_length'")
@@ -299,30 +159,5 @@ def _check_padding(padding: Any) -> None:
 
 
 def _check_derivative(derivative: Any) -> None:
-    _check_is_int(derivative=derivative)
-    _check_is_positive_value(derivative=derivative)
-
-
-def _check_downsample_factor(factor: Any) -> None:
-    _check_is_int(factor=factor)
-    _check_is_positive_value(factor=factor)
-
-
-def _check_is_int(**kwargs: Any) -> None:
-    for key, value in kwargs.items():
-        if not isinstance(value, int):
-            raise TypeError(
-                f"'{key}' must be of type 'int' but is of type '{type(value).__name__}'",
-            )
-
-
-def _check_is_greater_than_zero(**kwargs: float | int) -> None:
-    for key, value in kwargs.items():
-        if value < 1:
-            raise ValueError(f"'{key}' must be greater than zero but is {value}")
-
-
-def _check_is_positive_value(**kwargs: float | int) -> None:
-    for key, value in kwargs.items():
-        if value < 0:
-            raise ValueError(f"'{key}' must not be negative but is {value}")
+    checks.check_is_int(derivative=derivative)
+    checks.check_is_positive_value(derivative=derivative)

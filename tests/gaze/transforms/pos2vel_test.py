@@ -91,6 +91,15 @@ import pymovements as pm
             ),
             id='invalid_padding_raises_value_error',
         ),
+        pytest.param(
+            {'method': 'foobar', 'window_length': 2, 'degree': 1, 'sampling_rate': 1},
+            ValueError,
+            (
+                'unknown', 'method', "'foobar'", 'valid', 'preceding', 'neighbors', 'smooth',
+                'savitzky_golay',
+            ),
+            id='unknown_method_raises_value_error',
+        ),
     ],
 )
 def test_pos2vel_init_raises_error(kwargs, exception, msg_substrings):
