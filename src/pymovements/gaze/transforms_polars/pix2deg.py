@@ -47,7 +47,7 @@ def pix2deg(
     distance_px = distance_cm * (screen_px / screen_cm)
 
     # Compute positions as radians using arctan2.
-    radians = pl.map([centered_pixels], lambda s: np.arctan2(s[0], distance_px))
+    radians = pl.map([centered_pixels], lambda s: pl.Series(np.arctan2(s[0], distance_px)))
 
     # 180 / pi transforms radians to degrees.
     degrees = radians * (180 / np.pi)
