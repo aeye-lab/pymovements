@@ -95,8 +95,8 @@ import pymovements as pm
             {'method': 'foobar', 'window_length': 2, 'degree': 1, 'sampling_rate': 1},
             ValueError,
             (
-                'unknown', 'method', "'foobar'", 'valid', 'preceding', 'neighbors', 'smooth',
-                'savitzky_golay',
+                'unknown', 'method', "'foobar'", 'supported methods', 'preceding', 'neighbors',
+                'smooth', 'savitzky_golay',
             ),
             id='unknown_method_raises_value_error',
         ),

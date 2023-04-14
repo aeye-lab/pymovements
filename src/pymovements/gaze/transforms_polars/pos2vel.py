@@ -68,8 +68,7 @@ def pos2vel(
             derivative=1,
         )
 
-    else:
-        supported_methods = ['preceding', 'neighbors', 'smooth', 'savitzky_golay']
-        raise ValueError(
-            f"Unknown method '{method}'. Valid methods are: {supported_methods}",
-        )
+    supported_methods = ['preceding', 'neighbors', 'smooth', 'savitzky_golay']
+    raise ValueError(
+        f"Unknown method '{method}'. Supported methods are: {supported_methods}",
+    )
