@@ -111,7 +111,7 @@ def test_pos2vel_init_raises_error(kwargs, exception, msg_substrings):
                 'degree': 1, 'padding': None, 'sampling_rate': 1,
             },
             pl.Series('A', [1], pl.Float64),
-            pl.exceptions.PanicException,
+            pl.exceptions.PolarsPanicError,
             ('',),
             id='no_padding_input_shorter_than_window_length_raises_panicexception',
         ),
