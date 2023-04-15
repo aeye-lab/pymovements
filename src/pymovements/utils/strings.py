@@ -45,7 +45,7 @@ def curly_to_regex(s: str) -> re.Pattern:
         Pattern in python formatting style.
     """
 
-    def replace_aux(match: re.match) -> str:     # Auxiliary replacement function
+    def replace_aux(match: re.Match) -> str:     # Auxiliary replacement function
         pattern = r'.'
         if match.group('type') == 'd':
             pattern = r'[0-9]'
