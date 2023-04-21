@@ -30,8 +30,17 @@
     pymovements.dataset.DatasetLibrary
     pymovements.dataset.DatasetPaths
 """
-from pymovements.dataset.dataset import Dataset  # noqa: F401
-from pymovements.dataset.dataset_definition import DatasetDefinition  # noqa: F401
-from pymovements.dataset.dataset_library import DatasetLibrary  # noqa: F401
-from pymovements.dataset.dataset_library import register_dataset  # noqa: F401
-from pymovements.dataset.dataset_paths import DatasetPaths  # noqa: F401
+from pymovements.dataset.dataset import Dataset
+from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.dataset_library import DatasetLibrary
+from pymovements.dataset.dataset_library import register_dataset
+from pymovements.dataset.dataset_paths import DatasetPaths
+
+
+__all__ = [
+    'Dataset',
+    'DatasetDefinition',
+    'DatasetLibrary',
+    'DatasetPaths',
+    'register_dataset',
+]

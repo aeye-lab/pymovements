@@ -17,17 +17,34 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides access to all submodules."""
-from pymovements import datasets  # noqa: F401
-from pymovements import events  # noqa: F401
-from pymovements import gaze  # noqa: F401
-from pymovements import plotting  # noqa: F401
-from pymovements import synthetic  # noqa: F401
-from pymovements import utils  # noqa: F401
-from pymovements.dataset import Dataset  # noqa: F401
-from pymovements.dataset import DatasetDefinition  # noqa: F401
-from pymovements.dataset import DatasetLibrary  # noqa: F401
-from pymovements.dataset import DatasetPaths  # noqa: F401
-from pymovements.dataset import register_dataset  # noqa: F401
-from pymovements.gaze.experiment import Experiment  # noqa: F401
-from pymovements.gaze.screen import Screen  # noqa: F401
+"""This module provides top-level access to all submodules."""
+from pymovements import datasets
+from pymovements import events
+from pymovements import gaze
+from pymovements import plotting
+from pymovements import synthetic
+from pymovements import utils
+from pymovements.dataset import Dataset
+from pymovements.dataset import DatasetDefinition
+from pymovements.dataset import DatasetLibrary
+from pymovements.dataset import DatasetPaths
+from pymovements.dataset import register_dataset
+from pymovements.gaze.experiment import Experiment
+from pymovements.gaze.screen import Screen
+
+
+__all__ = [
+    'Dataset',
+    'DatasetDefinition',
+    'DatasetLibrary',
+    'DatasetPaths',
+    'datasets',
+    'events',
+    'Experiment',
+    'gaze',
+    'plotting',
+    'register_dataset',
+    'Screen',
+    'synthetic',
+    'utils',
+]
