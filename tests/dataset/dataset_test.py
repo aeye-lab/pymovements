@@ -230,8 +230,8 @@ def mock_toy(rootpath, raw_fileformat, eyes):
             origin='lower left',
             sampling_rate=1000,
         ),
-        filename_regex=r'(?P<subject_id>\d+).' + raw_fileformat,
-        filename_regex_dtypes={'subject_id': pl.Int64},
+        filename_format=r'{subject_id:d}.' + raw_fileformat,
+        filename_format_dtypes={'subject_id': pl.Int64},
     )
 
     return {

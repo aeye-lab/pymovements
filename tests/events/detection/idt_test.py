@@ -22,10 +22,7 @@ import numpy as np
 import pytest
 from polars.testing import assert_frame_equal
 
-from pymovements.events.detection.idt import idt
-from pymovements.events.events import EventDataFrame
-from pymovements.gaze.transforms import pos2vel
-from pymovements.synthetic import step_function
+import pymovements as pm
 
 
 @pytest.mark.parametrize(
@@ -116,7 +113,7 @@ from pymovements.synthetic import step_function
                 'positions': [[1, 2], [1, 2]],
                 'velocities': [[1, 2], [1, 2]],
                 'dispersion_threshold': 1,
-                'minimum_duration': 1.0,
+                'minimum_duration': 1.1,
             },
             TypeError,
             id='duration_threshold_not_integer_raises_type_error',
@@ -126,7 +123,7 @@ from pymovements.synthetic import step_function
 def test_idt_raises_error(kwargs, expected_error):
     """Test if idt raises expected error."""
     with pytest.raises(expected_error):
-        idt(**kwargs)
+        pm.events.idt(**kwargs)
 
 
 @pytest.mark.parametrize(
@@ -138,16 +135,16 @@ def test_idt_raises_error(kwargs, expected_error):
                 'dispersion_threshold': 1,
                 'minimum_duration': 10,
             },
-            EventDataFrame(),
+            pm.events.EventDataFrame(),
             id='constant_velocity_no_fixation',
         ),
         pytest.param(
             {
-                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
+                'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
                 'dispersion_threshold': 1,
-                'minimum_duration': 1,
+                'minimum_duration': 2,
             },
-            EventDataFrame(
+            pm.events.EventDataFrame(
                 name='fixation',
                 onsets=[0],
                 offsets=[99],
@@ -156,16 +153,16 @@ def test_idt_raises_error(kwargs, expected_error):
         ),
         pytest.param(
             {
-                'positions': step_function(
+                'positions': pm.synthetic.step_function(
                     length=100,
                     steps=[49, 50],
                     values=[(9, 9), (1, 1)],
                     start_value=(0, 0),
                 ),
                 'dispersion_threshold': 1,
-                'minimum_duration': 1,
+                'minimum_duration': 2,
             },
-            EventDataFrame(
+            pm.events.EventDataFrame(
                 name='fixation',
                 onsets=[0, 50],
                 offsets=[49, 99],
@@ -174,7 +171,7 @@ def test_idt_raises_error(kwargs, expected_error):
         ),
         pytest.param(
             {
-                'positions': step_function(
+                'positions': pm.synthetic.step_function(
                     length=100, steps=[10, 20, 90],
                     values=[
                         (np.nan, np.nan), (0, 0),
@@ -182,9 +179,9 @@ def test_idt_raises_error(kwargs, expected_error):
                     ],
                 ),
                 'dispersion_threshold': 1,
-                'minimum_duration': 1,
+                'minimum_duration': 2,
             },
-            EventDataFrame(
+            pm.events.EventDataFrame(
                 name='fixation',
                 onsets=[0, 20],
                 offsets=[9, 89],
@@ -193,7 +190,7 @@ def test_idt_raises_error(kwargs, expected_error):
         ),
         pytest.param(
             {
-                'positions': step_function(
+                'positions': pm.synthetic.step_function(
                     length=100, steps=[10, 20, 90],
                     values=[
                         (np.nan, np.nan), (0, 0),
@@ -201,10 +198,10 @@ def test_idt_raises_error(kwargs, expected_error):
                     ],
                 ),
                 'dispersion_threshold': 1,
-                'minimum_duration': 1,
+                'minimum_duration': 2,
                 'include_nan': True,
             },
-            EventDataFrame(
+            pm.events.EventDataFrame(
                 name='fixation',
                 onsets=[0],
                 offsets=[89],
@@ -213,24 +210,54 @@ def test_idt_raises_error(kwargs, expected_error):
         ),
         pytest.param(
             {
-                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
+                'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
                 'timesteps': np.arange(1000, 1100, dtype=int),
                 'dispersion_threshold': 1,
-                'minimum_duration': 1,
+                'minimum_duration': 2,
             },
-            EventDataFrame(
+            pm.events.EventDataFrame(
                 name='fixation',
                 onsets=[1000],
                 offsets=[1099],
             ),
             id='constant_position_single_fixation_with_timesteps',
         ),
+        pytest.param(
+            {
+                'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
+                'timesteps': np.reshape(np.arange(1000, 1100, dtype=int), (100, 1)),
+                'dispersion_threshold': 1,
+                'minimum_duration': 2,
+            },
+            pm.events.EventDataFrame(
+                name='fixation',
+                onsets=[1000],
+                offsets=[1099],
+            ),
+            id='constant_position_single_fixation_with_timesteps_extra_dim',
+        ),
+        pytest.param(
+            {
+                'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
+                'timesteps': np.arange(1000, 1100, dtype=float),
+                'dispersion_threshold': 1,
+                'minimum_duration': 2,
+            },
+            pm.events.EventDataFrame(
+                name='fixation',
+                onsets=[1000],
+                offsets=[1099],
+            ),
+            id='constant_position_single_fixation_with_timesteps_float',
+        ),
     ],
 )
 def test_idt_detects_fixations(kwargs, expected):
     """Test if idt detects fixations."""
-    velocities = pos2vel(kwargs['positions'], sampling_rate=10, method='preceding')
-    events = idt(velocities=velocities, **kwargs)
+    velocities = pm.gaze.transforms.pos2vel(
+        kwargs['positions'], sampling_rate=10, method='preceding',
+    )
+    events = pm.events.idt(velocities=velocities, **kwargs)
 
     assert_frame_equal(events.frame, expected.frame)
 
@@ -240,7 +267,7 @@ def test_idt_detects_fixations(kwargs, expected):
     [
         pytest.param(
             {
-                'positions': step_function(length=10, steps=[0], values=[(0, 0)]),
+                'positions': pm.synthetic.step_function(length=10, steps=[0], values=[(0, 0)]),
                 'timesteps': np.concatenate([
                     np.arange(0, 5, dtype=int), np.arange(7, 12, dtype=int),
                 ]),
@@ -252,7 +279,7 @@ def test_idt_detects_fixations(kwargs, expected):
         ),
         pytest.param(
             {
-                'positions': step_function(length=10, steps=[0], values=[(0, 0)]),
+                'positions': pm.synthetic.step_function(length=10, steps=[0], values=[(0, 0)]),
                 'timesteps': np.arange(0, 30, step=3, dtype=int),
                 'dispersion_threshold': 1,
                 'minimum_duration': 2,
@@ -260,12 +287,33 @@ def test_idt_detects_fixations(kwargs, expected):
             ValueError, ('interval', 'timesteps', 'divisible', 'minimum_duration'),
             id='minimum_duration_not_divisible_by_timesteps_interval',
         ),
+        pytest.param(
+            {
+                'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
+                'timesteps': np.linspace(0, 1, 100),
+                'dispersion_threshold': 1,
+                'minimum_duration': 1,
+            },
+            TypeError, ('timesteps', 'int'),
+            id='constant_position_single_fixation_with_timesteps_float_with_fractions',
+        ),
+        pytest.param(
+            {
+                'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
+                'dispersion_threshold': 1,
+                'minimum_duration': 1,
+            },
+            ValueError, ('minimum_duration', '2'),
+            id='minimum_duration_1_sample',
+        ),
     ],
 )
 def test_idt_timesteps_exceptions(kwargs, exception, msg_substrings):
-    velocities = pos2vel(kwargs['positions'], sampling_rate=10, method='preceding')
+    velocities = pm.gaze.transforms.pos2vel(
+        kwargs['positions'], sampling_rate=10, method='preceding',
+    )
     with pytest.raises(exception) as excinfo:
-        idt(velocities=velocities, **kwargs)
+        pm.events.idt(velocities=velocities, **kwargs)
 
     msg, = excinfo.value.args
     for msg_substring in msg_substrings:

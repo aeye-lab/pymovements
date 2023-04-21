@@ -376,7 +376,7 @@ class Dataset:
 
             positions = gaze_df.frame.select(position_columns).to_numpy()
             velocities = gaze_df.frame.select(velocity_columns).to_numpy()
-            timesteps = gaze_df.frame.select('time').to_numpy()
+            timesteps = gaze_df.frame.get_column('time').to_numpy()
 
             event_df = method(
                 positions=positions, velocities=velocities, timesteps=timesteps, **kwargs,

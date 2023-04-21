@@ -42,13 +42,13 @@ repos:
     hooks:
     -   id: nbstripout
 -   repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.4.2
+    rev: v1.5.1
     hooks:
     -   id: insert-license
         args: [--use-current-year]
-        exclude_types: [bib, css, image, json, jupyter, markdown, rst, toml, yaml]
+        types: [python]
 -   repo: https://github.com/nbQA-dev/nbQA
-    rev: 1.6.4
+    rev: 1.7.0
     hooks:
     -   id: nbqa-autopep8
     -   id: nbqa-flake8
@@ -58,7 +58,7 @@ repos:
     -   id: nbqa-pyupgrade
         args: ["--py37-plus"]
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.1.1
+    rev: v1.2.0
     hooks:
     -   id: mypy
         additional_dependencies: [types-all]
@@ -84,7 +84,7 @@ repos:
     hooks:
     -   id: autopep8
 -   repo: https://github.com/PyCQA/autoflake
-    rev: v2.0.2
+    rev: v2.1.0
     hooks:
     -   id: autoflake
 -   repo: https://github.com/PyCQA/doc8
@@ -96,7 +96,7 @@ repos:
     hooks:
     -   id: flake8
 - repo: https://github.com/PyCQA/pylint
-  rev: v2.17.1
+  rev: v3.0.0a6
   hooks:
     - id: pylint
       name: pylint
