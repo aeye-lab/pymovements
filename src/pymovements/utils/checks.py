@@ -22,8 +22,8 @@ This module holds basic checks which will be reused in other modules.
 """
 from __future__ import annotations
 
+from collections.abc import Sized
 from typing import Any
-from typing import Sized
 
 import numpy as np
 
