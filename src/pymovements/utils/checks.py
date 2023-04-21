@@ -23,9 +23,9 @@ This module holds basic checks which will be reused in other modules.
 from __future__ import annotations
 
 from typing import Any
+from typing import Sized
 
 import numpy as np
-import polars as pl
 
 
 def check_no_zeros(variable: Any, name: str = 'variable') -> None:
@@ -95,9 +95,7 @@ def check_shapes_positions_velocities(positions: np.ndarray, velocities: np.ndar
         )
 
 
-def check_two_kwargs(
-        **kwargs: Any,
-) -> None:
+def check_two_kwargs(**kwargs: Any) -> None:
     """Check if exactly two keyword arguments are given.
 
     Parameters
@@ -114,9 +112,7 @@ def check_two_kwargs(
         raise ValueError('there must be exactly two keyword arguments in kwargs')
 
 
-def check_is_mutual_exclusive(
-        **kwargs: None | str | list[str] | list[int] | np.ndarray | pl.DataFrame,
-) -> None:
+def check_is_mutual_exclusive(**kwargs: Any) -> None:
     """Check if at most one of two values is not None.
 
     Parameters
@@ -142,9 +138,7 @@ def check_is_mutual_exclusive(
         )
 
 
-def check_is_none_is_mutual(
-        **kwargs: None | list[int] | np.ndarray,
-) -> None:
+def check_is_none_is_mutual(**kwargs: Any) -> None:
     """Check if two values are either both None or both have a value.
 
     Parameters
@@ -171,10 +165,7 @@ def check_is_none_is_mutual(
         )
 
 
-def check_is_length_matching(
-        **kwargs: np.ndarray | list[list[float]] | list[tuple[float, float]] |
-        list[str] | list[int] | None,
-) -> None:
+def check_is_length_matching(**kwargs: Sized) -> None:
     """Check if two sequences are of equal length.
 
     Parameters
@@ -192,11 +183,6 @@ def check_is_length_matching(
     key_1, key_2 = (key for _, key in zip(range(2), kwargs.keys()))
     value_1 = kwargs[key_1]
     value_2 = kwargs[key_2]
-
-    # mypy does not understand value_1 and value_2 can't be None
-    # see pymovements.events.detection.* for specific checks
-    assert value_1 is not None
-    assert value_2 is not None
 
     if not len(value_1) == len(value_2):
         raise ValueError(f'The sequences "{key_1}" and "{key_2}" must be of equal length.')
