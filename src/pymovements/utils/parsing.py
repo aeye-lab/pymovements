@@ -75,10 +75,10 @@ def get_eye_tracking_sample_feature(eye_tracking_sample_match: re.Match, feature
 
 
 def process_asc2csv(
-    file_name: Path,
-    sync_msg_start_pattern: None | str = None,
-    sync_msg_stop_pattern: None | str = None,
-    overwrite_existing: bool = False,
+        file_name: Path,
+        sync_msg_start_pattern: None | str = None,
+        sync_msg_stop_pattern: None | str = None,
+        overwrite_existing: bool = False,
 ) -> pl.DataFrame:
     """Processes ascii files to csv.
 

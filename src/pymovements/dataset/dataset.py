@@ -194,9 +194,9 @@ class Dataset:
         return self
 
     def load_event_files(
-        self,
-        events_dirname: str | None = None,
-        extension: str = 'feather',
+            self,
+            events_dirname: str | None = None,
+            extension: str = 'feather',
     ) -> Dataset:
         """Load all available event files.
 
