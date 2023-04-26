@@ -48,10 +48,8 @@ def center_origin(
 
     if origin == 'center':
         centered_pixels = pl.col(pixel_column)
-
     elif origin == 'lower left':
         centered_pixels = pl.col(pixel_column) - ((screen_px - 1) / 2)
-
     else:
         supported_origins = ['center', 'lower left']
         raise ValueError(
