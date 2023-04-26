@@ -88,6 +88,10 @@ class EventDataFrame:
 
             # Make sure lengths of onsets and offsets are equal.
             if onsets is not None:
+
+                # mypy does not get that offsets cannot be None (l. 87)
+                assert offsets is not None
+
                 checks.check_is_length_matching(onsets=onsets, offsets=offsets)
                 # In case name is given as a list, check that too.
                 if isinstance(name, Sequence) and not isinstance(name, str):
@@ -125,7 +129,7 @@ class EventDataFrame:
     def __len__(self) -> int:
         return self.frame.__len__()
 
-    def __getitem__(self, *args, **kwargs) -> Any:
+    def __getitem__(self, *args: Any, **kwargs: Any) -> Any:
         return self.frame.__getitem__(*args, **kwargs)
 
     @property
@@ -133,7 +137,7 @@ class EventDataFrame:
         """List of column names."""
         return self.frame.columns
 
-    def _add_duration_property(self):
+    def _add_duration_property(self) -> None:
         """Adds duration property column to dataframe."""
         self.frame = self.frame.select([pl.all(), duration().alias('duration')])
 
@@ -179,7 +183,7 @@ class EventDetectionCallable(Protocol):
             velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
             timesteps: list[int] | np.ndarray | None = None,
             minimum_duration: int = 0,
-            **kwargs,
+            **kwargs: int | str | float,
     ) -> EventDataFrame:
         """Minimal interface to be implemented by all event detection methods.
 
