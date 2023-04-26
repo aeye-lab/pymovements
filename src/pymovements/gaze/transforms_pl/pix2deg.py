@@ -31,7 +31,7 @@ from pymovements.gaze.transforms_pl.transforms_library import register_transform
 from pymovements.utils import checks
 
 
-def helper(s, distance_px):
+def helper(s: Any, distance_px: float) -> pl.Series:
     """This function is a workaround to get complete coverage by testing this function
     explicitly."""
     return pl.Series(np.arctan2(s[0], distance_px))
