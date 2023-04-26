@@ -201,3 +201,14 @@ def test_savitzky_golay_returns(kwargs, series, expected_df):
         pm.gaze.transforms_pl.savitzky_golay(**kwargs),
     )
     assert_frame_equal(result_df, expected_df.to_frame())
+
+
+def test_savitzky_golay_helper():
+    def func(x):
+        return x
+
+    x = [0]
+    expected = 0
+
+    result = pm.gaze.transforms_pl.savitzky_golay_helper(x, func)
+    assert result == expected

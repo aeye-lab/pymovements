@@ -20,6 +20,7 @@
 """Module for py:func:`pymovements.gaze.transforms.savitzky_golay`"""
 from __future__ import annotations
 
+from functools import partial
 from typing import Any
 
 import polars as pl
@@ -27,6 +28,12 @@ import scipy
 
 from pymovements.gaze.transforms_pl.transforms_library import register_transform
 from pymovements.utils import checks
+
+
+def helper(s, func):
+    """This function is a workaround to get complete coverage by testing this function
+    explicitly."""
+    return func(x=s[0])
 
 
 @register_transform
@@ -114,21 +121,21 @@ def savitzky_golay(
     elif padding is None:
         padding = 'interp'
 
+    func = partial(
+        scipy.signal.savgol_filter,
+        window_length=window_length,
+        polyorder=degree,
+        deriv=derivative,
+        delta=delta,
+        axis=0,
+        mode=padding,
+        cval=constant_value,
+    )
+
     # If the sequence is empty, don't use apply but forward sequence.
     return pl.when(pl.all().len() == 0).then(pl.all()).otherwise(
-        pl.apply(
-            '*',
-            lambda s: scipy.signal.savgol_filter(
-                x=s[0],
-                window_length=window_length,
-                polyorder=degree,
-                deriv=derivative,
-                delta=delta,
-                axis=0,
-                mode=padding,
-                cval=constant_value,
-            ),
-        ).arr.explode(),  # Use explode to transform array to pl.Series
+        # Use explode to transform array to pl.Series
+        pl.apply('*', partial(helper, func=func)).arr.explode(),
     )
 
 

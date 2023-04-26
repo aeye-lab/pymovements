@@ -29,19 +29,19 @@ import pymovements as pm
     ('kwargs', 'exception', 'msg_substrings'),
     [
         pytest.param(
-            {'origin': 'center'},
+            {'origin': 'center', 'pixel_column': 'pixel'},
             TypeError,
             ('screen_px', 'missing'),
             id='no_screen_px_raises_type_error',
         ),
         pytest.param(
-            {'screen_px': 100},
+            {'screen_px': 100, 'pixel_column': 'pixel'},
             TypeError,
             ('origin', 'missing'),
             id='no_origin_raises_type_error',
         ),
         pytest.param(
-            {'screen_px': 100, 'origin': 'foobar'},
+            {'screen_px': 100, 'origin': 'foobar', 'pixel_column': 'pixel'},
             ValueError,
             ('origin', 'invalid', 'foobar', 'valid', 'center', 'lower left'),
             id='invalid_origin_raises_value_error',
@@ -61,19 +61,19 @@ def test_center_origin_init_raises_error(kwargs, exception, msg_substrings):
     'kwargs, series, expected_df',
     [
         pytest.param(
-            {'screen_px': 100, 'origin': 'center'},
+            {'screen_px': 100, 'origin': 'center', 'pixel_column': 'pixel'},
             pl.Series('pixel', [], pl.Float64),
             pl.Series('pixel', [], pl.Float64),
             id='empty_series_returns_empty_series',
         ),
         pytest.param(
-            {'screen_px': 100, 'origin': 'center'},
+            {'screen_px': 100, 'origin': 'center', 'pixel_column': 'pixel'},
             pl.Series('pixel', [0], pl.Float64),
             pl.Series('pixel', [0], pl.Float64),
             id='zero_origin_center_returns_0',
         ),
         pytest.param(
-            {'screen_px': 100, 'origin': 'lower left'},
+            {'screen_px': 100, 'origin': 'lower left', 'pixel_column': 'pixel'},
             pl.Series('pixel', [(100 - 1) / 2], pl.Float64),
             pl.Series('pixel', [0], pl.Float64),
             id='center_pixel_origin_lowerleft_returns_0',

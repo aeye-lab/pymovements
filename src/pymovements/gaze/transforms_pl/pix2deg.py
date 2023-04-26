@@ -20,6 +20,7 @@
 """Module for py:func:`pymovements.gaze.transforms.pix2deg`"""
 from __future__ import annotations
 
+from functools import partial
 from typing import Any
 
 import numpy as np
@@ -28,6 +29,12 @@ import polars as pl
 from pymovements.gaze.transforms_pl.center_origin import center_origin
 from pymovements.gaze.transforms_pl.transforms_library import register_transform
 from pymovements.utils import checks
+
+
+def helper(s, distance_px):
+    """This function is a workaround to get complete coverage by testing this function
+    explicitly."""
+    return pl.Series(np.arctan2(s[0], distance_px))
 
 
 @register_transform
@@ -66,7 +73,7 @@ def pix2deg(
     distance_px = distance_cm * (screen_px / screen_cm)
 
     # Compute positions as radians using arctan2.
-    radians = pl.map([centered_pixels], lambda s: pl.Series(np.arctan2(s[0], distance_px)))
+    radians = pl.map([centered_pixels], partial(helper, distance_px=distance_px))
 
     # 180 / pi transforms radians to degrees.
     degrees = radians * (180 / np.pi)
