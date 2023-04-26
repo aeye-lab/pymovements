@@ -30,14 +30,14 @@
     pymovements.plotting.traceplot
     pymovements.plotting.tsplot
 """
-from pymovements.plotting.heatmap import heatmap  # noqa: F401
-from pymovements.plotting.main_sequence_plot import main_sequence_plot  # noqa: F401
-from pymovements.plotting.traceplot import traceplot  # noqa: F401
-from pymovements.plotting.tsplot import tsplot  # noqa: F401
+from pymovements.plotting.heatmap import heatmap
+from pymovements.plotting.main_sequence_plot import main_sequence_plot
+from pymovements.plotting.traceplot import traceplot
+from pymovements.plotting.tsplot import tsplot
 
 __all__ = [
     'heatmap',
+    'main_sequence_plot',
     'traceplot',
     'tsplot',
-    'main_sequence_plot',
 ]

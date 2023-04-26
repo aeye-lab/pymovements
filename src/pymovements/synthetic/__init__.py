@@ -27,4 +27,9 @@
     pymovements.synthetic.step_function
 
 """
-from pymovements.synthetic.step_function import step_function  # noqa: F401
+from pymovements.synthetic.step_function import step_function
+
+
+__all__ = [
+    'step_function',
+]

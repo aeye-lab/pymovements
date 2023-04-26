@@ -20,7 +20,6 @@
 """Functionality to scan, load and save dataset files."""
 from __future__ import annotations
 
-import re
 from pathlib import Path
 from typing import Any
 
@@ -32,6 +31,7 @@ from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events.events import EventDataFrame
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
 from pymovements.utils.paths import match_filepaths
+from pymovements.utils.strings import curly_to_regex
 
 
 def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataFrame:
@@ -59,7 +59,7 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
     # Get all filepaths that match regular expression.
     fileinfo_dicts = match_filepaths(
         path=paths.raw,
-        regex=re.compile(definition.filename_regex),
+        regex=curly_to_regex(definition.filename_format),
         relative=True,
     )
 
@@ -72,7 +72,7 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
 
     fileinfo_df = fileinfo_df.with_columns([
         pl.col(fileinfo_key).cast(fileinfo_dtype)
-        for fileinfo_key, fileinfo_dtype in definition.filename_regex_dtypes.items()
+        for fileinfo_key, fileinfo_dtype in definition.filename_format_dtypes.items()
     ])
 
     return fileinfo_df
@@ -259,7 +259,7 @@ def add_fileinfo(
     # Cast columns from fileinfo according to specification.
     df = df.with_columns([
         pl.col(fileinfo_key).cast(fileinfo_dtype)
-        for fileinfo_key, fileinfo_dtype in definition.filename_regex_dtypes.items()
+        for fileinfo_key, fileinfo_dtype in definition.filename_format_dtypes.items()
     ])
     return df
 
