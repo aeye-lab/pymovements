@@ -20,6 +20,7 @@
 """Module for py:func:`pymovements.gaze.transforms.savitzky_golay`"""
 from __future__ import annotations
 
+from collections.abc import Callable
 from functools import partial
 from typing import Any
 
