@@ -88,7 +88,10 @@ class EventDataFrame:
 
             # Make sure lengths of onsets and offsets are equal.
             if onsets is not None:
+
+                # mypy does not get that offsets cannot be None (l. 87)
                 assert offsets is not None
+
                 checks.check_is_length_matching(onsets=onsets, offsets=offsets)
                 # In case name is given as a list, check that too.
                 if isinstance(name, Sequence) and not isinstance(name, str):
