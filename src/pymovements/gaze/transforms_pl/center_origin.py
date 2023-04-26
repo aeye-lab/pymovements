@@ -17,20 +17,34 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-Transforms module.
-"""
+"""Module for py:func:`pymovements.gaze.transforms.center_origin`"""
 from __future__ import annotations
 
 import polars as pl
 
+from pymovements.gaze.transforms_pl.transforms_library import register_transform
 
+
+@register_transform
 def center_origin(
         *,
         screen_px: int,
         origin: str,
-        pixel_column: str = 'pixel',
+        pixel_column: str,
 ) -> pl.Expr:
+    """Center pixel data.
+
+    Pixel data will have the coordinates ``(0, 0)`` afterwards.
+
+    Parameters
+    ----------
+    screen_px:
+        Size of screen in pixels.
+    origin:
+        The location of the pixel origin. Supported values: ``center``, ``lower left``
+    pixel_column:
+        Name of the column with pixel data.
+    """
 
     if origin == 'center':
         centered_pixels = pl.col(pixel_column)

@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2022-2023 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,21 +17,29 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from pymovements.gaze.transforms_polars.center_origin import center_origin
-from pymovements.gaze.transforms_polars.downsample import downsample
-from pymovements.gaze.transforms_polars.norm import norm
-from pymovements.gaze.transforms_polars.pix2deg import pix2deg
-from pymovements.gaze.transforms_polars.pos2acc import pos2acc
-from pymovements.gaze.transforms_polars.pos2vel import pos2vel
-from pymovements.gaze.transforms_polars.savitzky_golay import savitzky_golay
+"""Module for py:func:`pymovements.gaze.transforms.norm`"""
+from __future__ import annotations
+
+import polars as pl
+
+from pymovements.gaze.transforms_pl.transforms_library import register_transform
 
 
-__all__ = [
-    'center_origin',
-    'downsample',
-    'norm',
-    'pix2deg',
-    'pos2acc',
-    'pos2vel',
-    'savitzky_golay',
-]
+@register_transform
+def norm(
+        *,
+        columns: tuple[str, str],
+) -> pl.Expr:
+    r"""Take the norm of a 2D series.
+
+    The norm is defined by :math:`\sqrt{x^2 + y^2}` with :math:`x` being the yaw component and
+    :math:`y` being the pitch component of a coordinate.
+
+    Parameters
+    ----------
+    columns:
+        Columns to take norm of.
+    """
+    x = pl.col(columns[0])
+    y = pl.col(columns[1])
+    return (x.pow(2) + y.pow(2)).sqrt()

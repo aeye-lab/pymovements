@@ -50,7 +50,7 @@ import pymovements as pm
 )
 def test_center_origin_init_raises_error(kwargs, exception, msg_substrings):
     with pytest.raises(exception) as excinfo:
-        pm.gaze.transforms_polars.center_origin(**kwargs)
+        pm.gaze.transforms_pl.center_origin(**kwargs)
 
     msg, = excinfo.value.args
     for msg_substring in msg_substrings:
@@ -84,6 +84,6 @@ def test_center_origin_returns(kwargs, series, expected_df):
     df = series.to_frame()
 
     result_df = df.select(
-        pm.gaze.transforms_polars.center_origin(**kwargs),
+        pm.gaze.transforms_pl.center_origin(**kwargs),
     )
     assert_frame_equal(result_df, expected_df.to_frame())

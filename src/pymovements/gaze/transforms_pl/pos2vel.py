@@ -17,24 +17,52 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-Transforms module.
-"""
+"""Module for py:func:`pymovements.gaze.transforms.pos2vel`"""
 from __future__ import annotations
 
 import polars as pl
 
-from pymovements.gaze.transforms_polars.savitzky_golay import savitzky_golay
+from pymovements.gaze.transforms_pl.savitzky_golay import savitzky_golay
+from pymovements.gaze.transforms_pl.transforms_library import register_transform
 
 
+@register_transform
 def pos2vel(
         *,
         sampling_rate: float,
         method: str,
-        window_length: int | None = None,
         degree: int | None = None,
+        window_length: int | None = None,
         padding: str | float | int | None = 'nearest',
 ) -> pl.Expr:
+    """Compute velocitiy data from positional data.
+
+    There are three methods available for velocity calculation:
+    * ``savitzky_golay``: velocity is calculated by a polynomial of fixed degree and window length.
+    See :py:func:`~pymovements.gaze.transforms.savitzky_golay` for further details.
+    * ``smooth``: velocity is calculated from the difference of the mean values
+    of the subsequent two samples and the preceding two samples
+    * ``neighbors``: velocity is calculated from difference of the subsequent
+    sample and the preceding sample
+    * ``preceding``: velocity is calculated from the difference of the current
+    sample to the preceding sample
+
+    Parameters
+    ----------
+    sampling_rate:
+        Sampling rate of input time series.
+    method:
+        The method to use for velocity calculation.
+    degree:
+        The degree of the polynomial to use. This has only an effect if using ``savitzky_golay`` as
+        calculation method.
+    window_length:
+        The window size to use. This has only an effect if using ``savitzky_golay`` as calculation
+        method.
+    padding:
+        The padding to use.  This has only an effect if using ``savitzky_golay`` as calculation
+        method.
+    """
 
     if method == 'neighbors':
         preceding_neighbor = pl.all().shift(periods=1)

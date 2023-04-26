@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-Transforms module.
-"""
+"""Module for py:func:`pymovements.gaze.transforms.pix2deg`"""
 from __future__ import annotations
 
 from typing import Any
@@ -27,18 +25,39 @@ from typing import Any
 import numpy as np
 import polars as pl
 
-from pymovements.gaze.transforms_polars.center_origin import center_origin
+from pymovements.gaze.transforms_pl.center_origin import center_origin
+from pymovements.gaze.transforms_pl.transforms_library import register_transform
+from pymovements.utils import checks
 
 
+@register_transform
 def pix2deg(
         *,
         screen_px: int,
         screen_cm: float,
         distance_cm: float,
         origin: str,
-        pixel_column: str = 'pixel',
-        position_column: str = 'position',
+        pixel_column: str,
+        position_column: str,
 ) -> pl.Expr:
+    """Converts pixel screen coordinates to degrees of visual angle.
+
+    Parameters
+    ----------
+    screen_px:
+        Size of screen in pixels.
+    screen_cm:
+        Size of screen in centimeters.
+    distance_cm:
+        Eye-to-screen distance in centimeters
+    origin:
+        The location of the pixel origin. Supported values: ``center``, ``lower left``. See also
+        py:func:`~pymovements.gaze.transform.center_origin` for more information.
+    pixel_column:
+        The input pixel column name.
+    position_column:
+        The output position column name.
+    """
     _check_screen_scalar(screen_px=screen_px, screen_cm=screen_cm, distance_cm=distance_cm)
 
     centered_pixels = center_origin(screen_px=screen_px, origin=origin, pixel_column=pixel_column)
@@ -56,15 +75,6 @@ def pix2deg(
 
 
 def _check_screen_scalar(**kwargs: Any) -> None:
-    for key, value in kwargs.items():
-
-        if not isinstance(value, (int, float)):
-            raise TypeError(
-                f"'{key}' must be of type int or float but is of type {type(value)}",
-            )
-
-        if value == 0:
-            raise ValueError(f"'{key}' must not be zero")
-
-        if value < 0:
-            raise ValueError(f"'{key}' must not be negative, but is {value}")
+    """Check if all screen values are scalars and are greather than zero."""
+    checks.check_is_scalar(**kwargs)
+    checks.check_is_greater_than_zero(**kwargs)

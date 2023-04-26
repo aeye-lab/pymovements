@@ -17,17 +17,30 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-Transforms module.
-"""
+"""Module for py:func:`pymovements.gaze.transforms.downsample`"""
 from __future__ import annotations
 
 import polars as pl
 
+from pymovements.gaze.transforms_pl.transforms_library import register_transform
+from pymovements.utils import checks
 
-def norm(
-        columns: tuple[str, str],
+
+@register_transform
+def downsample(
+        *,
+        factor: int,
 ) -> pl.Expr:
-    x = pl.col(columns[0])
-    y = pl.col(columns[1])
-    return (x.pow(2) + y.pow(2)).sqrt()
+    """Downsample gaze data by an integer factor.
+
+    Downsampling is done by taking every `nth` sample specified by the downsampling factor.
+
+    Parameters
+    ----------
+    factor:
+        Downsample factor.
+    """
+    checks.check_is_int(factor=factor)
+    checks.check_is_positive_value(factor=factor)
+
+    return pl.all().take_every(n=factor)

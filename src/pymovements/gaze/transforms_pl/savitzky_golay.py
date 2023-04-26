@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-Transforms module.
-"""
+"""Module for py:func:`pymovements.gaze.transforms.savitzky_golay`"""
 from __future__ import annotations
 
 from typing import Any
@@ -27,9 +25,11 @@ from typing import Any
 import polars as pl
 import scipy
 
+from pymovements.gaze.transforms_pl.transforms_library import register_transform
 from pymovements.utils import checks
 
 
+@register_transform
 def savitzky_golay(
         *,
         window_length: int,
@@ -44,8 +44,8 @@ def savitzky_golay(
     ----------
     window_length : int
         The length of the filter window (i.e., the number of coefficients).
-        If `mode` is 'interp', `window_length` must be less than or equal
-        to the size of `x`.
+        If `padding` is ``None``, `window_length` must be less than or equal
+        to the length of the input.
     degree : int
         The degree of the polynomial used to fit the samples.
         `degree` must be less than `window_length`.
@@ -57,43 +57,47 @@ def savitzky_golay(
         The spacing of the samples to which the filter will be applied.
         This is only used if deriv > 0. Default is 1.0.
     padding : str or float, optional
-        Must be 'mirror', 'constant', 'nearest', 'wrap' or 'interp'. This
-        determines the type of extension to use for the padded signal to
-        which the filter is applied.  When `mode` is 'constant', the padding
-        value is given by `cval`.  See the Notes for more details on 'mirror',
-        'constant', 'wrap', and 'nearest'.
-        When the 'interp' mode is selected (the default), no extension
-        is used.  Instead, a degree `polyorder` polynomial is fit to the
-        last `window_length` values of the edges, and this polynomial is
-        used to evaluate the last `window_length // 2` output values.
+        Must be either ``None``, a scalar or one of the strings ``mirror``, ``nearest`` or ``wrap``.
+        This determines the type of extension to use for the padded signal to
+        which the filter is applied.
+        When passing ``None``, no extension padding is used. Instead, a degree `degree` polynomial
+        is fit to the last ``window_length`` values of the edges, and this polynomial is used to
+        evaluate the last ``window_length // 2`` output values.
+        When passing a scalar value, data will be padded using the passed value.
+        See the Notes for more details on the padding methods ``mirror``, ``nearest`` or ``wrap``.
 
     Returns
     -------
     polars.Expr
         The respective polars expression
 
+    Notes
     -----
     Details on the `padding` options:
-        'mirror':
+        ``None``:
+            No padding extension is used.
+        scalar value (int or float):
+            The padding extension contains the specified scalar value.
+        ``mirror``:
             Repeats the values at the edges in reverse order. The value
             closest to the edge is not included.
-        'nearest':
-            The extension contains the nearest input value.
-        'wrap':
-            The extension contains the values from the other end of the array.
-        'constant':
-            The extension contains the value given by the `cval` argument.
-    For example, if the input is [1, 2, 3, 4, 5, 6, 7, 8], and
-    `window_length` is 7, the following shows the extended data for
-    the various `mode` options (assuming `cval` is 0)::
-        mode       |   Ext   |         Input          |   Ext
-        -----------+---------+------------------------+---------
-        None       | -  -  - | 1  2  3  4  5  6  7  8 | -  -  -
-        0          | 0  0  0 | 1  2  3  4  5  6  7  8 | 0  0  0
-        1          | 1  1  1 | 1  2  3  4  5  6  7  8 | 1  1  1
-        'nearest'  | 1  1  1 | 1  2  3  4  5  6  7  8 | 8  8  8
-        'mirror'   | 4  3  2 | 1  2  3  4  5  6  7  8 | 7  6  5
-        'wrap'     | 6  7  8 | 1  2  3  4  5  6  7  8 | 1  2  3
+        ``nearest``:
+            The padding extension contains the nearest input value.
+        ``wrap``:
+            The padding extension contains the values from the other end of the array.
+
+    For example, if the input is ``[1, 2, 3, 4, 5, 6, 7, 8]``, and
+    `window_length` is 7, the following shows the padded data for
+    the various ``padding`` options::
+
+    mode        |   Ext   |         Input          |   Ext
+    ------------+---------+------------------------+---------
+    None        | -  -  - | 1  2  3  4  5  6  7  8 | -  -  -
+    0           | 0  0  0 | 1  2  3  4  5  6  7  8 | 0  0  0
+    1           | 1  1  1 | 1  2  3  4  5  6  7  8 | 1  1  1
+    ``nearest`` | 1  1  1 | 1  2  3  4  5  6  7  8 | 8  8  8
+    ``mirror``  | 4  3  2 | 1  2  3  4  5  6  7  8 | 7  6  5
+    ``wrap``    | 6  7  8 | 1  2  3  4  5  6  7  8 | 1  2  3
 
     """
     _check_window_length(window_length=window_length)
@@ -129,11 +133,13 @@ def savitzky_golay(
 
 
 def _check_window_length(window_length: Any) -> None:
+    """Check that window length is an integer and greater than zero."""
     checks.check_is_int(window_length=window_length)
     checks.check_is_greater_than_zero(degree=window_length)
 
 
 def _check_degree(degree: Any, window_length: int) -> None:
+    """Check that polynomial degree is an integer, greater than zero and less than window_length."""
     checks.check_is_int(degree=degree)
     checks.check_is_greater_than_zero(degree=degree)
 
@@ -142,6 +148,7 @@ def _check_degree(degree: Any, window_length: int) -> None:
 
 
 def _check_padding(padding: Any) -> None:
+    """Check if padding argument is valid."""
     if not isinstance(padding, (float, int, str)) and padding is not None:
         raise TypeError(
             f"'padding' must be of type 'str', 'int', 'float' or None"
@@ -159,5 +166,6 @@ def _check_padding(padding: Any) -> None:
 
 
 def _check_derivative(derivative: Any) -> None:
+    """Check that derivative has a positive integer value."""
     checks.check_is_int(derivative=derivative)
     checks.check_is_positive_value(derivative=derivative)

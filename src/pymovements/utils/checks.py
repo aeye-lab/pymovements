@@ -188,6 +188,18 @@ def check_is_length_matching(**kwargs) -> None:
 
 
 def check_is_int(**kwargs: Any) -> None:
+    """Check if all passed values are of type `int`.
+
+    Parameters
+    ----------
+    kwargs
+        Keyword argument dictionary.
+
+    Raises
+    ------
+    TypeError
+        If any of the passed arguments are not of type `int`.
+    """
     for key, value in kwargs.items():
         if not isinstance(value, int):
             raise TypeError(
@@ -195,13 +207,57 @@ def check_is_int(**kwargs: Any) -> None:
             )
 
 
+def check_is_scalar(**kwargs: Any) -> None:
+    """Check if all passed values are of type `int` or `float`.
+
+    Parameters
+    ----------
+    kwargs
+        Keyword argument dictionary.
+
+    Raises
+    ------
+    TypeError
+        If any of the passed arguments are neither of type `int` nor `float`.
+    """
+    for key, value in kwargs.items():
+        if not isinstance(value, (float, int)):
+            raise TypeError(
+                f"'{key}' must be of type 'int' or 'float' but is of type '{type(value).__name__}'",
+            )
+
+
 def check_is_greater_than_zero(**kwargs: float | int) -> None:
+    """Check if all passed values are greater than zero.
+
+    Parameters
+    ----------
+    kwargs
+        Keyword argument dictionary.
+
+    Raises
+    ------
+    ValueError
+        If any of the passed arguments are not greater than zero.
+    """
     for key, value in kwargs.items():
         if value < 1:
             raise ValueError(f"'{key}' must be greater than zero but is {value}")
 
 
 def check_is_positive_value(**kwargs: float | int) -> None:
+    """Check if all passed values are have a value greater or equal to zero.
+
+    Parameters
+    ----------
+    kwargs
+        Keyword argument dictionary.
+
+    Raises
+    ------
+    ValueError
+        If any of the passed arguments are not greater than or equal to zero.
+    """
     for key, value in kwargs.items():
         if value < 0:
             raise ValueError(f"'{key}' must not be negative but is {value}")

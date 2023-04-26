@@ -17,29 +17,43 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-Transforms module.
-"""
+"""Module for py:func:`pymovements.gaze.transforms.pos2acc`"""
 from __future__ import annotations
-
-from collections.abc import Iterable
-from typing import Any
 
 import polars as pl
 
-from pymovements.utils import checks
+from pymovements.gaze.transforms_pl.savitzky_golay import savitzky_golay
+from pymovements.gaze.transforms_pl.transforms_library import register_transform
 
 
-def downsample(
-        factor: int,
+@register_transform
+def pos2acc(
         *,
-        column: str | Iterable[str] = '*',
+        sampling_rate: float,
+        window_length: int,
+        degree: int,
+        padding: str | float | int | None = 'nearest',
 ) -> pl.Expr:
-    _check_downsample_factor(factor)
+    """Compute acceleration data from positional data.
 
-    return pl.col(column).take_every(n=factor)
+    The method which is used for calculation is
+    :py:func:`~pymovements.gaze.transforms.savitzky_golay`.
 
-
-def _check_downsample_factor(factor: Any) -> None:
-    checks.check_is_int(factor=factor)
-    checks.check_is_positive_value(factor=factor)
+    Parameters
+    ----------
+    sampling_rate:
+        Sampling rate of input time series.
+    degree:
+        The degree of the polynomial to use.
+    window_length:
+        The window size to use.
+    padding:
+        The padding to use.
+    """
+    return savitzky_golay(
+        window_length=window_length,
+        degree=degree,
+        sampling_rate=sampling_rate,
+        padding=padding,
+        derivative=2,
+    )
