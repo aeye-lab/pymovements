@@ -32,7 +32,7 @@ from pymovements.gaze import GazeDataFrame
 def heatmap(
         gaze: GazeDataFrame,
         position_columns: tuple[str, str] = ('x_pix', 'y_pix'),
-        gridsize=(10, 10),
+        gridsize: tuple[int, int] =(10, 10),
         cmap: colors.Colormap | str = 'jet',
         interpolation: str = 'gaussian',
         origin: str = 'lower',
