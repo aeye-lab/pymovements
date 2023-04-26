@@ -20,10 +20,9 @@
 """Module to create a GazeDataFrame from a numpy array."""
 from __future__ import annotations
 
-from typing import Literal
-
 import numpy as np
 import polars as pl
+from typing_extensions import Literal
 
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
