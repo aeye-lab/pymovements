@@ -48,13 +48,13 @@ class DatasetDefinition:
     experiment : Experiment
         The experiment definition.
 
-    filename_regex : str
+    filename_format : str
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_regex_dtypes : dict[str, type], optional
-        If named groups are present in the `filename_regex`, this makes it possible to cast specific
-        named groups to a particular datatype.
+    filename_format_dtypes : dict[str, type], optional
+        If named groups are present in the `filename_format`, this makes it possible to cast
+        specific named groups to a particular datatype.
 
     column_map : dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
@@ -70,9 +70,9 @@ class DatasetDefinition:
 
     experiment: Experiment | None = None
 
-    filename_regex: str = '.*'
+    filename_format: str = '.*'
 
-    filename_regex_dtypes: dict[str, type] = field(default_factory=dict)
+    filename_format_dtypes: dict[str, type] = field(default_factory=dict)
 
     custom_read_kwargs: dict[str, Any] = field(default_factory=dict)
 

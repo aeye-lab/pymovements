@@ -54,10 +54,10 @@
    pymovements.gaze.transforms_pl.pos2vel
    pymovements.gaze.transforms_pl.savitzky_golay
 """
-from pymovements.gaze import transforms  # noqa: F401
-from pymovements.gaze import transforms_pl  # noqa: F401
+from pymovements.gaze import transforms
+from pymovements.gaze import transforms_pl
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.gaze_dataframe import GazeDataFrame  # noqa: F401
+from pymovements.gaze.gaze_dataframe import GazeDataFrame
 from pymovements.gaze.screen import Screen
 
 

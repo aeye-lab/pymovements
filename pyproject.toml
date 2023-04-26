@@ -35,7 +35,7 @@ dependencies = [
   "matplotlib>=3.0.0",
   "numpy>=1.10.0",
   "pandas>1.0.0",
-  "polars>=0.17.0",
+  "polars>=0.17.2",
   "pyarrow>=4.0.0",
   "scipy>=1.5.4",
   "tqdm>=4.0.0",

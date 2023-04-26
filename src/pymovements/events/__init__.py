@@ -60,10 +60,21 @@
     pymovements.events.event_properties.amplitude
     pymovements.events.event_properties.peak_velocity
 """
-from pymovements.events.detection.engbert import microsaccades  # noqa: F401
-from pymovements.events.detection.idt import idt  # noqa: F401
-from pymovements.events.detection.ivt import ivt  # noqa: F401
-from pymovements.events.event_processing import EventGazeProcessor  # noqa: F401
-from pymovements.events.event_processing import EventProcessor  # noqa: F401
-from pymovements.events.events import EventDataFrame  # noqa: F401
-from pymovements.events.events import EventDetectionCallable  # noqa: F401
+from pymovements.events.detection.engbert import microsaccades
+from pymovements.events.detection.idt import idt
+from pymovements.events.detection.ivt import ivt
+from pymovements.events.event_processing import EventGazeProcessor
+from pymovements.events.event_processing import EventProcessor
+from pymovements.events.events import EventDataFrame
+from pymovements.events.events import EventDetectionCallable
+
+
+__all__ = [
+    'microsaccades',
+    'idt',
+    'ivt',
+    'EventGazeProcessor',
+    'EventProcessor',
+    'EventDataFrame',
+    'EventDetectionCallable',
+]

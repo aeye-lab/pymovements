@@ -29,6 +29,13 @@
     pymovements.datasets.GazeBase
     pymovements.datasets.JuDo1000
 """
-from pymovements.datasets.gazebase import GazeBase  # noqa: F401
-from pymovements.datasets.judo1000 import JuDo1000  # noqa: F401
-from pymovements.datasets.toy_dataset import ToyDataset  # noqa: F401
+from pymovements.datasets.gazebase import GazeBase
+from pymovements.datasets.judo1000 import JuDo1000
+from pymovements.datasets.toy_dataset import ToyDataset
+
+
+__all__ = [
+    'GazeBase',
+    'JuDo1000',
+    'ToyDataset',
+]
