@@ -17,43 +17,36 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module holds gaze time series related functionality.
+"""Test from gaze.from_pandas."""
+import pandas as pd
 
-.. rubric:: Classes
-
-.. autosummary::
-   :toctree:
-   :template: class.rst
-
-    pymovements.gaze.Experiment
-    pymovements.gaze.Screen
-    pymovements.gaze.GazeDataFrame
-
-.. rubric:: Transformations
-
-.. autosummary::
-   :toctree:
-
-   pymovements.gaze.transforms.pix2deg
-   pymovements.gaze.transforms.pos2vel
-   pymovements.gaze.transforms.norm
-   pymovements.gaze.transforms.split
-   pymovements.gaze.transforms.downsample
-   pymovements.gaze.transforms.consecutive
-"""
-from pymovements.gaze import transforms
-from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.from_numpy import from_numpy
-from pymovements.gaze.from_pandas import from_pandas
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
-from pymovements.gaze.screen import Screen
+import pymovements as pm
 
 
-__all__ = [
-    'Experiment',
-    'from_numpy',
-    'from_pandas',
-    'GazeDataFrame',
-    'Screen',
-    'transforms',
-]
+def test_from_pandas():
+    pandas_df = pd.DataFrame(
+        {
+            'x_pix': [0, 1, 2, 3],
+            'y_pix': [0, 1, 2, 3],
+            'x_pos': [0, 1, 2, 3],
+            'y_pos': [0, 1, 2, 3],
+        },
+    )
+
+    experiment = pm.Experiment(
+        screen_width_px=1280,
+        screen_height_px=1024,
+        screen_width_cm=38,
+        screen_height_cm=30,
+        distance_cm=68,
+        origin='lower left',
+        sampling_rate=1000.0,
+    )
+
+    gaze = pm.gaze.from_pandas(
+        data=pandas_df,
+        experiment=experiment,
+    )
+
+    assert gaze.frame.shape == (4, 4)
+    assert all(gaze.columns == pandas_df.columns)

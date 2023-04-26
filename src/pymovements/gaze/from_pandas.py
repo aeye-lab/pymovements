@@ -17,43 +17,33 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module holds gaze time series related functionality.
+"""Module to create a GazeDataFrame from a numpy array."""
+from __future__ import annotations
 
-.. rubric:: Classes
+import pandas as pd
+import polars as pl
 
-.. autosummary::
-   :toctree:
-   :template: class.rst
-
-    pymovements.gaze.Experiment
-    pymovements.gaze.Screen
-    pymovements.gaze.GazeDataFrame
-
-.. rubric:: Transformations
-
-.. autosummary::
-   :toctree:
-
-   pymovements.gaze.transforms.pix2deg
-   pymovements.gaze.transforms.pos2vel
-   pymovements.gaze.transforms.norm
-   pymovements.gaze.transforms.split
-   pymovements.gaze.transforms.downsample
-   pymovements.gaze.transforms.consecutive
-"""
-from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.from_numpy import from_numpy
-from pymovements.gaze.from_pandas import from_pandas
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
-from pymovements.gaze.screen import Screen
 
 
-__all__ = [
-    'Experiment',
-    'from_numpy',
-    'from_pandas',
-    'GazeDataFrame',
-    'Screen',
-    'transforms',
-]
+def from_pandas(
+        data: pd.DataFrame,
+        experiment: Experiment | None = None,
+) -> GazeDataFrame:
+    """Construct a :py:class:`~pymovements.gaze.gaze_dataframe.GazeDataFrame`
+    from a pandas DataFrame.
+
+    Parameters
+    ----------
+    data:
+        Data represented as a pandas DataFrame.
+    experiment : Experiment
+        The experiment definition.
+
+    Returns
+    -------
+    py:class:`~pymovements.GazeDataFrame`
+    """
+    df = pl.from_pandas(data=data)
+    return GazeDataFrame(data=df, experiment=experiment)
