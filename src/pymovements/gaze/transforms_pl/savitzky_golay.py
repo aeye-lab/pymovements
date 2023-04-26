@@ -30,7 +30,7 @@ from pymovements.gaze.transforms_pl.transforms_library import register_transform
 from pymovements.utils import checks
 
 
-def helper(s, func):
+def helper(s: Any, func: Callable) -> Any:
     """This function is a workaround to get complete coverage by testing this function
     explicitly."""
     return func(x=s[0])
