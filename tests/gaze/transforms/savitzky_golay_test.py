@@ -47,7 +47,7 @@ import pymovements as pm
             id='degree_zero_raises_type_error',
         ),
         pytest.param(
-            {'window_length': 2, 'degree': 1.0},
+            {'window_length': 3, 'degree': 1.0},
             TypeError,
             ('degree', "must be of type 'int'", "is of type 'float'"),
             id='degree_float_raises_type_error',
@@ -65,19 +65,19 @@ import pymovements as pm
             id='degree_greater_than_window_size_raises_value_error',
         ),
         pytest.param(
-            {'window_length': 2, 'degree': 1, 'derivative': -1},
+            {'window_length': 3, 'degree': 1, 'derivative': -1},
             ValueError,
             ("'derivative' must not be negative", '-1'),
             id='derivative_negative_raises_value_error',
         ),
         pytest.param(
-            {'window_length': 2, 'degree': 1, 'derivative': 1.0},
+            {'window_length': 3, 'degree': 1, 'derivative': 1.0},
             TypeError,
             ("'derivative' must be of type 'int'", "is of type 'float'"),
             id='derivative_float_raises_value_error',
         ),
         pytest.param(
-            {'window_length': 2, 'degree': 1, 'derivative': 0, 'padding': []},
+            {'window_length': 3, 'degree': 1, 'derivative': 0, 'padding': []},
             TypeError,
             (
                 "'padding' must be of type 'str', 'int', 'float' or None",
@@ -86,7 +86,7 @@ import pymovements as pm
             id='invalid_padding_raises_value_error',
         ),
         pytest.param(
-            {'window_length': 2, 'degree': 1, 'derivative': 0, 'padding': 'foobar'},
+            {'window_length': 3, 'degree': 1, 'derivative': 0, 'padding': 'foobar'},
             ValueError,
             (
                 'padding', 'invalid', 'foobar',
@@ -109,8 +109,8 @@ def test_savitzky_golay_init_raises_error(kwargs, exception, msg_substrings):
     ('kwargs', 'series', 'exception', 'msg_substrings'),
     [
         pytest.param(
-            {'window_length': 2, 'degree': 1, 'derivative': 0, 'padding': None},
-            pl.Series('A', [1], pl.Float64),
+            {'window_length': 3, 'degree': 1, 'derivative': 0, 'padding': None},
+            pl.Series('A', [1, 1], pl.Float64),
             pl.exceptions.PolarsPanicError,
             ('',),
             id='no_padding_input_shorter_than_window_length_raises_panicexception',
@@ -133,58 +133,58 @@ def test_savitzky_golay_raises_error(kwargs, series, exception, msg_substrings):
     'kwargs, series, expected_df',
     [
         pytest.param(
-            {'window_length': 2, 'degree': 1},
+            {'window_length': 3, 'degree': 1},
             pl.Series('A', [], pl.Float64),
             pl.Series('A', [], pl.Float64),
             id='empty_series_returns_empty_series',
         ),
         pytest.param(
-            {'window_length': 2, 'degree': 1, 'derivative': 0},
+            {'window_length': 3, 'degree': 1, 'derivative': 0},
             pl.Series('A', [1], pl.Float64),
             pl.Series('A', [1], pl.Float64),
             id='single_element_stays_the_same',
         ),
         pytest.param(
-            {'window_length': 2, 'degree': 1, 'derivative': 0, 'padding': 'mirror'},
+            {'window_length': 3, 'degree': 1, 'derivative': 0, 'padding': 'mirror'},
             pl.Series('A', [1], pl.Float64),
             pl.Series('A', [1], pl.Float64),
             id='single_element_stays_the_same_mirror_padding',
         ),
         pytest.param(
-            {'window_length': 2, 'degree': 1, 'derivative': 0, 'padding': 'nearest'},
+            {'window_length': 3, 'degree': 1, 'derivative': 0, 'padding': 'nearest'},
             pl.Series('A', [1], pl.Float64),
             pl.Series('A', [1], pl.Float64),
             id='single_element_stays_the_same_nearest_padding',
         ),
         pytest.param(
-            {'window_length': 2, 'degree': 1, 'derivative': 0, 'padding': 'wrap'},
+            {'window_length': 3, 'degree': 1, 'derivative': 0, 'padding': 'wrap'},
             pl.Series('A', [1], pl.Float64),
             pl.Series('A', [1], pl.Float64),
             id='single_element_stays_the_same_wrap_padding',
         ),
         pytest.param(
-            {'window_length': 2, 'degree': 1, 'derivative': 0, 'padding': 1},
+            {'window_length': 3, 'degree': 1, 'derivative': 0, 'padding': 1},
             pl.Series('A', [1], pl.Float64),
             pl.Series('A', [1], pl.Float64),
             id='single_element_stays_the_same_scalar_padding',
         ),
         pytest.param(
-            {'window_length': 2, 'degree': 1, 'derivative': 0, 'padding': None},
-            pl.Series('A', [1, 1], pl.Float64),
-            pl.Series('A', [1, 1], pl.Float64),
-            id='two_elements_stay_the_same_none_padding',
+            {'window_length': 3, 'degree': 1, 'derivative': 0, 'padding': None},
+            pl.Series('A', [1, 1, 1], pl.Float64),
+            pl.Series('A', [1, 1, 1], pl.Float64),
+            id='three_elements_stay_the_same_none_padding',
         ),
         pytest.param(
-            {'window_length': 2, 'degree': 1, 'derivative': 1, 'padding': None},
-            pl.Series('A', [1, 1], pl.Float64),
-            pl.Series('A', [0, 0], pl.Float64),
-            id='two_equal_elements_differentation_none_padding_result_zero',
+            {'window_length': 3, 'degree': 1, 'derivative': 1, 'padding': None},
+            pl.Series('A', [1, 1, 1], pl.Float64),
+            pl.Series('A', [0, 0, 0], pl.Float64),
+            id='three_equal_elements_differentation_none_padding_result_zero',
         ),
         pytest.param(
-            {'window_length': 2, 'degree': 1, 'derivative': 1, 'padding': None},
-            pl.Series('A', [1, 2], pl.Float64),
-            pl.Series('A', [1, 1], pl.Float64),
-            id='two_elements_1_2_differentation_none_padding_result_one',
+            {'window_length': 3, 'degree': 1, 'derivative': 1, 'padding': None},
+            pl.Series('A', [1, 2, 3], pl.Float64),
+            pl.Series('A', [1, 1, 1], pl.Float64),
+            id='three_elements_1_2_3_differentation_none_padding_result_one',
         ),
         pytest.param(
             {'window_length': 3, 'degree': 2, 'derivative': 2, 'padding': None},

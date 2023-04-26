@@ -157,22 +157,22 @@ def test_pos2acc_raises_error(kwargs, series, exception, msg_substrings):
             id='single_element_results_zero_equal_scalar_padding',
         ),
         pytest.param(
-            {'window_length': 3, 'degree': 1, 'padding': None, 'sampling_rate': 1},
+            {'window_length': 3, 'degree': 1, 'padding': 'nearest', 'sampling_rate': 1},
             pl.Series('A', [1, 1], pl.Float64),
             pl.Series('A', [0, 0], pl.Float64),
-            id='two_equal_elements_results_zero_none_padding',
+            id='two_equal_elements_results_zero_nearest_padding',
         ),
         pytest.param(
-            {'window_length': 3, 'degree': 1, 'padding': None, 'sampling_rate': 1},
+            {'window_length': 3, 'degree': 1, 'padding': 'nearest', 'sampling_rate': 1},
             pl.Series('A', [1, 1], pl.Float64),
             pl.Series('A', [0, 0], pl.Float64),
-            id='two_equal_elements_differentation_none_padding_result_zero',
+            id='two_equal_elements_differentation_nearest_padding_result_zero',
         ),
         pytest.param(
-            {'window_length': 3, 'degree': 1, 'padding': None, 'sampling_rate': 1},
+            {'window_length': 3, 'degree': 1, 'padding': 'nearest', 'sampling_rate': 1},
             pl.Series('A', [1, 2], pl.Float64),
             pl.Series('A', [0, 0], pl.Float64),
-            id='two_elements_1_2_double_differentation_none_padding_result_zero',
+            id='two_elements_1_2_double_differentation_nearest_padding_result_zero',
         ),
         pytest.param(
             {'window_length': 3, 'degree': 2, 'padding': None, 'sampling_rate': 1},
