@@ -28,7 +28,7 @@ import numpy as np
 from matplotlib import colors
 from matplotlib.collections import LineCollection
 
-default_segmentdata = {
+DEFAULT_SEGMENTDATA = {
     'red': [
         [0.0, 0.0, 0.0],
         [0.5, 1.0, 1.0],
@@ -47,7 +47,7 @@ default_segmentdata = {
 }
 
 
-default_segmentdata_twoslope = {
+DEFAULT_SEGMENTDATA_TWOSLOPE = {
     'red': [
         [0.0, 0.0, 0.0],
         [0.5, 0.0, 0.0],
@@ -155,9 +155,9 @@ def traceplot(
     if cmap is None:
         if cmap_segmentdata is None:
             if cmap_norm == 'twoslope':
-                cmap_segmentdata = default_segmentdata_twoslope
+                cmap_segmentdata = DEFAULT_SEGMENTDATA_TWOSLOPE
             else:
-                cmap_segmentdata = default_segmentdata
+                cmap_segmentdata = DEFAULT_SEGMENTDATA
 
         cmap = matplotlib.colors.LinearSegmentedColormap(
             'line_cmap', segmentdata=cmap_segmentdata, N=512,
