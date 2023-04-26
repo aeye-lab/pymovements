@@ -22,6 +22,7 @@ This module holds basic checks which will be reused in other modules.
 """
 from __future__ import annotations
 
+from collections.abc import Sized
 from typing import Any
 
 import numpy as np
@@ -94,7 +95,7 @@ def check_shapes_positions_velocities(positions: np.ndarray, velocities: np.ndar
         )
 
 
-def check_two_kwargs(**kwargs) -> None:
+def check_two_kwargs(**kwargs: Any) -> None:
     """Check if exactly two keyword arguments are given.
 
     Parameters
@@ -111,7 +112,7 @@ def check_two_kwargs(**kwargs) -> None:
         raise ValueError('there must be exactly two keyword arguments in kwargs')
 
 
-def check_is_mutual_exclusive(**kwargs) -> None:
+def check_is_mutual_exclusive(**kwargs: Any) -> None:
     """Check if at most one of two values is not None.
 
     Parameters
@@ -137,7 +138,7 @@ def check_is_mutual_exclusive(**kwargs) -> None:
         )
 
 
-def check_is_none_is_mutual(**kwargs) -> None:
+def check_is_none_is_mutual(**kwargs: Any) -> None:
     """Check if two values are either both None or both have a value.
 
     Parameters
@@ -164,7 +165,7 @@ def check_is_none_is_mutual(**kwargs) -> None:
         )
 
 
-def check_is_length_matching(**kwargs) -> None:
+def check_is_length_matching(**kwargs: Sized) -> None:
     """Check if two sequences are of equal length.
 
     Parameters
