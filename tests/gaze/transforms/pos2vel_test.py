@@ -47,7 +47,7 @@ import pymovements as pm
             id='degree_zero_raises_type_error',
         ),
         pytest.param(
-            {'method': 'savitzky_golay', 'window_length': 2, 'degree': 1.0, 'sampling_rate': 1},
+            {'method': 'savitzky_golay', 'window_length': 3, 'degree': 1.0, 'sampling_rate': 1},
             TypeError,
             ('degree', "must be of type 'int'", "is of type 'float'"),
             id='degree_float_raises_type_error',
@@ -67,7 +67,7 @@ import pymovements as pm
         pytest.param(
             {
                 'method': 'savitzky_golay',
-                'window_length': 2,
+                'window_length': 3,
                 'degree': 1,
                 'padding': [],
                 'sampling_rate': 1,
@@ -81,7 +81,7 @@ import pymovements as pm
         ),
         pytest.param(
             {
-                'method': 'savitzky_golay', 'window_length': 2,
+                'method': 'savitzky_golay', 'window_length': 3,
                 'degree': 1, 'padding': 'foobar', 'sampling_rate': 1,
             },
             ValueError,
@@ -92,7 +92,7 @@ import pymovements as pm
             id='invalid_padding_raises_value_error',
         ),
         pytest.param(
-            {'method': 'foobar', 'window_length': 2, 'degree': 1, 'sampling_rate': 1},
+            {'method': 'foobar', 'window_length': 3, 'degree': 1, 'sampling_rate': 1},
             ValueError,
             (
                 'unknown', 'method', "'foobar'", 'supported methods', 'preceding', 'neighbors',
@@ -116,7 +116,7 @@ def test_pos2vel_init_raises_error(kwargs, exception, msg_substrings):
     [
         pytest.param(
             {
-                'method': 'savitzky_golay', 'window_length': 2,
+                'method': 'savitzky_golay', 'window_length': 3,
                 'degree': 1, 'padding': None, 'sampling_rate': 1,
             },
             pl.Series('A', [1], pl.Float64),
@@ -142,20 +142,20 @@ def test_pos2vel_raises_error(kwargs, series, exception, msg_substrings):
     'kwargs, series, expected_df',
     [
         pytest.param(
-            {'method': 'savitzky_golay', 'window_length': 2, 'degree': 1, 'sampling_rate': 1},
+            {'method': 'savitzky_golay', 'window_length': 3, 'degree': 1, 'sampling_rate': 1},
             pl.Series('A', [], pl.Float64),
             pl.Series('A', [], pl.Float64),
             id='empty_series_returns_empty_series',
         ),
         pytest.param(
-            {'method': 'savitzky_golay', 'window_length': 2, 'degree': 1, 'sampling_rate': 1},
+            {'method': 'savitzky_golay', 'window_length': 3, 'degree': 1, 'sampling_rate': 1},
             pl.Series('A', [1], pl.Float64),
             pl.Series('A', [0], pl.Float64),
             id='single_element_results_zero',
         ),
         pytest.param(
             {
-                'method': 'savitzky_golay', 'window_length': 2,
+                'method': 'savitzky_golay', 'window_length': 3,
                 'degree': 1, 'padding': 'mirror', 'sampling_rate': 1,
             },
             pl.Series('A', [1], pl.Float64),
@@ -164,7 +164,7 @@ def test_pos2vel_raises_error(kwargs, series, exception, msg_substrings):
         ),
         pytest.param(
             {
-                'method': 'savitzky_golay', 'window_length': 2,
+                'method': 'savitzky_golay', 'window_length': 3,
                 'degree': 1, 'padding': 'nearest', 'sampling_rate': 1,
             },
             pl.Series('A', [1], pl.Float64),
@@ -173,7 +173,7 @@ def test_pos2vel_raises_error(kwargs, series, exception, msg_substrings):
         ),
         pytest.param(
             {
-                'method': 'savitzky_golay', 'window_length': 2,
+                'method': 'savitzky_golay', 'window_length': 3,
                 'degree': 1, 'padding': 'wrap', 'sampling_rate': 1,
             },
             pl.Series('A', [1], pl.Float64),
@@ -182,7 +182,7 @@ def test_pos2vel_raises_error(kwargs, series, exception, msg_substrings):
         ),
         pytest.param(
             {
-                'method': 'savitzky_golay', 'window_length': 2,
+                'method': 'savitzky_golay', 'window_length': 3,
                 'degree': 1, 'padding': 1, 'sampling_rate': 1,
             },
             pl.Series('A', [1], pl.Float64),
@@ -191,7 +191,7 @@ def test_pos2vel_raises_error(kwargs, series, exception, msg_substrings):
         ),
         pytest.param(
             {
-                'method': 'savitzky_golay', 'window_length': 2,
+                'method': 'savitzky_golay', 'window_length': 3,
                 'degree': 1, 'padding': 0, 'sampling_rate': 1,
             },
             pl.Series('A', [1], pl.Float64),
@@ -200,7 +200,7 @@ def test_pos2vel_raises_error(kwargs, series, exception, msg_substrings):
         ),
         pytest.param(
             {
-                'method': 'savitzky_golay', 'window_length': 2,
+                'method': 'savitzky_golay', 'window_length': 3,
                 'degree': 1, 'padding': None, 'sampling_rate': 1,
             },
             pl.Series('A', [1, 1], pl.Float64),
@@ -209,7 +209,7 @@ def test_pos2vel_raises_error(kwargs, series, exception, msg_substrings):
         ),
         pytest.param(
             {
-                'method': 'savitzky_golay', 'window_length': 2,
+                'method': 'savitzky_golay', 'window_length': 3,
                 'degree': 1, 'padding': None, 'sampling_rate': 1,
             },
             pl.Series('A', [1, 1], pl.Float64),
@@ -218,7 +218,7 @@ def test_pos2vel_raises_error(kwargs, series, exception, msg_substrings):
         ),
         pytest.param(
             {
-                'method': 'savitzky_golay', 'window_length': 2,
+                'method': 'savitzky_golay', 'window_length': 3,
                 'degree': 1, 'padding': None, 'sampling_rate': 1,
             },
             pl.Series('A', [1, 2], pl.Float64),
@@ -227,7 +227,7 @@ def test_pos2vel_raises_error(kwargs, series, exception, msg_substrings):
         ),
         pytest.param(
             {
-                'method': 'savitzky_golay', 'window_length': 2,
+                'method': 'savitzky_golay', 'window_length': 3,
                 'degree': 1, 'padding': None, 'sampling_rate': 1000,
             },
             pl.Series('A', [1, 2], pl.Float64),
