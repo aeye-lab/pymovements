@@ -9,6 +9,8 @@ jobs:
   test:
     name: test ${{ matrix.tox_env }} (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    env:
+      MPLBACKEND: Agg
     strategy:
       fail-fast: false
       matrix:
