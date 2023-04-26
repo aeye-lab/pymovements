@@ -105,6 +105,13 @@ omit = [
 [tool.doc8]
 max-line-length = 100
 
+[tool.mypy]
+check_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
 [[tool.mypy.overrides]]
 module = "scipy.*"
 ignore_missing_imports = true
@@ -112,6 +119,16 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = "matplotlib.*"
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+check_untyped_defs = false
+disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+module = "docs.*"
+check_untyped_defs = false
+disallow_untyped_defs = false
 
 [tool.pytest.ini_options]
 addopts = "-ra -l -v --doctest-modules"

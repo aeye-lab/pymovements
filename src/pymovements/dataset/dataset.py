@@ -22,6 +22,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from pathlib import Path
+from typing import Any
 
 import polars as pl
 from tqdm.auto import tqdm
@@ -264,7 +265,7 @@ class Dataset:
 
         return self
 
-    def pos2vel(self, method: str = 'smooth', verbose: bool = True, **kwargs) -> Dataset:
+    def pos2vel(self, method: str = 'smooth', verbose: bool = True, **kwargs: Any) -> Dataset:
         """Compute gaze velocites in dva/s from dva coordinates.
 
         This method requires a properly initialized :py:attr:`~.Dataset.experiment` attribute.
@@ -305,7 +306,7 @@ class Dataset:
             eye: str | None = 'auto',
             clear: bool = False,
             verbose: bool = True,
-            **kwargs,
+            **kwargs: Any,
     ) -> Dataset:
         """Detect events by applying a specific event detection method.
 
