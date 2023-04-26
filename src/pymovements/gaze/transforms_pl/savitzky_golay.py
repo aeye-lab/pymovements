@@ -82,15 +82,15 @@ def savitzky_golay(
     -----
     Details on the `padding` options:
     * ``None``: No padding extension is used.
-    scalar value (int or float): The padding extension contains the specified scalar value.
+    * scalar value (int or float): The padding extension contains the specified scalar value.
     * ``mirror``: Repeats the values at the edges in reverse order. The value closest to the edge is
-     not included.
+    not included.
     * ``nearest``: The padding extension contains the nearest input value.
     * ``wrap``: The padding extension contains the values from the other end of the array.
 
     For example, if the input is ``[1, 2, 3, 4, 5, 6, 7, 8]``, and
     `window_length` is 7, the following shows the padded data for
-    the various ``padding`` options::
+    the various ``padding`` options:
 
     mode        |   Ext   |         Input          |   Ext
     ------------+---------+------------------------+---------
@@ -100,7 +100,6 @@ def savitzky_golay(
     ``nearest`` | 1  1  1 | 1  2  3  4  5  6  7  8 | 8  8  8
     ``mirror``  | 4  3  2 | 1  2  3  4  5  6  7  8 | 7  6  5
     ``wrap``    | 6  7  8 | 1  2  3  4  5  6  7  8 | 1  2  3
-
     """
     _check_window_length(window_length=window_length)
     _check_degree(degree=degree, window_length=window_length)
