@@ -17,43 +17,40 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module holds gaze time series related functionality.
+"""Module to create a GazeDataFrame from a numpy array."""
+from __future__ import annotations
 
-.. rubric:: Classes
+import numpy as np
+import polars as pl
+from typing_extensions import Literal
 
-.. autosummary::
-   :toctree:
-   :template: class.rst
-
-    pymovements.gaze.Experiment
-    pymovements.gaze.Screen
-    pymovements.gaze.GazeDataFrame
-
-.. rubric:: Transformations
-
-.. autosummary::
-   :toctree:
-
-   pymovements.gaze.transforms.pix2deg
-   pymovements.gaze.transforms.pos2vel
-   pymovements.gaze.transforms.norm
-   pymovements.gaze.transforms.split
-   pymovements.gaze.transforms.downsample
-   pymovements.gaze.transforms.consecutive
-"""
-from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.from_numpy import from_numpy
-from pymovements.gaze.from_pandas import from_pandas
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
-from pymovements.gaze.screen import Screen
 
 
-__all__ = [
-    'Experiment',
-    'from_numpy',
-    'from_pandas',
-    'GazeDataFrame',
-    'Screen',
-    'transforms',
-]
+def from_numpy(
+        data: np.ndarray,
+        schema: list[str],
+        experiment: Experiment | None = None,
+        orient: Literal['col', 'row'] = 'col',
+) -> GazeDataFrame:
+    """Construct a :py:class:`~pymovements.gaze.gaze_dataframe.GazeDataFrame`
+    from a numpy array.
+
+    Parameters
+    ----------
+    data:
+        Two-dimensional data represented as a numpy ndarray.
+    schema:
+        A list of column names.
+    orient:
+        Whether to interpret the two-dimensional data as columns or as rows.
+    experiment : Experiment
+        The experiment definition.
+
+    Returns
+    -------
+    py:class:`~pymovements.GazeDataFrame`
+    """
+    df = pl.from_numpy(data=data, schema=schema, orient=orient)
+    return GazeDataFrame(data=df, experiment=experiment)
