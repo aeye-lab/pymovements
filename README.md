@@ -75,6 +75,7 @@ If you are using pymovements in your research, we would be happy if you cite our
     booktitle = {2023 Symposium on Eye Tracking Research and Applications},
     location = {Tubingen, Germany},
     series = {ETRA '23},
-}```
+}
+```
 
 There is also a preprint available on [arxiv](https://arxiv.org/abs/2304.09859).
