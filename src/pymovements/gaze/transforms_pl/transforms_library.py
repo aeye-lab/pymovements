@@ -20,7 +20,7 @@
 """TransformLibrary module."""
 from __future__ import annotations
 
-from collections.abc import Callable
+from typing import Callable
 from typing import TypeVar
 
 import polars as pl
