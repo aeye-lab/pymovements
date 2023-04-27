@@ -58,17 +58,23 @@ https://github.com/aeye-lab/pymovements/issues/new/choose) or write us at
 
 ## Citing
 
-If you are using pymovements in your research, we would be happy if you cite our work by using the
-following BibTex entry:
+If you are using pymovements in your research, we would be happy if you cite our work by using the following BibTex entry:
 
 ```bibtex
-@misc{pymovements,
-  author = {Krakowczyk, Daniel G. and Reich, David R. and Chwastek, Jakob and Süss, Assunta
-   and Prasse, Paul and Jakobi, Deborah N. and Turuta, Oleksii and Kasprowski, Paweł
+@inproceedings{pymovements,
+    author = {Krakowczyk, Daniel G. and Reich, David R. and Chwastek, Jakob and Jakobi, Deborah N.
+   and Prasse, Paul and Süss, Assunta and Turuta, Oleksii and Kasprowski, Paweł
    and Jäger, Lena A.},
-  title = {pymovements: A Python Package for Processing Eye Movement Data},
-  year = {2023},
-  publisher = {GitHub},
-  howpublished = {\url{https://github.com/aeye-lab/pymovements}},
-}
-```
+    title = {pymovements: A Python Package for Processing Eye Movement Data},
+    year = {2023},
+    isbn = {979-8-4007-0150-4/23/05},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/3588015.3590134},
+    doi = {10.1145/3588015.3590134},
+    booktitle = {2023 Symposium on Eye Tracking Research and Applications},
+    location = {Tubingen, Germany},
+    series = {ETRA '23},
+}```
+
+There is also a preprint available on [arxiv](https://arxiv.org/abs/2304.09859).
