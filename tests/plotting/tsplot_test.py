@@ -25,16 +25,35 @@ import numpy as np
 import pytest
 from matplotlib import figure
 
-from pymovements.plotting import tsplot
+import pymovements as pm
 
 
-@pytest.fixture(name='arr')
-def arr_fixture():
+@pytest.fixture(name='gaze')
+def gaze_fixture():
     x = np.arange(-100, 100)
     y = np.arange(-100, 100)
     arr = np.column_stack((x, y)).transpose()
 
-    return arr
+    experiment = pm.Experiment(
+        screen_width_px=1280,
+        screen_height_px=1024,
+        screen_width_cm=38,
+        screen_height_cm=30,
+        distance_cm=68,
+        origin='lower left',
+        sampling_rate=1000.0,
+    )
+
+    gaze = pm.gaze.from_numpy(
+        data=arr,
+        schema=['x_pix', 'y_pix'],
+        experiment=experiment,
+    )
+
+    gaze.pix2deg()
+    gaze.pos2vel()
+
+    return gaze
 
 
 @pytest.mark.parametrize(
@@ -43,58 +62,34 @@ def arr_fixture():
         pytest.param({}, id='no_kwargs'),
         pytest.param({'share_y': False}, id='share_y_false'),
         pytest.param({'show_yticks': False}, id='show_yticks_false'),
-        pytest.param({'channel_names': ['foo', 'bar']}, id='channel_names'),
+        pytest.param({'channels': ['x_pix']}, id='single_channel'),
+        pytest.param({'channels': 'x_pix'}, id='single_channel_string'),
+        pytest.param({'channels': ['x_pix', 'y_pix']}, id='two_channels'),
         pytest.param(
-            {'channel_names': ['foo', 'bar'], 'rotate_ylabels': False},
-            id='channel_names_no_rotate',
+            {'channels': ['x_pix', 'y_pix'], 'rotate_ylabels': False},
+            id='channels_no_rotate',
         ),
     ],
 )
-def test_tsplot_show(arr, kwargs, monkeypatch):
+def test_tsplot_show(gaze, kwargs, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
-    tsplot(arr, **kwargs)
+    pm.plotting.tsplot(gaze=gaze, **kwargs)
     plt.close()
     mock.assert_called_once()
 
 
-def test_tsplot_1d(monkeypatch):
+def test_tsplot_noshow(gaze, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
-    tsplot(np.arange(-100, 100))
-    plt.close()
-    mock.assert_called_once()
-
-
-def test_tsplot_noshow(arr, monkeypatch):
-    mock = Mock()
-    monkeypatch.setattr(plt, 'show', mock)
-    tsplot(arr, show=False)
+    pm.plotting.tsplot(gaze=gaze, show=False)
     plt.close()
     mock.assert_not_called()
 
 
-def test_tsplot_save(arr, monkeypatch, tmp_path):
+def test_tsplot_save(gaze, monkeypatch, tmp_path):
     mock = Mock()
     monkeypatch.setattr(figure.Figure, 'savefig', mock)
-    tsplot(arr, show=False, savepath=str(tmp_path / 'test.svg'))
+    pm.plotting.tsplot(gaze=gaze, show=False, savepath=str(tmp_path / 'test.svg'))
     plt.close()
     mock.assert_called_once()
-
-
-@pytest.mark.parametrize(
-    ('kwargs', 'exception'),
-    [
-        pytest.param(
-            {'arr': np.ones((1000, 3, 3))},
-            ValueError,
-            id='3_dim_input',
-        ),
-    ],
-)
-def test_tsplot_exceptions(kwargs, exception, monkeypatch):
-    mock = Mock()
-    monkeypatch.setattr(plt, 'show', mock)
-
-    with pytest.raises(exception):
-        tsplot(**kwargs)
