@@ -247,15 +247,16 @@ EXPECTED_DF_SYNC = pl.from_dict(
     'sync_msg_stop_pattern',
     [None, 'STOP'],
 )
-def test_parse_eyelink(tmp_path, sync_msg_start_pattern, sync_msg_stop_pattern):
+def test_load_eyelink_file(tmp_path, sync_msg_start_pattern, sync_msg_stop_pattern):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(ASC_TEXT)
 
-    df = pm.utils.parsing.parse_eyelink(
-        filepath,
-        sync_msg_start_pattern,
-        sync_msg_stop_pattern,
-    )
+    read_kwargs = {
+        'sync_msg_start_pattern': sync_msg_start_pattern,
+        'sync_msg_stop_pattern': sync_msg_stop_pattern,
+    }
+
+    df = pm.dataset.dataset_files.load_gaze_file(filepath, custom_read_kwargs=read_kwargs)
 
     if sync_msg_start_pattern is not None:
         expected_df = EXPECTED_DF_SYNC
