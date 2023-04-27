@@ -19,15 +19,12 @@
 # SOFTWARE.
 # flake8: noqa: E101, W191, E501
 """ Tests pymovements asc to csv processing"""
-import os
-
 import numpy as np
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
-from pymovements.utils.parsing import process_asc2csv
-from pymovements.utils.parsing import scolor
+from pymovements.utils.parsing import parse_eyelink
 
 
 ASC_TEXT = r"""\
@@ -163,7 +160,7 @@ EXPECTED_DF_NO_SYNC = pl.from_dict(
             2154565,
             2154567,
             2154568,
-        ], 'x_eye': [
+        ], 'x_pix': [
             139.6,
             139.5,
             np.nan,
@@ -171,7 +168,7 @@ EXPECTED_DF_NO_SYNC = pl.from_dict(
             139.5,
             np.nan,
             850.7,
-        ], 'y_eye': [
+        ], 'y_pix': [
             132.1,
             131.9,
             np.nan,
@@ -179,7 +176,7 @@ EXPECTED_DF_NO_SYNC = pl.from_dict(
             131.9,
             np.nan,
             717.5,
-        ], 'pupil_eye': [
+        ], 'pupil': [
             784.0,
             784.0,
             0.0,
@@ -208,21 +205,21 @@ EXPECTED_DF_SYNC = pl.from_dict(
             2154565,
             2154567,
             2154568,
-        ], 'x_eye': [
+        ], 'x_pix': [
             139.5,
             np.nan,
             850.7,
             139.5,
             np.nan,
             850.7,
-        ], 'y_eye': [
+        ], 'y_pix': [
             131.9,
             np.nan,
             717.5,
             131.9,
             np.nan,
             717.5,
-        ], 'pupil_eye': [
+        ], 'pupil': [
             784.0,
             0.0,
             714.0,
@@ -249,59 +246,19 @@ EXPECTED_DF_SYNC = pl.from_dict(
     'sync_msg_stop_pattern',
     [None, 'STOP'],
 )
-@pytest.mark.parametrize(
-    'overwrite_existing',
-    [False, True],
-)
-@pytest.mark.parametrize(
-    'create_overwrite_existing',
-    [False, True],
-)
-def test_process_asc2csv(
-    tmp_path, sync_msg_start_pattern, sync_msg_stop_pattern,
-    overwrite_existing, create_overwrite_existing, capsys,
-):
+def test_parse_eyelink(tmp_path, sync_msg_start_pattern, sync_msg_stop_pattern):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(ASC_TEXT)
-    if create_overwrite_existing:
-        status_msg = 'Rewritten'
-        start_color = scolor.rewritten
-        csv_filepath = tmp_path / 'sub.csv'
-        csv_filepath.write_text('test')
-    else:
-        status_msg = 'Created'
-        start_color = scolor.created
-    df = process_asc2csv(
+
+    df = parse_eyelink(
         filepath,
         sync_msg_start_pattern,
         sync_msg_stop_pattern,
-        overwrite_existing,
     )
-    captured = capsys.readouterr()
-    if sync_msg_start_pattern:
+
+    if sync_msg_start_pattern is not None:
         expected_df = EXPECTED_DF_SYNC
     else:
         expected_df = EXPECTED_DF_NO_SYNC
-    if create_overwrite_existing and not overwrite_existing:
-        status_msg = 'Skipped'
-        msg_begin = f"Processing csv for {os.path.join(tmp_path, 'sub.asc')}".ljust(
-            105 - len(status_msg), '.',
-        )
-        expected_out = msg_begin + f'{scolor.skipped}{status_msg}{scolor.end}\n'
-        expected_df = pl.DataFrame(
-            schema=[
-                ('time', pl.Int64),
-                ('x_eye', pl.Float64),
-                ('y_eye', pl.Float64),
-                ('pupil_eye', pl.Float64),
-                ('task', pl.Utf8),
-            ],
-        )
-        assert_frame_equal(df, expected_df)
-        assert captured.out == expected_out
-    else:
-        msg_begin = f"Processing csv for {os.path.join(tmp_path, 'sub.asc')}".ljust(
-            105 - len(status_msg), '.',
-        )
-        expected_out = msg_begin + f'{start_color}{status_msg}{scolor.end}\n'
-        assert captured.out == expected_out
+
+    assert_frame_equal(df, expected_df)
