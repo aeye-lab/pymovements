@@ -22,14 +22,20 @@ This module holds the time series plot.
 """
 from __future__ import annotations
 
+import math
+
 import matplotlib.pyplot as plt
 import numpy as np
 
+from pymovements.gaze import GazeDataFrame
+
 
 def tsplot(
-        arr: np.ndarray,
-        channel_names: list[str] | None = None,
+        gaze: GazeDataFrame,
+        channels: list[str] | None = None,
         xlabel: str | None = None,
+        n_cols: int | None = None,
+        n_rows: int | None = None,
         rotate_ylabels: bool = True,
         share_y: bool = True,
         zero_centered_yaxis: bool = True,
@@ -47,10 +53,14 @@ def tsplot(
 
     Parameters
     ----------
-    arr: np.ndarray
-        array with channeled time series
-    channel_names: list, optional
+    gaze:
+        The GazeDataFrame to plot.
+    channels: list, optional
         list of channel names
+    n_cols: int
+        Number of channel subplot colunms. If None, it will be automatically inferred.
+    n_rows: int
+        Number of channel subplot rows. If None, it will be automatically inferred.
     xlabel: str, optional
         set x label
     rotate_ylabels: bool
@@ -81,13 +91,15 @@ def tsplot(
     ValueError
         If array has more than two dimensions.
     """
+    if channels is None:
+        channels = gaze.frame.columns
+
+    arr = gaze.frame[channels].to_numpy().transpose()
 
     if arr.ndim == 1:
         arr = np.expand_dims(arr, axis=0)
     elif arr.ndim == 2:
         pass
-    else:
-        raise ValueError(arr.shape)
 
     channel_axis = 0
     sample_axis = 1
@@ -95,19 +107,31 @@ def tsplot(
     n_channels = arr.shape[channel_axis]
     n_samples = arr.shape[sample_axis]
 
+    if n_cols is None:
+        if n_channels % 2 == 0:
+            n_cols = 2
+        else:
+            n_cols = 1
+
+    if n_rows is None:
+        n_rows = math.ceil(n_channels / n_cols)
+
     # determine number of subplots and height ratios for events
-    n_subplots = n_channels
-    height_ratios = [1] * n_channels
+    height_ratios = [1] * n_rows
 
     fig, axs = plt.subplots(
-        nrows=n_subplots,
-        sharex=True, sharey=share_y,
+        ncols=n_cols,
+        nrows=n_rows,
+        sharex=True,
+        sharey=share_y,
+        squeeze=False,
         figsize=figsize,
         gridspec_kw={
             'hspace': 0,
             'height_ratios': height_ratios,
         },
     )
+    axs = axs.flatten()
 
     t = np.arange(n_samples)
     xlims = t.min(), t.max()
@@ -119,13 +143,9 @@ def tsplot(
         ylims = -ylim_abs * y_pad_factor, ylim_abs * y_pad_factor
 
     for channel_id in range(n_channels):
-        if n_channels == 1:
-            ax = axs
-        else:
-            ax = axs[channel_id]
+        ax = axs[channel_id]
 
         x_channel = arr[channel_id, :]
-
         ax.plot(t, x_channel, color=line_color, linewidth=line_width)
 
         if not share_y:
@@ -157,15 +177,14 @@ def tsplot(
         plt.rcParams.update(params)
 
         # set channel names as y-axis labels
-        if channel_names:
-            if rotate_ylabels:
-                ax.set_ylabel(
-                    channel_names[channel_id],
-                    rotation='horizontal',
-                    ha='right', va='center',
-                )
-            else:
-                ax.set_ylabel(channel_names[channel_id])
+        if rotate_ylabels:
+            ax.set_ylabel(
+                channels[channel_id],
+                rotation='horizontal',
+                ha='right', va='center',
+            )
+        else:
+            ax.set_ylabel(channels[channel_id])
 
     # print x label on last used (bottom) axis
     ax.set_xlabel(xlabel)

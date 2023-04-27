@@ -28,6 +28,9 @@ import numpy as np
 from matplotlib import colors
 from matplotlib.collections import LineCollection
 
+from pymovements.gaze.gaze_dataframe import GazeDataFrame
+
+
 DEFAULT_SEGMENTDATA = {
     'red': [
         [0.0, 0.0, 0.0],
@@ -71,8 +74,9 @@ DEFAULT_SEGMENTDATA_TWOSLOPE = {
 
 
 def traceplot(
-        x: np.ndarray,
-        y: np.ndarray,
+        gaze: GazeDataFrame,
+        x: str,
+        y: str,
         cval: np.ndarray | None = None,
         cmap: colors.Colormap | None = None,
         cmap_norm: colors.Normalize | str | None = None,
@@ -91,10 +95,12 @@ def traceplot(
 
     Parameters
     ----------
-    x: np.ndarray
-        x-coordinates
-    y: np.ndarray
-        y-coordinates
+    gaze: GazeDataFrame
+        The GazeDataFrame to plot.
+    x: str
+        Column name of x-coordinates
+    y: str
+        Column name of y-coordinates
     cval: np.ndarray
         line color values.
     cmap: matplotlib.colors.Colormap, optional
@@ -126,13 +132,10 @@ def traceplot(
         If length of x and y coordinates do not match or if ``cmap_norm`` is unknown.
 
     """
+    x_signal = gaze.frame[x]
+    y_signal = gaze.frame[y]
 
-    if len(x) != len(y):
-        raise ValueError(
-            'x and y do not share same length '
-            f'({len(x)} != {len(y)})',
-        )
-    n = len(x)
+    n = len(x_signal)
 
     fig = plt.figure(figsize=figsize)
     ax = fig.gca()
@@ -188,7 +191,7 @@ def traceplot(
     # This creates the points as a N x 1 x 2 array so that we can stack points
     # together easily to get the segments. The segments array for line collection
     # needs to be (numlines) x (points per line) x 2 (for x and y)
-    points = np.array([x, y]).T.reshape((-1, 1, 2))
+    points = np.array([x_signal, y_signal]).T.reshape((-1, 1, 2))
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
 
     # Create a continuous norm to map from data points to colors
@@ -199,14 +202,14 @@ def traceplot(
     line = ax.add_collection(line_collection)
 
     if padding is None:
-        x_pad = (np.nanmax(x) - np.nanmin(x)) * pad_factor
-        y_pad = (np.nanmax(y) - np.nanmin(y)) * pad_factor
+        x_pad = (np.nanmax(x_signal) - np.nanmin(x_signal)) * pad_factor
+        y_pad = (np.nanmax(y_signal) - np.nanmin(y_signal)) * pad_factor
     else:
         x_pad = padding
         y_pad = padding
 
-    ax.set_xlim(np.nanmin(x) - x_pad, np.nanmax(x) + x_pad)
-    ax.set_ylim(np.nanmin(y) - y_pad, np.nanmax(y) + y_pad)
+    ax.set_xlim(np.nanmin(x_signal) - x_pad, np.nanmax(x_signal) + x_pad)
+    ax.set_ylim(np.nanmin(y_signal) - y_pad, np.nanmax(y_signal) + y_pad)
 
     if show_cbar:
         # sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
