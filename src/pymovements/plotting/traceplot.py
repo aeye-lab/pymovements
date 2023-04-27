@@ -135,11 +135,6 @@ def traceplot(
     x_signal = gaze.frame[x]
     y_signal = gaze.frame[y]
 
-    if len(x_signal) != len(y_signal):
-        raise ValueError(
-            'x and y do not share same length '
-            f'({len(x_signal)} != {len(y_signal)})',
-        )
     n = len(x_signal)
 
     fig = plt.figure(figsize=figsize)
