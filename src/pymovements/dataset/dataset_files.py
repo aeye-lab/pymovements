@@ -204,15 +204,11 @@ def load_gaze_files(
                 extension=extension,
             )
 
-        if filepath.suffix == '.csv':
-            if preprocessed:
-                gaze_df = pl.read_csv(filepath)
-            else:
-                gaze_df = pl.read_csv(filepath, **definition.custom_read_kwargs)
-        elif filepath.suffix == '.feather':
-            gaze_df = pl.read_ipc(filepath)
-        else:
-            raise RuntimeError(f'data files of type {filepath.suffix} are not supported')
+        gaze_df = load_gaze_file(
+            filepath=filepath,
+            preprocessed=preprocessed,
+            custom_read_kwargs=definition.custom_read_kwargs,
+        )
 
         # Add fileinfo columns to dataframe.
         gaze_df = add_fileinfo(
@@ -224,6 +220,48 @@ def load_gaze_files(
         gaze_dfs.append(GazeDataFrame(gaze_df, experiment=definition.experiment))
 
     return gaze_dfs
+
+
+def load_gaze_file(
+        filepath: Path,
+        preprocessed: bool = False,
+        custom_read_kwargs: dict[str, Any] | None = None,
+) -> pl.DataFrame:
+    """Load a gaze data file as a polars DataFrame.
+
+    Parameters
+    ----------
+    filepath:
+        Path of gaze file.
+    preprocessed:
+        If ``True``, saved preprocessed data will be loaded, otherwise raw data will be loaded.
+    custom_read_kwargs:
+        Dictionary of keyword arguments for reading gaze file.
+
+    Returns
+    -------
+    pl.DataFrame
+        The resulting polars.DataFrame
+
+    Raises
+    ------
+    RuntimeError
+        If file type of gaze file is not supported.
+    """
+    if custom_read_kwargs is None:
+        custom_read_kwargs = {}
+
+    if filepath.suffix == '.csv':
+        if preprocessed:
+            gaze_df = pl.read_csv(filepath)
+        else:
+            gaze_df = pl.read_csv(filepath, **custom_read_kwargs)
+    elif filepath.suffix == '.feather':
+        gaze_df = pl.read_ipc(filepath)
+    else:
+        raise RuntimeError(f'data files of type {filepath.suffix} are not supported')
+
+    return gaze_df
 
 
 def add_fileinfo(
