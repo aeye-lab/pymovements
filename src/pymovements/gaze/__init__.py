@@ -40,8 +40,22 @@
    pymovements.gaze.transforms.split
    pymovements.gaze.transforms.downsample
    pymovements.gaze.transforms.consecutive
+
+.. rubric:: Transformations
+
+.. autosummary::
+   :toctree:
+
+   pymovements.gaze.transforms_pl.center_origin
+   pymovements.gaze.transforms_pl.downsample
+   pymovements.gaze.transforms_pl.norm
+   pymovements.gaze.transforms_pl.pix2deg
+   pymovements.gaze.transforms_pl.pos2acc
+   pymovements.gaze.transforms_pl.pos2vel
+   pymovements.gaze.transforms_pl.savitzky_golay
 """
 from pymovements.gaze import transforms
+from pymovements.gaze import transforms_pl
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.from_numpy import from_numpy
 from pymovements.gaze.from_pandas import from_pandas
@@ -56,4 +70,5 @@ __all__ = [
     'GazeDataFrame',
     'Screen',
     'transforms',
+    'transforms_pl',
 ]
