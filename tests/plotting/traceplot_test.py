@@ -26,76 +26,116 @@ import numpy as np
 import pytest
 from matplotlib import figure
 
-from pymovements.plotting import traceplot
+import pymovements as pm
 
 
-@pytest.fixture(name='args')
-def args_fixture():
+@pytest.fixture(name='gaze')
+def gaze_fixture():
     x = np.arange(-100, 100)
     y = np.arange(-100, 100)
+    arr = np.column_stack((x, y)).transpose()
 
-    return x, y
+    experiment = pm.Experiment(
+        screen_width_px=1280,
+        screen_height_px=1024,
+        screen_width_cm=38,
+        screen_height_cm=30,
+        distance_cm=68,
+        origin='lower left',
+        sampling_rate=1000.0,
+    )
+
+    gaze = pm.gaze.from_numpy(
+        data=arr,
+        schema=['x_pix', 'y_pix'],
+        experiment=experiment,
+    )
+
+    gaze.pix2deg()
+    gaze.pos2vel()
+
+    return gaze
 
 
 @pytest.mark.parametrize(
     'kwargs',
     [
-        pytest.param({}, id='no_kwargs'),
-        pytest.param({'cval': np.arange(-100, 100)}, id='cval_array'),
+        pytest.param({'x': 'x_pix', 'y': 'y_pix', 'cval': np.arange(-100, 100)}, id='cval_array'),
         pytest.param(
-            {'cval': np.arange(-100, 100), 'cmap_norm': 'twoslope'},
+            {'x': 'x_pix', 'y': 'y_pix', 'cval': np.arange(-100, 100), 'cmap_norm': 'twoslope'},
             id='cmap_norm_twoslope',
         ),
         pytest.param(
-            {'cval': np.arange(0, 200), 'cmap_norm': 'nonorm'},
+            {'x': 'x_pix', 'y': 'y_pix', 'cval': np.arange(0, 200), 'cmap_norm': 'nonorm'},
             id='cmap_norm_nonorm',
         ),
         pytest.param(
-            {'cval': np.arange(0, 200)},
+            {'x': 'x_pix', 'y': 'y_pix', 'cval': np.arange(0, 200)},
             id='cmap_norm_nonorm_implicit',
         ),
         pytest.param(
-            {'cval': np.arange(-100, 100), 'cmap_norm': 'normalize'},
+            {'x': 'x_pix', 'y': 'y_pix', 'cval': np.arange(-100, 100), 'cmap_norm': 'normalize'},
             id='cmap_norm_normalize',
         ),
         pytest.param(
-            {'cval': np.arange(0, 200), 'cmap_norm': 'linear'},
+            {'x': 'x_pix', 'y': 'y_pix', 'cval': np.arange(0, 200), 'cmap_norm': 'linear'},
             id='cmap_norm_linear',
         ),
         pytest.param(
-            {'cval': np.arange(0, 200), 'cmap_norm': matplotlib.colors.NoNorm()},
+            {
+                'x': 'x_pix', 'y': 'y_pix', 'cval': np.arange(0, 200),
+                'cmap_norm': matplotlib.colors.NoNorm(),
+            },
             id='cmap_norm_class',
         ),
         pytest.param(
-            {'cmap': matplotlib.colors.LinearSegmentedColormap(name='test', segmentdata={})},
+            {
+                'x': 'x_pix', 'y': 'y_pix',
+                'cmap': matplotlib.colors.LinearSegmentedColormap(name='test', segmentdata={}),
+            },
             id='cmap_class',
         ),
-        pytest.param({'cmap_segmentdata': {}}, id='cmap_segmentdata'),
-        pytest.param({'padding': 0.1}, id='padding'),
-        pytest.param({'cval': np.arange(0, 200), 'show_cbar': True}, id='show_cbar_true'),
-        pytest.param({'cval': np.arange(0, 200), 'show_cbar': False}, id='show_cbar_false'),
+        pytest.param({'x': 'x_pix', 'y': 'y_pix', 'cmap_segmentdata': {}}, id='cmap_segmentdata'),
+        pytest.param({'x': 'x_pix', 'y': 'y_pix', 'padding': 0.1}, id='padding'),
+        pytest.param(
+            {'x': 'x_pix', 'y': 'y_pix', 'cval': np.arange(0, 200), 'show_cbar': True},
+            id='show_cbar_true',
+        ),
+        pytest.param(
+            {'x': 'x_pix', 'y': 'y_pix', 'cval': np.arange(0, 200), 'show_cbar': False},
+            id='show_cbar_false',
+        ),
     ],
 )
-def test_traceplot_show(args, kwargs, monkeypatch):
+def test_traceplot_show(gaze, kwargs, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
-    traceplot(*args, **kwargs)
+    pm.plotting.traceplot(gaze=gaze, **kwargs)
     plt.close()
     mock.assert_called_once()
 
 
-def test_traceplot_noshow(args, monkeypatch):
+def test_traceplot_noshow(gaze, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
-    traceplot(*args, show=False)
+    pm.plotting.traceplot(gaze=gaze, x='x_pix', y='y_pix', show=False)
     plt.close()
     mock.assert_not_called()
 
 
-def test_traceplot_save(args, monkeypatch, tmp_path):
+def test_traceplot_save(gaze, monkeypatch, tmp_path):
     mock = Mock()
     monkeypatch.setattr(figure.Figure, 'savefig', mock)
-    traceplot(*args, show=False, savepath=str(tmp_path / 'test.svg'))
+    pm.plotting.traceplot(
+        gaze=gaze,
+        x='x_pix',
+        y='y_pix',
+        show=False,
+        savepath=str(
+            tmp_path /
+            'test.svg',
+        ),
+    )
     plt.close()
     mock.assert_called_once()
 
@@ -104,14 +144,7 @@ def test_traceplot_save(args, monkeypatch, tmp_path):
     ('kwargs', 'exception'),
     [
         pytest.param(
-            {'x': np.arange(100), 'y': np.arange(11)},
-            ValueError,
-            id='different_lengths',
-        ),
-        pytest.param(
             {
-                'x': np.arange(-100, 100),
-                'y': np.arange(-100, 100),
                 'cval': np.arange(0, 200),
                 'cmap_norm': 'invalid',
             },
@@ -120,9 +153,9 @@ def test_traceplot_save(args, monkeypatch, tmp_path):
         ),
     ],
 )
-def test_traceplot_exceptions(kwargs, exception, monkeypatch):
+def test_traceplot_exceptions(gaze, kwargs, exception, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
 
     with pytest.raises(exception):
-        traceplot(**kwargs)
+        pm.plotting.traceplot(gaze=gaze, x='x_pix', y='y_pix', **kwargs)
