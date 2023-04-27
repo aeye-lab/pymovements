@@ -240,25 +240,28 @@ EXPECTED_DF_SYNC = pl.from_dict(
 
 
 @pytest.mark.parametrize(
-    'sync_msg_start_pattern',
-    [None, 'SYNCTIME_READING_SCREEN_'],
+    'read_kwargs',
+    [
+        pytest.param(
+            {
+                'sync_msg_start_pattern': 'SYNCTIME_READING_SCREEN_',
+                'sync_msg_stop_pattern': 'STOP',
+            },
+            id='read_kwargs_dict',
+        ),
+        pytest.param(
+            None,
+            id='read_kwargs_none',
+        ),
+    ],
 )
-@pytest.mark.parametrize(
-    'sync_msg_stop_pattern',
-    [None, 'STOP'],
-)
-def test_load_eyelink_file(tmp_path, sync_msg_start_pattern, sync_msg_stop_pattern):
+def test_load_eyelink_file(tmp_path, read_kwargs):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(ASC_TEXT)
 
-    read_kwargs = {
-        'sync_msg_start_pattern': sync_msg_start_pattern,
-        'sync_msg_stop_pattern': sync_msg_stop_pattern,
-    }
-
     df = pm.dataset.dataset_files.load_gaze_file(filepath, custom_read_kwargs=read_kwargs)
 
-    if sync_msg_start_pattern is not None:
+    if read_kwargs is not None:
         expected_df = EXPECTED_DF_SYNC
     else:
         expected_df = EXPECTED_DF_NO_SYNC
