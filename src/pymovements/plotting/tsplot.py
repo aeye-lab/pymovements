@@ -177,15 +177,14 @@ def tsplot(
         plt.rcParams.update(params)
 
         # set channel names as y-axis labels
-        if channels:
-            if rotate_ylabels:
-                ax.set_ylabel(
-                    channels[channel_id],
-                    rotation='horizontal',
-                    ha='right', va='center',
-                )
-            else:
-                ax.set_ylabel(channels[channel_id])
+        if rotate_ylabels:
+            ax.set_ylabel(
+                channels[channel_id],
+                rotation='horizontal',
+                ha='right', va='center',
+            )
+        else:
+            ax.set_ylabel(channels[channel_id])
 
     # print x label on last used (bottom) axis
     ax.set_xlabel(xlabel)

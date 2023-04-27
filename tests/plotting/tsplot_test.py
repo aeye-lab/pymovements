@@ -66,6 +66,12 @@ def gaze_fixture():
         pytest.param({'channels': 'x_pix'}, id='single_channel_string'),
         pytest.param({'channels': ['x_pix', 'y_pix']}, id='two_channels'),
         pytest.param(
+            {
+                'channels': ['x_pix', 'y_pix'], 'n_rows': 1, 'n_cols': 2,
+            },
+            id='two_channels_explicit_rows_cols',
+        ),
+        pytest.param(
             {'channels': ['x_pix', 'y_pix'], 'rotate_ylabels': False},
             id='channels_no_rotate',
         ),
