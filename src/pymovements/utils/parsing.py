@@ -53,7 +53,7 @@ def check_nan(sample_location: str) -> float:
 
 
 def parse_eyelink(
-        file_name: Path,
+        filepath: Path,
         sync_msg_start_pattern: None | str = None,
         sync_msg_stop_pattern: None | str = None,
 ) -> pl.DataFrame:
@@ -61,7 +61,7 @@ def parse_eyelink(
 
     Parameters
     ----------
-    file_name: Path
+    filepath: Path
         file name of ascii file to convert
     sync_msg_start_pattern: str,
         Optional starting pattern of trial as sync message,
@@ -93,7 +93,7 @@ def parse_eyelink(
         'task': [],
     }
 
-    with open(file_name, encoding='ascii') as asc_file:
+    with open(filepath, encoding='ascii') as asc_file:
         lines = asc_file.readlines()
     current_task = None
     during_task_recording = False

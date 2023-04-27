@@ -30,6 +30,7 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events.events import EventDataFrame
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
+from pymovements.utils.parsing import parse_eyelink
 from pymovements.utils.paths import match_filepaths
 from pymovements.utils.strings import curly_to_regex
 
@@ -247,6 +248,8 @@ def load_gaze_file(
     ------
     RuntimeError
         If file type of gaze file is not supported.
+    ValueError
+        If extension is not in list of valid extensions.
     """
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
@@ -258,8 +261,14 @@ def load_gaze_file(
             gaze_df = pl.read_csv(filepath, **custom_read_kwargs)
     elif filepath.suffix == '.feather':
         gaze_df = pl.read_ipc(filepath)
+    elif filepath.suffix == '.asc':
+        gaze_df = parse_eyelink(filepath, **custom_read_kwargs)
     else:
-        raise RuntimeError(f'data files of type {filepath.suffix} are not supported')
+        valid_extensions = ['csv', 'feather', 'asc']
+        raise ValueError(
+            f'unsupported file format "{filepath.suffix}".'
+            f'Supported formats are: {valid_extensions}',
+        )
 
     return gaze_df
 
@@ -427,7 +436,7 @@ def save_preprocessed(
         elif extension == 'csv':
             gaze_df_out.write_csv(preprocessed_filepath)
         else:
-            valid_extensions = ['csv', 'feather']
+            valid_extensions = ['csv', 'feather', 'asc']
             raise ValueError(
                 f'unsupported file format "{extension}".'
                 f'Supported formats are: {valid_extensions}',
