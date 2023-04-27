@@ -455,7 +455,7 @@ def test_load_no_files_raises_exception(dataset_configuration):
 @pytest.mark.parametrize(
     'exception',
     [
-        pytest.param(RuntimeError, id='matlab_dataset'),
+        pytest.param(ValueError, id='matlab_dataset'),
     ],
 )
 @pytest.mark.parametrize('dataset_configuration', ['ToyMat'], indirect=['dataset_configuration'])

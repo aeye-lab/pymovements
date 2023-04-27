@@ -20,7 +20,6 @@
 """ Converts ascii to csv files."""
 from __future__ import annotations
 
-import os
 import re
 from pathlib import Path
 
@@ -29,20 +28,12 @@ import polars as pl
 
 EYE_TRACKING_SAMPLE = re.compile(
     r'(?P<time>(\d{7}|\d{8}|\d{9}|\d{10}))\s+'
-    r'(?P<x_eye>[-]?\d*[.]\d*)\s+'
-    r'(?P<y_eye>[-]?\d*[.]\d*)\s+'
-    r'(?P<pupil_eye>\d*[.]\d*)\s+'
+    r'(?P<x_pix>[-]?\d*[.]\d*)\s+'
+    r'(?P<y_pix>[-]?\d*[.]\d*)\s+'
+    r'(?P<pupil>\d*[.]\d*)\s+'
     r'(?P<dummy>\d*[.]\d*)\s+'
-    r'((?P<dots>[A-Za-z.]{5}))?\s*',
+    r'(?P<dots>[A-Za-z.]{5})?\s*',
 )
-
-
-class scolor:
-    """Implements colors for conversion"""
-    created: str = '\x1b[1;37;42m'
-    skipped: str = '\x1b[1;37;44m'
-    rewritten: str = '\x1b[1;37;43m'
-    end: str = '\x1b[0m'
 
 
 def check_nan(sample_location: str) -> float:
@@ -61,30 +52,16 @@ def check_nan(sample_location: str) -> float:
     return ret
 
 
-def get_eye_tracking_sample_feature(eye_tracking_sample_match: re.Match, feature: str) -> str:
-    """Extract sample information from line.
-
-    Parameters
-    ----------
-    eye_tracking_sample_match: re.Match
-        Matched eye tracking sample pattern.
-    feature: str
-        feature to extract from matched eye tracking sample pattern.
-    """
-    return eye_tracking_sample_match.group(feature)
-
-
-def process_asc2csv(
-        file_name: Path,
+def parse_eyelink(
+        filepath: Path,
         sync_msg_start_pattern: None | str = None,
         sync_msg_stop_pattern: None | str = None,
-        overwrite_existing: bool = False,
 ) -> pl.DataFrame:
     """Processes ascii files to csv.
 
     Parameters
     ----------
-    file_name: Path
+    filepath: Path
         file name of ascii file to convert
     sync_msg_start_pattern: str,
         Optional starting pattern of trial as sync message,
@@ -92,8 +69,6 @@ def process_asc2csv(
     sync_msg_stop_pattern: str,
         Optional stopping pattern of trial as sync message,
         if None is given reverts back to previous TRIALID
-    overwrite_existing: bool,
-        Decide whether to overwrite an existing csv file.
     """
     if sync_msg_start_pattern is None:
         # if no specific type pattern revert to trial ids
@@ -109,35 +84,18 @@ def process_asc2csv(
         _sync_msg_stop_pattern = re.compile(
             fr'MSG\t\d+\ \d+\ \S+(?P<stoppattern>{sync_msg_stop_pattern})\n',
         )
-    csv_file_name = f"{Path(*file_name.parts[:-1])}/{file_name.parts[-1].split('.')[0]}.csv"
-    df = pl.DataFrame(
-        schema=[
-            ('time', pl.Int64),
-            ('x_eye', pl.Float64),
-            ('y_eye', pl.Float64),
-            ('pupil_eye', pl.Float64),
-            ('task', pl.Utf8),
-        ],
-    )
-    if not os.path.exists(csv_file_name):
-        status_msg = 'Created'
-        status_clr = scolor.created
-    elif os.path.exists(csv_file_name) and not overwrite_existing:
-        status_msg = 'Skipped'
-        status_clr = scolor.skipped
-        written_msg = f'Processing csv for {file_name}'.ljust(105 - len(status_msg), '.')
-        print(written_msg, end='', flush=True)
-        print(f'{status_clr}{status_msg}{scolor.end}', flush=True)
-        return df
-    else:
-        status_msg = 'Rewritten'
-        status_clr = scolor.rewritten
 
-    written_msg = f'Processing csv for {file_name}'.ljust(105 - len(status_msg), '.')
-    print(written_msg, end='', flush=True)
-    with open(file_name, encoding='ascii') as asc_file:
+    samples: dict[str, list] = {
+        'time': [],
+        'x_pix': [],
+        'y_pix': [],
+        'pupil': [],
+        'task': [],
+    }
+
+    with open(filepath, encoding='ascii') as asc_file:
         lines = asc_file.readlines()
-    cur_task_type = None
+    current_task = None
     during_task_recording = False
     for line in lines:
 
@@ -149,9 +107,9 @@ def process_asc2csv(
             assert start_matched is not None
             start_id = start_matched.group('startpattern')
             if sync_msg_start_pattern is not None:
-                cur_task_type = str(sync_msg_start_pattern) + start_id
+                current_task = str(sync_msg_start_pattern) + start_id
             else:
-                cur_task_type = f'TRIALID_{start_id}'
+                current_task = f'TRIALID_{start_id}'
             during_task_recording = True
         if during_task_recording:
             if EYE_TRACKING_SAMPLE.match(line):
@@ -159,39 +117,31 @@ def process_asc2csv(
                 # mypy is unaware that 'eye_tracking_sample_match' can never be None (l.156)
                 assert eye_tracking_sample_match is not None
 
-                timestamp_s = get_eye_tracking_sample_feature(
-                    eye_tracking_sample_match,
-                    'time',
-                )
-                x_eye_s = get_eye_tracking_sample_feature(
-                    eye_tracking_sample_match,
-                    'x_eye',
-                )
-                y_eye_s = get_eye_tracking_sample_feature(
-                    eye_tracking_sample_match,
-                    'y_eye',
-                )
-                pupil_eye_s = get_eye_tracking_sample_feature(
-                    eye_tracking_sample_match,
-                    'pupil_eye',
-                )
+                timestamp_s = eye_tracking_sample_match.group('time')
+                x_pix_s = eye_tracking_sample_match.group('x_pix')
+                y_pix_s = eye_tracking_sample_match.group('y_pix')
+                pupil_s = eye_tracking_sample_match.group('pupil')
 
                 timestamp = int(timestamp_s)
-                x_eye = check_nan(x_eye_s)
-                y_eye = check_nan(y_eye_s)
-                pupil_eye = check_nan(pupil_eye_s)
-                df = df.extend(
-                    pl.DataFrame(
-                        {
-                            'time': [timestamp],
-                            'x_eye': [x_eye],
-                            'y_eye': [y_eye],
-                            'pupil_eye': [pupil_eye],
-                            'task': [cur_task_type],
-                        },
-                    ),
-                )
+                x_pix = check_nan(x_pix_s)
+                y_pix = check_nan(y_pix_s)
+                pupil = check_nan(pupil_s)
 
-    df.write_csv(csv_file_name, separator='\t')
-    print(f'{status_clr}{status_msg}{scolor.end}', flush=True)
+                samples['time'].append(timestamp)
+                samples['x_pix'].append(x_pix)
+                samples['y_pix'].append(y_pix)
+                samples['pupil'].append(pupil)
+                samples['task'].append(current_task)
+
+    df = pl.from_dict(
+        data=samples,
+        schema={
+            'time': pl.Int64,
+            'x_pix': pl.Float64,
+            'y_pix': pl.Float64,
+            'pupil': pl.Float64,
+            'task': pl.Utf8,
+        },
+    )
+
     return df
