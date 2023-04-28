@@ -25,17 +25,28 @@
    :toctree:
    :template: class.rst
 
-    pymovements.datasets.ToyDataset
     pymovements.datasets.GazeBase
     pymovements.datasets.JuDo1000
+
+
+.. rubric:: Example Datasets
+
+.. autosummary::
+   :toctree:
+   :template: class.rst
+
+    pymovements.datasets.ToyDataset
+    pymovements.datasets.ToyDatasetEyeLink
 """
 from pymovements.datasets.gazebase import GazeBase
 from pymovements.datasets.judo1000 import JuDo1000
 from pymovements.datasets.toy_dataset import ToyDataset
+from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
 
 
 __all__ = [
     'GazeBase',
     'JuDo1000',
     'ToyDataset',
+    'ToyDatasetEyeLink',
 ]
