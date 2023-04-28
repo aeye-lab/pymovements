@@ -67,9 +67,6 @@ class ToyDatasetEyeLink(DatasetDefinition):
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
-    column_map : dict[str, str]
-        The keys are the columns to read, the values are the names to which they should be renamed.
-
     custom_read_kwargs : dict[str, Any], optional
         If specified, these keyword arguments will be passed to the file reading function.
 
