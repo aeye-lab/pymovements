@@ -65,6 +65,8 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
     )
 
     if len(fileinfo_dicts) == 0:
+        print(definition.filename_format)
+        print(curly_to_regex(definition.filename_format))
         raise RuntimeError(f'no matching files found in {paths.raw}')
 
     # Create dataframe from all fileinfo records.

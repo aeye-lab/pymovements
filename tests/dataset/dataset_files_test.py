@@ -151,7 +151,7 @@ MSG	2154569 TRACKER_TIME 1 2222195.987
 MSG	2154570 0 READING_SCREEN_1.STOP
 """
 
-EXPECTED_DF_NO_SYNC = pl.from_dict(
+EXPECTED_DF_NO_PATTERNS = pl.from_dict(
     {
         'time': [
             2154557,
@@ -185,68 +185,36 @@ EXPECTED_DF_NO_SYNC = pl.from_dict(
             784.0,
             0.0,
             714.0,
-        ], 'task': [
-            'TRIALID_0',
-            'TRIALID_0',
-            'TRIALID_0',
-            'TRIALID_0',
-            'TRIALID_1',
-            'TRIALID_1',
-            'TRIALID_1',
         ],
     },
 )
 
-EXPECTED_DF_SYNC = pl.from_dict(
+EXPECTED_DF_PATTERNS = pl.from_dict(
     {
-        'time': [
-            2154558,
-            2154560,
-            2154561,
-            2154565,
-            2154567,
-            2154568,
-        ], 'x_pix': [
-            139.5,
-            np.nan,
-            850.7,
-            139.5,
-            np.nan,
-            850.7,
-        ], 'y_pix': [
-            131.9,
-            np.nan,
-            717.5,
-            131.9,
-            np.nan,
-            717.5,
-        ], 'pupil': [
-            784.0,
-            0.0,
-            714.0,
-            784.0,
-            0.0,
-            714.0,
-        ], 'task': [
-            'SYNCTIME_READING_SCREEN_0',
-            'SYNCTIME_READING_SCREEN_0',
-            'SYNCTIME_READING_SCREEN_0',
-            'SYNCTIME_READING_SCREEN_1',
-            'SYNCTIME_READING_SCREEN_1',
-            'SYNCTIME_READING_SCREEN_1',
-        ],
+        'time': [2154557, 2154558, 2154560, 2154561, 2154565, 2154567, 2154568],
+        'x_pix': [139.6, 139.5, np.nan, 850.7, 139.5, np.nan, 850.7],
+        'y_pix': [132.1, 131.9, np.nan, 717.5, 131.9, np.nan, 717.5],
+        'pupil': [784.0, 784.0, 0.0, 714.0, 784.0, 0.0, 714.0],
+        'task': ['reading', 'reading', 'reading', 'reading', 'reading', 'reading', 'reading'],
+        'trial_id': [0, 0, 0, 0, 1, 1, 1],
     },
 )
+
+PATTERNS = [
+    {
+        'pattern': 'SYNCTIME_READING',
+        'column': 'task',
+        'value': 'reading',
+    },
+    r'TRIALID (?P<trial_id>\d+)',
+]
 
 
 @pytest.mark.parametrize(
     'read_kwargs',
     [
         pytest.param(
-            {
-                'sync_msg_start_pattern': 'SYNCTIME_READING_SCREEN_',
-                'sync_msg_stop_pattern': 'STOP',
-            },
+            {'patterns': PATTERNS, 'schema': {'trial_id': pl.Int64}},
             id='read_kwargs_dict',
         ),
         pytest.param(
@@ -262,8 +230,8 @@ def test_load_eyelink_file(tmp_path, read_kwargs):
     df = pm.dataset.dataset_files.load_gaze_file(filepath, custom_read_kwargs=read_kwargs)
 
     if read_kwargs is not None:
-        expected_df = EXPECTED_DF_SYNC
+        expected_df = EXPECTED_DF_PATTERNS
     else:
-        expected_df = EXPECTED_DF_NO_SYNC
+        expected_df = EXPECTED_DF_NO_PATTERNS
 
-    assert_frame_equal(df, expected_df)
+    assert_frame_equal(df, expected_df, check_column_order=False)

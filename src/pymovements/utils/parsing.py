@@ -22,17 +22,18 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import polars as pl
 
 EYE_TRACKING_SAMPLE = re.compile(
-    r'(?P<time>(\d{7}|\d{8}|\d{9}|\d{10}))\s+'
+    r'(?P<time>(\d{7,10}))\s+'
     r'(?P<x_pix>[-]?\d*[.]\d*)\s+'
     r'(?P<y_pix>[-]?\d*[.]\d*)\s+'
     r'(?P<pupil>\d*[.]\d*)\s+'
     r'(?P<dummy>\d*[.]\d*)\s+'
-    r'(?P<dots>[A-Za-z.]{5})?\s*',
+    r'(?P<dots>[A-Za-z.]{3,5})?\s*',
 )
 
 
@@ -52,96 +53,146 @@ def check_nan(sample_location: str) -> float:
     return ret
 
 
+def compile_patterns(patterns: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Compile patterns from strings.
+
+    Parameters
+    ----------
+    patterns:
+        The list of patterns to compile.
+    """
+    msg_prefix = r'MSG\s+\d+\s+'
+
+    compiled_patterns = []
+
+    for pattern in patterns:
+        if isinstance(pattern, str):
+            compiled_pattern = {'pattern': re.compile(msg_prefix + pattern)}
+            compiled_patterns.append(compiled_pattern)
+            continue
+
+        if isinstance(pattern, dict):
+            if isinstance(pattern['pattern'], str):
+                compiled_patterns.append({
+                    **pattern,
+                    'pattern': re.compile(msg_prefix + pattern['pattern']),
+                })
+                continue
+
+            if isinstance(pattern['pattern'], tuple):
+                for single_pattern in pattern['pattern']:
+                    compiled_patterns.append({
+                        **pattern,
+                        'pattern': re.compile(msg_prefix + single_pattern),
+                    })
+                continue
+
+            raise ValueError(f'invalid pattern: {pattern}')
+
+        raise ValueError(f'invalid pattern: {pattern}')
+
+    return compiled_patterns
+
+
+def get_additional_columns(compiled_patterns: list[dict[str, Any]]) -> set[str]:
+    """Get additionally needed columns from compiled patterns."""
+    additional_columns = set()
+
+    for compiled_pattern_dict in compiled_patterns:
+        if 'column' in compiled_pattern_dict:
+            additional_columns.add(compiled_pattern_dict['column'])
+
+        for column in compiled_pattern_dict['pattern'].groupindex.keys():
+            additional_columns.add(column)
+
+    return additional_columns
+
+
 def parse_eyelink(
         filepath: Path,
-        sync_msg_start_pattern: None | str = None,
-        sync_msg_stop_pattern: None | str = None,
+        patterns: list | None = None,
+        schema: dict | None = None,
 ) -> pl.DataFrame:
     """Processes ascii files to csv.
 
     Parameters
     ----------
-    filepath: Path
-        file name of ascii file to convert
-    sync_msg_start_pattern: str,
-        Optional starting pattern of trial as sync message,
-        if None is given reverts back to TRIALID
-    sync_msg_stop_pattern: str,
-        Optional stopping pattern of trial as sync message,
-        if None is given reverts back to previous TRIALID
+    filepath:
+        file name of ascii file to convert.
+    patterns:
+        list of patterns to match for additional columns.
+    schema:
+        Dictionary to optionally specify types of columns parsed by patterns.
+
     """
-    if sync_msg_start_pattern is None:
-        # if no specific type pattern revert to trial ids
-        _sync_msg_start_pattern = re.compile('MSG\t\\d+ TRIALID (?P<startpattern>[0-9]+)\n')
-    else:
-        _sync_msg_start_pattern = re.compile(
-            f'MSG\t\\d+ .\\d+ {sync_msg_start_pattern}(?P<startpattern>[0-9]+)',
-        )
-    if sync_msg_stop_pattern is None:
-        # if no stop pattern, stop when "next" occurance of start pattern
-        _sync_msg_stop_pattern = _sync_msg_start_pattern
-    else:
-        _sync_msg_stop_pattern = re.compile(
-            fr'MSG\t\d+\ \d+\ \S+(?P<stoppattern>{sync_msg_stop_pattern})\n',
-        )
+    if patterns is None:
+        patterns = []
+    compiled_patterns = compile_patterns(patterns)
+
+    additional_columns = get_additional_columns(compiled_patterns)
+    additional: dict[str, list] = {
+        additional_column: [] for additional_column in additional_columns
+    }
+    current_additional = {
+        additional_column: None for additional_column in additional_columns
+    }
 
     samples: dict[str, list] = {
         'time': [],
         'x_pix': [],
         'y_pix': [],
         'pupil': [],
-        'task': [],
+        **additional,
     }
 
     with open(filepath, encoding='ascii') as asc_file:
         lines = asc_file.readlines()
-    current_task = None
-    during_task_recording = False
+
     for line in lines:
+        for pattern_dict in compiled_patterns:
+            match = pattern_dict['pattern'].match(line)
 
-        if _sync_msg_stop_pattern.match(line):
-            during_task_recording = False
-        if _sync_msg_start_pattern.match(line):
-            start_matched = _sync_msg_start_pattern.match(line)
-            # mypy is unaware that 'start_matched' can never be None (l.146)
-            assert start_matched is not None
-            start_id = start_matched.group('startpattern')
-            if sync_msg_start_pattern is not None:
-                current_task = str(sync_msg_start_pattern) + start_id
-            else:
-                current_task = f'TRIALID_{start_id}'
-            during_task_recording = True
-        if during_task_recording:
-            if EYE_TRACKING_SAMPLE.match(line):
-                eye_tracking_sample_match = EYE_TRACKING_SAMPLE.match(line)
-                # mypy is unaware that 'eye_tracking_sample_match' can never be None (l.156)
-                assert eye_tracking_sample_match is not None
+            if match:
+                if 'value' in pattern_dict:
+                    current_column = pattern_dict['column']
+                    current_additional[current_column] = pattern_dict['value']
 
-                timestamp_s = eye_tracking_sample_match.group('time')
-                x_pix_s = eye_tracking_sample_match.group('x_pix')
-                y_pix_s = eye_tracking_sample_match.group('y_pix')
-                pupil_s = eye_tracking_sample_match.group('pupil')
+                else:
+                    for column, value in match.groupdict().items():
+                        current_additional[column] = value
 
-                timestamp = int(timestamp_s)
-                x_pix = check_nan(x_pix_s)
-                y_pix = check_nan(y_pix_s)
-                pupil = check_nan(pupil_s)
+        eye_tracking_sample_match = EYE_TRACKING_SAMPLE.match(line)
+        if eye_tracking_sample_match:
 
-                samples['time'].append(timestamp)
-                samples['x_pix'].append(x_pix)
-                samples['y_pix'].append(y_pix)
-                samples['pupil'].append(pupil)
-                samples['task'].append(current_task)
+            timestamp_s = eye_tracking_sample_match.group('time')
+            x_pix_s = eye_tracking_sample_match.group('x_pix')
+            y_pix_s = eye_tracking_sample_match.group('y_pix')
+            pupil_s = eye_tracking_sample_match.group('pupil')
+
+            timestamp = int(timestamp_s)
+            x_pix = check_nan(x_pix_s)
+            y_pix = check_nan(y_pix_s)
+            pupil = check_nan(pupil_s)
+
+            samples['time'].append(timestamp)
+            samples['x_pix'].append(x_pix)
+            samples['y_pix'].append(y_pix)
+            samples['pupil'].append(pupil)
+
+            for additional_column in additional_columns:
+                samples[additional_column].append(current_additional[additional_column])
 
     df = pl.from_dict(
         data=samples,
-        schema={
+        schema_overrides={
             'time': pl.Int64,
             'x_pix': pl.Float64,
             'y_pix': pl.Float64,
             'pupil': pl.Float64,
-            'task': pl.Utf8,
         },
     )
+
+    if schema is not None:
+        df = df.with_columns([pl.col(column).cast(dtype) for column, dtype in schema.items()])
 
     return df
