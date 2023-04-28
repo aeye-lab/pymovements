@@ -98,8 +98,6 @@ def tsplot(
 
     if arr.ndim == 1:
         arr = np.expand_dims(arr, axis=0)
-    elif arr.ndim == 2:
-        pass
 
     channel_axis = 0
     sample_axis = 1
