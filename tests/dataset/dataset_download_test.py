@@ -126,12 +126,14 @@ def test_dataset_download_both_mirrors_fail(mock_download_file, tmp_path, datase
             dirpath=tmp_path / 'downloads',
             filename='test.gz.tar',
             md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+            verbose=True,
         ),
         mock.call(
             url='https://another_example.com/test.gz.tar',
             dirpath=tmp_path / 'downloads',
             filename='test.gz.tar',
             md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+            verbose=True,
         ),
     ])
 
@@ -150,12 +152,14 @@ def test_dataset_download_first_mirror_fails(mock_download_file, tmp_path, datas
             dirpath=tmp_path / 'downloads',
             filename='test.gz.tar',
             md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+            verbose=True,
         ),
         mock.call(
             url='https://another_example.com/test.gz.tar',
             dirpath=tmp_path / 'downloads',
             filename='test.gz.tar',
             md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+            verbose=True,
         ),
     ])
 
@@ -176,6 +180,7 @@ def test_dataset_download_file_not_found(mock_download_file, tmp_path, dataset_d
             dirpath=tmp_path / 'downloads',
             filename='test.gz.tar',
             md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+            verbose=True,
         ),
     ])
 
@@ -194,6 +199,7 @@ def test_dataset_download_no_extract(mock_download_file, tmp_path, dataset_defin
             dirpath=tmp_path / 'downloads',
             filename='test.gz.tar',
             md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+            verbose=True,
         ),
     ])
 
