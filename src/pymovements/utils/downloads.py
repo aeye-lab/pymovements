@@ -237,7 +237,7 @@ def _download_url(url: str, destination: Path, verbose: bool = True) -> None:
     verbose : bool
         If True, show progressbar.
     """
-    with _DownloadProgressBar(desc=destination.name, display=not verbose) as t:
+    with _DownloadProgressBar(desc=destination.name, disable=not verbose) as t:
         urllib.request.urlretrieve(url=url, filename=destination, reporthook=t.update_to)
         t.total = t.n
 
