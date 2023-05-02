@@ -93,6 +93,7 @@ def download_file(
         filename: str,
         md5: str | None = None,
         max_redirect_hops: int = 3,
+        verbose: bool = True,
 ) -> Path:
     """Download a file from a URL and place it in root.
 
@@ -108,6 +109,8 @@ def download_file(
         MD5 checksum of downloaded file. If None, do not check.
     max_redirect_hops : int, optional
         Maximum number of redirect hops allowed.
+    verbose : bool
+        If True, show progress bar and print info messages on downloading file.
 
     Returns
     -------
@@ -127,27 +130,34 @@ def download_file(
 
     # check if file is already present locally
     if _check_integrity(filepath, md5):
-        print('Using already downloaded and verified file:', filepath)
+        if verbose:
+            print('Using already downloaded and verified file:', filepath)
         return filepath
-    print(f'Downloading {url} to {filepath}')
+
+    if verbose:
+        print(f'Downloading {url} to {filepath}')
 
     # expand redirect chain if needed
     url = _get_redirected_url(url=url, max_hops=max_redirect_hops)
 
     # download the file
     try:
-        _download_url(url=url, destination=filepath)
+        _download_url(url=url, destination=filepath, verbose=verbose)
 
     except OSError as e:
         if url[:5] == 'https':
-            url = url.replace('https:', 'http:')
             print('Download failed. Trying https -> http instead.')
-            print(f'Downloading {url} to {filepath}')
-            _download_url(url=url, destination=filepath)
+            url = url.replace('https:', 'http:')
+
+            if verbose:
+                print(f'Downloading {url} to {filepath}')
+            _download_url(url=url, destination=filepath, verbose=verbose)
         else:
             raise e
 
     # check integrity of downloaded file
+    if verbose:
+        print(f'Check integrity of {filepath.name}')
     if not _check_integrity(filepath=filepath, md5=md5):
         raise RuntimeError(f'File {filepath} not found or download corrupted.')
 
@@ -215,7 +225,7 @@ class _DownloadProgressBar(tqdm):  # pylint: disable=inconsistent-mro
         return self.update(b * bsize - self.n)  # also sets self.n = b * bsize
 
 
-def _download_url(url: str, destination: Path) -> None:
+def _download_url(url: str, destination: Path, verbose: bool = True) -> None:
     """Download file from URL and save to destination.
 
     Parameters
@@ -224,8 +234,10 @@ def _download_url(url: str, destination: Path) -> None:
         URL of file to be downloaded.
     destination : Path
         Destination path of downloaded file.
+    verbose : bool
+        If True, show progressbar.
     """
-    with _DownloadProgressBar(desc=destination.name) as t:
+    with _DownloadProgressBar(desc=destination.name, display=not verbose) as t:
         urllib.request.urlretrieve(url=url, filename=destination, reporthook=t.update_to)
         t.total = t.n
 

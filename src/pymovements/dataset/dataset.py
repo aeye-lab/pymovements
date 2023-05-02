@@ -578,7 +578,13 @@ class Dataset:
         )
         return self
 
-    def download(self, *, extract: bool = True, remove_finished: bool = False) -> Dataset:
+    def download(
+            self,
+            *,
+            extract: bool = True,
+            remove_finished: bool = False,
+            verbose: bool = True,
+    ) -> Dataset:
         """Download dataset resources.
 
         This downloads all resources of the dataset. Per default this also extracts all archives
@@ -598,6 +604,8 @@ class Dataset:
             Extract dataset archive files.
         remove_finished : bool
             Remove archive files after extraction.
+        verbose : bool
+            If True, show progress of download and print message on starting extracting.
 
         Raises
         ------
@@ -616,6 +624,7 @@ class Dataset:
             paths=self.paths,
             extract=extract,
             remove_finished=remove_finished,
+            verbose=verbose,
         )
         return self
 
