@@ -39,6 +39,7 @@ def extract_archive(
         destination_path: Path | None = None,
         recursive: bool = True,
         remove_finished: bool = False,
+        verbose: int = 1,
 ) -> Path:
     """Extract an archive.
     The archive type and a possible compression is automatically detected from the file name.
@@ -55,6 +56,10 @@ def extract_archive(
         Recursively extract archives which are included in extracted archive.
     remove_finished : bool
         If ``True``, remove the file after the extraction.
+    verbose:
+        Verbosity levels: (1) Print messages for extracting each dataset resource without printing
+        messages for recursive archives. (2) Print messages for extracting each dataset resource and
+        each recursive archive extract.
 
     Returns
     -------
@@ -75,6 +80,9 @@ def extract_archive(
 
     if destination_path is None:
         destination_path = source_path.parent
+
+    if verbose:
+        print(f'Extracting {source_path.name} to {destination_path}')
 
     # Extract file and remove archive if desired.
     extractor(source_path, destination_path, compression_type)
@@ -99,6 +107,7 @@ def extract_archive(
                 destination_path=extract_destination,
                 recursive=recursive,
                 remove_finished=remove_finished,
+                verbose=0 if verbose < 2 else 2,
             )
 
     return destination_path

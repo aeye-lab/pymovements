@@ -121,7 +121,7 @@ def extract_dataset(
         definition: DatasetDefinition,
         paths: DatasetPaths,
         remove_finished: bool = False,
-        verbose: bool = True,
+        verbose: int = 1,
 ) -> None:
     """Extract downloaded dataset archive files.
 
@@ -134,7 +134,9 @@ def extract_dataset(
     remove_finished : bool
         Remove archive files after extraction.
     verbose:
-        Print message for extracting each dataset resource.
+        Verbosity levels: (1) Print messages for extracting each dataset resource without printing
+        messages for recursive archives. (2) Print messages for extracting each dataset resource and
+        each recursive archive extract.
     """
     paths.raw.mkdir(parents=True, exist_ok=True)
 
@@ -142,12 +144,10 @@ def extract_dataset(
         source_path = paths.downloads / resource['filename']
         destination_path = paths.raw
 
-        if verbose:
-            print(f'Extracting {source_path.name} to {destination_path}')
-
         extract_archive(
             source_path=source_path,
             destination_path=destination_path,
             recursive=True,
             remove_finished=remove_finished,
+            verbose=verbose,
         )
