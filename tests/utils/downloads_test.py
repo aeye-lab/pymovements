@@ -32,12 +32,19 @@ from pymovements.utils.downloads import download_and_extract_archive
 from pymovements.utils.downloads import download_file
 
 
-def test_download_file(tmp_path):
+@pytest.mark.parametrize(
+    'verbose',
+    [
+        pytest.param(False, id='verbose_false'),
+        pytest.param(True, id='verbose_true'),
+    ],
+)
+def test_download_file(tmp_path, verbose):
     url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
     filename = 'pymovements-0.4.0.tar.gz'
     md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
 
-    filepath = download_file(url, tmp_path, filename, md5)
+    filepath = download_file(url, tmp_path, filename, md5, verbose=verbose)
 
     assert filepath.exists()
     assert filepath.name == filename
