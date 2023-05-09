@@ -33,6 +33,7 @@ def download_dataset(
         paths: DatasetPaths,
         extract: bool = True,
         remove_finished: bool = False,
+        verbose: bool = True,
 ) -> None:
     """Download dataset resources.
 
@@ -57,6 +58,9 @@ def download_dataset(
         Extract dataset archive files.
     remove_finished : bool
         Remove archive files after extraction.
+    verbose : bool
+        If True, show progress of download and print status messages for integrity checking and
+        file extraction.
 
     Raises
     ------
@@ -86,13 +90,14 @@ def download_dataset(
                     dirpath=paths.downloads,
                     filename=resource['filename'],
                     md5=resource['md5'],
+                    verbose=verbose,
                 )
                 success = True
 
             # pylint: disable=overlapping-except
             except (URLError, OSError, RuntimeError) as error:
-                print(f'Failed to download (trying next):\n{error}')
-                # downloading the resource, try next mirror
+                # Error downloading the resource, try next mirror
+                print(f'Failed to download:\n{error}\nTrying next mirror.')
                 continue
 
             # downloading the resource was successful, we don't need to try another mirror
@@ -108,6 +113,7 @@ def download_dataset(
             definition=definition,
             paths=paths,
             remove_finished=remove_finished,
+            verbose=verbose,
         )
 
 
@@ -115,6 +121,7 @@ def extract_dataset(
         definition: DatasetDefinition,
         paths: DatasetPaths,
         remove_finished: bool = False,
+        verbose: int = 1,
 ) -> None:
     """Extract downloaded dataset archive files.
 
@@ -126,13 +133,21 @@ def extract_dataset(
         The dataset paths.
     remove_finished : bool
         Remove archive files after extraction.
+    verbose:
+        Verbosity levels: (1) Print messages for extracting each dataset resource without printing
+        messages for recursive archives. (2) Print messages for extracting each dataset resource and
+        each recursive archive extract.
     """
     paths.raw.mkdir(parents=True, exist_ok=True)
 
     for resource in definition.resources:
+        source_path = paths.downloads / resource['filename']
+        destination_path = paths.raw
+
         extract_archive(
-            source_path=paths.downloads / resource['filename'],
-            destination_path=paths.raw,
+            source_path=source_path,
+            destination_path=destination_path,
             recursive=True,
             remove_finished=remove_finished,
+            verbose=verbose,
         )
