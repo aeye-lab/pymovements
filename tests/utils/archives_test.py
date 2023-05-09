@@ -94,11 +94,19 @@ def fixture_archive(request, tmp_path):
     compression, extension = request.param
 
     # write tmp filepath
-    filepath = rootpath / 'test.file'
+    test_filepath = rootpath / 'test.file'
     if extension in {'zip', 'tar'}:
-        filepath.write_text('test')
+        test_filepath.write_text('test')
     if compression in {'bz2', 'xz', 'tbz', 'tbz2', 'tgz', 'gz'} and extension is None:
-        filepath.write_bytes(b'test')
+        test_filepath.write_bytes(b'test')
+
+    # add additional archive
+    filepath = rootpath / 'recursive.zip'
+    with zipfile.ZipFile(filepath, 'w') as zip_open:
+        zip_open.write(test_filepath)
+
+    # now remove original file again
+    test_filepath.unlink()
 
     # declare archive path
     if compression is None:
