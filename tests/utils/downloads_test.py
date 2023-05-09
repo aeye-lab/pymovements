@@ -75,6 +75,13 @@ def test_download_file_404(tmp_path):
         download_file(url, tmp_path, filename, md5)
 
 
+@pytest.mark.parametrize(
+    'verbose',
+    [
+        pytest.param(False, id='verbose_false'),
+        pytest.param(True, id='verbose_true'),
+    ],
+)
 def test_download_file_https_failure(tmp_path):
     url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
     filename = 'pymovements-0.4.0.tar.gz'
@@ -164,6 +171,13 @@ def test_download_and_extract_archive(tmp_path):
         assert hashlib.md5(file_bytes).hexdigest() == md5
 
 
+@pytest.mark.parametrize(
+    'verbose',
+    [
+        pytest.param(False, id='verbose_false'),
+        pytest.param(True, id='verbose_true'),
+    ],
+)
 def test_download_and_extract_archive_extract_dirpath_None(tmp_path, capsys):
     url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
     download_filename = 'pymovements-0.4.0.tar.gz'
