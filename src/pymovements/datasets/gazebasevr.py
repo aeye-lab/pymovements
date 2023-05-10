@@ -34,9 +34,9 @@ from pymovements.gaze.experiment import Experiment
 class GazeBaseVR(DatasetDefinition):
     """GazeBaseVR dataset :cite:p:`GazeBaseVR`.
 
-    This dataset includes binocular eye tracking data from 407 participants captured over
-    a period of 37 months. Participants attended up to 3 rounds during this time frame, with each
-    round consisting of two contiguous sessions.
+    This dataset includes binocular plus an additional cyclopian eye tracking data from 407
+    participants captured over a long period. Participants attended up to 3 rounds during this
+    time frame, with each round consisting of two contiguous sessions.
 
     Eye movements are recorded at a sampling frequency of 250 Hz a using SensoMotoric
     Instrument’s (SMI’s) tethered ET VR head-mounted display based on the
@@ -141,10 +141,8 @@ class GazeBaseVR(DatasetDefinition):
     column_map: dict[str, str] = field(
         default_factory=lambda: {
             'n': 'time',
-            'lx': 'x_left_pos',
-            'ly': 'y_left_pos',
-            'rx': 'x_right_pos',
-            'ry': 'y_right_pos',
+            'x': 'x_pos',
+            'y': 'y_pos',
             'xT': 'x_target_pos',
             'yT': 'y_target_pos',
         },
