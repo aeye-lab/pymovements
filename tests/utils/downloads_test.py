@@ -32,12 +32,19 @@ from pymovements.utils.downloads import download_and_extract_archive
 from pymovements.utils.downloads import download_file
 
 
-def test_download_file(tmp_path):
+@pytest.mark.parametrize(
+    'verbose',
+    [
+        pytest.param(False, id='verbose_false'),
+        pytest.param(True, id='verbose_true'),
+    ],
+)
+def test_download_file(tmp_path, verbose):
     url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
     filename = 'pymovements-0.4.0.tar.gz'
     md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
 
-    filepath = download_file(url, tmp_path, filename, md5)
+    filepath = download_file(url, tmp_path, filename, md5, verbose=verbose)
 
     assert filepath.exists()
     assert filepath.name == filename
@@ -68,7 +75,14 @@ def test_download_file_404(tmp_path):
         download_file(url, tmp_path, filename, md5)
 
 
-def test_download_file_https_failure(tmp_path):
+@pytest.mark.parametrize(
+    'verbose',
+    [
+        pytest.param(False, id='verbose_false'),
+        pytest.param(True, id='verbose_true'),
+    ],
+)
+def test_download_file_https_failure(tmp_path, verbose):
     url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
     filename = 'pymovements-0.4.0.tar.gz'
     md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
@@ -78,7 +92,7 @@ def test_download_file_https_failure(tmp_path):
         side_effect=OSError(),
     ):
         with pytest.raises(OSError):
-            download_file(url, tmp_path, filename, md5)
+            download_file(url, tmp_path, filename, md5, verbose=verbose)
 
 
 def test_download_file_http_failure(tmp_path):
@@ -157,26 +171,46 @@ def test_download_and_extract_archive(tmp_path):
         assert hashlib.md5(file_bytes).hexdigest() == md5
 
 
-def test_download_and_extract_archive_extract_dirpath_None(tmp_path, capsys):
+@pytest.mark.parametrize(
+    'verbose',
+    [
+        pytest.param(False, id='verbose_false'),
+        pytest.param(True, id='verbose_true'),
+    ],
+)
+def test_download_and_extract_archive_extract_dirpath_None(tmp_path, capsys, verbose):
     url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
     download_filename = 'pymovements-0.4.0.tar.gz'
     md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
     extract_dirpath = None
 
     # extract first time
-    download_and_extract_archive(url, tmp_path, download_filename, extract_dirpath, md5)
+    download_and_extract_archive(
+        url, tmp_path, download_filename, extract_dirpath, md5, verbose=verbose,
+    )
     out, _ = capsys.readouterr()
-    assert out == 'Downloading '\
-        'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'\
-        f" to {os.path.join(tmp_path, 'pymovements-0.4.0.tar.gz')}\n"\
-        f'Extracting pymovements-0.4.0.tar.gz to {tmp_path}\n'
+
+    if verbose:
+        assert out == 'Downloading '\
+            'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'\
+            f" to {os.path.join(tmp_path, 'pymovements-0.4.0.tar.gz')}\n" \
+            f'Checking integrity of pymovements-0.4.0.tar.gz\n'\
+            f'Extracting pymovements-0.4.0.tar.gz to {tmp_path}\n'
+    else:
+        assert out == ''
 
     # extract second time to test already downloaded and verified file
-    download_and_extract_archive(url, tmp_path, download_filename, extract_dirpath, md5)
+    download_and_extract_archive(
+        url, tmp_path, download_filename, extract_dirpath, md5, verbose=verbose,
+    )
     out, _ = capsys.readouterr()
-    assert out == f'Using already downloaded and verified file: '\
-        f"{os.path.join(tmp_path, 'pymovements-0.4.0.tar.gz')}"\
-        f'\nExtracting pymovements-0.4.0.tar.gz to {tmp_path}\n'
+
+    if verbose:
+        assert out == f'Using already downloaded and verified file: '\
+            f"{os.path.join(tmp_path, 'pymovements-0.4.0.tar.gz')}"\
+            f'\nExtracting pymovements-0.4.0.tar.gz to {tmp_path}\n'
+    else:
+        assert out == ''
 
 
 def test_download_and_extract_archive_invalid_md5(tmp_path):
