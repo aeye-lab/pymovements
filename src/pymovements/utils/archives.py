@@ -89,6 +89,7 @@ def extract_archive(
             *_COMPRESSED_FILE_OPENERS.keys(),
         ]
         archive_filepaths = get_filepaths(path=destination_path, extension=archive_extensions)
+        archive_filepaths = [filepath for filepath in archive_filepaths if filepath != source_path]
 
         # Extract all found archives.
         for archive_filepath in archive_filepaths:
