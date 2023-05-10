@@ -39,6 +39,7 @@
     pymovements.datasets.ToyDatasetEyeLink
 """
 from pymovements.datasets.gazebase import GazeBase
+from pymovements.datasets.gazebasevr import GazeBaseVR
 from pymovements.datasets.judo1000 import JuDo1000
 from pymovements.datasets.toy_dataset import ToyDataset
 from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
@@ -46,6 +47,7 @@ from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
 
 __all__ = [
     'GazeBase',
+    'GazeBaseVR',
     'JuDo1000',
     'ToyDataset',
     'ToyDatasetEyeLink',
