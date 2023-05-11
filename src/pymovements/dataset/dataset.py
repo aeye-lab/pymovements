@@ -578,7 +578,13 @@ class Dataset:
         )
         return self
 
-    def download(self, *, extract: bool = True, remove_finished: bool = False) -> Dataset:
+    def download(
+            self,
+            *,
+            extract: bool = True,
+            remove_finished: bool = False,
+            verbose: int = 1,
+    ) -> Dataset:
         """Download dataset resources.
 
         This downloads all resources of the dataset. Per default this also extracts all archives
@@ -598,6 +604,10 @@ class Dataset:
             Extract dataset archive files.
         remove_finished : bool
             Remove archive files after extraction.
+        verbose : int
+            Verbosity levels: (1) Show download progress bar and print info messages on downloading
+            and extracting archive files without printing messages for recursive archive extraction.
+            (2) Print additional messages for each recursive archive extract.
 
         Raises
         ------
@@ -616,16 +626,21 @@ class Dataset:
             paths=self.paths,
             extract=extract,
             remove_finished=remove_finished,
+            verbose=bool(verbose),
         )
         return self
 
-    def extract(self, remove_finished: bool = False) -> Dataset:
+    def extract(self, remove_finished: bool = False, verbose: int = 1) -> Dataset:
         """Extract downloaded dataset archive files.
 
         Parameters
         ----------
         remove_finished : bool
             Remove archive files after extraction.
+        verbose : int
+            Verbosity levels: (1) Print messages for extracting each dataset resource without
+            printing messages for recursive archives. (2) Print additional messages for each
+            recursive archive extract.
 
         Returns
         -------
@@ -636,6 +651,7 @@ class Dataset:
             definition=self.definition,
             paths=self.paths,
             remove_finished=remove_finished,
+            verbose=verbose,
         )
         return self
 
