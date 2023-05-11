@@ -37,7 +37,7 @@ def microsaccades(
         velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         timesteps: list[int] | np.ndarray | None = None,
         minimum_duration: int = 6,
-        threshold: np.ndarray | tuple[float] | str = 'engbert2015',
+        threshold: np.ndarray | tuple[float, float] | str = 'engbert2015',
         threshold_factor: float = 6,
         minimum_threshold: float = 1e-10,
         include_nan: bool = False,
