@@ -208,22 +208,15 @@ Core developers should follow these rules when processing pull requests:
 - Always wait for tests to pass before merging PRs.
 - Use "[Squash and merge](https://github.com/blog/2141-squash-your-commits)" to merge PRs.
 - Delete branches for merged PRs.
-- Edit the final commit message before merging to conform to the following style (we wish to have a
-clean `git log` output):
+- Edit the final commit message before merging to conform to the [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/) specification:
 
 ```
-Category: Short subject describing changes (#PR-id) (50 characters or less)
+<type>[optional scope]: <description> (#PR-id)
 
 - detailed description, wrapped at 72 characters
 - bullet points or sentences are okay
 - all changes should be documented and explained
-- valid categories are, for example:
-    - `Docs` for documentation
-    - `Tests` for tests
-    - `Core` for core changes
-    - `Events` for changes in event detection
-    - `Transforms` for changes in transformations
-    - `Package` for package-related changes, e.g. in setup.cfg
+- valid scopes are the names of the top-level directories in the package, like `dataset`, `gaze`, or `events`
 ```
 
 Make sure:
@@ -231,9 +224,6 @@ Make sure:
   - that when merging a multi-commit PR the commit message doesn't
     contain the local history from the committer and the review history from
     the PR. Edit the message to only describe the end state of the PR.
-  - that there is a *single* newline between subject and description,
-    This way there is a single empty line between commits in `git log`
-    output.
   - that the maximum subject line length is under 50 characters
   - that the maximum line length of the commit message is under 72 characters
   - to capitalize the subject and each paragraph.
