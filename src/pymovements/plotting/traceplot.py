@@ -31,6 +31,8 @@ from matplotlib.collections import LineCollection
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
 
 
+matplotlib.use('Agg')
+
 DEFAULT_SEGMENTDATA = {
     'red': [
         [0.0, 0.0, 0.0],
