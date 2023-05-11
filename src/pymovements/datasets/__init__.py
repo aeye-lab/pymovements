@@ -26,6 +26,7 @@
    :template: class.rst
 
     pymovements.datasets.GazeBase
+    pymovements.datasets.GazeBaseVR
     pymovements.datasets.JuDo1000
 
 

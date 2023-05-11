@@ -35,7 +35,7 @@ class GazeBaseVR(DatasetDefinition):
     """GazeBaseVR dataset :cite:p:`GazeBaseVR`.
 
     This dataset includes binocular plus an additional cyclopian eye tracking data from 407
-    participants captured over a long period. Participants attended up to 3 rounds during this
+    participants captured over a 26-month period. Participants attended up to 3 rounds during this
     time frame, with each round consisting of two contiguous sessions.
 
     Eye movements are recorded at a sampling frequency of 250 Hz a using SensoMotoric
@@ -143,6 +143,10 @@ class GazeBaseVR(DatasetDefinition):
             'n': 'time',
             'x': 'x_pos',
             'y': 'y_pos',
+            'lx': 'x_left_pos',
+            'ly': 'y_left_pos',
+            'rx': 'x_right_pos',
+            'ry': 'y_right_pos',
             'xT': 'x_target_pos',
             'yT': 'y_target_pos',
         },
