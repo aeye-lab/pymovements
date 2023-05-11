@@ -211,7 +211,7 @@ Core developers should follow these rules when processing pull requests:
 - Edit the final commit message before merging to conform to the [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/) specification:
 
 ```
-<type>[optional scope]: <description>
+<type>[optional scope]: <description> (#PR-id)
 
 - detailed description, wrapped at 72 characters
 - bullet points or sentences are okay
