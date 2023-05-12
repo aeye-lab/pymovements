@@ -22,9 +22,9 @@ This module holds all the main Event classes used for event detection.
 """
 from __future__ import annotations
 
+from collections.abc import Callable
 from collections.abc import Sequence
 from typing import Any
-from typing import Callable
 
 import numpy as np
 import polars as pl
