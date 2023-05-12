@@ -25,8 +25,6 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Any
 from typing import Callable
-from typing import Protocol
-from typing import TypeVar
 
 import numpy as np
 import polars as pl
