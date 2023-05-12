@@ -23,6 +23,7 @@ from __future__ import annotations
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
+from typing import Callable
 
 import polars as pl
 from tqdm.auto import tqdm
@@ -32,7 +33,6 @@ from pymovements.dataset import dataset_files
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_paths import DatasetPaths
-from pymovements.events import EventDetectionMethod
 from pymovements.events.event_processing import EventGazeProcessor
 from pymovements.events.events import EventDataFrame
 from pymovements.events.events import EventDetectionLibrary
@@ -303,7 +303,7 @@ class Dataset:
 
     def detect_events(
             self,
-            method: EventDetectionMethod | str,
+            method: Callable[..., EventDataFrame] | str,
             eye: str | None = 'auto',
             clear: bool = False,
             verbose: bool = True,

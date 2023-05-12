@@ -24,10 +24,12 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from typing import Any
+from typing import Callable
+from typing import Protocol
+from typing import TypeVar
 
 import numpy as np
 import polars as pl
-from typing_extensions import Protocol
 
 from pymovements.events.event_properties import duration
 from pymovements.utils import checks
@@ -183,10 +185,10 @@ class EventDetectionLibrary:
         Dictionary of event detection methods.
     """
 
-    methods: dict[str, EventDetectionMethod] = {}
+    methods: dict[str, Callable[..., EventDataFrame]] = {}
 
     @classmethod
-    def add(cls, method: EventDetectionMethod) -> None:
+    def add(cls, method: Callable[..., EventDataFrame]) -> None:
         """Add an event detection method to the library.
 
         Parameter
@@ -197,7 +199,7 @@ class EventDetectionLibrary:
         cls.methods[method.__name__] = method
 
     @classmethod
-    def get(cls, name: str) -> EventDetectionMethod:
+    def get(cls, name: str) -> Callable[..., EventDataFrame]:
         """Get event detection method py name.
 
         Parameter
@@ -208,42 +210,9 @@ class EventDetectionLibrary:
         return cls.methods[name]
 
 
-def register_event_detection(method: EventDetectionMethod) -> EventDetectionMethod:
+def register_event_detection(
+        method: Callable[..., EventDataFrame],
+) -> Callable[..., EventDataFrame]:
     """Register an event detection method."""
     EventDetectionLibrary.add(method)
     return method
-
-
-class EventDetectionMethod(Protocol):
-    """Minimal interface to be implemented by all event detection methods."""
-
-    def __call__(
-            self,
-            positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
-            velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
-            timesteps: list[int] | np.ndarray | None = None,
-            minimum_duration: int = 0,
-            **kwargs: int | str | float,
-    ) -> EventDataFrame:
-        """Minimal interface to be implemented by all event detection methods.
-
-        Parameters
-        ----------
-        positions: array-like, shape (N, 2)
-            Continuous 2D position time series
-        velocities: array-like, shape (N, 2)
-            Corresponding continuous 2D velocity time series.
-        timesteps: array-like, shape (N, )
-            Corresponding continuous 1D timestep time series. If None, sample based timesteps are
-            assumed.
-        minimum_duration: int
-            Minimum event duration. The duration is specified in the units used in ``timesteps``.
-            If ``timesteps`` is None, then ``minimum_duration`` is specified in numbers of samples.
-        **kwargs:
-            Additional keyword arguments for the specific event detection method.
-
-        Returns
-        -------
-        EventDataFrame
-            A dataframe with detected events as rows.
-        """

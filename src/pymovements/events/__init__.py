@@ -66,7 +66,6 @@ from pymovements.events.detection.ivt import ivt
 from pymovements.events.event_processing import EventGazeProcessor
 from pymovements.events.event_processing import EventProcessor
 from pymovements.events.events import EventDataFrame
-from pymovements.events.events import EventDetectionMethod
 from pymovements.events.events import register_event_detection
 
 __all__ = [
@@ -76,6 +75,5 @@ __all__ = [
     'EventGazeProcessor',
     'EventProcessor',
     'EventDataFrame',
-    'EventDetectionMethod',
     'register_event_detection',
 ]
