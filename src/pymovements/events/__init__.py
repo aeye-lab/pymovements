@@ -68,11 +68,11 @@ from pymovements.events.events import EventDataFrame
 from pymovements.events.events import register_event_detection
 
 __all__ = [
-    'microsaccades',
-    'idt',
-    'ivt',
+    'EventDataFrame',
     'EventGazeProcessor',
     'EventProcessor',
-    'EventDataFrame',
+    'idt',
+    'ivt',
+    'microsaccades',
     'register_event_detection',
 ]

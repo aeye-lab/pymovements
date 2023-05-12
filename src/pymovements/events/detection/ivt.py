@@ -40,6 +40,7 @@ def ivt(
         minimum_duration: int = 100,
         velocity_threshold: float = 20.0,
         include_nan: bool = False,
+        name: str = 'fixation',
 ) -> EventDataFrame:
     """
     Identification of fixations based on velocity-threshold
@@ -68,6 +69,8 @@ def ivt(
         velocity is below the threshold, the point is classified as a fixation.
     include_nan: bool
         Indicator, whether we want to split events on missing/corrupt value (np.nan)
+    name:
+        Name for detected events in EventDataFrame.
 
     Returns
     -------
@@ -127,5 +130,5 @@ def ivt(
     offsets = timesteps[[candidate_indices[-1] for candidate_indices in candidates]].flatten()
 
     # Create event dataframe from onsets and offsets.
-    event_df = EventDataFrame(name='fixation', onsets=onsets, offsets=offsets)
+    event_df = EventDataFrame(name=name, onsets=onsets, offsets=offsets)
     return event_df

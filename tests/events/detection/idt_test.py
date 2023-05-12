@@ -153,6 +153,20 @@ def test_idt_raises_error(kwargs, expected_error):
         ),
         pytest.param(
             {
+                'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
+                'dispersion_threshold': 1,
+                'minimum_duration': 2,
+                'name': 'custom_fixation',
+            },
+            pm.events.EventDataFrame(
+                name='custom_fixation',
+                onsets=[0],
+                offsets=[99],
+            ),
+            id='constant_position_single_fixation_custom_name',
+        ),
+        pytest.param(
+            {
                 'positions': pm.synthetic.step_function(
                     length=100,
                     steps=[49, 50],

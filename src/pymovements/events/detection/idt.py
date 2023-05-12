@@ -59,6 +59,7 @@ def idt(
         minimum_duration: int = 100,
         dispersion_threshold: float = 1.0,
         include_nan: bool = False,
+        name: str = 'fixation',
 ) -> EventDataFrame:
     """
     Fixation identification based on dispersion threshold.
@@ -88,6 +89,8 @@ def idt(
         Threshold for dispersion for a group of consecutive samples to be identified as fixation
     include_nan: bool
         Indicator, whether we want to split events on missing/corrupt value (np.nan)
+    name:
+        Name for detected events in EventDataFrame.
 
     Returns
     -------
@@ -210,5 +213,5 @@ def idt(
     onsets_arr = np.array(onsets).flatten()
     offsets_arr = np.array(offsets).flatten()
 
-    event_df = EventDataFrame(name='fixation', onsets=onsets_arr, offsets=offsets_arr)
+    event_df = EventDataFrame(name=name, onsets=onsets_arr, offsets=offsets_arr)
     return event_df
