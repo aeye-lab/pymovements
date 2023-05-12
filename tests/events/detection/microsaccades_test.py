@@ -17,13 +17,13 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test all functions in pymovements.events.engbert."""
+"""Test all functions in pymovements.events.microsaccades."""
 import numpy as np
 import pytest
 from polars.testing import assert_frame_equal
 
-from pymovements.events.detection.engbert import compute_threshold
-from pymovements.events.detection.engbert import microsaccades
+from pymovements.events.detection.microsaccades import compute_threshold
+from pymovements.events.detection.microsaccades import microsaccades
 from pymovements.events.events import EventDataFrame
 from pymovements.synthetic import step_function
 
