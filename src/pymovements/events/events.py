@@ -24,10 +24,10 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from typing import Any
-from typing_extensions import Protocol
 
 import numpy as np
 import polars as pl
+from typing_extensions import Protocol
 
 from pymovements.events.event_properties import duration
 from pymovements.utils import checks
