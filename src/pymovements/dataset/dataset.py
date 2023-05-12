@@ -304,6 +304,7 @@ class Dataset:
     def detect_events(
             self,
             method: Callable[..., EventDataFrame] | str,
+            *,
             eye: str | None = 'auto',
             clear: bool = False,
             verbose: bool = True,
