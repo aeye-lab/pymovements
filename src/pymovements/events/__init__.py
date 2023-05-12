@@ -60,9 +60,9 @@
     pymovements.events.event_properties.amplitude
     pymovements.events.event_properties.peak_velocity
 """
-from pymovements.events.detection.engbert import microsaccades
 from pymovements.events.detection.idt import idt
 from pymovements.events.detection.ivt import ivt
+from pymovements.events.detection.microsaccades import microsaccades
 from pymovements.events.event_processing import EventGazeProcessor
 from pymovements.events.event_processing import EventProcessor
 from pymovements.events.events import EventDataFrame
