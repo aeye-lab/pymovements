@@ -30,9 +30,9 @@
     pymovements.events.detection.microsaccades
 
 """
-from pymovements.events.detection.microsaccades import microsaccades
 from pymovements.events.detection.idt import idt
 from pymovements.events.detection.ivt import ivt
+from pymovements.events.detection.microsaccades import microsaccades
 
 
 __all__ = [
