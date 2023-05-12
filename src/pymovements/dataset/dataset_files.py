@@ -179,7 +179,7 @@ def load_gaze_files(
         This argument is used only for this single call and does not alter
         :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
     extension:
-        Specifies the file format for loading preprocessed data. Valid options are: `csv`, `feather`.
+        Specifies the file format for loading data. Valid options are: `csv`, `feather`.
         :Default: `feather`.
 
     Returns
