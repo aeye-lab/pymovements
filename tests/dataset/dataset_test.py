@@ -520,7 +520,7 @@ def test_pos2vel(dataset_configuration):
         ),
         pytest.param(
             {
-                'method': "microsaccades",
+                'method': 'microsaccades',
                 'threshold': 1,
                 'eye': 'auto',
             },
