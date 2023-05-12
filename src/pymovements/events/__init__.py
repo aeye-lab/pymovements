@@ -27,7 +27,6 @@
    :template: class.rst
 
     pymovements.events.EventDataFrame
-    pymovements.events.EventDetectionCallable
 
 .. rubric:: Processing
 
