@@ -22,12 +22,12 @@ This module holds all the main Event classes used for event detection.
 """
 from __future__ import annotations
 
+from collections.abc import Callable
 from collections.abc import Sequence
 from typing import Any
 
 import numpy as np
 import polars as pl
-from typing_extensions import Protocol
 
 from pymovements.events.event_properties import duration
 from pymovements.utils import checks
@@ -172,3 +172,45 @@ class EventDataFrame:
             ] + [pl.all()],
         )
         return df
+
+
+class EventDetectionLibrary:
+    """Provides access by name to event detection methods.
+
+    Attributes
+    ----------
+    methods:
+        Dictionary of event detection methods.
+    """
+
+    methods: dict[str, Callable[..., EventDataFrame]] = {}
+
+    @classmethod
+    def add(cls, method: Callable[..., EventDataFrame]) -> None:
+        """Add an event detection method to the library.
+
+        Parameter
+        ---------
+        method
+            The event detection method to add to the library.
+        """
+        cls.methods[method.__name__] = method
+
+    @classmethod
+    def get(cls, name: str) -> Callable[..., EventDataFrame]:
+        """Get event detection method py name.
+
+        Parameter
+        ---------
+        name
+            Name of the event detection method in the library.
+        """
+        return cls.methods[name]
+
+
+def register_event_detection(
+        method: Callable[..., EventDataFrame],
+) -> Callable[..., EventDataFrame]:
+    """Register an event detection method."""
+    EventDetectionLibrary.add(method)
+    return method

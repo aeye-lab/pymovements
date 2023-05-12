@@ -25,6 +25,7 @@ from __future__ import annotations
 import numpy as np
 
 from pymovements.events.events import EventDataFrame
+from pymovements.events.events import register_event_detection
 from pymovements.utils import checks
 from pymovements.utils.filters import events_split_nans
 from pymovements.utils.filters import filter_candidates_remove_nans
@@ -50,6 +51,7 @@ def dispersion(positions: list[list[float]] | np.ndarray) -> float:
     return sum(np.nanmax(positions, axis=0) - np.nanmin(positions, axis=0))
 
 
+@register_event_detection
 def idt(
         positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
