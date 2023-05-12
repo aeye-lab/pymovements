@@ -65,9 +65,7 @@ from pymovements.events.detection.idt import idt
 from pymovements.events.detection.ivt import ivt
 from pymovements.events.event_processing import EventGazeProcessor
 from pymovements.events.event_processing import EventProcessor
-from pymovements.events.events import EventDataFrame
-from pymovements.events.events import EventDetectionCallable
-
+from pymovements.events.events import EventDataFrame, EventDetectionMethod, register_event_detection
 
 __all__ = [
     'microsaccades',
@@ -76,5 +74,6 @@ __all__ = [
     'EventGazeProcessor',
     'EventProcessor',
     'EventDataFrame',
-    'EventDetectionCallable',
+    'EventDetectionMethod',
+    'register_event_detection',
 ]

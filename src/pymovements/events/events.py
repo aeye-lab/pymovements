@@ -24,10 +24,10 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from typing import Any
+from typing_extensions import Protocol
 
 import numpy as np
 import polars as pl
-from typing_extensions import Protocol
 
 from pymovements.events.event_properties import duration
 from pymovements.utils import checks
@@ -174,7 +174,47 @@ class EventDataFrame:
         return df
 
 
-class EventDetectionCallable(Protocol):
+class EventDetectionLibrary:
+    """Provides access by name to event detection methods.
+
+    Attributes
+    ----------
+    methods:
+        Dictionary of event detection methods.
+    """
+
+    methods: dict[str, EventDetectionMethod] = {}
+
+    @classmethod
+    def add(cls, method: EventDetectionMethod) -> None:
+        """Add an event detection method to the library.
+
+        Parameter
+        ---------
+        method
+            The event detection method to add to the library.
+        """
+        cls.methods[method.__name__] = method
+
+    @classmethod
+    def get(cls, name: str) -> EventDetectionMethod:
+        """Get event detection method py name.
+
+        Parameter
+        ---------
+        name
+            Name of the event detection method in the library.
+        """
+        return cls.methods[name]
+
+
+def register_event_detection(method: EventDetectionMethod) -> EventDetectionMethod:
+    """Register an event detection method."""
+    EventDetectionLibrary.add(method)
+    return method
+
+
+class EventDetectionMethod(Protocol):
     """Minimal interface to be implemented by all event detection methods."""
 
     def __call__(

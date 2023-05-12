@@ -34,7 +34,8 @@ from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events.event_processing import EventGazeProcessor
 from pymovements.events.events import EventDataFrame
-from pymovements.events.events import EventDetectionCallable
+from pymovements.events.events import EventDetectionLibrary
+from pymovements.events import EventDetectionMethod
 from pymovements.gaze import GazeDataFrame
 
 
@@ -302,7 +303,7 @@ class Dataset:
 
     def detect_events(
             self,
-            method: EventDetectionCallable,
+            method: EventDetectionMethod | str,
             eye: str | None = 'auto',
             clear: bool = False,
             verbose: bool = True,
@@ -337,6 +338,9 @@ class Dataset:
             Returns self, useful for method cascading.
         """
         self._check_gaze_dataframe()
+
+        if isinstance(method, str):
+            method = EventDetectionLibrary.get(method)
 
         # Automatically infer eye to use for event detection.
         if eye == 'auto':

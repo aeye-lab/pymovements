@@ -516,7 +516,15 @@ def test_pos2vel(dataset_configuration):
                 'threshold': 1,
                 'eye': 'auto',
             },
-            id='microsaccades',
+            id='microsaccades_class',
+        ),
+        pytest.param(
+            {
+                'method': "microsaccades",
+                'threshold': 1,
+                'eye': 'auto',
+            },
+            id='microsaccades_string',
         ),
     ],
 )

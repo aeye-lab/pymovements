@@ -27,11 +27,13 @@ from collections.abc import Sized
 import numpy as np
 
 from pymovements.events.events import EventDataFrame
+from pymovements.events.events import register_event_detection
 from pymovements.gaze.transforms import consecutive
 from pymovements.utils import checks
 from pymovements.utils.filters import filter_candidates_remove_nans
 
 
+@register_event_detection
 def microsaccades(
         positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
