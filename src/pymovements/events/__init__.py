@@ -27,7 +27,6 @@
    :template: class.rst
 
     pymovements.events.EventDataFrame
-    pymovements.events.EventDetectionCallable
 
 .. rubric:: Processing
 
@@ -66,7 +65,6 @@ from pymovements.events.detection.microsaccades import microsaccades
 from pymovements.events.event_processing import EventGazeProcessor
 from pymovements.events.event_processing import EventProcessor
 from pymovements.events.events import EventDataFrame
-from pymovements.events.events import EventDetectionCallable
 
 
 __all__ = [
@@ -76,5 +74,4 @@ __all__ = [
     'EventGazeProcessor',
     'EventProcessor',
     'EventDataFrame',
-    'EventDetectionCallable',
 ]
