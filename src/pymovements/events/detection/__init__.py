@@ -30,7 +30,7 @@
     pymovements.events.detection.microsaccades
 
 """
-from pymovements.events.detection.engbert import microsaccades
+from pymovements.events.detection.microsaccades import microsaccades
 from pymovements.events.detection.idt import idt
 from pymovements.events.detection.ivt import ivt
 
