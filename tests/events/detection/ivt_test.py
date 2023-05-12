@@ -188,6 +188,20 @@ def test_ivt_raise_error(kwargs, expected_error):
         ),
         pytest.param(
             {
+                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
+                'velocity_threshold': 1,
+                'minimum_duration': 1,
+                'name': 'custom_fixation',
+            },
+            EventDataFrame(
+                name='custom_fixation',
+                onsets=[0],
+                offsets=[99],
+            ),
+            id='constant_position_single_fixation_custom_name',
+        ),
+        pytest.param(
+            {
                 'positions': step_function(
                     length=100,
                     steps=[49, 50],

@@ -41,6 +41,7 @@ def microsaccades(
         threshold_factor: float = 6,
         minimum_threshold: float = 1e-10,
         include_nan: bool = False,
+        name: str = 'saccade',
 ) -> EventDataFrame:
     """Detect micro-saccades from velocity gaze sequence.
 
@@ -74,6 +75,8 @@ def microsaccades(
         Default: 1e-10
     include_nan: bool
         Indicator, whether we want to split events on missing/corrupt value (np.nan)
+    name:
+        Name for detected events in EventDataFrame.
 
     Returns
     -------
@@ -142,7 +145,7 @@ def microsaccades(
     offsets = timesteps[[candidate_indices[-1] for candidate_indices in candidates]].flatten()
 
     # Create event dataframe from onsets and offsets.
-    event_df = EventDataFrame(name='saccade', onsets=onsets, offsets=offsets)
+    event_df = EventDataFrame(name=name, onsets=onsets, offsets=offsets)
     return event_df
 
 

@@ -105,6 +105,25 @@ def test_microsaccades_raises_error(kwargs, expected):
                 'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'velocities': step_function(
                     length=100,
+                    steps=[40, 50],
+                    values=[(9, 9), (0, 0)],
+                    start_value=(0, 0),
+                ),
+                'threshold': 1e-5,
+                'name': 'custom_saccade',
+            },
+            EventDataFrame(
+                name='custom_saccade',
+                onsets=[40],
+                offsets=[49],
+            ),
+            id='two_steps_one_saccade_custom_name',
+        ),
+        pytest.param(
+            {
+                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
+                'velocities': step_function(
+                    length=100,
                     steps=[20, 30, 70, 80],
                     values=[(9, 9), (0, 0), (9, 9), (0, 0)],
                     start_value=(0, 0),
