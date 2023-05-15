@@ -231,7 +231,7 @@ def test_pix2deg_raises_error(kwargs, series, exception, msg_substrings):
 
 
 @pytest.mark.parametrize(
-    'kwargs, series, expected_df',
+    ('kwargs', 'series', 'expected_df'),
     [
         pytest.param(
             {

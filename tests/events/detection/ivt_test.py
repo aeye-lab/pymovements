@@ -31,7 +31,7 @@ from pymovements.synthetic import step_function
 
 
 @pytest.mark.parametrize(
-    'kwargs, expected_error',
+    ('kwargs', 'expected_error'),
     [
         pytest.param(
             {
@@ -162,7 +162,7 @@ def test_ivt_raise_error(kwargs, expected_error):
 
 
 @pytest.mark.parametrize(
-    'kwargs, expected',
+    ('kwargs', 'expected'),
     [
         pytest.param(
             {

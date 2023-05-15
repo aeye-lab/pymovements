@@ -30,7 +30,7 @@ from pymovements.utils.strings import curly_to_regex
 
 
 @pytest.mark.parametrize(
-    'pattern, expected_regex',
+    ('pattern', 'expected_regex'),
     [
         pytest.param(
             r'{subject_id:d}_{session_name}.csv',

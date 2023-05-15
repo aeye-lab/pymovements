@@ -139,7 +139,7 @@ def test_pos2vel_raises_error(kwargs, series, exception, msg_substrings):
 
 
 @pytest.mark.parametrize(
-    'kwargs, series, expected_df',
+    ('kwargs', 'series', 'expected_df'),
     [
         pytest.param(
             {'method': 'savitzky_golay', 'window_length': 3, 'degree': 1, 'sampling_rate': 1},

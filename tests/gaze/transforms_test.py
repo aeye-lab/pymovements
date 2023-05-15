@@ -36,7 +36,7 @@ screen_cm_2d = [100, 100]
 
 
 @pytest.mark.parametrize(
-    'kwargs, expected_error',
+    ('kwargs', 'expected_error'),
     [
         pytest.param(
             {
@@ -222,7 +222,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
 
 
 @pytest.mark.parametrize(
-    'kwargs, expected_value',
+    ('kwargs', 'expected_value'),
     [
         pytest.param(
             {
@@ -419,7 +419,7 @@ def test_pix2deg_returns(kwargs, expected_value):
 
 
 @pytest.mark.parametrize(
-    'kwargs, expected_error',
+    ('kwargs', 'expected_error'),
     [
         pytest.param(
             {
@@ -502,7 +502,7 @@ def test_pos2vel_raises_error(kwargs, expected_error):
     ],
 )
 @pytest.mark.parametrize(
-    'kwargs, padding, expected_value',
+    ('kwargs', 'padding', 'expected_value'),
     [
         pytest.param(
             {
@@ -530,7 +530,7 @@ def test_pos2vel_returns(method, kwargs, padding, expected_value):
 
 
 @pytest.mark.parametrize(
-    'params, expected_value',
+    ('params', 'expected_value'),
     [
         pytest.param(
             {'method': 'preceding', 'sampling_rate': 1},
@@ -570,7 +570,7 @@ def test_pos2vel_stepped_input_returns(params, expected_value):
 
 
 @pytest.mark.parametrize(
-    'params, expected_value',
+    ('params', 'expected_value'),
     [
         pytest.param(
             {'method': 'savitzky_golay', 'window_length': 7, 'polyorder': 2, 'sampling_rate': 1},
@@ -604,7 +604,7 @@ def test_pos2vel_2d_stepped_input_returns(params, expected_value):
 
 
 @pytest.mark.parametrize(
-    'params, expected_value',
+    ('params', 'expected_value'),
     [
         pytest.param(
             {'arr': np.ones((2, 2, 5)), 'axis': None},
@@ -641,7 +641,7 @@ def test_norm(params, expected_value):
 
 
 @pytest.mark.parametrize(
-    'params, expected_error',
+    ('params', 'expected_error'),
     [
         pytest.param(
             {'arr': np.ones((2, 2, 5, 5)), 'axis': None},
@@ -656,7 +656,7 @@ def test_norm_raises_exception(params, expected_error):
 
 
 @pytest.mark.parametrize(
-    'params, expected',
+    ('params', 'expected'),
     [
         pytest.param(
             {'arr': np.ones((1, 10, 2)), 'window_size': 2, 'keep_padded': False},

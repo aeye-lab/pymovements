@@ -53,7 +53,7 @@ def dataset_definition_fixture():
 
 
 @pytest.mark.parametrize(
-    'init_path, expected_paths',
+    ('init_path', 'expected_paths'),
     [
         pytest.param(
             '/data/set/path',

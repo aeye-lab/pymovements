@@ -26,7 +26,7 @@ import pymovements as pm
 
 
 @pytest.mark.parametrize(
-    'init_kwargs, expected_paths',
+    ('init_kwargs', 'expected_paths'),
     [
         pytest.param(
             {'root': '/data/set/path'},

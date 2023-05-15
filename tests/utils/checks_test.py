@@ -27,7 +27,7 @@ from pymovements.utils import checks
 
 
 @pytest.mark.parametrize(
-    'variable, expected_error, expected_err_msg',
+    ('variable', 'expected_error', 'expected_err_msg'),
     [
         pytest.param(5, None, '', id='non_zero_single_variable_raises_no_error'),
         pytest.param(
@@ -66,7 +66,7 @@ def test_check_no_zeros_raises_error(variable, expected_error, expected_err_msg)
 
 
 @pytest.mark.parametrize(
-    'arr, expected_error, expected_err_msg',
+    ('arr', 'expected_error', 'expected_err_msg'),
     [
         pytest.param(
             np.array([[1, 2], [3, 4]]),
@@ -116,7 +116,7 @@ def test_check_nan_both_channels_raises_error(arr, expected_error, expected_err_
 
 # Test check_shapes_positions_velocities
 @pytest.mark.parametrize(
-    'kwargs, expected_error, expected_err_msg',
+    ('kwargs', 'expected_error', 'expected_err_msg'),
     [
         pytest.param(
             {
