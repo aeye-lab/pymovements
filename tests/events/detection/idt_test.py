@@ -26,7 +26,7 @@ import pymovements as pm
 
 
 @pytest.mark.parametrize(
-    'kwargs, expected_error',
+    ('kwargs', 'expected_error'),
     [
         pytest.param(
             {
@@ -127,7 +127,7 @@ def test_idt_raises_error(kwargs, expected_error):
 
 
 @pytest.mark.parametrize(
-    'kwargs, expected',
+    ('kwargs', 'expected'),
     [
         pytest.param(
             {

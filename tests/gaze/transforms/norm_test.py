@@ -26,7 +26,7 @@ import pymovements as pm
 
 
 @pytest.mark.parametrize(
-    'columns, df, expected_series',
+    ('columns', 'df', 'expected_series'),
     [
         pytest.param(
             ('x', 'y'),

@@ -30,7 +30,7 @@ from pymovements.utils.filters import filter_candidates_remove_nans
 
 
 @pytest.mark.parametrize(
-    'params, expected',
+    ('params', 'expected'),
     [
         pytest.param(
             {

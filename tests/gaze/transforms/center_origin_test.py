@@ -58,7 +58,7 @@ def test_center_origin_init_raises_error(kwargs, exception, msg_substrings):
 
 
 @pytest.mark.parametrize(
-    'kwargs, series, expected_df',
+    ('kwargs', 'series', 'expected_df'),
     [
         pytest.param(
             {'screen_px': 100, 'origin': 'center', 'pixel_column': 'pixel'},

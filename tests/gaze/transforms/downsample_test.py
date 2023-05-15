@@ -52,7 +52,7 @@ def test_downsample_init_raises_error(factor, exception, msg_substrings):
 
 
 @pytest.mark.parametrize(
-    'factor, series, expected_df',
+    ('factor', 'series', 'expected_df'),
     [
         pytest.param(
             1,

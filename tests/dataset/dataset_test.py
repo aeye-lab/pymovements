@@ -303,7 +303,7 @@ def test_load_correct_event_dfs(dataset_configuration):
 
 
 @pytest.mark.parametrize(
-    'subset, fileinfo_idx',
+    ('subset', 'fileinfo_idx'),
     [
         pytest.param(
             {'subject_id': 1},
@@ -328,7 +328,7 @@ def test_load_subset(subset, fileinfo_idx, dataset_configuration):
 
 
 @pytest.mark.parametrize(
-    'init_kwargs, load_kwargs, exception',
+    ('init_kwargs', 'load_kwargs', 'exception'),
     [
         pytest.param(
             {},
@@ -365,7 +365,7 @@ def test_load_exceptions(init_kwargs, load_kwargs, exception, dataset_configurat
 
 
 @pytest.mark.parametrize(
-    'init_kwargs, save_kwargs, exception',
+    ('init_kwargs', 'save_kwargs', 'exception'),
     [
         pytest.param(
             {},
@@ -387,7 +387,7 @@ def test_save_gaze_exceptions(init_kwargs, save_kwargs, exception, dataset_confi
 
 
 @pytest.mark.parametrize(
-    'init_kwargs, load_kwargs, exception',
+    ('init_kwargs', 'load_kwargs', 'exception'),
     [
         pytest.param(
             {},
@@ -415,7 +415,7 @@ def test_load_events_exceptions(init_kwargs, load_kwargs, exception, dataset_con
 
 
 @pytest.mark.parametrize(
-    'init_kwargs, save_kwargs, exception',
+    ('init_kwargs', 'save_kwargs', 'exception'),
     [
         pytest.param(
             {},
@@ -602,7 +602,7 @@ def test_detect_events_explicit_eye(detect_event_kwargs, dataset_configuration):
 
 
 @pytest.mark.parametrize(
-    'detect_event_kwargs_1, detect_event_kwargs_2, expected_schema',
+    ('detect_event_kwargs_1', 'detect_event_kwargs_2', 'expected_schema'),
     [
         pytest.param(
             {
@@ -687,7 +687,7 @@ def test_detect_events_attribute_error(dataset_configuration):
 
 
 @pytest.mark.parametrize(
-    'events_init, events_expected',
+    ('events_init', 'events_expected'),
     [
         pytest.param(
             [],
@@ -728,7 +728,7 @@ def test_clear_events(events_init, events_expected, tmp_path):
 
 
 @pytest.mark.parametrize(
-    'detect_event_kwargs, events_dirname, expected_save_dirpath, save_kwargs',
+    ('detect_event_kwargs', 'events_dirname', 'expected_save_dirpath', 'save_kwargs'),
     [
         pytest.param(
             {'method': pm.events.microsaccades, 'threshold': 1, 'eye': 'auto'},
@@ -778,7 +778,7 @@ def test_save_events(
 
 
 @pytest.mark.parametrize(
-    'detect_event_kwargs, events_dirname, expected_save_dirpath, load_save_kwargs',
+    ('detect_event_kwargs', 'events_dirname', 'expected_save_dirpath', 'load_save_kwargs'),
     [
         pytest.param(
             {'method': pm.events.microsaccades, 'threshold': 1, 'eye': 'auto'},
@@ -834,7 +834,7 @@ def test_load_previously_saved_events_gaze(
 
 
 @pytest.mark.parametrize(
-    'preprocessed_dirname, expected_save_dirpath',
+    ('preprocessed_dirname', 'expected_save_dirpath'),
     [
         pytest.param(
             None,
@@ -866,7 +866,7 @@ def test_save_preprocessed(preprocessed_dirname, expected_save_dirpath, dataset_
 
 
 @pytest.mark.parametrize(
-    'expected_save_preprocessed_path, expected_save_events_path, save_kwargs',
+    ('expected_save_preprocessed_path', 'expected_save_events_path', 'save_kwargs'),
     [
         pytest.param(
             'preprocessed',
@@ -932,7 +932,7 @@ def test_save_creates_correct_directory(
 
 
 @pytest.mark.parametrize(
-    'expected_save_preprocessed_path, expected_save_events_path, save_kwargs',
+    ('expected_save_preprocessed_path', 'expected_save_events_path', 'save_kwargs'),
     [
         pytest.param(
             'preprocessed',
@@ -990,7 +990,7 @@ def test_save_files_have_correct_extension(
 
 
 @pytest.mark.parametrize(
-    'init_path, expected_paths',
+    ('init_path', 'expected_paths'),
     [
         pytest.param(
             '/data/set/path',
@@ -1070,7 +1070,7 @@ def test_paths(init_path, expected_paths):
 
 
 @pytest.mark.parametrize(
-    'new_fileinfo, exception',
+    ('new_fileinfo', 'exception'),
     [
         pytest.param(None, AttributeError),
         pytest.param([], AttributeError),
@@ -1086,7 +1086,7 @@ def test_check_fileinfo(new_fileinfo, exception, tmp_path):
 
 
 @pytest.mark.parametrize(
-    'new_gaze, exception',
+    ('new_gaze', 'exception'),
     [
         pytest.param(None, AttributeError),
         pytest.param([], AttributeError),

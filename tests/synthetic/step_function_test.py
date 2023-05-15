@@ -27,7 +27,7 @@ from pymovements.synthetic import step_function
 
 
 @pytest.mark.parametrize(
-    'params, expected',
+    ('params', 'expected'),
     [
         pytest.param(
             {'length': 0, 'steps': [0], 'values': [0]},

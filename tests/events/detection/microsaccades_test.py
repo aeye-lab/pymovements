@@ -29,7 +29,7 @@ from pymovements.synthetic import step_function
 
 
 @pytest.mark.parametrize(
-    'kwargs, expected',
+    ('kwargs', 'expected'),
     [
         pytest.param(
             {
@@ -66,7 +66,7 @@ def test_microsaccades_raises_error(kwargs, expected):
 
 
 @pytest.mark.parametrize(
-    'kwargs, expected',
+    ('kwargs', 'expected'),
     [
         pytest.param(
             {
@@ -219,7 +219,7 @@ def test_microsaccades_detects_saccades(kwargs, expected):
 
 
 @pytest.mark.parametrize(
-    'params, expected',
+    ('params', 'expected'),
     [
         pytest.param(
             {'method': 'invalid'},

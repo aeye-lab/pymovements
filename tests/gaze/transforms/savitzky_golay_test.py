@@ -130,7 +130,7 @@ def test_savitzky_golay_raises_error(kwargs, series, exception, msg_substrings):
 
 
 @pytest.mark.parametrize(
-    'kwargs, series, expected_df',
+    ('kwargs', 'series', 'expected_df'),
     [
         pytest.param(
             {'window_length': 3, 'degree': 1},
