@@ -22,6 +22,8 @@ This module holds the traceplot.
 """
 from __future__ import annotations
 
+import sys
+
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -30,8 +32,11 @@ from matplotlib.collections import LineCollection
 
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
 
-
-matplotlib.use('Agg')
+# This is really a dirty workaround to use the Agg backend if runnning pytest.
+# This is needed as Windows workers on GitHub fail randomly with other backends.
+# Unfortunately the Agg module cannot show plots in jupyter notebooks.
+if 'pytest' in sys.modules:
+    matplotlib.use('Agg')
 
 DEFAULT_SEGMENTDATA = {
     'red': [
