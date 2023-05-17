@@ -84,7 +84,7 @@ def traceplot(
         gaze: GazeDataFrame,
         x: str,
         y: str,
-        cval: np.ndarray | None = None,# pragma: no cover
+        cval: np.ndarray | None = None,  # pragma: no cover
         cmap: colors.Colormap | None = None,
         cmap_norm: colors.Normalize | str | None = None,
         cmap_segmentdata: dict[str, list[list[float]]] | None = None,
