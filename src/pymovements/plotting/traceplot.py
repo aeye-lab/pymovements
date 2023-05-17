@@ -35,7 +35,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
 # This is really a dirty workaround to use the Agg backend if runnning pytest.
 # This is needed as Windows workers on GitHub fail randomly with other backends.
 # Unfortunately the Agg module cannot show plots in jupyter notebooks.
-if 'pytest' in sys.modules:
+if 'pytest' in sys.modules:  # pragma: no cover
     matplotlib.use('Agg')
 
 DEFAULT_SEGMENTDATA = {
@@ -84,7 +84,7 @@ def traceplot(
         gaze: GazeDataFrame,
         x: str,
         y: str,
-        cval: np.ndarray | None = None,
+        cval: np.ndarray | None = None,# pragma: no cover
         cmap: colors.Colormap | None = None,
         cmap_norm: colors.Normalize | str | None = None,
         cmap_segmentdata: dict[str, list[list[float]]] | None = None,
