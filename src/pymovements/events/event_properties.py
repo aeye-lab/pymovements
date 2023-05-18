@@ -175,3 +175,85 @@ def _check_velocity_columns(velocity_columns: tuple[str, str]) -> None:
             'velocity_columns must be of type tuple[str, str] but is '
             f'tuple[{type(velocity_columns[0]).__name__}, {type(velocity_columns[1]).__name__}]',
         )
+
+
+@register_event_property
+def fixation_centroid_x(
+        position_columns: tuple[str, str] = ('x_pos', 'y_pos'),
+        centroid_calculation: str = 'mean',
+) -> pl.Expr:
+    """Calculate a fixations x centroid.
+
+    Parameters
+    ----------
+    position_columns
+        The column names of the pitch and yaw position components.
+    centroid_calculation
+        Specify the type of centroid to be extracted, defaults to 'mean'.
+
+    Raises
+    ------
+    TypeError
+        If position_columns not of type tuple, position_columns not of length 2, or elements of
+        position_columns not of type str.
+    ValueError
+        If centroid calculation is not yet supported -- currently we are supporting mean and median
+        fixation location position.
+    """
+    _check_position_columns(position_columns)
+
+    x_position = pl.col(position_columns[0])
+    if centroid_calculation not in ['mean', 'median']:
+        raise ValueError(
+            f'Centroid calculation {centroid_calculation} not (yet) supported '
+            f"please choose one of the following: ['mean', 'median'].",
+        )
+
+    if centroid_calculation == 'mean':
+        ret = x_position.mean()
+
+    if centroid_calculation == 'median':
+        ret = x_position.median()
+
+    return ret
+
+
+@register_event_property
+def fixation_centroid_y(
+        position_columns: tuple[str, str] = ('x_pos', 'y_pos'),
+        centroid_calculation: str = 'mean',
+) -> pl.Expr:
+    """Calculate a fixations y centroid.
+
+    Parameters
+    ----------
+    position_columns
+        The column names of the pitch and yaw position components.
+    centroid_calculation
+        Specify the type of centroid to be extracted, defaults to 'mean'.
+
+    Raises
+    ------
+    TypeError
+        If position_columns not of type tuple, position_columns not of length 2, or elements of
+        position_columns not of type str.
+    ValueError
+        If centroid calculation is not yet supported -- currently we are supporting mean and median
+        fixation location position.
+    """
+    _check_position_columns(position_columns)
+
+    y_position = pl.col(position_columns[1])
+    if centroid_calculation not in ['mean', 'median']:
+        raise ValueError(
+            f'Centroid calculation {centroid_calculation} not (yet) supported '
+            f"please choose one of the following: ['mean', 'median'].",
+        )
+
+    if centroid_calculation == 'mean':
+        ret = y_position.mean()
+
+    if centroid_calculation == 'median':
+        ret = y_position.median()
+
+    return ret
