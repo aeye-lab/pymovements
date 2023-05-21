@@ -109,16 +109,16 @@ from pymovements.events.event_properties import EVENT_PROPERTIES
         ),
         pytest.param(
             event_properties.fixation_centroid_x,
-            {'centroid_calculation': 'foo'},
+            {'method': 'foo'},
             ValueError,
-            ('centroid', 'foo', 'supported', 'mean', 'median'),
+            ('method', 'foo', 'not', 'supported', 'mean', 'median'),
             id='fixation_centroid_x_value_error',
         ),
         pytest.param(
             event_properties.fixation_centroid_y,
-            {'centroid_calculation': 'foo'},
+            {'method': 'foo'},
             ValueError,
-            ('centroid', 'foo', 'supported', 'mean', 'median'),
+            ('method', 'foo', 'not', 'supported', 'mean', 'median'),
             id='fixation_centroid_y_value_error',
         ),
     ],
@@ -480,7 +480,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
         ),
         pytest.param(
             event_properties.fixation_centroid_x,
-            {'centroid_calculation': 'median'},
+            {'method': 'median'},
             pl.DataFrame(
                 {'x_pos': [0, 1, 3], 'y_pos': [0, 2, 3]},
                 schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
@@ -519,7 +519,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
         ),
         pytest.param(
             event_properties.fixation_centroid_y,
-            {'centroid_calculation': 'median'},
+            {'method': 'median'},
             pl.DataFrame(
                 {'x_pos': [0, 1, 3], 'y_pos': [0, 2, 3]},
                 schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
