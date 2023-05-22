@@ -141,6 +141,65 @@ def disposition(position_columns: tuple[str, str] = ('x_pos', 'y_pos')) -> pl.Ex
     ).sqrt()
 
 
+@register_event_property
+def fixation_centroid(
+        component: str = 'x',
+        method: str = 'mean',
+        position_columns: tuple[str, str] = ('x_pos', 'y_pos'),
+) -> pl.Expr:
+    """Calculate a fixations x centroid.
+
+    Parameters
+    ----------
+    component
+        Specify the component of which to calculate the  centroid.
+        Supported components: 'x', 'y'.
+        Defaults to 'x'.
+    method
+        Specify the type of centroid to be extracted, supported methods: 'mean', 'median'.
+        Defaults to 'mean'.
+    position_columns
+        The column names of the pitch and yaw position components.
+
+    Raises
+    ------
+    TypeError
+        If position_columns not of type tuple, position_columns not of length 2, or elements of
+        position_columns not of type str.
+    ValueError
+        If component is not one of the supported methods.
+    ValueError
+        If method is not one of the supported methods.
+    """
+    _check_position_columns(position_columns)
+
+    component_to_pos = {
+        'x': 0,
+        'y': 1,
+    }
+
+    if component not in component_to_pos:
+        raise ValueError(
+            f'Component {component} not supported. '
+            f"Please choose one of the following: ['x', 'y'].",
+        )
+
+    position = pl.col(position_columns[component_to_pos[component]])
+    if method not in ['mean', 'median']:
+        raise ValueError(
+            f'Method {method} not supported. '
+            f"Please choose one of the following: ['mean', 'median'].",
+        )
+
+    if method == 'mean':
+        centroid = position.mean()
+
+    if method == 'median':
+        centroid = position.median()
+
+    return centroid
+
+
 def _check_position_columns(position_columns: tuple[str, str]) -> None:
     """Check if position_columns is of type tuple[str, str]."""
     if not isinstance(position_columns, tuple):
@@ -175,85 +234,3 @@ def _check_velocity_columns(velocity_columns: tuple[str, str]) -> None:
             'velocity_columns must be of type tuple[str, str] but is '
             f'tuple[{type(velocity_columns[0]).__name__}, {type(velocity_columns[1]).__name__}]',
         )
-
-
-@register_event_property
-def fixation_centroid_x(
-        method: str = 'mean',
-        position_columns: tuple[str, str] = ('x_pos', 'y_pos'),
-) -> pl.Expr:
-    """Calculate a fixations x centroid.
-
-    Parameters
-    ----------
-    method
-        Specify the type of centroid to be extracted, supported methods: 'mean', 'median'.
-        Defaults to 'mean'.
-    position_columns
-        The column names of the pitch and yaw position components.
-
-    Raises
-    ------
-    TypeError
-        If position_columns not of type tuple, position_columns not of length 2, or elements of
-        position_columns not of type str.
-    ValueError
-        If method is not one of the supported methods.
-    """
-    _check_position_columns(position_columns)
-
-    x_position = pl.col(position_columns[0])
-    if method not in ['mean', 'median']:
-        raise ValueError(
-            f'Method {method} not supported. '
-            f"Please choose one of the following: ['mean', 'median'].",
-        )
-
-    if method == 'mean':
-        centroid = x_position.mean()
-
-    if method == 'median':
-        centroid = x_position.median()
-
-    return centroid
-
-
-@register_event_property
-def fixation_centroid_y(
-        method: str = 'mean',
-        position_columns: tuple[str, str] = ('x_pos', 'y_pos'),
-) -> pl.Expr:
-    """Calculate a fixations y centroid.
-
-    Parameters
-    ----------
-    method
-        Specify the type of centroid to be extracted, supported methods: 'mean', 'median'.
-        Defaults to 'mean'.
-    position_columns
-        The column names of the pitch and yaw position components.
-
-    Raises
-    ------
-    TypeError
-        If position_columns not of type tuple, position_columns not of length 2, or elements of
-        position_columns not of type str.
-    ValueError
-        If method is not one of the supported methods.
-    """
-    _check_position_columns(position_columns)
-
-    y_position = pl.col(position_columns[1])
-    if method not in ['mean', 'median']:
-        raise ValueError(
-            f'Method {method} not supported. '
-            f"Please choose one of the following: ['mean', 'median'].",
-        )
-
-    if method == 'mean':
-        centroid = y_position.mean()
-
-    if method == 'median':
-        centroid = y_position.median()
-
-    return centroid
