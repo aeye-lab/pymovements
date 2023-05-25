@@ -108,18 +108,11 @@ from pymovements.events.event_properties import EVENT_PROPERTIES
             id='amplitude_tuple_of_int',
         ),
         pytest.param(
-            event_properties.fixation_centroid,
+            event_properties.position,
             {'method': 'foo'},
             ValueError,
             ('method', 'foo', 'not', 'supported', 'mean', 'median'),
-            id='fixation_centroid_value_error_method',
-        ),
-        pytest.param(
-            event_properties.fixation_centroid,
-            {'component': 'foo'},
-            ValueError,
-            ('component', 'foo', 'not', 'supported', 'x', 'y'),
-            id='fixation_centroid_value_error_component',
+            id='position_unsupported_method_raises_value_error',
         ),
     ],
 )
@@ -546,11 +539,7 @@ def test_property_has_expected_result(event_property, init_kwargs, input_df, exp
         pytest.param(event_properties.dispersion, 'dispersion', id='dispersion'),
         pytest.param(event_properties.amplitude, 'amplitude', id='amplitude'),
         pytest.param(event_properties.disposition, 'disposition', id='disposition'),
-        pytest.param(
-            event_properties.fixation_centroid,
-            'fixation_centroid',
-            id='fixation_centroid',
-        ),
+        pytest.param(event_properties.position, 'position', id='position'),
     ],
 )
 def test_property_registered(property_function, property_function_name):

@@ -184,7 +184,7 @@ def fixation_centroid(
             f"Please choose one of the following: ['x', 'y'].",
         )
 
-    position = pl.col(position_columns[component_to_pos[component]])
+    position_component = pl.col(position_columns[component_to_pos[component]])
     if method not in ['mean', 'median']:
         raise ValueError(
             f'Method {method} not supported. '
@@ -192,12 +192,41 @@ def fixation_centroid(
         )
 
     if method == 'mean':
-        centroid = position.mean()
+        centroid = position_component.mean()
 
     if method == 'median':
-        centroid = position.median()
+        centroid = position_component.median()
 
     return centroid
+
+
+@register_event_property
+def position(
+        method: str = 'mean',
+        position_column: str = 'position',
+) -> pl.Expr:
+    """Centroid position of an event.
+
+    Parameters
+    ----------
+    method
+        The centroid method to be used for calculation. Supported methods are ``mean``, ``median``.
+        Defaults to 'mean'.
+    position_column
+        The column name of the position tuples.
+
+    Raises
+    ------
+    ValueError
+        If method is not one of the supported methods.
+    """
+    if method not in ['mean', 'median']:
+        raise ValueError(
+            f"Method '{method}' not supported. "
+            f"Please choose one of the following: ['mean', 'median'].",
+        )
+
+    return pl.col(position_column)
 
 
 def _check_position_columns(position_columns: tuple[str, str]) -> None:
