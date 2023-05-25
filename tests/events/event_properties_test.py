@@ -446,87 +446,49 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             id='amplitude_two_samples_xy_move',
         ),
         pytest.param(
-            event_properties.fixation_centroid,
-            {'component': 'x'},
+            event_properties.position,
+            {'method': 'mean'},
             pl.DataFrame(
-                {'x_pos': [0, 1], 'y_pos': [0, 0]},
-                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+                {'position': [[0, 0], [1, 0]]},
+                schema={'position': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
-                {'fixation_centroid': [0.5]},
-                schema={'fixation_centroid': pl.Float64},
+                {'position': [[0.5, 0]]},
+                schema={'position': pl.List(pl.Float64)},
             ),
-            id='fixation_centroid_x_two_samples',
+            id='position_two_samples_mean',
         ),
         pytest.param(
-            event_properties.fixation_centroid,
-            {'component': 'x'},
+            event_properties.position,
+            {'method': 'mean'},
             pl.DataFrame(
-                {'x_pos': [0, 1, 3], 'y_pos': [0, 0, 0]},
-                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+                {'position': [[0, 0], [0, 1], [0, 3]]},
+                schema={'position': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
-                {'fixation_centroid': [1.333333]},
-                schema={'fixation_centroid': pl.Float64},
+                {'position': [[0, 1.3333333333333333]]},
+                schema={'position': pl.List(pl.Float64)},
             ),
-            id='fixation_centroid_x_three_samples_float',
+            id='position_three_samples_mean',
         ),
         pytest.param(
-            event_properties.fixation_centroid,
-            {'method': 'median', 'component': 'x'},
+            event_properties.position,
+            {'method': 'median'},
             pl.DataFrame(
-                {'x_pos': [0, 1, 3], 'y_pos': [0, 2, 3]},
-                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+                {'position': [[0, 0], [2, 1], [3, 3]]},
+                schema={'position': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
-                {'fixation_centroid': [1]},
-                schema={'fixation_centroid': pl.Float64},
+                {'position': [[2, 1]]},
+                schema={'position': pl.List(pl.Float64)},
             ),
-            id='fixation_centroid_x_median',
-        ),
-        pytest.param(
-            event_properties.fixation_centroid,
-            {'component': 'y'},
-            pl.DataFrame(
-                {'x_pos': [0, 1], 'y_pos': [0, 5]},
-                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
-            ),
-            pl.DataFrame(
-                {'fixation_centroid': [2.5]},
-                schema={'fixation_centroid': pl.Float64},
-            ),
-            id='fixation_centroid_y_two_samples',
-        ),
-        pytest.param(
-            event_properties.fixation_centroid,
-            {'component': 'y'},
-            pl.DataFrame(
-                {'x_pos': [0, 0, 0], 'y_pos': [0, 2, 4]},
-                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
-            ),
-            pl.DataFrame(
-                {'fixation_centroid': [2]},
-                schema={'fixation_centroid': pl.Float64},
-            ),
-            id='fixation_centroid_y_three_samples_float',
-        ),
-        pytest.param(
-            event_properties.fixation_centroid,
-            {'method': 'median', 'component': 'y'},
-            pl.DataFrame(
-                {'x_pos': [0, 1, 3], 'y_pos': [0, 2, 3]},
-                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
-            ),
-            pl.DataFrame(
-                {'fixation_centroid': [2]},
-                schema={'fixation_centroid': pl.Float64},
-            ),
-            id='fixation_centroid_y_median',
+            id='position_three_samples_median',
         ),
     ],
 )
 def test_property_has_expected_result(event_property, init_kwargs, input_df, expected_df):
-    result_df = input_df.select([event_property(**init_kwargs).alias(event_property.__name__)])
+    expression = event_property(**init_kwargs).alias(event_property.__name__)
+    result_df = input_df.select([expression])
 
     assert_frame_equal(result_df, expected_df)
 

@@ -204,6 +204,7 @@ def fixation_centroid(
 def position(
         method: str = 'mean',
         position_column: str = 'position',
+        n_components: int = 2,
 ) -> pl.Expr:
     """Centroid position of an event.
 
@@ -214,6 +215,8 @@ def position(
         Defaults to 'mean'.
     position_column
         The column name of the position tuples.
+    n_components:
+        Number of positional components. Usually these are the two components yaw and pitch.
 
     Raises
     ------
@@ -226,7 +229,23 @@ def position(
             f"Please choose one of the following: ['mean', 'median'].",
         )
 
-    return pl.col(position_column)
+    component_expressions = []
+    for component in range(n_components):
+        position_component = (
+            pl.col(position_column)
+            .arr.slice(0, None)
+            .arr.get(component)
+        )
+
+        if method == 'mean':
+            expression_component = position_component.mean()
+
+        if method == 'median':
+            expression_component = position_component.median()
+
+        component_expressions.append(expression_component)
+
+    return pl.concat_list(component_expressions)
 
 
 def _check_position_columns(position_columns: tuple[str, str]) -> None:
