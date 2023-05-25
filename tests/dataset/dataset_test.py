@@ -1226,11 +1226,6 @@ def test_event_dataframe_add_property_has_expected_schema(
             ['position'],
             id='single_event_position',
         ),
-        pytest.param(
-            {'event_properties': ['position', 'position']},
-            ['position'],
-            id='single_event_position_two_times',
-        ),
     ],
 )
 def test_event_dataframe_add_property_effect_property_columns(

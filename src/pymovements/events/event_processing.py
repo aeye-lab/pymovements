@@ -181,13 +181,12 @@ class EventGazeProcessor:
                 # We need to create a new column here, which is a list of position tuples.
                 # For the intermediate time before the tuple will be the default format for
                 # positions, we create this column here and drop this column afterwards.
-                if 'position' not in gaze.frame.columns:
-                    position_columns = tuple(gaze.position_columns[:2])
-                    component_expressions = [pl.col(component) for component in position_columns]
-                    gaze.frame = gaze.frame.with_columns(
-                        pl.concat_list(component_expressions)
-                        .alias('position'),
-                    )
+                position_columns = tuple(gaze.position_columns[:2])
+                component_expressions = [pl.col(component) for component in position_columns]
+                gaze.frame = gaze.frame.with_columns(
+                    pl.concat_list(component_expressions)
+                    .alias('position'),
+                )
                 property_kwargs[property_name]['position_column'] = 'position'
 
         result = (
