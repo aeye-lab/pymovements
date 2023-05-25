@@ -90,13 +90,18 @@ def dispersion(position_columns: tuple[str, str] = ('x_pos', 'y_pos')) -> pl.Exp
 
 
 @register_event_property
-def amplitude(position_columns: tuple[str, str] = ('x_pos', 'y_pos')) -> pl.Expr:
+def amplitude(
+        position_column: str = 'position',
+        n_components: int = 2,
+) -> pl.Expr:
     """Amplitude of an event.
 
     Parameters
     ----------
-    position_columns
-        The column names of the pitch and yaw position components.
+    position_column
+        The column name of the position tuples.
+    n_components:
+        Number of positional components. Usually these are the two components yaw and pitch.
 
     Raises
     ------
@@ -104,10 +109,10 @@ def amplitude(position_columns: tuple[str, str] = ('x_pos', 'y_pos')) -> pl.Expr
         If position_columns not of type tuple, position_columns not of length 2, or elements of
         position_columns not of type str.
     """
-    _check_position_columns(position_columns)
+    _check_has_two_componenents(n_components)
 
-    x_position = pl.col(position_columns[0])
-    y_position = pl.col(position_columns[1])
+    x_position = pl.col(position_column).arr.get(0)
+    y_position = pl.col(position_column).arr.get(1)
 
     return (
         (x_position.max() - x_position.min()).pow(2)
@@ -116,13 +121,18 @@ def amplitude(position_columns: tuple[str, str] = ('x_pos', 'y_pos')) -> pl.Expr
 
 
 @register_event_property
-def disposition(position_columns: tuple[str, str] = ('x_pos', 'y_pos')) -> pl.Expr:
+def disposition(
+        position_column: str = 'position',
+        n_components: int = 2,
+) -> pl.Expr:
     """Disposition of an event.
 
     Parameters
     ----------
-    position_columns
-        The column names of the pitch and yaw position components.
+    position_column
+        The column name of the position tuples.
+    n_components:
+        Number of positional components. Usually these are the two components yaw and pitch.
 
     Raises
     ------
@@ -130,10 +140,10 @@ def disposition(position_columns: tuple[str, str] = ('x_pos', 'y_pos')) -> pl.Ex
         If position_columns not of type tuple, position_columns not of length 2, or elements of
         position_columns not of type str.
     """
-    _check_position_columns(position_columns)
+    _check_has_two_componenents(n_components)
 
-    x_position = pl.col(position_columns[0])
-    y_position = pl.col(position_columns[1])
+    x_position = pl.col(position_column).arr.get(0)
+    y_position = pl.col(position_column).arr.get(1)
 
     return (
         (x_position.head(n=1) - x_position.reverse().head(n=1)).pow(2)
@@ -187,6 +197,12 @@ def position(
         component_expressions.append(expression_component)
 
     return pl.concat_list(component_expressions)
+
+
+def _check_has_two_componenents(n_components: int) -> None:
+    """Check that number of componenents is two."""
+    if n_components != 2:
+        raise ValueError('data must have exactly two components')
 
 
 def _check_position_columns(position_columns: tuple[str, str]) -> None:
