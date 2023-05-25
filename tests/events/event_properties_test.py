@@ -107,6 +107,20 @@ from pymovements.events.event_properties import EVENT_PROPERTIES
             ('position_columns', 'type', 'must', 'tuple', 'str', 'int'),
             id='amplitude_tuple_of_int',
         ),
+        pytest.param(
+            event_properties.fixation_centroid,
+            {'method': 'foo'},
+            ValueError,
+            ('method', 'foo', 'not', 'supported', 'mean', 'median'),
+            id='fixation_centroid_value_error_method',
+        ),
+        pytest.param(
+            event_properties.fixation_centroid,
+            {'component': 'foo'},
+            ValueError,
+            ('component', 'foo', 'not', 'supported', 'x', 'y'),
+            id='fixation_centroid_value_error_component',
+        ),
     ],
 )
 def test_property_init_exceptions(event_property, init_kwargs, exception, msg_substrings):
@@ -425,7 +439,6 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             ),
             id='amplitude_two_samples_y_move',
         ),
-
         pytest.param(
             event_properties.amplitude,
             {},
@@ -438,6 +451,84 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
                 schema={'amplitude': pl.Float64},
             ),
             id='amplitude_two_samples_xy_move',
+        ),
+        pytest.param(
+            event_properties.fixation_centroid,
+            {'component': 'x'},
+            pl.DataFrame(
+                {'x_pos': [0, 1], 'y_pos': [0, 0]},
+                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+            ),
+            pl.DataFrame(
+                {'fixation_centroid': [0.5]},
+                schema={'fixation_centroid': pl.Float64},
+            ),
+            id='fixation_centroid_x_two_samples',
+        ),
+        pytest.param(
+            event_properties.fixation_centroid,
+            {'component': 'x'},
+            pl.DataFrame(
+                {'x_pos': [0, 1, 3], 'y_pos': [0, 0, 0]},
+                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+            ),
+            pl.DataFrame(
+                {'fixation_centroid': [1.333333]},
+                schema={'fixation_centroid': pl.Float64},
+            ),
+            id='fixation_centroid_x_three_samples_float',
+        ),
+        pytest.param(
+            event_properties.fixation_centroid,
+            {'method': 'median', 'component': 'x'},
+            pl.DataFrame(
+                {'x_pos': [0, 1, 3], 'y_pos': [0, 2, 3]},
+                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+            ),
+            pl.DataFrame(
+                {'fixation_centroid': [1]},
+                schema={'fixation_centroid': pl.Float64},
+            ),
+            id='fixation_centroid_x_median',
+        ),
+        pytest.param(
+            event_properties.fixation_centroid,
+            {'component': 'y'},
+            pl.DataFrame(
+                {'x_pos': [0, 1], 'y_pos': [0, 5]},
+                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+            ),
+            pl.DataFrame(
+                {'fixation_centroid': [2.5]},
+                schema={'fixation_centroid': pl.Float64},
+            ),
+            id='fixation_centroid_y_two_samples',
+        ),
+        pytest.param(
+            event_properties.fixation_centroid,
+            {'component': 'y'},
+            pl.DataFrame(
+                {'x_pos': [0, 0, 0], 'y_pos': [0, 2, 4]},
+                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+            ),
+            pl.DataFrame(
+                {'fixation_centroid': [2]},
+                schema={'fixation_centroid': pl.Float64},
+            ),
+            id='fixation_centroid_y_three_samples_float',
+        ),
+        pytest.param(
+            event_properties.fixation_centroid,
+            {'method': 'median', 'component': 'y'},
+            pl.DataFrame(
+                {'x_pos': [0, 1, 3], 'y_pos': [0, 2, 3]},
+                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+            ),
+            pl.DataFrame(
+                {'fixation_centroid': [2]},
+                schema={'fixation_centroid': pl.Float64},
+            ),
+            id='fixation_centroid_y_median',
         ),
     ],
 )
@@ -455,6 +546,11 @@ def test_property_has_expected_result(event_property, init_kwargs, input_df, exp
         pytest.param(event_properties.dispersion, 'dispersion', id='dispersion'),
         pytest.param(event_properties.amplitude, 'amplitude', id='amplitude'),
         pytest.param(event_properties.disposition, 'disposition', id='disposition'),
+        pytest.param(
+            event_properties.fixation_centroid,
+            'fixation_centroid',
+            id='fixation_centroid',
+        ),
     ],
 )
 def test_property_registered(property_function, property_function_name):
