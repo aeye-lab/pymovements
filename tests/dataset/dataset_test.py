@@ -286,7 +286,7 @@ def test_load_correct_raw_gaze_dfs(dataset_configuration):
 
 def test_load_gaze_has_position_columns(dataset_configuration):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
-    dataset.load()
+    dataset.load(preprocessed=True)
 
     for result_gaze_df in dataset.gaze:
         assert result_gaze_df.position_columns
@@ -670,17 +670,17 @@ def test_detect_events_attribute_error(dataset_configuration):
     dataset.load()
 
     try:
-        dataset.gaze[0] = dataset.gaze[0].drop('x_left_dva')
+        dataset.gaze[0] = dataset.gaze[0].drop('x_left_pos')
     except BaseException:
         pass
 
     try:
-        dataset.gaze[0] = dataset.gaze[0].drop('x_right_dva')
+        dataset.gaze[0] = dataset.gaze[0].drop('x_right_pos')
     except BaseException:
         pass
 
     try:
-        dataset.gaze[0] = dataset.gaze[0].drop('x_eye_dva')
+        dataset.gaze[0] = dataset.gaze[0].drop('x_eye_pos')
     except BaseException:
         pass
 
