@@ -1187,6 +1187,16 @@ def test_event_dataframe_add_property_has_expected_height(dataset_configuration,
             },
             id='single_event_peak_velocity',
         ),
+        pytest.param(
+            {'event_properties': 'position'},
+            {
+                'subject_id': pl.Int64,
+                **pm.events.EventDataFrame._minimal_schema,
+                'duration': pl.Int64,
+                'position': pl.List(pl.Float64),
+            },
+            id='single_event_position',
+        ),
     ],
 )
 def test_event_dataframe_add_property_has_expected_schema(
@@ -1198,6 +1208,8 @@ def test_event_dataframe_add_property_has_expected_schema(
     dataset.compute_event_properties(**property_kwargs)
 
     for events_df in dataset.events:
+        if events_df.frame.schema != expected_schema:
+            print(events_df.frame)
         assert events_df.frame.schema == expected_schema
 
 
@@ -1208,6 +1220,11 @@ def test_event_dataframe_add_property_has_expected_schema(
             {'event_properties': 'peak_velocity'},
             ['peak_velocity'],
             id='single_event_peak_velocity',
+        ),
+        pytest.param(
+            {'event_properties': 'position'},
+            ['position'],
+            id='single_event_position',
         ),
     ],
 )

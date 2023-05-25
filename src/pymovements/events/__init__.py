@@ -53,11 +53,12 @@
     :toctree:
     :recursive:
 
+    pymovements.events.event_properties.amplitude
     pymovements.events.event_properties.duration
     pymovements.events.event_properties.dispersion
     pymovements.events.event_properties.disposition
-    pymovements.events.event_properties.amplitude
     pymovements.events.event_properties.peak_velocity
+    pymovements.events.event_properties.position
 """
 from pymovements.events.detection.idt import idt
 from pymovements.events.detection.ivt import ivt

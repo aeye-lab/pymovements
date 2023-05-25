@@ -177,6 +177,18 @@ class EventGazeProcessor:
                 position_columns = tuple(gaze.position_columns[:2])
                 property_kwargs[property_name]['position_columns'] = position_columns
 
+            if 'position_column' in property_args:
+                # We need to create a new column here, which is a list of position tuples.
+                # For the intermediate time before the tuple will be the default format for
+                # positions, we create this column here and drop this column afterwards.
+                position_columns = tuple(gaze.position_columns[:2])
+                component_expressions = [pl.col(component) for component in position_columns]
+                gaze.frame = gaze.frame.with_columns(
+                    pl.concat_list(component_expressions)
+                    .alias('position'),
+                )
+                property_kwargs[property_name]['position_column'] = 'position'
+
         result = (
             gaze.frame.join(events.frame, on=identifiers)
             .filter(pl.col('time').is_between(pl.col('onset'), pl.col('offset')))
@@ -186,7 +198,20 @@ class EventGazeProcessor:
                     property_expression(**property_kwargs[property_name])
                     .alias(property_name)
                     for property_name, property_expression in property_expressions.items()
+                    if 'position_column' not in property_kwargs[property_name]
+                ] + [
+                    property_expression(**property_kwargs[property_name])
+                    .alias(property_name)
+                    .first()  # Not sure why this is needed, an outer list is being created somehow.
+                    for property_name, property_expression in property_expressions.items()
+                    if 'position_column' in property_kwargs[property_name]
+
                 ],
             )
         )
+
+        # If we created the position tuple column we drop it again.
+        if 'position' in gaze.frame.columns:
+            gaze.frame.drop_in_place('position')
+
         return result
