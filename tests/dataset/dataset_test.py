@@ -166,10 +166,10 @@ def mock_toy(rootpath, raw_fileformat, eyes):
                 'y_left_pix': np.zeros(1000),
                 'x_right_pix': np.zeros(1000),
                 'y_right_pix': np.zeros(1000),
-                'x_left_dva': np.zeros(1000),
-                'y_left_dva': np.zeros(1000),
-                'x_right_dva': np.zeros(1000),
-                'y_right_dva': np.zeros(1000),
+                'x_left_pos': np.zeros(1000),
+                'y_left_pos': np.zeros(1000),
+                'x_right_pos': np.zeros(1000),
+                'y_right_pos': np.zeros(1000),
                 'x_left_vel': np.zeros(1000),
                 'y_left_vel': np.zeros(1000),
                 'x_right_vel': np.zeros(1000),
@@ -182,10 +182,10 @@ def mock_toy(rootpath, raw_fileformat, eyes):
                 'y_left_pix': pl.Float64,
                 'x_right_pix': pl.Float64,
                 'y_right_pix': pl.Float64,
-                'x_left_dva': pl.Float64,
-                'y_left_dva': pl.Float64,
-                'x_right_dva': pl.Float64,
-                'y_right_dva': pl.Float64,
+                'x_left_pos': pl.Float64,
+                'y_left_pos': pl.Float64,
+                'x_right_pos': pl.Float64,
+                'y_right_pos': pl.Float64,
                 'x_left_vel': pl.Float64,
                 'y_left_vel': pl.Float64,
                 'x_right_vel': pl.Float64,
@@ -282,6 +282,14 @@ def test_load_correct_raw_gaze_dfs(dataset_configuration):
     expected_gaze_dfs = dataset_configuration['raw_gaze_dfs']
     for result_gaze_df, expected_gaze_df in zip(dataset.gaze, expected_gaze_dfs):
         assert_frame_equal(result_gaze_df.frame, expected_gaze_df)
+
+
+def test_load_gaze_has_position_columns(dataset_configuration):
+    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+
+    for result_gaze_df in dataset.gaze:
+        assert result_gaze_df.position_columns
 
 
 def test_load_correct_preprocessed_gaze_dfs(dataset_configuration):
