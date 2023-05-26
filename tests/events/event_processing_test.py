@@ -295,14 +295,54 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
             ),
             id='dispersion_single_event_complete_window',
         ),
+        pytest.param(
+            pl.from_dict(
+                {'subject_id': [1], 'onset': [0], 'offset': [10]},
+                schema={'subject_id': pl.Int64, 'onset': pl.Int64, 'offset': pl.Int64},
+            ),
+            pl.from_dict(
+                {
+                    'subject_id': np.ones(10),
+                    'time': np.arange(10),
+                    'x_vel': np.concatenate([np.arange(0.1, 1.1, 0.1)]),
+                    'y_vel': np.concatenate([np.arange(0.1, 1.1, 0.1)]),
+                },
+                schema={
+                    'subject_id': pl.Int64,
+                    'time': pl.Int64,
+                    'x_vel': pl.Float64,
+                    'y_vel': pl.Float64,
+                },
+            ),
+            {'event_properties': 'peak_velocity'},
+            {'identifiers': 'subject_id'},
+            pl.from_dict(
+                {
+                    'subject_id': [1],
+                    'name': [None],
+                    'onset': [0],
+                    'offset': [10],
+                    'peak_velocity': [np.sqrt(2)],
+                },
+                schema={
+                    'subject_id': pl.Int64,
+                    'name': pl.Utf8,
+                    'onset': pl.Int64,
+                    'offset': pl.Int64,
+                    'peak_velocity': pl.Float64,
+                },
+            ),
+            id='peak_velocity_single_event_complete_window',
+        ),
     ],
 )
 def test_event_gaze_processor_process_correct_result(
         event_df, gaze_df, init_kwargs, process_kwargs, expected_dataframe,
 ):
-    processor = EventGazeProcessor(**init_kwargs)
     events = EventDataFrame(event_df)
     gaze = GazeDataFrame(gaze_df)
+
+    processor = EventGazeProcessor(**init_kwargs)
     property_result = processor.process(events, gaze, **process_kwargs)
     assert_frame_equal(property_result, expected_dataframe)
 
