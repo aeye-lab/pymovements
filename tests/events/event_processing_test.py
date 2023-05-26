@@ -267,16 +267,12 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                     'time': np.arange(10),
                     'x_pos': np.concatenate([np.ones(5), np.zeros(5)]),
                     'y_pos': np.concatenate([np.zeros(5), np.ones(5)]),
-                    'x_vel': np.concatenate([np.zeros(10)]),
-                    'y_vel': np.concatenate([np.zeros(10)]),
                 },
                 schema={
                     'subject_id': pl.Int64,
                     'time': pl.Int64,
                     'x_pos': pl.Float64,
                     'y_pos': pl.Float64,
-                    'x_vel': pl.Float64,
-                    'y_vel': pl.Float64,
                 },
             ),
             {'event_properties': 'dispersion'},
@@ -298,6 +294,45 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                 },
             ),
             id='dispersion_single_event_complete_window',
+        ),
+        pytest.param(
+            pl.from_dict(
+                {'subject_id': [1], 'onset': [0], 'offset': [10]},
+                schema={'subject_id': pl.Int64, 'onset': pl.Int64, 'offset': pl.Int64},
+            ),
+            pl.from_dict(
+                {
+                    'subject_id': np.ones(10),
+                    'time': np.arange(10),
+                    'x_vel': np.concatenate([np.arange(0.1, 1.1, 0.1)]),
+                    'y_vel': np.concatenate([np.arange(0.1, 1.1, 0.1)]),
+                },
+                schema={
+                    'subject_id': pl.Int64,
+                    'time': pl.Int64,
+                    'x_vel': pl.Float64,
+                    'y_vel': pl.Float64,
+                },
+            ),
+            {'event_properties': 'peak_velocity'},
+            {'identifiers': 'subject_id'},
+            pl.from_dict(
+                {
+                    'subject_id': [1],
+                    'name': [None],
+                    'onset': [0],
+                    'offset': [10],
+                    'peak_velocity': [np.sqrt(2)],
+                },
+                schema={
+                    'subject_id': pl.Int64,
+                    'name': pl.Utf8,
+                    'onset': pl.Int64,
+                    'offset': pl.Int64,
+                    'peak_velocity': pl.Float64,
+                },
+            ),
+            id='peak_velocity_single_event_complete_window',
         ),
     ],
 )

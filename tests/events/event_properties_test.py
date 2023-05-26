@@ -31,6 +31,13 @@ from pymovements.events.event_properties import EVENT_PROPERTIES
     ('event_property', 'init_kwargs', 'exception', 'msg_substrings'),
     [
         pytest.param(
+            event_properties.peak_velocity,
+            {'n_components': 3},
+            ValueError,
+            ('data must have exactly two components',),
+            id='peak_velocity_not_2_components_raise_value_error',
+        ),
+        pytest.param(
             event_properties.position,
             {'method': 'foo'},
             ValueError,
