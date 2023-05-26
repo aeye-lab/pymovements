@@ -36,6 +36,7 @@ def register_event_property(function: Callable) -> Callable:
 
 @register_event_property
 def amplitude(
+        *,
         position_column: str = 'position',
         n_components: int = 2,
 ) -> pl.Expr:
@@ -66,6 +67,7 @@ def amplitude(
 
 @register_event_property
 def dispersion(
+        *,
         position_column: str = 'position',
         n_components: int = 2,
 ) -> pl.Expr:
@@ -93,6 +95,7 @@ def dispersion(
 
 @register_event_property
 def disposition(
+        *,
         position_column: str = 'position',
         n_components: int = 2,
 ) -> pl.Expr:
@@ -133,6 +136,7 @@ def duration() -> pl.Expr:
 
 @register_event_property
 def peak_velocity(
+        *,
         velocity_column: str = 'velocity',
         n_components: int = 2,
 ) -> pl.Expr:
@@ -161,6 +165,7 @@ def peak_velocity(
 @register_event_property
 def position(
         method: str = 'mean',
+        *,
         position_column: str = 'position',
         n_components: int = 2,
 ) -> pl.Expr:
