@@ -186,7 +186,7 @@ class EventGazeProcessor:
             property_name: {} for property_name in property_expressions.keys()
         }
         for property_name, property_expression in property_expressions.items():
-            property_args = inspect.getfullargspec(property_expression).args
+            property_args = inspect.getfullargspec(property_expression).kwonlyargs
 
             if 'position_column' in property_args:
                 property_kwargs[property_name]['position_column'] = 'position'
