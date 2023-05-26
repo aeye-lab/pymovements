@@ -187,16 +187,12 @@ class EventGazeProcessor:
         }
         for property_name, property_expression in property_expressions.items():
             property_args = inspect.getfullargspec(property_expression).args
-            if 'velocity_columns' in property_args:
-                velocity_columns = tuple(gaze.velocity_columns[:2])
-                property_kwargs[property_name]['velocity_columns'] = velocity_columns
-
-            if 'position_columns' in property_args:
-                position_columns = tuple(gaze.position_columns[:2])
-                property_kwargs[property_name]['position_columns'] = position_columns
 
             if 'position_column' in property_args:
                 property_kwargs[property_name]['position_column'] = 'position'
+
+            if 'velocity_column' in property_args:
+                property_kwargs[property_name]['velocity_column'] = 'velocity'
 
         result = (
             gaze.frame.join(events.frame, on=identifiers)
@@ -207,19 +203,11 @@ class EventGazeProcessor:
                     property_expression(**property_kwargs[property_name])
                     .alias(property_name)
                     for property_name, property_expression in property_expressions.items()
-                    if property_name != 'position'
-                ] + [
-                    property_expression(**property_kwargs[property_name])
-                    .alias(property_name)
-                    .first()  # Not sure why this is needed, an outer list is being created somehow.
-                    for property_name, property_expression in property_expressions.items()
-                    if property_name == 'position'
-
                 ],
             )
         )
 
-        # If we created the position and velocity tuple columns and now we drop it again.
+        # If we created the position and velocity tuple columns, we drop it again.
         if 'position' in gaze.frame.columns:
             gaze.frame.drop_in_place('position')
         if 'velocity' in gaze.frame.columns:

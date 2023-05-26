@@ -35,6 +35,94 @@ def register_event_property(function: Callable) -> Callable:
 
 
 @register_event_property
+def amplitude(
+        position_column: str = 'position',
+        n_components: int = 2,
+) -> pl.Expr:
+    """Amplitude of an event.
+
+    Parameters
+    ----------
+    position_column
+        The column name of the position tuples.
+    n_components:
+        Number of positional components. Usually these are the two components yaw and pitch.
+
+    Raises
+    ------
+    ValueError
+        If number of components is not 2.
+    """
+    _check_has_two_componenents(n_components)
+
+    x_position = pl.col(position_column).arr.get(0)
+    y_position = pl.col(position_column).arr.get(1)
+
+    return (
+        (x_position.max() - x_position.min()).pow(2)
+        + (y_position.max() - y_position.min()).pow(2)
+    ).sqrt()
+
+
+@register_event_property
+def dispersion(
+        position_column: str = 'position',
+        n_components: int = 2,
+) -> pl.Expr:
+    """Dispersion of an event.
+
+    Parameters
+    ----------
+    position_column
+        The column name of the position tuples.
+    n_components:
+        Number of positional components. Usually these are the two components yaw and pitch.
+
+    Raises
+    ------
+    ValueError
+        If number of components is not 2.
+    """
+    _check_has_two_componenents(n_components)
+
+    x_position = pl.col(position_column).arr.get(0)
+    y_position = pl.col(position_column).arr.get(1)
+
+    return x_position.max() - x_position.min() + y_position.max() - y_position.min()
+
+
+@register_event_property
+def disposition(
+        position_column: str = 'position',
+        n_components: int = 2,
+) -> pl.Expr:
+    """Disposition of an event.
+
+    Parameters
+    ----------
+    position_column
+        The column name of the position tuples.
+    n_components:
+        Number of positional components. Usually these are the two components yaw and pitch.
+
+    Raises
+    ------
+    TypeError
+        If position_columns not of type tuple, position_columns not of length 2, or elements of
+        position_columns not of type str.
+    """
+    _check_has_two_componenents(n_components)
+
+    x_position = pl.col(position_column).arr.get(0)
+    y_position = pl.col(position_column).arr.get(1)
+
+    return (
+        (x_position.head(n=1) - x_position.reverse().head(n=1)).pow(2)
+        + (y_position.head(n=1) - y_position.reverse().head(n=1)).pow(2)
+    ).sqrt()
+
+
+@register_event_property
 def duration() -> pl.Expr:
     """Duration of an event.
 
@@ -68,94 +156,6 @@ def peak_velocity(
     y_velocity = pl.col(velocity_column).arr.get(1)
 
     return (x_velocity.pow(2) + y_velocity.pow(2)).sqrt().max()
-
-
-@register_event_property
-def dispersion(
-        position_column: str = 'position',
-        n_components: int = 2,
-) -> pl.Expr:
-    """Dispersion of an event.
-
-    Parameters
-    ----------
-    position_column
-        The column name of the position tuples.
-    n_components:
-        Number of positional components. Usually these are the two components yaw and pitch.
-
-    Raises
-    ------
-    ValueError
-        If number of components is not 2.
-    """
-    _check_has_two_componenents(n_components)
-
-    x_position = pl.col(position_column).arr.get(0)
-    y_position = pl.col(position_column).arr.get(1)
-
-    return x_position.max() - x_position.min() + y_position.max() - y_position.min()
-
-
-@register_event_property
-def amplitude(
-        position_column: str = 'position',
-        n_components: int = 2,
-) -> pl.Expr:
-    """Amplitude of an event.
-
-    Parameters
-    ----------
-    position_column
-        The column name of the position tuples.
-    n_components:
-        Number of positional components. Usually these are the two components yaw and pitch.
-
-    Raises
-    ------
-    ValueError
-        If number of components is not 2.
-    """
-    _check_has_two_componenents(n_components)
-
-    x_position = pl.col(position_column).arr.get(0)
-    y_position = pl.col(position_column).arr.get(1)
-
-    return (
-        (x_position.max() - x_position.min()).pow(2)
-        + (y_position.max() - y_position.min()).pow(2)
-    ).sqrt()
-
-
-@register_event_property
-def disposition(
-        position_column: str = 'position',
-        n_components: int = 2,
-) -> pl.Expr:
-    """Disposition of an event.
-
-    Parameters
-    ----------
-    position_column
-        The column name of the position tuples.
-    n_components:
-        Number of positional components. Usually these are the two components yaw and pitch.
-
-    Raises
-    ------
-    TypeError
-        If position_columns not of type tuple, position_columns not of length 2, or elements of
-        position_columns not of type str.
-    """
-    _check_has_two_componenents(n_components)
-
-    x_position = pl.col(position_column).arr.get(0)
-    y_position = pl.col(position_column).arr.get(1)
-
-    return (
-        (x_position.head(n=1) - x_position.reverse().head(n=1)).pow(2)
-        + (y_position.head(n=1) - y_position.reverse().head(n=1)).pow(2)
-    ).sqrt()
 
 
 @register_event_property
@@ -203,46 +203,11 @@ def position(
 
         component_expressions.append(expression_component)
 
-    return pl.concat_list(component_expressions)
+    # Not sure why first() is needed here, but an outer list is being created somehow.
+    return pl.concat_list(component_expressions).first()
 
 
 def _check_has_two_componenents(n_components: int) -> None:
     """Check that number of componenents is two."""
     if n_components != 2:
         raise ValueError('data must have exactly two components')
-
-
-def _check_position_columns(position_columns: tuple[str, str]) -> None:
-    """Check if position_columns is of type tuple[str, str]."""
-    if not isinstance(position_columns, tuple):
-        raise TypeError(
-            'position_columns must be of type tuple[str, str]'
-            f' but is of type {type(position_columns).__name__}',
-        )
-    if len(position_columns) != 2:
-        raise TypeError(
-            f'position_columns must be of length of 2 but is of length {len(position_columns)}',
-        )
-    if not all(isinstance(velocity_column, str) for velocity_column in position_columns):
-        raise TypeError(
-            'position_columns must be of type tuple[str, str] but is '
-            f'tuple[{type(position_columns[0]).__name__}, {type(position_columns[1]).__name__}]',
-        )
-
-
-def _check_velocity_columns(velocity_columns: tuple[str, str]) -> None:
-    """Check if velocity_columns is of type tuple[str, str]."""
-    if not isinstance(velocity_columns, tuple):
-        raise TypeError(
-            'velocity_columns must be of type tuple[str, str]'
-            f' but is of type {type(velocity_columns).__name__}',
-        )
-    if len(velocity_columns) != 2:
-        raise TypeError(
-            f'velocity_columns must be of length of 2 but is of length {len(velocity_columns)}',
-        )
-    if not all(isinstance(velocity_column, str) for velocity_column in velocity_columns):
-        raise TypeError(
-            'velocity_columns must be of type tuple[str, str] but is '
-            f'tuple[{type(velocity_columns[0]).__name__}, {type(velocity_columns[1]).__name__}]',
-        )
