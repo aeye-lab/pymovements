@@ -207,7 +207,7 @@ class EventGazeProcessor:
                     property_expression(**property_kwargs[property_name])
                     .alias(property_name)
                     for property_name, property_expression in property_expressions.items()
-                    if 'position_column' not in property_kwargs[property_name]
+                    if property_name != 'position'
                 ] + [
                     property_expression(**property_kwargs[property_name])
                     .alias(property_name)

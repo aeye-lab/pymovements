@@ -44,47 +44,55 @@ def duration() -> pl.Expr:
 
 
 @register_event_property
-def peak_velocity(velocity_columns: tuple[str, str] = ('x_vel', 'y_vel')) -> pl.Expr:
+def peak_velocity(
+        velocity_column: str = 'velocity',
+        n_components: int = 2,
+) -> pl.Expr:
     """Peak velocity of an event.
 
     Parameters
     ----------
-    velocity_columns
-        The column names of the pitch and yaw velocity components.
+    velocity_column
+        The column name of the velocity tuples.
+    n_components:
+        Number of positional components. Usually these are the two components yaw and pitch.
 
     Raises
     ------
-    TypeError
-        If velocity_columns not of type tuple, velocity_columns not of length 2, or elements of
-        velocity_columns not of type str.
+    ValueError
+        If number of components is not 2.
     """
-    _check_velocity_columns(velocity_columns)
+    _check_has_two_componenents(n_components)
 
-    x_velocity = pl.col(velocity_columns[0])
-    y_velocity = pl.col(velocity_columns[1])
+    x_velocity = pl.col(velocity_column).arr.get(0)
+    y_velocity = pl.col(velocity_column).arr.get(1)
 
     return (x_velocity.pow(2) + y_velocity.pow(2)).sqrt().max()
 
 
 @register_event_property
-def dispersion(position_columns: tuple[str, str] = ('x_pos', 'y_pos')) -> pl.Expr:
+def dispersion(
+        position_column: str = 'position',
+        n_components: int = 2,
+) -> pl.Expr:
     """Dispersion of an event.
 
     Parameters
     ----------
-    position_columns
-        The column names of the pitch and yaw position components.
+    position_column
+        The column name of the position tuples.
+    n_components:
+        Number of positional components. Usually these are the two components yaw and pitch.
 
     Raises
     ------
-    TypeError
-        If position_columns not of type tuple, position_columns not of length 2, or elements of
-        position_columns not of type str.
+    ValueError
+        If number of components is not 2.
     """
-    _check_position_columns(position_columns)
+    _check_has_two_componenents(n_components)
 
-    x_position = pl.col(position_columns[0])
-    y_position = pl.col(position_columns[1])
+    x_position = pl.col(position_column).arr.get(0)
+    y_position = pl.col(position_column).arr.get(1)
 
     return x_position.max() - x_position.min() + y_position.max() - y_position.min()
 
@@ -105,9 +113,8 @@ def amplitude(
 
     Raises
     ------
-    TypeError
-        If position_columns not of type tuple, position_columns not of length 2, or elements of
-        position_columns not of type str.
+    ValueError
+        If number of components is not 2.
     """
     _check_has_two_componenents(n_components)
 

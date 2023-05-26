@@ -31,83 +31,6 @@ from pymovements.events.event_properties import EVENT_PROPERTIES
     ('event_property', 'init_kwargs', 'exception', 'msg_substrings'),
     [
         pytest.param(
-            event_properties.peak_velocity,
-            {'velocity_columns': 'x_vel'},
-            TypeError,
-            ('velocity_columns', 'type', 'must', 'tuple', 'str'),
-            id='peak_velocity_str',
-        ),
-        pytest.param(
-            event_properties.peak_velocity,
-            {'velocity_columns': 1},
-            TypeError,
-            ('velocity_columns', 'type', 'must', 'tuple', 'int'),
-            id='peak_velocity_int',
-        ),
-        pytest.param(
-            event_properties.peak_velocity,
-            {'velocity_columns': ('x_vel', 'y_vel', 'z_vel')},
-            TypeError,
-            ('velocity_columns', 'length', 'must', '2', '3'),
-            id='peak_velocity_tuple_length_3',
-        ),
-        pytest.param(
-            event_properties.peak_velocity,
-            {'velocity_columns': ('x_vel', 1)},
-            TypeError,
-            ('velocity_columns', 'type', 'must', 'tuple', 'str', 'int'),
-            id='peak_velocity_tuple_of_int',
-        ),
-        pytest.param(
-            event_properties.dispersion,
-            {'position_columns': 'x_pos'},
-            TypeError,
-            ('position_columns', 'type', 'must', 'tuple', 'str'),
-            id='duration_str',
-        ),
-        pytest.param(
-            event_properties.dispersion,
-            {'position_columns': 1},
-            TypeError,
-            ('position_columns', 'type', 'must', 'tuple', 'int'),
-            id='duration_int',
-        ),
-        pytest.param(
-            event_properties.dispersion,
-            {'position_columns': ('x_pos', 'y_pos', 'z_pos')},
-            TypeError,
-            ('position_columns', 'length', 'must', '2', '3'),
-            id='duration_tuple_length_3',
-        ),
-        pytest.param(
-            event_properties.dispersion,
-            {'position_columns': ('x_pos', 1)},
-            TypeError,
-            ('position_columns', 'type', 'must', 'tuple', 'str', 'int'),
-            id='duration_tuple_of_int',
-        ),
-        pytest.param(
-            event_properties.amplitude,
-            {'position_columns': 1},
-            TypeError,
-            ('position_columns', 'type', 'must', 'tuple', 'int'),
-            id='amplitude_int',
-        ),
-        pytest.param(
-            event_properties.amplitude,
-            {'position_columns': ('x_pos', 'y_pos', 'z_pos')},
-            TypeError,
-            ('position_columns', 'length', 'must', '2', '3'),
-            id='amplitude_tuple_length_3',
-        ),
-        pytest.param(
-            event_properties.amplitude,
-            {'position_columns': ('x_pos', 1)},
-            TypeError,
-            ('position_columns', 'type', 'must', 'tuple', 'str', 'int'),
-            id='amplitude_tuple_of_int',
-        ),
-        pytest.param(
             event_properties.position,
             {'method': 'foo'},
             ValueError,
@@ -146,51 +69,27 @@ def test_property_init_exceptions(event_property, init_kwargs, exception, msg_su
         ),
         pytest.param(
             event_properties.peak_velocity,
-            {'velocity_columns': ('x_vel', 'y_vel')},
-            pl.DataFrame(schema={'y_vel': pl.Int64}),
+            {'velocity_column': 'velocity'},
+            pl.DataFrame(schema={'_velocity': pl.Int64}),
             pl.exceptions.ColumnNotFoundError,
-            ('x_vel',),
-            id='peak_velocity_missing_x_vel_column',
-        ),
-        pytest.param(
-            event_properties.peak_velocity,
-            {'velocity_columns': ('x_vel', 'y_vel')},
-            pl.DataFrame(schema={'x_vel': pl.Int64}),
-            pl.exceptions.ColumnNotFoundError,
-            ('y_vel',),
-            id='peak_velocity_missing_y_vel_column',
+            ('velocity',),
+            id='peak_velocity_missing_velocity_column',
         ),
         pytest.param(
             event_properties.dispersion,
-            {'position_columns': ('x_pos', 'y_pos')},
-            pl.DataFrame(schema={'y_pos': pl.Int64}),
+            {'position_column': 'position'},
+            pl.DataFrame(schema={'_position': pl.Int64}),
             pl.exceptions.ColumnNotFoundError,
-            ('x_pos',),
-            id='dispersion_missing_x_pos_column',
-        ),
-        pytest.param(
-            event_properties.dispersion,
-            {'position_columns': ('x_pos', 'y_pos')},
-            pl.DataFrame(schema={'x_pos': pl.Int64}),
-            pl.exceptions.ColumnNotFoundError,
-            ('y_pos',),
-            id='dispersion_missing_y_pos_column',
+            ('position',),
+            id='dispersion_missing_position_column',
         ),
         pytest.param(
             event_properties.amplitude,
-            {'position_columns': ('x_pos', 'y_pos')},
-            pl.DataFrame(schema={'y_pos': pl.Int64}),
+            {'position_column': 'position'},
+            pl.DataFrame(schema={'_position': pl.Int64}),
             pl.exceptions.ColumnNotFoundError,
-            ('x_pos',),
-            id='amplitude_missing_x_pos_column',
-        ),
-        pytest.param(
-            event_properties.amplitude,
-            {'position_columns': ('x_pos', 'y_pos')},
-            pl.DataFrame(schema={'x_pos': pl.Int64}),
-            pl.exceptions.ColumnNotFoundError,
-            ('y_pos',),
-            id='amplitude_missing_y_pos_column',
+            ('position',),
+            id='amplitude_missing_position_column',
         ),
     ],
 )
@@ -241,8 +140,8 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             event_properties.peak_velocity,
             {},
             pl.DataFrame(
-                {'x_vel': [0, 0], 'y_vel': [1, 1]},
-                schema={'x_vel': pl.Float64, 'y_vel': pl.Float64},
+                {'velocity': [[0, 0], [0, 1]]},
+                schema={'velocity': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
                 {'peak_velocity': [1]},
@@ -255,8 +154,8 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             event_properties.dispersion,
             {},
             pl.DataFrame(
-                {'x_pos': [2], 'y_pos': [3]},
-                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+                {'position': [[2, 3]]},
+                schema={'position': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
                 {'dispersion': [0]},
@@ -269,8 +168,8 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             event_properties.dispersion,
             {},
             pl.DataFrame(
-                {'x_pos': [0, 2], 'y_pos': [0, 0]},
-                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+                {'position': [[0, 0], [2, 0]]},
+                schema={'position': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
                 {'dispersion': [2]},
@@ -283,8 +182,8 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             event_properties.dispersion,
             {},
             pl.DataFrame(
-                {'x_pos': [0, 0], 'y_pos': [0, 3]},
-                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+                {'position': [[0, 0], [0, 3]]},
+                schema={'position': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
                 {'dispersion': [3]},
@@ -297,8 +196,8 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             event_properties.dispersion,
             {},
             pl.DataFrame(
-                {'x_pos': [0, 2], 'y_pos': [0, 3]},
-                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+                {'position': [[0, 0], [2, 3]]},
+                schema={'position': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
                 {'dispersion': [5]},
@@ -311,8 +210,8 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             event_properties.disposition,
             {},
             pl.DataFrame(
-                {'x_pos': [1], 'y_pos': [1]},
-                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+                {'position': [[2, 1]]},
+                schema={'position': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
                 {'disposition': [0]},
@@ -325,8 +224,8 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             event_properties.disposition,
             {},
             pl.DataFrame(
-                {'x_pos': [0, 1], 'y_pos': [0, 0]},
-                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+                {'position': [[0, 0], [1, 0]]},
+                schema={'position': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
                 {'disposition': [1]},
@@ -339,8 +238,8 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             event_properties.disposition,
             {},
             pl.DataFrame(
-                {'x_pos': [0, 0], 'y_pos': [0, 1]},
-                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+                {'position': [[0, 0], [0, 1]]},
+                schema={'position': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
                 {'disposition': [1]},
@@ -353,8 +252,8 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             event_properties.disposition,
             {},
             pl.DataFrame(
-                {'x_pos': [0, 1], 'y_pos': [0, 1]},
-                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+                {'position': [[0, 0], [1, 1]]},
+                schema={'position': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
                 {'disposition': [np.sqrt(2)]},
@@ -367,8 +266,8 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             event_properties.disposition,
             {},
             pl.DataFrame(
-                {'x_pos': [0, 1.1, 1], 'y_pos': [0, 0, 0]},
-                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+                {'position': [[0, 0], [1.1, 0], [1, 0]]},
+                schema={'position': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
                 {'disposition': [1]},
@@ -381,8 +280,8 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             event_properties.disposition,
             {},
             pl.DataFrame(
-                {'x_pos': [-1, 0, 1], 'y_pos': [0, 0, 0]},
-                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+                {'position': [[-1, 0], [0, 0], [1, 0]]},
+                schema={'position': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
                 {'disposition': [2]},
@@ -395,8 +294,8 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             event_properties.amplitude,
             {},
             pl.DataFrame(
-                {'x_pos': [4], 'y_pos': [5]},
-                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+                {'position': [[4, 5]]},
+                schema={'position': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
                 {'amplitude': [0]},
@@ -409,8 +308,8 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             event_properties.amplitude,
             {},
             pl.DataFrame(
-                {'x_pos': [2, 0], 'y_pos': [0, 0]},
-                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+                {'position': [[2, 0], [0, 0]]},
+                schema={'position': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
                 {'amplitude': [2]},
@@ -423,8 +322,8 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             event_properties.amplitude,
             {},
             pl.DataFrame(
-                {'x_pos': [0, 0], 'y_pos': [3, 0]},
-                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+                {'position': [[0, 3], [0, 0]]},
+                schema={'position': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
                 {'amplitude': [3]},
@@ -436,8 +335,8 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             event_properties.amplitude,
             {},
             pl.DataFrame(
-                {'x_pos': [0, 1], 'y_pos': [0, 1]},
-                schema={'x_pos': pl.Float64, 'y_pos': pl.Float64},
+                {'position': [[0, 0], [1, 1]]},
+                schema={'position': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
                 {'amplitude': [np.sqrt(2)]},

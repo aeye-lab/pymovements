@@ -267,12 +267,16 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                     'time': np.arange(10),
                     'x_pos': np.concatenate([np.ones(5), np.zeros(5)]),
                     'y_pos': np.concatenate([np.zeros(5), np.ones(5)]),
+                    'x_vel': np.concatenate([np.zeros(10)]),
+                    'y_vel': np.concatenate([np.zeros(10)]),
                 },
                 schema={
                     'subject_id': pl.Int64,
                     'time': pl.Int64,
                     'x_pos': pl.Float64,
                     'y_pos': pl.Float64,
+                    'x_vel': pl.Float64,
+                    'y_vel': pl.Float64,
                 },
             ),
             {'event_properties': 'dispersion'},
@@ -300,9 +304,10 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
 def test_event_gaze_processor_process_correct_result(
         event_df, gaze_df, init_kwargs, process_kwargs, expected_dataframe,
 ):
-    processor = EventGazeProcessor(**init_kwargs)
     events = EventDataFrame(event_df)
     gaze = GazeDataFrame(gaze_df)
+
+    processor = EventGazeProcessor(**init_kwargs)
     property_result = processor.process(events, gaze, **process_kwargs)
     assert_frame_equal(property_result, expected_dataframe)
 
