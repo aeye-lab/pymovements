@@ -135,41 +135,13 @@ def duration() -> pl.Expr:
 
 
 @register_event_property
-def peak_velocity(
-        *,
-        velocity_column: str = 'velocity',
-        n_components: int = 2,
-) -> pl.Expr:
-    """Peak velocity of an event.
-
-    Parameters
-    ----------
-    velocity_column
-        The column name of the velocity tuples.
-    n_components:
-        Number of positional components. Usually these are the two components yaw and pitch.
-
-    Raises
-    ------
-    ValueError
-        If number of components is not 2.
-    """
-    _check_has_two_componenents(n_components)
-
-    x_velocity = pl.col(velocity_column).arr.get(0)
-    y_velocity = pl.col(velocity_column).arr.get(1)
-
-    return (x_velocity.pow(2) + y_velocity.pow(2)).sqrt().max()
-
-
-@register_event_property
-def position(
+def location(
         method: str = 'mean',
         *,
         position_column: str = 'position',
         n_components: int = 2,
 ) -> pl.Expr:
-    """Centroid position of an event.
+    """Location of an event.
 
     Parameters
     ----------
@@ -210,6 +182,34 @@ def position(
 
     # Not sure why first() is needed here, but an outer list is being created somehow.
     return pl.concat_list(component_expressions).first()
+
+
+@register_event_property
+def peak_velocity(
+        *,
+        velocity_column: str = 'velocity',
+        n_components: int = 2,
+) -> pl.Expr:
+    """Peak velocity of an event.
+
+    Parameters
+    ----------
+    velocity_column
+        The column name of the velocity tuples.
+    n_components:
+        Number of positional components. Usually these are the two components yaw and pitch.
+
+    Raises
+    ------
+    ValueError
+        If number of components is not 2.
+    """
+    _check_has_two_componenents(n_components)
+
+    x_velocity = pl.col(velocity_column).arr.get(0)
+    y_velocity = pl.col(velocity_column).arr.get(1)
+
+    return (x_velocity.pow(2) + y_velocity.pow(2)).sqrt().max()
 
 
 def _check_has_two_componenents(n_components: int) -> None:
