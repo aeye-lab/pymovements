@@ -141,15 +141,21 @@ class EventDataFrame:
         """Adds duration property column to dataframe."""
         self.frame = self.frame.select([pl.all(), duration().alias('duration')])
 
-    def add_event_properties(self, event_properties: pl.DataFrame) -> None:
+    def add_event_properties(
+            self,
+            event_properties: pl.DataFrame,
+            join_on: str | list[str],
+    ) -> None:
         """Add new event properties into dataframe.
 
         Parameters
         ----------
         event_properties
             Dataframe with new event properties.
+        join_on
+            Columns to join event properties on.
         """
-        self.frame = self.frame.select([pl.all(), *event_properties])
+        self.frame = self.frame.join(event_properties, on=join_on, how='left')
 
     @property
     def event_property_columns(self) -> list[str]:

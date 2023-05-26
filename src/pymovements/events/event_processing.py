@@ -142,6 +142,7 @@ class EventGazeProcessor:
             events: EventDataFrame,
             gaze: GazeDataFrame,
             identifiers: str | list[str],
+            name: str | None = None,
     ) -> pl.DataFrame:
         """Process event and gaze dataframe.
 
@@ -153,6 +154,8 @@ class EventGazeProcessor:
             Gaze data to process event properties from.
         identifiers:
             Column names to join on events and gaze dataframes.
+        name:
+            Process only events that match the name.
 
         Returns
         -------
@@ -217,8 +220,12 @@ class EventGazeProcessor:
         # a name and its on- and offset.
         event_identifiers = [*trial_identifiers, 'name', 'onset', 'offset']
 
+        joined_frame = gaze.frame.join(events.frame, on=trial_identifiers)
+        if name is not None:
+            joined_frame = joined_frame.filter(pl.col('name').str.contains(f'^{name}$'))
+
         result = (
-            gaze.frame.join(events.frame, on=trial_identifiers)
+            joined_frame
             .filter(pl.col('time').is_between(pl.col('onset'), pl.col('offset')))
             .groupby(event_identifiers, maintain_order=True)
             .agg(

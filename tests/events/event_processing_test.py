@@ -385,6 +385,81 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                 {
                     'subject_id': np.ones(100),
                     'time': np.arange(100),
+                    'x_vel': np.concatenate([np.ones(10), np.zeros(70), 2 * np.ones(20)]),
+                    'y_vel': np.concatenate([np.ones(10), np.zeros(70), 2 * np.ones(20)]),
+                },
+                schema={
+                    'subject_id': pl.Int64,
+                    'time': pl.Int64,
+                    'x_vel': pl.Float64,
+                    'y_vel': pl.Float64,
+                },
+            ),
+            {'event_properties': 'peak_velocity'},
+            {'identifiers': 'subject_id', 'name': 'A'},
+            pl.from_dict(
+                {
+                    'subject_id': [1],
+                    'name': ['A'],
+                    'onset': [0],
+                    'offset': [10],
+                    'peak_velocity': [np.sqrt(2)],
+                },
+                schema={
+                    'subject_id': pl.Int64,
+                    'name': pl.Utf8,
+                    'onset': pl.Int64,
+                    'offset': pl.Int64,
+                    'peak_velocity': pl.Float64,
+                },
+            ),
+            id='two_events_peak_velocity_name_filter',
+        ),
+        pytest.param(
+            pl.from_dict(
+                {'subject_id': [1, 1], 'name': 'abcdef', 'onset': [0, 80], 'offset': [10, 100]},
+                schema={
+                    'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
+                },
+            ),
+            pl.from_dict(
+                {
+                    'subject_id': np.ones(100),
+                    'time': np.arange(100),
+                    'x_vel': np.concatenate([np.ones(10), np.zeros(70), 2 * np.ones(20)]),
+                    'y_vel': np.concatenate([np.ones(10), np.zeros(70), 2 * np.ones(20)]),
+                },
+                schema={
+                    'subject_id': pl.Int64,
+                    'time': pl.Int64,
+                    'x_vel': pl.Float64,
+                    'y_vel': pl.Float64,
+                },
+            ),
+            {'event_properties': 'peak_velocity'},
+            {'identifiers': 'subject_id', 'name': 'cde'},
+            pl.DataFrame(
+                schema={
+                    'subject_id': pl.Int64,
+                    'name': pl.Utf8,
+                    'onset': pl.Int64,
+                    'offset': pl.Int64,
+                    'peak_velocity': pl.Float64,
+                },
+            ),
+            id='two_events_peak_velocity_name_filter_no_match_all_empty_dataframe',
+        ),
+        pytest.param(
+            pl.from_dict(
+                {'subject_id': [1, 1], 'name': ['A', 'B'], 'onset': [0, 80], 'offset': [10, 100]},
+                schema={
+                    'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
+                },
+            ),
+            pl.from_dict(
+                {
+                    'subject_id': np.ones(100),
+                    'time': np.arange(100),
                     'x_pos': np.concatenate([np.ones(11), np.zeros(69), 2 * np.ones(20)]),
                     'y_pos': np.concatenate([np.ones(11), np.zeros(69), 2 * np.ones(20)]),
                 },
