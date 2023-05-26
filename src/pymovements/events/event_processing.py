@@ -155,8 +155,11 @@ class EventGazeProcessor:
             :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
         """
         if isinstance(identifiers, str):
-            identifiers = [identifiers]
-        if len(identifiers) == 0:
+            trial_identifiers = [identifiers]
+        else:
+            trial_identifiers = identifiers
+
+        if len(trial_identifiers) == 0:
             raise ValueError('list of identifiers must not be empty')
 
         property_expressions: dict[str, Callable[..., pl.Expr]] = {
@@ -194,10 +197,14 @@ class EventGazeProcessor:
             if 'velocity_column' in property_args:
                 property_kwargs[property_name]['velocity_column'] = 'velocity'
 
+        # Each event is uniquely defined by a list of trial identifiers,
+        # a name and its on- and offset.
+        event_identifiers = [*trial_identifiers, 'name', 'onset', 'offset']
+
         result = (
-            gaze.frame.join(events.frame, on=identifiers)
+            gaze.frame.join(events.frame, on=trial_identifiers)
             .filter(pl.col('time').is_between(pl.col('onset'), pl.col('offset')))
-            .groupby([*identifiers, 'name', 'onset', 'offset'])
+            .groupby(event_identifiers, maintain_order=True)
             .agg(
                 [
                     property_expression(**property_kwargs[property_name])
