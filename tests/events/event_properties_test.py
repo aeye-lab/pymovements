@@ -38,7 +38,7 @@ from pymovements.events.event_properties import EVENT_PROPERTIES
             id='peak_velocity_not_2_components_raise_value_error',
         ),
         pytest.param(
-            event_properties.position,
+            event_properties.location,
             {'method': 'foo'},
             ValueError,
             ('method', 'foo', 'not', 'supported', 'mean', 'median'),
@@ -352,41 +352,41 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             id='amplitude_two_samples_xy_move',
         ),
         pytest.param(
-            event_properties.position,
+            event_properties.location,
             {'method': 'mean'},
             pl.DataFrame(
                 {'position': [[0, 0], [1, 0]]},
                 schema={'position': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
-                {'position': [[0.5, 0]]},
-                schema={'position': pl.List(pl.Float64)},
+                {'location': [[0.5, 0]]},
+                schema={'location': pl.List(pl.Float64)},
             ),
             id='position_two_samples_mean',
         ),
         pytest.param(
-            event_properties.position,
+            event_properties.location,
             {'method': 'mean'},
             pl.DataFrame(
                 {'position': [[0, 0], [0, 1], [0, 3]]},
                 schema={'position': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
-                {'position': [[0, 1.3333333333333333]]},
-                schema={'position': pl.List(pl.Float64)},
+                {'location': [[0, 1.3333333333333333]]},
+                schema={'location': pl.List(pl.Float64)},
             ),
             id='position_three_samples_mean',
         ),
         pytest.param(
-            event_properties.position,
+            event_properties.location,
             {'method': 'median'},
             pl.DataFrame(
                 {'position': [[0, 0], [2, 1], [3, 3]]},
                 schema={'position': pl.List(pl.Float64)},
             ),
             pl.DataFrame(
-                {'position': [[2, 1]]},
-                schema={'position': pl.List(pl.Float64)},
+                {'location': [[2, 1]]},
+                schema={'location': pl.List(pl.Float64)},
             ),
             id='position_three_samples_median',
         ),
@@ -407,7 +407,7 @@ def test_property_has_expected_result(event_property, init_kwargs, input_df, exp
         pytest.param(event_properties.dispersion, 'dispersion', id='dispersion'),
         pytest.param(event_properties.amplitude, 'amplitude', id='amplitude'),
         pytest.param(event_properties.disposition, 'disposition', id='disposition'),
-        pytest.param(event_properties.position, 'position', id='position'),
+        pytest.param(event_properties.location, 'location', id='location'),
     ],
 )
 def test_property_registered(property_function, property_function_name):
