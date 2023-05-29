@@ -459,7 +459,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
             pl.from_dict(
                 {
                     'subject_id': np.ones(100),
-                    'time': np.arange(100),
+                    'time': np.arange(100)
                     'x_pos': np.concatenate([np.ones(11), np.zeros(69), 2 * np.ones(20)]),
                     'y_pos': np.concatenate([np.ones(11), np.zeros(69), 2 * np.ones(20)]),
                 },

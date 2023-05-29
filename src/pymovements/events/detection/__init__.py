@@ -25,17 +25,20 @@
    :toctree:
    :recursive:
 
+    pymovements.events.detection.fill
     pymovements.events.detection.idt
     pymovements.events.detection.ivt
     pymovements.events.detection.microsaccades
 
 """
+from pymovements.events.detection.fill import fill
 from pymovements.events.detection.idt import idt
 from pymovements.events.detection.ivt import ivt
 from pymovements.events.detection.microsaccades import microsaccades
 
 __all__ = [
-    'microsaccades',
+    'fill',
     'idt',
     'ivt',
+    'microsaccades',
 ]

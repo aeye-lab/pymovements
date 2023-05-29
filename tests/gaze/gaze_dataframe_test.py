@@ -263,39 +263,39 @@ def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, msg_substring
 
 
 @pytest.mark.parametrize(
-    ('init_df', 'expected_position_columns'),
+    ('init_df', 'expected_acceleration_columns'),
     [
         pytest.param(
             pl.DataFrame(
                 {'x_pix': np.arange(100), 'y_pix': np.arange(100)},
                 schema={'x_pix': pl.Float64, 'y_pix': pl.Float64},
             ),
-            ['x_pos', 'y_pos'],
-            id='no_eye_pos_columns',
+            ['x_acc', 'y_acc'],
+            id='no_eye_pos_acc_columns',
         ),
         pytest.param(
             pl.DataFrame(
                 {'abc': np.arange(100), 'x_pix': np.arange(100), 'y_pix': np.arange(100)},
                 schema={'abc': pl.Int64, 'x_pix': pl.Float64, 'y_pix': pl.Float64},
             ),
-            ['x_pos', 'y_pos'],
-            id='no_eye_pos_columns_with_other_columns',
+            ['x_acc', 'y_acc'],
+            id='no_eye_pos_acc_columns',
         ),
         pytest.param(
             pl.DataFrame(
                 {'x_right_pix': np.arange(100), 'y_right_pix': np.arange(100)},
                 schema={'x_right_pix': pl.Float64, 'y_right_pix': pl.Float64},
             ),
-            ['x_right_pos', 'y_right_pos'],
-            id='right_eye_pos_columns',
+            ['x_right_acc', 'y_right_acc'],
+            id='right_eye_pos_acc_columns',
         ),
         pytest.param(
             pl.DataFrame(
                 {'x_left_pix': np.arange(100), 'y_left_pix': np.arange(100)},
                 schema={'x_left_pix': pl.Float64, 'y_left_pix': pl.Float64},
             ),
-            ['x_left_pos', 'y_left_pos'],
-            id='left_eye_pos_columns',
+            ['x_left_acc', 'y_left_acc'],
+            id='left_eye_pos_acc_columns',
         ),
         pytest.param(
             pl.DataFrame(
@@ -308,19 +308,113 @@ def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, msg_substring
                     'x_right_pix': pl.Float64, 'y_right_pix': pl.Float64,
                 },
             ),
-            ['x_left_pos', 'y_left_pos', 'x_right_pos', 'y_right_pos'],
-            id='both_eyes_pos_columns',
+            [
+                'x_left_acc', 'y_left_acc', 'x_right_acc', 'y_right_acc',
+            ],
+            id='both_eyes_pos_acc_columns',
+        ),
+    ],
+)
+def test_gaze_dataframe_pos2acc_has_correct_columns(
+        init_df, expected_acceleration_columns, experiment_fixture,
+):
+    gaze_df = GazeDataFrame(init_df, experiment=experiment_fixture)
+    gaze_df.pix2deg()
+    gaze_df.pos2acc()
+
+    assert set(gaze_df.acceleration_columns) == set(expected_acceleration_columns)
+
+
+@pytest.mark.parametrize(
+    ('init_kwargs', 'exception', 'msg_substrings'),
+    [
+        pytest.param(
+            {
+                'data': pl.DataFrame(schema={'x_pix': pl.Float64, 'y_pix': pl.Float64}),
+                'experiment': Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+            },
+            AttributeError, ('position', 'columns', 'valid', 'x_pos', 'x_pix'),
+            id='no_dva_pos_columns',
+        ),
+        pytest.param(
+            {'data': pl.DataFrame(schema={'x_pos': pl.Float64, 'y_pos': pl.Float64})},
+            AttributeError, ('experiment', 'must'),
+            id='no_dva_pos_columns',
+        ),
+    ],
+)
+def test_gaze_dataframe_pos2acc_exceptions(init_kwargs, exception, msg_substrings):
+    gaze_df = GazeDataFrame(**init_kwargs)
+
+    with pytest.raises(exception) as excinfo:
+        gaze_df.pos2acc()
+
+    msg, = excinfo.value.args
+    for msg_substring in msg_substrings:
+        assert msg_substring.lower() in msg.lower()
+
+
+@pytest.mark.parametrize(
+    ('init_df', 'expected_velocity_columns'),
+    [
+        pytest.param(
+            pl.DataFrame(
+                {'x_pix': np.arange(100), 'y_pix': np.arange(100)},
+                schema={'x_pix': pl.Float64, 'y_pix': pl.Float64},
+            ),
+            ['x_vel', 'y_vel'],
+            id='no_eye_pos_vel_columns',
+        ),
+        pytest.param(
+            pl.DataFrame(
+                {'abc': np.arange(100), 'x_pix': np.arange(100), 'y_pix': np.arange(100)},
+                schema={'abc': pl.Int64, 'x_pix': pl.Float64, 'y_pix': pl.Float64},
+            ),
+            ['x_vel', 'y_vel'],
+            id='no_eye_pos_vel_columns',
+        ),
+        pytest.param(
+            pl.DataFrame(
+                {'x_right_pix': np.arange(100), 'y_right_pix': np.arange(100)},
+                schema={'x_right_pix': pl.Float64, 'y_right_pix': pl.Float64},
+            ),
+            ['x_right_vel', 'y_right_vel'],
+            id='right_eye_pos_vel_columns',
+        ),
+        pytest.param(
+            pl.DataFrame(
+                {'x_left_pix': np.arange(100), 'y_left_pix': np.arange(100)},
+                schema={'x_left_pix': pl.Float64, 'y_left_pix': pl.Float64},
+            ),
+            ['x_left_vel', 'y_left_vel'],
+            id='left_eye_pos_vel_columns',
+        ),
+        pytest.param(
+            pl.DataFrame(
+                {
+                    'x_left_pix': np.arange(100), 'y_left_pix': np.arange(100),
+                    'x_right_pix': np.arange(100), 'y_right_pix': np.arange(100),
+                },
+                schema={
+                    'x_left_pix': pl.Float64, 'y_left_pix': pl.Float64,
+                    'x_right_pix': pl.Float64, 'y_right_pix': pl.Float64,
+                },
+            ),
+            [
+                'x_left_vel', 'y_left_vel', 'x_right_vel', 'y_right_vel',
+            ],
+            id='both_eyes_pos_vel_columns',
         ),
     ],
 )
 def test_gaze_dataframe_pos2vel_has_correct_columns(
-        init_df, expected_position_columns, experiment_fixture,
+        init_df, expected_velocity_columns, experiment_fixture,
 ):
     gaze_df = GazeDataFrame(init_df, experiment=experiment_fixture)
     gaze_df.pix2deg()
     gaze_df.pos2vel()
 
-    assert set(gaze_df.position_columns) == set(expected_position_columns)
+    assert set(gaze_df.velocity_columns) == set(expected_velocity_columns)
 
 
 @pytest.mark.parametrize(

@@ -495,6 +495,26 @@ def test_pix2deg(dataset_configuration):
         assert result_gaze_df.schema == expected_schema
 
 
+def test_pos2acc(dataset_configuration):
+    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+
+    original_schema = dataset.gaze[0].schema
+
+    dataset.pos2acc()
+
+    acc_schema = {}
+    for column_name in original_schema.keys():
+        if column_name.endswith('_pix'):
+            acc_column_name = column_name.replace('_pix', '_acc')
+            acc_schema[acc_column_name] = original_schema[column_name]
+    expected_schema = {**original_schema, **acc_schema}
+
+    for result_gaze_df in dataset.gaze:
+        assert result_gaze_df.schema == expected_schema
+
+
 def test_pos2vel(dataset_configuration):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
@@ -533,6 +553,13 @@ def test_pos2vel(dataset_configuration):
                 'eye': 'auto',
             },
             id='microsaccades_string',
+        ),
+        pytest.param(
+            {
+                'method': 'fill',
+                'eye': 'auto',
+            },
+            id='fill_string',
         ),
     ],
 )
