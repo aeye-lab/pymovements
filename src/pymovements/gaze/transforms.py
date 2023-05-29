@@ -161,6 +161,90 @@ def pix2deg(
     return np.arctan2(arr, distance_px) * 180 / np.pi
 
 
+def pos2acc(
+        arr: list[float] | list[list[float]] | np.ndarray,
+        sampling_rate: float,
+        window_length: int = 7,
+        degree: int = 2,
+        mode: str = 'interp',
+        cval: float = 0.0,
+) -> np.ndarray:
+    """Compute velocity time series from 2-dimensional position time series.
+
+    Parameters
+    ----------
+    arr : array_like
+        Continuous 2D position time series
+    sampling_rate:
+        Sampling rate of input time series.
+    degree:
+        The degree of the polynomial to use.
+    window_length:
+        The window size to use.
+    mode:
+        The padding mode to use.
+    cval:
+        A constant value for padding.
+
+    Returns
+    -------
+    np.ndarray
+        Velocity time series in input_unit / sec
+
+    Examples
+    --------
+    >>> arr = [(0., 0.), (1., 1.), (4., 4.), (9., 9.), (16., 16.), (25., 25.)]
+    >>> pos2acc(
+    ...    arr=arr,
+    ...    sampling_rate=1000,
+    ...    window_length=5,
+    ... )
+    array([[2000., 2000.],
+           [2000., 2000.],
+           [2000., 2000.],
+           [2000., 2000.],
+           [2000., 2000.],
+           [2000., 2000.]])
+    """
+    if sampling_rate <= 0:
+        raise ValueError('sampling_rate needs to be above zero')
+
+    # make sure that we're operating on a numpy array
+    arr = np.array(arr)
+
+    if arr.ndim not in [1, 2]:
+        raise ValueError(
+            'arr needs to have 1 or 2 dimensions (are: {arr.ndim = })',
+        )
+
+    acc = np.zeros(arr.shape)
+
+    # transform to velocities
+    if arr.ndim == 1:
+        acc = savgol_filter(
+            x=arr,
+            deriv=2,
+            window_length=window_length,
+            polyorder=degree,
+            mode=mode,
+            cval=cval,
+        )
+    else:  # we already checked for error cases
+
+        for channel_id in range(arr.shape[1]):
+            acc[:, channel_id] = savgol_filter(
+                x=arr[:, channel_id],
+                deriv=2,
+                window_length=window_length,
+                polyorder=degree,
+                mode=mode,
+                cval=cval,
+            )
+    acc = acc * sampling_rate
+
+    return acc
+
+
 def pos2vel(
         arr: list[float] | list[list[float]] | np.ndarray,
         sampling_rate: float = 1000,

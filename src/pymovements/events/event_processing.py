@@ -217,6 +217,10 @@ class EventGazeProcessor:
         # a name and its on- and offset.
         event_identifiers = [*trial_identifiers, 'name', 'onset', 'offset']
 
+        # Each event is uniquely defined by a list of trial identifiers,
+        # a name and its on- and offset.
+        event_identifiers = [*trial_identifiers, 'name', 'onset', 'offset']
+
         result = (
             gaze.frame.join(events.frame, on=trial_identifiers)
             .filter(pl.col('time').is_between(pl.col('onset'), pl.col('offset')))
