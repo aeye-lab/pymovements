@@ -59,7 +59,7 @@
     pymovements.events.event_properties.dispersion
     pymovements.events.event_properties.disposition
     pymovements.events.event_properties.peak_velocity
-    pymovements.events.event_properties.position
+    pymovements.events.event_properties.location
 """
 from pymovements.events.detection.fill import fill
 from pymovements.events.detection.idt import idt
