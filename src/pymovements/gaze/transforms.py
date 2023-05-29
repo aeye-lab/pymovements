@@ -194,16 +194,17 @@ def pos2acc(
     Examples
     --------
     >>> arr = [(0., 0.), (1., 1.), (4., 4.), (9., 9.), (16., 16.), (25., 25.)]
-    >>> pos2vel(
+    >>> pos2acc(
     ...    arr=arr,
     ...    sampling_rate=1000,
+    ...    window_length=5,
     ... )
-    array([[ 500.,  500.],
-           [1000., 1000.],
-           [1000., 1000.],
-           [1000., 1000.],
-           [1000., 1000.],
-           [ 500.,  500.]])
+    array([[2000., 2000.],
+           [2000., 2000.],
+           [2000., 2000.],
+           [2000., 2000.],
+           [2000., 2000.],
+           [2000., 2000.]])
     """
     if sampling_rate <= 0:
         raise ValueError('sampling_rate needs to be above zero')
@@ -216,11 +217,11 @@ def pos2acc(
             'arr needs to have 1 or 2 dimensions (are: {arr.ndim = })',
         )
 
-    v = np.zeros(arr.shape)
+    acc = np.zeros(arr.shape)
 
     # transform to velocities
     if arr.ndim == 1:
-        v = savgol_filter(
+        acc = savgol_filter(
             x=arr,
             deriv=2,
             window_length=window_length,
@@ -231,7 +232,7 @@ def pos2acc(
     else:  # we already checked for error cases
 
         for channel_id in range(arr.shape[1]):
-            v[:, channel_id] = savgol_filter(
+            acc[:, channel_id] = savgol_filter(
                 x=arr[:, channel_id],
                 deriv=2,
                 window_length=window_length,
@@ -239,9 +240,9 @@ def pos2acc(
                 mode=mode,
                 cval=cval,
             )
-    v = v * sampling_rate
+    acc = acc * sampling_rate
 
-    return v
+    return acc
 
 
 def pos2vel(
