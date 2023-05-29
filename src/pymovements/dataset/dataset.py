@@ -459,6 +459,7 @@ class Dataset:
             self,
             event_properties: str | tuple[str, dict[str, Any]]
             | list[str | tuple[str, dict[str, Any]]],
+            name: str | None = None,
             verbose: bool = True,
     ) -> Dataset:
         """Calculate an event property for and add it as a column to the event dataframe.
@@ -467,6 +468,8 @@ class Dataset:
         ----------
         event_properties:
             The event properties to compute.
+        name:
+            Process only events that match the name.
         verbose : bool
             If ``True``, show progress bar.
 
@@ -487,12 +490,11 @@ class Dataset:
 
         disable_progressbar = not verbose
         for events, gaze in tqdm(zip(self.events, self.gaze), disable=disable_progressbar):
-            new_properties = processor.process(events, gaze, identifiers=identifier_columns)
-
-            new_properties = new_properties.drop(identifier_columns)
-            new_properties = new_properties.drop(['name', 'onset', 'offset'])
-
-            events.add_event_properties(new_properties)
+            new_properties = processor.process(
+                events, gaze, identifiers=identifier_columns, name=name,
+            )
+            join_on = identifier_columns + ['name', 'onset', 'offset']
+            events.add_event_properties(new_properties, join_on=join_on)
 
         return self
 

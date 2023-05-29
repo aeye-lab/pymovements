@@ -203,7 +203,7 @@ def mock_toy(rootpath, raw_fileformat, eyes):
         event_df = pl.from_dict(
             {
                 'subject_id': fileinfo_row['subject_id'],
-                'name': 'saccade',
+                'name': ['saccade', 'fixation'] * 5,
                 'onset': np.arange(0, 100, 10),
                 'offset': np.arange(5, 105, 10),
                 'duration': np.array([5] * 10),
@@ -1251,7 +1251,22 @@ def test_event_dataframe_add_property_has_expected_schema(
         pytest.param(
             {'event_properties': 'location'},
             ['location'],
-            id='single_event_position',
+            id='single_event_location',
+        ),
+        pytest.param(
+            {'event_properties': 'location', 'name': 'fixation'},
+            ['location'],
+            id='single_event_location_name_fixation',
+        ),
+        pytest.param(
+            {'event_properties': 'peak_velocity', 'name': 'sacc.*'},
+            ['peak_velocity'],
+            id='single_event_peak_velocity_regex_name_sacc',
+        ),
+        pytest.param(
+            {'event_properties': 'peak_velocity', 'name': 'acc'},
+            ['peak_velocity'],
+            id='single_event_peak_velocity_name_acc_all_null',
         ),
     ],
 )
@@ -1265,3 +1280,33 @@ def test_event_dataframe_add_property_effect_property_columns(
 
     for events_df in dataset.events:
         assert events_df.event_property_columns == expected_property_columns
+
+
+@pytest.mark.parametrize(
+    'property_kwargs',
+    [
+        pytest.param(
+            {'event_properties': 'peak_velocity'},
+            id='single_event_peak_velocity',
+        ),
+        pytest.param(
+            {'event_properties': 'location'},
+            id='single_event_position',
+        ),
+        pytest.param(
+            {'event_properties': 'location', 'name': 'fixation'},
+            id='single_event_position_name_fixation',
+        ),
+    ],
+)
+def test_event_dataframe_add_property_does_not_change_length(
+        dataset_configuration, property_kwargs,
+):
+    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load(preprocessed=True, events=True)
+
+    lengths_pre = [len(events_df.frame) for events_df in dataset.events]
+    dataset.compute_event_properties(**property_kwargs)
+    lengths_post = [len(events_df.frame) for events_df in dataset.events]
+
+    assert lengths_pre == lengths_post
