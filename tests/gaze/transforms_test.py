@@ -25,6 +25,7 @@ import pytest
 
 from pymovements.gaze.transforms import norm
 from pymovements.gaze.transforms import pix2deg
+from pymovements.gaze.transforms import pos2acc
 from pymovements.gaze.transforms import pos2vel
 from pymovements.gaze.transforms import split
 
@@ -416,6 +417,72 @@ def test_pix2deg_raises_error(kwargs, expected_error):
 def test_pix2deg_returns(kwargs, expected_value):
     actual_value = pix2deg(**kwargs)
     assert (actual_value == expected_value).all()
+
+
+@pytest.mark.parametrize(
+    ('kwargs', 'expected_error'),
+    [
+        pytest.param(
+            {
+                'arr': [[0] * 10],
+                'sampling_rate': 0,
+            },
+            ValueError,
+            id='sampling_rate_zero_raises_value_error',
+        ),
+        pytest.param(
+            {
+                'arr': [[0] * 10],
+                'sampling_rate': -1,
+            },
+            ValueError,
+            id='sampling_rate_less_zero_raises_value_error',
+        ),
+        pytest.param(
+            {
+                'arr': np.ones((3, 3, 3)),
+                'sampling_rate': 1,
+            },
+            ValueError,
+            id='wrong_dimensions_input_arr_raises_value_error',
+        ),
+    ],
+)
+def test_pos2acc_raises_error(kwargs, expected_error):
+    with pytest.raises(expected_error):
+        pos2acc(**kwargs)
+
+
+@pytest.mark.parametrize(
+    ('kwargs', 'padding', 'expected_value'),
+    [
+        pytest.param(
+            {
+                'arr': np.repeat(0, n_coords),
+                'sampling_rate': 1,
+            },
+            (0, n_coords),
+            np.zeros(n_coords),
+            id='constant_input_returns_zero_velocity',
+        ),
+        pytest.param(
+            {
+                'arr': np.square(np.linspace(0, n_coords - 1, n_coords)),
+                'sampling_rate': 1,
+            },
+            (1, -1),
+            2 * np.ones(n_coords),
+            id='linear_input_returns_constant_velocity',
+        ),
+    ],
+)
+def test_pos2acc_returns(kwargs, padding, expected_value):
+    actual_value = pos2acc(**kwargs)
+
+    assert np.allclose(
+        actual_value[padding[0]:padding[1]],
+        expected_value[padding[0]:padding[1]],
+    )
 
 
 @pytest.mark.parametrize(

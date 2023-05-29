@@ -23,6 +23,7 @@ from __future__ import annotations
 import polars as pl
 
 from pymovements.gaze.experiment import Experiment
+from pymovements.gaze.transforms import pos2acc
 
 
 class GazeDataFrame:
@@ -48,6 +49,12 @@ class GazeDataFrame:
         'x_vel', 'y_vel',
         'x_left_vel', 'y_left_vel',
         'x_right_vel', 'y_right_vel',
+    ]
+
+    _valid_acceleration_columns = [
+        'x_acc', 'y_acc',
+        'x_left_acc', 'y_left_acc',
+        'x_right_acc', 'y_right_acc',
     ]
 
     def __init__(
@@ -107,8 +114,69 @@ class GazeDataFrame:
             ],
         )
 
+    def pos2acc(
+            self,
+            window_length: int = 7,
+            degree: int = 2,
+            mode: str = 'interp',
+            cval: float = 0.0,
+    ) -> None:
+        """Compute gaze acceleration in dva/s^2 from dva position coordinates.
+
+        This method requires a properly initialized :py:attr:`~.GazeDataFrame.experiment` attribute.
+
+        After success, the gaze dataframe is extended by the resulting velocity columns.
+
+        Parameters
+        ----------
+        window_length:
+            The window size to use.
+        degree:
+            The degree of the polynomial to use.
+        mode:
+            The padding mode to use.
+        cval:
+            A constant value for padding.
+
+        Raises
+        ------
+        AttributeError
+            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
+            if experiment is None.
+        """
+        self._check_experiment()
+        # mypy does not get that experiment now cannot be None anymore
+        assert self.experiment is not None
+
+        position_columns = self.position_columns
+        if not position_columns:
+            raise AttributeError(
+                'No valid position columns found.'
+                f' Valid position columns are: {self._valid_position_columns}.'
+                f' Available columns are: {self.frame.columns}.',
+            )
+        acceleration_columns = self._position_to_acceleration_columns(position_columns)
+
+        positions = self.frame.select(position_columns)
+
+        acceleration = pos2acc(
+            positions.to_numpy(),
+            sampling_rate=self.experiment.sampling_rate,
+            window_length=window_length,
+            degree=degree,
+            mode=mode,
+            cval=cval,
+        )
+
+        self.frame = self.frame.with_columns(
+            [
+                pl.Series(name=velocity_column_name, values=acceleration[:, column_id])
+                for column_id, velocity_column_name in enumerate(acceleration_columns)
+            ],
+        )
+
     def pos2vel(self, method: str = 'smooth', **kwargs: int | float | str) -> None:
-        """Compute gaze velocites in dva/s from dva position coordinates.
+        """Compute gaze velocity in dva/s from dva position coordinates.
 
         This method requires a properly initialized :py:attr:`~.GazeDataFrame.experiment` attribute.
 
@@ -162,6 +230,12 @@ class GazeDataFrame:
         return self.frame.columns
 
     @property
+    def acceleration_columns(self) -> list[str]:
+        """Acceleration columns (in degrees of visual angle per second^2) of dataframe."""
+        acceleration_columns = list(set(self._valid_acceleration_columns) & set(self.frame.columns))
+        return acceleration_columns
+
+    @property
     def velocity_columns(self) -> list[str]:
         """Velocity columns (in degrees of visual angle per second) of dataframe."""
         velocity_columns = list(set(self._valid_velocity_columns) & set(self.frame.columns))
@@ -186,6 +260,15 @@ class GazeDataFrame:
             column.replace('_pix', '_pos')
             for column in columns
             if column.endswith('_pix')
+        ]
+
+    @staticmethod
+    def _position_to_acceleration_columns(columns: list[str]) -> list[str]:
+        """Get corresponding acceleration columns from dva position columns."""
+        return [
+            column.replace('_pos', '_acc')
+            for column in columns
+            if column.endswith('_pos')
         ]
 
     @staticmethod
