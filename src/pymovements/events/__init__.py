@@ -46,6 +46,7 @@
     pymovements.events.idt
     pymovements.events.ivt
     pymovements.events.microsaccades
+    pymovements.events.fill
 
 .. rubric:: Event Properties
 
@@ -60,6 +61,7 @@
     pymovements.events.event_properties.peak_velocity
     pymovements.events.event_properties.location
 """
+from pymovements.events.detection.fill import fill
 from pymovements.events.detection.idt import idt
 from pymovements.events.detection.ivt import ivt
 from pymovements.events.detection.microsaccades import microsaccades
@@ -72,6 +74,7 @@ __all__ = [
     'EventDataFrame',
     'EventGazeProcessor',
     'EventProcessor',
+    'fill',
     'idt',
     'ivt',
     'microsaccades',

@@ -20,6 +20,7 @@
 """This module provides the base dataset class."""
 from __future__ import annotations
 
+import inspect
 from collections.abc import Callable
 from copy import deepcopy
 from pathlib import Path
@@ -424,34 +425,32 @@ class Dataset:
 
         disable_progressbar = not verbose
 
-        event_dfs: list[EventDataFrame] = []
+        if not self.events or clear:
+            self.events = [EventDataFrame() for _ in self.fileinfo.iter_rows()]
 
-        for gaze_df, fileinfo_row in tqdm(
-                zip(self.gaze, self.fileinfo.to_dicts()), disable=disable_progressbar,
+        for file_id, (gaze_df, fileinfo_row) in tqdm(
+                enumerate(zip(self.gaze, self.fileinfo.to_dicts())), disable=disable_progressbar,
         ):
 
             positions = gaze_df.frame.select(position_columns).to_numpy()
             velocities = gaze_df.frame.select(velocity_columns).to_numpy()
             timesteps = gaze_df.frame.get_column('time').to_numpy()
 
-            event_df = method(
+            if 'events' in inspect.getfullargspec(method).args:
+                kwargs['events'] = self.events[file_id]
+
+            new_event_df = method(
                 positions=positions, velocities=velocities, timesteps=timesteps, **kwargs,
             )
 
-            event_df.frame = dataset_files.add_fileinfo(
+            new_event_df.frame = dataset_files.add_fileinfo(
                 definition=self.definition,
-                df=event_df.frame,
+                df=new_event_df.frame,
                 fileinfo=fileinfo_row,
             )
-            event_dfs.append(event_df)
 
-        if not self.events or clear:
-            self.events = event_dfs
-            return self
-
-        for file_id, event_df in enumerate(event_dfs):
             self.events[file_id].frame = pl.concat(
-                [self.events[file_id].frame, event_df.frame],
+                [self.events[file_id].frame, new_event_df.frame],
                 how='diagonal',
             )
         return self

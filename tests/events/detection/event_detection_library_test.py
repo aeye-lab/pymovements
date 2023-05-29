@@ -32,6 +32,7 @@ import pymovements.events.events
         pytest.param(pm.events.idt, 'idt', id='idt'),
         pytest.param(pm.events.ivt, 'ivt', id='ivt'),
         pytest.param(pm.events.microsaccades, 'microsaccades', id='microsaccades'),
+        pytest.param(pm.events.fill, 'fill', id='fill'),
     ],
 )
 def test_transform_registered(method, name):
