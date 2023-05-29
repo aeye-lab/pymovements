@@ -534,6 +534,13 @@ def test_pos2vel(dataset_configuration):
             },
             id='microsaccades_string',
         ),
+        pytest.param(
+            {
+                'method': 'fill',
+                'eye': 'auto',
+            },
+            id='fill_string',
+        ),
     ],
 )
 def test_detect_events_auto_eye(detect_event_kwargs, dataset_configuration):
