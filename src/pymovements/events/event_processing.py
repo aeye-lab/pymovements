@@ -103,7 +103,11 @@ class EventGazeProcessor:
         A list of property names.
     """
 
-    def __init__(self, event_properties: str | list[str]):
+    def __init__(
+            self,
+            event_properties: str | tuple[str, dict[str, Any]]
+            | list[str | tuple[str, dict[str, Any]]],
+    ):
         """Initialize processor with event property definitions.
 
         Parameters
@@ -111,17 +115,27 @@ class EventGazeProcessor:
         event_properties:
             List of event property names.
         """
-        if isinstance(event_properties, str):
+        if isinstance(event_properties, (str, tuple)):
             event_properties = [event_properties]
 
-        for property_name in event_properties:
+        event_properties_with_kwargs = []
+        for event_property in event_properties:
+            if isinstance(event_property, str):
+                property_name = event_property
+                property_kwargs = {}
+            else:
+                property_name = event_property[0]
+                property_kwargs = event_property[1]
+
             if property_name not in EVENT_PROPERTIES:
                 valid_properties = list(EVENT_PROPERTIES.keys())
                 raise InvalidProperty(
                     property_name=property_name, valid_properties=valid_properties,
                 )
 
-        self.event_properties = event_properties
+            event_properties_with_kwargs.append((property_name, property_kwargs))
+
+        self.event_properties: list[tuple[str, dict[str, Any]]] = event_properties_with_kwargs
 
     def process(
             self,
@@ -162,10 +176,15 @@ class EventGazeProcessor:
         if len(trial_identifiers) == 0:
             raise ValueError('list of identifiers must not be empty')
 
-        property_expressions: dict[str, Callable[..., pl.Expr]] = {
-            property_name: EVENT_PROPERTIES[property_name]
-            for property_name in self.event_properties
-        }
+        property_expressions: list[Callable[..., pl.Expr]] = [
+            EVENT_PROPERTIES[property_name] for property_name, _ in self.event_properties
+        ]
+
+        property_names: list[str] = [property_name for property_name, _ in self.event_properties]
+
+        property_kwargs: list[dict[str, Any]] = [
+            property_kwargs for _, property_kwargs in self.event_properties
+        ]
 
         # We need to create a new column here, which is a list of position tuples.
         # For the intermediate time before the tuple will be the default format for
@@ -185,17 +204,18 @@ class EventGazeProcessor:
                 .alias('velocity'),
             )
 
-        property_kwargs: dict[str, dict[str, Any]] = {
-            property_name: {} for property_name in property_expressions.keys()
-        }
-        for property_name, property_expression in property_expressions.items():
+        for property_id, property_expression in enumerate(property_expressions):
             property_args = inspect.getfullargspec(property_expression).kwonlyargs
 
             if 'position_column' in property_args:
-                property_kwargs[property_name]['position_column'] = 'position'
+                property_kwargs[property_id]['position_column'] = 'position'
 
             if 'velocity_column' in property_args:
-                property_kwargs[property_name]['velocity_column'] = 'velocity'
+                property_kwargs[property_id]['velocity_column'] = 'velocity'
+
+        # Each event is uniquely defined by a list of trial identifiers,
+        # a name and its on- and offset.
+        event_identifiers = [*trial_identifiers, 'name', 'onset', 'offset']
 
         # Each event is uniquely defined by a list of trial identifiers,
         # a name and its on- and offset.
@@ -207,9 +227,10 @@ class EventGazeProcessor:
             .groupby(event_identifiers, maintain_order=True)
             .agg(
                 [
-                    property_expression(**property_kwargs[property_name])
-                    .alias(property_name)
-                    for property_name, property_expression in property_expressions.items()
+                    this_property_expression(**this_property_kwargs)
+                    .alias(this_property_name)
+                    for this_property_name, this_property_expression, this_property_kwargs,
+                    in zip(property_names, property_expressions, property_kwargs)
                 ],
             )
         )

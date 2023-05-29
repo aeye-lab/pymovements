@@ -102,10 +102,10 @@ def test_event_processor_process_correct_result(
 @pytest.mark.parametrize(
     ('args', 'kwargs', 'expected_property_definitions'),
     [
-        pytest.param(['peak_velocity'], {}, ['peak_velocity'], id='arg_str_peak_velocity'),
-        pytest.param([['peak_velocity']], {}, ['peak_velocity'], id='arg_list_peak_velocity'),
+        pytest.param(['peak_velocity'], {}, [('peak_velocity', {})], id='arg_str_peak_velocity'),
+        pytest.param([['peak_velocity']], {}, [('peak_velocity', {})], id='arg_list_peak_velocity'),
         pytest.param(
-            [], {'event_properties': 'peak_velocity'}, ['peak_velocity'],
+            [], {'event_properties': 'peak_velocity'}, [('peak_velocity', {})],
             id='kwarg_properties_peak_velocity',
         ),
     ],
@@ -414,6 +414,88 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                 },
             ),
             id='two_events_different_names_different_location',
+        ),
+        pytest.param(
+            pl.from_dict(
+                {'subject_id': [1, 1], 'name': ['A', 'B'], 'onset': [0, 80], 'offset': [10, 100]},
+                schema={
+                    'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
+                },
+            ),
+            pl.from_dict(
+                {
+                    'subject_id': np.ones(100),
+                    'time': np.arange(100),
+                    'x_pos': np.concatenate([np.ones(11), np.zeros(69), 2 * np.ones(19), [200]]),
+                    'y_pos': np.concatenate([np.ones(11), np.zeros(69), 2 * np.ones(19), [200]]),
+                },
+                schema={
+                    'subject_id': pl.Int64,
+                    'time': pl.Int64,
+                    'x_pos': pl.Float64,
+                    'y_pos': pl.Float64,
+                },
+            ),
+            {'event_properties': ('location', {'method': 'mean'})},
+            {'identifiers': 'subject_id'},
+            pl.from_dict(
+                {
+                    'subject_id': [1, 1],
+                    'name': ['A', 'B'],
+                    'onset': [0, 80],
+                    'offset': [10, 100],
+                    'location': [[1.0, 1.0], [11.9, 11.9]],
+                },
+                schema={
+                    'subject_id': pl.Int64,
+                    'name': pl.Utf8,
+                    'onset': pl.Int64,
+                    'offset': pl.Int64,
+                    'location': pl.List(pl.Float64),
+                },
+            ),
+            id='two_events_location_method_mean',
+        ),
+        pytest.param(
+            pl.from_dict(
+                {'subject_id': [1, 1], 'name': ['A', 'B'], 'onset': [0, 80], 'offset': [10, 100]},
+                schema={
+                    'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
+                },
+            ),
+            pl.from_dict(
+                {
+                    'subject_id': np.ones(100),
+                    'time': np.arange(100),
+                    'x_pos': np.concatenate([np.ones(11), np.zeros(69), 2 * np.ones(19), [200]]),
+                    'y_pos': np.concatenate([np.ones(11), np.zeros(69), 2 * np.ones(19), [200]]),
+                },
+                schema={
+                    'subject_id': pl.Int64,
+                    'time': pl.Int64,
+                    'x_pos': pl.Float64,
+                    'y_pos': pl.Float64,
+                },
+            ),
+            {'event_properties': ('location', {'method': 'median'})},
+            {'identifiers': 'subject_id'},
+            pl.from_dict(
+                {
+                    'subject_id': [1, 1],
+                    'name': ['A', 'B'],
+                    'onset': [0, 80],
+                    'offset': [10, 100],
+                    'location': [[1, 1], [2, 2]],
+                },
+                schema={
+                    'subject_id': pl.Int64,
+                    'name': pl.Utf8,
+                    'onset': pl.Int64,
+                    'offset': pl.Int64,
+                    'location': pl.List(pl.Float64),
+                },
+            ),
+            id='two_events_location_method_median',
         ),
     ],
 )

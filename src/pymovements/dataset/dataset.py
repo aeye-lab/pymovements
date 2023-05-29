@@ -458,7 +458,8 @@ class Dataset:
 
     def compute_event_properties(
             self,
-            event_properties: str | list[str],
+            event_properties: str | tuple[str, dict[str, Any]]
+            | list[str | tuple[str, dict[str, Any]]],
             verbose: bool = True,
     ) -> Dataset:
         """Calculate an event property for and add it as a column to the event dataframe.
