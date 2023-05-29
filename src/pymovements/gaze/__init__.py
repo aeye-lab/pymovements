@@ -35,6 +35,7 @@
    :toctree:
 
    pymovements.gaze.transforms.pix2deg
+   pymovements.gaze.transforms.pos2acc
    pymovements.gaze.transforms.pos2vel
    pymovements.gaze.transforms.norm
    pymovements.gaze.transforms.split
