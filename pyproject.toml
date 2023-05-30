@@ -36,7 +36,7 @@ dependencies = [
   "numpy>=1.10.0,<2",
   "pandas>1.0.0,<3",
   "polars>=0.17.2,<0.18",
-  "pyarrow>=4.0.0,<5",
+  "pyarrow>=11.0.0,<12",
   "scipy>=1.5.4,<2",
   "tqdm>=4.0.0,<5",
   "typing_extensions>=4.0.0,<5"
