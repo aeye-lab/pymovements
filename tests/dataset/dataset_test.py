@@ -316,12 +316,17 @@ def test_load_correct_event_dfs(dataset_configuration):
         pytest.param(
             {'subject_id': 1},
             [0],
-            id='subset_key_not_in_fileinfo',
+            id='subset_int',
         ),
         pytest.param(
             {'subject_id': [1, 11, 12]},
             [0, 2, 3],
-            id='subset_key_not_in_fileinfo',
+            id='subset_list',
+        ),
+        pytest.param(
+            {'subject_id': range(3)},
+            [0, 11],
+            id='subset_range',
         ),
     ],
 )

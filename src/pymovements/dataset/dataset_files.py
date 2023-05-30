@@ -496,12 +496,12 @@ def take_subset(
 
         if isinstance(subset_value, (bool, float, int, str)):
             column_values = [subset_value]
-        elif isinstance(subset_value, (list, tuple)):
+        elif isinstance(subset_value, (list, tuple, range)):
             column_values = subset_value
         else:
             raise TypeError(
-                f'subset value must be of type bool, float, int, str or a list of these but'
-                f' key-value pair {subset_key}: {subset_value} is of type {type(subset_value)}',
+                f'subset values must be of type bool, float, int, str, range, or list, '
+                f'but value of pair {subset_key}: {subset_value} is of type {type(subset_value)}',
             )
 
         fileinfo = fileinfo.filter(pl.col(subset_key).is_in(column_values))
