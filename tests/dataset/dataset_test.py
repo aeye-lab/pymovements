@@ -22,6 +22,7 @@ import os
 import shutil
 import unittest
 from pathlib import Path
+from unittest.mock import Mock
 
 import numpy as np
 import polars as pl
@@ -697,6 +698,34 @@ def test_detect_events_multiple_calls(
         assert result_event_df.schema == expected_schema
 
 
+@pytest.mark.parametrize(
+    'detect_kwargs',
+    [
+        pytest.param(
+            {
+                'method': 'microsaccades',
+                'threshold': 1,
+                'eye': 'left',
+                'clear': False,
+                'verbose': True,
+            },
+            id='left',
+        ),
+    ],
+)
+def test_detect_events_alias(dataset_configuration, detect_kwargs, monkeypatch):
+    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+    dataset.pos2vel()
+
+    mock = Mock()
+    monkeypatch.setattr(dataset, 'detect_events', mock)
+
+    dataset.detect(**detect_kwargs)
+    mock.assert_called_with(**detect_kwargs)
+
+
 def test_detect_events_attribute_error(dataset_configuration):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
@@ -1315,3 +1344,26 @@ def test_event_dataframe_add_property_does_not_change_length(
     lengths_post = [len(events_df.frame) for events_df in dataset.events]
 
     assert lengths_pre == lengths_post
+
+
+@pytest.mark.parametrize(
+    'property_kwargs',
+    [
+        pytest.param(
+            {
+                'event_properties': 'peak_velocity',
+                'name': None,
+                'verbose': True,
+            }, id='peak_velocity',
+        ),
+    ],
+)
+def test_compute_event_properties_alias(dataset_configuration, property_kwargs, monkeypatch):
+    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load(preprocessed=True, events=True)
+
+    mock = Mock()
+    monkeypatch.setattr(dataset, 'compute_event_properties', mock)
+
+    dataset.compute_properties(**property_kwargs)
+    mock.assert_called_with(**property_kwargs)
