@@ -1349,7 +1349,13 @@ def test_event_dataframe_add_property_does_not_change_length(
 @pytest.mark.parametrize(
     'property_kwargs',
     [
-        pytest.param({'event_properties': 'peak_velocity'}, id='peak_velocity'),
+        pytest.param(
+            {
+                'event_properties': 'peak_velocity',
+                'name': None,
+                'verbose': True,
+            }, id='peak_velocity',
+        ),
     ],
 )
 def test_compute_event_properties_alias(dataset_configuration, property_kwargs, monkeypatch):
