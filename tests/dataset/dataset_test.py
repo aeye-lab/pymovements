@@ -1359,5 +1359,5 @@ def test_compute_event_properties_alias(dataset_configuration, property_kwargs, 
     mock = Mock()
     monkeypatch.setattr(dataset, 'compute_event_properties', mock)
 
-    dataset.compute_event_properties(**property_kwargs)
+    dataset.compute_properties(**property_kwargs)
     mock.assert_called_with(**property_kwargs)
