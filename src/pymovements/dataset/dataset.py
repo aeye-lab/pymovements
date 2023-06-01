@@ -455,6 +455,53 @@ class Dataset:
             )
         return self
 
+    def detect(
+            self,
+            method: Callable[..., EventDataFrame] | str,
+            *,
+            eye: str | None = 'auto',
+            clear: bool = False,
+            verbose: bool = True,
+            **kwargs: Any,
+    ) -> Dataset:
+        """Detect events by applying a specific event detection method.
+
+        Alias for :py:meth:`pymovements.Dataset.detect_events`
+
+        Parameters
+        ----------
+        method : EventDetectionCallable
+            The event detection method to be applied.
+        eye : str
+            Select which eye to choose. Valid options are ``auto``, ``left``, ``right`` or ``None``.
+            If ``auto`` is passed, eye is inferred in the order ``['right', 'left', 'eye']`` from
+            the available :py:attr:`~.Dataset.gaze` dataframe columns.
+        clear : bool
+            If ``True``, event DataFrame will be overwritten with new DataFrame instead of being
+             merged into the existing one.
+        verbose : bool
+            If ``True``, show progress bar.
+        **kwargs :
+            Additional keyword arguments to be passed to the event detection method.
+
+        Raises
+        ------
+        AttributeError
+            If gaze files have not been loaded yet or gaze files do not contain the right columns.
+
+        Returns
+        -------
+        Dataset
+            Returns self, useful for method cascading.
+        """
+        return self.detect_events(
+            method=method,
+            eye=eye,
+            clear=clear,
+            verbose=verbose,
+            **kwargs,
+        )
+
     def compute_event_properties(
             self,
             event_properties: str | tuple[str, dict[str, Any]]
@@ -497,6 +544,43 @@ class Dataset:
             events.add_event_properties(new_properties, join_on=join_on)
 
         return self
+
+    def compute_properties(
+            self,
+            event_properties: str | tuple[str, dict[str, Any]]
+            | list[str | tuple[str, dict[str, Any]]],
+            name: str | None = None,
+            verbose: bool = True,
+    ) -> Dataset:
+        """Calculate an event property for and add it as a column to the event dataframe.
+
+        Alias for :py:meth:`pymovements.Dataset.compute_event_properties`
+
+        Parameters
+        ----------
+        event_properties:
+            The event properties to compute.
+        name:
+            Process only events that match the name.
+        verbose : bool
+            If ``True``, show progress bar.
+
+        Raises
+        ------
+        InvalidProperty
+            If ``property_name`` is not a valid property. See
+            :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
+
+        Returns
+        -------
+        Dataset
+            Returns self, useful for method cascading.
+        """
+        return self.compute_event_properties(
+            event_properties=event_properties,
+            name=name,
+            verbose=verbose,
+        )
 
     def clear_events(self) -> Dataset:
         """Clear event DataFrame.
