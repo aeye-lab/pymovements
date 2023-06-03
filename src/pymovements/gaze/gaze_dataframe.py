@@ -61,6 +61,12 @@ class GazeDataFrame:
             self,
             data: pl.DataFrame | None = None,
             experiment: Experiment | None = None,
+            position_pixel_columns: list[str] | None = None,
+            position_dva_columns: list[str] | None = None,
+            velocity_pixel_columns: list[str] | None = None,
+            velocity_dva_columns: list[str] | None = None,
+            acceleration_pixel_columns: list[str] | None = None,
+            acceleration_dva_columns: list[str] | None = None,
     ):
         """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
 
@@ -70,11 +76,90 @@ class GazeDataFrame:
             A dataframe to be transformed to a polars dataframe.
         experiment : Experiment
             The experiment definition.
+        position_pixel_columns:
+            The name of the pixel position columns in the input data frame.
+        position_dva_columns:
+            The name of the dva position columns in the input data frame.
+        velocity_pixel_columns:
+            The name of the pixel velocity columns in the input data frame.
+        velocity_dva_columns:
+            The name of the dva velocity columns in the input data frame.
         """
         if data is None:
             data = pl.DataFrame()
+        else:
+            data = data.clone()
+        self.frame = data
 
-        self.frame = data.clone()
+        if position_pixel_columns is not None:
+            _check_component_columns(
+                frame=self.frame,
+                position_pixel_columns=position_pixel_columns,
+            )
+            self.frame = _merge_component_columns_into_tuple_column(
+                frame=self.frame,
+                input_columns=position_pixel_columns,
+                output_column='position_pixel',
+            )
+
+        if position_dva_columns is not None:
+            _check_component_columns(
+                frame=self.frame,
+                position_dva_columns=position_dva_columns,
+            )
+
+            self.frame = _merge_component_columns_into_tuple_column(
+                frame=self.frame,
+                input_columns=position_dva_columns,
+                output_column='position_dva',
+            )
+
+        if velocity_pixel_columns is not None:
+            _check_component_columns(
+                frame=self.frame,
+                velocity_pixel_columns=velocity_pixel_columns,
+            )
+            self.frame = _merge_component_columns_into_tuple_column(
+                frame=self.frame,
+                input_columns=velocity_pixel_columns,
+                output_column='velocity_pixel',
+            )
+
+        if velocity_dva_columns is not None:
+            _check_component_columns(
+                frame=self.frame,
+                velocity_dva_columns=velocity_dva_columns,
+            )
+
+            self.frame = _merge_component_columns_into_tuple_column(
+                frame=self.frame,
+                input_columns=velocity_dva_columns,
+                output_column='velocity_dva',
+            )
+
+        if acceleration_pixel_columns is not None:
+            _check_component_columns(
+                frame=self.frame,
+                acceleration_pixel_columns=acceleration_pixel_columns,
+            )
+            self.frame = _merge_component_columns_into_tuple_column(
+                frame=self.frame,
+                input_columns=acceleration_pixel_columns,
+                output_column='acceleration_pixel',
+            )
+
+        if acceleration_dva_columns is not None:
+            _check_component_columns(
+                frame=self.frame,
+                acceleration_dva_columns=acceleration_dva_columns,
+            )
+
+            self.frame = _merge_component_columns_into_tuple_column(
+                frame=self.frame,
+                input_columns=acceleration_dva_columns,
+                output_column='acceleration_dva',
+            )
+
         self.experiment = experiment
 
     def pix2deg(self) -> None:
@@ -284,3 +369,54 @@ class GazeDataFrame:
         """Check if experiment attribute has been set."""
         if self.experiment is None:
             raise AttributeError('experiment must be specified for this method to work.')
+
+
+def _check_component_columns(
+        frame: pl.DataFrame,
+        **kwargs: list[str],
+) -> None:
+    """Check if component columns are in valid format."""
+    for component_type, columns in kwargs.items():
+        if not isinstance(columns, list):
+            raise TypeError(
+                f'{component_type} must be of type list, but is of type {type(columns).__name__}',
+            )
+
+        for column in columns:
+            if not isinstance(column, str):
+                raise TypeError(
+                    f'all elements in {component_type} must be of type str, '
+                    f'but one of the elements is of type {type(column).__name__}',
+                )
+
+        if len(columns) not in [2, 4, 6]:
+            raise ValueError(
+                f'{component_type} must contain either 2, 4 or 6 columns, but has {len(columns)}',
+            )
+
+        for column in columns:
+            if column not in frame.columns:
+                raise pl.exceptions.ColumnNotFoundError(
+                    f'column {column} from {component_type} is not available in dataframe',
+                )
+
+        if len(set(frame[columns].dtypes)) != 1:
+            types_list = sorted([str(t) for t in set(frame[columns].dtypes)])
+            raise ValueError(
+                f'all columns in {component_type} must be of same type, but types are {types_list}',
+            )
+
+
+def _merge_component_columns_into_tuple_column(
+        frame: pl.DataFrame,
+        input_columns: list[str],
+        output_column: str,
+) -> pl.DataFrame:
+    """Merge component columns into a single tuple columns.
+
+    Input component columns will be dropped.
+    """
+    return frame.with_columns(
+        pl.concat_list([pl.col(component) for component in input_columns])
+        .alias(output_column),
+    ).drop(input_columns)
