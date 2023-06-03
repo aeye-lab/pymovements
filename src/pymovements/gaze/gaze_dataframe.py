@@ -95,8 +95,7 @@ class GazeDataFrame:
                 frame=self.frame,
                 pixel_columns=pixel_columns,
             )
-            self.frame = _merge_component_columns_into_tuple_column(
-                frame=self.frame,
+            self.merge_component_columns_into_tuple_column(
                 input_columns=pixel_columns,
                 output_column='pixel',
             )
@@ -107,8 +106,7 @@ class GazeDataFrame:
                 position_columns=position_columns,
             )
 
-            self.frame = _merge_component_columns_into_tuple_column(
-                frame=self.frame,
+            self.merge_component_columns_into_tuple_column(
                 input_columns=position_columns,
                 output_column='position',
             )
@@ -119,8 +117,7 @@ class GazeDataFrame:
                 velocity_columns=velocity_columns,
             )
 
-            self.frame = _merge_component_columns_into_tuple_column(
-                frame=self.frame,
+            self.merge_component_columns_into_tuple_column(
                 input_columns=velocity_columns,
                 output_column='velocity',
             )
@@ -131,8 +128,7 @@ class GazeDataFrame:
                 acceleration_columns=acceleration_columns,
             )
 
-            self.frame = _merge_component_columns_into_tuple_column(
-                frame=self.frame,
+            self.merge_component_columns_into_tuple_column(
                 input_columns=acceleration_columns,
                 output_column='acceleration',
             )
@@ -315,6 +311,27 @@ class GazeDataFrame:
         position_columns = set(self._valid_position_columns) & set(self.frame.columns)
         return list(position_columns)
 
+    def merge_component_columns_into_tuple_column(
+            self,
+            input_columns: list[str],
+            output_column: str,
+    ) -> None:
+        """Merge component columns into a single tuple columns.
+
+        Input component columns will be dropped.
+
+        Parameters
+        ----------
+        input_columns:
+            Names of input columns to be merged into a single tuple column.
+        output_column:
+            Name of the resulting tuple column.
+        """
+        self.frame = self.frame.with_columns(
+            pl.concat_list([pl.col(component) for component in input_columns])
+            .alias(output_column),
+        ).drop(input_columns)
+
     @staticmethod
     def _pixel_to_dva_position_columns(columns: list[str]) -> list[str]:
         """Get corresponding dva position columns from pixel position columns."""
@@ -382,18 +399,3 @@ def _check_component_columns(
             raise ValueError(
                 f'all columns in {component_type} must be of same type, but types are {types_list}',
             )
-
-
-def _merge_component_columns_into_tuple_column(
-        frame: pl.DataFrame,
-        input_columns: list[str],
-        output_column: str,
-) -> pl.DataFrame:
-    """Merge component columns into a single tuple columns.
-
-    Input component columns will be dropped.
-    """
-    return frame.with_columns(
-        pl.concat_list([pl.col(component) for component in input_columns])
-        .alias(output_column),
-    ).drop(input_columns)
