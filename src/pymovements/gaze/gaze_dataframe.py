@@ -62,12 +62,10 @@ class GazeDataFrame:
             data: pl.DataFrame | None = None,
             experiment: Experiment | None = None,
             *,
-            position_pixel_columns: list[str] | None = None,
-            position_dva_columns: list[str] | None = None,
-            velocity_pixel_columns: list[str] | None = None,
-            velocity_dva_columns: list[str] | None = None,
-            acceleration_pixel_columns: list[str] | None = None,
-            acceleration_dva_columns: list[str] | None = None,
+            pixel_columns: list[str] | None = None,
+            position_columns: list[str] | None = None,
+            velocity_columns: list[str] | None = None,
+            acceleration_columns: list[str] | None = None,
     ):
         """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
 
@@ -77,14 +75,14 @@ class GazeDataFrame:
             A dataframe to be transformed to a polars dataframe.
         experiment : Experiment
             The experiment definition.
-        position_pixel_columns:
+        pixel_columns:
             The name of the pixel position columns in the input data frame.
-        position_dva_columns:
+        position_columns:
             The name of the dva position columns in the input data frame.
-        velocity_pixel_columns:
-            The name of the pixel velocity columns in the input data frame.
-        velocity_dva_columns:
+        velocity_columns:
             The name of the dva velocity columns in the input data frame.
+        acceleration_columns:
+            The name of the dva acceleration columns in the input data frame.
         """
         if data is None:
             data = pl.DataFrame()
@@ -92,73 +90,51 @@ class GazeDataFrame:
             data = data.clone()
         self.frame = data
 
-        if position_pixel_columns is not None:
+        if pixel_columns is not None:
             _check_component_columns(
                 frame=self.frame,
-                position_pixel_columns=position_pixel_columns,
+                pixel_columns=pixel_columns,
             )
             self.frame = _merge_component_columns_into_tuple_column(
                 frame=self.frame,
-                input_columns=position_pixel_columns,
-                output_column='position_pixel',
+                input_columns=pixel_columns,
+                output_column='pixel',
             )
 
-        if position_dva_columns is not None:
+        if position_columns is not None:
             _check_component_columns(
                 frame=self.frame,
-                position_dva_columns=position_dva_columns,
-            )
-
-            self.frame = _merge_component_columns_into_tuple_column(
-                frame=self.frame,
-                input_columns=position_dva_columns,
-                output_column='position_dva',
-            )
-
-        if velocity_pixel_columns is not None:
-            _check_component_columns(
-                frame=self.frame,
-                velocity_pixel_columns=velocity_pixel_columns,
-            )
-            self.frame = _merge_component_columns_into_tuple_column(
-                frame=self.frame,
-                input_columns=velocity_pixel_columns,
-                output_column='velocity_pixel',
-            )
-
-        if velocity_dva_columns is not None:
-            _check_component_columns(
-                frame=self.frame,
-                velocity_dva_columns=velocity_dva_columns,
+                position_columns=position_columns,
             )
 
             self.frame = _merge_component_columns_into_tuple_column(
                 frame=self.frame,
-                input_columns=velocity_dva_columns,
-                output_column='velocity_dva',
+                input_columns=position_columns,
+                output_column='position',
             )
 
-        if acceleration_pixel_columns is not None:
+        if velocity_columns is not None:
             _check_component_columns(
                 frame=self.frame,
-                acceleration_pixel_columns=acceleration_pixel_columns,
-            )
-            self.frame = _merge_component_columns_into_tuple_column(
-                frame=self.frame,
-                input_columns=acceleration_pixel_columns,
-                output_column='acceleration_pixel',
-            )
-
-        if acceleration_dva_columns is not None:
-            _check_component_columns(
-                frame=self.frame,
-                acceleration_dva_columns=acceleration_dva_columns,
+                velocity_columns=velocity_columns,
             )
 
             self.frame = _merge_component_columns_into_tuple_column(
                 frame=self.frame,
-                input_columns=acceleration_dva_columns,
-                output_column='acceleration_dva',
+                input_columns=velocity_columns,
+                output_column='velocity',
+            )
+
+        if acceleration_columns is not None:
+            _check_component_columns(
+                frame=self.frame,
+                acceleration_columns=acceleration_columns,
+            )
+
+            self.frame = _merge_component_columns_into_tuple_column(
+                frame=self.frame,
+                input_columns=acceleration_columns,
+                output_column='acceleration',
             )
 
         self.experiment = experiment
