@@ -61,6 +61,7 @@ class GazeDataFrame:
             self,
             data: pl.DataFrame | None = None,
             experiment: Experiment | None = None,
+            *,
             position_pixel_columns: list[str] | None = None,
             position_dva_columns: list[str] | None = None,
             velocity_pixel_columns: list[str] | None = None,
