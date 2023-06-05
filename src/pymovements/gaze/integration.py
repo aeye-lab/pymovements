@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import numpy as np
+import pandas as pd
 import polars as pl
 from typing_extensions import Literal
 
@@ -53,4 +54,26 @@ def from_numpy(
     py:class:`~pymovements.GazeDataFrame`
     """
     df = pl.from_numpy(data=data, schema=schema, orient=orient)
+    return GazeDataFrame(data=df, experiment=experiment)
+
+
+def from_pandas(
+        data: pd.DataFrame,
+        experiment: Experiment | None = None,
+) -> GazeDataFrame:
+    """Construct a :py:class:`~pymovements.gaze.gaze_dataframe.GazeDataFrame`
+    from a pandas DataFrame.
+
+    Parameters
+    ----------
+    data:
+        Data represented as a pandas DataFrame.
+    experiment : Experiment
+        The experiment definition.
+
+    Returns
+    -------
+    py:class:`~pymovements.GazeDataFrame`
+    """
+    df = pl.from_pandas(data=data)
     return GazeDataFrame(data=df, experiment=experiment)
