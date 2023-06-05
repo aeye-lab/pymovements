@@ -56,8 +56,8 @@ def amplitude(
     """
     _check_has_two_componenents(n_components)
 
-    x_position = pl.col(position_column).arr.get(0)
-    y_position = pl.col(position_column).arr.get(1)
+    x_position = pl.col(position_column).list.get(0)
+    y_position = pl.col(position_column).list.get(1)
 
     return (
         (x_position.max() - x_position.min()).pow(2)
@@ -87,8 +87,8 @@ def dispersion(
     """
     _check_has_two_componenents(n_components)
 
-    x_position = pl.col(position_column).arr.get(0)
-    y_position = pl.col(position_column).arr.get(1)
+    x_position = pl.col(position_column).list.get(0)
+    y_position = pl.col(position_column).list.get(1)
 
     return x_position.max() - x_position.min() + y_position.max() - y_position.min()
 
@@ -116,8 +116,8 @@ def disposition(
     """
     _check_has_two_componenents(n_components)
 
-    x_position = pl.col(position_column).arr.get(0)
-    y_position = pl.col(position_column).arr.get(1)
+    x_position = pl.col(position_column).list.get(0)
+    y_position = pl.col(position_column).list.get(1)
 
     return (
         (x_position.head(n=1) - x_position.reverse().head(n=1)).pow(2)
@@ -168,8 +168,8 @@ def location(
     for component in range(n_components):
         position_component = (
             pl.col(position_column)
-            .arr.slice(0, None)
-            .arr.get(component)
+            .list.slice(0, None)
+            .list.get(component)
         )
 
         if method == 'mean':
@@ -206,8 +206,8 @@ def peak_velocity(
     """
     _check_has_two_componenents(n_components)
 
-    x_velocity = pl.col(velocity_column).arr.get(0)
-    y_velocity = pl.col(velocity_column).arr.get(1)
+    x_velocity = pl.col(velocity_column).list.get(0)
+    y_velocity = pl.col(velocity_column).list.get(1)
 
     return (x_velocity.pow(2) + y_velocity.pow(2)).sqrt().max()
 

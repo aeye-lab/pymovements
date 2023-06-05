@@ -130,7 +130,7 @@ def savitzky_golay(
     # If the sequence is empty, don't use apply but forward sequence.
     return pl.when(pl.all().len() == 0).then(pl.all()).otherwise(
         # Use explode to transform array to pl.Series
-        pl.apply('*', partial(helper, func=func)).arr.explode(),
+        pl.apply('*', partial(helper, func=func)).list.explode(),
     )
 
 
