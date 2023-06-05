@@ -170,6 +170,8 @@ class EventGazeProcessor:
         InvalidProperty
             If ``property_name`` is not a valid property. See
             :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
+        RuntimeError
+            If specified event name ``name`` is missing from ``events``.
         """
         if isinstance(identifiers, str):
             trial_identifiers = [identifiers]
@@ -220,13 +222,12 @@ class EventGazeProcessor:
         # a name and its on- and offset.
         event_identifiers = [*trial_identifiers, 'name', 'onset', 'offset']
 
-        # Each event is uniquely defined by a list of trial identifiers,
-        # a name and its on- and offset.
-        event_identifiers = [*trial_identifiers, 'name', 'onset', 'offset']
-
         joined_frame = gaze.frame.join(events.frame, on=trial_identifiers)
         if name is not None:
             joined_frame = joined_frame.filter(pl.col('name').str.contains(f'^{name}$'))
+
+        if len(joined_frame) == 0:
+            raise RuntimeError(f'No events with name "{name}" found in data frame')
 
         result = (
             joined_frame
