@@ -1297,11 +1297,6 @@ def test_event_dataframe_add_property_has_expected_schema(
             ['peak_velocity'],
             id='single_event_peak_velocity_regex_name_sacc',
         ),
-        pytest.param(
-            {'event_properties': 'peak_velocity', 'name': 'acc'},
-            ['peak_velocity'],
-            id='single_event_peak_velocity_name_acc_all_null',
-        ),
     ],
 )
 def test_event_dataframe_add_property_effect_property_columns(
@@ -1314,6 +1309,29 @@ def test_event_dataframe_add_property_effect_property_columns(
 
     for events_df in dataset.events:
         assert events_df.event_property_columns == expected_property_columns
+
+
+@pytest.mark.parametrize(
+    ('property_kwargs', 'exception', 'exception_msg'),
+    [
+        pytest.param(
+            {'event_properties': 'peak_velocity', 'name': 'taccade'},
+            RuntimeError, 'No events with name "taccade" found in data frame',
+            id='name_missing',
+        ),
+    ],
+)
+def test_event_dataframe_add_property_raises_exception(
+        dataset_configuration, property_kwargs, exception, exception_msg,
+):
+    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load(preprocessed=True, events=True)
+
+    with pytest.raises(exception) as excinfo:
+        dataset.compute_event_properties(**property_kwargs)
+
+    msg, = excinfo.value.args
+    assert msg == exception_msg
 
 
 @pytest.mark.parametrize(
