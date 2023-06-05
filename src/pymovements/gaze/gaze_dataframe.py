@@ -61,6 +61,11 @@ class GazeDataFrame:
             self,
             data: pl.DataFrame | None = None,
             experiment: Experiment | None = None,
+            *,
+            pixel_columns: list[str] | None = None,
+            position_columns: list[str] | None = None,
+            velocity_columns: list[str] | None = None,
+            acceleration_columns: list[str] | None = None,
     ):
         """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
 
@@ -70,11 +75,120 @@ class GazeDataFrame:
             A dataframe to be transformed to a polars dataframe.
         experiment : Experiment
             The experiment definition.
+        pixel_columns:
+            The name of the pixel position columns in the input data frame.
+        position_columns:
+            The name of the dva position columns in the input data frame.
+        velocity_columns:
+            The name of the dva velocity columns in the input data frame.
+        acceleration_columns:
+            The name of the dva acceleration columns in the input data frame.
+
+        Notes
+        -----
+        About using the arguments ``pixel_columns``, ``position_columns``, ``velocity_columns``,
+        and ``acceleration_columns``:
+
+        By passing a list of columns as any of these arguments, these columns will be merged into a
+        single column with the corresponding name , e.g. using `pixel_columns` will merge the
+        respective columns into the column `pixel`.
+
+        The supported number of component columns with the expected order are:
+
+        * two columns: monocular data; expected order: x-component, y-component
+        * four columns: binocular data; expected order: x-component left eye, y-component left eye,
+            x-component right eye, y-component right eye,
+        * six columns: binocular data with additional cyclopian data; expected order: x-component
+            left eye, y-component left eye, x-component right eye, y-component right eye,
+            x-component cyclopian eye, y-component cyclopian eye,
+
+
+        Examples
+        --------
+
+        First let's create an example `DataFrame` with three columns:
+        the timestamp ``t`` and ``x`` and ``y`` for the pixel position.
+
+        >>> df = pl.from_dict(
+        ...     data={'t': [1000, 1001, 1002], 'x': [0.1, 0.2, 0.3], 'y': [0.1, 0.2, 0.3]},
+        ... )
+        >>> df
+        shape: (3, 3)
+        ┌──────┬─────┬─────┐
+        │ t    ┆ x   ┆ y   │
+        │ ---  ┆ --- ┆ --- │
+        │ i64  ┆ f64 ┆ f64 │
+        ╞══════╪═════╪═════╡
+        │ 1000 ┆ 0.1 ┆ 0.1 │
+        │ 1001 ┆ 0.2 ┆ 0.2 │
+        │ 1002 ┆ 0.3 ┆ 0.3 │
+        └──────┴─────┴─────┘
+
+        We can now initialize our ``GazeDataFrame`` by specyfing the names of the pixel position
+        columns.
+        >>> gaze = GazeDataFrame(data=df, pixel_columns=['x', 'y'])
+        >>> gaze.frame
+        shape: (3, 2)
+        ┌──────┬────────────┐
+        │ t    ┆ pixel      │
+        │ ---  ┆ ---        │
+        │ i64  ┆ list[f64]  │
+        ╞══════╪════════════╡
+        │ 1000 ┆ [0.1, 0.1] │
+        │ 1001 ┆ [0.2, 0.2] │
+        │ 1002 ┆ [0.3, 0.3] │
+        └──────┴────────────┘
+
         """
         if data is None:
             data = pl.DataFrame()
+        else:
+            data = data.clone()
+        self.frame = data
 
-        self.frame = data.clone()
+        if pixel_columns is not None:
+            _check_component_columns(
+                frame=self.frame,
+                pixel_columns=pixel_columns,
+            )
+            self.merge_component_columns_into_tuple_column(
+                input_columns=pixel_columns,
+                output_column='pixel',
+            )
+
+        if position_columns is not None:
+            _check_component_columns(
+                frame=self.frame,
+                position_columns=position_columns,
+            )
+
+            self.merge_component_columns_into_tuple_column(
+                input_columns=position_columns,
+                output_column='position',
+            )
+
+        if velocity_columns is not None:
+            _check_component_columns(
+                frame=self.frame,
+                velocity_columns=velocity_columns,
+            )
+
+            self.merge_component_columns_into_tuple_column(
+                input_columns=velocity_columns,
+                output_column='velocity',
+            )
+
+        if acceleration_columns is not None:
+            _check_component_columns(
+                frame=self.frame,
+                acceleration_columns=acceleration_columns,
+            )
+
+            self.merge_component_columns_into_tuple_column(
+                input_columns=acceleration_columns,
+                output_column='acceleration',
+            )
+
         self.experiment = experiment
 
     def pix2deg(self) -> None:
@@ -253,6 +367,27 @@ class GazeDataFrame:
         position_columns = set(self._valid_position_columns) & set(self.frame.columns)
         return list(position_columns)
 
+    def merge_component_columns_into_tuple_column(
+            self,
+            input_columns: list[str],
+            output_column: str,
+    ) -> None:
+        """Merge component columns into a single tuple columns.
+
+        Input component columns will be dropped.
+
+        Parameters
+        ----------
+        input_columns:
+            Names of input columns to be merged into a single tuple column.
+        output_column:
+            Name of the resulting tuple column.
+        """
+        self.frame = self.frame.with_columns(
+            pl.concat_list([pl.col(component) for component in input_columns])
+            .alias(output_column),
+        ).drop(input_columns)
+
     @staticmethod
     def _pixel_to_dva_position_columns(columns: list[str]) -> list[str]:
         """Get corresponding dva position columns from pixel position columns."""
@@ -284,3 +419,39 @@ class GazeDataFrame:
         """Check if experiment attribute has been set."""
         if self.experiment is None:
             raise AttributeError('experiment must be specified for this method to work.')
+
+
+def _check_component_columns(
+        frame: pl.DataFrame,
+        **kwargs: list[str],
+) -> None:
+    """Check if component columns are in valid format."""
+    for component_type, columns in kwargs.items():
+        if not isinstance(columns, list):
+            raise TypeError(
+                f'{component_type} must be of type list, but is of type {type(columns).__name__}',
+            )
+
+        for column in columns:
+            if not isinstance(column, str):
+                raise TypeError(
+                    f'all elements in {component_type} must be of type str, '
+                    f'but one of the elements is of type {type(column).__name__}',
+                )
+
+        if len(columns) not in [2, 4, 6]:
+            raise ValueError(
+                f'{component_type} must contain either 2, 4 or 6 columns, but has {len(columns)}',
+            )
+
+        for column in columns:
+            if column not in frame.columns:
+                raise pl.exceptions.ColumnNotFoundError(
+                    f'column {column} from {component_type} is not available in dataframe',
+                )
+
+        if len(set(frame[columns].dtypes)) != 1:
+            types_list = sorted([str(t) for t in set(frame[columns].dtypes)])
+            raise ValueError(
+                f'all columns in {component_type} must be of same type, but types are {types_list}',
+            )
