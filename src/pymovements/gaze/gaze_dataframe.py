@@ -83,6 +83,61 @@ class GazeDataFrame:
             The name of the dva velocity columns in the input data frame.
         acceleration_columns:
             The name of the dva acceleration columns in the input data frame.
+
+        Notes
+        -----
+        About using the arguments ``pixel_columns``, ``position_columns``, ``velocity_columns``,
+        and ``acceleration_columns``:
+
+        By passing a list of columns as any of these arguments, these columns will be merged into a
+        single column with the corresponding name , e.g. using `pixel_columns` will merge the
+        respective columns into the column `pixel`.
+
+        The supported number of component columns with the expected order are:
+
+        * two columns: monocular data; expected order: x-component, y-component
+        * four columns: binocular data; expected order: x-component left eye, y-component left eye,
+        x-component right eye, y-component right eye,
+        * six columns: binocular data with additional cyclopian data; expected order: x-component
+        left eye, y-component left eye, x-component right eye, y-component right eye, x-component
+        cyclopian eye, y-component cyclopian eye,
+
+        Examples
+        --------
+
+        First let's create an example `DataFrame` with three columns:
+        the timestamp ``t`` and ``x`` and ``y`` for the pixel position.
+
+        >>> df = pl.from_dict(
+        ...     data={'t': [1000, 1001, 1002], 'x': [0.1, 0.2, 0.3], 'y': [0.1, 0.2, 0.3]},
+        ... )
+        >>> df
+        shape: (3, 3)
+        ┌──────┬─────┬─────┐
+        │ t    ┆ x   ┆ y   │
+        │ ---  ┆ --- ┆ --- │
+        │ i64  ┆ f64 ┆ f64 │
+        ╞══════╪═════╪═════╡
+        │ 1000 ┆ 0.1 ┆ 0.1 │
+        │ 1001 ┆ 0.2 ┆ 0.2 │
+        │ 1002 ┆ 0.3 ┆ 0.3 │
+        └──────┴─────┴─────┘
+
+        We can now initialize our ``GazeDataFrame`` by specyfing the names of the pixel position
+        columns.
+        >>> gaze = GazeDataFrame(data=df, pixel_columns=['x', 'y'])
+        >>> gaze.frame
+        shape: (3, 2)
+        ┌──────┬────────────┐
+        │ t    ┆ pixel      │
+        │ ---  ┆ ---        │
+        │ i64  ┆ list[f64]  │
+        ╞══════╪════════════╡
+        │ 1000 ┆ [0.1, 0.1] │
+        │ 1001 ┆ [0.2, 0.2] │
+        │ 1002 ┆ [0.3, 0.3] │
+        └──────┴────────────┘
+
         """
         if data is None:
             data = pl.DataFrame()
