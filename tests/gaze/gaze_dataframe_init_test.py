@@ -548,6 +548,44 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
             {
                 'data': pl.from_dict(
                     {
+                        'x_pix': [0.1], 'y_pix': [0.2],
+                        'x_dva': [1.1], 'y_dva': [1.2],
+                        'x_vel': [3.1], 'y_vel': [3.2],
+                        'x_acc': [5.1], 'y_acc': [5.2],
+                    },
+                    schema={
+                        'x_pix': pl.Float64, 'y_pix': pl.Float64,
+                        'x_dva': pl.Float64, 'y_dva': pl.Float64,
+                        'x_vel': pl.Float64, 'y_vel': pl.Float64,
+                        'x_acc': pl.Float64, 'y_acc': pl.Float64,
+                    },
+                ),
+                'pixel_columns': ['x_pix', 'y_pix'],
+                'position_columns': ['x_dva', 'y_dva'],
+                'velocity_columns': ['x_vel', 'y_vel'],
+                'acceleration_columns': ['x_acc', 'y_acc'],
+            },
+            pl.from_dict(
+                {
+                    'pixel': [[0.1, 0.2]],
+                    'position': [[1.1, 1.2]],
+                    'velocity': [[3.1, 3.2]],
+                    'acceleration': [[5.1, 5.2]],
+                },
+                schema={
+                    'pixel': pl.List(pl.Float64),
+                    'position': pl.List(pl.Float64),
+                    'velocity': pl.List(pl.Float64),
+                    'acceleration': pl.List(pl.Float64),
+                },
+            ),
+            id='df_single_row_all_types_two_columns',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
                         'x_right_pos_pix': [0.1], 'y_right_pos_pix': [0.2],
                         'x_left_pos_pix': [0.3], 'y_left_pos_pix': [0.4],
                         'x_avg_pos_pix': [0.5], 'y_avg_pos_pix': [0.6],
@@ -611,7 +649,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                     'acceleration': pl.List(pl.Float64),
                 },
             ),
-            id='df_single_row_six_acceleration_columns',
+            id='df_single_row_all_types_six_columns',
         ),
     ],
 )
