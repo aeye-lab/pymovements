@@ -58,9 +58,9 @@
 from pymovements.gaze import transforms
 from pymovements.gaze import transforms_pl
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.from_numpy import from_numpy
-from pymovements.gaze.from_pandas import from_pandas
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
+from pymovements.gaze.integration import from_numpy
+from pymovements.gaze.integration import from_pandas
 from pymovements.gaze.screen import Screen
 
 
