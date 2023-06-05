@@ -97,10 +97,10 @@ class GazeDataFrame:
 
         * two columns: monocular data; expected order: x-component, y-component
         * four columns: binocular data; expected order: x-component left eye, y-component left eye,
-            x-component right eye, y-component right eye,
+         x-component right eye, y-component right eye,
         * six columns: binocular data with additional cyclopian data; expected order: x-component
-            left eye, y-component left eye, x-component right eye, y-component right eye,
-            x-component cyclopian eye, y-component cyclopian eye,
+         left eye, y-component left eye, x-component right eye, y-component right eye,
+         x-component cyclopian eye, y-component cyclopian eye,
 
 
         Examples
@@ -126,6 +126,7 @@ class GazeDataFrame:
 
         We can now initialize our ``GazeDataFrame`` by specyfing the names of the pixel position
         columns.
+
         >>> gaze = GazeDataFrame(data=df, pixel_columns=['x', 'y'])
         >>> gaze.frame
         shape: (3, 2)
