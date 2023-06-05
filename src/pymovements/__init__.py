@@ -29,8 +29,9 @@ from pymovements.dataset import DatasetDefinition
 from pymovements.dataset import DatasetLibrary
 from pymovements.dataset import DatasetPaths
 from pymovements.dataset import register_dataset
-from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.screen import Screen
+from pymovements.gaze import Experiment
+from pymovements.gaze import GazeDataFrame
+from pymovements.gaze import Screen
 
 
 __all__ = [
@@ -42,6 +43,7 @@ __all__ = [
     'events',
     'Experiment',
     'gaze',
+    'GazeDataFrame',
     'plotting',
     'register_dataset',
     'Screen',
