@@ -20,7 +20,6 @@
 """Module for py:func:`pymovements.gaze.transforms.savitzky_golay`"""
 from __future__ import annotations
 
-from collections.abc import Callable
 from functools import partial
 from typing import Any
 
@@ -31,25 +30,27 @@ from pymovements.gaze.transforms_pl.transforms_library import register_transform
 from pymovements.utils import checks
 
 
-def helper(s: Any, func: Callable) -> Any:
-    """This function is a workaround to get complete coverage by testing this function
-    explicitly."""
-    return func(x=s[0])
-
-
 @register_transform
 def savitzky_golay(
         *,
         window_length: int,
         degree: int,
+        sampling_rate: float,
+        n_components: int,
+        input_column: str,
+        output_column: str | None = None,
         derivative: int = 0,
-        sampling_rate: float = 1.0,
         padding: str | float | int | None = 'nearest',
 ) -> pl.Expr:
     """Apply a 1-D Savitzky-Golay filter to a column. :cite:p:`SavitzkyGolay1964`
 
     Parameters
     ----------
+    sampling_rate : float, optional
+        The spacing of the samples to which the filter will be applied.
+        This is only used if deriv > 0. Default is 1.0.
+    n_components:
+        Number of components in input column.
     window_length : int
         The length of the filter window (i.e., the number of coefficients).
         If `padding` is ``None``, `window_length` must be less than or equal
@@ -61,9 +62,6 @@ def savitzky_golay(
         The order of the derivative to compute. This must be a
         nonnegative integer. The default is 0, which means to filter
         the data without differentiating.
-    sampling_rate : float, optional
-        The spacing of the samples to which the filter will be applied.
-        This is only used if deriv > 0. Default is 1.0.
     padding : str or float, optional
         Must be either ``None``, a scalar or one of the strings ``mirror``, ``nearest`` or ``wrap``.
         This determines the type of extension to use for the padded signal to
@@ -85,7 +83,7 @@ def savitzky_golay(
     * ``None``: No padding extension is used.
     * scalar value (int or float): The padding extension contains the specified scalar value.
     * ``mirror``: Repeats the values at the edges in reverse order. The value closest to the edge is
-    not included.
+      not included.
     * ``nearest``: The padding extension contains the nearest input value.
     * ``wrap``: The padding extension contains the values from the other end of the array.
 
@@ -106,6 +104,9 @@ def savitzky_golay(
     _check_degree(degree=degree, window_length=window_length)
     _check_derivative(derivative=derivative)
     _check_padding(padding=padding)
+
+    if output_column is None:
+        output_column = input_column
 
     delta = 1 / sampling_rate
 
@@ -130,8 +131,15 @@ def savitzky_golay(
     # If the sequence is empty, don't use apply but forward sequence.
     return pl.when(pl.all().len() == 0).then(pl.all()).otherwise(
         # Use explode to transform array to pl.Series
-        pl.apply('*', partial(helper, func=func)).list.explode(),
-    )
+        # pl.apply(input_column, partial(helper, func=func)).list.explode(),
+        pl.concat_list(
+            [
+                # pl.map([pl.col(input_column).list.get(component)], func)
+                pl.col(input_column).list.get(component).map(func).list.explode()
+                for component in range(n_components)
+            ],
+        ),
+    ).alias(output_column)
 
 
 def _check_window_length(window_length: Any) -> None:

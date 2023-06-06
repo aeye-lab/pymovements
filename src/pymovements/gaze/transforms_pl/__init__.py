@@ -21,11 +21,9 @@
 from pymovements.gaze.transforms_pl.center_origin import center_origin
 from pymovements.gaze.transforms_pl.downsample import downsample
 from pymovements.gaze.transforms_pl.norm import norm
-from pymovements.gaze.transforms_pl.pix2deg import helper as pix2deg_helper
 from pymovements.gaze.transforms_pl.pix2deg import pix2deg
 from pymovements.gaze.transforms_pl.pos2acc import pos2acc
 from pymovements.gaze.transforms_pl.pos2vel import pos2vel
-from pymovements.gaze.transforms_pl.savitzky_golay import helper as savitzky_golay_helper
 from pymovements.gaze.transforms_pl.savitzky_golay import savitzky_golay
 from pymovements.gaze.transforms_pl.transforms_library import register_transform
 from pymovements.gaze.transforms_pl.transforms_library import TransformLibrary
