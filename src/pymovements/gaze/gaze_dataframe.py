@@ -389,6 +389,29 @@ class GazeDataFrame:
             .alias(output_column),
         ).drop(input_columns)
 
+    def explode(
+            self,
+            column: str,
+            output_columns: list[str],
+    ) -> None:
+        """Explode a column of type ``pl.List`` into one column for each list component.
+
+        The input column will be dropped.
+
+        Parameters
+        ----------
+        column:
+            Name of input columns to be exploded into several component columns.
+        output_columns:
+            Name of the resulting tuple columns.
+        """
+        self.frame = self.frame.with_columns(
+            [
+                pl.col(column).list.get(component_id).alias(output_column)
+                for component_id, output_column in enumerate(output_columns)
+            ],
+        ).drop(column)
+
     @staticmethod
     def _pixel_to_dva_position_columns(columns: list[str]) -> list[str]:
         """Get corresponding dva position columns from pixel position columns."""
