@@ -48,10 +48,13 @@ def gaze_fixture():
         data=arr,
         schema=['x_pix', 'y_pix'],
         experiment=experiment,
+        pixel_columns=['x_pix', 'y_pix'],
     )
 
     gaze.pix2deg()
     gaze.pos2vel()
+
+    gaze.explode('pixel', ['x_pix', 'y_pix'])
 
     return gaze
 
