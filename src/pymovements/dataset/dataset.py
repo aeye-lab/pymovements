@@ -428,27 +428,14 @@ class Dataset:
                 eye = 'right'
             elif 'x_left_pos' in self.gaze[0].columns:
                 eye = 'left'
-            elif 'x_pos' in self.gaze[0].columns:
-                eye = None
             else:
                 raise AttributeError(
                     'Either right or left eye columns must be present in gaze data frame.'
                     f' Available columns are: {self.gaze[0].columns}',
                 )
 
-        if eye is None:
-            position_columns = ['x_pos', 'y_pos']
-            velocity_columns = ['x_vel', 'y_vel']
-        else:
-            position_columns = [f'x_{eye}_pos', f'y_{eye}_pos']
-            velocity_columns = [f'x_{eye}_vel', f'y_{eye}_vel']
-
-        if not set(position_columns).issubset(set(self.gaze[0].columns)):
-            raise AttributeError(
-                f'{eye} eye specified but required columns are not available in gaze dataframe.'
-                f' required columns: {position_columns}'
-                f', available columns: {self.gaze[0].columns}',
-            )
+        position_columns = [f'x_{eye}_pos', f'y_{eye}_pos']
+        velocity_columns = [f'x_{eye}_vel', f'y_{eye}_vel']
 
         # this is just a work-around until merged columns are standard behavior
         if 'position' in exploded_columns:
