@@ -413,30 +413,6 @@ class GazeDataFrame:
         """List of column names."""
         return self.frame.columns
 
-    @property
-    def acceleration_columns(self) -> list[str]:
-        """Acceleration columns (in degrees of visual angle per second^2) of dataframe."""
-        acceleration_columns = list(set(self.valid_acceleration_columns) & set(self.frame.columns))
-        return acceleration_columns
-
-    @property
-    def velocity_columns(self) -> list[str]:
-        """Velocity columns (in degrees of visual angle per second) of dataframe."""
-        velocity_columns = list(set(self.valid_velocity_columns) & set(self.frame.columns))
-        return velocity_columns
-
-    @property
-    def pixel_position_columns(self) -> list[str]:
-        """Pixel position columns for this dataset."""
-        pixel_position_columns = set(self.valid_pixel_position_columns) & set(self.frame.columns)
-        return list(pixel_position_columns)
-
-    @property
-    def position_columns(self) -> list[str]:
-        """Position columns (in degrees of visual angle) for this dataset."""
-        position_columns = set(self.valid_position_columns) & set(self.frame.columns)
-        return list(position_columns)
-
     def merge_component_columns_into_tuple_column(
             self,
             input_columns: list[str],

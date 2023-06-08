@@ -191,24 +191,6 @@ class EventGazeProcessor:
             property_kwargs for _, property_kwargs in self.event_properties
         ]
 
-        # We need to create a new column here, which is a list of position tuples.
-        # For the intermediate time before the tuple will be the default format for
-        # positions, we create this column here and drop this column afterwards.
-        position_columns = tuple(gaze.position_columns[:2])
-        if position_columns:
-            position_component_expressions = [pl.col(component) for component in position_columns]
-            gaze.frame = gaze.frame.with_columns(
-                pl.concat_list(position_component_expressions)
-                .alias('position'),
-            )
-        velocity_columns = tuple(gaze.velocity_columns[:2])
-        if velocity_columns:
-            velocity_component_expressions = [pl.col(component) for component in velocity_columns]
-            gaze.frame = gaze.frame.with_columns(
-                pl.concat_list(velocity_component_expressions)
-                .alias('velocity'),
-            )
-
         for property_id, property_expression in enumerate(property_expressions):
             property_args = inspect.getfullargspec(property_expression).kwonlyargs
 
@@ -242,11 +224,4 @@ class EventGazeProcessor:
                 ],
             )
         )
-
-        # If we created the position and velocity tuple columns, we drop it again.
-        if 'position' in gaze.frame.columns:
-            gaze.frame.drop_in_place('position')
-        if 'velocity' in gaze.frame.columns:
-            gaze.frame.drop_in_place('velocity')
-
         return result

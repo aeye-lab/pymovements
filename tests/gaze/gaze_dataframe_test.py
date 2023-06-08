@@ -32,23 +32,8 @@ def fixture_experiment():
 
 
 @pytest.mark.parametrize(
-    ('init_df', 'expected_velocity_columns'),
+    ('init_df', 'velocity_columns'),
     [
-        pytest.param(
-            None,
-            [],
-            id='no_data',
-        ),
-        pytest.param(
-            pl.DataFrame(),
-            [],
-            id='no_columns',
-        ),
-        pytest.param(
-            pl.DataFrame(schema={'abc': pl.Int64}),
-            [],
-            id='no_velocity_columns',
-        ),
         pytest.param(
             pl.DataFrame(schema={'x_vel': pl.Float64, 'y_vel': pl.Float64}),
             ['x_vel', 'y_vel'],
@@ -81,10 +66,10 @@ def fixture_experiment():
         ),
     ],
 )
-def test_gaze_dataframe_velocity_columns(init_df, expected_velocity_columns):
-    gaze_df = GazeDataFrame(init_df)
+def test_gaze_dataframe_velocity_columns(init_df, velocity_columns):
+    gaze_df = GazeDataFrame(init_df, velocity_columns=velocity_columns)
 
-    assert set(gaze_df.velocity_columns) == set(expected_velocity_columns)
+    assert 'velocity' in gaze_df.columns
 
 
 @pytest.mark.parametrize(
