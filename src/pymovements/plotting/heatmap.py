@@ -118,8 +118,8 @@ def heatmap(
         xmin, xmax = int(screen.x_min_dva), int(screen.x_max_dva)
         ymin, ymax = int(screen.y_min_dva), int(screen.y_max_dva)
     else:
-        xmin, xmax = x.min(), x.max()
-        ymin, ymax = y.min(), y.max()
+        xmin, xmax = int(x.min()), int(x.max())
+        ymin, ymax = int(y.min()), int(y.max())
 
     # Define the grid and bin the gaze data
     x_bins = np.linspace(xmin, xmax, num=gridsize[0]).astype(int)
