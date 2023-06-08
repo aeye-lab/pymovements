@@ -65,6 +65,7 @@ def test_from_pandas_explicit_columns():
             [9, 8, 7, 6],
             [5, 4, 3, 2],
         ],
+        dtype=np.int64,
     )
 
     schema = ['x_pix', 'y_pix', 'x_pos', 'y_pos']
