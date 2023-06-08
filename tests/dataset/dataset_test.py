@@ -403,6 +403,7 @@ def test_save_gaze_exceptions(init_kwargs, save_kwargs, exception, dataset_confi
         dataset.load()
         dataset.pix2deg()
         dataset.pos2vel()
+        dataset.pos2acc()
         dataset.save_preprocessed(**save_kwargs)
 
 
@@ -862,6 +863,7 @@ def test_load_previously_saved_events_gaze(
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
+    dataset.pos2acc()
     dataset.detect_events(**detect_event_kwargs)
 
     # We must not overwrite the original variable as it's needed in the end.
@@ -1006,6 +1008,7 @@ def test_save_files_have_correct_extension(
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
+    dataset.pos2acc()
 
     detect_events_kwargs = {'method': pm.events.microsaccades, 'threshold': 1, 'eye': 'auto'}
     dataset.detect_events(**detect_events_kwargs)
