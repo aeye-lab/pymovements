@@ -138,15 +138,11 @@ class GazeBaseVR(DatasetDefinition):
         },
     )
 
+    time_column: str = 'n'
+    position_columns: list[str] = field(default_factory=lambda: ['lx', 'ly', 'rx', 'ry', 'x', 'y'])
+
     column_map: dict[str, str] = field(
         default_factory=lambda: {
-            'n': 'time',
-            'x': 'x_pos',
-            'y': 'y_pos',
-            'lx': 'x_left_pos',
-            'ly': 'y_left_pos',
-            'rx': 'x_right_pos',
-            'ry': 'y_right_pos',
             'xT': 'x_target_pos',
             'yT': 'y_target_pos',
         },

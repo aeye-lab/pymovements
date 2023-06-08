@@ -493,6 +493,7 @@ def save_preprocessed(
                 ][:gaze_df.n_components]
                 gaze_df.explode('pixel', exploded_columns_pix)
                 exploded_columns['pixel'] = exploded_columns_pix
+
             if 'position' in gaze_df.frame.columns:
                 exploded_columns_pos = [
                     'x_left_pos', 'y_left_pos',
@@ -501,6 +502,7 @@ def save_preprocessed(
                 ][:gaze_df.n_components]
                 gaze_df.explode('position', exploded_columns_pos)
                 exploded_columns['position'] = exploded_columns_pos
+
             if 'velocity' in gaze_df.frame.columns:
                 exploded_columns_vel = [
                     'x_left_vel', 'y_left_vel',
@@ -509,6 +511,7 @@ def save_preprocessed(
                 ][:gaze_df.n_components]
                 gaze_df.explode('velocity', exploded_columns_vel)
                 exploded_columns['velocity'] = exploded_columns_vel
+
             if 'acceleration' in gaze_df.frame.columns:
                 exploded_columns_vel = [
                     'x_left_acc', 'y_left_acc',
