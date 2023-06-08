@@ -32,6 +32,24 @@ def fixture_experiment():
 
 
 @pytest.mark.parametrize(
+    ('init_arg'),
+    [
+        pytest.param(
+            None,
+            id='None',
+        ),
+        pytest.param(
+            pl.DataFrame(),
+            id='no_eye_velocity_columns',
+        ),
+    ],
+)
+def test_gaze_dataframe_init(init_arg):
+    gaze_df = GazeDataFrame(init_arg)
+    assert isinstance(gaze_df.frame, pl.DataFrame)
+
+
+@pytest.mark.parametrize(
     ('init_df', 'velocity_columns'),
     [
         pytest.param(
