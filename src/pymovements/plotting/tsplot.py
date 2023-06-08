@@ -26,6 +26,7 @@ import math
 
 import matplotlib.pyplot as plt
 import numpy as np
+import polars as pl
 
 from pymovements.gaze import GazeDataFrame
 
@@ -92,7 +93,7 @@ def tsplot(
         If array has more than two dimensions.
     """
     if channels is None:
-        channels = gaze.frame.columns
+        channels = [c for c in gaze.frame.columns if gaze.frame[c].dtype != pl.List]
 
     arr = gaze.frame[channels].to_numpy().transpose()
 
