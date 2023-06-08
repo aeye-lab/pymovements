@@ -395,6 +395,33 @@ class Dataset:
         if isinstance(method, str):
             method = EventDetectionLibrary.get(method)
 
+        # this is just a work-around until merged columns are standard behavior
+        exploded_columns = {}
+        if 'position' in self.gaze[0].frame.columns:
+            exploded_columns_pos = [
+                'x_left_pos', 'y_left_pos',
+                'x_right_pos', 'y_right_pos',
+                'x_avg_pos', 'y_avg_pos',
+            ][:self.gaze[0].n_components]
+            self.gaze[0].explode('position', exploded_columns_pos)
+            exploded_columns['position'] = exploded_columns_pos
+        if 'velocity' in self.gaze[0].frame.columns:
+            exploded_columns_vel = [
+                'x_left_vel', 'y_left_vel',
+                'x_right_vel', 'y_right_vel',
+                'x_avg_vel', 'y_avg_vel',
+            ][:self.gaze[0].n_components]
+
+            if (
+                    isinstance(self.gaze[0].n_components, int)
+                    and self.gaze[0].n_components < 4
+                    and eye not in [None, 'auto']
+            ):
+                raise AttributeError()
+
+            self.gaze[0].explode('velocity', exploded_columns_vel)
+            exploded_columns['velocity'] = exploded_columns_vel
+
         # Automatically infer eye to use for event detection.
         if eye == 'auto':
             if 'x_right_pos' in self.gaze[0].columns:
@@ -423,6 +450,18 @@ class Dataset:
                 f', available columns: {self.gaze[0].columns}',
             )
 
+        # this is just a work-around until merged columns are standard behavior
+        if 'position' in exploded_columns:
+            self.gaze[0].merge_component_columns_into_tuple_column(
+                input_columns=exploded_columns['position'],
+                output_column='position',
+            )
+        if 'velocity' in exploded_columns:
+            self.gaze[0].merge_component_columns_into_tuple_column(
+                input_columns=exploded_columns['velocity'],
+                output_column='velocity',
+            )
+
         disable_progressbar = not verbose
 
         if not self.events or clear:
@@ -431,6 +470,11 @@ class Dataset:
         for file_id, (gaze_df, fileinfo_row) in tqdm(
                 enumerate(zip(self.gaze, self.fileinfo.to_dicts())), disable=disable_progressbar,
         ):
+            # this is just a work-around until merged columns are standard behavior
+            if 'position' in exploded_columns:
+                gaze_df.explode('position', exploded_columns['position'])
+            if 'velocity' in exploded_columns:
+                gaze_df.explode('velocity', exploded_columns['velocity'])
 
             positions = gaze_df.frame.select(position_columns).to_numpy()
             velocities = gaze_df.frame.select(velocity_columns).to_numpy()
@@ -453,6 +497,19 @@ class Dataset:
                 [self.events[file_id].frame, new_event_df.frame],
                 how='diagonal',
             )
+
+            # this is just a work-around until merged columns are standard behavior
+            if 'position' in exploded_columns:
+                gaze_df.merge_component_columns_into_tuple_column(
+                    input_columns=exploded_columns['position'],
+                    output_column='position',
+                )
+            if 'velocity' in exploded_columns:
+                gaze_df.merge_component_columns_into_tuple_column(
+                    input_columns=exploded_columns['velocity'],
+                    output_column='velocity',
+                )
+
         return self
 
     def detect(

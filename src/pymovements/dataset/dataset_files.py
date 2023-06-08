@@ -220,16 +220,63 @@ def load_gaze_files(
             fileinfo=fileinfo_row,
         )
 
-        # Create GazeDataFrame
-        gaze_df = GazeDataFrame(
-            gaze_data,
-            experiment=definition.experiment,
-            time_column=definition.time_column,
-            pixel_columns=definition.pixel_columns,
-            position_columns=definition.position_columns,
-            velocity_columns=definition.velocity_columns,
-            acceleration_columns=definition.acceleration_columns,
-        )
+        if preprocessed and extension == 'feather':
+            # Preprocessed data already has tuple columns.
+            gaze_df = GazeDataFrame(
+                gaze_data,
+                experiment=definition.experiment,
+            )
+
+        elif preprocessed and extension == 'csv':
+            # Workaround for preprocessed column names
+            time_column = None
+            if 'time' in gaze_data.columns:
+                time_column = 'time'
+
+            pixel_columns: list[str] = list(
+                set(GazeDataFrame.valid_pixel_position_columns) & set(gaze_data.columns),
+            )
+            if len(pixel_columns) == 0:
+                pixel_columns = None  # type: ignore
+
+            position_columns: list[str] = list(
+                set(GazeDataFrame.valid_position_columns) & set(gaze_data.columns),
+            )
+            if len(position_columns) == 0:
+                position_columns = None  # type: ignore
+
+            velocity_columns: list[str] = list(
+                set(GazeDataFrame.valid_velocity_columns) & set(gaze_data.columns),
+            )
+            if len(velocity_columns) == 0:
+                velocity_columns = None  # type: ignore
+
+            acceleration_columns: list[str] = list(
+                set(GazeDataFrame.valid_acceleration_columns) & set(gaze_data.columns),
+            )
+            if len(acceleration_columns) == 0:
+                acceleration_columns = None  # type: ignore
+
+            gaze_df = GazeDataFrame(
+                gaze_data,
+                experiment=definition.experiment,
+                time_column=time_column,
+                pixel_columns=pixel_columns,
+                position_columns=position_columns,
+                velocity_columns=velocity_columns,
+                acceleration_columns=acceleration_columns,
+            )
+        else:
+            # Create GazeDataFrame
+            gaze_df = GazeDataFrame(
+                gaze_data,
+                experiment=definition.experiment,
+                time_column=definition.time_column,
+                pixel_columns=definition.pixel_columns,
+                position_columns=definition.position_columns,
+                velocity_columns=definition.velocity_columns,
+                acceleration_columns=definition.acceleration_columns,
+            )
 
         gaze_dfs.append(gaze_df)
 
@@ -435,6 +482,42 @@ def save_preprocessed(
             extension=extension,
         )
 
+        if extension == 'csv':
+            # this is just a work-around until merged columns are standard behavior
+            exploded_columns = {}
+            if 'pixel' in gaze_df.frame.columns:
+                exploded_columns_pix = [
+                    'x_left_pix', 'y_left_pix',
+                    'x_right_pix', 'y_right_pix',
+                    'x_avg_pix', 'y_avg_pix',
+                ][:gaze_df.n_components]
+                gaze_df.explode('pixel', exploded_columns_pix)
+                exploded_columns['pixel'] = exploded_columns_pix
+            if 'position' in gaze_df.frame.columns:
+                exploded_columns_pos = [
+                    'x_left_pos', 'y_left_pos',
+                    'x_right_pos', 'y_right_pos',
+                    'x_avg_pos', 'y_avg_pos',
+                ][:gaze_df.n_components]
+                gaze_df.explode('position', exploded_columns_pos)
+                exploded_columns['position'] = exploded_columns_pos
+            if 'velocity' in gaze_df.frame.columns:
+                exploded_columns_vel = [
+                    'x_left_vel', 'y_left_vel',
+                    'x_right_vel', 'y_right_vel',
+                    'x_avg_vel', 'y_avg_vel',
+                ][:gaze_df.n_components]
+                gaze_df.explode('velocity', exploded_columns_vel)
+                exploded_columns['velocity'] = exploded_columns_vel
+            if 'acceleration' in gaze_df.frame.columns:
+                exploded_columns_vel = [
+                    'x_left_acc', 'y_left_acc',
+                    'x_right_acc', 'y_right_acc',
+                    'x_avg_acc', 'y_avg_acc',
+                ][:gaze_df.n_components]
+                gaze_df.explode('acceleration', exploded_columns_vel)
+                exploded_columns['acceleration'] = exploded_columns_vel
+
         gaze_df_out = gaze_df.frame.clone()
         for column in gaze_df.columns:
             if column in fileinfo.columns:
@@ -449,7 +532,7 @@ def save_preprocessed(
         elif extension == 'csv':
             gaze_df_out.write_csv(preprocessed_filepath)
         else:
-            valid_extensions = ['csv', 'feather', 'asc']
+            valid_extensions = ['csv', 'feather']
             raise ValueError(
                 f'unsupported file format "{extension}".'
                 f'Supported formats are: {valid_extensions}',

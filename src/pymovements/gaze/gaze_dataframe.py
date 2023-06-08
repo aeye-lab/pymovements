@@ -33,28 +33,40 @@ class GazeDataFrame:
     Each column is a channel in the gaze time series.
     """
 
-    _valid_pixel_position_columns = [
+    valid_pixel_position_columns = [
         'x_pix', 'y_pix',
         'x_left_pix', 'y_left_pix',
         'x_right_pix', 'y_right_pix',
+        '__x_pix__', '__y_pix__',
+        '__x_left_pix__', '__y_left_pix__',
+        '__x_right_pix__', '__y_right_pix__',
     ]
 
-    _valid_position_columns = [
+    valid_position_columns = [
         'x_pos', 'y_pos',
         'x_left_pos', 'y_left_pos',
         'x_right_pos', 'y_right_pos',
+        '__x_pos__', '__y_pos__',
+        '__x_left_pos__', '__y_left_pos__',
+        '__x_right_pos__', '__y_right_pos__',
     ]
 
-    _valid_velocity_columns = [
+    valid_velocity_columns = [
         'x_vel', 'y_vel',
         'x_left_vel', 'y_left_vel',
         'x_right_vel', 'y_right_vel',
+        '__x_vel__', '__y_vel__',
+        '__x_left_vel__', '__y_left_vel__',
+        '__x_right_vel__', '__y_right_vel__',
     ]
 
-    _valid_acceleration_columns = [
+    valid_acceleration_columns = [
         'x_acc', 'y_acc',
         'x_left_acc', 'y_left_acc',
         'x_right_acc', 'y_right_acc',
+        '__x_acc__', '__y_acc__',
+        '__x_left_acc__', '__y_left_acc__',
+        '__x_right_acc__', '__y_right_acc__',
     ]
 
     def __init__(
@@ -221,13 +233,14 @@ class GazeDataFrame:
         # mypy does not get that experiment now cannot be None anymore
         assert self.experiment is not None
 
+        # this is just a work-around until merged columns are standard behavior
         if 'pixel' in self.frame.columns:
             exploded_columns = [
-                '__x_left_pixel__', '__x_left_pixel__',
-                '__x_right_pixel__', '__x_right_pixel__',
-                '__x_avg_pixel__', '__x_avg_pixel__',
+                '__x_left_pix__', '__y_left_pix__',
+                '__x_right_pix__', '__y_right_pix__',
+                '__x_avg_pix__', '__y_avg_pix__',
             ][:self.n_components]
-            self.explode('pixel', [])
+            self.explode('pixel', exploded_columns)
         else:
             exploded_columns = None
 
@@ -235,7 +248,7 @@ class GazeDataFrame:
         if not pix_position_columns:
             raise AttributeError(
                 'No valid pixel position columns found.'
-                f' Valid pixel position columns are: {self._valid_pixel_position_columns}.'
+                f' Valid pixel position columns are: {self.valid_pixel_position_columns}.'
                 f' Available columns are: {self.frame.columns}.',
             )
 
@@ -256,6 +269,7 @@ class GazeDataFrame:
             output_column='position',
         )
 
+        # this is just a work-around until merged columns are standard behavior
         if exploded_columns:
             self.merge_component_columns_into_tuple_column(
                 input_columns=exploded_columns,
@@ -296,11 +310,22 @@ class GazeDataFrame:
         # mypy does not get that experiment now cannot be None anymore
         assert self.experiment is not None
 
+        # this is just a work-around until merged columns are standard behavior
+        if 'position' in self.frame.columns:
+            exploded_columns = [
+                '__x_left_pos__', '__y_left_pos__',
+                '__x_right_pos__', '__y_right_pos__',
+                '__x_avg_pos__', '__y_avg_pos__',
+            ][:self.n_components]
+            self.explode('position', exploded_columns)
+        else:
+            exploded_columns = None
+
         position_columns = self.position_columns
         if not position_columns:
             raise AttributeError(
                 'No valid position columns found.'
-                f' Valid position columns are: {self._valid_position_columns}.'
+                f' Valid position columns are: {self.valid_position_columns}.'
                 f' Available columns are: {self.frame.columns}.',
             )
         acceleration_columns = self._position_to_acceleration_columns(position_columns)
@@ -322,6 +347,18 @@ class GazeDataFrame:
                 for column_id, velocity_column_name in enumerate(acceleration_columns)
             ],
         )
+
+        self.merge_component_columns_into_tuple_column(
+            input_columns=acceleration_columns,
+            output_column='acceleration',
+        )
+
+        # this is just a work-around until merged columns are standard behavior
+        if exploded_columns:
+            self.merge_component_columns_into_tuple_column(
+                input_columns=exploded_columns,
+                output_column='position',
+            )
 
     def pos2vel(self, method: str = 'smooth', **kwargs: int | float | str) -> None:
         """Compute gaze velocity in dva/s from dva position coordinates.
@@ -347,11 +384,22 @@ class GazeDataFrame:
         # mypy does not get that experiment now cannot be None anymore
         assert self.experiment is not None
 
+        # this is just a work-around until merged columns are standard behavior
+        if 'position' in self.frame.columns:
+            exploded_columns = [
+                '__x_left_pos__', '__y_left_pos__',
+                '__x_right_pos__', '__y_right_pos__',
+                '__x_avg_pos__', '__y_avg_pos__',
+            ][:self.n_components]
+            self.explode('position', exploded_columns)
+        else:
+            exploded_columns = None
+
         position_columns = self.position_columns
         if not position_columns:
             raise AttributeError(
                 'No valid position columns found.'
-                f' Valid position columns are: {self._valid_position_columns}.'
+                f' Valid position columns are: {self.valid_position_columns}.'
                 f' Available columns are: {self.frame.columns}.',
             )
         velocity_columns = self._position_to_velocity_columns(position_columns)
@@ -367,6 +415,18 @@ class GazeDataFrame:
             ],
         )
 
+        self.merge_component_columns_into_tuple_column(
+            input_columns=velocity_columns,
+            output_column='velocity',
+        )
+
+        # this is just a work-around until merged columns are standard behavior
+        if exploded_columns:
+            self.merge_component_columns_into_tuple_column(
+                input_columns=exploded_columns,
+                output_column='position',
+            )
+
     @property
     def schema(self) -> pl.type_aliases.SchemaDict:
         """Schema of event dataframe."""
@@ -380,25 +440,25 @@ class GazeDataFrame:
     @property
     def acceleration_columns(self) -> list[str]:
         """Acceleration columns (in degrees of visual angle per second^2) of dataframe."""
-        acceleration_columns = list(set(self._valid_acceleration_columns) & set(self.frame.columns))
+        acceleration_columns = list(set(self.valid_acceleration_columns) & set(self.frame.columns))
         return acceleration_columns
 
     @property
     def velocity_columns(self) -> list[str]:
         """Velocity columns (in degrees of visual angle per second) of dataframe."""
-        velocity_columns = list(set(self._valid_velocity_columns) & set(self.frame.columns))
+        velocity_columns = list(set(self.valid_velocity_columns) & set(self.frame.columns))
         return velocity_columns
 
     @property
     def pixel_position_columns(self) -> list[str]:
         """Pixel position columns for this dataset."""
-        pixel_position_columns = set(self._valid_pixel_position_columns) & set(self.frame.columns)
+        pixel_position_columns = set(self.valid_pixel_position_columns) & set(self.frame.columns)
         return list(pixel_position_columns)
 
     @property
     def position_columns(self) -> list[str]:
         """Position columns (in degrees of visual angle) for this dataset."""
-        position_columns = set(self._valid_position_columns) & set(self.frame.columns)
+        position_columns = set(self.valid_position_columns) & set(self.frame.columns)
         return list(position_columns)
 
     def merge_component_columns_into_tuple_column(
@@ -451,7 +511,7 @@ class GazeDataFrame:
         return [
             column.replace('_pix', '_pos')
             for column in columns
-            if column.endswith('_pix')
+            if column.endswith('_pix') or column.endswith('_pix__')
         ]
 
     @staticmethod
@@ -460,7 +520,7 @@ class GazeDataFrame:
         return [
             column.replace('_pos', '_acc')
             for column in columns
-            if column.endswith('_pos')
+            if column.endswith('_pos') or column.endswith('_pos__')
         ]
 
     @staticmethod
@@ -469,7 +529,7 @@ class GazeDataFrame:
         return [
             column.replace('_pos', '_vel')
             for column in columns
-            if column.endswith('_pos')
+            if column.endswith('_pos') or column.endswith('_pos__')
         ]
 
     def _check_experiment(self) -> None:
