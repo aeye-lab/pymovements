@@ -435,15 +435,12 @@ class Dataset:
 
         # Automatically infer eye to use for event detection.
         if eye == 'auto':
-            if 'x_right_pos' in self.gaze[0].columns:
+            if 'x_avg_pos' in self.gaze[0].columns:
+                eye = 'avg'
+            elif 'x_right_pos' in self.gaze[0].columns:
                 eye = 'right'
-            elif 'x_left_pos' in self.gaze[0].columns:
-                eye = 'left'
             else:
-                raise AttributeError(
-                    'Either right or left eye columns must be present in gaze data frame.'
-                    f' Available columns are: {self.gaze[0].columns}',
-                )
+                eye = 'left'
 
         position_columns = [f'x_{eye}_pos', f'y_{eye}_pos']
         velocity_columns = [f'x_{eye}_vel', f'y_{eye}_vel']

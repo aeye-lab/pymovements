@@ -706,29 +706,17 @@ def test_detect_events_alias(dataset_configuration, detect_kwargs, monkeypatch):
     mock.assert_called_with(**detect_kwargs)
 
 
+@pytest.mark.parametrize('dataset_configuration', ['ToyMono'], indirect=['dataset_configuration'])
 def test_detect_events_attribute_error(dataset_configuration):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
-
-    try:
-        dataset.gaze[0] = dataset.gaze[0].drop('x_left_pos')
-    except BaseException:
-        pass
-
-    try:
-        dataset.gaze[0] = dataset.gaze[0].drop('x_right_pos')
-    except BaseException:
-        pass
-
-    try:
-        dataset.gaze[0] = dataset.gaze[0].drop('x_eye_pos')
-    except BaseException:
-        pass
+    dataset.pix2deg()
+    dataset.pos2vel()
 
     detect_event_kwargs = {
         'method': pm.events.microsaccades,
         'threshold': 1,
-        'eye': 'auto',
+        'eye': 'right',
     }
 
     with pytest.raises(AttributeError):
