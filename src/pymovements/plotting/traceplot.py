@@ -82,6 +82,7 @@ DEFAULT_SEGMENTDATA_TWOSLOPE = {
 
 def traceplot(
         gaze: GazeDataFrame,
+        position_column: str = 'pixel',
         cval: np.ndarray | None = None,  # pragma: no cover
         cmap: colors.Colormap | None = None,
         cmap_norm: colors.Normalize | str | None = None,
@@ -102,6 +103,8 @@ def traceplot(
     ----------
     gaze: GazeDataFrame
         The GazeDataFrame to plot.
+    position_column : str, optional
+        The column name of the x and y position data
     cval: np.ndarray
         line color values.
     cmap: matplotlib.colors.Colormap, optional
@@ -133,8 +136,8 @@ def traceplot(
         If length of x and y coordinates do not match or if ``cmap_norm`` is unknown.
 
     """
-    x_signal = gaze.frame['pixel'].list.get(0)
-    y_signal = gaze.frame['pixel'].list.get(1)
+    x_signal = gaze.frame[position_column].list.get(0)
+    y_signal = gaze.frame[position_column].list.get(1)
 
     n = len(x_signal)
 

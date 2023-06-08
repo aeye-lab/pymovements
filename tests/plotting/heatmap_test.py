@@ -38,29 +38,34 @@ def fixture_experiment():
     return Experiment(1024, 768, 38, 30, 60, 'center', 1000)
 
 
-# Fixture for x and y position columns
-@pytest.fixture(
-    name='column_names_fixture',
-    params=[('x_pos', 'y_pos'), ('x_pix', 'y_pix')],
-)
-def fixture_column_names(request):
-    return request.param
+@pytest.fixture(name='args', params=['pix', 'pos'])
+def args_fixture(experiment_fixture, request):
+    if request.param == 'pix':
+        column_names = ['x_pix', 'y_pix']
+        pixel_columns = column_names
+        position_columns = None
+    else:
+        column_names = ['x_pos', 'y_pos']
+        pixel_columns = None
+        position_columns = column_names
 
-
-@pytest.fixture(name='args')
-def args_fixture(experiment_fixture, column_names_fixture):
     # Init a dataframe with 2 columns and 100 rows
     df = pl.DataFrame(
         {
-            column_names_fixture[0]: np.arange(0, 100),
-            column_names_fixture[1]: np.arange(0, 100),
+            column_names[0]: np.arange(0, 100),
+            column_names[1]: np.arange(0, 100),
         },
     )
 
     # Init a GazeDataFrame
-    gdf = GazeDataFrame(data=df, experiment=experiment_fixture)
+    gdf = GazeDataFrame(
+        data=df,
+        experiment=experiment_fixture,
+        pixel_columns=pixel_columns,
+        position_columns=position_columns,
+    )
 
-    return {'gaze': gdf, 'position_columns': column_names_fixture}
+    return gdf, request.param
 
 
 @pytest.mark.parametrize(
@@ -118,7 +123,13 @@ def args_fixture(experiment_fixture, column_names_fixture):
 def test_heatmap_show(args, kwargs, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
-    heatmap(**args, **kwargs)
+
+    if args[1] == 'pix':
+        kwargs['position_column'] = 'pixel'
+    else:
+        kwargs['position_column'] = 'position'
+
+    heatmap(args[0], **kwargs)
     plt.close()
     mock.assert_called_once()
 
@@ -126,7 +137,13 @@ def test_heatmap_show(args, kwargs, monkeypatch):
 def test_heatmap_noshow(args, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
-    heatmap(**args, show=False)
+
+    if args[1] == 'pix':
+        position_column = 'pixel'
+    else:
+        position_column = 'position'
+
+    heatmap(args[0], position_column=position_column, show=False)
     plt.close()
     mock.assert_not_called()
 
@@ -134,14 +151,27 @@ def test_heatmap_noshow(args, monkeypatch):
 def test_heatmap_save(args, monkeypatch, tmp_path):
     mock = Mock()
     monkeypatch.setattr(figure.Figure, 'savefig', mock)
-    heatmap(**args, show=False, savepath=str(tmp_path / 'test.svg'))
+
+    if args[1] == 'pix':
+        position_column = 'pixel'
+    else:
+        position_column = 'position'
+
+    heatmap(
+        args[0], position_column=position_column, show=False, savepath=str(tmp_path / 'test.svg'),
+    )
     plt.close()
     mock.assert_called_once()
 
 
 def test_heatmap_invalid_position_columns(args):
+    if args[1] == 'pix':
+        position_column = 'position'
+    else:
+        position_column = 'pixel'
+
     with pytest.raises(ColumnNotFoundError):
-        heatmap(gaze=args['gaze'], position_columns=('x_invalid', 'y_invalid'), show=False)
+        heatmap(gaze=args[0], position_column=position_column, show=False)
 
 
 def test_heatmap_no_experiment_property():
@@ -152,7 +182,7 @@ def test_heatmap_no_experiment_property():
         },
     )
 
-    gdf = GazeDataFrame(data=df, experiment=None)
+    gdf = GazeDataFrame(data=df, pixel_columns=['x_pix', 'y_pix'], experiment=None)
 
     with pytest.raises(ValueError):
         heatmap(gdf, show=False)
