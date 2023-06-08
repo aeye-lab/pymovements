@@ -127,6 +127,8 @@ class ToyDataset(DatasetDefinition):
 
     pixel_columns: list[str] = field(default_factory=lambda: ['x', 'y'])
 
+    column_map: dict[str, str] = field(default_factory=lambda: {})
+
     custom_read_kwargs: dict[str, str] = field(
         default_factory=lambda: {
             'separator': '\t',
