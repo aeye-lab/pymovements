@@ -105,6 +105,8 @@ def mock_toy(rootpath, raw_fileformat, eyes):
                     'y_right_pix': pl.Float64,
                 },
             )
+            pixel_columns = ['x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix']
+
         elif eyes == 'left':
             gaze_df = pl.from_dict(
                 {
@@ -120,6 +122,7 @@ def mock_toy(rootpath, raw_fileformat, eyes):
                     'y_left_pix': pl.Float64,
                 },
             )
+            pixel_columns = ['x_left_pix', 'y_left_pix']
         elif eyes == 'right':
             gaze_df = pl.from_dict(
                 {
@@ -135,6 +138,7 @@ def mock_toy(rootpath, raw_fileformat, eyes):
                     'y_right_pix': pl.Float64,
                 },
             )
+            pixel_columns = ['x_right_pix', 'y_right_pix']
         elif eyes == 'none':
             gaze_df = pl.from_dict(
                 {
@@ -150,6 +154,7 @@ def mock_toy(rootpath, raw_fileformat, eyes):
                     'y_pix': pl.Float64,
                 },
             )
+            pixel_columns = ['x_pix', 'y_pix']
         else:
             raise ValueError(f'invalid value for eyes: {eyes}')
 
@@ -157,47 +162,51 @@ def mock_toy(rootpath, raw_fileformat, eyes):
 
     create_raw_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath / 'raw')
 
+    # Create GazeDataFrames for passing as ground truth
+    gaze_dfs = [
+        pm.GazeDataFrame(gaze_df, pixel_columns=pixel_columns)
+        for gaze_df in gaze_dfs
+    ]
+
     preprocessed_gaze_dfs = []
     for fileinfo_row in fileinfo.to_dicts():
-        gaze_df = pl.from_dict(
-            {
-                'subject_id': fileinfo_row['subject_id'],
-                'time': np.arange(1000),
-                'x_left_pix': np.zeros(1000),
-                'y_left_pix': np.zeros(1000),
-                'x_right_pix': np.zeros(1000),
-                'y_right_pix': np.zeros(1000),
-                'x_left_pos': np.zeros(1000),
-                'y_left_pos': np.zeros(1000),
-                'x_right_pos': np.zeros(1000),
-                'y_right_pos': np.zeros(1000),
-                'x_left_vel': np.zeros(1000),
-                'y_left_vel': np.zeros(1000),
-                'x_right_vel': np.zeros(1000),
-                'y_right_vel': np.zeros(1000),
-            },
-            schema={
-                'subject_id': pl.Int64,
-                'time': pl.Int64,
-                'x_left_pix': pl.Float64,
-                'y_left_pix': pl.Float64,
-                'x_right_pix': pl.Float64,
-                'y_right_pix': pl.Float64,
-                'x_left_pos': pl.Float64,
-                'y_left_pos': pl.Float64,
-                'x_right_pos': pl.Float64,
-                'y_right_pos': pl.Float64,
-                'x_left_vel': pl.Float64,
-                'y_left_vel': pl.Float64,
-                'x_right_vel': pl.Float64,
-                'y_right_vel': pl.Float64,
-            },
-        )
+        position_columns = [pixel_column.replace('pix', 'pos') for pixel_column in pixel_columns]
+        velocity_columns = [pixel_column.replace('pix', 'vel') for pixel_column in pixel_columns]
+        acceleration_columns = [
+            pixel_column.replace('pix', 'acc') for pixel_column in pixel_columns
+        ]
+
+        gaze_data = {
+            'subject_id': fileinfo_row['subject_id'],
+            'time': np.arange(1000),
+        }
+        gaze_schema = {
+            'subject_id': pl.Int64,
+            'time': pl.Int64,
+        }
+
+        for column in pixel_columns + position_columns + velocity_columns + acceleration_columns:
+            gaze_data[column] = np.zeros(1000)
+            gaze_schema[column] = pl.Float64
+
+        gaze_df = pl.from_dict(gaze_data, schema=gaze_schema)
         preprocessed_gaze_dfs.append(gaze_df)
 
     create_preprocessed_gaze_files_from_fileinfo(
         preprocessed_gaze_dfs, fileinfo, rootpath / 'preprocessed',
     )
+
+    # Create GazeDataFrames for passing as ground truth
+    preprocessed_gaze_dfs = [
+        pm.GazeDataFrame(
+            preprocessed_gaze_df,
+            pixel_columns=pixel_columns,
+            # position_columns=position_columns,
+            # velocity_columns=velocity_columns,
+            # acceleration_columns=acceleration_columns,
+        )
+        for preprocessed_gaze_df in preprocessed_gaze_dfs
+    ]
 
     event_dfs = []
     for fileinfo_row in fileinfo.to_dicts():
@@ -233,6 +242,8 @@ def mock_toy(rootpath, raw_fileformat, eyes):
         ),
         filename_format=r'{subject_id:d}.' + raw_fileformat,
         filename_format_dtypes={'subject_id': pl.Int64},
+        time_column='time',
+        pixel_columns=pixel_columns,
     )
 
     return {
@@ -282,7 +293,7 @@ def test_load_correct_raw_gaze_dfs(dataset_configuration):
 
     expected_gaze_dfs = dataset_configuration['raw_gaze_dfs']
     for result_gaze_df, expected_gaze_df in zip(dataset.gaze, expected_gaze_dfs):
-        assert_frame_equal(result_gaze_df.frame, expected_gaze_df)
+        assert_frame_equal(result_gaze_df.frame, expected_gaze_df.frame)
 
 
 def test_load_gaze_has_position_columns(dataset_configuration):
@@ -299,7 +310,7 @@ def test_load_correct_preprocessed_gaze_dfs(dataset_configuration):
 
     expected_gaze_dfs = dataset_configuration['preprocessed_gaze_dfs']
     for result_gaze_df, expected_gaze_df in zip(dataset.gaze, expected_gaze_dfs):
-        assert_frame_equal(result_gaze_df.frame, expected_gaze_df)
+        assert_frame_equal(result_gaze_df.frame, expected_gaze_df.frame)
 
 
 def test_load_correct_event_dfs(dataset_configuration):

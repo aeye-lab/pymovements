@@ -62,6 +62,7 @@ class GazeDataFrame:
             data: pl.DataFrame | None = None,
             experiment: Experiment | None = None,
             *,
+            time_column: str | None = None,
             pixel_columns: list[str] | None = None,
             position_columns: list[str] | None = None,
             velocity_columns: list[str] | None = None,
@@ -75,6 +76,8 @@ class GazeDataFrame:
             A dataframe to be transformed to a polars dataframe.
         experiment : Experiment
             The experiment definition.
+        time_column:
+            The name if the timestamp column in the input data frame.
         pixel_columns:
             The name of the pixel position columns in the input data frame.
         position_columns:
@@ -146,6 +149,9 @@ class GazeDataFrame:
         else:
             data = data.clone()
         self.frame = data
+
+        if time_column is not None:
+            self.frame = self.frame.rename({time_column: 'time'})
 
         if pixel_columns is not None:
             _check_component_columns(

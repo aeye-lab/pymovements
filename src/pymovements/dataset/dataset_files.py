@@ -207,20 +207,31 @@ def load_gaze_files(
                 extension=extension,
             )
 
-        gaze_df = load_gaze_file(
+        gaze_data = load_gaze_file(
             filepath=filepath,
             preprocessed=preprocessed,
             custom_read_kwargs=definition.custom_read_kwargs,
         )
 
         # Add fileinfo columns to dataframe.
-        gaze_df = add_fileinfo(
+        gaze_data = add_fileinfo(
             definition=definition,
-            df=gaze_df,
+            df=gaze_data,
             fileinfo=fileinfo_row,
         )
 
-        gaze_dfs.append(GazeDataFrame(gaze_df, experiment=definition.experiment))
+        # Create GazeDataFrame
+        gaze_df = GazeDataFrame(
+            gaze_data,
+            experiment=definition.experiment,
+            time_column=definition.time_column,
+            pixel_columns=definition.pixel_columns,
+            position_columns=definition.position_columns,
+            velocity_columns=definition.velocity_columns,
+            acceleration_columns=definition.acceleration_columns,
+        )
+
+        gaze_dfs.append(gaze_df)
 
     return gaze_dfs
 
