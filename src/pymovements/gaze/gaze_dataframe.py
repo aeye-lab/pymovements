@@ -153,6 +153,7 @@ class GazeDataFrame:
         if time_column is not None:
             self.frame = self.frame.rename({time_column: 'time'})
 
+        n_components = None
         if pixel_columns is not None:
             _check_component_columns(
                 frame=self.frame,
@@ -162,6 +163,7 @@ class GazeDataFrame:
                 input_columns=pixel_columns,
                 output_column='pixel',
             )
+            n_components = len(pixel_columns)
 
         if position_columns is not None:
             _check_component_columns(
@@ -173,6 +175,7 @@ class GazeDataFrame:
                 input_columns=position_columns,
                 output_column='position',
             )
+            n_components = len(position_columns)
 
         if velocity_columns is not None:
             _check_component_columns(
@@ -184,6 +187,7 @@ class GazeDataFrame:
                 input_columns=velocity_columns,
                 output_column='velocity',
             )
+            n_components = len(velocity_columns)
 
         if acceleration_columns is not None:
             _check_component_columns(
@@ -195,7 +199,9 @@ class GazeDataFrame:
                 input_columns=acceleration_columns,
                 output_column='acceleration',
             )
+            n_components = len(acceleration_columns)
 
+        self.n_components = n_components
         self.experiment = experiment
 
     def pix2deg(self) -> None:
@@ -214,6 +220,16 @@ class GazeDataFrame:
         self._check_experiment()
         # mypy does not get that experiment now cannot be None anymore
         assert self.experiment is not None
+
+        if 'pixel' in self.frame.columns:
+            exploded_columns = [
+                '__x_left_pixel__', '__x_left_pixel__',
+                '__x_right_pixel__', '__x_right_pixel__',
+                '__x_avg_pixel__', '__x_avg_pixel__',
+            ][:self.n_components]
+            self.explode('pixel', [])
+        else:
+            exploded_columns = None
 
         pix_position_columns = self.pixel_position_columns
         if not pix_position_columns:
@@ -234,6 +250,17 @@ class GazeDataFrame:
                 for dva_column_id, dva_column_name in enumerate(dva_position_columns)
             ],
         )
+
+        self.merge_component_columns_into_tuple_column(
+            input_columns=dva_position_columns,
+            output_column='position',
+        )
+
+        if exploded_columns:
+            self.merge_component_columns_into_tuple_column(
+                input_columns=exploded_columns,
+                output_column='pixel',
+            )
 
     def pos2acc(
             self,
