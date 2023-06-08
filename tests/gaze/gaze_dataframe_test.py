@@ -214,32 +214,33 @@ def test_gaze_dataframe_pix2deg_has_correct_columns(
 
 
 @pytest.mark.parametrize(
-    ('init_kwargs', 'exception', 'msg_substrings'),
+    ('init_kwargs', 'exception', 'expected_msg'),
     [
         pytest.param(
             {
                 'data': pl.DataFrame(schema={'x_foo': pl.Float64, 'y_foo': pl.Float64}),
                 'experiment': Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             },
-            AttributeError, ('pixel', 'position', 'columns', 'valid', 'x_pix', 'x_foo'),
-            id='no_pix_pos_columns',
+            pl.exceptions.ColumnNotFoundError,
+            'Column \'pixel\' not found. Available columns are: [\'x_foo\', \'y_foo\']',
+            id='no_pixel_column',
         ),
         pytest.param(
             {'data': pl.DataFrame(schema={'x_pix': pl.Float64, 'y_pix': pl.Float64})},
-            AttributeError, ('experiment', 'must'),
-            id='no_pix_pos_columns',
+            AttributeError,
+            'experiment must be specified for this method to work',
+            id='no_experiment',
         ),
     ],
 )
-def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, msg_substrings):
+def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg):
     gaze_df = GazeDataFrame(**init_kwargs)
 
     with pytest.raises(exception) as excinfo:
         gaze_df.pix2deg()
 
     msg, = excinfo.value.args
-    for msg_substring in msg_substrings:
-        assert msg_substring.lower() in msg.lower()
+    assert msg == expected_msg
 
 
 @pytest.mark.parametrize(
@@ -306,32 +307,33 @@ def test_gaze_dataframe_pos2acc_has_correct_columns(
 
 
 @pytest.mark.parametrize(
-    ('init_kwargs', 'exception', 'msg_substrings'),
+    ('init_kwargs', 'exception', 'expected_msg'),
     [
         pytest.param(
             {
-                'data': pl.DataFrame(schema={'x_pix': pl.Float64, 'y_pix': pl.Float64}),
+                'data': pl.DataFrame(schema={'x_pos': pl.Float64, 'y_pos': pl.Float64}),
                 'experiment': Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             },
-            AttributeError, ('position', 'columns', 'valid', 'x_pos', 'x_pix'),
-            id='no_dva_pos_columns',
+            pl.exceptions.ColumnNotFoundError,
+            "Column 'position' not found. Available columns are: ['x_pos', 'y_pos']",
+            id='no_pixel_column',
         ),
         pytest.param(
             {'data': pl.DataFrame(schema={'x_pos': pl.Float64, 'y_pos': pl.Float64})},
-            AttributeError, ('experiment', 'must'),
-            id='no_dva_pos_columns',
+            AttributeError,
+            'experiment must be specified for this method to work',
+            id='no_experiment',
         ),
     ],
 )
-def test_gaze_dataframe_pos2acc_exceptions(init_kwargs, exception, msg_substrings):
+def test_gaze_dataframe_pos2acc_exceptions(init_kwargs, exception, expected_msg):
     gaze_df = GazeDataFrame(**init_kwargs)
 
     with pytest.raises(exception) as excinfo:
         gaze_df.pos2acc()
 
     msg, = excinfo.value.args
-    for msg_substring in msg_substrings:
-        assert msg_substring.lower() in msg.lower()
+    assert msg == expected_msg
 
 
 @pytest.mark.parametrize(
@@ -398,29 +400,29 @@ def test_gaze_dataframe_pos2vel_has_correct_columns(
 
 
 @pytest.mark.parametrize(
-    ('init_kwargs', 'exception', 'msg_substrings'),
+    ('init_kwargs', 'exception', 'expected_msg'),
     [
         pytest.param(
             {
-                'data': pl.DataFrame(schema={'x_pix': pl.Float64, 'y_pix': pl.Float64}),
+                'data': pl.DataFrame(schema={'x_pos': pl.Float64, 'y_pos': pl.Float64}),
                 'experiment': Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             },
-            AttributeError, ('position', 'columns', 'valid', 'x_pos', 'x_pix'),
-            id='no_dva_pos_columns',
+            pl.exceptions.ColumnNotFoundError,
+            "Column 'position' not found. Available columns are: ['x_pos', 'y_pos']",
         ),
         pytest.param(
             {'data': pl.DataFrame(schema={'x_pos': pl.Float64, 'y_pos': pl.Float64})},
-            AttributeError, ('experiment', 'must'),
+            AttributeError,
+            'experiment must be specified for this method to work',
             id='no_dva_pos_columns',
         ),
     ],
 )
-def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, msg_substrings):
+def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg):
     gaze_df = GazeDataFrame(**init_kwargs)
 
     with pytest.raises(exception) as excinfo:
         gaze_df.pos2vel()
 
     msg, = excinfo.value.args
-    for msg_substring in msg_substrings:
-        assert msg_substring.lower() in msg.lower()
+    assert msg == expected_msg

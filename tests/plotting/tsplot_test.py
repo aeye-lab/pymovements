@@ -48,6 +48,7 @@ def gaze_fixture():
         data=arr,
         schema=['x_pix', 'y_pix'],
         experiment=experiment,
+        pixel_columns=['x_pix', 'y_pix'],
     )
 
     gaze.pix2deg()
@@ -80,6 +81,7 @@ def gaze_fixture():
 def test_tsplot_show(gaze, kwargs, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
+    gaze.explode('pixel', ['x_pix', 'y_pix'])
     pm.plotting.tsplot(gaze=gaze, **kwargs)
     plt.close()
     mock.assert_called_once()
@@ -88,6 +90,7 @@ def test_tsplot_show(gaze, kwargs, monkeypatch):
 def test_tsplot_noshow(gaze, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
+    gaze.explode('pixel', ['x_pix', 'y_pix'])
     pm.plotting.tsplot(gaze=gaze, show=False)
     plt.close()
     mock.assert_not_called()
@@ -96,6 +99,7 @@ def test_tsplot_noshow(gaze, monkeypatch):
 def test_tsplot_save(gaze, monkeypatch, tmp_path):
     mock = Mock()
     monkeypatch.setattr(figure.Figure, 'savefig', mock)
+    gaze.explode('pixel', ['x_pix', 'y_pix'])
     pm.plotting.tsplot(gaze=gaze, show=False, savepath=str(tmp_path / 'test.svg'))
     plt.close()
     mock.assert_called_once()

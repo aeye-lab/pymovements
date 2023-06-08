@@ -148,4 +148,6 @@ class GazeBase(DatasetDefinition):
         },
     )
 
+    time_column: str = 'n'
+
     custom_read_kwargs: dict[str, Any] = field(default_factory=dict)

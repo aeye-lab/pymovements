@@ -233,48 +233,40 @@ class GazeDataFrame:
         # mypy does not get that experiment now cannot be None anymore
         assert self.experiment is not None
 
-        # this is just a work-around until merged columns are standard behavior
+        # this is just a work-around until GazeDataFrame.transform() is implemented
         if 'pixel' in self.frame.columns:
-            exploded_columns = [
+            pixel_columns = [
                 '__x_left_pix__', '__y_left_pix__',
                 '__x_right_pix__', '__y_right_pix__',
                 '__x_avg_pix__', '__y_avg_pix__',
             ][:self.n_components]
-            self.explode('pixel', exploded_columns)
+            self.explode('pixel', pixel_columns)
         else:
-            exploded_columns = None
-
-        pix_position_columns = self.pixel_position_columns
-        if not pix_position_columns:
-            raise AttributeError(
-                'No valid pixel position columns found.'
-                f' Valid pixel position columns are: {self.valid_pixel_position_columns}.'
-                f' Available columns are: {self.frame.columns}.',
+            raise pl.exceptions.ColumnNotFoundError(
+                f'Column \'pixel\' not found. Available columns are: {self.frame.columns}',
             )
 
-        dva_position_columns = self._pixel_to_dva_position_columns(pix_position_columns)
-
-        pixel_positions = self.frame.select(pix_position_columns)
+        pixel_positions = self.frame.select(pixel_columns)
         dva_positions = self.experiment.screen.pix2deg(pixel_positions.to_numpy())
 
+        dva_columns = self._pixel_to_dva_position_columns(pixel_columns)
         self.frame = self.frame.with_columns(
             [
                 pl.Series(name=dva_column_name, values=dva_positions[:, dva_column_id])
-                for dva_column_id, dva_column_name in enumerate(dva_position_columns)
+                for dva_column_id, dva_column_name in enumerate(dva_columns)
             ],
         )
 
         self.merge_component_columns_into_tuple_column(
-            input_columns=dva_position_columns,
+            input_columns=dva_columns,
             output_column='position',
         )
 
         # this is just a work-around until merged columns are standard behavior
-        if exploded_columns:
-            self.merge_component_columns_into_tuple_column(
-                input_columns=exploded_columns,
-                output_column='pixel',
-            )
+        self.merge_component_columns_into_tuple_column(
+            input_columns=pixel_columns,
+            output_column='pixel',
+        )
 
     def pos2acc(
             self,
@@ -312,26 +304,18 @@ class GazeDataFrame:
 
         # this is just a work-around until merged columns are standard behavior
         if 'position' in self.frame.columns:
-            exploded_columns = [
+            position_columns = [
                 '__x_left_pos__', '__y_left_pos__',
                 '__x_right_pos__', '__y_right_pos__',
                 '__x_avg_pos__', '__y_avg_pos__',
             ][:self.n_components]
-            self.explode('position', exploded_columns)
+            self.explode('position', position_columns)
         else:
-            exploded_columns = None
-
-        position_columns = self.position_columns
-        if not position_columns:
-            raise AttributeError(
-                'No valid position columns found.'
-                f' Valid position columns are: {self.valid_position_columns}.'
-                f' Available columns are: {self.frame.columns}.',
+            raise pl.exceptions.ColumnNotFoundError(
+                f'Column \'position\' not found. Available columns are: {self.frame.columns}',
             )
-        acceleration_columns = self._position_to_acceleration_columns(position_columns)
 
         positions = self.frame.select(position_columns)
-
         acceleration = pos2acc(
             positions.to_numpy(),
             sampling_rate=self.experiment.sampling_rate,
@@ -341,6 +325,7 @@ class GazeDataFrame:
             cval=cval,
         )
 
+        acceleration_columns = self._position_to_acceleration_columns(position_columns)
         self.frame = self.frame.with_columns(
             [
                 pl.Series(name=velocity_column_name, values=acceleration[:, column_id])
@@ -354,11 +339,10 @@ class GazeDataFrame:
         )
 
         # this is just a work-around until merged columns are standard behavior
-        if exploded_columns:
-            self.merge_component_columns_into_tuple_column(
-                input_columns=exploded_columns,
-                output_column='position',
-            )
+        self.merge_component_columns_into_tuple_column(
+            input_columns=position_columns,
+            output_column='position',
+        )
 
     def pos2vel(self, method: str = 'smooth', **kwargs: int | float | str) -> None:
         """Compute gaze velocity in dva/s from dva position coordinates.
@@ -386,28 +370,21 @@ class GazeDataFrame:
 
         # this is just a work-around until merged columns are standard behavior
         if 'position' in self.frame.columns:
-            exploded_columns = [
+            position_columns = [
                 '__x_left_pos__', '__y_left_pos__',
                 '__x_right_pos__', '__y_right_pos__',
                 '__x_avg_pos__', '__y_avg_pos__',
             ][:self.n_components]
-            self.explode('position', exploded_columns)
+            self.explode('position', position_columns)
         else:
-            exploded_columns = None
-
-        position_columns = self.position_columns
-        if not position_columns:
-            raise AttributeError(
-                'No valid position columns found.'
-                f' Valid position columns are: {self.valid_position_columns}.'
-                f' Available columns are: {self.frame.columns}.',
+            raise pl.exceptions.ColumnNotFoundError(
+                f'Column \'position\' not found. Available columns are: {self.frame.columns}',
             )
-        velocity_columns = self._position_to_velocity_columns(position_columns)
 
         positions = self.frame.select(position_columns)
-
         velocities = self.experiment.pos2vel(positions.to_numpy(), method=method, **kwargs)
 
+        velocity_columns = self._position_to_velocity_columns(position_columns)
         self.frame = self.frame.with_columns(
             [
                 pl.Series(name=velocity_column_name, values=velocities[:, column_id])
@@ -421,11 +398,10 @@ class GazeDataFrame:
         )
 
         # this is just a work-around until merged columns are standard behavior
-        if exploded_columns:
-            self.merge_component_columns_into_tuple_column(
-                input_columns=exploded_columns,
-                output_column='position',
-            )
+        self.merge_component_columns_into_tuple_column(
+            input_columns=position_columns,
+            output_column='position',
+        )
 
     @property
     def schema(self) -> pl.type_aliases.SchemaDict:
@@ -509,33 +485,30 @@ class GazeDataFrame:
     def _pixel_to_dva_position_columns(columns: list[str]) -> list[str]:
         """Get corresponding dva position columns from pixel position columns."""
         return [
-            column.replace('_pix', '_pos')
-            for column in columns
-            if column.endswith('_pix') or column.endswith('_pix__')
+            column.replace('pixel', 'position').replace('pix', 'pos')
+            for column in columns if 'pix' in column
         ]
 
     @staticmethod
     def _position_to_acceleration_columns(columns: list[str]) -> list[str]:
         """Get corresponding acceleration columns from dva position columns."""
         return [
-            column.replace('_pos', '_acc')
-            for column in columns
-            if column.endswith('_pos') or column.endswith('_pos__')
+            column.replace('position', 'acceleration').replace('pos', 'acc')
+            for column in columns if 'pos' in column
         ]
 
     @staticmethod
     def _position_to_velocity_columns(columns: list[str]) -> list[str]:
         """Get corresponding velocity columns from dva position columns."""
         return [
-            column.replace('_pos', '_vel')
-            for column in columns
-            if column.endswith('_pos') or column.endswith('_pos__')
+            column.replace('position', 'velocity').replace('pos', 'vel')
+            for column in columns if 'pos' in column
         ]
 
     def _check_experiment(self) -> None:
         """Check if experiment attribute has been set."""
         if self.experiment is None:
-            raise AttributeError('experiment must be specified for this method to work.')
+            raise AttributeError('experiment must be specified for this method to work')
 
 
 def _check_component_columns(
