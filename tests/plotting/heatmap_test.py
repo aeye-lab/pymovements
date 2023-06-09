@@ -148,6 +148,23 @@ def test_heatmap_noshow(args, monkeypatch):
     mock.assert_not_called()
 
 
+def test_heatmap_noshow_no_pixel_or_position_column(args, monkeypatch):
+    mock = Mock()
+    monkeypatch.setattr(plt, 'show', mock)
+
+    if args[1] == 'pix':
+        position_column = 'pixel'
+    else:
+        position_column = 'position'
+
+    gaze = args[0]
+    gaze.frame = gaze.frame.rename({position_column: 'custom_column'})
+
+    heatmap(gaze, position_column='custom_column', show=False)
+    plt.close()
+    mock.assert_not_called()
+
+
 def test_heatmap_save(args, monkeypatch, tmp_path):
     mock = Mock()
     monkeypatch.setattr(figure.Figure, 'savefig', mock)
