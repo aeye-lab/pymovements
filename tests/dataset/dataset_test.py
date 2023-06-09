@@ -987,44 +987,28 @@ def test_save_preprocessed_directory_exists(
     )
 
 
-@pytest.mark.parametrize(
-    ('preprocessed_dirname', 'expected_save_dirpath'),
-    [
-        pytest.param(
-            None,
-            'preprocessed',
-            id='none_dirname',
-        ),
-        pytest.param(
-            'preprocessed_test',
-            'preprocessed_test',
-            id='explicit_dirname',
-        ),
-    ],
-)
-def test_save_preprocessed_different_columns(
-        preprocessed_dirname, expected_save_dirpath, dataset_configuration,
-):
+def test_save_preprocessed_no_tuple_columns(dataset_configuration):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
     dataset.pos2acc()
 
-    dataset.gaze[0].frame = dataset.gaze[0].frame.rename({'time': 'my_time'})
-    dataset.gaze[0].frame = dataset.gaze[0].frame.rename({'pixel': 'my_pixel'})
-    dataset.gaze[0].frame = dataset.gaze[0].frame.rename({'position': 'my_position'})
-    dataset.gaze[0].frame = dataset.gaze[0].frame.rename({'velocity': 'my_velocity'})
-    dataset.gaze[0].frame = dataset.gaze[0].frame.rename({'acceleration': 'my_acceleration'})
+    # This is not implemented yet
+    # dataset.gaze[0].explode(['pixel', 'position', 'velocity', 'acceleration'])
+    dataset.gaze[0].frame = dataset.gaze[0].frame.rename({'time': 'ttt'})
+    dataset.gaze[0].frame = dataset.gaze[0].frame.drop(
+        ['pixel', 'position', 'velocity', 'acceleration'],
+    )
 
-    if preprocessed_dirname is None:
-        preprocessed_dirname = 'preprocessed'
+    preprocessed_dirname = 'preprocessed-test'
     shutil.rmtree(dataset.path / Path(preprocessed_dirname), ignore_errors=True)
-    shutil.rmtree(dataset.path / Path(expected_save_dirpath), ignore_errors=True)
-    dataset.save_preprocessed(preprocessed_dirname)
+    shutil.rmtree(dataset.path / Path(preprocessed_dirname), ignore_errors=True)
+    dataset.save_preprocessed(preprocessed_dirname, extension='csv')
+    dataset.load_gaze_files(True, preprocessed_dirname, extension='csv')
 
-    assert (dataset.path / expected_save_dirpath).is_dir(), (
-        f'data was not written to {dataset.path / Path(expected_save_dirpath)}'
+    assert (dataset.path / preprocessed_dirname).is_dir(), (
+        f'data was not written to {dataset.path / Path(preprocessed_dirname)}'
     )
 
 
