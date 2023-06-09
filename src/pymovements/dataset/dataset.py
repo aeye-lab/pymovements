@@ -403,7 +403,6 @@ class Dataset:
                 'x_right_pos', 'y_right_pos',
                 'x_avg_pos', 'y_avg_pos',
             ][:self.gaze[0].n_components]
-            self.gaze[0].explode('position', exploded_columns_pos)
             exploded_columns['position'] = exploded_columns_pos
         else:
             raise pl.exceptions.ColumnNotFoundError(
@@ -417,11 +416,15 @@ class Dataset:
                 'x_right_vel', 'y_right_vel',
                 'x_avg_vel', 'y_avg_vel',
             ][:self.gaze[0].n_components]
+            exploded_columns['velocity'] = exploded_columns_vel
         else:
             raise pl.exceptions.ColumnNotFoundError(
                 f'Column \'velocity\' not found.'
                 f' Available columns are: {self.gaze[0].frame.columns}',
             )
+
+        self.gaze[0].explode('position', exploded_columns['position'])
+        self.gaze[0].explode('velocity', exploded_columns['velocity'])
 
         if (
                 isinstance(self.gaze[0].n_components, int)
@@ -429,9 +432,6 @@ class Dataset:
                 and eye not in [None, 'auto']
         ):
             raise AttributeError()
-
-        self.gaze[0].explode('velocity', exploded_columns_vel)
-        exploded_columns['velocity'] = exploded_columns_vel
 
         # Automatically infer eye to use for event detection.
         if eye == 'auto':

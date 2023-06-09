@@ -106,6 +106,33 @@ def mock_toy(rootpath, raw_fileformat, eyes):
             )
             pixel_columns = ['x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix']
 
+        elif eyes == 'both+avg':
+            gaze_df = pl.from_dict(
+                {
+                    'subject_id': fileinfo_row['subject_id'],
+                    'time': np.arange(1000),
+                    'x_left_pix': np.zeros(1000),
+                    'y_left_pix': np.zeros(1000),
+                    'x_right_pix': np.zeros(1000),
+                    'y_right_pix': np.zeros(1000),
+                    'x_avg_pix': np.zeros(1000),
+                    'y_avg_pix': np.zeros(1000),
+                },
+                schema={
+                    'subject_id': pl.Int64,
+                    'time': pl.Int64,
+                    'x_left_pix': pl.Float64,
+                    'y_left_pix': pl.Float64,
+                    'x_right_pix': pl.Float64,
+                    'y_right_pix': pl.Float64,
+                    'x_avg_pix': pl.Float64,
+                    'y_avg_pix': pl.Float64,
+                },
+            )
+            pixel_columns = [
+                'x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix', 'x_avg_pix', 'y_avg_pix',
+            ]
+
         elif eyes == 'left':
             gaze_df = pl.from_dict(
                 {
@@ -254,12 +281,17 @@ def mock_toy(rootpath, raw_fileformat, eyes):
     }
 
 
-@pytest.fixture(name='dataset_configuration', params=['ToyMono', 'ToyBino', 'ToyLeft', 'ToyRight'])
+@pytest.fixture(
+    name='dataset_configuration',
+    params=['ToyMono', 'ToyBino', 'ToyLeft', 'ToyRight', 'ToyBino+Avg'],
+)
 def fixture_dataset(request, tmp_path):
     rootpath = tmp_path
 
     if request.param == 'ToyBino':
         dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='both')
+    elif request.param == 'ToyBino+Avg':
+        dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='both+avg')
     elif request.param == 'ToyMono':
         dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='none')
     elif request.param == 'ToyLeft':
@@ -602,7 +634,7 @@ def test_detect_events_explicit_eye(detect_event_kwargs, dataset_configuration):
     dataset_eyes = dataset_configuration['eyes']
 
     exception = None
-    if dataset_eyes != 'both' and detect_event_kwargs['eye'] is not None:
+    if not dataset_eyes.startswith('both') and detect_event_kwargs['eye'] is not None:
         exception = AttributeError
 
     if exception is None:
@@ -721,6 +753,55 @@ def test_detect_events_attribute_error(dataset_configuration):
 
     with pytest.raises(AttributeError):
         dataset.detect_events(**detect_event_kwargs)
+
+
+@pytest.mark.parametrize('dataset_configuration', ['ToyMono'], indirect=['dataset_configuration'])
+@pytest.mark.parametrize(
+    ('rename_arg', 'detect_event_kwargs', 'expected_message'),
+    [
+        pytest.param(
+            {'position': 'custom_position'},
+            {
+                'method': pm.events.microsaccades,
+                'threshold': 1,
+                'eye': 'right',
+            },
+            (
+                "Column 'position' not found. Available columns are: "
+                "['subject_id', 'time', 'pixel', 'velocity', 'custom_position']"
+            ),
+            id='no_position',
+        ),
+        pytest.param(
+            {'velocity': 'custom_velocity'},
+            {
+                'method': pm.events.microsaccades,
+                'threshold': 1,
+                'eye': 'right',
+            },
+            (
+                "Column 'velocity' not found. Available columns are: "
+                "['subject_id', 'time', 'pixel', 'custom_velocity', 'position']"
+            ),
+            id='no_velocity',
+        ),
+    ],
+)
+def test_detect_events_raises_column_not_found_error(
+        dataset_configuration, rename_arg, detect_event_kwargs, expected_message,
+):
+    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+    dataset.pos2vel()
+
+    dataset.gaze[0].frame = dataset.gaze[0].frame.rename(rename_arg)
+
+    with pytest.raises(pl.exceptions.ColumnNotFoundError) as excinfo:
+        dataset.detect_events(**detect_event_kwargs)
+
+    msg, = excinfo.value.args
+    assert msg == expected_message
 
 
 @pytest.mark.parametrize(
