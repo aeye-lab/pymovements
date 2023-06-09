@@ -34,6 +34,10 @@ def from_numpy(
         schema: list[str],
         experiment: Experiment | None = None,
         orient: Literal['col', 'row'] = 'col',
+        pixel_columns: list[str] | None = None,
+        position_columns: list[str] | None = None,
+        velocity_columns: list[str] | None = None,
+        acceleration_columns: list[str] | None = None,
 ) -> GazeDataFrame:
     """Construct a :py:class:`~pymovements.gaze.gaze_dataframe.GazeDataFrame`
     from a numpy array.
@@ -48,18 +52,37 @@ def from_numpy(
         Whether to interpret the two-dimensional data as columns or as rows.
     experiment : Experiment
         The experiment definition.
+    pixel_columns:
+        The name of the pixel position columns in the input data frame.
+    position_columns:
+        The name of the dva position columns in the input data frame.
+    velocity_columns:
+        The name of the dva velocity columns in the input data frame.
+    acceleration_columns:
+        The name of the dva acceleration columns in the input data frame.
 
     Returns
     -------
     py:class:`~pymovements.GazeDataFrame`
     """
     df = pl.from_numpy(data=data, schema=schema, orient=orient)
-    return GazeDataFrame(data=df, experiment=experiment)
+    return GazeDataFrame(
+        data=df,
+        experiment=experiment,
+        pixel_columns=pixel_columns,
+        position_columns=position_columns,
+        velocity_columns=velocity_columns,
+        acceleration_columns=acceleration_columns,
+    )
 
 
 def from_pandas(
         data: pd.DataFrame,
         experiment: Experiment | None = None,
+        pixel_columns: list[str] | None = None,
+        position_columns: list[str] | None = None,
+        velocity_columns: list[str] | None = None,
+        acceleration_columns: list[str] | None = None,
 ) -> GazeDataFrame:
     """Construct a :py:class:`~pymovements.gaze.gaze_dataframe.GazeDataFrame`
     from a pandas DataFrame.
@@ -70,10 +93,25 @@ def from_pandas(
         Data represented as a pandas DataFrame.
     experiment : Experiment
         The experiment definition.
+    pixel_columns:
+        The name of the pixel position columns in the input data frame.
+    position_columns:
+        The name of the dva position columns in the input data frame.
+    velocity_columns:
+        The name of the dva velocity columns in the input data frame.
+    acceleration_columns:
+        The name of the dva acceleration columns in the input data frame.
 
     Returns
     -------
     py:class:`~pymovements.GazeDataFrame`
     """
     df = pl.from_pandas(data=data)
-    return GazeDataFrame(data=df, experiment=experiment)
+    return GazeDataFrame(
+        data=df,
+        experiment=experiment,
+        pixel_columns=pixel_columns,
+        position_columns=position_columns,
+        velocity_columns=velocity_columns,
+        acceleration_columns=acceleration_columns,
+    )
