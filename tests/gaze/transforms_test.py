@@ -206,6 +206,28 @@ screen_cm_2d = [100, 100]
         ),
         pytest.param(
             {
+                'arr': np.zeros((n_coords, 6)),
+                'screen_px': screen_px_1d,
+                'screen_cm': screen_px_2d,
+                'distance_cm': screen_cm_1d,
+                'origin': 'center',
+            },
+            ValueError,
+            id='list_coords_6d_screen_px_not_2d_raises_value_error',
+        ),
+        pytest.param(
+            {
+                'arr': np.zeros((n_coords, 6)),
+                'screen_px': screen_px_2d,
+                'screen_cm': screen_cm_1d,
+                'distance_cm': screen_cm_1d,
+                'origin': 'center',
+            },
+            ValueError,
+            id='list_coords_6d_screen_cm_not_2d_raises_value_error',
+        ),
+        pytest.param(
+            {
                 'arr': np.zeros((n_coords, 4)),
                 'screen_px': screen_px_2d,
                 'screen_cm': screen_px_2d,
