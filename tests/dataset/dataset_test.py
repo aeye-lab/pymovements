@@ -967,11 +967,55 @@ def test_load_previously_saved_events_gaze(
         ),
     ],
 )
-def test_save_preprocessed(preprocessed_dirname, expected_save_dirpath, dataset_configuration):
+def test_save_preprocessed_directory_exists(
+        preprocessed_dirname, expected_save_dirpath, dataset_configuration,
+):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
+    dataset.pos2acc()
+
+    if preprocessed_dirname is None:
+        preprocessed_dirname = 'preprocessed'
+    shutil.rmtree(dataset.path / Path(preprocessed_dirname), ignore_errors=True)
+    shutil.rmtree(dataset.path / Path(expected_save_dirpath), ignore_errors=True)
+    dataset.save_preprocessed(preprocessed_dirname)
+
+    assert (dataset.path / expected_save_dirpath).is_dir(), (
+        f'data was not written to {dataset.path / Path(expected_save_dirpath)}'
+    )
+
+
+@pytest.mark.parametrize(
+    ('preprocessed_dirname', 'expected_save_dirpath'),
+    [
+        pytest.param(
+            None,
+            'preprocessed',
+            id='none_dirname',
+        ),
+        pytest.param(
+            'preprocessed_test',
+            'preprocessed_test',
+            id='explicit_dirname',
+        ),
+    ],
+)
+def test_save_preprocessed_different_columns(
+        preprocessed_dirname, expected_save_dirpath, dataset_configuration,
+):
+    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+    dataset.pos2vel()
+    dataset.pos2acc()
+
+    dataset.gaze[0].frame = dataset.gaze[0].frame.rename({'time': 'my_time'})
+    dataset.gaze[0].frame = dataset.gaze[0].frame.rename({'pixel': 'my_pixel'})
+    dataset.gaze[0].frame = dataset.gaze[0].frame.rename({'position': 'my_position'})
+    dataset.gaze[0].frame = dataset.gaze[0].frame.rename({'velocity': 'my_velocity'})
+    dataset.gaze[0].frame = dataset.gaze[0].frame.rename({'acceleration': 'my_acceleration'})
 
     if preprocessed_dirname is None:
         preprocessed_dirname = 'preprocessed'
