@@ -249,13 +249,13 @@ def load_gaze_files(
             velocity_columns: list[str] = list(
                 set(GazeDataFrame.valid_velocity_columns) & set(gaze_data.columns),
             )
-            if velocity_columns:
+            if not velocity_columns:
                 velocity_columns = None  # type: ignore
 
             acceleration_columns: list[str] = list(
                 set(GazeDataFrame.valid_acceleration_columns) & set(gaze_data.columns),
             )
-            if acceleration_columns:
+            if not acceleration_columns:
                 acceleration_columns = None  # type: ignore
 
             gaze_df = GazeDataFrame(
