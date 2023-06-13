@@ -396,6 +396,7 @@ class Dataset:
             method = EventDetectionLibrary.get(method)
 
         # this is just a work-around until merged columns are standard behavior
+        # https://github.com/aeye-lab/pymovements/pull/443
         exploded_columns = {}
         if 'position' in self.gaze[0].frame.columns:
             exploded_columns_pos = [
@@ -446,6 +447,7 @@ class Dataset:
         velocity_columns = [f'x_{eye}_vel', f'y_{eye}_vel']
 
         # this is just a work-around until merged columns are standard behavior
+        # https://github.com/aeye-lab/pymovements/pull/443
         self.gaze[0].merge_component_columns_into_tuple_column(
             input_columns=exploded_columns['position'],
             output_column='position',
@@ -464,6 +466,7 @@ class Dataset:
                 enumerate(zip(self.gaze, self.fileinfo.to_dicts())), disable=disable_progressbar,
         ):
             # this is just a work-around until merged columns are standard behavior
+            # https://github.com/aeye-lab/pymovements/pull/443
             gaze_df.explode('position', exploded_columns['position'])
             gaze_df.explode('velocity', exploded_columns['velocity'])
 
@@ -490,6 +493,7 @@ class Dataset:
             )
 
             # this is just a work-around until merged columns are standard behavior
+            # https://github.com/aeye-lab/pymovements/pull/443
             gaze_df.merge_component_columns_into_tuple_column(
                 input_columns=exploded_columns['position'],
                 output_column='position',

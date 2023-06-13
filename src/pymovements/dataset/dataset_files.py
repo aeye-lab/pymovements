@@ -64,7 +64,7 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
         relative=True,
     )
 
-    if len(fileinfo_dicts) == 0:
+    if not fileinfo_dicts:
         print(definition.filename_format)
         print(curly_to_regex(definition.filename_format))
         raise RuntimeError(f'no matching files found in {paths.raw}')
@@ -229,6 +229,7 @@ def load_gaze_files(
 
         elif preprocessed and extension == 'csv':
             # Workaround for preprocessed column names
+            # https://github.com/aeye-lab/pymovements/pull/443
             time_column = None
             if 'time' in gaze_data.columns:
                 time_column = 'time'
@@ -236,25 +237,25 @@ def load_gaze_files(
             pixel_columns: list[str] = list(
                 set(GazeDataFrame.valid_pixel_position_columns) & set(gaze_data.columns),
             )
-            if len(pixel_columns) == 0:
+            if not pixel_columns:
                 pixel_columns = None  # type: ignore
 
             position_columns: list[str] = list(
                 set(GazeDataFrame.valid_position_columns) & set(gaze_data.columns),
             )
-            if len(position_columns) == 0:
+            if not position_columns:
                 position_columns = None  # type: ignore
 
             velocity_columns: list[str] = list(
                 set(GazeDataFrame.valid_velocity_columns) & set(gaze_data.columns),
             )
-            if len(velocity_columns) == 0:
+            if velocity_columns:
                 velocity_columns = None  # type: ignore
 
             acceleration_columns: list[str] = list(
                 set(GazeDataFrame.valid_acceleration_columns) & set(gaze_data.columns),
             )
-            if len(acceleration_columns) == 0:
+            if acceleration_columns:
                 acceleration_columns = None  # type: ignore
 
             gaze_df = GazeDataFrame(
@@ -484,6 +485,7 @@ def save_preprocessed(
 
         if extension == 'csv':
             # this is just a work-around until merged columns are standard behavior
+            # https://github.com/aeye-lab/pymovements/pull/443
             exploded_columns = {}
             if 'pixel' in gaze_df.frame.columns:
                 exploded_columns_pix = [
