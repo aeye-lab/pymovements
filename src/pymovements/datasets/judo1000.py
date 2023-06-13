@@ -125,15 +125,17 @@ class JuDo1000(DatasetDefinition):
         },
     )
 
+    time_column: str = 'time'
+    pixel_columns: list[str] = field(
+        default_factory=lambda: [
+            'x_left', 'y_left', 'x_right', 'y_right',
+        ],
+    )
+
     column_map: dict[str, str] = field(
         default_factory=lambda: {
             'trialId': 'trial_id',
             'pointId': 'point_id',
-            'time': 'time',
-            'x_left': 'x_left_pix',
-            'y_left': 'y_left_pix',
-            'x_right': 'x_right_pix',
-            'y_right': 'y_right_pix',
         },
     )
 

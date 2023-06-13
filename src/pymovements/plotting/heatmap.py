@@ -31,7 +31,7 @@ from pymovements.gaze import GazeDataFrame
 
 def heatmap(
         gaze: GazeDataFrame,
-        position_columns: tuple[str, str] = ('x_pix', 'y_pix'),
+        position_column: str = 'pixel',
         gridsize: tuple[int, int] = (10, 10),
         cmap: colors.Colormap | str = 'jet',
         interpolation: str = 'gaussian',
@@ -55,8 +55,8 @@ def heatmap(
     ----------
     gaze : GazeDataFrame
         A GazeDataFrame object.
-    position_columns : tuple[str, str], optional
-        The column names of the x and y position data
+    position_column : str, optional
+        The column name of the x and y position data
     gridsize : tuple[int, int], optional
         The number of bins in the x and y dimensions.
     cmap : colors.Colormap | str, optional
@@ -97,8 +97,8 @@ def heatmap(
     """
 
     # Extract x and y positions from the gaze dataframe
-    x = gaze.frame[position_columns[0]]
-    y = gaze.frame[position_columns[1]]
+    x = gaze.frame[position_column].list.get(0).to_numpy()
+    y = gaze.frame[position_column].list.get(1).to_numpy()
 
     # Check if experiment properties are available
     if not gaze.experiment:
@@ -111,12 +111,15 @@ def heatmap(
     screen = gaze.experiment.screen
 
     # Use screen properties to define the grid or degrees of visual angle
-    if 'pix' in position_columns[0] and 'pix' in position_columns[1]:
+    if position_column == 'pixel':
         xmin, xmax = 0, screen.width_px
         ymin, ymax = 0, screen.height_px
-    else:
+    elif position_column == 'position':
         xmin, xmax = int(screen.x_min_dva), int(screen.x_max_dva)
         ymin, ymax = int(screen.y_min_dva), int(screen.y_max_dva)
+    else:
+        xmin, xmax = int(x.min()), int(x.max())
+        ymin, ymax = int(y.min()), int(y.max())
 
     # Define the grid and bin the gaze data
     x_bins = np.linspace(xmin, xmax, num=gridsize[0]).astype(int)

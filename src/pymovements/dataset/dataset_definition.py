@@ -62,6 +62,7 @@ class DatasetDefinition:
     custom_read_kwargs : dict[str, Any], optional
         If specified, these keyword arguments will be passed to the file reading function.
     """
+    # pylint: disable=too-many-instance-attributes
     name: str = '.'
 
     mirrors: tuple[str, ...] = field(default_factory=tuple)
@@ -77,6 +78,12 @@ class DatasetDefinition:
     custom_read_kwargs: dict[str, Any] = field(default_factory=dict)
 
     column_map: dict[str, str] = field(default_factory=dict)
+
+    time_column: str | None = None
+    pixel_columns: list[str] | None = None
+    position_columns: list[str] | None = None
+    velocity_columns: list[str] | None = None
+    acceleration_columns: list[str] | None = None
 
     def __post_init__(self) -> None:
         if len(self.column_map) > 0:
