@@ -35,7 +35,6 @@ from pymovements.utils.filters import filter_candidates_remove_nans
 
 @register_event_detection
 def microsaccades(
-        positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         timesteps: list[int] | np.ndarray | None = None,
         minimum_duration: int = 6,
@@ -56,8 +55,6 @@ def microsaccades(
 
     Parameters
     ----------
-    positions : np.ndarray, shape (N, 2)
-        x and y positions of N samples in chronological order
     velocities : np.ndarray, shape (N, 2)
         x and y velocities of N samples in chronological order
     timesteps: array-like, shape (N, )
@@ -91,10 +88,7 @@ def microsaccades(
         If `threshold` value is below `min_threshold` value.
         If passed `threshold` is either not two-dimensional or not a supported method.
     """
-    positions = np.array(positions)
     velocities = np.array(velocities)
-
-    checks.check_shapes_positions_velocities(positions=positions, velocities=velocities)
 
     if timesteps is None:
         timesteps = np.arange(len(velocities), dtype=np.int64)
