@@ -35,17 +35,6 @@ from pymovements.synthetic import step_function
     [
         pytest.param(
             {
-                'positions': None,
-                'velocities': np.ones((100, 2)),
-                'velocity_threshold': 1.,
-                'minimum_duration': 1,
-            },
-            ValueError,
-            id='positions_none_raises_value_error',
-        ),
-        pytest.param(
-            {
-                'positions': np.ones((100, 2)),
                 'velocities': None,
                 'velocity_threshold': 1.,
                 'minimum_duration': 1,
@@ -55,17 +44,6 @@ from pymovements.synthetic import step_function
         ),
         pytest.param(
             {
-                'positions': 1,
-                'velocities': np.ones((100, 2)),
-                'velocity_threshold': 1.,
-                'minimum_duration': 1,
-            },
-            ValueError,
-            id='positions_not_array_like_raises_value_error',
-        ),
-        pytest.param(
-            {
-                'positions': np.ones((100, 2)),
                 'velocities': 1,
                 'velocity_threshold': 1.,
                 'minimum_duration': 1,
@@ -75,17 +53,6 @@ from pymovements.synthetic import step_function
         ),
         pytest.param(
             {
-                'positions': np.ones(100),
-                'velocities': np.ones((100, 2)),
-                'velocity_threshold': 1.,
-                'minimum_duration': 1,
-            },
-            ValueError,
-            id='positions_not_2d_array_raises_value_error',
-        ),
-        pytest.param(
-            {
-                'positions': np.ones((100, 2)),
                 'velocities': np.ones(100),
                 'velocity_threshold': 1.,
                 'minimum_duration': 1,
@@ -95,17 +62,6 @@ from pymovements.synthetic import step_function
         ),
         pytest.param(
             {
-                'positions': np.ones((100, 3)),
-                'velocities': np.ones((100, 2)),
-                'velocity_threshold': 1.,
-                'minimum_duration': 1,
-            },
-            ValueError,
-            id='positions_not_2_elements_in_second_dimension_raises_value_error',
-        ),
-        pytest.param(
-            {
-                'positions': np.ones((100, 2)),
                 'velocities': np.ones((100, 3)),
                 'velocity_threshold': 1.,
                 'minimum_duration': 1,
@@ -115,17 +71,6 @@ from pymovements.synthetic import step_function
         ),
         pytest.param(
             {
-                'positions': np.ones((100, 2)),
-                'velocities': np.ones((101, 2)),
-                'velocity_threshold': 1.,
-                'minimum_duration': 1,
-            },
-            ValueError,
-            id='positions_and_velocities_different_lengths_raises_value_error',
-        ),
-        pytest.param(
-            {
-                'positions': np.ones((100, 2)),
                 'velocities': np.ones((100, 2)),
                 'velocity_threshold': None,
                 'minimum_duration': 1,
@@ -135,7 +80,6 @@ from pymovements.synthetic import step_function
         ),
         pytest.param(
             {
-                'positions': np.ones((100, 2)),
                 'velocities': np.ones((100, 2)),
                 'velocity_threshold': '1.',
                 'minimum_duration': 1,
@@ -145,7 +89,6 @@ from pymovements.synthetic import step_function
         ),
         pytest.param(
             {
-                'positions': np.ones((100, 2)),
                 'velocities': np.ones((100, 2)),
                 'velocity_threshold': 0.,
                 'minimum_duration': 1,

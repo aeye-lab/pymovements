@@ -84,6 +84,8 @@ def ivt(
     """
     velocities = np.array(velocities)
 
+    checks.check_shapes(velocities=velocities)
+
     if velocity_threshold is None:
         raise ValueError('velocity threshold must not be None')
     if velocity_threshold <= 0:
