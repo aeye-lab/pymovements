@@ -118,6 +118,15 @@ def test_check_nan_both_channels_raises_error(arr, expected_error, expected_err_
 @pytest.mark.parametrize(
     ('kwargs', 'expected_error', 'expected_err_msg'),
     [
+        # Test for one array
+        pytest.param(
+            {
+                'positions': np.array([[1, 2], [3, 4]]),
+            },
+            None,
+            '',
+            id='one_array_with_shape_N_2_raises_no_error',
+        ),
         pytest.param(
             {
                 'positions': np.array([[1, 2], [3, 4]]),
@@ -125,7 +134,16 @@ def test_check_nan_both_channels_raises_error(arr, expected_error, expected_err_
             },
             None,
             '',
-            id='positions_and_velocities_shape_N_2_raises_no_error',
+            id='two_arrays_with_shape_N_2_raises_no_error',
+        ),
+        # Test for one wrong array
+        pytest.param(
+            {
+                'positions': np.array([1, 2, 3, 4]),
+            },
+            ValueError,
+            'positions must have shape (N, 2) but have shape (4,)',
+            id='array_not_shape_N_2_raises_value_error',
         ),
         pytest.param(
             {
@@ -160,23 +178,24 @@ def test_check_nan_both_channels_raises_error(arr, expected_error, expected_err_
                 'velocities': np.array([[1, 2], [3, 4], [5, 6]]),
             },
             ValueError,
-            'shape of positions (2, 2) does not match'
-            ' shape of velocities (3, 2)',
+            'positions, velocities'
+            ' must have the same shape, but shapes are '
+            '(2, 2), (3, 2)',
             id='positions_and_velocities_N_2_but_different_lengths_raises_value_error',
         ),
     ],
 )
-def test_check_shapes_positions_velocities_raises_error(kwargs, expected_error, expected_err_msg):
+def test_check_shapes_raises_error(kwargs, expected_error, expected_err_msg):
     """
-    Test that check_shapes_positions_velocities() only raises an Exception if
+    Test that check_shapes() only raises an Exception if
     the shapes of the positions and velocities are not (N, 2) or if the lengths
     of the positions and velocities are not equal.
     """
     if expected_error is None:
-        checks.check_shapes_positions_velocities(**kwargs)
+        checks.check_shapes(**kwargs)
     else:
         with pytest.raises(expected_error) as excinfo:
-            checks.check_shapes_positions_velocities(**kwargs)
+            checks.check_shapes(**kwargs)
         msg, = excinfo.value.args
         assert msg == expected_err_msg
 
