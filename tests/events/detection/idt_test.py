@@ -31,7 +31,6 @@ import pymovements as pm
         pytest.param(
             {
                 'positions': None,
-                'velocities': None,
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
             },
@@ -41,7 +40,6 @@ import pymovements as pm
         pytest.param(
             {
                 'positions': [[1, 2], [1, 2]],
-                'velocities': [[1, 2], [1, 2]],
                 'dispersion_threshold': None,
                 'minimum_duration': 1,
             },
@@ -51,7 +49,6 @@ import pymovements as pm
         pytest.param(
             {
                 'positions': [[1, 2], [1, 2]],
-                'velocities': [[1, 2], [1, 2]],
                 'dispersion_threshold': 1,
                 'minimum_duration': None,
             },
@@ -61,7 +58,6 @@ import pymovements as pm
         pytest.param(
             {
                 'positions': 1,
-                'velocities': 1,
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
             },
@@ -71,7 +67,6 @@ import pymovements as pm
         pytest.param(
             {
                 'positions': [1, 2, 3],
-                'velocities': [1, 2, 3],
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
             },
@@ -81,7 +76,6 @@ import pymovements as pm
         pytest.param(
             {
                 'positions': [[1, 2, 3], [1, 2, 3]],
-                'velocities': [[1, 2, 3], [1, 2, 3]],
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
             },
@@ -91,7 +85,6 @@ import pymovements as pm
         pytest.param(
             {
                 'positions': [[1, 2], [1, 2]],
-                'velocities': [[1, 2], [1, 2]],
                 'dispersion_threshold': 0,
                 'minimum_duration': 1,
             },
@@ -101,7 +94,6 @@ import pymovements as pm
         pytest.param(
             {
                 'positions': [[1, 2], [1, 2]],
-                'velocities': [[1, 2], [1, 2]],
                 'dispersion_threshold': 1,
                 'minimum_duration': 0,
             },
@@ -111,7 +103,6 @@ import pymovements as pm
         pytest.param(
             {
                 'positions': [[1, 2], [1, 2]],
-                'velocities': [[1, 2], [1, 2]],
                 'dispersion_threshold': 1,
                 'minimum_duration': 1.1,
             },

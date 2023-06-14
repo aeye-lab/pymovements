@@ -105,6 +105,8 @@ def idt(
     """
     positions = np.array(positions)
 
+    checks.check_shapes(positions=positions)
+
     if timesteps is None:
         timesteps = np.arange(len(positions), dtype=np.int64)
     timesteps = np.array(timesteps).flatten()
