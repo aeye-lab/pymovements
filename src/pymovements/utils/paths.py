@@ -129,8 +129,7 @@ def match_filepaths(
             )
             match_dicts.extend(recursive_results)
         else:
-            match = regex.match(childpath.name)
-            if match is not None:
+            if (match := regex.match(childpath.name)) is not None:
                 match_dict = match.groupdict()
 
                 filepath = childpath
