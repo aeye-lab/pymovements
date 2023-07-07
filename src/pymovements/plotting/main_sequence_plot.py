@@ -31,18 +31,31 @@ from pymovements.events import EventDataFrame
 
 def main_sequence_plot(
         event_df: EventDataFrame,
+        marker_size: float = 25,
+        color: str = 'purple',
+        alpha: float = 0.5,
+        marker: str = 'o',
         figsize: tuple[int, int] = (15, 5),
         title: str | None = None,
         savepath: str | None = None,
         show: bool = True,
+        **kwargs,
 ) -> None:
     """
     Plots the saccade main sequence.
 
     Parameters
     ----------
-    event_df:
-        Event dataframe. It must contain columns "peak_velocity" and "amplitude".
+    event_df: Event dataframe
+        It must contain columns "peak_velocity" and "amplitude".
+    marker_size: float
+        Size of the marker symbol.
+    color: str
+        Color of the marker symbol.
+    alpha: float
+        Alpha value (=transparency) of the marker symbol. Between 0 and 1.
+    marker: str
+        Marker symbol. Possible values defined by matplotlib.markers.
     figsize: tuple
         Figure size.
     title: str, optional
@@ -51,6 +64,8 @@ def main_sequence_plot(
         If given, figure will be saved to this path.
     show: bool
         If True, figure will be shown.
+    **kwargs:
+        Additional keyword arguments passed to matplotlib.pyplot.scatter.
 
     Raises
     ------
@@ -90,7 +105,15 @@ def main_sequence_plot(
 
     fig = plt.figure(figsize=figsize)
 
-    plt.scatter(amplitudes, peak_velocities, color='purple', alpha=0.5)
+    plt.scatter(
+        amplitudes,
+        peak_velocities,
+        color=color,
+        alpha=alpha,
+        s=marker_size,
+        marker=marker,
+        **kwargs,
+    )
 
     plt.title(title)
     plt.xlabel('Amplitude [dva]')
