@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import matplotlib.pyplot as plt
 import polars as pl
+from matplotlib.collections import Collection
 from polars import ColumnNotFoundError
 
 from pymovements.events import EventDataFrame
@@ -39,7 +40,7 @@ def main_sequence_plot(
         title: str | None = None,
         savepath: str | None = None,
         show: bool = True,
-        **kwargs,
+        **kwargs: Collection,
 ) -> None:
     """
     Plots the saccade main sequence.
