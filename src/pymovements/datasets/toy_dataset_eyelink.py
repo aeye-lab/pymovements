@@ -128,6 +128,10 @@ class ToyDatasetEyeLink(DatasetDefinition):
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 
+    time_column: str = 'time'
+
+    pixel_columns: list[str] = field(default_factory=lambda: ['x_pix', 'y_pix'])
+
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
             'patterns': [

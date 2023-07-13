@@ -29,7 +29,7 @@ from matplotlib import figure
 import pymovements as pm
 
 
-@pytest.fixture(name='gaze')
+@pytest.fixture(name='gaze', scope='session')
 def gaze_fixture():
     x = np.arange(-100, 100)
     y = np.arange(-100, 100)
@@ -49,6 +49,7 @@ def gaze_fixture():
         data=arr,
         schema=['x_pix', 'y_pix'],
         experiment=experiment,
+        pixel_columns=['x_pix', 'y_pix'],
     )
 
     gaze.pix2deg()
@@ -60,49 +61,52 @@ def gaze_fixture():
 @pytest.mark.parametrize(
     'kwargs',
     [
-        pytest.param({'x': 'x_pix', 'y': 'y_pix', 'cval': np.arange(-100, 100)}, id='cval_array'),
         pytest.param(
-            {'x': 'x_pix', 'y': 'y_pix', 'cval': np.arange(-100, 100), 'cmap_norm': 'twoslope'},
+            {'cval': np.arange(-100, 100)},
+            id='cval_array',
+        ),
+        pytest.param(
+            {'cval': np.arange(-100, 100), 'cmap_norm': 'twoslope'},
             id='cmap_norm_twoslope',
         ),
         pytest.param(
-            {'x': 'x_pix', 'y': 'y_pix', 'cval': np.arange(0, 200), 'cmap_norm': 'nonorm'},
+            {'cval': np.arange(0, 200), 'cmap_norm': 'nonorm'},
             id='cmap_norm_nonorm',
         ),
         pytest.param(
-            {'x': 'x_pix', 'y': 'y_pix', 'cval': np.arange(0, 200)},
+            {'cval': np.arange(0, 200)},
             id='cmap_norm_nonorm_implicit',
         ),
         pytest.param(
-            {'x': 'x_pix', 'y': 'y_pix', 'cval': np.arange(-100, 100), 'cmap_norm': 'normalize'},
+            {'cval': np.arange(-100, 100), 'cmap_norm': 'normalize'},
             id='cmap_norm_normalize',
         ),
         pytest.param(
-            {'x': 'x_pix', 'y': 'y_pix', 'cval': np.arange(0, 200), 'cmap_norm': 'linear'},
+            {'cval': np.arange(0, 200), 'cmap_norm': 'linear'},
             id='cmap_norm_linear',
         ),
         pytest.param(
-            {
-                'x': 'x_pix', 'y': 'y_pix', 'cval': np.arange(0, 200),
-                'cmap_norm': matplotlib.colors.NoNorm(),
-            },
+            {'cval': np.arange(0, 200), 'cmap_norm': matplotlib.colors.NoNorm()},
             id='cmap_norm_class',
         ),
         pytest.param(
-            {
-                'x': 'x_pix', 'y': 'y_pix',
-                'cmap': matplotlib.colors.LinearSegmentedColormap(name='test', segmentdata={}),
-            },
+            {'cmap': matplotlib.colors.LinearSegmentedColormap(name='test', segmentdata={})},
             id='cmap_class',
         ),
-        pytest.param({'x': 'x_pix', 'y': 'y_pix', 'cmap_segmentdata': {}}, id='cmap_segmentdata'),
-        pytest.param({'x': 'x_pix', 'y': 'y_pix', 'padding': 0.1}, id='padding'),
         pytest.param(
-            {'x': 'x_pix', 'y': 'y_pix', 'cval': np.arange(0, 200), 'show_cbar': True},
+            {'cmap_segmentdata': {}},
+            id='cmap_segmentdata',
+        ),
+        pytest.param(
+            {'padding': 0.1},
+            id='padding',
+        ),
+        pytest.param(
+            {'cval': np.arange(0, 200), 'show_cbar': True},
             id='show_cbar_true',
         ),
         pytest.param(
-            {'x': 'x_pix', 'y': 'y_pix', 'cval': np.arange(0, 200), 'show_cbar': False},
+            {'cval': np.arange(0, 200), 'show_cbar': False},
             id='show_cbar_false',
         ),
     ],
@@ -118,7 +122,7 @@ def test_traceplot_show(gaze, kwargs, monkeypatch):
 def test_traceplot_noshow(gaze, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
-    pm.plotting.traceplot(gaze=gaze, x='x_pix', y='y_pix', show=False)
+    pm.plotting.traceplot(gaze=gaze, show=False)
     plt.close()
     mock.assert_not_called()
 
@@ -128,8 +132,6 @@ def test_traceplot_save(gaze, monkeypatch, tmp_path):
     monkeypatch.setattr(figure.Figure, 'savefig', mock)
     pm.plotting.traceplot(
         gaze=gaze,
-        x='x_pix',
-        y='y_pix',
         show=False,
         savepath=str(
             tmp_path /
@@ -158,4 +160,4 @@ def test_traceplot_exceptions(gaze, kwargs, exception, monkeypatch):
     monkeypatch.setattr(plt, 'show', mock)
 
     with pytest.raises(exception):
-        pm.plotting.traceplot(gaze=gaze, x='x_pix', y='y_pix', **kwargs)
+        pm.plotting.traceplot(gaze=gaze, **kwargs)

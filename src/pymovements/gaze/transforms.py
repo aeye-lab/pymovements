@@ -121,9 +121,9 @@ def pix2deg(
             'Number of dimensions of arr must be either 0, 1 or 2'
             f' (arr.ndim: {arr.ndim})',
         )
-    if arr.ndim == 2 and arr.shape[-1] not in [1, 2, 4]:
+    if arr.ndim == 2 and arr.shape[-1] not in [1, 2, 4, 6]:
         raise ValueError(
-            'Last coord dimension must have length 1, 2 or 4.'
+            'Last coord dimension must have length 1, 2, 4 or 6.'
             f' (arr.shape: {arr.shape})',
         )
 
@@ -147,6 +147,16 @@ def pix2deg(
         # We have binocular data. Double tile screen parameters.
         screen_px = np.tile(screen_px, 2)
         screen_cm = np.tile(screen_cm, 2)
+
+    if arr.ndim != 0 and arr.shape[-1] == 6:
+        if screen_px.shape != (2,):
+            raise ValueError('arr is 6-dimensional, but screen_px is not 2-dimensional')
+        if screen_cm.shape != (2,):
+            raise ValueError('arr is 6-dimensional, but screen_cm is not 2-dimensional')
+
+        # We have binocular and cyclopian data. Triple tile screen parameters.
+        screen_px = np.tile(screen_px, 3)
+        screen_cm = np.tile(screen_cm, 3)
 
     # Compute eye-to-screen-distance in pixels.
     distance_px = distance_cm * (screen_px / screen_cm)

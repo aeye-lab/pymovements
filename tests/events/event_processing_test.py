@@ -143,19 +143,22 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                 {'subject_id': [1], 'onset': [0], 'offset': [10]},
                 schema={'subject_id': pl.Int64, 'onset': pl.Int64, 'offset': pl.Int64},
             ),
-            pl.from_dict(
-                {
-                    'subject_id': np.ones(10),
-                    'time': np.arange(10),
-                    'x_vel': np.ones(10),
-                    'y_vel': np.zeros(10),
-                },
-                schema={
-                    'subject_id': pl.Int64,
-                    'time': pl.Int64,
-                    'x_vel': pl.Float64,
-                    'y_vel': pl.Float64,
-                },
+            GazeDataFrame(
+                pl.from_dict(
+                    {
+                        'subject_id': np.ones(10),
+                        'time': np.arange(10),
+                        'x_vel': np.ones(10),
+                        'y_vel': np.zeros(10),
+                    },
+                    schema={
+                        'subject_id': pl.Int64,
+                        'time': pl.Int64,
+                        'x_vel': pl.Float64,
+                        'y_vel': pl.Float64,
+                    },
+                ),
+                velocity_columns=['x_vel', 'y_vel'],
             ),
             {'event_properties': 'peak_velocity'},
             {'identifiers': 'subject_id'},
@@ -182,19 +185,22 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                 {'subject_id': [1], 'onset': [0], 'offset': [10]},
                 schema={'subject_id': pl.Int64, 'onset': pl.Int64, 'offset': pl.Int64},
             ),
-            pl.from_dict(
-                {
-                    'subject_id': np.ones(10),
-                    'time': np.arange(10),
-                    'x_vel': np.ones(10),
-                    'y_vel': np.zeros(10),
-                },
-                schema={
-                    'subject_id': pl.Int64,
-                    'time': pl.Int64,
-                    'x_vel': pl.Float64,
-                    'y_vel': pl.Float64,
-                },
+            GazeDataFrame(
+                pl.from_dict(
+                    {
+                        'subject_id': np.ones(10),
+                        'time': np.arange(10),
+                        'x_vel': np.ones(10),
+                        'y_vel': np.zeros(10),
+                    },
+                    schema={
+                        'subject_id': pl.Int64,
+                        'time': pl.Int64,
+                        'x_vel': pl.Float64,
+                        'y_vel': pl.Float64,
+                    },
+                ),
+                velocity_columns=['x_vel', 'y_vel'],
             ),
             {'event_properties': 'peak_velocity'},
             {'identifiers': 'subject_id'},
@@ -221,19 +227,22 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                 {'subject_id': [1], 'onset': [0], 'offset': [5]},
                 schema={'subject_id': pl.Int64, 'onset': pl.Int64, 'offset': pl.Int64},
             ),
-            pl.from_dict(
-                {
-                    'subject_id': np.ones(10),
-                    'time': np.arange(10),
-                    'x_vel': np.concatenate([np.ones(5), np.zeros(5)]),
-                    'y_vel': np.zeros(10),
-                },
-                schema={
-                    'subject_id': pl.Int64,
-                    'time': pl.Int64,
-                    'x_vel': pl.Float64,
-                    'y_vel': pl.Float64,
-                },
+            GazeDataFrame(
+                pl.from_dict(
+                    {
+                        'subject_id': np.ones(10),
+                        'time': np.arange(10),
+                        'x_vel': np.concatenate([np.ones(5), np.zeros(5)]),
+                        'y_vel': np.zeros(10),
+                    },
+                    schema={
+                        'subject_id': pl.Int64,
+                        'time': pl.Int64,
+                        'x_vel': pl.Float64,
+                        'y_vel': pl.Float64,
+                    },
+                ),
+                velocity_columns=['x_vel', 'y_vel'],
             ),
             {'event_properties': 'peak_velocity'},
             {'identifiers': 'subject_id'},
@@ -260,19 +269,22 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                 {'subject_id': [1], 'onset': [0], 'offset': [10]},
                 schema={'subject_id': pl.Int64, 'onset': pl.Int64, 'offset': pl.Int64},
             ),
-            pl.from_dict(
-                {
-                    'subject_id': np.ones(10),
-                    'time': np.arange(10),
-                    'x_pos': np.concatenate([np.ones(5), np.zeros(5)]),
-                    'y_pos': np.concatenate([np.zeros(5), np.ones(5)]),
-                },
-                schema={
-                    'subject_id': pl.Int64,
-                    'time': pl.Int64,
-                    'x_pos': pl.Float64,
-                    'y_pos': pl.Float64,
-                },
+            GazeDataFrame(
+                pl.from_dict(
+                    {
+                        'subject_id': np.ones(10),
+                        'time': np.arange(10),
+                        'x_pos': np.concatenate([np.ones(5), np.zeros(5)]),
+                        'y_pos': np.concatenate([np.zeros(5), np.ones(5)]),
+                    },
+                    schema={
+                        'subject_id': pl.Int64,
+                        'time': pl.Int64,
+                        'x_pos': pl.Float64,
+                        'y_pos': pl.Float64,
+                    },
+                ),
+                position_columns=['x_pos', 'y_pos'],
             ),
             {'event_properties': 'dispersion'},
             {'identifiers': 'subject_id'},
@@ -299,19 +311,22 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                 {'subject_id': [1], 'onset': [0], 'offset': [10]},
                 schema={'subject_id': pl.Int64, 'onset': pl.Int64, 'offset': pl.Int64},
             ),
-            pl.from_dict(
-                {
-                    'subject_id': np.ones(10),
-                    'time': np.arange(10),
-                    'x_vel': np.concatenate([np.arange(0.1, 1.1, 0.1)]),
-                    'y_vel': np.concatenate([np.arange(0.1, 1.1, 0.1)]),
-                },
-                schema={
-                    'subject_id': pl.Int64,
-                    'time': pl.Int64,
-                    'x_vel': pl.Float64,
-                    'y_vel': pl.Float64,
-                },
+            GazeDataFrame(
+                pl.from_dict(
+                    {
+                        'subject_id': np.ones(10),
+                        'time': np.arange(10),
+                        'x_vel': np.concatenate([np.arange(0.1, 1.1, 0.1)]),
+                        'y_vel': np.concatenate([np.arange(0.1, 1.1, 0.1)]),
+                    },
+                    schema={
+                        'subject_id': pl.Int64,
+                        'time': pl.Int64,
+                        'x_vel': pl.Float64,
+                        'y_vel': pl.Float64,
+                    },
+                ),
+                velocity_columns=['x_vel', 'y_vel'],
             ),
             {'event_properties': 'peak_velocity'},
             {'identifiers': 'subject_id'},
@@ -340,19 +355,22 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                     'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
                 },
             ),
-            pl.from_dict(
-                {
-                    'subject_id': np.ones(100),
-                    'time': np.arange(100),
-                    'x_vel': np.concatenate([np.ones(10), np.zeros(70), 2 * np.ones(20)]),
-                    'y_vel': np.concatenate([np.ones(10), np.zeros(70), 2 * np.ones(20)]),
-                },
-                schema={
-                    'subject_id': pl.Int64,
-                    'time': pl.Int64,
-                    'x_vel': pl.Float64,
-                    'y_vel': pl.Float64,
-                },
+            GazeDataFrame(
+                pl.from_dict(
+                    {
+                        'subject_id': np.ones(100),
+                        'time': np.arange(100),
+                        'x_vel': np.concatenate([np.ones(10), np.zeros(70), 2 * np.ones(20)]),
+                        'y_vel': np.concatenate([np.ones(10), np.zeros(70), 2 * np.ones(20)]),
+                    },
+                    schema={
+                        'subject_id': pl.Int64,
+                        'time': pl.Int64,
+                        'x_vel': pl.Float64,
+                        'y_vel': pl.Float64,
+                    },
+                ),
+                velocity_columns=['x_vel', 'y_vel'],
             ),
             {'event_properties': 'peak_velocity'},
             {'identifiers': 'subject_id'},
@@ -381,19 +399,22 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                     'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
                 },
             ),
-            pl.from_dict(
-                {
-                    'subject_id': np.ones(100),
-                    'time': np.arange(100),
-                    'x_vel': np.concatenate([np.ones(10), np.zeros(70), 2 * np.ones(20)]),
-                    'y_vel': np.concatenate([np.ones(10), np.zeros(70), 2 * np.ones(20)]),
-                },
-                schema={
-                    'subject_id': pl.Int64,
-                    'time': pl.Int64,
-                    'x_vel': pl.Float64,
-                    'y_vel': pl.Float64,
-                },
+            GazeDataFrame(
+                pl.from_dict(
+                    {
+                        'subject_id': np.ones(100),
+                        'time': np.arange(100),
+                        'x_vel': np.concatenate([np.ones(10), np.zeros(70), 2 * np.ones(20)]),
+                        'y_vel': np.concatenate([np.ones(10), np.zeros(70), 2 * np.ones(20)]),
+                    },
+                    schema={
+                        'subject_id': pl.Int64,
+                        'time': pl.Int64,
+                        'x_vel': pl.Float64,
+                        'y_vel': pl.Float64,
+                    },
+                ),
+                velocity_columns=['x_vel', 'y_vel'],
             ),
             {'event_properties': 'peak_velocity'},
             {'identifiers': 'subject_id', 'name': 'A'},
@@ -422,19 +443,22 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                     'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
                 },
             ),
-            pl.from_dict(
-                {
-                    'subject_id': np.ones(100),
-                    'time': np.arange(100),
-                    'x_pos': np.concatenate([np.ones(11), np.zeros(69), 2 * np.ones(20)]),
-                    'y_pos': np.concatenate([np.ones(11), np.zeros(69), 2 * np.ones(20)]),
-                },
-                schema={
-                    'subject_id': pl.Int64,
-                    'time': pl.Int64,
-                    'x_pos': pl.Float64,
-                    'y_pos': pl.Float64,
-                },
+            GazeDataFrame(
+                pl.from_dict(
+                    {
+                        'subject_id': np.ones(100),
+                        'time': np.arange(100),
+                        'x_pos': np.concatenate([np.ones(11), np.zeros(69), 2 * np.ones(20)]),
+                        'y_pos': np.concatenate([np.ones(11), np.zeros(69), 2 * np.ones(20)]),
+                    },
+                    schema={
+                        'subject_id': pl.Int64,
+                        'time': pl.Int64,
+                        'x_pos': pl.Float64,
+                        'y_pos': pl.Float64,
+                    },
+                ),
+                position_columns=['x_pos', 'y_pos'],
             ),
             {'event_properties': 'location'},
             {'identifiers': 'subject_id'},
@@ -463,19 +487,26 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                     'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
                 },
             ),
-            pl.from_dict(
-                {
-                    'subject_id': np.ones(100),
-                    'time': np.arange(100),
-                    'x_pos': np.concatenate([np.ones(11), np.zeros(69), 2 * np.ones(19), [200]]),
-                    'y_pos': np.concatenate([np.ones(11), np.zeros(69), 2 * np.ones(19), [200]]),
-                },
-                schema={
-                    'subject_id': pl.Int64,
-                    'time': pl.Int64,
-                    'x_pos': pl.Float64,
-                    'y_pos': pl.Float64,
-                },
+            GazeDataFrame(
+                pl.from_dict(
+                    {
+                        'subject_id': np.ones(100),
+                        'time': np.arange(100),
+                        'x_pos': np.concatenate(
+                            [np.ones(11), np.zeros(69), 2 * np.ones(19), [200]],
+                        ),
+                        'y_pos': np.concatenate(
+                            [np.ones(11), np.zeros(69), 2 * np.ones(19), [200]],
+                        ),
+                    },
+                    schema={
+                        'subject_id': pl.Int64,
+                        'time': pl.Int64,
+                        'x_pos': pl.Float64,
+                        'y_pos': pl.Float64,
+                    },
+                ),
+                position_columns=['x_pos', 'y_pos'],
             ),
             {'event_properties': ('location', {'method': 'mean'})},
             {'identifiers': 'subject_id'},
@@ -504,19 +535,26 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                     'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
                 },
             ),
-            pl.from_dict(
-                {
-                    'subject_id': np.ones(100),
-                    'time': np.arange(100),
-                    'x_pos': np.concatenate([np.ones(11), np.zeros(69), 2 * np.ones(19), [200]]),
-                    'y_pos': np.concatenate([np.ones(11), np.zeros(69), 2 * np.ones(19), [200]]),
-                },
-                schema={
-                    'subject_id': pl.Int64,
-                    'time': pl.Int64,
-                    'x_pos': pl.Float64,
-                    'y_pos': pl.Float64,
-                },
+            GazeDataFrame(
+                pl.from_dict(
+                    {
+                        'subject_id': np.ones(100),
+                        'time': np.arange(100),
+                        'x_pos': np.concatenate(
+                            [np.ones(11), np.zeros(69), 2 * np.ones(19), [200]],
+                        ),
+                        'y_pos': np.concatenate(
+                            [np.ones(11), np.zeros(69), 2 * np.ones(19), [200]],
+                        ),
+                    },
+                    schema={
+                        'subject_id': pl.Int64,
+                        'time': pl.Int64,
+                        'x_pos': pl.Float64,
+                        'y_pos': pl.Float64,
+                    },
+                ),
+                position_columns=['x_pos', 'y_pos'],
             ),
             {'event_properties': ('location', {'method': 'median'})},
             {'identifiers': 'subject_id'},
@@ -544,10 +582,8 @@ def test_event_gaze_processor_process_correct_result(
         event_df, gaze_df, init_kwargs, process_kwargs, expected_dataframe,
 ):
     events = EventDataFrame(event_df)
-    gaze = GazeDataFrame(gaze_df)
-
     processor = EventGazeProcessor(**init_kwargs)
-    property_result = processor.process(events, gaze, **process_kwargs)
+    property_result = processor.process(events, gaze_df, **process_kwargs)
     assert_frame_equal(property_result, expected_dataframe)
 
 
@@ -559,19 +595,22 @@ def test_event_gaze_processor_process_correct_result(
                 {'subject_id': [1], 'onset': [0], 'offset': [10]},
                 schema={'subject_id': pl.Int64, 'onset': pl.Int64, 'offset': pl.Int64},
             ),
-            pl.from_dict(
-                {
-                    'subject_id': np.ones(10),
-                    'time': np.arange(10),
-                    'x_vel': np.ones(10),
-                    'y_vel': np.zeros(10),
-                },
-                schema={
-                    'subject_id': pl.Int64,
-                    'time': pl.Int64,
-                    'x_vel': pl.Float64,
-                    'y_vel': pl.Float64,
-                },
+            GazeDataFrame(
+                pl.from_dict(
+                    {
+                        'subject_id': np.ones(10),
+                        'time': np.arange(10),
+                        'x_vel': np.ones(10),
+                        'y_vel': np.zeros(10),
+                    },
+                    schema={
+                        'subject_id': pl.Int64,
+                        'time': pl.Int64,
+                        'x_vel': pl.Float64,
+                        'y_vel': pl.Float64,
+                    },
+                ),
+                velocity_columns=['x_vel', 'y_vel'],
             ),
             {'event_properties': 'peak_velocity'},
             {'identifiers': []},
@@ -587,19 +626,22 @@ def test_event_gaze_processor_process_correct_result(
                     'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
                 },
             ),
-            pl.from_dict(
-                {
-                    'subject_id': np.ones(100),
-                    'time': np.arange(100),
-                    'x_vel': np.concatenate([np.ones(10), np.zeros(70), 2 * np.ones(20)]),
-                    'y_vel': np.concatenate([np.ones(10), np.zeros(70), 2 * np.ones(20)]),
-                },
-                schema={
-                    'subject_id': pl.Int64,
-                    'time': pl.Int64,
-                    'x_vel': pl.Float64,
-                    'y_vel': pl.Float64,
-                },
+            GazeDataFrame(
+                pl.from_dict(
+                    {
+                        'subject_id': np.ones(100),
+                        'time': np.arange(100),
+                        'x_vel': np.concatenate([np.ones(10), np.zeros(70), 2 * np.ones(20)]),
+                        'y_vel': np.concatenate([np.ones(10), np.zeros(70), 2 * np.ones(20)]),
+                    },
+                    schema={
+                        'subject_id': pl.Int64,
+                        'time': pl.Int64,
+                        'x_vel': pl.Float64,
+                        'y_vel': pl.Float64,
+                    },
+                ),
+                velocity_columns=['x_vel', 'y_vel'],
             ),
             {'event_properties': 'peak_velocity'},
             {'identifiers': 'subject_id', 'name': 'cde'},
@@ -614,10 +656,9 @@ def test_event_processor_process_exceptions(
 ):
     processor = EventGazeProcessor(**init_kwargs)
     events = EventDataFrame(event_df)
-    gaze = GazeDataFrame(gaze_df)
 
     with pytest.raises(exception) as excinfo:
-        processor.process(events, gaze, **process_kwargs)
+        processor.process(events, gaze_df, **process_kwargs)
 
     msg, = excinfo.value.args
     for msg_substring in msg_substrings:

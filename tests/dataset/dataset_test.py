@@ -20,7 +20,6 @@
 """Test all functionality in pymovements.dataset.dataset."""
 import os
 import shutil
-import unittest
 from pathlib import Path
 from unittest.mock import Mock
 
@@ -54,7 +53,7 @@ def create_preprocessed_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):
 
         for key in fileinfo_row.keys():
             if key in gaze_df.columns:
-                gaze_df = gaze_df.drop(key)
+                gaze_df = gaze_df.frame.drop(key)
 
         gaze_df.write_ipc(rootpath / filepath)
 
@@ -105,6 +104,35 @@ def mock_toy(rootpath, raw_fileformat, eyes):
                     'y_right_pix': pl.Float64,
                 },
             )
+            pixel_columns = ['x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix']
+
+        elif eyes == 'both+avg':
+            gaze_df = pl.from_dict(
+                {
+                    'subject_id': fileinfo_row['subject_id'],
+                    'time': np.arange(1000),
+                    'x_left_pix': np.zeros(1000),
+                    'y_left_pix': np.zeros(1000),
+                    'x_right_pix': np.zeros(1000),
+                    'y_right_pix': np.zeros(1000),
+                    'x_avg_pix': np.zeros(1000),
+                    'y_avg_pix': np.zeros(1000),
+                },
+                schema={
+                    'subject_id': pl.Int64,
+                    'time': pl.Int64,
+                    'x_left_pix': pl.Float64,
+                    'y_left_pix': pl.Float64,
+                    'x_right_pix': pl.Float64,
+                    'y_right_pix': pl.Float64,
+                    'x_avg_pix': pl.Float64,
+                    'y_avg_pix': pl.Float64,
+                },
+            )
+            pixel_columns = [
+                'x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix', 'x_avg_pix', 'y_avg_pix',
+            ]
+
         elif eyes == 'left':
             gaze_df = pl.from_dict(
                 {
@@ -120,6 +148,7 @@ def mock_toy(rootpath, raw_fileformat, eyes):
                     'y_left_pix': pl.Float64,
                 },
             )
+            pixel_columns = ['x_left_pix', 'y_left_pix']
         elif eyes == 'right':
             gaze_df = pl.from_dict(
                 {
@@ -135,6 +164,7 @@ def mock_toy(rootpath, raw_fileformat, eyes):
                     'y_right_pix': pl.Float64,
                 },
             )
+            pixel_columns = ['x_right_pix', 'y_right_pix']
         elif eyes == 'none':
             gaze_df = pl.from_dict(
                 {
@@ -150,6 +180,7 @@ def mock_toy(rootpath, raw_fileformat, eyes):
                     'y_pix': pl.Float64,
                 },
             )
+            pixel_columns = ['x_pix', 'y_pix']
         else:
             raise ValueError(f'invalid value for eyes: {eyes}')
 
@@ -157,42 +188,42 @@ def mock_toy(rootpath, raw_fileformat, eyes):
 
     create_raw_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath / 'raw')
 
+    # Create GazeDataFrames for passing as ground truth
+    gaze_dfs = [
+        pm.GazeDataFrame(gaze_df, pixel_columns=pixel_columns)
+        for gaze_df in gaze_dfs
+    ]
+
     preprocessed_gaze_dfs = []
     for fileinfo_row in fileinfo.to_dicts():
-        gaze_df = pl.from_dict(
-            {
-                'subject_id': fileinfo_row['subject_id'],
-                'time': np.arange(1000),
-                'x_left_pix': np.zeros(1000),
-                'y_left_pix': np.zeros(1000),
-                'x_right_pix': np.zeros(1000),
-                'y_right_pix': np.zeros(1000),
-                'x_left_pos': np.zeros(1000),
-                'y_left_pos': np.zeros(1000),
-                'x_right_pos': np.zeros(1000),
-                'y_right_pos': np.zeros(1000),
-                'x_left_vel': np.zeros(1000),
-                'y_left_vel': np.zeros(1000),
-                'x_right_vel': np.zeros(1000),
-                'y_right_vel': np.zeros(1000),
-            },
-            schema={
-                'subject_id': pl.Int64,
-                'time': pl.Int64,
-                'x_left_pix': pl.Float64,
-                'y_left_pix': pl.Float64,
-                'x_right_pix': pl.Float64,
-                'y_right_pix': pl.Float64,
-                'x_left_pos': pl.Float64,
-                'y_left_pos': pl.Float64,
-                'x_right_pos': pl.Float64,
-                'y_right_pos': pl.Float64,
-                'x_left_vel': pl.Float64,
-                'y_left_vel': pl.Float64,
-                'x_right_vel': pl.Float64,
-                'y_right_vel': pl.Float64,
-            },
+        position_columns = [pixel_column.replace('pix', 'pos') for pixel_column in pixel_columns]
+        velocity_columns = [pixel_column.replace('pix', 'vel') for pixel_column in pixel_columns]
+        acceleration_columns = [
+            pixel_column.replace('pix', 'acc') for pixel_column in pixel_columns
+        ]
+
+        gaze_data = {
+            'subject_id': fileinfo_row['subject_id'],
+            'time': np.arange(1000),
+        }
+        gaze_schema = {
+            'subject_id': pl.Int64,
+            'time': pl.Int64,
+        }
+
+        for column in pixel_columns + position_columns + velocity_columns + acceleration_columns:
+            gaze_data[column] = np.zeros(1000)
+            gaze_schema[column] = pl.Float64
+
+        # Create GazeDataFrames for passing as ground truth
+        gaze_df = pm.GazeDataFrame(
+            pl.from_dict(gaze_data, schema=gaze_schema),
+            pixel_columns=pixel_columns,
+            position_columns=position_columns,
+            velocity_columns=velocity_columns,
+            acceleration_columns=acceleration_columns,
         )
+
         preprocessed_gaze_dfs.append(gaze_df)
 
     create_preprocessed_gaze_files_from_fileinfo(
@@ -233,6 +264,8 @@ def mock_toy(rootpath, raw_fileformat, eyes):
         ),
         filename_format=r'{subject_id:d}.' + raw_fileformat,
         filename_format_dtypes={'subject_id': pl.Int64},
+        time_column='time',
+        pixel_columns=pixel_columns,
     )
 
     return {
@@ -248,12 +281,17 @@ def mock_toy(rootpath, raw_fileformat, eyes):
     }
 
 
-@pytest.fixture(name='dataset_configuration', params=['ToyMono', 'ToyBino', 'ToyLeft', 'ToyRight'])
+@pytest.fixture(
+    name='dataset_configuration',
+    params=['ToyMono', 'ToyBino', 'ToyLeft', 'ToyRight', 'ToyBino+Avg'],
+)
 def fixture_dataset(request, tmp_path):
     rootpath = tmp_path
 
     if request.param == 'ToyBino':
         dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='both')
+    elif request.param == 'ToyBino+Avg':
+        dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='both+avg')
     elif request.param == 'ToyMono':
         dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='none')
     elif request.param == 'ToyLeft':
@@ -282,7 +320,7 @@ def test_load_correct_raw_gaze_dfs(dataset_configuration):
 
     expected_gaze_dfs = dataset_configuration['raw_gaze_dfs']
     for result_gaze_df, expected_gaze_df in zip(dataset.gaze, expected_gaze_dfs):
-        assert_frame_equal(result_gaze_df.frame, expected_gaze_df)
+        assert_frame_equal(result_gaze_df.frame, expected_gaze_df.frame)
 
 
 def test_load_gaze_has_position_columns(dataset_configuration):
@@ -290,7 +328,7 @@ def test_load_gaze_has_position_columns(dataset_configuration):
     dataset.load(preprocessed=True)
 
     for result_gaze_df in dataset.gaze:
-        assert result_gaze_df.position_columns
+        assert 'position' in result_gaze_df.columns
 
 
 def test_load_correct_preprocessed_gaze_dfs(dataset_configuration):
@@ -299,7 +337,7 @@ def test_load_correct_preprocessed_gaze_dfs(dataset_configuration):
 
     expected_gaze_dfs = dataset_configuration['preprocessed_gaze_dfs']
     for result_gaze_df, expected_gaze_df in zip(dataset.gaze, expected_gaze_dfs):
-        assert_frame_equal(result_gaze_df.frame, expected_gaze_df)
+        assert_frame_equal(result_gaze_df.frame, expected_gaze_df.frame)
 
 
 def test_load_correct_event_dfs(dataset_configuration):
@@ -397,6 +435,7 @@ def test_save_gaze_exceptions(init_kwargs, save_kwargs, exception, dataset_confi
         dataset.load()
         dataset.pix2deg()
         dataset.pos2vel()
+        dataset.pos2acc()
         dataset.save_preprocessed(**save_kwargs)
 
 
@@ -488,13 +527,7 @@ def test_pix2deg(dataset_configuration):
 
     dataset.pix2deg()
 
-    dva_schema = {}
-    for column_name in original_schema.keys():
-        if column_name.endswith('_pix'):
-            dva_column_name = column_name.replace('_pix', '_pos')
-            dva_schema[dva_column_name] = original_schema[column_name]
-    expected_schema = {**original_schema, **dva_schema}
-
+    expected_schema = {**original_schema, 'position': pl.List(pl.Float64)}
     for result_gaze_df in dataset.gaze:
         print(result_gaze_df.schema)
         print(expected_schema)
@@ -510,13 +543,7 @@ def test_pos2acc(dataset_configuration):
 
     dataset.pos2acc()
 
-    acc_schema = {}
-    for column_name in original_schema.keys():
-        if column_name.endswith('_pix'):
-            acc_column_name = column_name.replace('_pix', '_acc')
-            acc_schema[acc_column_name] = original_schema[column_name]
-    expected_schema = {**original_schema, **acc_schema}
-
+    expected_schema = {**original_schema, 'acceleration': pl.List(pl.Float64)}
     for result_gaze_df in dataset.gaze:
         assert result_gaze_df.schema == expected_schema
 
@@ -530,13 +557,7 @@ def test_pos2vel(dataset_configuration):
 
     dataset.pos2vel()
 
-    vel_schema = {}
-    for column_name in original_schema.keys():
-        if column_name.endswith('_pix'):
-            vel_column_name = column_name.replace('_pix', '_vel')
-            vel_schema[vel_column_name] = original_schema[column_name]
-    expected_schema = {**original_schema, **vel_schema}
-
+    expected_schema = {**original_schema, 'velocity': pl.List(pl.Float64)}
     for result_gaze_df in dataset.gaze:
         assert result_gaze_df.schema == expected_schema
 
@@ -602,14 +623,6 @@ def test_detect_events_auto_eye(detect_event_kwargs, dataset_configuration):
             },
             id='right',
         ),
-        pytest.param(
-            {
-                'method': pm.events.microsaccades,
-                'threshold': 1,
-                'eye': 'eye',
-            },
-            id='eye',
-        ),
     ],
 )
 def test_detect_events_explicit_eye(detect_event_kwargs, dataset_configuration):
@@ -621,9 +634,8 @@ def test_detect_events_explicit_eye(detect_event_kwargs, dataset_configuration):
     dataset_eyes = dataset_configuration['eyes']
 
     exception = None
-    if dataset_eyes != detect_event_kwargs['eye']:
-        if dataset_eyes != 'both' or detect_event_kwargs['eye'] == 'eye':
-            exception = AttributeError
+    if not dataset_eyes.startswith('both') and detect_event_kwargs['eye'] is not None:
+        exception = AttributeError
 
     if exception is None:
         dataset.detect_events(**detect_event_kwargs)
@@ -726,33 +738,70 @@ def test_detect_events_alias(dataset_configuration, detect_kwargs, monkeypatch):
     mock.assert_called_with(**detect_kwargs)
 
 
+@pytest.mark.parametrize('dataset_configuration', ['ToyMono'], indirect=['dataset_configuration'])
 def test_detect_events_attribute_error(dataset_configuration):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
-
-    try:
-        dataset.gaze[0] = dataset.gaze[0].drop('x_left_pos')
-    except BaseException:
-        pass
-
-    try:
-        dataset.gaze[0] = dataset.gaze[0].drop('x_right_pos')
-    except BaseException:
-        pass
-
-    try:
-        dataset.gaze[0] = dataset.gaze[0].drop('x_eye_pos')
-    except BaseException:
-        pass
+    dataset.pix2deg()
+    dataset.pos2vel()
 
     detect_event_kwargs = {
         'method': pm.events.microsaccades,
         'threshold': 1,
-        'eye': 'auto',
+        'eye': 'right',
     }
 
     with pytest.raises(AttributeError):
         dataset.detect_events(**detect_event_kwargs)
+
+
+@pytest.mark.parametrize('dataset_configuration', ['ToyMono'], indirect=['dataset_configuration'])
+@pytest.mark.parametrize(
+    ('rename_arg', 'detect_event_kwargs', 'expected_message'),
+    [
+        pytest.param(
+            {'position': 'custom_position'},
+            {
+                'method': pm.events.microsaccades,
+                'threshold': 1,
+                'eye': 'right',
+            },
+            (
+                "Column 'position' not found. Available columns are: "
+                "['subject_id', 'time', 'pixel', 'velocity', 'custom_position']"
+            ),
+            id='no_position',
+        ),
+        pytest.param(
+            {'velocity': 'custom_velocity'},
+            {
+                'method': pm.events.microsaccades,
+                'threshold': 1,
+                'eye': 'right',
+            },
+            (
+                "Column 'velocity' not found. Available columns are: "
+                "['subject_id', 'time', 'pixel', 'custom_velocity', 'position']"
+            ),
+            id='no_velocity',
+        ),
+    ],
+)
+def test_detect_events_raises_column_not_found_error(
+        dataset_configuration, rename_arg, detect_event_kwargs, expected_message,
+):
+    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+    dataset.pos2vel()
+
+    dataset.gaze[0].frame = dataset.gaze[0].frame.rename(rename_arg)
+
+    with pytest.raises(pl.exceptions.ColumnNotFoundError) as excinfo:
+        dataset.detect_events(**detect_event_kwargs)
+
+    msg, = excinfo.value.args
+    assert msg == expected_message
 
 
 @pytest.mark.parametrize(
@@ -883,6 +932,7 @@ def test_load_previously_saved_events_gaze(
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
+    dataset.pos2acc()
     dataset.detect_events(**detect_event_kwargs)
 
     # We must not overwrite the original variable as it's needed in the end.
@@ -917,11 +967,14 @@ def test_load_previously_saved_events_gaze(
         ),
     ],
 )
-def test_save_preprocessed(preprocessed_dirname, expected_save_dirpath, dataset_configuration):
+def test_save_preprocessed_directory_exists(
+        preprocessed_dirname, expected_save_dirpath, dataset_configuration,
+):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
+    dataset.pos2acc()
 
     if preprocessed_dirname is None:
         preprocessed_dirname = 'preprocessed'
@@ -931,6 +984,31 @@ def test_save_preprocessed(preprocessed_dirname, expected_save_dirpath, dataset_
 
     assert (dataset.path / expected_save_dirpath).is_dir(), (
         f'data was not written to {dataset.path / Path(expected_save_dirpath)}'
+    )
+
+
+def test_save_preprocessed_no_tuple_columns(dataset_configuration):
+    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+    dataset.pos2vel()
+    dataset.pos2acc()
+
+    # This is not implemented yet
+    # dataset.gaze[0].explode(['pixel', 'position', 'velocity', 'acceleration'])
+    dataset.gaze[0].frame = dataset.gaze[0].frame.rename({'time': 'ttt'})
+    dataset.gaze[0].frame = dataset.gaze[0].frame.drop(
+        ['pixel', 'position', 'velocity', 'acceleration'],
+    )
+
+    preprocessed_dirname = 'preprocessed-test'
+    shutil.rmtree(dataset.path / Path(preprocessed_dirname), ignore_errors=True)
+    shutil.rmtree(dataset.path / Path(preprocessed_dirname), ignore_errors=True)
+    dataset.save_preprocessed(preprocessed_dirname, extension='csv')
+    dataset.load_gaze_files(True, preprocessed_dirname, extension='csv')
+
+    assert (dataset.path / preprocessed_dirname).is_dir(), (
+        f'data was not written to {dataset.path / Path(preprocessed_dirname)}'
     )
 
 
@@ -1027,6 +1105,7 @@ def test_save_files_have_correct_extension(
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
+    dataset.pos2acc()
 
     detect_events_kwargs = {'method': pm.events.microsaccades, 'threshold': 1, 'eye': 'auto'}
     dataset.detect_events(**detect_events_kwargs)
@@ -1185,11 +1264,8 @@ def test_velocity_columns(dataset_configuration):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True)
 
-    expected_velocity_columns = ['x_left_vel', 'y_left_vel', 'x_right_vel', 'y_right_vel']
-    case = unittest.TestCase()
-
     for gaze_df in dataset.gaze:
-        case.assertCountEqual(gaze_df.velocity_columns, expected_velocity_columns)
+        assert 'velocity' in gaze_df.columns
 
 
 @pytest.mark.parametrize(

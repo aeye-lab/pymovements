@@ -123,13 +123,11 @@ class ToyDataset(DatasetDefinition):
         },
     )
 
-    column_map: dict[str, str] = field(
-        default_factory=lambda: {
-            'timestamp': 'time',
-            'x': 'x_right_pix',
-            'y': 'y_right_pix',
-        },
-    )
+    time_column: str = 'timestamp'
+
+    pixel_columns: list[str] = field(default_factory=lambda: ['x', 'y'])
+
+    column_map: dict[str, str] = field(default_factory=lambda: {})
 
     custom_read_kwargs: dict[str, str] = field(
         default_factory=lambda: {
