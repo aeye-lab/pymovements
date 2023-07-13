@@ -27,7 +27,6 @@ import numpy as np
 from pymovements.events.events import EventDataFrame
 from pymovements.events.events import register_event_detection
 from pymovements.gaze.transforms import consecutive
-from pymovements.utils import checks
 
 
 @register_event_detection

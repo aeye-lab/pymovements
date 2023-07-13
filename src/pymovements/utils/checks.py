@@ -89,7 +89,7 @@ def check_shapes(**kwargs) -> None:
         raise ValueError(
             f'{", ".join(key for key in kwargs.keys())}'
             f' must have the same shape, but shapes are '
-            f'{", ".join(str(array.shape) for array in kwargs.values())}'
+            f'{", ".join(str(array.shape) for array in kwargs.values())}',
         )
 
 
