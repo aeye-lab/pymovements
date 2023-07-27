@@ -224,13 +224,7 @@ def test_savitzky_golay_raises_error(kwargs, series, exception, msg_substrings):
                 'sampling_rate': 1, 'n_components': 2, 'input_column': 'A',
             },
             pl.Series('A', [[1, 1], [1, 1], [1, 1]], pl.List(pl.Float64)),
-            pl.Series(
-                'A', [
-                    [0.9999999999999997, 0.9999999999999997], [1, 1],
-                    [1.0000000000000002, 1.0000000000000002],
-                ],
-                pl.List(pl.Float64),
-            ),
+            pl.Series('A', [[1, 1], [1, 1], [1, 1]], pl.List(pl.Float64)),
             id='three_elements_stay_the_same_none_padding',
         ),
         pytest.param(
@@ -239,14 +233,7 @@ def test_savitzky_golay_raises_error(kwargs, series, exception, msg_substrings):
                 'sampling_rate': 1, 'n_components': 2, 'input_column': 'A',
             },
             pl.Series('A', [[1, 1], [1, 1], [1, 1]], pl.List(pl.Float64)),
-            pl.Series(
-                'A', [
-                    [2.5171994467032234e-16, 2.5171994467032234e-16],
-                    [2.7755575615628914e-17, 2.7755575615628914e-17],
-                    [2.5171994467032234e-16, 2.5171994467032234e-16],
-                ],
-                pl.List(pl.Float64),
-            ),
+            pl.Series('A', [[0, 0], [0, 0], [0, 0]], pl.List(pl.Float64)),
             id='three_equal_elements_differentation_none_padding_result_zero',
         ),
         pytest.param(
@@ -255,14 +242,7 @@ def test_savitzky_golay_raises_error(kwargs, series, exception, msg_substrings):
                 'sampling_rate': 1, 'n_components': 2, 'input_column': 'A',
             },
             pl.Series('A', [[1, 1], [2, 2], [3, 3]], pl.List(pl.Float64)),
-            pl.Series(
-                'A', [
-                    [1.0000000000000004, 1.0000000000000004],
-                    [1.0000000000000002, 1.0000000000000002],
-                    [1.0000000000000004, 1.0000000000000004],
-                ],
-                pl.List(pl.Float64),
-            ),
+            pl.Series('A', [[1, 1], [1, 1], [1, 1]], pl.List(pl.Float64)),
             id='three_elements_1_2_3_differentation_none_padding_result_one',
         ),
         pytest.param(
@@ -271,13 +251,7 @@ def test_savitzky_golay_raises_error(kwargs, series, exception, msg_substrings):
                 'sampling_rate': 1, 'n_components': 2, 'input_column': 'A',
             },
             pl.Series('A', [[1, 1], [4, 4], [9, 9]], pl.List(pl.Float64)),
-            pl.Series(
-                'A', [
-                    [1.9999999999999991, 1.9999999999999991], [2, 2],  # FIXME
-                    [1.9999999999999991, 1.9999999999999991],
-                ],
-                pl.List(pl.Float64),
-            ),
+            pl.Series('A', [[2, 2], [2, 2], [2, 2]], pl.List(pl.Float64)),
             id='three_elements_1_4_9_double_differentation_none_padding_result_two',
         ),
     ],

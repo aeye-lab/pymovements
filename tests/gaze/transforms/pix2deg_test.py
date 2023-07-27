@@ -300,7 +300,7 @@ def test_pix2deg_raises_error(kwargs, series, exception, msg_substrings):
                 'n_components': 2,
             },
             pl.Series('pixel', [[0, (100 - 1) / 2]], pl.List(pl.Float64)),
-            pl.Series('position', [[-26.335410003881348, 0]], pl.List(pl.Float64)),
+            pl.Series('position', [[-26.3354, 0]], pl.List(pl.Float64)),
             id='center_pixel_origin_lowerleft_returns_0',
         ),
         pytest.param(
@@ -328,7 +328,7 @@ def test_pix2deg_raises_error(kwargs, series, exception, msg_substrings):
                 'n_components': 2,
             },
             pl.Series('pixel', [[0, 100 - 0.5]], pl.List(pl.Float64)),
-            pl.Series('position', [[-44.712083933442905, 45]], pl.List(pl.Float64)),
+            pl.Series('position', [[-44.7120, 45]], pl.List(pl.Float64)),
             id='isosceles_triangle_origin_lowerleft_returns_45',
         ),
         pytest.param(
@@ -342,7 +342,7 @@ def test_pix2deg_raises_error(kwargs, series, exception, msg_substrings):
                 'n_components': 2,
             },
             pl.Series('pixel', [[0, -0.5]], pl.List(pl.Float64)),
-            pl.Series('position', [[-44.712083933442905, -45]], pl.List(pl.Float64)),
+            pl.Series('position', [[-44.7120, -45]], pl.List(pl.Float64)),
             id='isosceles_triangle_left_origin_lowerleft_returns_neg45',
         ),
         pytest.param(
@@ -356,7 +356,7 @@ def test_pix2deg_raises_error(kwargs, series, exception, msg_substrings):
                 'n_components': 2,
             },
             pl.Series('pixel', [[0, 50]], pl.List(pl.Float64)),
-            pl.Series('position', [[0, 26.56505117707799]], pl.List(pl.Float64)),
+            pl.Series('position', [[0, 26.5650]], pl.List(pl.Float64)),
             id='ankathet_half_origin_center_returns_26.565',
         ),
         pytest.param(
@@ -370,7 +370,7 @@ def test_pix2deg_raises_error(kwargs, series, exception, msg_substrings):
                 'n_components': 2,
             },
             pl.Series('pixel', [[0, 100 - 0.5]], pl.List(pl.Float64)),
-            pl.Series('position', [[-26.335410003881346, 26.56505117707799]], pl.List(pl.Float64)),
+            pl.Series('position', [[-26.3354, 26.5650]], pl.List(pl.Float64)),
             id='ankathet_half_origin_lowerleft_returns_26.565',
         ),
         pytest.param(
@@ -384,7 +384,7 @@ def test_pix2deg_raises_error(kwargs, series, exception, msg_substrings):
                 'n_components': 2,
             },
             pl.Series('pixel', [[0, 50]], pl.List(pl.Float64)),
-            pl.Series('position', [[0, 59.99999999999999]], pl.List(pl.Float64)),
+            pl.Series('position', [[0, 60]], pl.List(pl.Float64)),
             id='ankathet_sqrt3_origin_center_returns_60',
         ),
         pytest.param(
@@ -398,7 +398,7 @@ def test_pix2deg_raises_error(kwargs, series, exception, msg_substrings):
                 'n_components': 2,
             },
             pl.Series('pixel', [[0, 100 - 0.5]], pl.List(pl.Float64)),
-            pl.Series('position', [[-59.75002878708134, 59.99999999999999]], pl.List(pl.Float64)),
+            pl.Series('position', [[-59.75, 60]], pl.List(pl.Float64)),
             id='ankathet_sqrt3_origin_lowerleft_returns_60',
         ),
         pytest.param(
@@ -412,7 +412,7 @@ def test_pix2deg_raises_error(kwargs, series, exception, msg_substrings):
                 'n_components': 2,
             },
             pl.Series('pixel', [[0, 50]], pl.List(pl.Float64)),
-            pl.Series('position', [[0, 30.000000000000004]], pl.List(pl.Float64)),
+            pl.Series('position', [[0, 30]], pl.List(pl.Float64)),
             id='opposite_sqrt3_origin_center_returns_30',
         ),
         pytest.param(
@@ -426,7 +426,7 @@ def test_pix2deg_raises_error(kwargs, series, exception, msg_substrings):
                 'n_components': 2,
             },
             pl.Series('pixel', [[-0.5, 100 - 0.5]], pl.List(pl.Float64)),
-            pl.Series('position', [[-30.000000000000004, 30.000000000000004]], pl.List(pl.Float64)),
+            pl.Series('position', [[-30, 30]], pl.List(pl.Float64)),
             id='opposite_sqrt3_origin_lowerleft_returns_30',
         ),
     ],
