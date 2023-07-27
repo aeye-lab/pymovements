@@ -28,10 +28,6 @@ from pymovements.gaze.transforms_pl.transforms_library import register_transform
 from pymovements.utils import checks
 
 
-def pix2deg_helper():
-    pass
-
-
 @register_transform
 def pix2deg(
         *,

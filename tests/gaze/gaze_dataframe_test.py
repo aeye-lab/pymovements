@@ -231,7 +231,7 @@ def test_gaze_dataframe_pix2deg_has_correct_columns(
         pytest.param(
             {'data': pl.DataFrame(schema={'x_pix': pl.Float64, 'y_pix': pl.Float64})},
             AttributeError,
-            'experiment must be specified for this method to work',
+            'experiment must not be None for this method to work',
             id='no_experiment',
         ),
     ],
@@ -324,7 +324,7 @@ def test_gaze_dataframe_pos2acc_has_correct_columns(
         pytest.param(
             {'data': pl.DataFrame(schema={'x_pos': pl.Float64, 'y_pos': pl.Float64})},
             AttributeError,
-            'experiment must be specified for this method to work',
+            'experiment must not be None for this method to work',
             id='no_experiment',
         ),
     ],
@@ -416,7 +416,7 @@ def test_gaze_dataframe_pos2vel_has_correct_columns(
         pytest.param(
             {'data': pl.DataFrame(schema={'x_pos': pl.Float64, 'y_pos': pl.Float64})},
             AttributeError,
-            'experiment must be specified for this method to work',
+            'experiment must not be None for this method to work',
             id='no_dva_pos_columns',
         ),
     ],

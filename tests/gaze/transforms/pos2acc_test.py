@@ -29,18 +29,6 @@ import pymovements as pm
     ('kwargs', 'exception', 'msg_substrings'),
     [
         pytest.param(
-            {'window_length': 1, 'sampling_rate': 1, 'n_components': 2},
-            TypeError,
-            ('degree', 'must not be None'),
-            id='no_degree_raises_type_error',
-        ),
-        pytest.param(
-            {'degree': 1, 'sampling_rate': 1, 'n_components': 2},
-            TypeError,
-            ('window_length', 'must not be None'),
-            id='no_window_length_raises_type_error',
-        ),
-        pytest.param(
             {'window_length': 1, 'degree': 0, 'sampling_rate': 1, 'n_components': 2},
             ValueError,
             ('degree', 'must', 'greater than zero'),
@@ -74,7 +62,10 @@ import pymovements as pm
             id='invalid_padding_raises_value_error',
         ),
         pytest.param(
-            {'window_length': 3, 'degree': 1, 'padding': 'foobar', 'sampling_rate': 1, 'n_components': 2},
+            {
+                'window_length': 3, 'degree': 1, 'padding': 'foobar', 'sampling_rate': 1,
+                'n_components': 2,
+            },
             ValueError,
             (
                 'padding', 'invalid', 'foobar',

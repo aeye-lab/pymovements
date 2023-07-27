@@ -105,7 +105,10 @@ import pymovements as pm
             id='invalid_padding_raises_value_error',
         ),
         pytest.param(
-            {'method': 'foobar', 'window_length': 3, 'degree': 1, 'sampling_rate': 1, 'n_components': 2},
+            {
+                'method': 'foobar', 'window_length': 3, 'degree': 1, 'sampling_rate': 1,
+                'n_components': 2,
+            },
             ValueError,
             (
                 'unknown', 'method', "'foobar'", 'supported methods', 'preceding', 'neighbors',

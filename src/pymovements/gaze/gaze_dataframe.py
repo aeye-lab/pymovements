@@ -241,22 +241,32 @@ class GazeDataFrame:
         else:
             method_kwargs = inspect.getfullargspec(transform_method).kwonlyargs
             if 'origin' in method_kwargs and 'origin' not in kwargs:
+                self._check_experiment()
+                assert self.experiment is not None
                 kwargs['origin'] = self.experiment.screen.origin
 
             if 'screen_resolution' in method_kwargs and 'screen_resolution' not in kwargs:
+                self._check_experiment()
+                assert self.experiment is not None
                 kwargs['screen_resolution'] = (
                     self.experiment.screen.width_px, self.experiment.screen.height_px,
                 )
 
             if 'screen_size' in method_kwargs and 'screen_size' not in kwargs:
+                self._check_experiment()
+                assert self.experiment is not None
                 kwargs['screen_size'] = (
                     self.experiment.screen.width_cm, self.experiment.screen.height_cm,
                 )
 
             if 'distance' in method_kwargs and 'distance' not in kwargs:
+                self._check_experiment()
+                assert self.experiment is not None
                 kwargs['distance'] = self.experiment.screen.distance_cm
 
             if 'sampling_rate' in method_kwargs and 'sampling_rate' not in kwargs:
+                self._check_experiment()
+                assert self.experiment is not None
                 kwargs['sampling_rate'] = self.experiment.sampling_rate
 
             if 'n_components' in method_kwargs and 'n_components' not in kwargs:
@@ -535,7 +545,7 @@ class GazeDataFrame:
     def _check_experiment(self) -> None:
         """Check if experiment attribute has been set."""
         if self.experiment is None:
-            raise AttributeError('experiment must be specified for this method to work')
+            raise AttributeError('experiment must not be None for this method to work')
 
 
 def _check_component_columns(
