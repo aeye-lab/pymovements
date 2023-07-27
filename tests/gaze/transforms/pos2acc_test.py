@@ -31,13 +31,13 @@ import pymovements as pm
         pytest.param(
             {'window_length': 1, 'sampling_rate': 1, 'n_components': 2},
             TypeError,
-            ('degree', 'must not be None',),
+            ('degree', 'must not be None'),
             id='no_degree_raises_type_error',
         ),
         pytest.param(
             {'degree': 1, 'sampling_rate': 1, 'n_components': 2},
             TypeError,
-            ('window_length', 'must not be None',),
+            ('window_length', 'must not be None'),
             id='no_window_length_raises_type_error',
         ),
         pytest.param(
@@ -139,7 +139,7 @@ def test_pos2acc_raises_error(kwargs, series, exception, msg_substrings):
             {
                 'window_length': 3, 'degree': 1, 'padding': 'mirror', 'sampling_rate': 1,
                 'n_components': 2,
-             },
+            },
             pl.Series('position', [[1, 1]], pl.List(pl.Float64)),
             pl.Series('acceleration', [[0, 0]], pl.List(pl.Float64)),
             id='single_element_results_zero_mirror_padding',

@@ -55,6 +55,12 @@ def pos2vel(
     padding:
         The padding to use.  This has only an effect if using ``savitzky_golay`` as calculation
         method.
+    n_components:
+        Number of components in input column.
+    position_column:
+        The input position column name.
+    velocity_column:
+        The output velocity column name.
 
     Notes
     -----
@@ -89,8 +95,7 @@ def pos2vel(
             ],
         ).alias(velocity_column)
 
-    if method == 'fivepoint' or method == 'smooth':
-        # TODO: deprecate smooth
+    if method in {'fivepoint', 'smooth'}:
         # Center of window is period 0 and will be filled.
         # mean(arr_-2, arr_-1) and mean(arr_1, arr_2) needs division by two
         # window is now 3 samples long (arr_-1.5, arr_0, arr_1+5)

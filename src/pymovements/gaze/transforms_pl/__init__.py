@@ -34,11 +34,9 @@ __all__ = [
     'downsample',
     'norm',
     'pix2deg',
-    'pix2deg_helper',
     'pos2acc',
     'pos2vel',
     'register_transform',
     'savitzky_golay',
-    'savitzky_golay_helper',
     'TransformLibrary',
 ]

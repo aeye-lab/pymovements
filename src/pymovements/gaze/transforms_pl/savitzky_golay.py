@@ -71,6 +71,10 @@ def savitzky_golay(
         evaluate the last ``window_length // 2`` output values.
         When passing a scalar value, data will be padded using the passed value.
         See the Notes for more details on the padding methods ``mirror``, ``nearest`` or ``wrap``.
+    input_column:
+        The input column name.
+    output_column:
+        The output column name.
 
     Returns
     -------

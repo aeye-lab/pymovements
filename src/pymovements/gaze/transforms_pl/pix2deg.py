@@ -28,6 +28,10 @@ from pymovements.gaze.transforms_pl.transforms_library import register_transform
 from pymovements.utils import checks
 
 
+def pix2deg_helper():
+    pass
+
+
 @register_transform
 def pix2deg(
         *,
@@ -93,6 +97,7 @@ def _check_distance(distance: float) -> None:
 
 
 def _check_screen_resolution(screen_resolution: tuple[int, int]) -> None:
+    """Check screen resolution value."""
     if screen_resolution is None:
         raise TypeError('screen_resolution must not be None')
 
@@ -113,6 +118,7 @@ def _check_screen_resolution(screen_resolution: tuple[int, int]) -> None:
 
 
 def _check_screen_size(screen_size: tuple[float, float]) -> None:
+    """Check screen size value."""
     if screen_size is None:
         raise TypeError('screen_size must not be None')
 

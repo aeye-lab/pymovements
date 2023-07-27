@@ -49,6 +49,12 @@ def pos2acc(
         The window size to use.
     padding:
         The padding to use.
+    n_components:
+        Number of components in input column.
+    position_column:
+        The input position column name.
+    acceleration_column:
+        The output acceleration column name.
     """
     return savitzky_golay(
         window_length=window_length,
