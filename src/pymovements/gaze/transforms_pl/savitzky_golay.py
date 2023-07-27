@@ -144,12 +144,14 @@ def savitzky_golay(
 
 def _check_window_length(window_length: Any) -> None:
     """Check that window length is an integer and greater than zero."""
+    checks.check_is_not_none(window_length=window_length)
     checks.check_is_int(window_length=window_length)
     checks.check_is_greater_than_zero(degree=window_length)
 
 
 def _check_degree(degree: Any, window_length: int) -> None:
     """Check that polynomial degree is an integer, greater than zero and less than window_length."""
+    checks.check_is_not_none(degree=degree)
     checks.check_is_int(degree=degree)
     checks.check_is_greater_than_zero(degree=degree)
 
