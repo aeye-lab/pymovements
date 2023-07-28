@@ -40,6 +40,31 @@ import pymovements as pm
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
+            pm.gaze.transforms_pl.downsample, {'factor': 1},
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'time': np.arange(1000, 1100, 1),
+                        'x_pix': np.arange(0, 10, 0.1),
+                        'y_pix': np.arange(20, 30, 0.1),
+                    },
+                ),
+                pixel_columns=['x_pix', 'y_pix'],
+            ),
+            id='downsample_factor_1_method_pass',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': np.arange(1000, 1100, 1),
+                        'x_pix': np.arange(0, 10, 0.1),
+                        'y_pix': np.arange(20, 30, 0.1),
+                    },
+                ),
+                'pixel_columns': ['x_pix', 'y_pix'],
+            },
             'downsample', {'factor': 1},
             pm.GazeDataFrame(
                 data=pl.from_dict(
