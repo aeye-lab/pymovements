@@ -74,6 +74,16 @@ def test_center_origin_init_raises_error(kwargs, exception, msg_substrings):
         ),
         pytest.param(
             {
+                'screen_resolution': (100, 100), 'origin': 'center',
+                'pixel_column': 'pixel', 'output_column': 'centered',
+                'n_components': 2,
+            },
+            pl.Series('pixel', [], pl.List(pl.Float64)),
+            pl.Series('centered', [], pl.List(pl.Float64)),
+            id='empty_series_returns_empty_series_with_output_column',
+        ),
+        pytest.param(
+            {
                 'screen_resolution': (100, 100), 'origin': 'center', 'pixel_column': 'pixel',
                 'n_components': 2,
             },
