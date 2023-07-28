@@ -76,14 +76,16 @@ def pix2deg(
         for screen_px, screen_cm in zip(screen_resolution, screen_size)
     )
 
-    return pl.concat_list(
-        [
-            centered_pixels.list.get(component).map(
-                lambda s: np.arctan2(s, distance_pixels[component % 2]),
-            ) * (180 / np.pi)
-            for component in range(n_components)
-        ],
-    ).alias(position_column)
+    degree_components = [
+        centered_pixels.list.get(component).map(
+            lambda s: np.arctan2(
+                s, distance_pixels[component % 2],  # pylint: disable=cell-var-from-loop
+            ),
+        ) * (180 / np.pi)
+        for component in range(n_components)
+    ]
+
+    return pl.concat_list(degree_components).alias(position_column)
 
 
 def _check_distance(distance: float) -> None:
