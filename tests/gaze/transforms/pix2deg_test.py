@@ -437,7 +437,4 @@ def test_pix2deg_returns(kwargs, series, expected_df):
     result_df = df.select(
         pm.gaze.transforms_pl.pix2deg(**kwargs),
     )
-    try:
-        assert_frame_equal(result_df, expected_df.to_frame())
-    except BaseException:
-        breakpoint()
+    assert_frame_equal(result_df, expected_df.to_frame())
