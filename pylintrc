@@ -95,12 +95,13 @@ enable=
 # --disable=W"
 
 disable=
+    consider-using-namedtuple-or-dataclass,
+    consider-using-assignment-expr,
     invalid-name,
+    redefined-variable-type,
     too-few-public-methods,
     too-many-arguments,
     too-many-locals,
-    redefined-variable-type,
-    consider-using-namedtuple-or-dataclass,
 
 [REPORTS]
 
