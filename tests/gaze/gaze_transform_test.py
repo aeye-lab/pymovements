@@ -215,6 +215,43 @@ import pymovements as pm
             {
                 'data': pl.from_dict(
                     {
+                        'time': [1000, 1000],
+                        'x_pix': [(100 - 1) / 2, (100 - 1) / 2],
+                        'y_pix': [0.0, 0.0],
+                    },
+                ),
+                'experiment': pm.Experiment(
+                    sampling_rate=1000,
+                    screen_width_px=100,
+                    screen_height_px=100,
+                    screen_width_cm=100,
+                    screen_height_cm=100,
+                    distance_cm=100,
+                    origin='center',
+                ),
+                'pixel_columns': ['x_pix', 'y_pix'],
+            },
+            'pix2deg', {'n_components': 2},
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'time': [1000, 1000],
+                        'x_pix': [49.5, 49.5],
+                        'y_pix': [0.0, 0.0],
+                        'x_dva': [26.335410003881348, 26.335410003881348],
+                        'y_dva': [0.0, 0.0],
+                    },
+                ),
+                pixel_columns=['x_pix', 'y_pix'],
+                position_columns=['x_dva', 'y_dva'],
+            ),
+            id='pix2deg_origin_center_explicit_n_components',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
                         'time': [1000],
                         'x_pix': [(100 - 1) / 2],
                         'y_pix': [0.0],
