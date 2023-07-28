@@ -140,7 +140,21 @@ import pymovements as pm
             },
             TypeError,
             ('screen_resolution', 'must be of type tuple[int, int]', 'type int'),
-            id='zero_screen_resolution_int_scalar',
+            id='screen_resolution_int_scalar',
+        ),
+        pytest.param(
+            {
+                'screen_resolution': (100, 100, 100),
+                'screen_size': (100, 100),
+                'distance': 100,
+                'origin': 'center',
+                'pixel_column': 'pixel',
+                'position_column': 'position',
+                'n_components': 2,
+            },
+            ValueError,
+            ('screen_resolution must have length of 2, but is of length 3',),
+            id='screen_resolution_3-tuple',
         ),
         pytest.param(
             {
@@ -151,6 +165,34 @@ import pymovements as pm
             ValueError,
             ('screen_size', 'must be greater than zero', '0'),
             id='zero_screen_size_raises_type_error',
+        ),
+        pytest.param(
+            {
+                'screen_resolution': (100, 100),
+                'screen_size': 1,
+                'distance': 100,
+                'origin': 'center',
+                'pixel_column': 'pixel',
+                'position_column': 'position',
+                'n_components': 2,
+            },
+            TypeError,
+            ('screen_size', 'must be of type tuple[int, int]', 'type int'),
+            id='screen_size_int_scalar',
+        ),
+        pytest.param(
+            {
+                'screen_resolution': (100, 100),
+                'screen_size': (100, 100, 100),
+                'distance': 100,
+                'origin': 'center',
+                'pixel_column': 'pixel',
+                'position_column': 'position',
+                'n_components': 2,
+            },
+            ValueError,
+            ('screen_size must have length of 2, but is of length 3',),
+            id='screen_size_3-tuple',
         ),
         pytest.param(
             {
