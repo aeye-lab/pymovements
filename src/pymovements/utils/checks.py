@@ -66,7 +66,7 @@ def check_nan_both_channels(arr: np.ndarray) -> None:
         )
 
 
-def check_shapes(**kwargs) -> None:
+def check_shapes(**kwargs: Any) -> None:
     """Checks if all provided arrays are of shape ``(N, 2)`` and shape is equal for all arrays.
 
     Parameters
@@ -87,7 +87,7 @@ def check_shapes(**kwargs) -> None:
     # Check if shapes are equal, printing the key of the first array that is not equal
     if not all(array.shape == next(iter(kwargs.values())).shape for array in kwargs.values()):
         raise ValueError(
-            f'{", ".join(key for key in kwargs.keys())}'
+            f'{", ".join(key for key in kwargs)}'
             f' must have the same shape, but shapes are '
             f'{", ".join(str(array.shape) for array in kwargs.values())}',
         )
