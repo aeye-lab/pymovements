@@ -218,6 +218,10 @@ def test_ivt_raise_error(kwargs, expected_error):
 )
 def test_ivt_detects_fixations(kwargs, expected):
     velocities = pos2vel(kwargs['positions'], sampling_rate=10, method='preceding')
+
+    # Just use positions argument for velocity calculation
+    kwargs.pop('positions')
+
     events = ivt(velocities=velocities, **kwargs)
 
     assert_frame_equal(events.frame, expected.frame)
