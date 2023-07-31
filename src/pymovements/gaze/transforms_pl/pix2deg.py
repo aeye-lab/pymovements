@@ -20,6 +20,8 @@
 """Module for py:func:`pymovements.gaze.transforms.pix2deg`"""
 from __future__ import annotations
 
+from collections.abc import Callable
+
 import numpy as np
 import polars as pl
 
@@ -78,14 +80,17 @@ def pix2deg(
 
     degree_components = [
         centered_pixels.list.get(component).map(
-            lambda s: np.arctan2(
-                s, distance_pixels[component % 2],  # pylint: disable=cell-var-from-loop
-            ),
+            _arctan2_helper(distance_pixels[component % 2]),
         ) * (180 / np.pi)
         for component in range(n_components)
     ]
 
-    return pl.concat_list(degree_components).alias(position_column)
+    return pl.concat_list(list(degree_components)).alias(position_column)
+
+
+def _arctan2_helper(distance: float) -> Callable:
+    """Returns single-argument lambda function with fixed second argument."""
+    return lambda s: np.arctan2(s, distance)
 
 
 def _check_distance(distance: float) -> None:

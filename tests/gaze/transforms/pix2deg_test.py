@@ -471,6 +471,34 @@ def test_pix2deg_raises_error(kwargs, series, exception, msg_substrings):
             pl.Series('position', [[-30, 30]], pl.List(pl.Float64)),
             id='opposite_sqrt3_origin_lowerleft_returns_30',
         ),
+        pytest.param(
+            {
+                'screen_resolution': (100, 200),
+                'screen_size': (100, 100),
+                'distance': 100,
+                'origin': 'center',
+                'pixel_column': 'pixel',
+                'position_column': 'position',
+                'n_components': 2,
+            },
+            pl.Series('pixel', [[100, 100]], pl.List(pl.Float64)),
+            pl.Series('position', [[45, 26.5650]], pl.List(pl.Float64)),
+            id='screen_resolution_different_values',
+        ),
+        pytest.param(
+            {
+                'screen_resolution': (100, 100),
+                'screen_size': (100, 200),
+                'distance': 100,
+                'origin': 'center',
+                'pixel_column': 'pixel',
+                'position_column': 'position',
+                'n_components': 2,
+            },
+            pl.Series('pixel', [[100, 100]], pl.List(pl.Float64)),
+            pl.Series('position', [[45, 63.4349]], pl.List(pl.Float64)),
+            id='screen_size_different_values',
+        ),
     ],
 )
 def test_pix2deg_returns(kwargs, series, expected_df):
