@@ -508,3 +508,11 @@ def test_pix2deg_returns(kwargs, series, expected_df):
         pm.gaze.transforms_pl.pix2deg(**kwargs),
     )
     assert_frame_equal(result_df, expected_df.to_frame())
+
+
+def test__arctan2_helper():
+    x1 = 2
+    x2 = 100
+
+    f = pm.gaze.transforms_pl._arctan2_helper(x2)
+    assert np.allclose(f(x1), np.arctan2(x1, x2))

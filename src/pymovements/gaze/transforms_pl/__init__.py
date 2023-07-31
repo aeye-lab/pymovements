@@ -21,6 +21,7 @@
 from pymovements.gaze.transforms_pl.center_origin import center_origin
 from pymovements.gaze.transforms_pl.downsample import downsample
 from pymovements.gaze.transforms_pl.norm import norm
+from pymovements.gaze.transforms_pl.pix2deg import _arctan2_helper
 from pymovements.gaze.transforms_pl.pix2deg import pix2deg
 from pymovements.gaze.transforms_pl.pos2acc import pos2acc
 from pymovements.gaze.transforms_pl.pos2vel import pos2vel
@@ -30,6 +31,7 @@ from pymovements.gaze.transforms_pl.transforms_library import TransformLibrary
 
 
 __all__ = [
+    '_arctan2_helper',
     'center_origin',
     'downsample',
     'norm',
