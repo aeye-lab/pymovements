@@ -26,9 +26,9 @@ from typing import Any
 
 import polars as pl
 
-from pymovements.gaze import transforms_pl
+from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.transforms import pos2acc
+from pymovements.gaze.transforms_numpy import pos2acc
 
 
 class GazeDataFrame:
@@ -228,12 +228,12 @@ class GazeDataFrame:
     ) -> None:
         """Apply transformation method."""
         if isinstance(transform_method, str):
-            transform_method = transforms_pl.TransformLibrary.get(transform_method)
+            transform_method = transforms.TransformLibrary.get(transform_method)
 
         if transform_method.__name__ == 'downsample':
             downsample_factor = kwargs.pop('factor')
             self.frame = self.frame.select(
-                transforms_pl.downsample(
+                transforms.downsample(
                     factor=downsample_factor, **kwargs,
                 ),
             )

@@ -26,7 +26,7 @@ from polars.testing import assert_frame_equal
 
 from pymovements.events.detection.fill import fill
 from pymovements.events.events import EventDataFrame
-from pymovements.gaze.transforms import pos2vel
+from pymovements.gaze.transforms_numpy import pos2vel
 
 
 @pytest.mark.parametrize(

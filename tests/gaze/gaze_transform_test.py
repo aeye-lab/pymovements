@@ -40,7 +40,7 @@ import pymovements as pm
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
-            pm.gaze.transforms_pl.downsample, {'factor': 1},
+            pm.gaze.transforms.downsample, {'factor': 1},
             pm.GazeDataFrame(
                 data=pl.from_dict(
                     {

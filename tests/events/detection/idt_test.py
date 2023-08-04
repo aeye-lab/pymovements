@@ -268,7 +268,7 @@ def test_idt_raises_error(kwargs, expected_error):
 )
 def test_idt_detects_fixations(kwargs, expected):
     """Test if idt detects fixations."""
-    velocities = pm.gaze.transforms.pos2vel(
+    velocities = pm.gaze.transforms_numpy.pos2vel(
         kwargs['positions'], sampling_rate=10, method='preceding',
     )
     events = pm.events.idt(velocities=velocities, **kwargs)
@@ -323,7 +323,7 @@ def test_idt_detects_fixations(kwargs, expected):
     ],
 )
 def test_idt_timesteps_exceptions(kwargs, exception, msg_substrings):
-    velocities = pm.gaze.transforms.pos2vel(
+    velocities = pm.gaze.transforms_numpy.pos2vel(
         kwargs['positions'], sampling_rate=10, method='preceding',
     )
     with pytest.raises(exception) as excinfo:
