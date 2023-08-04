@@ -28,9 +28,11 @@ from pymovements.gaze.transforms_pl.transforms_library import register_transform
 @register_transform
 def center_origin(
         *,
-        screen_px: int,
+        screen_resolution: tuple[int, int],
         origin: str,
-        pixel_column: str,
+        n_components: int,
+        pixel_column: str = 'pixel',
+        output_column: str | None = None,
 ) -> pl.Expr:
     """Center pixel data.
 
@@ -38,18 +40,24 @@ def center_origin(
 
     Parameters
     ----------
-    screen_px:
-        Size of screen in pixels.
+    screen_resolution:
+        Pixel screen resolution as tuple (width, height).
     origin:
         The location of the pixel origin. Supported values: ``center``, ``lower left``
+    n_components:
+        Number of components in input column.
     pixel_column:
-        Name of the column with pixel data.
+        Name of the input column with pixel data.
+    output_column:
+        Name of the output column with centered pixel data.
     """
+    if output_column is None:
+        output_column = pixel_column
 
     if origin == 'center':
-        centered_pixels = pl.col(pixel_column)
+        origin_offset = (0.0, 0.0)
     elif origin == 'lower left':
-        centered_pixels = pl.col(pixel_column) - ((screen_px - 1) / 2)
+        origin_offset = ((screen_resolution[0] - 1) / 2, (screen_resolution[1] - 1) / 2)
     else:
         supported_origins = ['center', 'lower left']
         raise ValueError(
@@ -57,5 +65,10 @@ def center_origin(
             f' Valid values are: {supported_origins}',
         )
 
-    # If the sequence is empty, just forward sequence.
-    return pl.when(pl.all().len() == 0).then(pl.all()).otherwise(centered_pixels)
+    centered_pixels = pl.concat_list(
+        [
+            pl.col(pixel_column).list.get(component) - origin_offset[component % 2]
+            for component in range(n_components)
+        ],
+    ).alias(output_column)
+    return centered_pixels
