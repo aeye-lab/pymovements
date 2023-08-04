@@ -486,42 +486,42 @@ def save_preprocessed(
         if extension == 'csv':
             # this is just a work-around until merged columns are standard behavior
             # https://github.com/aeye-lab/pymovements/pull/443
-            exploded_columns = {}
+            unnested_columns = {}
             if 'pixel' in gaze_df.frame.columns:
-                exploded_columns_pix = [
+                unnested_columns_pix = [
                     'x_left_pix', 'y_left_pix',
                     'x_right_pix', 'y_right_pix',
                     'x_avg_pix', 'y_avg_pix',
                 ][:gaze_df.n_components]
-                gaze_df.explode('pixel', exploded_columns_pix)
-                exploded_columns['pixel'] = exploded_columns_pix
+                gaze_df.unnest('pixel', unnested_columns_pix)
+                unnested_columns['pixel'] = unnested_columns_pix
 
             if 'position' in gaze_df.frame.columns:
-                exploded_columns_pos = [
+                unnested_columns_pos = [
                     'x_left_pos', 'y_left_pos',
                     'x_right_pos', 'y_right_pos',
                     'x_avg_pos', 'y_avg_pos',
                 ][:gaze_df.n_components]
-                gaze_df.explode('position', exploded_columns_pos)
-                exploded_columns['position'] = exploded_columns_pos
+                gaze_df.unnest('position', unnested_columns_pos)
+                unnested_columns['position'] = unnested_columns_pos
 
             if 'velocity' in gaze_df.frame.columns:
-                exploded_columns_vel = [
+                unnested_columns_vel = [
                     'x_left_vel', 'y_left_vel',
                     'x_right_vel', 'y_right_vel',
                     'x_avg_vel', 'y_avg_vel',
                 ][:gaze_df.n_components]
-                gaze_df.explode('velocity', exploded_columns_vel)
-                exploded_columns['velocity'] = exploded_columns_vel
+                gaze_df.unnest('velocity', unnested_columns_vel)
+                unnested_columns['velocity'] = unnested_columns_vel
 
             if 'acceleration' in gaze_df.frame.columns:
-                exploded_columns_vel = [
+                unnested_columns_vel = [
                     'x_left_acc', 'y_left_acc',
                     'x_right_acc', 'y_right_acc',
                     'x_avg_acc', 'y_avg_acc',
                 ][:gaze_df.n_components]
-                gaze_df.explode('acceleration', exploded_columns_vel)
-                exploded_columns['acceleration'] = exploded_columns_vel
+                gaze_df.unnest('acceleration', unnested_columns_vel)
+                unnested_columns['acceleration'] = unnested_columns_vel
 
         gaze_df_out = gaze_df.frame.clone()
         for column in gaze_df.columns:
