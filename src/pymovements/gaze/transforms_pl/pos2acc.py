@@ -30,14 +30,14 @@ from pymovements.gaze.transforms_pl.transforms_library import register_transform
 def pos2acc(
         *,
         sampling_rate: float,
-        window_length: int,
-        degree: int,
+        n_components: int,
+        degree: int = 2,
+        window_length: int = 7,
         padding: str | float | int | None = 'nearest',
+        position_column: str = 'position',
+        acceleration_column: str = 'acceleration',
 ) -> pl.Expr:
     """Compute acceleration data from positional data.
-
-    The method which is used for calculation is
-    :py:func:`~pymovements.gaze.transforms.savitzky_golay`.
 
     Parameters
     ----------
@@ -49,6 +49,12 @@ def pos2acc(
         The window size to use.
     padding:
         The padding to use.
+    n_components:
+        Number of components in input column.
+    position_column:
+        The input position column name.
+    acceleration_column:
+        The output acceleration column name.
     """
     return savitzky_golay(
         window_length=window_length,
@@ -56,4 +62,7 @@ def pos2acc(
         sampling_rate=sampling_rate,
         padding=padding,
         derivative=2,
+        n_components=n_components,
+        input_column=position_column,
+        output_column=acceleration_column,
     )

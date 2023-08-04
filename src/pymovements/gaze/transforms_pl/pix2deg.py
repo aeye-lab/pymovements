@@ -20,8 +20,7 @@
 """Module for py:func:`pymovements.gaze.transforms.pix2deg`"""
 from __future__ import annotations
 
-from functools import partial
-from typing import Any
+from collections.abc import Callable
 
 import numpy as np
 import polars as pl
@@ -31,57 +30,110 @@ from pymovements.gaze.transforms_pl.transforms_library import register_transform
 from pymovements.utils import checks
 
 
-def helper(s: Any, distance_px: float) -> pl.Series:
-    """This function is a workaround to get complete coverage by testing this function
-    explicitly."""
-    return pl.Series(np.arctan2(s[0], distance_px))
-
-
 @register_transform
 def pix2deg(
         *,
-        screen_px: int,
-        screen_cm: float,
-        distance_cm: float,
+        screen_resolution: tuple[int, int],
+        screen_size: tuple[float, float],
+        distance: float,
         origin: str,
-        pixel_column: str,
-        position_column: str,
+        n_components: int,
+        pixel_column: str = 'pixel',
+        position_column: str = 'position',
 ) -> pl.Expr:
     """Converts pixel screen coordinates to degrees of visual angle.
 
     Parameters
     ----------
-    screen_px:
-        Size of screen in pixels.
-    screen_cm:
-        Size of screen in centimeters.
-    distance_cm:
+    screen_resolution:
+        Pixel screen resolution as tuple (width, height).
+    screen_size:
+        Screen size in centimeters as tuple (width, height).
+    distance:
         Eye-to-screen distance in centimeters
     origin:
         The location of the pixel origin. Supported values: ``center``, ``lower left``. See also
         py:func:`~pymovements.gaze.transform.center_origin` for more information.
+    n_components:
+        Number of components in input column.
     pixel_column:
         The input pixel column name.
     position_column:
         The output position column name.
     """
-    _check_screen_scalar(screen_px=screen_px, screen_cm=screen_cm, distance_cm=distance_cm)
+    _check_screen_resolution(screen_resolution)
+    _check_screen_size(screen_size)
+    _check_distance(distance)
 
-    centered_pixels = center_origin(screen_px=screen_px, origin=origin, pixel_column=pixel_column)
+    centered_pixels = center_origin(
+        screen_resolution=screen_resolution,
+        origin=origin,
+        n_components=n_components,
+        pixel_column=pixel_column,
+    )
 
     # Compute eye-to-screen-distance in pixel units.
-    distance_px = distance_cm * (screen_px / screen_cm)
+    distance_pixels = tuple(
+        distance * (screen_px / screen_cm)
+        for screen_px, screen_cm in zip(screen_resolution, screen_size)
+    )
 
-    # Compute positions as radians using arctan2.
-    radians = pl.map([centered_pixels], partial(helper, distance_px=distance_px))
+    degree_components = [
+        centered_pixels.list.get(component).map(
+            _arctan2_helper(distance_pixels[component % 2]),
+        ) * (180 / np.pi)
+        for component in range(n_components)
+    ]
 
-    # 180 / pi transforms radians to degrees.
-    degrees = radians * (180 / np.pi)
-
-    return degrees.alias(position_column)
+    return pl.concat_list(list(degree_components)).alias(position_column)
 
 
-def _check_screen_scalar(**kwargs: Any) -> None:
+def _arctan2_helper(distance: float) -> Callable:
+    """Returns single-argument lambda function with fixed second argument."""
+    return lambda s: np.arctan2(s, distance)
+
+
+def _check_distance(distance: float) -> None:
     """Check if all screen values are scalars and are greather than zero."""
-    checks.check_is_scalar(**kwargs)
-    checks.check_is_greater_than_zero(**kwargs)
+    checks.check_is_scalar(distance=distance)
+    checks.check_is_greater_than_zero(distance=distance)
+
+
+def _check_screen_resolution(screen_resolution: tuple[int, int]) -> None:
+    """Check screen resolution value."""
+    if screen_resolution is None:
+        raise TypeError('screen_resolution must not be None')
+
+    if not isinstance(screen_resolution, (tuple, list)):
+        raise TypeError(
+            'screen_resolution must be of type tuple[int, int],'
+            f' but is of type {type(screen_resolution).__name__}',
+        )
+
+    if len(screen_resolution) != 2:
+        raise ValueError(
+            f'screen_resolution must have length of 2, but is of length {len(screen_resolution)}',
+        )
+
+    for element in screen_resolution:
+        checks.check_is_scalar(screen_resolution=element)
+        checks.check_is_greater_than_zero(screen_resolution=element)
+
+
+def _check_screen_size(screen_size: tuple[float, float]) -> None:
+    """Check screen size value."""
+    if screen_size is None:
+        raise TypeError('screen_size must not be None')
+
+    if not isinstance(screen_size, (tuple, list)):
+        raise TypeError(
+            'screen_size must be of type tuple[int, int],'
+            f' but is of type {type(screen_size).__name__}',
+        )
+
+    if len(screen_size) != 2:
+        raise ValueError(f'screen_size must have length of 2, but is of length {len(screen_size)}')
+
+    for element in screen_size:
+        checks.check_is_scalar(screen_size=element)
+        checks.check_is_greater_than_zero(screen_size=element)

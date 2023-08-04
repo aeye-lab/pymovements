@@ -184,3 +184,8 @@ def test_check_shapes_positions_velocities_raises_error(kwargs, expected_error, 
 def test_check_two_kwargs_with_three_kwargs_raises_value_error() -> None:
     with pytest.raises(ValueError):
         checks.check_two_kwargs(a=1, b=2, c=3)
+
+
+def test_check_is_not_none_raises_type_error() -> None:
+    with pytest.raises(TypeError):
+        checks.check_is_not_none(a=1, b=None)
