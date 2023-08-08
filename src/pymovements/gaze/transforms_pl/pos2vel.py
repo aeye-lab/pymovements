@@ -31,21 +31,14 @@ def pos2vel(
         *,
         sampling_rate: float,
         method: str,
+        n_components: int,
         degree: int | None = None,
         window_length: int | None = None,
         padding: str | float | int | None = 'nearest',
+        position_column: str = 'position',
+        velocity_column: str = 'velocity',
 ) -> pl.Expr:
     """Compute velocitiy data from positional data.
-
-    There are three methods available for velocity calculation:
-    * ``savitzky_golay``: velocity is calculated by a polynomial of fixed degree and window length.
-    See :py:func:`~pymovements.gaze.transforms.savitzky_golay` for further details.
-    * ``smooth``: velocity is calculated from the difference of the mean values
-    of the subsequent two samples and the preceding two samples
-    * ``neighbors``: velocity is calculated from difference of the subsequent
-    sample and the preceding sample
-    * ``preceding``: velocity is calculated from the difference of the current
-    sample to the preceding sample
 
     Parameters
     ----------
@@ -62,25 +55,62 @@ def pos2vel(
     padding:
         The padding to use.  This has only an effect if using ``savitzky_golay`` as calculation
         method.
+    n_components:
+        Number of components in input column.
+    position_column:
+        The input position column name.
+    velocity_column:
+        The output velocity column name.
+
+    Notes
+    -----
+    There are three methods available for velocity calculation:
+
+    * ``savitzky_golay``: velocity is calculated by a polynomial of fixed degree and window length.
+      See :py:func:`~pymovements.gaze.transforms.savitzky_golay` for further details.
+    * ``five_point``: velocity is calculated from the difference of the mean values
+      of the subsequent two samples and the preceding two samples
+    * ``neighbors``: velocity is calculated from difference of the subsequent
+      sample and the preceding sample
+    * ``preceding``: velocity is calculated from the difference of the current
+      sample to the preceding sample
     """
+    if method == 'preceding':
+        return pl.concat_list(
+            [
+                pl.col(position_column).list.get(component)
+                .diff(n=1, null_behavior='ignore') * sampling_rate
+                for component in range(n_components)
+            ],
+        ).alias(velocity_column)
 
     if method == 'neighbors':
-        preceding_neighbor = pl.all().shift(periods=1)
-        succeeding_neighbor = pl.all().shift(periods=-1)
-        return (succeeding_neighbor - preceding_neighbor) * (sampling_rate / 2)
+        return pl.concat_list(
+            [
+                (
+                    pl.col(position_column).shift(periods=-1).list.get(component)
+                    - pl.col(position_column).shift(periods=1).list.get(component)
+                ) * (sampling_rate / 2)
+                for component in range(n_components)
+            ],
+        ).alias(velocity_column)
 
-    if method == 'preceding':
-        return pl.all().diff(n=1, null_behavior='ignore') * sampling_rate
-
-    if method == 'smooth':
+    if method in {'fivepoint', 'smooth'}:
         # Center of window is period 0 and will be filled.
         # mean(arr_-2, arr_-1) and mean(arr_1, arr_2) needs division by two
         # window is now 3 samples long (arr_-1.5, arr_0, arr_1+5)
         # we therefore need a divison by three, all in all it's a division by 6
-        return (
-            pl.all().shift(periods=-2) + pl.all().shift(periods=-1)
-            - pl.all().shift(periods=1) - pl.all().shift(periods=2)
-        ) * (sampling_rate / 6)
+        return pl.concat_list(
+            [
+                (
+                    pl.col(position_column).shift(periods=-2).list.get(component)
+                    + pl.col(position_column).shift(periods=-1).list.get(component)
+                    - pl.col(position_column).shift(periods=1).list.get(component)
+                    - pl.col(position_column).shift(periods=2).list.get(component)
+                ) * (sampling_rate / 6)
+                for component in range(n_components)
+            ],
+        ).alias(velocity_column)
 
     if method == 'savitzky_golay':
         if window_length is None:
@@ -94,9 +124,12 @@ def pos2vel(
             sampling_rate=sampling_rate,
             padding=padding,
             derivative=1,
+            n_components=n_components,
+            input_column=position_column,
+            output_column=velocity_column,
         )
 
-    supported_methods = ['preceding', 'neighbors', 'smooth', 'savitzky_golay']
+    supported_methods = ['preceding', 'neighbors', 'fivepoint', 'smooth', 'savitzky_golay']
     raise ValueError(
         f"Unknown method '{method}'. Supported methods are: {supported_methods}",
     )
