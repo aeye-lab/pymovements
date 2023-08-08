@@ -79,6 +79,7 @@ class GazeDataFrame:
             data: pl.DataFrame | None = None,
             experiment: Experiment | None = None,
             *,
+            trial_columns: str | list[str] | None = None,
             time_column: str | None = None,
             pixel_columns: list[str] | None = None,
             position_columns: list[str] | None = None,
@@ -166,6 +167,8 @@ class GazeDataFrame:
         else:
             data = data.clone()
         self.frame = data
+
+        self.trial_columns = trial_columns
 
         if time_column is not None:
             self.frame = self.frame.rename({time_column: 'time'})

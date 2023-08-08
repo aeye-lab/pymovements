@@ -96,10 +96,7 @@ import pymovements as pm
                     {
                         'time': np.arange(1000, 1010, 2),
                         'x_pix': np.arange(0, 1, 0.2),
-                        'y_pix': [
-                            20.0, 20.200000000000003, 20.400000000000006,
-                            20.60000000000001, 20.80000000000001,
-                        ],
+                        'y_pix': [20.0, 20.2, 20.4, 20.6, 20.8],
                     },
                 ),
                 pixel_columns=['x_pix', 'y_pix'],
@@ -201,7 +198,7 @@ import pymovements as pm
                         'time': [1000, 1000],
                         'x_pix': [49.5, 49.5],
                         'y_pix': [0.0, 0.0],
-                        'x_dva': [26.335410003881348, 26.335410003881348],
+                        'x_dva': [26.3354, 26.3354],
                         'y_dva': [0.0, 0.0],
                     },
                 ),
@@ -238,7 +235,7 @@ import pymovements as pm
                         'time': [1000, 1000],
                         'x_pix': [49.5, 49.5],
                         'y_pix': [0.0, 0.0],
-                        'x_dva': [26.335410003881348, 26.335410003881348],
+                        'x_dva': [26.3354, 26.3354],
                         'y_dva': [0.0, 0.0],
                     },
                 ),
@@ -276,7 +273,7 @@ import pymovements as pm
                         'x_pix': [49.5],
                         'y_pix': [0.0],
                         'x_dva': [0.0],
-                        'y_dva': [-26.335410003881348],
+                        'y_dva': [-26.3354],
                     },
                 ),
                 pixel_columns=['x_pix', 'y_pix'],
@@ -289,9 +286,10 @@ import pymovements as pm
             {
                 'data': pl.from_dict(
                     {
-                        'time': [1000, 1001, 1002],
-                        'x_dva': [1.0, 1.0, 1.0],
-                        'y_dva': [1.0, 1.1, 1.2],
+                        'trial_id': [1, 1, 1, 2, 2, 2],
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
+                        'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                        'y_dva': [1.0, 1.1, 1.2, 1.0, 1.1, 1.2],
                     },
                 ),
                 'experiment': pm.Experiment(
@@ -309,11 +307,12 @@ import pymovements as pm
             pm.GazeDataFrame(
                 data=pl.from_dict(
                     {
-                        'time': [1000, 1001, 1002],
-                        'x_dva': [1.0, 1.0, 1.0],
-                        'y_dva': [1.0, 1.1, 1.2],
-                        'x_vel': [None, 0.0, 0.0],
-                        'y_vel': [None, 100.00000000000009, 99.99999999999987],
+                        'trial_id': [1, 1, 1, 2, 2, 2],
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
+                        'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                        'y_dva': [1.0, 1.1, 1.2, 1.0, 1.1, 1.2],
+                        'x_vel': [None, 0.0, 0.0, 0.0, 0.0, 0.0],
+                        'y_vel': [None, 100.0, 100.0, -200.0, 100.0, 100.0],
                     },
                 ),
                 position_columns=['x_dva', 'y_dva'],
@@ -350,7 +349,7 @@ import pymovements as pm
                         'x_dva': [1.0, 1.0, 1.0],
                         'y_dva': [1.0, 1.1, 1.2],
                         'x_vel': [None, 0.0, None],
-                        'y_vel': [None, 99.99999999999997, None],
+                        'y_vel': [None, 100.0, None],
                     },
                 ),
                 position_columns=['x_dva', 'y_dva'],
@@ -387,7 +386,7 @@ import pymovements as pm
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0],
                         'y_dva': [1.0, 1.1, 1.2, 1.3, 1.4],
                         'x_vel': [None, None, 0.0, None, None],
-                        'y_vel': [None, None, 100.00000000000001, None, None],
+                        'y_vel': [None, None, 100.0, None, None],
                     },
                 ),
                 position_columns=['x_dva', 'y_dva'],
@@ -395,6 +394,47 @@ import pymovements as pm
             ),
             id='pos2vel_five_point',
         ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'trial_id': [1, 1, 1, 2, 2, 2],
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
+                        'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                        'y_dva': [1.0, 1.1, 1.2, 1.0, 1.1, 1.2],
+                    },
+                ),
+                'experiment': pm.Experiment(
+                    sampling_rate=1000,
+                    screen_width_px=100,
+                    screen_height_px=100,
+                    screen_width_cm=100,
+                    screen_height_cm=100,
+                    distance_cm=100,
+                    origin='lower left',
+                ),
+                'position_columns': ['x_dva', 'y_dva'],
+                'trial_columns': 'trial_id',
+            },
+            'pos2vel', {'method': 'preceding'},
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'trial_id': [1, 1, 1, 2, 2, 2],
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
+                        'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                        'y_dva': [1.0, 1.1, 1.2, 1.0, 1.1, 1.2],
+                        'x_vel': [None, 0.0, 0.0, None, 0.0, 0.0],
+                        'y_vel': [None, 100.0, 100.0, None, 100.0, 100.0],
+                    },
+                ),
+                position_columns=['x_dva', 'y_dva'],
+                velocity_columns=['x_vel', 'y_vel'],
+            ),
+            id='pos2vel_preceding_trialize_single_column_str',
+        ),
+
     ],
 )
 def test_gaze_transform_expected_frame(
