@@ -30,7 +30,7 @@ from pymovements.plotting.main_sequence_plot import main_sequence_plot
 
 
 @pytest.mark.parametrize(
-    ('input_df', 'show'),
+    ('input_df', 'show', 'color', 'marker', 'alpha', 'size'),
     [
         pytest.param(
             EventDataFrame(
@@ -44,25 +44,38 @@ from pymovements.plotting.main_sequence_plot import main_sequence_plot
                 ),
             ),
             True,
+            'blue',
+            'x',
+            0.6,
+            30,
             id='show_plot',
         ),
     ],
 )
-def test_main_sequence_plot_show_plot(input_df, show, monkeypatch):
+def test_main_sequence_plot_show_plot(input_df, show, monkeypatch, color, marker, alpha, size):
     mock_show = Mock()
     mock_scatter = Mock()
 
     monkeypatch.setattr(plt, 'show', mock_show)
     monkeypatch.setattr(plt, 'scatter', mock_scatter)
 
-    main_sequence_plot(input_df, show=show)
+    main_sequence_plot(
+        input_df,
+        show=show,
+        color=color,
+        marker=marker,
+        alpha=alpha,
+        marker_size=size,
+    )
     plt.close()
 
     mock_scatter.assert_called_with(
         [1.0, 1.0, 2.0, 2.0, 3.0, 4.0],
         [10.0, 11.0, 12.0, 11.0, 13.0, 13.0],
-        color='purple',
-        alpha=0.5,
+        color='blue',
+        alpha=0.6,
+        s=30,
+        marker='x',
     )
 
     mock_show.assert_called_once()
@@ -99,6 +112,8 @@ def test_main_sequence_plot_filter_out_fixations(input_df, monkeypatch):
         [10.0, 11.0, 12.0, 11.0, 13.0],
         color='purple',
         alpha=0.5,
+        s=25,
+        marker='o',
     )
 
 
