@@ -1,2 +1,2 @@
-# installs dependencies from ./setup.cfg, and the package itself, in editable mode
+# installs dependencies from ./pyproject.toml, and the package itself, in editable mode
 -e .[test,docs]
