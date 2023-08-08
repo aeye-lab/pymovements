@@ -2,6 +2,7 @@
 requires = [
   "setuptools>=42",
   "setuptools-git-versioning<2",
+  "versioneer[toml]==0.29",
   "wheel"
 ]
 build-backend = "setuptools.build_meta"
@@ -37,7 +38,8 @@ dependencies = [
   "polars>=0.18.3,<0.19.0",
   "pyarrow>=11.0.0,<12",
   "scipy>=1.5.4,<2",
-  "tqdm>=4.0.0,<5"
+  "tqdm>=4.0.0,<5",
+  "versioneer>=0.29"
 ]
 dynamic = ["version"]
 
@@ -62,6 +64,7 @@ test = [
   "pytest-cov>=4.0.0",
   "types-tqdm"
 ]
+toml = ["tomli; python_version < '3.11'"]
 
 [project.urls]
 Homepage = "https://github.com/aeye-lab/pymovements"
@@ -97,7 +100,9 @@ parallel = true
 branch = true
 omit = [
   'docs/*',
-  'tests/*'
+  'src/pymovements/_version.py',
+  'tests/*',
+  'versioneer.py'
 ]
 
 [tool.doc8]
@@ -136,3 +141,11 @@ testpaths = ['tests', 'src']
 
 [tool.setuptools-git-versioning]
 enabled = true
+
+[tool.versioneer]
+VCS = "git"
+style = "pep440"
+versionfile_source = "src/pymovements/_version.py"
+versionfile_build = "src/pymovements/_version.py"
+tag_prefix = "v"
+parentdir_prefix = "pymovements-"
