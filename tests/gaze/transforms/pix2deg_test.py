@@ -264,7 +264,7 @@ import pymovements as pm
 )
 def test_pix2deg_init_raises_error(kwargs, exception, msg_substrings):
     with pytest.raises(exception) as excinfo:
-        pm.gaze.transforms_pl.pix2deg(**kwargs)
+        pm.gaze.transforms.pix2deg(**kwargs)
 
     msg, = excinfo.value.args
     for msg_substring in msg_substrings:
@@ -292,7 +292,7 @@ def test_pix2deg_raises_error(kwargs, series, exception, msg_substrings):
 
     with pytest.raises(exception) as excinfo:
         df.with_columns(
-            pm.gaze.transforms_pl.pix2deg(**kwargs),
+            pm.gaze.transforms.pix2deg(**kwargs),
         )
 
     msg, = excinfo.value.args
@@ -505,7 +505,7 @@ def test_pix2deg_returns(kwargs, series, expected_df):
     df = series.to_frame()
 
     result_df = df.select(
-        pm.gaze.transforms_pl.pix2deg(**kwargs),
+        pm.gaze.transforms.pix2deg(**kwargs),
     )
     assert_frame_equal(result_df, expected_df.to_frame())
 
@@ -514,5 +514,5 @@ def test__arctan2_helper():
     x1 = 2
     x2 = 100
 
-    f = pm.gaze.transforms_pl._arctan2_helper(x2)
+    f = pm.gaze.transforms._arctan2_helper(x2)
     assert np.allclose(f(x1), np.arctan2(x1, x2))

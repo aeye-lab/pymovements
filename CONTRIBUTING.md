@@ -142,10 +142,10 @@ subsequent runs.
 If you add a new feature, please also include appropriate tests to verify its intended
 functionality. We try to keep our code coverage close to 100%.
 
-It is possible to limit the scope of testing to specific environments and files, for example, to
-only test transformations using the Python 3.8 environment use:
+It is possible to limit the scope of testing to specific environments and files. For example, to
+only test event related functionality using the Python 3.7 environment use:
 ```bash
-tox -e py38 tests/transforms_test.py
+tox -e py37 tests/events
 ```
 
 

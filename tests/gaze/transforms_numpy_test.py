@@ -23,11 +23,11 @@ Test all functions in pymovements.transforms.
 import numpy as np
 import pytest
 
-from pymovements.gaze.transforms import norm
-from pymovements.gaze.transforms import pix2deg
-from pymovements.gaze.transforms import pos2acc
-from pymovements.gaze.transforms import pos2vel
-from pymovements.gaze.transforms import split
+from pymovements.gaze.transforms_numpy import norm
+from pymovements.gaze.transforms_numpy import pix2deg
+from pymovements.gaze.transforms_numpy import pos2acc
+from pymovements.gaze.transforms_numpy import pos2vel
+from pymovements.gaze.transforms_numpy import split
 
 n_coords = 100
 screen_px_1d = 100

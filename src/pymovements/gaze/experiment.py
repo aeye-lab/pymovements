@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from pymovements.gaze import transforms
+from pymovements.gaze import transforms_numpy
 from pymovements.gaze.screen import Screen
 from pymovements.utils import decorators
 
@@ -148,6 +148,6 @@ class Experiment:
                [1000., 1000.],
                [ 500.,  500.]])
         """
-        return transforms.pos2vel(
+        return transforms_numpy.pos2vel(
             arr=arr, sampling_rate=self.sampling_rate, method=method, **kwargs,
         )
