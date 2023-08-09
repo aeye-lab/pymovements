@@ -183,9 +183,8 @@ def traceplot(
 
     elif isinstance(cmap_norm, str):
         # pylint: disable=protected-access
-        scale_class = matplotlib.scale._scale_mapping.get(cmap_norm, None)
 
-        if scale_class is None:
+        if (scale_class := matplotlib.scale._scale_mapping.get(cmap_norm, None)) is None:
             raise ValueError(f'cmap_norm string {cmap_norm} is not supported')
 
         norm_class = matplotlib.colors.make_norm_from_scale(scale_class)
