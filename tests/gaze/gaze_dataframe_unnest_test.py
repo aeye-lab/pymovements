@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test GazeDataFrame.explode()."""
+"""Test GazeDataFrame.unnest()."""
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
@@ -26,7 +26,7 @@ import pymovements as pm
 
 
 @pytest.mark.parametrize(
-    ('init_data', 'explode_kwargs', 'expected'),
+    ('init_data', 'unnest_kwargs', 'expected'),
     [
         pytest.param(
             pl.DataFrame(schema={'pixel': pl.List(pl.Float64)}),
@@ -95,7 +95,7 @@ import pymovements as pm
         ),
     ],
 )
-def test_gaze_dataframe_explode_has_expected_frame(init_data, explode_kwargs, expected):
+def test_gaze_dataframe_unnest_has_expected_frame(init_data, unnest_kwargs, expected):
     gaze = pm.GazeDataFrame(init_data)
-    gaze.explode(**explode_kwargs)
+    gaze.unnest(**unnest_kwargs)
     assert_frame_equal(gaze.frame, expected)
