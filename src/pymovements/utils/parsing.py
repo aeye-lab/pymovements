@@ -150,9 +150,8 @@ def parse_eyelink(
 
     for line in lines:
         for pattern_dict in compiled_patterns:
-            match = pattern_dict['pattern'].match(line)
 
-            if match:
+            if match := pattern_dict['pattern'].match(line):
                 if 'value' in pattern_dict:
                     current_column = pattern_dict['column']
                     current_additional[current_column] = pattern_dict['value']
@@ -161,8 +160,7 @@ def parse_eyelink(
                     for column, value in match.groupdict().items():
                         current_additional[column] = value
 
-        eye_tracking_sample_match = EYE_TRACKING_SAMPLE.match(line)
-        if eye_tracking_sample_match:
+        if eye_tracking_sample_match := EYE_TRACKING_SAMPLE.match(line):
 
             timestamp_s = eye_tracking_sample_match.group('time')
             x_pix_s = eye_tracking_sample_match.group('x_pix')

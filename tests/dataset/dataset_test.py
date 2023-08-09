@@ -995,7 +995,7 @@ def test_save_preprocessed_no_tuple_columns(dataset_configuration):
     dataset.pos2acc()
 
     # This is not implemented yet
-    # dataset.gaze[0].explode(['pixel', 'position', 'velocity', 'acceleration'])
+    # dataset.gaze[0].unnest(['pixel', 'position', 'velocity', 'acceleration'])
     dataset.gaze[0].frame = dataset.gaze[0].frame.rename({'time': 'ttt'})
     dataset.gaze[0].frame = dataset.gaze[0].frame.drop(
         ['pixel', 'position', 'velocity', 'acceleration'],

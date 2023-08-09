@@ -146,8 +146,7 @@ def idt(
         raise ValueError(
             'minimum_duration must be divisible by the constant interval between timesteps',
         )
-    minimum_sample_duration = int(minimum_duration // timesteps_diff[0])
-    if minimum_sample_duration < 2:
+    if (minimum_sample_duration := int(minimum_duration // timesteps_diff[0])) < 2:
         raise ValueError('minimum_duration must be longer than the equivalent of 2 samples')
 
     # Initialize window over first points to cover the duration threshold

@@ -26,9 +26,9 @@ from typing import Any
 
 import polars as pl
 
-from pymovements.gaze import transforms_pl
+from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.transforms import pos2acc
+from pymovements.gaze.transforms_numpy import pos2acc
 
 
 class GazeDataFrame:
@@ -176,7 +176,7 @@ class GazeDataFrame:
                 frame=self.frame,
                 pixel_columns=pixel_columns,
             )
-            self.merge_component_columns_into_tuple_column(
+            self.nest(
                 input_columns=pixel_columns,
                 output_column='pixel',
             )
@@ -188,7 +188,7 @@ class GazeDataFrame:
                 position_columns=position_columns,
             )
 
-            self.merge_component_columns_into_tuple_column(
+            self.nest(
                 input_columns=position_columns,
                 output_column='position',
             )
@@ -200,7 +200,7 @@ class GazeDataFrame:
                 velocity_columns=velocity_columns,
             )
 
-            self.merge_component_columns_into_tuple_column(
+            self.nest(
                 input_columns=velocity_columns,
                 output_column='velocity',
             )
@@ -212,7 +212,7 @@ class GazeDataFrame:
                 acceleration_columns=acceleration_columns,
             )
 
-            self.merge_component_columns_into_tuple_column(
+            self.nest(
                 input_columns=acceleration_columns,
                 output_column='acceleration',
             )
@@ -228,12 +228,12 @@ class GazeDataFrame:
     ) -> None:
         """Apply transformation method."""
         if isinstance(transform_method, str):
-            transform_method = transforms_pl.TransformLibrary.get(transform_method)
+            transform_method = transforms.TransformLibrary.get(transform_method)
 
         if transform_method.__name__ == 'downsample':
             downsample_factor = kwargs.pop('factor')
             self.frame = self.frame.select(
-                transforms_pl.downsample(
+                transforms.downsample(
                     factor=downsample_factor, **kwargs,
                 ),
             )
@@ -301,7 +301,7 @@ class GazeDataFrame:
                 '__x_right_pix__', '__y_right_pix__',
                 '__x_avg_pix__', '__y_avg_pix__',
             ][:self.n_components]
-            self.explode('pixel', pixel_columns)
+            self.unnest('pixel', pixel_columns)
         else:
             raise pl.exceptions.ColumnNotFoundError(
                 f'Column \'pixel\' not found. Available columns are: {self.frame.columns}',
@@ -318,13 +318,13 @@ class GazeDataFrame:
             ],
         )
 
-        self.merge_component_columns_into_tuple_column(
+        self.nest(
             input_columns=dva_columns,
             output_column='position',
         )
 
         # this is just a work-around until merged columns are standard behavior
-        self.merge_component_columns_into_tuple_column(
+        self.nest(
             input_columns=pixel_columns,
             output_column='pixel',
         )
@@ -370,7 +370,7 @@ class GazeDataFrame:
                 '__x_right_pos__', '__y_right_pos__',
                 '__x_avg_pos__', '__y_avg_pos__',
             ][:self.n_components]
-            self.explode('position', position_columns)
+            self.unnest('position', position_columns)
         else:
             raise pl.exceptions.ColumnNotFoundError(
                 f'Column \'position\' not found. Available columns are: {self.frame.columns}',
@@ -394,13 +394,13 @@ class GazeDataFrame:
             ],
         )
 
-        self.merge_component_columns_into_tuple_column(
+        self.nest(
             input_columns=acceleration_columns,
             output_column='acceleration',
         )
 
         # this is just a work-around until merged columns are standard behavior
-        self.merge_component_columns_into_tuple_column(
+        self.nest(
             input_columns=position_columns,
             output_column='position',
         )
@@ -436,7 +436,7 @@ class GazeDataFrame:
                 '__x_right_pos__', '__y_right_pos__',
                 '__x_avg_pos__', '__y_avg_pos__',
             ][:self.n_components]
-            self.explode('position', position_columns)
+            self.unnest('position', position_columns)
         else:
             raise pl.exceptions.ColumnNotFoundError(
                 f'Column \'position\' not found. Available columns are: {self.frame.columns}',
@@ -453,13 +453,13 @@ class GazeDataFrame:
             ],
         )
 
-        self.merge_component_columns_into_tuple_column(
+        self.nest(
             input_columns=velocity_columns,
             output_column='velocity',
         )
 
         # this is just a work-around until merged columns are standard behavior
-        self.merge_component_columns_into_tuple_column(
+        self.nest(
             input_columns=position_columns,
             output_column='position',
         )
@@ -474,12 +474,12 @@ class GazeDataFrame:
         """List of column names."""
         return self.frame.columns
 
-    def merge_component_columns_into_tuple_column(
+    def nest(
             self,
             input_columns: list[str],
             output_column: str,
     ) -> None:
-        """Merge component columns into a single tuple columns.
+        """Nest component columns into a single tuple column.
 
         Input component columns will be dropped.
 
@@ -495,7 +495,7 @@ class GazeDataFrame:
             .alias(output_column),
         ).drop(input_columns)
 
-    def explode(
+    def unnest(
             self,
             column: str,
             output_columns: list[str],
@@ -507,7 +507,7 @@ class GazeDataFrame:
         Parameters
         ----------
         column:
-            Name of input columns to be exploded into several component columns.
+            Name of input columns to be unnested into several component columns.
         output_columns:
             Name of the resulting tuple columns.
         """
