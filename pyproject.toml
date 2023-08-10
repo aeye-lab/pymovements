@@ -2,6 +2,7 @@
 requires = [
   "setuptools>=42",
   "setuptools-git-versioning<2",
+  "versioneer[toml]>=0.29,<1.0",
   "wheel"
 ]
 build-backend = "setuptools.build_meta"
@@ -97,6 +98,7 @@ parallel = true
 branch = true
 omit = [
   'docs/*',
+  'src/pymovements/_version.py',
   'tests/*'
 ]
 
@@ -136,3 +138,11 @@ testpaths = ['tests', 'src']
 
 [tool.setuptools-git-versioning]
 enabled = true
+
+[tool.versioneer]
+VCS = "git"
+style = "pep440"
+versionfile_source = "src/pymovements/_version.py"
+versionfile_build = "src/pymovements/_version.py"
+tag_prefix = "v"
+parentdir_prefix = "pymovements-"
