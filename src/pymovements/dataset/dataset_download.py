@@ -80,7 +80,7 @@ def download_dataset(
     for resource in definition.resources:
         success = False
 
-        for mirror in definition.mirrors:
+        for mirror_idx, mirror in enumerate(definition.mirrors):
 
             url = f'{mirror}{resource["resource"]}'
 
@@ -97,7 +97,8 @@ def download_dataset(
             # pylint: disable=overlapping-except
             except (URLError, OSError, RuntimeError) as error:
                 # Error downloading the resource, try next mirror
-                print(f'Failed to download:\n{error}\nTrying next mirror.')
+                if mirror_idx < len(definition.mirrors) - 1:
+                    print(f'Failed to download:\n{error}\nTrying next mirror.')
                 continue
 
             # downloading the resource was successful, we don't need to try another mirror
