@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """This module provides top-level access to all submodules."""
+from pymovements import _version
 from pymovements import datasets
 from pymovements import events
 from pymovements import gaze
@@ -50,6 +51,8 @@ __all__ = [
     'synthetic',
     'utils',
 ]
+
+__version__ = _version.get_versions()['version']
 
 from . import _version
 __version__ = _version.get_versions()['version']

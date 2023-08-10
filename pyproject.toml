@@ -2,7 +2,7 @@
 requires = [
   "setuptools>=42",
   "setuptools-git-versioning<2",
-  "versioneer[toml]==0.29",
+  "versioneer[toml]>=0.29,<1.0",
   "wheel"
 ]
 build-backend = "setuptools.build_meta"
@@ -38,8 +38,7 @@ dependencies = [
   "polars>=0.18.3,<0.19.0",
   "pyarrow>=11.0.0,<12",
   "scipy>=1.5.4,<2",
-  "tqdm>=4.0.0,<5",
-  "versioneer>=0.29"
+  "tqdm>=4.0.0,<5"
 ]
 dynamic = ["version"]
 
@@ -64,7 +63,6 @@ test = [
   "pytest-cov>=4.0.0",
   "types-tqdm"
 ]
-toml = ["tomli; python_version < '3.11'"]
 
 [project.urls]
 Homepage = "https://github.com/aeye-lab/pymovements"
