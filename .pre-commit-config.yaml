@@ -1,6 +1,5 @@
 exclude: |
   (?x)^(
-    versioneer.py|
     src/pymovements/_version.py
   )$
 
