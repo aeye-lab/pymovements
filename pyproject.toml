@@ -99,8 +99,7 @@ branch = true
 omit = [
   'docs/*',
   'src/pymovements/_version.py',
-  'tests/*',
-  'versioneer.py'
+  'tests/*'
 ]
 
 [tool.doc8]
