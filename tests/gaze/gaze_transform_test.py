@@ -433,11 +433,36 @@ def test_gaze_transform_raises_exception(init_kwargs, exception, exception_msg):
     assert msg == exception_msg
 
 
-def test_gaze_dataframe_pix2deg_creates_position_column(experiment):
+@pytest.mark.parametrize(
+    ('data', 'pixel_columns'),
+    [
+        pytest.param(
+            {'x': [0.0], 'y': [0.0]},
+            ['x', 'y'],
+            id='two_components',
+        ),
+        pytest.param(
+            {'t': [0], 'x': [0.0], 'y': [0.0]},
+            ['x', 'y'],
+            id='two_components_and_time',
+        ),
+        pytest.param(
+            {'xl': [0.0], 'yl': [0.0], 'xr': [0.0], 'yr': [0.0]},
+            ['xl', 'yl', 'xr', 'yr'],
+            id='four_components',
+        ),
+        pytest.param(
+            {'xl': [0.0], 'yl': [0.0], 'xr': [0.0], 'yr': [0.0], 'xa': [0.0], 'ya': [0.0]},
+            ['xl', 'yl', 'xr', 'yr', 'xa', 'ya'],
+            id='six_components',
+        ),
+    ],
+)
+def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_columns):
     gaze = pm.GazeDataFrame(
-        data=pl.from_dict({'t': [1000, 1000], 'x': [1.0, 1.0], 'y': [0.0, 0.0]}),
+        data=pl.from_dict(data),
         experiment=experiment,
-        pixel_columns=['x', 'y'],
+        pixel_columns=pixel_columns,
     )
     gaze.pix2deg()
     assert 'position' in gaze.columns
@@ -489,11 +514,36 @@ def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg)
     assert msg == expected_msg
 
 
-def test_gaze_dataframe_pos2acc_creates_acceleration_column(experiment):
+@pytest.mark.parametrize(
+    ('data', 'position_columns'),
+    [
+        pytest.param(
+            {'x': [0.0], 'y': [0.0]},
+            ['x', 'y'],
+            id='two_components',
+        ),
+        pytest.param(
+            {'t': [0], 'x': [0.0], 'y': [0.0]},
+            ['x', 'y'],
+            id='two_components_and_time',
+        ),
+        pytest.param(
+            {'xl': [0.0], 'yl': [0.0], 'xr': [0.0], 'yr': [0.0]},
+            ['xl', 'yl', 'xr', 'yr'],
+            id='four_components',
+        ),
+        pytest.param(
+            {'xl': [0.0], 'yl': [0.0], 'xr': [0.0], 'yr': [0.0], 'xa': [0.0], 'ya': [0.0]},
+            ['xl', 'yl', 'xr', 'yr', 'xa', 'ya'],
+            id='six_components',
+        ),
+    ],
+)
+def test_gaze_dataframe_pos2acc_creates_acceleration_column(data, experiment, position_columns):
     gaze = pm.GazeDataFrame(
-        data=pl.from_dict({'t': [1000, 1000], 'x': [1.0, 1.0], 'y': [0.0, 0.0]}),
+        data=pl.from_dict(data),
         experiment=experiment,
-        position_columns=['x', 'y'],
+        position_columns=position_columns,
     )
     gaze.pos2acc()
     assert 'acceleration' in gaze.columns
@@ -545,11 +595,36 @@ def test_gaze_dataframe_pos2acc_exceptions(init_kwargs, exception, expected_msg)
     assert msg == expected_msg
 
 
-def test_gaze_dataframe_pos2vel_creates_velocity_column(experiment):
+@pytest.mark.parametrize(
+    ('data', 'position_columns'),
+    [
+        pytest.param(
+            {'x': [0.0], 'y': [0.0]},
+            ['x', 'y'],
+            id='two_components',
+        ),
+        pytest.param(
+            {'t': [0], 'x': [0.0], 'y': [0.0]},
+            ['x', 'y'],
+            id='two_components_and_time',
+        ),
+        pytest.param(
+            {'xl': [0.0], 'yl': [0.0], 'xr': [0.0], 'yr': [0.0]},
+            ['xl', 'yl', 'xr', 'yr'],
+            id='four_components',
+        ),
+        pytest.param(
+            {'xl': [0.0], 'yl': [0.0], 'xr': [0.0], 'yr': [0.0], 'xa': [0.0], 'ya': [0.0]},
+            ['xl', 'yl', 'xr', 'yr', 'xa', 'ya'],
+            id='six_components',
+        ),
+    ],
+)
+def test_gaze_dataframe_pos2vel_creates_velocity_column(data, experiment, position_columns):
     gaze = pm.GazeDataFrame(
-        data=pl.from_dict({'t': [1000, 1000] * 10, 'x': [1.0, 1.0] * 10, 'y': [0.0, 0.0] * 10}),
+        data=pl.from_dict(data),
         experiment=experiment,
-        position_columns=['x', 'y'],
+        position_columns=position_columns,
     )
     gaze.pos2vel(method='savitzky_golay', window_length=7, degree=2)
     assert 'velocity' in gaze.columns
