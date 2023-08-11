@@ -267,47 +267,6 @@ class Dataset:
 
         return self
 
-    def pos2vel(
-            self,
-            method: str = 'fivepoint',
-            *,
-            verbose: bool = True,
-            **kwargs: Any,
-    ) -> Dataset:
-        """Compute gaze velocites in dva/s from dva coordinates.
-
-        This method requires a properly initialized :py:attr:`~.Dataset.experiment` attribute.
-
-        After success, the gaze dataframe is extended by the resulting velocity columns.
-
-        Parameters
-        ----------
-        method : str
-            Computation method. See :func:`~transforms.pos2vel()` for details, default: smooth.
-        verbose : bool
-            If True, show progress of computation.
-        **kwargs
-            Additional keyword arguments to be passed to the :func:`~transforms.pos2vel()` method.
-
-        Raises
-        ------
-        AttributeError
-            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
-            if experiment is None.
-
-        Returns
-        -------
-        Dataset
-            Returns self, useful for method cascading.
-        """
-        self._check_gaze_dataframe()
-
-        disable_progressbar = not verbose
-        for gaze_df in tqdm(self.gaze, disable=disable_progressbar):
-            gaze_df.pos2vel(method=method, **kwargs)
-
-        return self
-
     def pos2acc(
             self,
             *,
@@ -353,6 +312,47 @@ class Dataset:
                 degree=degree,
                 padding=padding,
             )
+
+        return self
+
+    def pos2vel(
+            self,
+            method: str = 'fivepoint',
+            *,
+            verbose: bool = True,
+            **kwargs: Any,
+    ) -> Dataset:
+        """Compute gaze velocites in dva/s from dva coordinates.
+
+        This method requires a properly initialized :py:attr:`~.Dataset.experiment` attribute.
+
+        After success, the gaze dataframe is extended by the resulting velocity columns.
+
+        Parameters
+        ----------
+        method : str
+            Computation method. See :func:`~transforms.pos2vel()` for details, default: smooth.
+        verbose : bool
+            If True, show progress of computation.
+        **kwargs
+            Additional keyword arguments to be passed to the :func:`~transforms.pos2vel()` method.
+
+        Raises
+        ------
+        AttributeError
+            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
+            if experiment is None.
+
+        Returns
+        -------
+        Dataset
+            Returns self, useful for method cascading.
+        """
+        self._check_gaze_dataframe()
+
+        disable_progressbar = not verbose
+        for gaze_df in tqdm(self.gaze, disable=disable_progressbar):
+            gaze_df.pos2vel(method=method, **kwargs)
 
         return self
 

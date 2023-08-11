@@ -289,32 +289,6 @@ class GazeDataFrame:
         """
         self.transform('pix2deg')
 
-    def pos2vel(
-            self,
-            method: str = 'fivepoint',
-            **kwargs: int | float | str,
-    ) -> None:
-        """Compute gaze velocity in dva/s from dva position coordinates.
-
-        This method requires a properly initialized :py:attr:`~.GazeDataFrame.experiment` attribute.
-
-        After success, the gaze dataframe is extended by the resulting velocity columns.
-
-        Parameters
-        ----------
-        method : str
-            Computation method. See :func:`~transforms.pos2vel()` for details, default: fivepoint.
-        **kwargs
-            Additional keyword arguments to be passed to the :func:`~transforms.pos2vel()` method.
-
-        Raises
-        ------
-        AttributeError
-            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
-            if experiment is None.
-        """
-        self.transform('pos2vel', method=method, **kwargs)
-
     def pos2acc(
             self,
             *,
@@ -344,6 +318,32 @@ class GazeDataFrame:
             if experiment is None.
         """
         self.transform('pos2acc', window_length=window_length, degree=degree, padding=padding)
+
+    def pos2vel(
+            self,
+            method: str = 'fivepoint',
+            **kwargs: int | float | str,
+    ) -> None:
+        """Compute gaze velocity in dva/s from dva position coordinates.
+
+        This method requires a properly initialized :py:attr:`~.GazeDataFrame.experiment` attribute.
+
+        After success, the gaze dataframe is extended by the resulting velocity columns.
+
+        Parameters
+        ----------
+        method : str
+            Computation method. See :func:`~transforms.pos2vel()` for details, default: fivepoint.
+        **kwargs
+            Additional keyword arguments to be passed to the :func:`~transforms.pos2vel()` method.
+
+        Raises
+        ------
+        AttributeError
+            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
+            if experiment is None.
+        """
+        self.transform('pos2vel', method=method, **kwargs)
 
     @property
     def schema(self) -> pl.type_aliases.SchemaDict:
