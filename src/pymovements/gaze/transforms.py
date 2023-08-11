@@ -295,7 +295,7 @@ def pos2acc(
     window_length:
         The window size to use.
     padding:
-        The padding to use.
+        The padding method to use. See ``savitzky_golay`` for details.
     n_components:
         Number of components in input column.
     position_column:

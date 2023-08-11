@@ -328,10 +328,8 @@ class Dataset:
             The window size to use.
         degree:
             The degree of the polynomial to use.
-        mode:
-            The padding mode to use.
-        cval:
-            A constant value for padding.
+        padding:
+            The padding method to use. See ``savitzky_golay`` for details.
         verbose : bool
             If True, show progress of computation.
 
