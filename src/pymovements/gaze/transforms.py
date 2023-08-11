@@ -534,17 +534,12 @@ def savitzky_golay(
         cval=constant_value,
     )
 
-    # If the sequence is empty, don't use apply but forward sequence.
-    return pl.when(pl.all().len() == 0).then(pl.all()).otherwise(
-        # Use explode to transform array to pl.Series
-        # pl.apply(input_column, partial(helper, func=func)).list.explode(),
-        pl.concat_list(
-            [
-                # pl.map([pl.col(input_column).list.get(component)], func)
-                pl.col(input_column).list.get(component).map(func).list.explode()
-                for component in range(n_components)
-            ],
-        ),
+    #return pl.when(pl.all().len() == 0).then(pl.col(input_column)).otherwise(
+    return pl.concat_list(
+        [
+            pl.col(input_column).list.get(component).map(func).list.explode()
+            for component in range(n_components)
+        ],
     ).alias(output_column)
 
 

@@ -272,10 +272,7 @@ class GazeDataFrame:
                 _check_n_components(self.n_components)
                 kwargs['n_components'] = self.n_components
 
-            try:
-                self.frame = self.frame.with_columns(transform_method(**kwargs))
-            except Exception:
-                breakpoint()
+            self.frame = self.frame.with_columns(transform_method(**kwargs))
 
     def pix2deg(self) -> None:
         """Compute gaze positions in degrees of visual angle from pixel position coordinates.
@@ -291,6 +288,32 @@ class GazeDataFrame:
             if experiment is None.
         """
         self.transform('pix2deg')
+
+    def pos2vel(
+            self,
+            method: str = 'fivepoint',
+            **kwargs: int | float | str,
+    ) -> None:
+        """Compute gaze velocity in dva/s from dva position coordinates.
+
+        This method requires a properly initialized :py:attr:`~.GazeDataFrame.experiment` attribute.
+
+        After success, the gaze dataframe is extended by the resulting velocity columns.
+
+        Parameters
+        ----------
+        method : str
+            Computation method. See :func:`~transforms.pos2vel()` for details, default: fivepoint.
+        **kwargs
+            Additional keyword arguments to be passed to the :func:`~transforms.pos2vel()` method.
+
+        Raises
+        ------
+        AttributeError
+            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
+            if experiment is None.
+        """
+        self.transform('pos2vel', method=method, **kwargs)
 
     def pos2acc(
             self,
@@ -323,33 +346,6 @@ class GazeDataFrame:
             if experiment is None.
         """
         self.transform('pos2acc', window_length=window_length, degree=degree, padding=padding)
-
-    def pos2vel(
-            self,
-            *,
-            method: str = 'fivepoint',
-            **kwargs: int | float | str,
-    ) -> None:
-        """Compute gaze velocity in dva/s from dva position coordinates.
-
-        This method requires a properly initialized :py:attr:`~.GazeDataFrame.experiment` attribute.
-
-        After success, the gaze dataframe is extended by the resulting velocity columns.
-
-        Parameters
-        ----------
-        method : str
-            Computation method. See :func:`~transforms.pos2vel()` for details, default: fivepoint.
-        **kwargs
-            Additional keyword arguments to be passed to the :func:`~transforms.pos2vel()` method.
-
-        Raises
-        ------
-        AttributeError
-            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
-            if experiment is None.
-        """
-        self.transform('pos2vel', method=method, **kwargs)
 
     @property
     def schema(self) -> pl.type_aliases.SchemaDict:
@@ -404,30 +400,6 @@ class GazeDataFrame:
                 for component_id, output_column in enumerate(output_columns)
             ],
         ).drop(column)
-
-    @staticmethod
-    def _pixel_to_dva_position_columns(columns: list[str]) -> list[str]:
-        """Get corresponding dva position columns from pixel position columns."""
-        return [
-            column.replace('pixel', 'position').replace('pix', 'pos')
-            for column in columns if 'pix' in column
-        ]
-
-    @staticmethod
-    def _position_to_acceleration_columns(columns: list[str]) -> list[str]:
-        """Get corresponding acceleration columns from dva position columns."""
-        return [
-            column.replace('position', 'acceleration').replace('pos', 'acc')
-            for column in columns if 'pos' in column
-        ]
-
-    @staticmethod
-    def _position_to_velocity_columns(columns: list[str]) -> list[str]:
-        """Get corresponding velocity columns from dva position columns."""
-        return [
-            column.replace('position', 'velocity').replace('pos', 'vel')
-            for column in columns if 'pos' in column
-        ]
 
     def _check_experiment(self) -> None:
         """Check if experiment attribute has been set."""
