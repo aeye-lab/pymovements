@@ -534,7 +534,7 @@ def savitzky_golay(
         cval=constant_value,
     )
 
-    #return pl.when(pl.all().len() == 0).then(pl.col(input_column)).otherwise(
+    # return pl.when(pl.all().len() == 0).then(pl.col(input_column)).otherwise(
     return pl.concat_list(
         [
             pl.col(input_column).list.get(component).map(func).list.explode()
