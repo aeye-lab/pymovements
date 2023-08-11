@@ -165,6 +165,7 @@ def test_pos2vel_raises_error(kwargs, series, exception, msg_substrings):
             pl.Series('position', [], pl.List(pl.Float64)),
             pl.Series('velocity', [], pl.List(pl.Float64)),
             id='empty_series_raises_compute_error',
+            marks=pytest.mark.xfail(reason='#475'),
         ),
         pytest.param(
             {

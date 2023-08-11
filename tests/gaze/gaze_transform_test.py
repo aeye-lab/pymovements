@@ -26,6 +26,11 @@ from polars.testing import assert_frame_equal
 import pymovements as pm
 
 
+@pytest.fixture(name='experiment')
+def fixture_experiment():
+    return pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000)
+
+
 @pytest.mark.parametrize(
     ('gaze_init_kwargs', 'transform_method', 'transform_kwargs', 'expected'),
     [
@@ -426,3 +431,246 @@ def test_gaze_transform_raises_exception(init_kwargs, exception, exception_msg):
 
     msg, = excinfo.value.args
     assert msg == exception_msg
+
+
+@pytest.mark.parametrize(
+    ('data', 'pixel_columns'),
+    [
+        pytest.param(
+            {'x': [0.0], 'y': [0.0]},
+            ['x', 'y'],
+            id='two_components',
+        ),
+        pytest.param(
+            {'t': [0], 'x': [0.0], 'y': [0.0]},
+            ['x', 'y'],
+            id='two_components_and_time',
+        ),
+        pytest.param(
+            {'xl': [0.0], 'yl': [0.0], 'xr': [0.0], 'yr': [0.0]},
+            ['xl', 'yl', 'xr', 'yr'],
+            id='four_components',
+        ),
+        pytest.param(
+            {'xl': [0.0], 'yl': [0.0], 'xr': [0.0], 'yr': [0.0], 'xa': [0.0], 'ya': [0.0]},
+            ['xl', 'yl', 'xr', 'yr', 'xa', 'ya'],
+            id='six_components',
+        ),
+    ],
+)
+def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_columns):
+    gaze = pm.GazeDataFrame(
+        data=pl.from_dict(data),
+        experiment=experiment,
+        pixel_columns=pixel_columns,
+    )
+    gaze.pix2deg()
+    assert 'position' in gaze.columns
+
+
+@pytest.mark.parametrize(
+    ('init_kwargs', 'exception', 'expected_msg'),
+    [
+        pytest.param(
+            {
+                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+            },
+            AttributeError,
+            'n_components must be either 2, 4 or 6 but is None',
+            id='no_column_components',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+                'acceleration_columns': ['x', 'y'],
+            },
+            pl.exceptions.ColumnNotFoundError,
+            (
+                'pixel\n\nError originated just after this operation:\nDF ["acceleration"]; '
+                'PROJECT */1 COLUMNS; SELECTION: "None"'
+            ),
+            id='no_pixel_column',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'pixel_columns': ['x', 'y'],
+            },
+            AttributeError,
+            'experiment must not be None for this method to work',
+            id='no_experiment',
+        ),
+    ],
+)
+def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg):
+    gaze_df = pm.GazeDataFrame(**init_kwargs)
+
+    with pytest.raises(exception) as excinfo:
+        gaze_df.pix2deg()
+
+    msg, = excinfo.value.args
+    assert msg == expected_msg
+
+
+@pytest.mark.parametrize(
+    ('data', 'position_columns'),
+    [
+        pytest.param(
+            {'x': [0.0], 'y': [0.0]},
+            ['x', 'y'],
+            id='two_components',
+        ),
+        pytest.param(
+            {'t': [0], 'x': [0.0], 'y': [0.0]},
+            ['x', 'y'],
+            id='two_components_and_time',
+        ),
+        pytest.param(
+            {'xl': [0.0], 'yl': [0.0], 'xr': [0.0], 'yr': [0.0]},
+            ['xl', 'yl', 'xr', 'yr'],
+            id='four_components',
+        ),
+        pytest.param(
+            {'xl': [0.0], 'yl': [0.0], 'xr': [0.0], 'yr': [0.0], 'xa': [0.0], 'ya': [0.0]},
+            ['xl', 'yl', 'xr', 'yr', 'xa', 'ya'],
+            id='six_components',
+        ),
+    ],
+)
+def test_gaze_dataframe_pos2acc_creates_acceleration_column(data, experiment, position_columns):
+    gaze = pm.GazeDataFrame(
+        data=pl.from_dict(data),
+        experiment=experiment,
+        position_columns=position_columns,
+    )
+    gaze.pos2acc()
+    assert 'acceleration' in gaze.columns
+
+
+@pytest.mark.parametrize(
+    ('init_kwargs', 'exception', 'expected_msg'),
+    [
+        pytest.param(
+            {
+                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+            },
+            AttributeError,
+            'n_components must be either 2, 4 or 6 but is None',
+            id='no_column_components',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+                'pixel_columns': ['x', 'y'],
+            },
+            pl.exceptions.ColumnNotFoundError,
+            (
+                'position\n\nError originated just after this operation:\nDF ["pixel"]; '
+                'PROJECT */1 COLUMNS; SELECTION: "None"'
+            ),
+            id='no_position_column',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'position_columns': ['x', 'y'],
+            },
+            AttributeError,
+            'experiment must not be None for this method to work',
+            id='no_experiment',
+        ),
+    ],
+)
+def test_gaze_dataframe_pos2acc_exceptions(init_kwargs, exception, expected_msg):
+    gaze_df = pm.GazeDataFrame(**init_kwargs)
+
+    with pytest.raises(exception) as excinfo:
+        gaze_df.pos2acc()
+
+    msg, = excinfo.value.args
+    assert msg == expected_msg
+
+
+@pytest.mark.parametrize(
+    ('data', 'position_columns'),
+    [
+        pytest.param(
+            {'x': [0.0], 'y': [0.0]},
+            ['x', 'y'],
+            id='two_components',
+        ),
+        pytest.param(
+            {'t': [0], 'x': [0.0], 'y': [0.0]},
+            ['x', 'y'],
+            id='two_components_and_time',
+        ),
+        pytest.param(
+            {'xl': [0.0], 'yl': [0.0], 'xr': [0.0], 'yr': [0.0]},
+            ['xl', 'yl', 'xr', 'yr'],
+            id='four_components',
+        ),
+        pytest.param(
+            {'xl': [0.0], 'yl': [0.0], 'xr': [0.0], 'yr': [0.0], 'xa': [0.0], 'ya': [0.0]},
+            ['xl', 'yl', 'xr', 'yr', 'xa', 'ya'],
+            id='six_components',
+        ),
+    ],
+)
+def test_gaze_dataframe_pos2vel_creates_velocity_column(data, experiment, position_columns):
+    gaze = pm.GazeDataFrame(
+        data=pl.from_dict(data),
+        experiment=experiment,
+        position_columns=position_columns,
+    )
+    gaze.pos2vel(method='savitzky_golay', window_length=7, degree=2)
+    assert 'velocity' in gaze.columns
+
+
+@pytest.mark.parametrize(
+    ('init_kwargs', 'exception', 'expected_msg'),
+    [
+        pytest.param(
+            {
+                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+            },
+            AttributeError,
+            'n_components must be either 2, 4 or 6 but is None',
+            id='no_column_components',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+                'pixel_columns': ['x', 'y'],
+            },
+            pl.exceptions.ColumnNotFoundError,
+            (
+                'position\n\nError originated just after this operation:\nDF ["pixel"]; '
+                'PROJECT */1 COLUMNS; SELECTION: "None"'
+            ),
+            id='no_position_column',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'position_columns': ['x', 'y'],
+            },
+            AttributeError,
+            'experiment must not be None for this method to work',
+            id='no_experiment',
+        ),
+    ],
+)
+def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg):
+    gaze_df = pm.GazeDataFrame(**init_kwargs)
+
+    with pytest.raises(exception) as excinfo:
+        gaze_df.pos2vel()
+
+    msg, = excinfo.value.args
+    assert msg == expected_msg

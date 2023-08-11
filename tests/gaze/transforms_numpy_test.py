@@ -434,6 +434,17 @@ def test_pix2deg_raises_error(kwargs, expected_error):
             np.array([[0.0, 0.0, 0.0, 0.0]] * n_coords),
             id='nparray_of_zero_coords_4d',
         ),
+        pytest.param(
+            {
+                'arr': np.array([[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]] * n_coords),
+                'screen_px': screen_px_2d,
+                'screen_cm': screen_cm_2d,
+                'distance_cm': screen_cm_1d,
+                'origin': 'center',
+            },
+            np.array([[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]] * n_coords),
+            id='nparray_of_zero_coords_6d',
+        ),
     ],
 )
 def test_pix2deg_returns(kwargs, expected_value):
