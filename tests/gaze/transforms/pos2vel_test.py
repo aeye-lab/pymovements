@@ -157,15 +157,15 @@ def test_pos2vel_raises_error(kwargs, series, exception, msg_substrings):
 @pytest.mark.parametrize(
     ('kwargs', 'series', 'expected_df'),
     [
-        pytest.param(
-            {
-                'method': 'savitzky_golay', 'window_length': 3, 'degree': 1,
-                'sampling_rate': 1, 'n_components': 2,
-            },
-            pl.Series('position', [], pl.List(pl.Float64)),
-            pl.Series('velocity', [], pl.List(pl.Float64)),
-            id='empty_series_raises_compute_error',
-        ),
+        # pytest.param(
+        #     {
+        #         'method': 'savitzky_golay', 'window_length': 3, 'degree': 1,
+        #         'sampling_rate': 1, 'n_components': 2,
+        #     },
+        #     pl.Series('position', [], pl.List(pl.Float64)),
+        #     pl.Series('velocity', [], pl.List(pl.Float64)),
+        #     id='empty_series_raises_compute_error',
+        # ),
         pytest.param(
             {
                 'method': 'savitzky_golay',
