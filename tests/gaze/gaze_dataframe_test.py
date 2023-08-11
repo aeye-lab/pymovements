@@ -21,13 +21,7 @@
 import polars as pl
 import pytest
 
-from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
-
-
-@pytest.fixture(name='experiment')
-def fixture_experiment():
-    return Experiment(1024, 768, 38, 30, 60, 'center', 1000)
 
 
 @pytest.mark.parametrize(
