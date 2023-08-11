@@ -164,15 +164,16 @@ def test_savitzky_golay_raises_error(kwargs, series, exception, msg_substrings):
 @pytest.mark.parametrize(
     ('kwargs', 'series', 'expected_df'),
     [
-        # pytest.param(
-        #     {
-        #         'window_length': 3, 'degree': 1,
-        #         'sampling_rate': 1, 'n_components': 2, 'input_column': 'A',
-        #     },
-        #     pl.Series('A', [], pl.List(pl.Float64)),
-        #     pl.Series('A', [], pl.List(pl.Float64)),
-        #     id='empty_series_returns_empty_series',
-        # ),
+        pytest.param(
+            {
+                'window_length': 3, 'degree': 1,
+                'sampling_rate': 1, 'n_components': 2, 'input_column': 'A',
+            },
+            pl.Series('A', [], pl.List(pl.Float64)),
+            pl.Series('A', [], pl.List(pl.Float64)),
+            id='empty_series_returns_empty_series',
+            marks=pytest.mark.xfail(reason='#475'),
+        ),
         pytest.param(
             {
                 'window_length': 3, 'degree': 1, 'derivative': 0,
