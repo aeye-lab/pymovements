@@ -23,22 +23,21 @@ import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
-from pymovements.events import event_properties
-from pymovements.events.event_properties import EVENT_PROPERTIES
+import pymovements as pm
 
 
 @pytest.mark.parametrize(
     ('event_property', 'init_kwargs', 'exception', 'msg_substrings'),
     [
         pytest.param(
-            event_properties.peak_velocity,
+            pm.events.peak_velocity,
             {'n_components': 3},
             ValueError,
             ('data must have exactly two components',),
             id='peak_velocity_not_2_components_raise_value_error',
         ),
         pytest.param(
-            event_properties.location,
+            pm.events.location,
             {'method': 'foo'},
             ValueError,
             ('method', 'foo', 'not', 'supported', 'mean', 'median'),
@@ -59,7 +58,7 @@ def test_property_init_exceptions(event_property, init_kwargs, exception, msg_su
     ('event_property', 'init_kwargs', 'input_df', 'exception', 'msg_substrings'),
     [
         pytest.param(
-            event_properties.duration,
+            pm.events.duration,
             {},
             pl.DataFrame(schema={'onset': pl.Int64}),
             pl.exceptions.ColumnNotFoundError,
@@ -67,7 +66,7 @@ def test_property_init_exceptions(event_property, init_kwargs, exception, msg_su
             id='duration_missing_offset_column',
         ),
         pytest.param(
-            event_properties.duration,
+            pm.events.duration,
             {},
             pl.DataFrame(schema={'offset': pl.Int64}),
             pl.exceptions.ColumnNotFoundError,
@@ -75,7 +74,7 @@ def test_property_init_exceptions(event_property, init_kwargs, exception, msg_su
             id='duration_missing_onset_column',
         ),
         pytest.param(
-            event_properties.peak_velocity,
+            pm.events.peak_velocity,
             {'velocity_column': 'velocity'},
             pl.DataFrame(schema={'_velocity': pl.Int64}),
             pl.exceptions.ColumnNotFoundError,
@@ -83,7 +82,7 @@ def test_property_init_exceptions(event_property, init_kwargs, exception, msg_su
             id='peak_velocity_missing_velocity_column',
         ),
         pytest.param(
-            event_properties.dispersion,
+            pm.events.dispersion,
             {'position_column': 'position'},
             pl.DataFrame(schema={'_position': pl.Int64}),
             pl.exceptions.ColumnNotFoundError,
@@ -91,7 +90,7 @@ def test_property_init_exceptions(event_property, init_kwargs, exception, msg_su
             id='dispersion_missing_position_column',
         ),
         pytest.param(
-            event_properties.amplitude,
+            pm.events.amplitude,
             {'position_column': 'position'},
             pl.DataFrame(schema={'_position': pl.Int64}),
             pl.exceptions.ColumnNotFoundError,
@@ -114,7 +113,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
     ('event_property', 'init_kwargs', 'input_df', 'expected_df'),
     [
         pytest.param(
-            event_properties.duration,
+            pm.events.duration,
             {},
             pl.DataFrame(schema={'onset': pl.Int64, 'offset': pl.Int64}),
             pl.DataFrame(schema={'duration': pl.Int64}),
@@ -122,7 +121,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
         ),
 
         pytest.param(
-            event_properties.duration,
+            pm.events.duration,
             {},
             pl.DataFrame({'onset': 0, 'offset': 1}, schema={'onset': pl.Int64, 'offset': pl.Int64}),
             pl.DataFrame({'duration': 1}, schema={'duration': pl.Int64}),
@@ -130,7 +129,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
         ),
 
         pytest.param(
-            event_properties.duration,
+            pm.events.duration,
             {},
             pl.DataFrame(
                 {'onset': [0, 10], 'offset': [9, 23]},
@@ -144,7 +143,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
         ),
 
         pytest.param(
-            event_properties.peak_velocity,
+            pm.events.peak_velocity,
             {},
             pl.DataFrame(
                 {'velocity': [[0, 0], [0, 1]]},
@@ -158,7 +157,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
         ),
 
         pytest.param(
-            event_properties.dispersion,
+            pm.events.dispersion,
             {},
             pl.DataFrame(
                 {'position': [[2, 3]]},
@@ -172,7 +171,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
         ),
 
         pytest.param(
-            event_properties.dispersion,
+            pm.events.dispersion,
             {},
             pl.DataFrame(
                 {'position': [[0, 0], [2, 0]]},
@@ -186,7 +185,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
         ),
 
         pytest.param(
-            event_properties.dispersion,
+            pm.events.dispersion,
             {},
             pl.DataFrame(
                 {'position': [[0, 0], [0, 3]]},
@@ -200,7 +199,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
         ),
 
         pytest.param(
-            event_properties.dispersion,
+            pm.events.dispersion,
             {},
             pl.DataFrame(
                 {'position': [[0, 0], [2, 3]]},
@@ -214,7 +213,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
         ),
 
         pytest.param(
-            event_properties.disposition,
+            pm.events.disposition,
             {},
             pl.DataFrame(
                 {'position': [[2, 1]]},
@@ -228,7 +227,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
         ),
 
         pytest.param(
-            event_properties.disposition,
+            pm.events.disposition,
             {},
             pl.DataFrame(
                 {'position': [[0, 0], [1, 0]]},
@@ -242,7 +241,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
         ),
 
         pytest.param(
-            event_properties.disposition,
+            pm.events.disposition,
             {},
             pl.DataFrame(
                 {'position': [[0, 0], [0, 1]]},
@@ -256,7 +255,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
         ),
 
         pytest.param(
-            event_properties.disposition,
+            pm.events.disposition,
             {},
             pl.DataFrame(
                 {'position': [[0, 0], [1, 1]]},
@@ -270,7 +269,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
         ),
 
         pytest.param(
-            event_properties.disposition,
+            pm.events.disposition,
             {},
             pl.DataFrame(
                 {'position': [[0, 0], [1.1, 0], [1, 0]]},
@@ -284,7 +283,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
         ),
 
         pytest.param(
-            event_properties.disposition,
+            pm.events.disposition,
             {},
             pl.DataFrame(
                 {'position': [[-1, 0], [0, 0], [1, 0]]},
@@ -298,7 +297,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
         ),
 
         pytest.param(
-            event_properties.amplitude,
+            pm.events.amplitude,
             {},
             pl.DataFrame(
                 {'position': [[4, 5]]},
@@ -312,7 +311,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
         ),
 
         pytest.param(
-            event_properties.amplitude,
+            pm.events.amplitude,
             {},
             pl.DataFrame(
                 {'position': [[2, 0], [0, 0]]},
@@ -326,7 +325,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
         ),
 
         pytest.param(
-            event_properties.amplitude,
+            pm.events.amplitude,
             {},
             pl.DataFrame(
                 {'position': [[0, 3], [0, 0]]},
@@ -339,7 +338,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             id='amplitude_two_samples_y_move',
         ),
         pytest.param(
-            event_properties.amplitude,
+            pm.events.amplitude,
             {},
             pl.DataFrame(
                 {'position': [[0, 0], [1, 1]]},
@@ -352,7 +351,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             id='amplitude_two_samples_xy_move',
         ),
         pytest.param(
-            event_properties.location,
+            pm.events.location,
             {'method': 'mean'},
             pl.DataFrame(
                 {'position': [[0, 0], [1, 0]]},
@@ -365,7 +364,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             id='position_two_samples_mean',
         ),
         pytest.param(
-            event_properties.location,
+            pm.events.location,
             {'method': 'mean'},
             pl.DataFrame(
                 {'position': [[0, 0], [0, 1], [0, 3]]},
@@ -378,7 +377,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             id='position_three_samples_mean',
         ),
         pytest.param(
-            event_properties.location,
+            pm.events.location,
             {'method': 'median'},
             pl.DataFrame(
                 {'position': [[0, 0], [2, 1], [3, 3]]},
@@ -402,20 +401,22 @@ def test_property_has_expected_result(event_property, init_kwargs, input_df, exp
 @pytest.mark.parametrize(
     ('property_function', 'property_function_name'),
     [
-        pytest.param(event_properties.duration, 'duration', id='duration'),
-        pytest.param(event_properties.peak_velocity, 'peak_velocity', id='peak_velocity'),
-        pytest.param(event_properties.dispersion, 'dispersion', id='dispersion'),
-        pytest.param(event_properties.amplitude, 'amplitude', id='amplitude'),
-        pytest.param(event_properties.disposition, 'disposition', id='disposition'),
-        pytest.param(event_properties.location, 'location', id='location'),
+        pytest.param(pm.events.duration, 'duration', id='duration'),
+        pytest.param(pm.events.peak_velocity, 'peak_velocity', id='peak_velocity'),
+        pytest.param(pm.events.dispersion, 'dispersion', id='dispersion'),
+        pytest.param(pm.events.amplitude, 'amplitude', id='amplitude'),
+        pytest.param(pm.events.disposition, 'disposition', id='disposition'),
+        pytest.param(pm.events.location, 'location', id='location'),
     ],
 )
 def test_property_registered(property_function, property_function_name):
-    assert property_function_name in EVENT_PROPERTIES
-    assert EVENT_PROPERTIES[property_function_name] == property_function
-    assert EVENT_PROPERTIES[property_function_name].__name__ == property_function_name
+    property_dict = pm.events.EVENT_PROPERTIES
+
+    assert property_function_name in property_dict
+    assert property_dict[property_function_name] == property_function
+    assert property_dict[property_function_name].__name__ == property_function_name
 
 
-@pytest.mark.parametrize('property_function', EVENT_PROPERTIES.values())
+@pytest.mark.parametrize('property_function', pm.events.EVENT_PROPERTIES.values())
 def test_property_returns_polars_expression(property_function):
     assert isinstance(property_function(), pl.Expr)

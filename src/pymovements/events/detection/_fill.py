@@ -24,36 +24,28 @@ from __future__ import annotations
 
 import numpy as np
 
-from pymovements.events.events import EventDataFrame
-from pymovements.events.events import register_event_detection
+from pymovements.events.detection._library import register_event_detection
+from pymovements.events.frame import EventDataFrame
 from pymovements.gaze.transforms_numpy import consecutive
-from pymovements.gaze.transforms_numpy import norm
 from pymovements.utils import checks
-from pymovements.utils.filters import filter_candidates_remove_nans
 
 
 @register_event_detection
-def ivt(
+def fill(
+        events: EventDataFrame,
         positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         timesteps: list[int] | np.ndarray | None = None,
-        minimum_duration: int = 100,
-        velocity_threshold: float = 20.0,
-        include_nan: bool = False,
-        name: str = 'fixation',
+        minimum_duration: int = 1,
+        name: str = 'unclassified',
 ) -> EventDataFrame:
     """
-    Identification of fixations based on velocity-threshold
-
-    The algorithm classifies each point as a fixation if the velocity is below
-    the given velocity threshold. Consecutive fixation points are merged into
-    one fixation.
-
-    The implementation and its default parameter values are based on the description and pseudocode
-    from Salvucci and Goldberg :cite:p:`SalvucciGoldberg2000`.
+    Classify all previously unclassified timesteps as events.
 
     Parameters
     ----------
+    events:
+        The already detected events.
     positions: array-like, shape (N, 2)
         Continuous 2D position time series.
     velocities: array-like, shape (N, 2)
@@ -64,11 +56,6 @@ def ivt(
     minimum_duration: int
         Minimum fixation duration. The duration is specified in the units used in ``timesteps``.
          If ``timesteps`` is None, then ``minimum_duration`` is specified in numbers of samples.
-    velocity_threshold: float
-        Threshold for a point to be classified as a fixation. If the
-        velocity is below the threshold, the point is classified as a fixation.
-    include_nan: bool
-        Indicator, whether we want to split events on missing/corrupt value (np.nan)
     name:
         Name for detected events in EventDataFrame.
 
@@ -90,23 +77,23 @@ def ivt(
     velocities = np.array(velocities)
 
     checks.check_shapes_positions_velocities(positions=positions, velocities=velocities)
-    if velocity_threshold is None:
-        raise ValueError('velocity threshold must not be None')
-    if velocity_threshold <= 0:
-        raise ValueError('velocity threshold must be greater than 0')
 
     if timesteps is None:
         timesteps = np.arange(len(velocities), dtype=np.int64)
     timesteps = np.array(timesteps)
     checks.check_is_length_matching(velocities=velocities, timesteps=timesteps)
 
-    # Get all indices with norm-velocities below threshold.
-    velocity_norm = norm(velocities, axis=1)
-    candidate_mask = velocity_norm < velocity_threshold
+    # Create binary mask where each existing event is marked.
+    events_mask = np.zeros(len(positions), dtype=bool)
 
-    # Add nans to candidates if desired.
-    if include_nan:
-        candidate_mask = np.logical_or(candidate_mask, np.isnan(velocities).any(axis=1))
+    for row in events.frame.iter_rows(named=True):
+        idx_onset = np.where(timesteps == row['onset'])[0][0]
+        idx_offset = np.where(timesteps == row['offset'] - 1)[0][0]
+
+        events_mask[idx_onset:idx_offset + 1] = True
+
+    # Mask all indices where there is no event.
+    candidate_mask = ~events_mask
 
     # Get indices of true values in candidate mask.
     candidate_indices = np.where(candidate_mask)[0]
@@ -114,9 +101,8 @@ def ivt(
     # Get all fixation candidates by grouping all consecutive indices.
     candidates = consecutive(arr=candidate_indices)
 
-    # Remove leading and trailing nan values from candidates.
-    if include_nan:
-        candidates = filter_candidates_remove_nans(candidates=candidates, values=velocities)
+    if len(candidates) == 1 and np.array_equal(candidates[0], np.array([], dtype=np.int64)):
+        return EventDataFrame()
 
     # Filter all candidates by minimum duration.
     candidates = [

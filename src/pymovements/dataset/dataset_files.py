@@ -28,7 +28,7 @@ from tqdm.auto import tqdm
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
-from pymovements.events.events import EventDataFrame
+from pymovements.events import EventDataFrame
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
 from pymovements.utils.parsing import parse_eyelink
 from pymovements.utils.paths import match_filepaths
