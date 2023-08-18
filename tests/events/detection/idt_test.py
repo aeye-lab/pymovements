@@ -23,6 +23,7 @@ import pytest
 from polars.testing import assert_frame_equal
 
 import pymovements as pm
+from pymovements.synthetic import step_function
 
 
 @pytest.mark.parametrize(
@@ -140,7 +141,7 @@ def test_idt_raises_error(kwargs, expected_error):
         ),
         pytest.param(
             {
-                'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
+                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'dispersion_threshold': 1,
                 'minimum_duration': 2,
             },
@@ -153,7 +154,7 @@ def test_idt_raises_error(kwargs, expected_error):
         ),
         pytest.param(
             {
-                'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
+                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'dispersion_threshold': 1,
                 'minimum_duration': 2,
                 'name': 'custom_fixation',
@@ -167,7 +168,7 @@ def test_idt_raises_error(kwargs, expected_error):
         ),
         pytest.param(
             {
-                'positions': pm.synthetic.step_function(
+                'positions': step_function(
                     length=100,
                     steps=[49, 50],
                     values=[(9, 9), (1, 1)],
@@ -185,7 +186,7 @@ def test_idt_raises_error(kwargs, expected_error):
         ),
         pytest.param(
             {
-                'positions': pm.synthetic.step_function(
+                'positions': step_function(
                     length=100, steps=[10, 20, 90],
                     values=[
                         (np.nan, np.nan), (0, 0),
@@ -204,7 +205,7 @@ def test_idt_raises_error(kwargs, expected_error):
         ),
         pytest.param(
             {
-                'positions': pm.synthetic.step_function(
+                'positions': step_function(
                     length=100, steps=[10, 20, 90],
                     values=[
                         (np.nan, np.nan), (0, 0),
@@ -224,7 +225,7 @@ def test_idt_raises_error(kwargs, expected_error):
         ),
         pytest.param(
             {
-                'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
+                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'timesteps': np.arange(1000, 1100, dtype=int),
                 'dispersion_threshold': 1,
                 'minimum_duration': 2,
@@ -238,7 +239,7 @@ def test_idt_raises_error(kwargs, expected_error):
         ),
         pytest.param(
             {
-                'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
+                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'timesteps': np.reshape(np.arange(1000, 1100, dtype=int), (100, 1)),
                 'dispersion_threshold': 1,
                 'minimum_duration': 2,
@@ -252,7 +253,7 @@ def test_idt_raises_error(kwargs, expected_error):
         ),
         pytest.param(
             {
-                'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
+                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'timesteps': np.arange(1000, 1100, dtype=float),
                 'dispersion_threshold': 1,
                 'minimum_duration': 2,
@@ -268,7 +269,7 @@ def test_idt_raises_error(kwargs, expected_error):
 )
 def test_idt_detects_fixations(kwargs, expected):
     """Test if idt detects fixations."""
-    velocities = pm.gaze.transforms.pos2vel(
+    velocities = pm.gaze.transforms_numpy.pos2vel(
         kwargs['positions'], sampling_rate=10, method='preceding',
     )
     events = pm.events.idt(velocities=velocities, **kwargs)
@@ -281,7 +282,7 @@ def test_idt_detects_fixations(kwargs, expected):
     [
         pytest.param(
             {
-                'positions': pm.synthetic.step_function(length=10, steps=[0], values=[(0, 0)]),
+                'positions': step_function(length=10, steps=[0], values=[(0, 0)]),
                 'timesteps': np.concatenate([
                     np.arange(0, 5, dtype=int), np.arange(7, 12, dtype=int),
                 ]),
@@ -293,7 +294,7 @@ def test_idt_detects_fixations(kwargs, expected):
         ),
         pytest.param(
             {
-                'positions': pm.synthetic.step_function(length=10, steps=[0], values=[(0, 0)]),
+                'positions': step_function(length=10, steps=[0], values=[(0, 0)]),
                 'timesteps': np.arange(0, 30, step=3, dtype=int),
                 'dispersion_threshold': 1,
                 'minimum_duration': 2,
@@ -303,7 +304,7 @@ def test_idt_detects_fixations(kwargs, expected):
         ),
         pytest.param(
             {
-                'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
+                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'timesteps': np.linspace(0, 1, 100),
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
@@ -313,7 +314,7 @@ def test_idt_detects_fixations(kwargs, expected):
         ),
         pytest.param(
             {
-                'positions': pm.synthetic.step_function(length=100, steps=[0], values=[(0, 0)]),
+                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
             },
@@ -323,7 +324,7 @@ def test_idt_detects_fixations(kwargs, expected):
     ],
 )
 def test_idt_timesteps_exceptions(kwargs, exception, msg_substrings):
-    velocities = pm.gaze.transforms.pos2vel(
+    velocities = pm.gaze.transforms_numpy.pos2vel(
         kwargs['positions'], sampling_rate=10, method='preceding',
     )
     with pytest.raises(exception) as excinfo:

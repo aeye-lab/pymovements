@@ -196,9 +196,7 @@ def _detect_file_type(filepath: Path) -> tuple[str | None, str | None]:
     RuntimeError
         If the file has no suffix or the suffix is not supported.
     """
-    suffixes = filepath.suffixes
-
-    if not suffixes:
+    if not (suffixes := filepath.suffixes):
         raise RuntimeError(
             f"File '{filepath}' has no suffixes that could be used to detect the archive type or"
             ' compression.',
@@ -219,10 +217,9 @@ def _detect_file_type(filepath: Path) -> tuple[str | None, str | None]:
     if suffix in _COMPRESSED_FILE_OPENERS:
         # Check if there are more than one suffix.
         if len(suffixes) > 1:
-            suffix2 = suffixes[-2]
 
             # Check if the second last suffix refers to an archive type.
-            if suffix2 not in _ARCHIVE_EXTRACTORS:
+            if (suffix2 := suffixes[-2]) not in _ARCHIVE_EXTRACTORS:
                 raise RuntimeError(
                     f"Unsupported archive type: '{suffix2}'.\n"
                     f"Supported suffixes are: '{sorted(set(_ARCHIVE_EXTRACTORS))}'.",

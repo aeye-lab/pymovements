@@ -23,11 +23,11 @@ Test all functions in pymovements.transforms.
 import numpy as np
 import pytest
 
-from pymovements.gaze.transforms import norm
-from pymovements.gaze.transforms import pix2deg
-from pymovements.gaze.transforms import pos2acc
-from pymovements.gaze.transforms import pos2vel
-from pymovements.gaze.transforms import split
+from pymovements.gaze.transforms_numpy import norm
+from pymovements.gaze.transforms_numpy import pix2deg
+from pymovements.gaze.transforms_numpy import pos2acc
+from pymovements.gaze.transforms_numpy import pos2vel
+from pymovements.gaze.transforms_numpy import split
 
 n_coords = 100
 screen_px_1d = 100
@@ -433,6 +433,17 @@ def test_pix2deg_raises_error(kwargs, expected_error):
             },
             np.array([[0.0, 0.0, 0.0, 0.0]] * n_coords),
             id='nparray_of_zero_coords_4d',
+        ),
+        pytest.param(
+            {
+                'arr': np.array([[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]] * n_coords),
+                'screen_px': screen_px_2d,
+                'screen_cm': screen_cm_2d,
+                'distance_cm': screen_cm_1d,
+                'origin': 'center',
+            },
+            np.array([[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]] * n_coords),
+            id='nparray_of_zero_coords_6d',
         ),
     ],
 )

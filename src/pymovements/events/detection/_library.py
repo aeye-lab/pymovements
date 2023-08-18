@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2022-2023 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,53 +17,53 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""TransformLibrary module."""
+"""
+This module holds the EventDataFrame class.
+"""
 from __future__ import annotations
 
-from typing import Callable
-from typing import TypeVar
+from collections.abc import Callable
 
-import polars as pl
-
-
-TransformMethod = TypeVar('TransformMethod', bound=Callable[..., pl.Expr])
+from pymovements.events.frame import EventDataFrame
 
 
-class TransformLibrary:
-    """Provides access by name to transformation methods.
+class EventDetectionLibrary:
+    """Provides access by name to event detection methods.
 
     Attributes
     ----------
     methods:
-        Dictionary of transformation methods.
+        Dictionary of event detection methods.
     """
 
-    methods: dict[str, Callable[..., pl.Expr]] = {}
+    methods: dict[str, Callable[..., EventDataFrame]] = {}
 
     @classmethod
-    def add(cls, method: Callable[..., pl.Expr]) -> None:
-        """Add a transformation method to the library.
+    def add(cls, method: Callable[..., EventDataFrame]) -> None:
+        """Add an event detection method to the library.
 
         Parameter
         ---------
         method
-            The transformation method to add to the library.
+            The event detection method to add to the library.
         """
         cls.methods[method.__name__] = method
 
     @classmethod
-    def get(cls, name: str) -> Callable[..., pl.Expr]:
-        """Get transformation method py name.
+    def get(cls, name: str) -> Callable[..., EventDataFrame]:
+        """Get event detection method py name.
 
         Parameter
         ---------
         name
-            Name of the transformation method in the library.
+            Name of the event detection method in the library.
         """
         return cls.methods[name]
 
 
-def register_transform(method: TransformMethod) -> TransformMethod:
-    """Register a transform method."""
-    TransformLibrary.add(method)
+def register_event_detection(
+        method: Callable[..., EventDataFrame],
+) -> Callable[..., EventDataFrame]:
+    """Register an event detection method."""
+    EventDetectionLibrary.add(method)
     return method

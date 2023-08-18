@@ -52,13 +52,13 @@ import pymovements as pm
                 pl.Series('x', [1, 1], pl.Float64),
                 pl.Series('y', [1, 1], pl.Float64),
             ]),
-            pl.Series(None, [1.41421356, 1.41421356], pl.Float64),
+            pl.Series(None, [1.4142, 1.4142], pl.Float64),
             id='empty_series_returns_empty_series',
         ),
     ],
 )
 def test_norm_returns(columns, df, expected_series):
     result_df = df.select(
-        pm.gaze.transforms_pl.norm(columns=columns).alias('norm'),
+        pm.gaze.transforms.norm(columns=columns).alias('norm'),
     )
     assert_series_equal(result_df['norm'], expected_series, check_names=False)

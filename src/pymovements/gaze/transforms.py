@@ -17,570 +17,567 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-Transforms module.
-"""
+"""Module for py:func:`pymovements.gaze.transforms`"""
 from __future__ import annotations
 
+from functools import partial
 from typing import Any
+from typing import Callable
+from typing import TypeVar
 
 import numpy as np
-from scipy.signal import savgol_filter
+import polars as pl
+import scipy
 
 from pymovements.utils import checks
 
 
-def pix2deg(
-        arr: float | list[float] | list[list[float]] | np.ndarray,
-        screen_px: float | list[float] | tuple[float, float] | np.ndarray,
-        screen_cm: float | list[float] | tuple[float, float] | np.ndarray,
-        distance_cm: float,
+TransformMethod = TypeVar('TransformMethod', bound=Callable[..., pl.Expr])
+
+
+class TransformLibrary:
+    """Provides access by name to transformation methods.
+
+    Attributes
+    ----------
+    methods:
+        Dictionary of transformation methods.
+    """
+
+    methods: dict[str, Callable[..., pl.Expr]] = {}
+
+    @classmethod
+    def add(cls, method: Callable[..., pl.Expr]) -> None:
+        """Add a transformation method to the library.
+
+        Parameter
+        ---------
+        method
+            The transformation method to add to the library.
+        """
+        cls.methods[method.__name__] = method
+
+    @classmethod
+    def get(cls, name: str) -> Callable[..., pl.Expr]:
+        """Get transformation method py name.
+
+        Parameter
+        ---------
+        name
+            Name of the transformation method in the library.
+        """
+        return cls.methods[name]
+
+
+def register_transform(method: TransformMethod) -> TransformMethod:
+    """Register a transform method."""
+    TransformLibrary.add(method)
+    return method
+
+
+@register_transform
+def center_origin(
+        *,
+        screen_resolution: tuple[int, int],
         origin: str,
-) -> np.ndarray:
-    """Converts pixel screen coordinates to degrees of visual angle.
+        n_components: int,
+        pixel_column: str = 'pixel',
+        output_column: str | None = None,
+) -> pl.Expr:
+    """Center pixel data.
+
+    Pixel data will have the coordinates ``(0, 0)`` afterwards.
 
     Parameters
     ----------
-    arr : float, array_like
-        Pixel coordinates to transform into degrees of visual angle
-    screen_px : int, int
-        Screen dimension in pixels
-    screen_cm : float, float
-        Screen dimension in centimeters
-    distance_cm : float
-        Eye-to-screen distance in centimeters
-    origin : str
-        Specifies the screen location of the origin of the pixel coordinate system. Valid values
-        are: center, lower left.
-
-    Returns
-    -------
-    np.ndarray
-        Coordinates in degrees of visual angle
-
-    Raises
-    ------
-    TypeError
-        If arr is None.
-    ValueError
-        If dimension screen_px or screen_cm don't match dimension of arr.
-        If screen_px or screen_cm or one of its elements is zero.
-        If distance_cm is zero.
-        If origin value is not supported.
-
-    Examples
-    --------
-    >>> pix2deg(
-    ...    arr=[(123.0, 865.0)],
-    ...    screen_px=(1280, 1024),
-    ...    screen_cm=(38.0, 30.0),
-    ...    distance_cm=68.0,
-    ...    origin='lower left',
-    ... )
-    array([[-12.70732231, 8.65963972]])
-
-    >>> pix2deg(
-    ...    arr=[(123.0, 865.0)],
-    ...    screen_px=(1280, 1024),
-    ...    screen_cm=(38.0, 30.0),
-    ...    distance_cm=68.0,
-    ...    origin='center',
-    ... )
-    array([[ 3.07379946, 20.43909054]])
-
-    If the eye-movement of both eyes was recorded, the input array must contain
-    first the x- and y-coordinates of one eye and then the x- and y-coordinates
-    of the other eye as shown in the example below.
-
-    >>> x_left, y_left = 123.0, 865.0
-    >>> x_right, y_right = 183.0, 865.0
-    >>> arr = [(x_left, y_left, x_right, y_right)]
-    >>> pix2deg(
-    ...    arr=arr,
-    ...    screen_px=(1280, 1024),
-    ...    screen_cm=(38.0, 30.0),
-    ...    distance_cm=68.0,
-    ...    origin='center',
-    ... )
-    array([[ 3.07379946, 20.43909054,  4.56790364, 20.43909054]])
+    screen_resolution:
+        Pixel screen resolution as tuple (width, height).
+    origin:
+        The location of the pixel origin. Supported values: ``center``, ``lower left``
+    n_components:
+        Number of components in input column.
+    pixel_column:
+        Name of the input column with pixel data.
+    output_column:
+        Name of the output column with centered pixel data.
     """
-    if arr is None:
-        raise TypeError('arr must not be None')
+    if output_column is None:
+        output_column = pixel_column
 
-    checks.check_no_zeros(screen_px, 'screen_px')
-    checks.check_no_zeros(screen_cm, 'screen_px')
-    checks.check_no_zeros(distance_cm, 'distance_cm')
-
-    arr = np.array(arr)
-    screen_px = np.array(screen_px)
-    screen_cm = np.array(screen_cm)
-
-    # Check basic arr dimensions.
-    if arr.ndim not in [0, 1, 2]:
-        raise ValueError(
-            'Number of dimensions of arr must be either 0, 1 or 2'
-            f' (arr.ndim: {arr.ndim})',
-        )
-    if arr.ndim == 2 and arr.shape[-1] not in [1, 2, 4, 6]:
-        raise ValueError(
-            'Last coord dimension must have length 1, 2, 4 or 6.'
-            f' (arr.shape: {arr.shape})',
-        )
-
-    # check if arr dimensions match screen_px and screen_cm dimensions
-    if arr.ndim in {0, 1}:
-        if screen_px.ndim != 0 and screen_px.shape != (1,):
-            raise ValueError('arr is 1-dimensional, but screen_px is not')
-        if screen_cm.ndim != 0 and screen_cm.shape != (1,):
-            raise ValueError('arr is 1-dimensional, but screen_cm is not')
-    if arr.ndim != 0 and arr.shape[-1] == 2:
-        if screen_px.shape != (2,):
-            raise ValueError('arr is 2-dimensional, but screen_px is not')
-        if screen_cm.shape != (2,):
-            raise ValueError('arr is 2-dimensional, but screen_cm is not')
-    if arr.ndim != 0 and arr.shape[-1] == 4:
-        if screen_px.shape != (2,):
-            raise ValueError('arr is 4-dimensional, but screen_px is not 2-dimensional')
-        if screen_cm.shape != (2,):
-            raise ValueError('arr is 4-dimensional, but screen_cm is not 2-dimensional')
-
-        # We have binocular data. Double tile screen parameters.
-        screen_px = np.tile(screen_px, 2)
-        screen_cm = np.tile(screen_cm, 2)
-
-    if arr.ndim != 0 and arr.shape[-1] == 6:
-        if screen_px.shape != (2,):
-            raise ValueError('arr is 6-dimensional, but screen_px is not 2-dimensional')
-        if screen_cm.shape != (2,):
-            raise ValueError('arr is 6-dimensional, but screen_cm is not 2-dimensional')
-
-        # We have binocular and cyclopian data. Triple tile screen parameters.
-        screen_px = np.tile(screen_px, 3)
-        screen_cm = np.tile(screen_cm, 3)
-
-    # Compute eye-to-screen-distance in pixels.
-    distance_px = distance_cm * (screen_px / screen_cm)
-
-    # If pixel coordinate system is not centered, shift pixel coordinate to the center.
-    if origin == 'lower left':
-        arr = arr - (screen_px - 1) / 2
-    elif origin != 'center':
-        raise ValueError(f'origin {origin} is not supported.')
-
-    # 180 / pi transforms arc measure to degrees.
-    return np.arctan2(arr, distance_px) * 180 / np.pi
-
-
-def pos2acc(
-        arr: list[float] | list[list[float]] | np.ndarray,
-        sampling_rate: float,
-        window_length: int = 7,
-        degree: int = 2,
-        mode: str = 'interp',
-        cval: float = 0.0,
-) -> np.ndarray:
-    """Compute velocity time series from 2-dimensional position time series.
-
-    Parameters
-    ----------
-    arr : array_like
-        Continuous 2D position time series
-    sampling_rate:
-        Sampling rate of input time series.
-    degree:
-        The degree of the polynomial to use.
-    window_length:
-        The window size to use.
-    mode:
-        The padding mode to use.
-    cval:
-        A constant value for padding.
-
-    Returns
-    -------
-    np.ndarray
-        Velocity time series in input_unit / sec
-
-    Examples
-    --------
-    >>> arr = [(0., 0.), (1., 1.), (4., 4.), (9., 9.), (16., 16.), (25., 25.)]
-    >>> pos2acc(
-    ...    arr=arr,
-    ...    sampling_rate=1000,
-    ...    window_length=5,
-    ... )
-    array([[2000., 2000.],
-           [2000., 2000.],
-           [2000., 2000.],
-           [2000., 2000.],
-           [2000., 2000.],
-           [2000., 2000.]])
-    """
-    if sampling_rate <= 0:
-        raise ValueError('sampling_rate needs to be above zero')
-
-    # make sure that we're operating on a numpy array
-    arr = np.array(arr)
-
-    if arr.ndim not in [1, 2]:
-        raise ValueError(
-            'arr needs to have 1 or 2 dimensions (are: {arr.ndim = })',
-        )
-
-    acc = np.zeros(arr.shape)
-
-    # transform to velocities
-    if arr.ndim == 1:
-        acc = savgol_filter(
-            x=arr,
-            deriv=2,
-            window_length=window_length,
-            polyorder=degree,
-            mode=mode,
-            cval=cval,
-        )
-    else:  # we already checked for error cases
-
-        for channel_id in range(arr.shape[1]):
-            acc[:, channel_id] = savgol_filter(
-                x=arr[:, channel_id],
-                deriv=2,
-                window_length=window_length,
-                polyorder=degree,
-                mode=mode,
-                cval=cval,
-            )
-    acc = acc * sampling_rate
-
-    return acc
-
-
-def pos2vel(
-        arr: list[float] | list[list[float]] | np.ndarray,
-        sampling_rate: float = 1000,
-        method: str = 'smooth',
-        **kwargs: int | float | str,
-) -> np.ndarray:
-    """Compute velocity time series from 2-dimensional position time series.
-
-    Methods 'smooth', 'neighbors' and 'preceding' are adapted from
-        Engbert et al.: Microsaccade Toolbox 0.9.
-
-    Parameters
-    ----------
-    arr : array_like
-        Continuous 2D position time series
-    sampling_rate : int
-        Sampling rate of input time series
-    method : str
-        Following methods are available:
-        * *smooth*: velocity is calculated from the difference of the mean values
-        of the subsequent two samples and the preceding two samples
-        * *neighbors*: velocity is calculated from difference of the subsequent
-        sample and the preceding sample
-        * *preceding*: velocity is calculated from the difference of the current
-        sample to the preceding sample
-    kwargs: dict
-        Additional keyword arguments used for savitzky golay method.
-
-    Returns
-    -------
-    np.ndarray
-        Velocity time series in input_unit / sec
-
-    Raises
-    ------
-    ValueError
-        If selected method is invalid, input array is too short for the
-        selected method or the sampling rate is below zero
-
-    Examples
-    --------
-    >>> arr = [(0., 0.), (1., 1.), (2., 2.), (3., 3.), (4., 4.), (5., 5.)]
-    >>> pos2vel(
-    ...    arr=arr,
-    ...    sampling_rate=1000,
-    ...    method="smooth",
-    ... )
-    array([[ 500.,  500.],
-           [1000., 1000.],
-           [1000., 1000.],
-           [1000., 1000.],
-           [1000., 1000.],
-           [ 500.,  500.]])
-    """
-    if sampling_rate <= 0:
-        raise ValueError('sampling_rate needs to be above zero')
-
-    # make sure that we're operating on a numpy array
-    arr = np.array(arr)
-
-    if arr.ndim not in [1, 2]:
-        raise ValueError(
-            'arr needs to have 1 or 2 dimensions (are: {arr.ndim = })',
-        )
-    if method == 'smooth' and arr.shape[0] < 6:
-        raise ValueError(
-            'arr has to have at least 6 elements for method "smooth"',
-        )
-    if method == 'neighbors' and arr.shape[0] < 3:
-        raise ValueError(
-            'arr has to have at least 3 elements for method "neighbors"',
-        )
-    if method == 'preceding' and arr.shape[0] < 2:
-        raise ValueError(
-            'arr has to have at least 2 elements for method "preceding"',
-        )
-    if method != 'savitzky_golay' and kwargs:
-        raise ValueError(
-            'selected method doesn\'t support any additional kwargs',
-        )
-
-    N = arr.shape[0]
-    v = np.zeros(arr.shape)
-
-    valid_methods = ['smooth', 'neighbors', 'preceding', 'savitzky_golay']
-    if method == 'smooth':
-        # center is N - 2
-        moving_avg = arr[4:N] + arr[3:N - 1] - arr[1:N - 3] - arr[0:N - 4]
-        # mean(arr_-2, arr_-1) and mean(arr_1, arr_2) needs division by two
-        # window is now 3 samples long (arr_-1.5, arr_0, arr_1+5)
-        # we therefore need a divison by three, all in all it's a division by 6
-        v[2:N - 2] = moving_avg * sampling_rate / 6
-
-        # for second and second last sample:
-        # calculate vocity from preceding and subsequent sample
-        v[1] = (arr[2] - arr[0]) * sampling_rate / 2
-        v[N - 2] = (arr[N - 1] - arr[N - 3]) * sampling_rate / 2
-
-        # for first and second sample:
-        # calculate velocity from current and neighboring sample
-        v[0] = (arr[1] - arr[0]) * sampling_rate / 2
-        v[N - 1] = (arr[N - 1] - arr[N - 2]) * sampling_rate / 2
-
-    elif method == 'neighbors':
-        # window size is two, so we need to divide by two
-        v[1:N - 1] = (arr[2:N] - arr[0:N - 2]) * sampling_rate / 2
-
-    elif method == 'preceding':
-        v[1:N] = (arr[1:N] - arr[0:N - 1]) * sampling_rate
-
-    elif method == 'savitzky_golay':
-        # transform to velocities
-        if arr.ndim == 1:
-            v = savgol_filter(x=arr, deriv=1, **kwargs)
-        else:  # we already checked for error cases
-
-            for channel_id in range(arr.shape[1]):
-                v[:, channel_id] = savgol_filter(
-                    x=arr[:, channel_id], deriv=1, **kwargs,
-                )
-        v = v * sampling_rate
-
+    if origin == 'center':
+        origin_offset = (0.0, 0.0)
+    elif origin == 'lower left':
+        origin_offset = ((screen_resolution[0] - 1) / 2, (screen_resolution[1] - 1) / 2)
     else:
+        supported_origins = ['center', 'lower left']
         raise ValueError(
-            f'Method needs to be in {valid_methods}'
-            f' (is: {method})',
+            f'value `{origin}` for argument `origin` is invalid. '
+            f' Valid values are: {supported_origins}',
         )
 
-    return v
+    centered_pixels = pl.concat_list(
+        [
+            pl.col(pixel_column).list.get(component) - origin_offset[component % 2]
+            for component in range(n_components)
+        ],
+    ).alias(output_column)
+    return centered_pixels
 
 
-def norm(arr: np.ndarray, axis: int | None = None) -> np.ndarray | Any:
-    r"""Takes the norm of an array.
+@register_transform
+def downsample(
+        *,
+        factor: int,
+) -> pl.Expr:
+    """Downsample gaze data by an integer factor.
+
+    Downsampling is done by taking every `nth` sample specified by the downsampling factor.
+
+    Parameters
+    ----------
+    factor:
+        Downsample factor.
+    """
+    checks.check_is_int(factor=factor)
+    checks.check_is_positive_value(factor=factor)
+
+    return pl.all().take_every(n=factor)
+
+
+@register_transform
+def norm(
+        *,
+        columns: tuple[str, str],
+) -> pl.Expr:
+    r"""Take the norm of a 2D series.
 
     The norm is defined by :math:`\sqrt{x^2 + y^2}` with :math:`x` being the yaw component and
     :math:`y` being the pitch component of a coordinate.
 
     Parameters
     ----------
-    arr: np.ndarray
-        velocity sequence
-    axis: int, optional
-        axis to take norm. If None it is inferred from arr.shape.
+    columns:
+        Columns to take norm of.
+    """
+    x = pl.col(columns[0])
+    y = pl.col(columns[1])
+    return (x.pow(2) + y.pow(2)).sqrt()
+
+
+@register_transform
+def pix2deg(
+        *,
+        screen_resolution: tuple[int, int],
+        screen_size: tuple[float, float],
+        distance: float,
+        origin: str,
+        n_components: int,
+        pixel_column: str = 'pixel',
+        position_column: str = 'position',
+) -> pl.Expr:
+    """Converts pixel screen coordinates to degrees of visual angle.
+
+    Parameters
+    ----------
+    screen_resolution:
+        Pixel screen resolution as tuple (width, height).
+    screen_size:
+        Screen size in centimeters as tuple (width, height).
+    distance:
+        Eye-to-screen distance in centimeters
+    origin:
+        The location of the pixel origin. Supported values: ``center``, ``lower left``. See also
+        py:func:`~pymovements.gaze.transform.center_origin` for more information.
+    n_components:
+        Number of components in input column.
+    pixel_column:
+        The input pixel column name.
+    position_column:
+        The output position column name.
+    """
+    _check_screen_resolution(screen_resolution)
+    _check_screen_size(screen_size)
+    _check_distance(distance)
+
+    centered_pixels = center_origin(
+        screen_resolution=screen_resolution,
+        origin=origin,
+        n_components=n_components,
+        pixel_column=pixel_column,
+    )
+
+    # Compute eye-to-screen-distance in pixel units.
+    distance_pixels = tuple(
+        distance * (screen_px / screen_cm)
+        for screen_px, screen_cm in zip(screen_resolution, screen_size)
+    )
+
+    degree_components = [
+        centered_pixels.list.get(component).map(
+            _arctan2_helper(distance_pixels[component % 2]),
+        ) * (180 / np.pi)
+        for component in range(n_components)
+    ]
+
+    return pl.concat_list(list(degree_components)).alias(position_column)
+
+
+def _arctan2_helper(distance: float) -> Callable:
+    """Returns single-argument lambda function with fixed second argument."""
+    return lambda s: np.arctan2(s, distance)
+
+
+def _check_distance(distance: float) -> None:
+    """Check if all screen values are scalars and are greather than zero."""
+    checks.check_is_scalar(distance=distance)
+    checks.check_is_greater_than_zero(distance=distance)
+
+
+def _check_screen_resolution(screen_resolution: tuple[int, int]) -> None:
+    """Check screen resolution value."""
+    if screen_resolution is None:
+        raise TypeError('screen_resolution must not be None')
+
+    if not isinstance(screen_resolution, (tuple, list)):
+        raise TypeError(
+            'screen_resolution must be of type tuple[int, int],'
+            f' but is of type {type(screen_resolution).__name__}',
+        )
+
+    if len(screen_resolution) != 2:
+        raise ValueError(
+            f'screen_resolution must have length of 2, but is of length {len(screen_resolution)}',
+        )
+
+    for element in screen_resolution:
+        checks.check_is_scalar(screen_resolution=element)
+        checks.check_is_greater_than_zero(screen_resolution=element)
+
+
+def _check_screen_size(screen_size: tuple[float, float]) -> None:
+    """Check screen size value."""
+    if screen_size is None:
+        raise TypeError('screen_size must not be None')
+
+    if not isinstance(screen_size, (tuple, list)):
+        raise TypeError(
+            'screen_size must be of type tuple[int, int],'
+            f' but is of type {type(screen_size).__name__}',
+        )
+
+    if len(screen_size) != 2:
+        raise ValueError(f'screen_size must have length of 2, but is of length {len(screen_size)}')
+
+    for element in screen_size:
+        checks.check_is_scalar(screen_size=element)
+        checks.check_is_greater_than_zero(screen_size=element)
+
+
+@register_transform
+def pos2acc(
+        *,
+        sampling_rate: float,
+        n_components: int,
+        degree: int = 2,
+        window_length: int = 7,
+        padding: str | float | int | None = 'nearest',
+        position_column: str = 'position',
+        acceleration_column: str = 'acceleration',
+) -> pl.Expr:
+    """Compute acceleration data from positional data.
+
+    Parameters
+    ----------
+    sampling_rate:
+        Sampling rate of input time series.
+    degree:
+        The degree of the polynomial to use.
+    window_length:
+        The window size to use.
+    padding:
+        The padding method to use. See ``savitzky_golay`` for details.
+    n_components:
+        Number of components in input column.
+    position_column:
+        The input position column name.
+    acceleration_column:
+        The output acceleration column name.
+    """
+    return savitzky_golay(
+        window_length=window_length,
+        degree=degree,
+        sampling_rate=sampling_rate,
+        padding=padding,
+        derivative=2,
+        n_components=n_components,
+        input_column=position_column,
+        output_column=acceleration_column,
+    )
+
+
+@register_transform
+def pos2vel(
+        *,
+        sampling_rate: float,
+        method: str,
+        n_components: int,
+        degree: int | None = None,
+        window_length: int | None = None,
+        padding: str | float | int | None = 'nearest',
+        position_column: str = 'position',
+        velocity_column: str = 'velocity',
+) -> pl.Expr:
+    """Compute velocitiy data from positional data.
+
+    Parameters
+    ----------
+    sampling_rate:
+        Sampling rate of input time series.
+    method:
+        The method to use for velocity calculation.
+    degree:
+        The degree of the polynomial to use. This has only an effect if using ``savitzky_golay`` as
+        calculation method.
+    window_length:
+        The window size to use. This has only an effect if using ``savitzky_golay`` as calculation
+        method.
+    padding:
+        The padding to use.  This has only an effect if using ``savitzky_golay`` as calculation
+        method.
+    n_components:
+        Number of components in input column.
+    position_column:
+        The input position column name.
+    velocity_column:
+        The output velocity column name.
+
+    Notes
+    -----
+    There are three methods available for velocity calculation:
+
+    * ``savitzky_golay``: velocity is calculated by a polynomial of fixed degree and window length.
+      See :py:func:`~pymovements.gaze.transforms.savitzky_golay` for further details.
+    * ``five_point``: velocity is calculated from the difference of the mean values
+      of the subsequent two samples and the preceding two samples
+    * ``neighbors``: velocity is calculated from difference of the subsequent
+      sample and the preceding sample
+    * ``preceding``: velocity is calculated from the difference of the current
+      sample to the preceding sample
+    """
+    if method == 'preceding':
+        return pl.concat_list(
+            [
+                pl.col(position_column).list.get(component)
+                .diff(n=1, null_behavior='ignore') * sampling_rate
+                for component in range(n_components)
+            ],
+        ).alias(velocity_column)
+
+    if method == 'neighbors':
+        return pl.concat_list(
+            [
+                (
+                    pl.col(position_column).shift(periods=-1).list.get(component)
+                    - pl.col(position_column).shift(periods=1).list.get(component)
+                ) * (sampling_rate / 2)
+                for component in range(n_components)
+            ],
+        ).alias(velocity_column)
+
+    if method in {'fivepoint', 'smooth'}:
+        # Center of window is period 0 and will be filled.
+        # mean(arr_-2, arr_-1) and mean(arr_1, arr_2) needs division by two
+        # window is now 3 samples long (arr_-1.5, arr_0, arr_1+5)
+        # we therefore need a divison by three, all in all it's a division by 6
+        return pl.concat_list(
+            [
+                (
+                    pl.col(position_column).shift(periods=-2).list.get(component)
+                    + pl.col(position_column).shift(periods=-1).list.get(component)
+                    - pl.col(position_column).shift(periods=1).list.get(component)
+                    - pl.col(position_column).shift(periods=2).list.get(component)
+                ) * (sampling_rate / 6)
+                for component in range(n_components)
+            ],
+        ).alias(velocity_column)
+
+    if method == 'savitzky_golay':
+        if window_length is None:
+            raise TypeError("'window_length' must not be none for method 'savitzky_golay'")
+        if degree is None:
+            raise TypeError("'degree' must not be none for method 'savitzky_golay'")
+
+        return savitzky_golay(
+            window_length=window_length,
+            degree=degree,
+            sampling_rate=sampling_rate,
+            padding=padding,
+            derivative=1,
+            n_components=n_components,
+            input_column=position_column,
+            output_column=velocity_column,
+        )
+
+    supported_methods = ['preceding', 'neighbors', 'fivepoint', 'smooth', 'savitzky_golay']
+    raise ValueError(
+        f"Unknown method '{method}'. Supported methods are: {supported_methods}",
+    )
+
+
+@register_transform
+def savitzky_golay(
+        *,
+        window_length: int,
+        degree: int,
+        sampling_rate: float,
+        n_components: int,
+        input_column: str,
+        output_column: str | None = None,
+        derivative: int = 0,
+        padding: str | float | int | None = 'nearest',
+) -> pl.Expr:
+    """Apply a 1-D Savitzky-Golay filter to a column. :cite:p:`SavitzkyGolay1964`
+
+    Parameters
+    ----------
+    sampling_rate : float, optional
+        The spacing of the samples to which the filter will be applied.
+        This is only used if deriv > 0. Default is 1.0.
+    n_components:
+        Number of components in input column.
+    window_length : int
+        The length of the filter window (i.e., the number of coefficients).
+        If `padding` is ``None``, `window_length` must be less than or equal
+        to the length of the input.
+    degree : int
+        The degree of the polynomial used to fit the samples.
+        `degree` must be less than `window_length`.
+    derivative : int, optional
+        The order of the derivative to compute. This must be a
+        nonnegative integer. The default is 0, which means to filter
+        the data without differentiating.
+    padding : str or float, optional
+        Must be either ``None``, a scalar or one of the strings ``mirror``, ``nearest`` or ``wrap``.
+        This determines the type of extension to use for the padded signal to
+        which the filter is applied.
+        When passing ``None``, no extension padding is used. Instead, a degree `degree` polynomial
+        is fit to the last ``window_length`` values of the edges, and this polynomial is used to
+        evaluate the last ``window_length // 2`` output values.
+        When passing a scalar value, data will be padded using the passed value.
+        See the Notes for more details on the padding methods ``mirror``, ``nearest`` or ``wrap``.
+    input_column:
+        The input column name.
+    output_column:
+        The output column name.
 
     Returns
     -------
-    np.ndarray
+    polars.Expr
+        The respective polars expression
 
-    Raises
-    ------
-    ValueError
-        If no axis is given but the array dimensions are lager than 3.
-        In that case the axis cannot be inferred.
+    Notes
+    -----
+    Details on the `padding` options:
 
-    Examples
-    --------
-    >>> arr = np.array([[1., 1., 1., 1., 1., 1.], [1., 1., 1., 1., 1., 1.]])
-    >>> norm(arr=arr)
-    array([1.41421356, 1.41421356, 1.41421356, 1.41421356, 1.41421356,
-           1.41421356])
+    * ``None``: No padding extension is used.
+    * scalar value (int or float): The padding extension contains the specified scalar value.
+    * ``mirror``: Repeats the values at the edges in reverse order. The value closest to the edge is
+      not included.
+    * ``nearest``: The padding extension contains the nearest input value.
+    * ``wrap``: The padding extension contains the values from the other end of the array.
+
+    Given the input is ``[1, 2, 3, 4, 5, 6, 7, 8]``, and
+    `window_length` is 7, the following table shows the padded data for
+    the various ``padding`` options:
+
+    +-------------+-------------+----------------------------+-------------+
+    | mode        |   padding   |           input            |   padding   |
+    +=============+=============+============================+=============+
+    | ``None``    | ``-  -  -`` | ``1  2  3  4  5  6  7  8`` | ``-  -  -`` |
+    +-------------+-------------+----------------------------+-------------+
+    | ``0``       | ``0  0  0`` | ``1  2  3  4  5  6  7  8`` | ``0  0  0`` |
+    +-------------+-------------+----------------------------+-------------+
+    | ``1``       | ``1  1  1`` | ``1  2  3  4  5  6  7  8`` | ``1  1  1`` |
+    +-------------+-------------+----------------------------+-------------+
+    | ``nearest`` | ``1  1  1`` | ``1  2  3  4  5  6  7  8`` | ``8  8  8`` |
+    +-------------+-------------+----------------------------+-------------+
+    | ``mirror``  | ``4  3  2`` | ``1  2  3  4  5  6  7  8`` | ``7  6  5`` |
+    +-------------+-------------+----------------------------+-------------+
+    | ``wrap``    | ``6  7  8`` | ``1  2  3  4  5  6  7  8`` | ``1  2  3`` |
+    +-------------+-------------+----------------------------+-------------+
     """
-    if axis is None:
-        # for single vector and array of vectors the axis is 0
-        # shape is assumed to be either (2, ) or (2, sequence_length)
-        if arr.ndim in {1, 2}:
-            axis = 0
+    _check_window_length(window_length=window_length)
+    _check_degree(degree=degree, window_length=window_length)
+    _check_derivative(derivative=derivative)
+    _check_padding(padding=padding)
 
-        # for batched array of vectors, the
-        # shape is assumed to be (n_batches, 2, sequence_length)
-        elif arr.ndim == 3:
-            axis = 1
+    if output_column is None:
+        output_column = input_column
 
-        else:
+    delta = 1 / sampling_rate
+
+    constant_value = 0.0
+    if isinstance(padding, (int, float)):
+        constant_value = padding
+        padding = 'constant'
+    elif padding is None:
+        padding = 'interp'
+
+    func = partial(
+        scipy.signal.savgol_filter,
+        window_length=window_length,
+        polyorder=degree,
+        deriv=derivative,
+        delta=delta,
+        axis=0,
+        mode=padding,
+        cval=constant_value,
+    )
+
+    return pl.concat_list(
+        [
+            pl.col(input_column).list.get(component).map(func).list.explode()
+            for component in range(n_components)
+        ],
+    ).alias(output_column)
+
+
+def _check_window_length(window_length: Any) -> None:
+    """Check that window length is an integer and greater than zero."""
+    checks.check_is_not_none(window_length=window_length)
+    checks.check_is_int(window_length=window_length)
+    checks.check_is_greater_than_zero(degree=window_length)
+
+
+def _check_degree(degree: Any, window_length: int) -> None:
+    """Check that polynomial degree is an integer, greater than zero and less than window_length."""
+    checks.check_is_not_none(degree=degree)
+    checks.check_is_int(degree=degree)
+    checks.check_is_greater_than_zero(degree=degree)
+
+    if degree >= window_length:
+        raise ValueError("'degree' must be less than 'window_length'")
+
+
+def _check_padding(padding: Any) -> None:
+    """Check if padding argument is valid."""
+    if not isinstance(padding, (float, int, str)) and padding is not None:
+        raise TypeError(
+            f"'padding' must be of type 'str', 'int', 'float' or None"
+            f"' but is of type '{type(padding).__name__}'",
+        )
+
+    if isinstance(padding, str):
+        supported_padding_modes = ['nearest', 'mirror', 'wrap']
+        if padding not in supported_padding_modes:
             raise ValueError(
-                f'Axis can not be inferred in case of more than 3 '
-                f'input array dimensions (arr.shape={arr.shape}).'
-                f' Either reduce the number of input array '
-                f'dimensions or specify `axis` explicitly.',
+                f"Invalid 'padding' value '{padding}'."
+                'Choose a valid padding string, a scalar, or None.'
+                f' Valid padding strings are: {supported_padding_modes}',
             )
 
-    return np.linalg.norm(arr, axis=axis)
 
-
-def split(
-        arr: np.ndarray,
-        window_size: int,
-        keep_padded: bool = True,
-) -> np.ndarray:
-    """Split sequence into subsequences of equal length.
-
-    Parameters
-    ----------
-    arr: np.ndarray
-        Input sequence of shape (N, L, C).
-    window_size: int
-        size of subsequences
-    keep_padded: bool
-        If True, last subsequence (if not of length `window_size`) is kept in the output array and
-        padded with np.nan.
-
-    Returns
-    -------
-    np.ndarray
-        Array of split sequences with new window length of shape (N', L', C)
-
-    Examples
-    --------
-    We first create an array with `2` channels and a sequence length of `13`.
-
-    >>> arr = np.ones((1, 13, 2))
-    >>> arr.shape
-    (1, 13, 2)
-
-    We now split the original array into three subsequences of length `5`.
-
-    >>> arr_split = split(
-    ...    arr=arr,
-    ...    window_size=5,
-    ...    keep_padded=True,
-    ... )
-    >>> arr_split.shape
-    (3, 5, 2)
-
-    The last subsequence is padded with `nan` to have a length of `5`.
-
-    >>> arr_split[-1]
-    array([[ 1.,  1.],
-           [ 1.,  1.],
-           [ 1.,  1.],
-           [nan, nan],
-           [nan, nan]])
-
-    We can also drop any remaining sequences that would need padding by passing
-    ``keep_padded=False``.
-
-    >>> arr_split = split(
-    ...    arr=arr,
-    ...    window_size=5,
-    ...    keep_padded=False,
-    ... )
-    >>> arr_split.shape
-    (2, 5, 2)
-
-    """
-    n, rest = np.divmod(arr.shape[1], window_size)
-
-    if rest > 0 and keep_padded:
-        n_rows = arr.shape[0] * (n + 1)
-    else:
-        n_rows = arr.shape[0] * n
-
-    arr_split = np.nan * np.ones((n_rows, window_size, arr.shape[2]))
-
-    idx = 0
-    for arr_instance in arr:
-        # Create an array of indicies where sequence will be split.
-        split_indices = np.arange(start=window_size, stop=(n + 1) * window_size, step=window_size)
-
-        # The length of the last element in list will be equal to rest.
-        arr_split_list = np.split(arr_instance, split_indices)
-
-        # Put the first n elements of split list into output array.
-        arr_split[idx:idx + n] = arr_split_list[:-1]
-        idx += n
-
-        if rest > 0 and keep_padded:
-            # Insert last split, remaining padded samples are already np.nan.
-            arr_split[idx, :rest] = arr_split_list[-1]
-            idx += 1
-
-    return arr_split
-
-
-def downsample(
-        arr: np.ndarray,
-        factor: int,
-) -> np.ndarray:
-    """
-    Downsamples array by integer factor.
-
-    Parameters
-    ----------
-    arr: np.ndarray
-        sequence to be downsampled
-    factor: int
-        factor to be downsampled with
-
-    Returns
-    -------
-    np.ndarray
-
-    Examples
-    --------
-    >>> arr = np.array([0., 0., 1., 1., 2., 2., 3., 3., 4., 4., 5., 5.])
-    >>> downsample(arr=arr, factor=2)
-    array([0., 1., 2., 3., 4., 5.])
-
-    >>> arr2 = np.array([(0., 0.), (1., 1.), (2., 2.), (3., 3.), (4., 4.), (5., 5.)])
-    >>> downsample(arr=arr2, factor=2)
-    array([[0., 0.],
-           [2., 2.],
-           [4., 4.]])
-    """
-    sequence_length = arr.shape[0]
-    select = [i % factor == 0 for i in range(sequence_length)]
-
-    return arr[select].copy()
-
-
-def consecutive(arr: np.ndarray) -> list[np.ndarray]:
-    """Split array into groups of consecutive numbers.
-
-    Parameters
-    ----------
-    arr : np.ndarray
-        Array to be split into groups of consecutive numbers.
-
-    Returns
-    -------
-    list[np.ndarray]
-        List of arrays with consecutive numbers.
-
-    Example
-    -------
-    >>> arr = np.array([0, 47, 48, 49, 50, 97, 98, 99])
-    >>> consecutive(arr)
-    [array([0]), array([47, 48, 49, 50]), array([97, 98, 99])]
-    """
-    return np.split(arr, np.where(np.diff(arr) != 1)[0] + 1)
+def _check_derivative(derivative: Any) -> None:
+    """Check that derivative has a positive integer value."""
+    checks.check_is_int(derivative=derivative)
+    checks.check_is_positive_value(derivative=derivative)

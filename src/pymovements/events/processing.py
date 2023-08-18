@@ -26,8 +26,8 @@ from typing import Any
 
 import polars as pl
 
-from pymovements.events.event_properties import EVENT_PROPERTIES
-from pymovements.events.events import EventDataFrame
+from pymovements.events.frame import EventDataFrame
+from pymovements.events.properties import EVENT_PROPERTIES
 from pymovements.exceptions import InvalidProperty
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
 

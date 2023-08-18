@@ -34,29 +34,30 @@
 .. autosummary::
    :toctree:
 
+   pymovements.gaze.transforms.center_origin
+   pymovements.gaze.transforms.downsample
+   pymovements.gaze.transforms.norm
    pymovements.gaze.transforms.pix2deg
    pymovements.gaze.transforms.pos2acc
    pymovements.gaze.transforms.pos2vel
-   pymovements.gaze.transforms.norm
-   pymovements.gaze.transforms.split
-   pymovements.gaze.transforms.downsample
-   pymovements.gaze.transforms.consecutive
+   pymovements.gaze.transforms.savitzky_golay
 
-.. rubric:: Transformations
+.. rubric:: Numpy Transformations
 
 .. autosummary::
    :toctree:
 
-   pymovements.gaze.transforms_pl.center_origin
-   pymovements.gaze.transforms_pl.downsample
-   pymovements.gaze.transforms_pl.norm
-   pymovements.gaze.transforms_pl.pix2deg
-   pymovements.gaze.transforms_pl.pos2acc
-   pymovements.gaze.transforms_pl.pos2vel
-   pymovements.gaze.transforms_pl.savitzky_golay
+   pymovements.gaze.transforms_numpy.pix2deg
+   pymovements.gaze.transforms_numpy.pos2acc
+   pymovements.gaze.transforms_numpy.pos2vel
+   pymovements.gaze.transforms_numpy.norm
+   pymovements.gaze.transforms_numpy.split
+   pymovements.gaze.transforms_numpy.downsample
+   pymovements.gaze.transforms_numpy.consecutive
+
 """
 from pymovements.gaze import transforms
-from pymovements.gaze import transforms_pl
+from pymovements.gaze import transforms_numpy
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
 from pymovements.gaze.integration import from_numpy
@@ -70,6 +71,6 @@ __all__ = [
     'from_pandas',
     'GazeDataFrame',
     'Screen',
+    'transforms_numpy',
     'transforms',
-    'transforms_pl',
 ]
