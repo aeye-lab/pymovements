@@ -225,6 +225,7 @@ def load_gaze_files(
             gaze_df = GazeDataFrame(
                 gaze_data,
                 experiment=definition.experiment,
+                trial_columns=definition.trial_columns,
             )
 
         elif preprocessed and extension == 'csv':
@@ -261,6 +262,7 @@ def load_gaze_files(
             gaze_df = GazeDataFrame(
                 gaze_data,
                 experiment=definition.experiment,
+                trial_columns=definition.trial_columns,
                 time_column=time_column,
                 pixel_columns=pixel_columns,
                 position_columns=position_columns,
@@ -272,6 +274,7 @@ def load_gaze_files(
             gaze_df = GazeDataFrame(
                 gaze_data,
                 experiment=definition.experiment,
+                trial_columns=definition.trial_columns,
                 time_column=definition.time_column,
                 pixel_columns=definition.pixel_columns,
                 position_columns=definition.position_columns,

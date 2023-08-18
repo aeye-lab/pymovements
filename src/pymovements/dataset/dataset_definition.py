@@ -79,6 +79,7 @@ class DatasetDefinition:
 
     column_map: dict[str, str] = field(default_factory=dict)
 
+    trial_columns: list[str] | None = None
     time_column: str | None = None
     pixel_columns: list[str] | None = None
     position_columns: list[str] | None = None
