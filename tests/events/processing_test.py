@@ -23,11 +23,7 @@ import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
-from pymovements.events.event_processing import EventGazeProcessor
-from pymovements.events.event_processing import EventProcessor
-from pymovements.events.events import EventDataFrame
-from pymovements.exceptions import InvalidProperty
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
+import pymovements as pm
 
 
 @pytest.mark.parametrize(
@@ -42,7 +38,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
     ],
 )
 def test_event_processor_init(args, kwargs, expected_property_definitions):
-    processor = EventProcessor(*args, **kwargs)
+    processor = pm.EventProcessor(*args, **kwargs)
 
     assert processor.event_properties == expected_property_definitions
 
@@ -52,14 +48,14 @@ def test_event_processor_init(args, kwargs, expected_property_definitions):
     [
         pytest.param(
             ['foo'], {},
-            InvalidProperty, ('foo', 'invalid', 'duration'),
+            pm.exceptions.InvalidProperty, ('foo', 'invalid', 'duration'),
             id='unknown_event_property',
         ),
     ],
 )
 def test_event_processor_init_exceptions(args, kwargs, exception, msg_substrings):
     with pytest.raises(exception) as excinfo:
-        EventProcessor(*args, **kwargs)
+        pm.EventProcessor(*args, **kwargs)
 
     msg, = excinfo.value.args
     for msg_substring in msg_substrings:
@@ -92,8 +88,8 @@ def test_event_processor_init_exceptions(args, kwargs, exception, msg_substrings
 def test_event_processor_process_correct_result(
         events_kwargs, event_properties, expected_dataframe,
 ):
-    events = EventDataFrame(**events_kwargs)
-    processor = EventProcessor(event_properties)
+    events = pm.EventDataFrame(**events_kwargs)
+    processor = pm.EventProcessor(event_properties)
 
     property_result = processor.process(events)
     assert_frame_equal(property_result, expected_dataframe)
@@ -111,7 +107,7 @@ def test_event_processor_process_correct_result(
     ],
 )
 def test_event_gaze_processor_init(args, kwargs, expected_property_definitions):
-    processor = EventGazeProcessor(*args, **kwargs)
+    processor = pm.EventGazeProcessor(*args, **kwargs)
 
     assert processor.event_properties == expected_property_definitions
 
@@ -121,14 +117,14 @@ def test_event_gaze_processor_init(args, kwargs, expected_property_definitions):
     [
         pytest.param(
             ['foo'], {},
-            InvalidProperty, ('foo', 'invalid', 'peak_velocity'),
+            pm.exceptions.InvalidProperty, ('foo', 'invalid', 'peak_velocity'),
             id='unknown_event_property',
         ),
     ],
 )
 def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_substrings):
     with pytest.raises(exception) as excinfo:
-        EventGazeProcessor(*args, **kwargs)
+        pm.EventGazeProcessor(*args, **kwargs)
 
     msg, = excinfo.value.args
     for msg_substring in msg_substrings:
@@ -143,7 +139,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                 {'subject_id': [1], 'onset': [0], 'offset': [10]},
                 schema={'subject_id': pl.Int64, 'onset': pl.Int64, 'offset': pl.Int64},
             ),
-            GazeDataFrame(
+            pm.GazeDataFrame(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(10),
@@ -185,7 +181,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                 {'subject_id': [1], 'onset': [0], 'offset': [10]},
                 schema={'subject_id': pl.Int64, 'onset': pl.Int64, 'offset': pl.Int64},
             ),
-            GazeDataFrame(
+            pm.GazeDataFrame(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(10),
@@ -227,7 +223,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                 {'subject_id': [1], 'onset': [0], 'offset': [5]},
                 schema={'subject_id': pl.Int64, 'onset': pl.Int64, 'offset': pl.Int64},
             ),
-            GazeDataFrame(
+            pm.GazeDataFrame(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(10),
@@ -269,7 +265,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                 {'subject_id': [1], 'onset': [0], 'offset': [10]},
                 schema={'subject_id': pl.Int64, 'onset': pl.Int64, 'offset': pl.Int64},
             ),
-            GazeDataFrame(
+            pm.GazeDataFrame(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(10),
@@ -311,7 +307,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                 {'subject_id': [1], 'onset': [0], 'offset': [10]},
                 schema={'subject_id': pl.Int64, 'onset': pl.Int64, 'offset': pl.Int64},
             ),
-            GazeDataFrame(
+            pm.GazeDataFrame(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(10),
@@ -355,7 +351,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                     'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
                 },
             ),
-            GazeDataFrame(
+            pm.GazeDataFrame(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(100),
@@ -399,7 +395,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                     'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
                 },
             ),
-            GazeDataFrame(
+            pm.GazeDataFrame(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(100),
@@ -443,7 +439,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                     'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
                 },
             ),
-            GazeDataFrame(
+            pm.GazeDataFrame(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(100),
@@ -487,7 +483,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                     'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
                 },
             ),
-            GazeDataFrame(
+            pm.GazeDataFrame(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(100),
@@ -535,7 +531,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                     'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
                 },
             ),
-            GazeDataFrame(
+            pm.GazeDataFrame(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(100),
@@ -581,8 +577,8 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
 def test_event_gaze_processor_process_correct_result(
         event_df, gaze_df, init_kwargs, process_kwargs, expected_dataframe,
 ):
-    events = EventDataFrame(event_df)
-    processor = EventGazeProcessor(**init_kwargs)
+    events = pm.EventDataFrame(event_df)
+    processor = pm.EventGazeProcessor(**init_kwargs)
     property_result = processor.process(events, gaze_df, **process_kwargs)
     assert_frame_equal(property_result, expected_dataframe)
 
@@ -595,7 +591,7 @@ def test_event_gaze_processor_process_correct_result(
                 {'subject_id': [1], 'onset': [0], 'offset': [10]},
                 schema={'subject_id': pl.Int64, 'onset': pl.Int64, 'offset': pl.Int64},
             ),
-            GazeDataFrame(
+            pm.GazeDataFrame(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(10),
@@ -626,7 +622,7 @@ def test_event_gaze_processor_process_correct_result(
                     'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
                 },
             ),
-            GazeDataFrame(
+            pm.GazeDataFrame(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(100),
@@ -654,8 +650,8 @@ def test_event_gaze_processor_process_correct_result(
 def test_event_processor_process_exceptions(
         event_df, gaze_df, init_kwargs, process_kwargs, exception, msg_substrings,
 ):
-    processor = EventGazeProcessor(**init_kwargs)
-    events = EventDataFrame(event_df)
+    processor = pm.EventGazeProcessor(**init_kwargs)
+    events = pm.EventDataFrame(event_df)
 
     with pytest.raises(exception) as excinfo:
         processor.process(events, gaze_df, **process_kwargs)

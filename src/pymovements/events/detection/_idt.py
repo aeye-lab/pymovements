@@ -24,8 +24,8 @@ from __future__ import annotations
 
 import numpy as np
 
-from pymovements.events.events import EventDataFrame
-from pymovements.events.events import register_event_detection
+from pymovements.events.detection._library import register_event_detection
+from pymovements.events.frame import EventDataFrame
 from pymovements.utils import checks
 from pymovements.utils.filters import events_split_nans
 from pymovements.utils.filters import filter_candidates_remove_nans

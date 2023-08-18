@@ -34,9 +34,9 @@ from pymovements.dataset import dataset_files
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_paths import DatasetPaths
-from pymovements.events.event_processing import EventGazeProcessor
-from pymovements.events.events import EventDataFrame
-from pymovements.events.events import EventDetectionLibrary
+from pymovements.events.detection import EventDetectionLibrary
+from pymovements.events.frame import EventDataFrame
+from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import GazeDataFrame
 
 
@@ -269,10 +269,10 @@ class Dataset:
 
     def pos2acc(
             self,
-            window_length: int = 7,
+            *,
             degree: int = 2,
-            mode: str = 'interp',
-            cval: float = 0.0,
+            window_length: int = 7,
+            padding: str | float | int | None = 'nearest',
             verbose: bool = True,
     ) -> Dataset:
         """Compute gaze accelerations in dva/s^2 from dva coordinates.
@@ -287,10 +287,8 @@ class Dataset:
             The window size to use.
         degree:
             The degree of the polynomial to use.
-        mode:
-            The padding mode to use.
-        cval:
-            A constant value for padding.
+        padding:
+            The padding method to use. See ``savitzky_golay`` for details.
         verbose : bool
             If True, show progress of computation.
 
@@ -312,13 +310,18 @@ class Dataset:
             gaze_df.pos2acc(
                 window_length=window_length,
                 degree=degree,
-                mode=mode,
-                cval=cval,
+                padding=padding,
             )
 
         return self
 
-    def pos2vel(self, method: str = 'smooth', verbose: bool = True, **kwargs: Any) -> Dataset:
+    def pos2vel(
+            self,
+            method: str = 'fivepoint',
+            *,
+            verbose: bool = True,
+            **kwargs: Any,
+    ) -> Dataset:
         """Compute gaze velocites in dva/s from dva coordinates.
 
         This method requires a properly initialized :py:attr:`~.Dataset.experiment` attribute.
