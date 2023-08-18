@@ -78,6 +78,7 @@ class GazeDataFrame:
             data: pl.DataFrame | None = None,
             experiment: Experiment | None = None,
             *,
+            trial_columns: str | list[str] | None = None,
             time_column: str | None = None,
             pixel_columns: list[str] | None = None,
             position_columns: list[str] | None = None,
@@ -165,6 +166,8 @@ class GazeDataFrame:
         else:
             data = data.clone()
         self.frame = data
+
+        self.trial_columns = trial_columns
 
         if time_column is not None:
             self.frame = self.frame.rename({time_column: 'time'})
@@ -272,7 +275,15 @@ class GazeDataFrame:
                 _check_n_components(self.n_components)
                 kwargs['n_components'] = self.n_components
 
-            self.frame = self.frame.with_columns(transform_method(**kwargs))
+            if self.trial_columns is None:
+                self.frame = self.frame.with_columns(transform_method(**kwargs))
+            else:
+                self.frame = pl.concat(
+                    [
+                        df.with_columns(transform_method(**kwargs))
+                        for group, df in self.frame.groupby(self.trial_columns, maintain_order=True)
+                    ],
+                )
 
     def pix2deg(self) -> None:
         """Compute gaze positions in degrees of visual angle from pixel position coordinates.

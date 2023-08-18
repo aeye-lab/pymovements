@@ -123,6 +123,8 @@ class ToyDataset(DatasetDefinition):
         },
     )
 
+    trial_columns: list[str] = field(default_factory=lambda: ['text_id', 'page_id'])
+
     time_column: str = 'timestamp'
 
     pixel_columns: list[str] = field(default_factory=lambda: ['x', 'y'])
