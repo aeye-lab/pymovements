@@ -275,7 +275,12 @@ class GazeDataFrame:
                 _check_n_components(self.n_components)
                 kwargs['n_components'] = self.n_components
 
-            self.frame = self.frame.with_columns(transform_method(**kwargs))
+            self.frame = pl.concat(
+                [
+                    df.with_columns(transform_method(**kwargs))
+                    for group, df in self.frame.groupby(self.trial_columns)
+                ],
+            )
 
     def pix2deg(self) -> None:
         """Compute gaze positions in degrees of visual angle from pixel position coordinates.
