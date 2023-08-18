@@ -23,7 +23,6 @@ from __future__ import annotations
 import pytest
 
 import pymovements as pm
-import pymovements.events.events
 
 
 @pytest.mark.parametrize(
@@ -36,6 +35,6 @@ import pymovements.events.events
     ],
 )
 def test_transform_registered(method, name):
-    assert name in pymovements.events.events.EventDetectionLibrary.methods
-    assert pymovements.events.events.EventDetectionLibrary.get(name) == method
-    assert pymovements.events.events.EventDetectionLibrary.get(name).__name__ == name
+    assert name in pm.events.EventDetectionLibrary.methods
+    assert pm.events.EventDetectionLibrary.get(name) == method
+    assert pm.events.EventDetectionLibrary.get(name).__name__ == name

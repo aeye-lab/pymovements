@@ -34,9 +34,9 @@ from pymovements.dataset import dataset_files
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_paths import DatasetPaths
-from pymovements.events.event_processing import EventGazeProcessor
-from pymovements.events.events import EventDataFrame
-from pymovements.events.events import EventDetectionLibrary
+from pymovements.events.detection import EventDetectionLibrary
+from pymovements.events.frame import EventDataFrame
+from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import GazeDataFrame
 
 
