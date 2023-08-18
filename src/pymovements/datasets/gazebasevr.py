@@ -139,7 +139,7 @@ class GazeBaseVR(DatasetDefinition):
     )
 
     trial_columns: list[str] = field(
-        default_factory=lambda: ['round_id', 'subject_id', 'session_id'],
+        default_factory=lambda: ['round_id', 'subject_id', 'session_id', 'task_name'],
     )
 
     time_column: str = 'n'
