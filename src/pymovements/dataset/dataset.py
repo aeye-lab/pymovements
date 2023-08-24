@@ -478,12 +478,14 @@ class Dataset:
 
             if 'positions' in method_args:
                 kwargs['positions'] = positions
+
             if 'velocities' in method_args:
                 kwargs['velocities'] = velocities
-            if 'timesteps' in method_args:
-                kwargs['timesteps'] = timesteps
+
             if 'events' in method_args:
                 kwargs['events'] = self.events[file_id]
+
+            kwargs['timesteps'] = timesteps
 
             new_event_df = method(**kwargs)
 
