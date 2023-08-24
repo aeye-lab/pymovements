@@ -807,7 +807,7 @@ def test_detect_events_attribute_error(dataset_configuration):
             },
             (
                 "Column 'position' not found. Available columns are: "
-                "['subject_id', 'time', 'pixel', 'velocity', 'custom_position']"
+                "['subject_id', 'time', 'pixel', 'custom_position', 'velocity']"
             ),
             id='no_position',
         ),
@@ -820,7 +820,7 @@ def test_detect_events_attribute_error(dataset_configuration):
             },
             (
                 "Column 'velocity' not found. Available columns are: "
-                "['subject_id', 'time', 'pixel', 'custom_velocity', 'position']"
+                "['subject_id', 'time', 'pixel', 'position', 'custom_velocity']"
             ),
             id='no_velocity',
         ),
@@ -1034,7 +1034,7 @@ def test_save_preprocessed_no_tuple_columns(dataset_configuration):
     dataset.pos2acc()
 
     # This is not implemented yet
-    # dataset.gaze[0].explode(['pixel', 'position', 'velocity', 'acceleration'])
+    # dataset.gaze[0].unnest(['pixel', 'position', 'velocity', 'acceleration'])
     dataset.gaze[0].frame = dataset.gaze[0].frame.rename({'time': 'ttt'})
     dataset.gaze[0].frame = dataset.gaze[0].frame.drop(
         ['pixel', 'position', 'velocity', 'acceleration'],

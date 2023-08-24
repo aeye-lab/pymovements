@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """This module provides top-level access to all submodules."""
+from pymovements import _version
 from pymovements import datasets
 from pymovements import events
 from pymovements import gaze
@@ -29,6 +30,9 @@ from pymovements.dataset import DatasetDefinition
 from pymovements.dataset import DatasetLibrary
 from pymovements.dataset import DatasetPaths
 from pymovements.dataset import register_dataset
+from pymovements.events import EventDataFrame
+from pymovements.events import EventGazeProcessor
+from pymovements.events import EventProcessor
 from pymovements.gaze import Experiment
 from pymovements.gaze import GazeDataFrame
 from pymovements.gaze import Screen
@@ -40,13 +44,21 @@ __all__ = [
     'DatasetLibrary',
     'DatasetPaths',
     'datasets',
-    'events',
-    'Experiment',
-    'gaze',
-    'GazeDataFrame',
-    'plotting',
     'register_dataset',
+
+    'events',
+    'EventDataFrame',
+    'EventGazeProcessor',
+    'EventProcessor',
+
+    'gaze',
+    'Experiment',
     'Screen',
+    'GazeDataFrame',
+
+    'plotting',
     'synthetic',
     'utils',
 ]
+
+__version__ = _version.get_versions()['version']

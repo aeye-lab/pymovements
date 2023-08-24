@@ -2,6 +2,7 @@
 requires = [
   "setuptools>=42",
   "setuptools-git-versioning<2",
+  "versioneer[toml]>=0.29,<1.0",
   "wheel"
 ]
 build-backend = "setuptools.build_meta"
@@ -10,7 +11,7 @@ build-backend = "setuptools.build_meta"
 name = "pymovements"
 description = "A python package for processing eye movement data"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 license = {text = "MIT License"}
 maintainers = [
   {name = "Daniel Krakowczyk", email = "daniel.krakowczyk@uni-potsdam.de"}
@@ -23,7 +24,6 @@ classifiers = [
   "Operating System :: Microsoft :: Windows",
   "Operating System :: POSIX :: Linux",
   "Operating System :: OS Independent",
-  "Programming Language :: Python :: 3.7",
   "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
@@ -35,11 +35,10 @@ dependencies = [
   "matplotlib>=3.0.0,<4",
   "numpy>=1.10.0,<2",
   "pandas>1.0.0,<3",
-  "polars>=0.18.0,<0.19.0",
+  "polars>=0.18.3,<0.19.0",
   "pyarrow>=11.0.0,<12",
   "scipy>=1.5.4,<2",
-  "tqdm>=4.0.0,<5",
-  "typing_extensions>=4.0.0,<5"
+  "tqdm>=4.0.0,<5"
 ]
 dynamic = ["version"]
 
@@ -99,6 +98,7 @@ parallel = true
 branch = true
 omit = [
   'docs/*',
+  'src/pymovements/_version.py',
   'tests/*'
 ]
 
@@ -138,3 +138,11 @@ testpaths = ['tests', 'src']
 
 [tool.setuptools-git-versioning]
 enabled = true
+
+[tool.versioneer]
+VCS = "git"
+style = "pep440"
+versionfile_source = "src/pymovements/_version.py"
+versionfile_build = "src/pymovements/_version.py"
+tag_prefix = "v"
+parentdir_prefix = "pymovements-"

@@ -29,19 +29,22 @@ import pymovements as pm
     ('kwargs', 'exception', 'msg_substrings'),
     [
         pytest.param(
-            {'origin': 'center', 'pixel_column': 'pixel'},
+            {'origin': 'center', 'pixel_column': 'pixel', 'n_components': 2},
             TypeError,
-            ('screen_px', 'missing'),
-            id='no_screen_px_raises_type_error',
+            ('screen_resolution', 'missing'),
+            id='no_screen_resolution_raises_type_error',
         ),
         pytest.param(
-            {'screen_px': 100, 'pixel_column': 'pixel'},
+            {'screen_resolution': (100, 100), 'pixel_column': 'pixel', 'n_components': 2},
             TypeError,
             ('origin', 'missing'),
             id='no_origin_raises_type_error',
         ),
         pytest.param(
-            {'screen_px': 100, 'origin': 'foobar', 'pixel_column': 'pixel'},
+            {
+                'screen_resolution': (100, 100), 'origin': 'foobar', 'pixel_column': 'pixel',
+                'n_components': 2,
+            },
             ValueError,
             ('origin', 'invalid', 'foobar', 'valid', 'center', 'lower left'),
             id='invalid_origin_raises_value_error',
@@ -50,7 +53,7 @@ import pymovements as pm
 )
 def test_center_origin_init_raises_error(kwargs, exception, msg_substrings):
     with pytest.raises(exception) as excinfo:
-        pm.gaze.transforms_pl.center_origin(**kwargs)
+        pm.gaze.transforms.center_origin(**kwargs)
 
     msg, = excinfo.value.args
     for msg_substring in msg_substrings:
@@ -61,22 +64,41 @@ def test_center_origin_init_raises_error(kwargs, exception, msg_substrings):
     ('kwargs', 'series', 'expected_df'),
     [
         pytest.param(
-            {'screen_px': 100, 'origin': 'center', 'pixel_column': 'pixel'},
-            pl.Series('pixel', [], pl.Float64),
-            pl.Series('pixel', [], pl.Float64),
+            {
+                'screen_resolution': (100, 100), 'origin': 'center', 'pixel_column': 'pixel',
+                'n_components': 2,
+            },
+            pl.Series('pixel', [], pl.List(pl.Float64)),
+            pl.Series('pixel', [], pl.List(pl.Float64)),
             id='empty_series_returns_empty_series',
         ),
         pytest.param(
-            {'screen_px': 100, 'origin': 'center', 'pixel_column': 'pixel'},
-            pl.Series('pixel', [0], pl.Float64),
-            pl.Series('pixel', [0], pl.Float64),
-            id='zero_origin_center_returns_0',
+            {
+                'screen_resolution': (100, 100), 'origin': 'center',
+                'pixel_column': 'pixel', 'output_column': 'centered',
+                'n_components': 2,
+            },
+            pl.Series('pixel', [], pl.List(pl.Float64)),
+            pl.Series('centered', [], pl.List(pl.Float64)),
+            id='empty_series_returns_empty_series_with_output_column',
         ),
         pytest.param(
-            {'screen_px': 100, 'origin': 'lower left', 'pixel_column': 'pixel'},
-            pl.Series('pixel', [(100 - 1) / 2], pl.Float64),
-            pl.Series('pixel', [0], pl.Float64),
-            id='center_pixel_origin_lowerleft_returns_0',
+            {
+                'screen_resolution': (100, 100), 'origin': 'center', 'pixel_column': 'pixel',
+                'n_components': 2,
+            },
+            pl.Series('pixel', [[0, (100 - 1) / 2]], pl.List(pl.Float64)),
+            pl.Series('pixel', [[0, 49.5]], pl.List(pl.Float64)),
+            id='origin_center',
+        ),
+        pytest.param(
+            {
+                'screen_resolution': (100, 100), 'origin': 'lower left', 'pixel_column': 'pixel',
+                'n_components': 2,
+            },
+            pl.Series('pixel', [[0, (100 - 1) / 2]], pl.List(pl.Float64)),
+            pl.Series('pixel', [[-49.5, 0]], pl.List(pl.Float64)),
+            id='origin_lowerleft',
         ),
     ],
 )
@@ -84,6 +106,6 @@ def test_center_origin_returns(kwargs, series, expected_df):
     df = series.to_frame()
 
     result_df = df.select(
-        pm.gaze.transforms_pl.center_origin(**kwargs),
+        pm.gaze.transforms.center_origin(**kwargs),
     )
     assert_frame_equal(result_df, expected_df.to_frame())

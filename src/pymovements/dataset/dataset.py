@@ -34,9 +34,9 @@ from pymovements.dataset import dataset_files
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_paths import DatasetPaths
-from pymovements.events.event_processing import EventGazeProcessor
-from pymovements.events.events import EventDataFrame
-from pymovements.events.events import EventDetectionLibrary
+from pymovements.events.detection import EventDetectionLibrary
+from pymovements.events.frame import EventDataFrame
+from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import GazeDataFrame
 
 
@@ -269,10 +269,10 @@ class Dataset:
 
     def pos2acc(
             self,
-            window_length: int = 7,
+            *,
             degree: int = 2,
-            mode: str = 'interp',
-            cval: float = 0.0,
+            window_length: int = 7,
+            padding: str | float | int | None = 'nearest',
             verbose: bool = True,
     ) -> Dataset:
         """Compute gaze accelerations in dva/s^2 from dva coordinates.
@@ -287,10 +287,8 @@ class Dataset:
             The window size to use.
         degree:
             The degree of the polynomial to use.
-        mode:
-            The padding mode to use.
-        cval:
-            A constant value for padding.
+        padding:
+            The padding method to use. See ``savitzky_golay`` for details.
         verbose : bool
             If True, show progress of computation.
 
@@ -312,13 +310,18 @@ class Dataset:
             gaze_df.pos2acc(
                 window_length=window_length,
                 degree=degree,
-                mode=mode,
-                cval=cval,
+                padding=padding,
             )
 
         return self
 
-    def pos2vel(self, method: str = 'smooth', verbose: bool = True, **kwargs: Any) -> Dataset:
+    def pos2vel(
+            self,
+            method: str = 'fivepoint',
+            *,
+            verbose: bool = True,
+            **kwargs: Any,
+    ) -> Dataset:
         """Compute gaze velocites in dva/s from dva coordinates.
 
         This method requires a properly initialized :py:attr:`~.Dataset.experiment` attribute.
@@ -397,14 +400,14 @@ class Dataset:
 
         # this is just a work-around until merged columns are standard behavior
         # https://github.com/aeye-lab/pymovements/pull/443
-        exploded_columns = {}
+        unnested_columns = {}
         if 'position' in self.gaze[0].frame.columns:
-            exploded_columns_pos = [
+            unnested_columns_pos = [
                 'x_left_pos', 'y_left_pos',
                 'x_right_pos', 'y_right_pos',
                 'x_avg_pos', 'y_avg_pos',
             ][:self.gaze[0].n_components]
-            exploded_columns['position'] = exploded_columns_pos
+            unnested_columns['position'] = unnested_columns_pos
         else:
             raise pl.exceptions.ColumnNotFoundError(
                 f'Column \'position\' not found.'
@@ -412,20 +415,20 @@ class Dataset:
             )
 
         if 'velocity' in self.gaze[0].frame.columns:
-            exploded_columns_vel = [
+            unnested_columns_vel = [
                 'x_left_vel', 'y_left_vel',
                 'x_right_vel', 'y_right_vel',
                 'x_avg_vel', 'y_avg_vel',
             ][:self.gaze[0].n_components]
-            exploded_columns['velocity'] = exploded_columns_vel
+            unnested_columns['velocity'] = unnested_columns_vel
         else:
             raise pl.exceptions.ColumnNotFoundError(
                 f'Column \'velocity\' not found.'
                 f' Available columns are: {self.gaze[0].frame.columns}',
             )
 
-        self.gaze[0].explode('position', exploded_columns['position'])
-        self.gaze[0].explode('velocity', exploded_columns['velocity'])
+        self.gaze[0].unnest('position', unnested_columns['position'])
+        self.gaze[0].unnest('velocity', unnested_columns['velocity'])
 
         if (
                 isinstance(self.gaze[0].n_components, int)
@@ -448,12 +451,12 @@ class Dataset:
 
         # this is just a work-around until merged columns are standard behavior
         # https://github.com/aeye-lab/pymovements/pull/443
-        self.gaze[0].merge_component_columns_into_tuple_column(
-            input_columns=exploded_columns['position'],
+        self.gaze[0].nest(
+            input_columns=unnested_columns['position'],
             output_column='position',
         )
-        self.gaze[0].merge_component_columns_into_tuple_column(
-            input_columns=exploded_columns['velocity'],
+        self.gaze[0].nest(
+            input_columns=unnested_columns['velocity'],
             output_column='velocity',
         )
 
@@ -467,8 +470,8 @@ class Dataset:
         ):
             # this is just a work-around until merged columns are standard behavior
             # https://github.com/aeye-lab/pymovements/pull/443
-            gaze_df.explode('position', exploded_columns['position'])
-            gaze_df.explode('velocity', exploded_columns['velocity'])
+            gaze_df.unnest('position', unnested_columns['position'])
+            gaze_df.unnest('velocity', unnested_columns['velocity'])
 
             positions = gaze_df.frame.select(position_columns).to_numpy()
             velocities = gaze_df.frame.select(velocity_columns).to_numpy()
@@ -502,12 +505,12 @@ class Dataset:
 
             # this is just a work-around until merged columns are standard behavior
             # https://github.com/aeye-lab/pymovements/pull/443
-            gaze_df.merge_component_columns_into_tuple_column(
-                input_columns=exploded_columns['position'],
+            gaze_df.nest(
+                input_columns=unnested_columns['position'],
                 output_column='position',
             )
-            gaze_df.merge_component_columns_into_tuple_column(
-                input_columns=exploded_columns['velocity'],
+            gaze_df.nest(
+                input_columns=unnested_columns['velocity'],
                 output_column='velocity',
             )
 

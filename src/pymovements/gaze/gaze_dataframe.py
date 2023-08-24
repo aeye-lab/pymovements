@@ -20,10 +20,14 @@
 """Module for the GazeDataFrame."""
 from __future__ import annotations
 
+import inspect
+from collections.abc import Callable
+from typing import Any
+
 import polars as pl
 
+from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.transforms import pos2acc
 
 
 class GazeDataFrame:
@@ -74,6 +78,7 @@ class GazeDataFrame:
             data: pl.DataFrame | None = None,
             experiment: Experiment | None = None,
             *,
+            trial_columns: str | list[str] | None = None,
             time_column: str | None = None,
             pixel_columns: list[str] | None = None,
             position_columns: list[str] | None = None,
@@ -162,6 +167,8 @@ class GazeDataFrame:
             data = data.clone()
         self.frame = data
 
+        self.trial_columns = trial_columns
+
         if time_column is not None:
             self.frame = self.frame.rename({time_column: 'time'})
 
@@ -171,7 +178,7 @@ class GazeDataFrame:
                 frame=self.frame,
                 pixel_columns=pixel_columns,
             )
-            self.merge_component_columns_into_tuple_column(
+            self.nest(
                 input_columns=pixel_columns,
                 output_column='pixel',
             )
@@ -183,7 +190,7 @@ class GazeDataFrame:
                 position_columns=position_columns,
             )
 
-            self.merge_component_columns_into_tuple_column(
+            self.nest(
                 input_columns=position_columns,
                 output_column='position',
             )
@@ -195,7 +202,7 @@ class GazeDataFrame:
                 velocity_columns=velocity_columns,
             )
 
-            self.merge_component_columns_into_tuple_column(
+            self.nest(
                 input_columns=velocity_columns,
                 output_column='velocity',
             )
@@ -207,7 +214,7 @@ class GazeDataFrame:
                 acceleration_columns=acceleration_columns,
             )
 
-            self.merge_component_columns_into_tuple_column(
+            self.nest(
                 input_columns=acceleration_columns,
                 output_column='acceleration',
             )
@@ -215,6 +222,68 @@ class GazeDataFrame:
 
         self.n_components = n_components
         self.experiment = experiment
+
+    def transform(
+            self,
+            transform_method: str | Callable[..., pl.Expr],
+            **kwargs: Any,
+    ) -> None:
+        """Apply transformation method."""
+        if isinstance(transform_method, str):
+            transform_method = transforms.TransformLibrary.get(transform_method)
+
+        if transform_method.__name__ == 'downsample':
+            downsample_factor = kwargs.pop('factor')
+            self.frame = self.frame.select(
+                transforms.downsample(
+                    factor=downsample_factor, **kwargs,
+                ),
+            )
+
+        else:
+            method_kwargs = inspect.getfullargspec(transform_method).kwonlyargs
+            if 'origin' in method_kwargs and 'origin' not in kwargs:
+                self._check_experiment()
+                assert self.experiment is not None
+                kwargs['origin'] = self.experiment.screen.origin
+
+            if 'screen_resolution' in method_kwargs and 'screen_resolution' not in kwargs:
+                self._check_experiment()
+                assert self.experiment is not None
+                kwargs['screen_resolution'] = (
+                    self.experiment.screen.width_px, self.experiment.screen.height_px,
+                )
+
+            if 'screen_size' in method_kwargs and 'screen_size' not in kwargs:
+                self._check_experiment()
+                assert self.experiment is not None
+                kwargs['screen_size'] = (
+                    self.experiment.screen.width_cm, self.experiment.screen.height_cm,
+                )
+
+            if 'distance' in method_kwargs and 'distance' not in kwargs:
+                self._check_experiment()
+                assert self.experiment is not None
+                kwargs['distance'] = self.experiment.screen.distance_cm
+
+            if 'sampling_rate' in method_kwargs and 'sampling_rate' not in kwargs:
+                self._check_experiment()
+                assert self.experiment is not None
+                kwargs['sampling_rate'] = self.experiment.sampling_rate
+
+            if 'n_components' in method_kwargs and 'n_components' not in kwargs:
+                _check_n_components(self.n_components)
+                kwargs['n_components'] = self.n_components
+
+            if self.trial_columns is None:
+                self.frame = self.frame.with_columns(transform_method(**kwargs))
+            else:
+                self.frame = pl.concat(
+                    [
+                        df.with_columns(transform_method(**kwargs))
+                        for group, df in self.frame.groupby(self.trial_columns, maintain_order=True)
+                    ],
+                )
 
     def pix2deg(self) -> None:
         """Compute gaze positions in degrees of visual angle from pixel position coordinates.
@@ -229,51 +298,14 @@ class GazeDataFrame:
             If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
             if experiment is None.
         """
-        self._check_experiment()
-        # mypy does not get that experiment now cannot be None anymore
-        assert self.experiment is not None
-
-        # this is just a work-around until GazeDataFrame.transform() is implemented
-        if 'pixel' in self.frame.columns:
-            pixel_columns = [
-                '__x_left_pix__', '__y_left_pix__',
-                '__x_right_pix__', '__y_right_pix__',
-                '__x_avg_pix__', '__y_avg_pix__',
-            ][:self.n_components]
-            self.explode('pixel', pixel_columns)
-        else:
-            raise pl.exceptions.ColumnNotFoundError(
-                f'Column \'pixel\' not found. Available columns are: {self.frame.columns}',
-            )
-
-        pixel_positions = self.frame.select(pixel_columns)
-        dva_positions = self.experiment.screen.pix2deg(pixel_positions.to_numpy())
-
-        dva_columns = self._pixel_to_dva_position_columns(pixel_columns)
-        self.frame = self.frame.with_columns(
-            [
-                pl.Series(name=dva_column_name, values=dva_positions[:, dva_column_id])
-                for dva_column_id, dva_column_name in enumerate(dva_columns)
-            ],
-        )
-
-        self.merge_component_columns_into_tuple_column(
-            input_columns=dva_columns,
-            output_column='position',
-        )
-
-        # this is just a work-around until merged columns are standard behavior
-        self.merge_component_columns_into_tuple_column(
-            input_columns=pixel_columns,
-            output_column='pixel',
-        )
+        self.transform('pix2deg')
 
     def pos2acc(
             self,
-            window_length: int = 7,
+            *,
             degree: int = 2,
-            mode: str = 'interp',
-            cval: float = 0.0,
+            window_length: int = 7,
+            padding: str | float | int | None = 'nearest',
     ) -> None:
         """Compute gaze acceleration in dva/s^2 from dva position coordinates.
 
@@ -287,10 +319,8 @@ class GazeDataFrame:
             The window size to use.
         degree:
             The degree of the polynomial to use.
-        mode:
-            The padding mode to use.
-        cval:
-            A constant value for padding.
+        padding:
+            The padding method to use. See ``savitzky_golay`` for details.
 
         Raises
         ------
@@ -298,53 +328,13 @@ class GazeDataFrame:
             If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
             if experiment is None.
         """
-        self._check_experiment()
-        # mypy does not get that experiment now cannot be None anymore
-        assert self.experiment is not None
+        self.transform('pos2acc', window_length=window_length, degree=degree, padding=padding)
 
-        # this is just a work-around until merged columns are standard behavior
-        if 'position' in self.frame.columns:
-            position_columns = [
-                '__x_left_pos__', '__y_left_pos__',
-                '__x_right_pos__', '__y_right_pos__',
-                '__x_avg_pos__', '__y_avg_pos__',
-            ][:self.n_components]
-            self.explode('position', position_columns)
-        else:
-            raise pl.exceptions.ColumnNotFoundError(
-                f'Column \'position\' not found. Available columns are: {self.frame.columns}',
-            )
-
-        positions = self.frame.select(position_columns)
-        acceleration = pos2acc(
-            positions.to_numpy(),
-            sampling_rate=self.experiment.sampling_rate,
-            window_length=window_length,
-            degree=degree,
-            mode=mode,
-            cval=cval,
-        )
-
-        acceleration_columns = self._position_to_acceleration_columns(position_columns)
-        self.frame = self.frame.with_columns(
-            [
-                pl.Series(name=velocity_column_name, values=acceleration[:, column_id])
-                for column_id, velocity_column_name in enumerate(acceleration_columns)
-            ],
-        )
-
-        self.merge_component_columns_into_tuple_column(
-            input_columns=acceleration_columns,
-            output_column='acceleration',
-        )
-
-        # this is just a work-around until merged columns are standard behavior
-        self.merge_component_columns_into_tuple_column(
-            input_columns=position_columns,
-            output_column='position',
-        )
-
-    def pos2vel(self, method: str = 'smooth', **kwargs: int | float | str) -> None:
+    def pos2vel(
+            self,
+            method: str = 'fivepoint',
+            **kwargs: int | float | str,
+    ) -> None:
         """Compute gaze velocity in dva/s from dva position coordinates.
 
         This method requires a properly initialized :py:attr:`~.GazeDataFrame.experiment` attribute.
@@ -354,7 +344,7 @@ class GazeDataFrame:
         Parameters
         ----------
         method : str
-            Computation method. See :func:`~transforms.pos2vel()` for details, default: smooth.
+            Computation method. See :func:`~transforms.pos2vel()` for details, default: fivepoint.
         **kwargs
             Additional keyword arguments to be passed to the :func:`~transforms.pos2vel()` method.
 
@@ -364,44 +354,7 @@ class GazeDataFrame:
             If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
             if experiment is None.
         """
-        self._check_experiment()
-        # mypy does not get that experiment now cannot be None anymore
-        assert self.experiment is not None
-
-        # this is just a work-around until merged columns are standard behavior
-        if 'position' in self.frame.columns:
-            position_columns = [
-                '__x_left_pos__', '__y_left_pos__',
-                '__x_right_pos__', '__y_right_pos__',
-                '__x_avg_pos__', '__y_avg_pos__',
-            ][:self.n_components]
-            self.explode('position', position_columns)
-        else:
-            raise pl.exceptions.ColumnNotFoundError(
-                f'Column \'position\' not found. Available columns are: {self.frame.columns}',
-            )
-
-        positions = self.frame.select(position_columns)
-        velocities = self.experiment.pos2vel(positions.to_numpy(), method=method, **kwargs)
-
-        velocity_columns = self._position_to_velocity_columns(position_columns)
-        self.frame = self.frame.with_columns(
-            [
-                pl.Series(name=velocity_column_name, values=velocities[:, column_id])
-                for column_id, velocity_column_name in enumerate(velocity_columns)
-            ],
-        )
-
-        self.merge_component_columns_into_tuple_column(
-            input_columns=velocity_columns,
-            output_column='velocity',
-        )
-
-        # this is just a work-around until merged columns are standard behavior
-        self.merge_component_columns_into_tuple_column(
-            input_columns=position_columns,
-            output_column='position',
-        )
+        self.transform('pos2vel', method=method, **kwargs)
 
     @property
     def schema(self) -> pl.type_aliases.SchemaDict:
@@ -413,12 +366,12 @@ class GazeDataFrame:
         """List of column names."""
         return self.frame.columns
 
-    def merge_component_columns_into_tuple_column(
+    def nest(
             self,
             input_columns: list[str],
             output_column: str,
     ) -> None:
-        """Merge component columns into a single tuple columns.
+        """Nest component columns into a single tuple column.
 
         Input component columns will be dropped.
 
@@ -434,7 +387,7 @@ class GazeDataFrame:
             .alias(output_column),
         ).drop(input_columns)
 
-    def explode(
+    def unnest(
             self,
             column: str,
             output_columns: list[str],
@@ -446,7 +399,7 @@ class GazeDataFrame:
         Parameters
         ----------
         column:
-            Name of input columns to be exploded into several component columns.
+            Name of input columns to be unnested into several component columns.
         output_columns:
             Name of the resulting tuple columns.
         """
@@ -457,34 +410,10 @@ class GazeDataFrame:
             ],
         ).drop(column)
 
-    @staticmethod
-    def _pixel_to_dva_position_columns(columns: list[str]) -> list[str]:
-        """Get corresponding dva position columns from pixel position columns."""
-        return [
-            column.replace('pixel', 'position').replace('pix', 'pos')
-            for column in columns if 'pix' in column
-        ]
-
-    @staticmethod
-    def _position_to_acceleration_columns(columns: list[str]) -> list[str]:
-        """Get corresponding acceleration columns from dva position columns."""
-        return [
-            column.replace('position', 'acceleration').replace('pos', 'acc')
-            for column in columns if 'pos' in column
-        ]
-
-    @staticmethod
-    def _position_to_velocity_columns(columns: list[str]) -> list[str]:
-        """Get corresponding velocity columns from dva position columns."""
-        return [
-            column.replace('position', 'velocity').replace('pos', 'vel')
-            for column in columns if 'pos' in column
-        ]
-
     def _check_experiment(self) -> None:
         """Check if experiment attribute has been set."""
         if self.experiment is None:
-            raise AttributeError('experiment must be specified for this method to work')
+            raise AttributeError('experiment must not be None for this method to work')
 
 
 def _check_component_columns(
@@ -521,3 +450,9 @@ def _check_component_columns(
             raise ValueError(
                 f'all columns in {component_type} must be of same type, but types are {types_list}',
             )
+
+
+def _check_n_components(n_components: Any) -> None:
+    """Check that n_components is either 2, 4 or 6."""
+    if n_components not in {2, 4, 6}:
+        raise AttributeError(f'n_components must be either 2, 4 or 6 but is {n_components}')

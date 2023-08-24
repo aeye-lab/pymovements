@@ -54,29 +54,51 @@
     :toctree:
     :recursive:
 
-    pymovements.events.event_properties.amplitude
-    pymovements.events.event_properties.duration
-    pymovements.events.event_properties.dispersion
-    pymovements.events.event_properties.disposition
-    pymovements.events.event_properties.peak_velocity
-    pymovements.events.event_properties.location
+    pymovements.events.amplitude
+    pymovements.events.duration
+    pymovements.events.dispersion
+    pymovements.events.disposition
+    pymovements.events.peak_velocity
+    pymovements.events.location
 """
-from pymovements.events.detection.fill import fill
-from pymovements.events.detection.idt import idt
-from pymovements.events.detection.ivt import ivt
-from pymovements.events.detection.microsaccades import microsaccades
-from pymovements.events.event_processing import EventGazeProcessor
-from pymovements.events.event_processing import EventProcessor
-from pymovements.events.events import EventDataFrame
-from pymovements.events.events import register_event_detection
+from pymovements.events.detection import fill
+from pymovements.events.detection import idt
+from pymovements.events.detection import ivt
+from pymovements.events.detection import microsaccades
+from pymovements.events.detection._library import EventDetectionLibrary
+from pymovements.events.detection._library import register_event_detection
+from pymovements.events.frame import EventDataFrame
+from pymovements.events.processing import EventGazeProcessor
+from pymovements.events.processing import EventProcessor
+from pymovements.events.properties import amplitude
+from pymovements.events.properties import dispersion
+from pymovements.events.properties import disposition
+from pymovements.events.properties import duration
+from pymovements.events.properties import EVENT_PROPERTIES
+from pymovements.events.properties import location
+from pymovements.events.properties import peak_velocity
+from pymovements.events.properties import register_event_property
+
 
 __all__ = [
-    'EventDataFrame',
-    'EventGazeProcessor',
-    'EventProcessor',
+    'EventDetectionLibrary',
+    'register_event_detection',
     'fill',
     'idt',
     'ivt',
     'microsaccades',
-    'register_event_detection',
+
+    'EventDataFrame',
+
+    'EventGazeProcessor',
+    'EventProcessor',
+
+    'EVENT_PROPERTIES',
+    'register_event_property',
+    'amplitude',
+    'dispersion',
+    'disposition',
+    'duration',
+    'location',
+    'peak_velocity',
 ]

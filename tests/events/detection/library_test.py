@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 The pymovements Project Authors
+# Copyright (c) 2023 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,30 +17,24 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Module for py:func:`pymovements.gaze.transforms.downsample`"""
+"""Test event detection library."""
 from __future__ import annotations
 
-import polars as pl
+import pytest
 
-from pymovements.gaze.transforms_pl.transforms_library import register_transform
-from pymovements.utils import checks
+import pymovements as pm
 
 
-@register_transform
-def downsample(
-        *,
-        factor: int,
-) -> pl.Expr:
-    """Downsample gaze data by an integer factor.
-
-    Downsampling is done by taking every `nth` sample specified by the downsampling factor.
-
-    Parameters
-    ----------
-    factor:
-        Downsample factor.
-    """
-    checks.check_is_int(factor=factor)
-    checks.check_is_positive_value(factor=factor)
-
-    return pl.all().take_every(n=factor)
+@pytest.mark.parametrize(
+    ('method', 'name'),
+    [
+        pytest.param(pm.events.idt, 'idt', id='idt'),
+        pytest.param(pm.events.ivt, 'ivt', id='ivt'),
+        pytest.param(pm.events.microsaccades, 'microsaccades', id='microsaccades'),
+        pytest.param(pm.events.fill, 'fill', id='fill'),
+    ],
+)
+def test_transform_registered(method, name):
+    assert name in pm.events.EventDetectionLibrary.methods
+    assert pm.events.EventDetectionLibrary.get(name) == method
+    assert pm.events.EventDetectionLibrary.get(name).__name__ == name

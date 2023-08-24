@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from pymovements.gaze import transforms
+from pymovements.gaze import transforms_numpy
 from pymovements.utils import checks
 from pymovements.utils import decorators
 
@@ -116,19 +116,19 @@ class Screen:
         self.origin = origin
 
         # calculate screen boundary coordinates in degrees of visual angle
-        self.x_max_dva = transforms.pix2deg(
+        self.x_max_dva = transforms_numpy.pix2deg(
             width_px - 1,
             screen_px=width_px, screen_cm=width_cm, distance_cm=distance_cm, origin=origin,
         )
-        self.y_max_dva = transforms.pix2deg(
+        self.y_max_dva = transforms_numpy.pix2deg(
             height_px - 1,
             screen_px=height_px, screen_cm=height_cm, distance_cm=distance_cm, origin=origin,
         )
-        self.x_min_dva = transforms.pix2deg(
+        self.x_min_dva = transforms_numpy.pix2deg(
             0,
             screen_px=width_px, screen_cm=width_cm, distance_cm=distance_cm, origin=origin,
         )
-        self.y_min_dva = transforms.pix2deg(
+        self.y_min_dva = transforms_numpy.pix2deg(
             0,
             screen_px=height_px, screen_cm=height_cm, distance_cm=distance_cm, origin=origin,
         )
@@ -180,7 +180,7 @@ class Screen:
         >>> screen.pix2deg(arr=arr)
         array([[ 3.07379946, 20.43909054]])
         """
-        return transforms.pix2deg(
+        return transforms_numpy.pix2deg(
             arr=arr,
             screen_px=(self.width_px, self.height_px),
             screen_cm=(self.width_cm, self.height_cm),

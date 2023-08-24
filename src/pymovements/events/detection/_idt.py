@@ -24,8 +24,8 @@ from __future__ import annotations
 
 import numpy as np
 
-from pymovements.events.events import EventDataFrame
-from pymovements.events.events import register_event_detection
+from pymovements.events.detection._library import register_event_detection
+from pymovements.events.frame import EventDataFrame
 from pymovements.utils import checks
 from pymovements.utils.filters import events_split_nans
 from pymovements.utils.filters import filter_candidates_remove_nans
@@ -143,8 +143,7 @@ def idt(
         raise ValueError(
             'minimum_duration must be divisible by the constant interval between timesteps',
         )
-    minimum_sample_duration = int(minimum_duration // timesteps_diff[0])
-    if minimum_sample_duration < 2:
+    if (minimum_sample_duration := int(minimum_duration // timesteps_diff[0])) < 2:
         raise ValueError('minimum_duration must be longer than the equivalent of 2 samples')
 
     # Initialize window over first points to cover the duration threshold

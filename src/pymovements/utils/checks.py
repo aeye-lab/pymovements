@@ -186,6 +186,24 @@ def check_is_length_matching(**kwargs: Sized) -> None:
         raise ValueError(f'The sequences "{key_1}" and "{key_2}" must be of equal length.')
 
 
+def check_is_not_none(**kwargs: Any) -> None:
+    """Check if all passed values are None.
+
+    Parameters
+    ----------
+    kwargs
+        Keyword argument dictionary.
+
+    Raises
+    ------
+    TypeError
+        If any of the passed arguments are not None.
+    """
+    for key, value in kwargs.items():
+        if value is None:
+            raise TypeError(f"'{key}' must not be None")
+
+
 def check_is_int(**kwargs: Any) -> None:
     """Check if all passed values are of type `int`.
 

@@ -25,18 +25,23 @@
    :toctree:
    :recursive:
 
-    pymovements.events.detection.fill
-    pymovements.events.detection.idt
-    pymovements.events.detection.ivt
-    pymovements.events.detection.microsaccades
+    pymovements.events.fill
+    pymovements.events.idt
+    pymovements.events.ivt
+    pymovements.events.microsaccades
 
 """
-from pymovements.events.detection.fill import fill
-from pymovements.events.detection.idt import idt
-from pymovements.events.detection.ivt import ivt
-from pymovements.events.detection.microsaccades import microsaccades
+from pymovements.events.detection._fill import fill
+from pymovements.events.detection._idt import idt
+from pymovements.events.detection._ivt import ivt
+from pymovements.events.detection._library import EventDetectionLibrary
+from pymovements.events.detection._library import register_event_detection
+from pymovements.events.detection._microsaccades import microsaccades
 
 __all__ = [
+    'EventDetectionLibrary',
+    'register_event_detection',
+
     'fill',
     'idt',
     'ivt',

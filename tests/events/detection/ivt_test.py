@@ -24,9 +24,7 @@ import numpy as np
 import pytest
 from polars.testing import assert_frame_equal
 
-from pymovements.events.detection.ivt import ivt
-from pymovements.events.events import EventDataFrame
-from pymovements.gaze.transforms import pos2vel
+import pymovements as pm
 from pymovements.synthetic import step_function
 
 
@@ -101,7 +99,7 @@ from pymovements.synthetic import step_function
 def test_ivt_raise_error(kwargs, expected_error):
     """Test if ivt raises expected error."""
     with pytest.raises(expected_error):
-        ivt(**kwargs)
+        pm.events.ivt(**kwargs)
 
 
 @pytest.mark.parametrize(
@@ -113,7 +111,7 @@ def test_ivt_raise_error(kwargs, expected_error):
                 'velocity_threshold': 1,
                 'minimum_duration': 10,
             },
-            EventDataFrame(),
+            pm.EventDataFrame(),
             id='constant_velocity_no_fixation',
         ),
         pytest.param(
@@ -122,7 +120,7 @@ def test_ivt_raise_error(kwargs, expected_error):
                 'velocity_threshold': 1,
                 'minimum_duration': 1,
             },
-            EventDataFrame(
+            pm.EventDataFrame(
                 name='fixation',
                 onsets=[0],
                 offsets=[99],
@@ -136,7 +134,7 @@ def test_ivt_raise_error(kwargs, expected_error):
                 'minimum_duration': 1,
                 'name': 'custom_fixation',
             },
-            EventDataFrame(
+            pm.EventDataFrame(
                 name='custom_fixation',
                 onsets=[0],
                 offsets=[99],
@@ -154,7 +152,7 @@ def test_ivt_raise_error(kwargs, expected_error):
                 'velocity_threshold': 1,
                 'minimum_duration': 1,
             },
-            EventDataFrame(
+            pm.EventDataFrame(
                 name='fixation',
                 onsets=[0, 51],
                 offsets=[48, 99],
@@ -173,7 +171,7 @@ def test_ivt_raise_error(kwargs, expected_error):
                 'velocity_threshold': 1,
                 'minimum_duration': 1,
             },
-            EventDataFrame(
+            pm.EventDataFrame(
                 name='fixation',
                 onsets=[0, 21],
                 offsets=[9, 89],
@@ -193,7 +191,7 @@ def test_ivt_raise_error(kwargs, expected_error):
                 'minimum_duration': 1,
                 'include_nan': True,
             },
-            EventDataFrame(
+            pm.EventDataFrame(
                 name='fixation',
                 onsets=[0],
                 offsets=[89],
@@ -207,7 +205,7 @@ def test_ivt_raise_error(kwargs, expected_error):
                 'velocity_threshold': 1,
                 'minimum_duration': 1,
             },
-            EventDataFrame(
+            pm.EventDataFrame(
                 name='fixation',
                 onsets=[1000],
                 offsets=[1099],
@@ -217,11 +215,13 @@ def test_ivt_raise_error(kwargs, expected_error):
     ],
 )
 def test_ivt_detects_fixations(kwargs, expected):
-    velocities = pos2vel(kwargs['positions'], sampling_rate=10, method='preceding')
+    velocities = pm.gaze.transforms_numpy.pos2vel(
+        kwargs['positions'], sampling_rate=10, method='preceding',
+    )
 
     # Just use positions argument for velocity calculation
     kwargs.pop('positions')
 
-    events = ivt(velocities=velocities, **kwargs)
+    events = pm.events.ivt(velocities=velocities, **kwargs)
 
     assert_frame_equal(events.frame, expected.frame)
