@@ -32,7 +32,6 @@ from pymovements.synthetic import step_function
     [
         pytest.param(
             {
-                'positions': np.zeros(shape=(10, 2)),
                 'velocities': np.zeros(shape=(10, 2)),
                 'threshold': (1, 1, 1),
             },
@@ -41,7 +40,6 @@ from pymovements.synthetic import step_function
         ),
         pytest.param(
             {
-                'positions': np.zeros(shape=(10, 2)),
                 'velocities': np.random.uniform(size=(10, 2)),
                 'threshold': (0, 100),
             },
@@ -50,7 +48,6 @@ from pymovements.synthetic import step_function
         ),
         pytest.param(
             {
-                'positions': np.zeros(shape=(10, 2)),
                 'velocities': np.random.uniform(size=(10, 2)),
                 'threshold': (100, 0),
             },
@@ -69,7 +66,6 @@ def test_microsaccades_raises_error(kwargs, expected):
     [
         pytest.param(
             {
-                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'velocities': step_function(
                     length=100,
                     steps=[40, 50],
@@ -83,7 +79,6 @@ def test_microsaccades_raises_error(kwargs, expected):
         ),
         pytest.param(
             {
-                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'velocities': step_function(
                     length=100,
                     steps=[40, 50],
@@ -101,7 +96,6 @@ def test_microsaccades_raises_error(kwargs, expected):
         ),
         pytest.param(
             {
-                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'velocities': step_function(
                     length=100,
                     steps=[40, 50],
@@ -120,7 +114,6 @@ def test_microsaccades_raises_error(kwargs, expected):
         ),
         pytest.param(
             {
-                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'velocities': step_function(
                     length=100,
                     steps=[20, 30, 70, 80],
@@ -138,7 +131,6 @@ def test_microsaccades_raises_error(kwargs, expected):
         ),
         pytest.param(
             {
-                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'velocities': step_function(
                     length=100,
                     steps=[20, 25, 28, 30, 70, 80],
@@ -157,7 +149,6 @@ def test_microsaccades_raises_error(kwargs, expected):
         ),
         pytest.param(
             {
-                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'velocities': step_function(
                     length=100,
                     steps=[20, 25, 28, 30, 70, 80],
@@ -176,7 +167,6 @@ def test_microsaccades_raises_error(kwargs, expected):
         ),
         pytest.param(
             {
-                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'velocities': step_function(
                     length=100,
                     steps=[40, 50],
@@ -190,7 +180,6 @@ def test_microsaccades_raises_error(kwargs, expected):
         ),
         pytest.param(
             {
-                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
                 'velocities': step_function(
                     length=100,
                     steps=[40, 50],

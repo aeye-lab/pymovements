@@ -28,113 +28,12 @@ import pymovements as pm
 
 
 @pytest.mark.parametrize(
-    ('kwargs', 'expected_error'),
-    [
-        pytest.param(
-            {
-                'events': pm.EventDataFrame(),
-                'positions': None,
-                'velocities': np.ones((100, 2)),
-                'minimum_duration': 1,
-            },
-            ValueError,
-            id='positions_none_raises_value_error',
-        ),
-        pytest.param(
-            {
-                'events': pm.EventDataFrame(),
-                'positions': np.ones((100, 2)),
-                'velocities': None,
-                'minimum_duration': 1,
-            },
-            ValueError,
-            id='velocities_none_raises_value_error',
-        ),
-        pytest.param(
-            {
-                'events': pm.EventDataFrame(),
-                'positions': 1,
-                'velocities': np.ones((100, 2)),
-                'minimum_duration': 1,
-            },
-            ValueError,
-            id='positions_not_array_like_raises_value_error',
-        ),
-        pytest.param(
-            {
-                'events': pm.EventDataFrame(),
-                'positions': np.ones((100, 2)),
-                'velocities': 1,
-                'minimum_duration': 1,
-            },
-            ValueError,
-            id='velocities_not_array_like_raises_value_error',
-        ),
-        pytest.param(
-            {
-                'events': pm.EventDataFrame(),
-                'positions': np.ones(100),
-                'velocities': np.ones((100, 2)),
-                'minimum_duration': 1,
-            },
-            ValueError,
-            id='positions_not_2d_array_raises_value_error',
-        ),
-        pytest.param(
-            {
-                'events': pm.EventDataFrame(),
-                'positions': np.ones((100, 2)),
-                'velocities': np.ones(100),
-                'minimum_duration': 1,
-            },
-            ValueError,
-            id='velocities_not_2d_array_raises_value_error',
-        ),
-        pytest.param(
-            {
-                'events': pm.EventDataFrame(),
-                'positions': np.ones((100, 3)),
-                'velocities': np.ones((100, 2)),
-                'minimum_duration': 1,
-            },
-            ValueError,
-            id='positions_not_2_elements_in_second_dimension_raises_value_error',
-        ),
-        pytest.param(
-            {
-                'events': pm.EventDataFrame(),
-                'positions': np.ones((100, 2)),
-                'velocities': np.ones((100, 3)),
-                'minimum_duration': 1,
-            },
-            ValueError,
-            id='velocities_not_2_elements_in_second_dimension_raises_value_error',
-        ),
-        pytest.param(
-            {
-                'events': pm.EventDataFrame(),
-                'positions': np.ones((100, 2)),
-                'velocities': np.ones((101, 2)),
-                'minimum_duration': 1,
-            },
-            ValueError,
-            id='positions_and_velocities_different_lengths_raises_value_error',
-        ),
-    ],
-)
-def test_fill_raise_error(kwargs, expected_error):
-    """Test if ivt raises expected error."""
-    with pytest.raises(expected_error):
-        pm.events.fill(**kwargs)
-
-
-@pytest.mark.parametrize(
     ('kwargs', 'expected'),
     [
         pytest.param(
             {
                 'events': pm.EventDataFrame(name='fixation', onsets=[0], offsets=[100]),
-                'positions': np.stack([np.arange(0, 100), np.arange(0, 100)], axis=1),
+                'timesteps': np.arange(0, 100),
             },
             pm.EventDataFrame(),
             id='fixation_from_start_to_end_no_fill',
@@ -142,7 +41,7 @@ def test_fill_raise_error(kwargs, expected_error):
         pytest.param(
             {
                 'events': pm.EventDataFrame(name='fixation', onsets=[10], offsets=[100]),
-                'positions': np.stack([np.arange(0, 100), np.arange(0, 100)], axis=1),
+                'timesteps': np.arange(0, 100),
             },
             pm.EventDataFrame(
                 name='unclassified',
@@ -154,7 +53,7 @@ def test_fill_raise_error(kwargs, expected_error):
         pytest.param(
             {
                 'events': pm.EventDataFrame(name='fixation', onsets=[0], offsets=[90]),
-                'positions': np.stack([np.arange(0, 100), np.arange(0, 100)], axis=1),
+                'timesteps': np.arange(0, 100),
             },
             pm.EventDataFrame(
                 name='unclassified',
@@ -166,7 +65,7 @@ def test_fill_raise_error(kwargs, expected_error):
         pytest.param(
             {
                 'events': pm.EventDataFrame(name='fixation', onsets=[0, 50], offsets=[40, 100]),
-                'positions': np.stack([np.arange(0, 100), np.arange(0, 100)], axis=1),
+                'timesteps': np.arange(0, 100),
             },
             pm.EventDataFrame(
                 name='unclassified',
@@ -180,7 +79,7 @@ def test_fill_raise_error(kwargs, expected_error):
                 'events': pm.EventDataFrame(
                     name=['fixation', 'saccade'], onsets=[0, 50], offsets=[40, 100],
                 ),
-                'positions': np.stack([np.arange(0, 100), np.arange(0, 100)], axis=1),
+                'timesteps': np.arange(0, 100),
             },
             pm.EventDataFrame(
                 name='unclassified',
@@ -192,9 +91,6 @@ def test_fill_raise_error(kwargs, expected_error):
     ],
 )
 def test_fill_fills_events(kwargs, expected):
-    velocities = pm.gaze.transforms_numpy.pos2vel(
-        kwargs['positions'], sampling_rate=10, method='preceding',
-    )
-    events = pm.events.fill(velocities=velocities, **kwargs)
+    events = pm.events.fill(**kwargs)
 
     assert_frame_equal(events.frame, expected.frame)

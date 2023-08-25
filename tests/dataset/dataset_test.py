@@ -583,10 +583,49 @@ def test_pos2vel(dataset_configuration):
         ),
         pytest.param(
             {
+                'method': pm.events.fill,
+                'eye': 'auto',
+            },
+            id='fill_class',
+        ),
+        pytest.param(
+            {
                 'method': 'fill',
                 'eye': 'auto',
             },
             id='fill_string',
+        ),
+        pytest.param(
+            {
+                'method': 'ivt',
+                'velocity_threshold': 1,
+                'minimum_duration': 1,
+                'eye': 'auto',
+            },
+            id='ivt_string',
+        ),
+        pytest.param(
+            {
+                'method': pm.events.ivt,
+                'velocity_threshold': 1,
+                'minimum_duration': 1,
+                'eye': 'auto',
+            },
+            id='ivt_class',
+        ),
+        pytest.param(
+            {
+                'method': 'idt',
+                'eye': 'auto',
+            },
+            id='idt_string',
+        ),
+        pytest.param(
+            {
+                'method': pm.events.idt,
+                'eye': 'auto',
+            },
+            id='idt_class',
         ),
     ],
 )

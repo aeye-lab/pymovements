@@ -34,7 +34,6 @@ from pymovements.utils.filters import filter_candidates_remove_nans
 
 @register_event_detection
 def ivt(
-        positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         timesteps: list[int] | np.ndarray | None = None,
         minimum_duration: int = 100,
@@ -54,8 +53,6 @@ def ivt(
 
     Parameters
     ----------
-    positions: array-like, shape (N, 2)
-        Continuous 2D position time series.
     velocities: array-like, shape (N, 2)
         Corresponding continuous 2D velocity time series.
     timesteps: array-like, shape (N, )
@@ -80,16 +77,15 @@ def ivt(
     Raises
     ------
     ValueError
-        If positions or velocities are None
-        If positions or velocities do not have shape (N, 2)
-        If positions and velocities have different shapes
+        If velocities is None
+        If velocities does not have shape (N, 2)
         If velocity threshold is None.
         If velocity threshold is not greater than 0.
     """
-    positions = np.array(positions)
     velocities = np.array(velocities)
 
-    checks.check_shapes_positions_velocities(positions=positions, velocities=velocities)
+    checks.check_shapes(velocities=velocities)
+
     if velocity_threshold is None:
         raise ValueError('velocity threshold must not be None')
     if velocity_threshold <= 0:
