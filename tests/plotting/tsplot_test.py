@@ -81,7 +81,7 @@ def gaze_fixture():
 def test_tsplot_show(gaze, kwargs, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
-    gaze.unnest('pixel', ['x_pix', 'y_pix'])
+    gaze.unnest('pixel', output_columns=['x_pix', 'y_pix'])
     pm.plotting.tsplot(gaze=gaze, **kwargs)
     plt.close()
     mock.assert_called_once()
