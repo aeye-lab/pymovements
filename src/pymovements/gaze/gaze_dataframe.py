@@ -419,7 +419,6 @@ class GazeDataFrame:
         GazeDataFrame
             A copy of the GazeDataFrame.
         """
-
         return GazeDataFrame(
             data=self.frame.clone(),
             experiment=deepcopy(self.experiment),
