@@ -433,7 +433,6 @@ class GazeDataFrame:
         )
         _check_n_components(self.n_components)
 
-        # make mypy happy
         col_names = output_columns if output_columns is not None else []
 
         if output_columns is None and output_suffixes is None:
@@ -441,7 +440,7 @@ class GazeDataFrame:
                 output_suffixes = ['_x', '_y']
             elif self.n_components == 4:
                 output_suffixes = ['_xl', '_yl', '_xr', '_yr']
-            elif self.n_components == 6:
+            else:  # This must be 6 as we already have checked our n_components.
                 output_suffixes = ['_xl', '_yl', '_xr', '_yr', '_xa', '_ya']
 
         if output_suffixes:

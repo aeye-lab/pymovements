@@ -229,8 +229,6 @@ def load_gaze_files(
             )
 
         elif preprocessed and extension == 'csv':
-            # Workaround for preprocessed column names
-            # https://github.com/aeye-lab/pymovements/pull/443
             time_column = None
             if 'time' in gaze_data.columns:
                 time_column = 'time'
@@ -238,26 +236,15 @@ def load_gaze_files(
             pixel_columns: list[str] = list(
                 set(GazeDataFrame.valid_pixel_position_columns) & set(gaze_data.columns),
             )
-            if not pixel_columns:
-                pixel_columns = None  # type: ignore
-
             position_columns: list[str] = list(
                 set(GazeDataFrame.valid_position_columns) & set(gaze_data.columns),
             )
-            if not position_columns:
-                position_columns = None  # type: ignore
-
             velocity_columns: list[str] = list(
                 set(GazeDataFrame.valid_velocity_columns) & set(gaze_data.columns),
             )
-            if not velocity_columns:
-                velocity_columns = None  # type: ignore
-
             acceleration_columns: list[str] = list(
                 set(GazeDataFrame.valid_acceleration_columns) & set(gaze_data.columns),
             )
-            if not acceleration_columns:
-                acceleration_columns = None  # type: ignore
 
             gaze_df = GazeDataFrame(
                 gaze_data,
@@ -487,8 +474,6 @@ def save_preprocessed(
         )
 
         if extension == 'csv':
-            # this is just a work-around until merged columns are standard behavior
-            # https://github.com/aeye-lab/pymovements/pull/443
             if 'pixel' in gaze_df.frame.columns:
                 gaze_df.unnest('pixel')
 
