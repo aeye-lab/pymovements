@@ -26,7 +26,7 @@ import pymovements as pm
 
 
 @pytest.mark.parametrize(
-    ('init_arg'),
+    'init_arg',
     [
         pytest.param(
             None,
@@ -166,7 +166,7 @@ def test_gaze_dataframe_position_columns(init_df, position_columns):
     assert 'position' in gaze_df.columns
 
 
-def test_gaze_dataframe_copy():
+def test_gaze_dataframe_copy_with_experiment():
     gaze = pm.GazeDataFrame(
         pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
         experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
@@ -181,7 +181,7 @@ def test_gaze_dataframe_copy():
 
     # We want to have separate experiment instances but the same values.
     assert gaze.experiment is not gaze_copy.experiment
-    assert gaze.experiment.screen.width_px ==gaze_copy.experiment.screen.width_px
+    assert gaze.experiment.screen.width_px == gaze_copy.experiment.screen.width_px
     assert gaze.experiment.screen.height_px == gaze_copy.experiment.screen.height_px
     assert gaze.experiment.screen.width_cm == gaze_copy.experiment.screen.width_cm
     assert gaze.experiment.screen.height_cm == gaze_copy.experiment.screen.height_cm
@@ -189,3 +189,19 @@ def test_gaze_dataframe_copy():
     assert gaze.experiment.screen.origin == gaze_copy.experiment.screen.origin
     assert gaze.experiment.sampling_rate == gaze_copy.experiment.sampling_rate
 
+
+def test_gaze_dataframe_copy_no_experiment():
+    gaze = pm.GazeDataFrame(
+        pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+        experiment=None,
+        position_columns=['x', 'y'],
+    )
+
+    gaze_copy = gaze.copy()
+
+    # We want to have separate dataframes but with the exact same data.
+    assert gaze.frame is not gaze_copy.frame
+    assert_frame_equal(gaze.frame, gaze_copy.frame)
+
+    # We want to have separate experiment instances but the same values.
+    assert gaze.experiment is gaze_copy.experiment

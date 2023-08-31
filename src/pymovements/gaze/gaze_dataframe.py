@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import inspect
 from collections.abc import Callable
+from copy import deepcopy
 from typing import Any
 
 import polars as pl
@@ -418,19 +419,10 @@ class GazeDataFrame:
         GazeDataFrame
             A copy of the GazeDataFrame.
         """
-        experiment_copy = Experiment(
-            screen_width_px=self.experiment.screen.width_px,
-            screen_height_px=self.experiment.screen.height_px,
-            screen_width_cm=self.experiment.screen.width_cm,
-            screen_height_cm=self.experiment.screen.height_cm,
-            distance_cm=self.experiment.screen.distance_cm,
-            origin=self.experiment.screen.origin,
-            sampling_rate=self.experiment.sampling_rate,
-        )
 
         return GazeDataFrame(
             data=self.frame.clone(),
-            experiment=experiment_copy,
+            experiment=deepcopy(self.experiment),
         )
 
     def _check_experiment(self) -> None:
