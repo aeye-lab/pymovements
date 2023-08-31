@@ -96,13 +96,21 @@ class GazeDataFrame:
         time_column:
             The name if the timestamp column in the input data frame.
         pixel_columns:
-            The name of the pixel position columns in the input data frame.
+            The name of the pixel position columns in the input data frame. These columns will be
+            nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
+            column will not be created.
         position_columns:
-            The name of the dva position columns in the input data frame.
+            The name of the dva position columns in the input data frame. These columns will be
+            nested into the column ``position``. If the list is empty or None, the nested
+            ``position`` column will not be created.
         velocity_columns:
-            The name of the dva velocity columns in the input data frame.
+            The name of the velocity columns in the input data frame. These columns will be nested
+            into the column ``velocity``. If the list is empty or None, the nested ``velocity``
+            column will not be created.
         acceleration_columns:
-            The name of the dva acceleration columns in the input data frame.
+            The name of the acceleration columns in the input data frame. These columns will be
+            nested into the column ``acceleration``. If the list is empty or None, the nested
+            ``acceleration`` column will not be created.
 
         Notes
         -----
@@ -115,6 +123,7 @@ class GazeDataFrame:
 
         The supported number of component columns with the expected order are:
 
+        * zero columns: No nested component column will be created.
         * two columns: monocular data; expected order: x-component, y-component
         * four columns: binocular data; expected order: x-component left eye, y-component left eye,
           x-component right eye, y-component right eye,
@@ -173,7 +182,7 @@ class GazeDataFrame:
             self.frame = self.frame.rename({time_column: 'time'})
 
         n_components = None
-        if pixel_columns is not None:
+        if pixel_columns:
             _check_component_columns(
                 frame=self.frame,
                 pixel_columns=pixel_columns,
@@ -184,7 +193,7 @@ class GazeDataFrame:
             )
             n_components = len(pixel_columns)
 
-        if position_columns is not None:
+        if position_columns:
             _check_component_columns(
                 frame=self.frame,
                 position_columns=position_columns,
@@ -196,7 +205,7 @@ class GazeDataFrame:
             )
             n_components = len(position_columns)
 
-        if velocity_columns is not None:
+        if velocity_columns:
             _check_component_columns(
                 frame=self.frame,
                 velocity_columns=velocity_columns,
@@ -208,7 +217,7 @@ class GazeDataFrame:
             )
             n_components = len(velocity_columns)
 
-        if acceleration_columns is not None:
+        if acceleration_columns:
             _check_component_columns(
                 frame=self.frame,
                 acceleration_columns=acceleration_columns,
