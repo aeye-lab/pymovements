@@ -42,6 +42,17 @@ def amplitude(
 ) -> pl.Expr:
     """Amplitude of an event.
 
+    The amplitude is calculated as:
+
+    .. math::
+        \\text{Amplitude} = \\sqrt{(x_{\text{max}} - x_{\\text{min}})^2 +
+        (y_{\\text{max}} - y_{\\text{min}})^2}
+
+    Where :math:`x_{\\text{max}}` and :math:`x_{\\text{min}}` are the maximum and minimum values of
+    the :math`x` component of the event positions and :math:`y_{\\text{max}}` and
+    :math:`y_{\\text{min}}` are the maximum and minimum values of the :math`y` component
+    of the event positions.
+
     Parameters
     ----------
     position_column
@@ -71,7 +82,18 @@ def dispersion(
         position_column: str = 'position',
         n_components: int = 2,
 ) -> pl.Expr:
-    """Dispersion of an event.
+    """
+    Dispersion of an event.
+
+    The dispersion is calculated as:
+
+    .. math::
+        \\text{Dispersion} = x_{\\text{max}} - x_{\\text{min}} + y_{\\text{max}} - y_{\\text{min}}
+
+    Where :math:`x_{\\text{max}}` and :math:`x_{\\text{min}}` are the maximum and minimum values of
+    the :math`x` component of the event positions and :math:`y_{\\text{max}}`
+    and :math:`y_{\\text{min}}` are the maximum and minimum values of the :math`y` component
+    of the event positions.
 
     Parameters
     ----------
@@ -100,6 +122,10 @@ def disposition(
         n_components: int = 2,
 ) -> pl.Expr:
     """Disposition of an event.
+
+    :math:`\\sqrt{(x_0 - x_n)^2 + (y_0 - y_n)^2)}` where :math:`x_0` and :math:`y_0` are the
+    coordinates of the first position and :math:`x_n` and :math:`y_n` are the coordinates of the
+    last position.
 
     Parameters
     ----------
@@ -142,6 +168,17 @@ def location(
         n_components: int = 2,
 ) -> pl.Expr:
     """Location of an event.
+
+    For method ``mean`` the location is calculated as:
+
+    .. math::
+        \\text{Location} = \\frac{1}{n} \\sum_{i=1}^n \\text{position}_i
+
+    For method ``median`` the location is calculated as:
+
+    .. math::
+        \\text{Location} = median \\left(\\text{position}_1, \\ldots, \\text{position}_n \\right)
+
 
     Parameters
     ----------
@@ -191,6 +228,14 @@ def peak_velocity(
         n_components: int = 2,
 ) -> pl.Expr:
     """Peak velocity of an event.
+
+    The peak velocity is calculated as:
+
+    .. math::
+        \\text{Peak Velocity} = \\max \\left(\\sqrt{v_x^2 + v_y^2} \\right)
+
+    Where :math:`v_x` and :math:`v_y` are the velocity components in :math:`x` and :math:`y`
+    direction, respectively.
 
     Parameters
     ----------
