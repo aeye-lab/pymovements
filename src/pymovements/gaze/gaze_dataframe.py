@@ -410,6 +410,29 @@ class GazeDataFrame:
             ],
         ).drop(column)
 
+    def copy(self) -> GazeDataFrame:
+        """Return a copy of the GazeDataFrame.
+
+        Returns
+        -------
+        GazeDataFrame
+            A copy of the GazeDataFrame.
+        """
+        experiment_copy = Experiment(
+            screen_width_px=self.experiment.screen.width_px,
+            screen_height_px=self.experiment.screen.height_px,
+            screen_width_cm=self.experiment.screen.width_cm,
+            screen_height_cm=self.experiment.screen.height_cm,
+            distance_cm=self.experiment.screen.distance_cm,
+            origin=self.experiment.screen.origin,
+            sampling_rate=self.experiment.sampling_rate,
+        )
+
+        return GazeDataFrame(
+            data=self.frame.clone(),
+            experiment=experiment_copy,
+        )
+
     def _check_experiment(self) -> None:
         """Check if experiment attribute has been set."""
         if self.experiment is None:
