@@ -470,10 +470,12 @@ class GazeDataFrame:
         GazeDataFrame
             A copy of the GazeDataFrame.
         """
-        return GazeDataFrame(
+        gaze = GazeDataFrame(
             data=self.frame.clone(),
             experiment=deepcopy(self.experiment),
         )
+        gaze.n_components = self.n_components
+        return gaze
 
     def _check_experiment(self) -> None:
         """Check if experiment attribute has been set."""
