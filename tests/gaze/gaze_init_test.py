@@ -46,6 +46,18 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
 
         pytest.param(
             {
+                'data': pl.DataFrame(schema={'abc': pl.Int64}),
+                'pixel_columns': [],
+                'position_columns': [],
+                'velocity_columns': [],
+                'acceleration_columns': [],
+            },
+            pl.DataFrame(schema={'abc': pl.Int64}),
+            id='empty_df_with_schema_all_component_columns_empty_lists',
+        ),
+
+        pytest.param(
+            {
                 'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
                 'pixel_columns': ['x', 'y'],
             },
@@ -684,16 +696,6 @@ def test_init_gaze_dataframe_has_expected_frame(init_kwargs, expected_frame):
         pytest.param(
             {
                 'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
-                'pixel_columns': [],
-            },
-            ValueError,
-            'pixel_columns must contain either 2, 4 or 6 columns, but has 0',
-            id='pixel_columns_empty_list',
-        ),
-
-        pytest.param(
-            {
-                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
                 'pixel_columns': [0, 1],
             },
             TypeError,
@@ -798,16 +800,6 @@ def test_init_gaze_dataframe_has_expected_frame(init_kwargs, expected_frame):
             TypeError,
             'position_columns must be of type list, but is of type str',
             id='position_columns_str',
-        ),
-
-        pytest.param(
-            {
-                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
-                'position_columns': [],
-            },
-            ValueError,
-            'position_columns must contain either 2, 4 or 6 columns, but has 0',
-            id='position_columns_empty_list',
         ),
 
         pytest.param(
@@ -922,16 +914,6 @@ def test_init_gaze_dataframe_has_expected_frame(init_kwargs, expected_frame):
         pytest.param(
             {
                 'data': pl.DataFrame(schema={'x_vel': pl.Float64, 'y_vel': pl.Float64}),
-                'velocity_columns': [],
-            },
-            ValueError,
-            'velocity_columns must contain either 2, 4 or 6 columns, but has 0',
-            id='velocity_columns_empty_list',
-        ),
-
-        pytest.param(
-            {
-                'data': pl.DataFrame(schema={'x_vel': pl.Float64, 'y_vel': pl.Float64}),
                 'velocity_columns': [0, 1],
             },
             TypeError,
@@ -1039,16 +1021,6 @@ def test_init_gaze_dataframe_has_expected_frame(init_kwargs, expected_frame):
             TypeError,
             'acceleration_columns must be of type list, but is of type str',
             id='acceleration_columns_str',
-        ),
-
-        pytest.param(
-            {
-                'data': pl.DataFrame(schema={'x_acc': pl.Float64, 'y_acc': pl.Float64}),
-                'acceleration_columns': [],
-            },
-            ValueError,
-            'acceleration_columns must contain either 2, 4 or 6 columns, but has 0',
-            id='acceleration_columns_empty_list',
         ),
 
         pytest.param(
