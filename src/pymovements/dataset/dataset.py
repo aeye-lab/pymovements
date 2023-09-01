@@ -427,8 +427,8 @@ class Dataset:
                 f' Available columns are: {self.gaze[0].frame.columns}',
             )
 
-        self.gaze[0].unnest('position', unnested_columns['position'])
-        self.gaze[0].unnest('velocity', unnested_columns['velocity'])
+        self.gaze[0].unnest('position', output_columns=unnested_columns['position'])
+        self.gaze[0].unnest('velocity', output_columns=unnested_columns['velocity'])
 
         if (
                 isinstance(self.gaze[0].n_components, int)
@@ -470,19 +470,27 @@ class Dataset:
         ):
             # this is just a work-around until merged columns are standard behavior
             # https://github.com/aeye-lab/pymovements/pull/443
-            gaze_df.unnest('position', unnested_columns['position'])
-            gaze_df.unnest('velocity', unnested_columns['velocity'])
+            gaze_df.unnest('position', output_columns=unnested_columns['position'])
+            gaze_df.unnest('velocity', output_columns=unnested_columns['velocity'])
 
             positions = gaze_df.frame.select(position_columns).to_numpy()
             velocities = gaze_df.frame.select(velocity_columns).to_numpy()
             timesteps = gaze_df.frame.get_column('time').to_numpy()
 
-            if 'events' in inspect.getfullargspec(method).args:
+            method_args = inspect.getfullargspec(method).args
+
+            if 'positions' in method_args:
+                kwargs['positions'] = positions
+
+            if 'velocities' in method_args:
+                kwargs['velocities'] = velocities
+
+            if 'events' in method_args:
                 kwargs['events'] = self.events[file_id]
 
-            new_event_df = method(
-                positions=positions, velocities=velocities, timesteps=timesteps, **kwargs,
-            )
+            kwargs['timesteps'] = timesteps
+
+            new_event_df = method(**kwargs)
 
             new_event_df.frame = dataset_files.add_fileinfo(
                 definition=self.definition,

@@ -20,12 +20,13 @@
 """Test all GazeDataFrame functionality."""
 import polars as pl
 import pytest
+from polars.testing import assert_frame_equal
 
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
+import pymovements as pm
 
 
 @pytest.mark.parametrize(
-    ('init_arg'),
+    'init_arg',
     [
         pytest.param(
             None,
@@ -38,7 +39,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
     ],
 )
 def test_gaze_dataframe_init(init_arg):
-    gaze_df = GazeDataFrame(init_arg)
+    gaze_df = pm.GazeDataFrame(init_arg)
     assert isinstance(gaze_df.frame, pl.DataFrame)
 
 
@@ -78,7 +79,7 @@ def test_gaze_dataframe_init(init_arg):
     ],
 )
 def test_gaze_dataframe_velocity_columns(init_df, velocity_columns):
-    gaze_df = GazeDataFrame(init_df, velocity_columns=velocity_columns)
+    gaze_df = pm.GazeDataFrame(init_df, velocity_columns=velocity_columns)
 
     assert 'velocity' in gaze_df.columns
 
@@ -119,7 +120,7 @@ def test_gaze_dataframe_velocity_columns(init_df, velocity_columns):
     ],
 )
 def test_gaze_dataframe_pixel_position_columns(init_df, pixel_columns):
-    gaze_df = GazeDataFrame(init_df, pixel_columns=pixel_columns)
+    gaze_df = pm.GazeDataFrame(init_df, pixel_columns=pixel_columns)
 
     assert 'pixel' in gaze_df.columns
 
@@ -160,6 +161,47 @@ def test_gaze_dataframe_pixel_position_columns(init_df, pixel_columns):
     ],
 )
 def test_gaze_dataframe_position_columns(init_df, position_columns):
-    gaze_df = GazeDataFrame(init_df, position_columns=position_columns)
+    gaze_df = pm.GazeDataFrame(init_df, position_columns=position_columns)
 
     assert 'position' in gaze_df.columns
+
+
+def test_gaze_dataframe_copy_with_experiment():
+    gaze = pm.GazeDataFrame(
+        pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+        experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+        position_columns=['x', 'y'],
+    )
+
+    gaze_copy = gaze.copy()
+
+    # We want to have separate dataframes but with the exact same data.
+    assert gaze.frame is not gaze_copy.frame
+    assert_frame_equal(gaze.frame, gaze_copy.frame)
+
+    # We want to have separate experiment instances but the same values.
+    assert gaze.experiment is not gaze_copy.experiment
+    assert gaze.experiment.screen.width_px == gaze_copy.experiment.screen.width_px
+    assert gaze.experiment.screen.height_px == gaze_copy.experiment.screen.height_px
+    assert gaze.experiment.screen.width_cm == gaze_copy.experiment.screen.width_cm
+    assert gaze.experiment.screen.height_cm == gaze_copy.experiment.screen.height_cm
+    assert gaze.experiment.screen.distance_cm == gaze_copy.experiment.screen.distance_cm
+    assert gaze.experiment.screen.origin == gaze_copy.experiment.screen.origin
+    assert gaze.experiment.sampling_rate == gaze_copy.experiment.sampling_rate
+
+
+def test_gaze_dataframe_copy_no_experiment():
+    gaze = pm.GazeDataFrame(
+        pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+        experiment=None,
+        position_columns=['x', 'y'],
+    )
+
+    gaze_copy = gaze.copy()
+
+    # We want to have separate dataframes but with the exact same data.
+    assert gaze.frame is not gaze_copy.frame
+    assert_frame_equal(gaze.frame, gaze_copy.frame)
+
+    # We want to have separate experiment instances but the same values.
+    assert gaze.experiment is gaze_copy.experiment

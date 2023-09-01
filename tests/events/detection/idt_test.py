@@ -32,7 +32,6 @@ from pymovements.synthetic import step_function
         pytest.param(
             {
                 'positions': None,
-                'velocities': None,
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
             },
@@ -42,7 +41,6 @@ from pymovements.synthetic import step_function
         pytest.param(
             {
                 'positions': [[1, 2], [1, 2]],
-                'velocities': [[1, 2], [1, 2]],
                 'dispersion_threshold': None,
                 'minimum_duration': 1,
             },
@@ -52,7 +50,6 @@ from pymovements.synthetic import step_function
         pytest.param(
             {
                 'positions': [[1, 2], [1, 2]],
-                'velocities': [[1, 2], [1, 2]],
                 'dispersion_threshold': 1,
                 'minimum_duration': None,
             },
@@ -62,7 +59,6 @@ from pymovements.synthetic import step_function
         pytest.param(
             {
                 'positions': 1,
-                'velocities': 1,
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
             },
@@ -72,7 +68,6 @@ from pymovements.synthetic import step_function
         pytest.param(
             {
                 'positions': [1, 2, 3],
-                'velocities': [1, 2, 3],
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
             },
@@ -82,7 +77,6 @@ from pymovements.synthetic import step_function
         pytest.param(
             {
                 'positions': [[1, 2, 3], [1, 2, 3]],
-                'velocities': [[1, 2, 3], [1, 2, 3]],
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
             },
@@ -92,7 +86,6 @@ from pymovements.synthetic import step_function
         pytest.param(
             {
                 'positions': [[1, 2], [1, 2]],
-                'velocities': [[1, 2], [1, 2]],
                 'dispersion_threshold': 0,
                 'minimum_duration': 1,
             },
@@ -102,7 +95,6 @@ from pymovements.synthetic import step_function
         pytest.param(
             {
                 'positions': [[1, 2], [1, 2]],
-                'velocities': [[1, 2], [1, 2]],
                 'dispersion_threshold': 1,
                 'minimum_duration': 0,
             },
@@ -112,7 +104,6 @@ from pymovements.synthetic import step_function
         pytest.param(
             {
                 'positions': [[1, 2], [1, 2]],
-                'velocities': [[1, 2], [1, 2]],
                 'dispersion_threshold': 1,
                 'minimum_duration': 1.1,
             },
@@ -269,10 +260,7 @@ def test_idt_raises_error(kwargs, expected_error):
 )
 def test_idt_detects_fixations(kwargs, expected):
     """Test if idt detects fixations."""
-    velocities = pm.gaze.transforms_numpy.pos2vel(
-        kwargs['positions'], sampling_rate=10, method='preceding',
-    )
-    events = pm.events.idt(velocities=velocities, **kwargs)
+    events = pm.events.idt(**kwargs)
 
     assert_frame_equal(events.frame, expected.frame)
 
@@ -324,11 +312,8 @@ def test_idt_detects_fixations(kwargs, expected):
     ],
 )
 def test_idt_timesteps_exceptions(kwargs, exception, msg_substrings):
-    velocities = pm.gaze.transforms_numpy.pos2vel(
-        kwargs['positions'], sampling_rate=10, method='preceding',
-    )
     with pytest.raises(exception) as excinfo:
-        pm.events.idt(velocities=velocities, **kwargs)
+        pm.events.idt(**kwargs)
 
     msg, = excinfo.value.args
     for msg_substring in msg_substrings:

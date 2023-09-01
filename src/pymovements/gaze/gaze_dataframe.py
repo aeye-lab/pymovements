@@ -22,12 +22,14 @@ from __future__ import annotations
 
 import inspect
 from collections.abc import Callable
+from copy import deepcopy
 from typing import Any
 
 import polars as pl
 
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
+from pymovements.utils import checks
 
 
 class GazeDataFrame:
@@ -96,13 +98,21 @@ class GazeDataFrame:
         time_column:
             The name if the timestamp column in the input data frame.
         pixel_columns:
-            The name of the pixel position columns in the input data frame.
+            The name of the pixel position columns in the input data frame. These columns will be
+            nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
+            column will not be created.
         position_columns:
-            The name of the dva position columns in the input data frame.
+            The name of the dva position columns in the input data frame. These columns will be
+            nested into the column ``position``. If the list is empty or None, the nested
+            ``position`` column will not be created.
         velocity_columns:
-            The name of the dva velocity columns in the input data frame.
+            The name of the velocity columns in the input data frame. These columns will be nested
+            into the column ``velocity``. If the list is empty or None, the nested ``velocity``
+            column will not be created.
         acceleration_columns:
-            The name of the dva acceleration columns in the input data frame.
+            The name of the acceleration columns in the input data frame. These columns will be
+            nested into the column ``acceleration``. If the list is empty or None, the nested
+            ``acceleration`` column will not be created.
 
         Notes
         -----
@@ -115,6 +125,7 @@ class GazeDataFrame:
 
         The supported number of component columns with the expected order are:
 
+        * zero columns: No nested component column will be created.
         * two columns: monocular data; expected order: x-component, y-component
         * four columns: binocular data; expected order: x-component left eye, y-component left eye,
           x-component right eye, y-component right eye,
@@ -173,7 +184,7 @@ class GazeDataFrame:
             self.frame = self.frame.rename({time_column: 'time'})
 
         n_components = None
-        if pixel_columns is not None:
+        if pixel_columns:
             _check_component_columns(
                 frame=self.frame,
                 pixel_columns=pixel_columns,
@@ -184,7 +195,7 @@ class GazeDataFrame:
             )
             n_components = len(pixel_columns)
 
-        if position_columns is not None:
+        if position_columns:
             _check_component_columns(
                 frame=self.frame,
                 position_columns=position_columns,
@@ -196,7 +207,7 @@ class GazeDataFrame:
             )
             n_components = len(position_columns)
 
-        if velocity_columns is not None:
+        if velocity_columns:
             _check_component_columns(
                 frame=self.frame,
                 velocity_columns=velocity_columns,
@@ -208,7 +219,7 @@ class GazeDataFrame:
             )
             n_components = len(velocity_columns)
 
-        if acceleration_columns is not None:
+        if acceleration_columns:
             _check_component_columns(
                 frame=self.frame,
                 acceleration_columns=acceleration_columns,
@@ -390,7 +401,9 @@ class GazeDataFrame:
     def unnest(
             self,
             column: str,
-            output_columns: list[str],
+            output_suffixes: list[str] | None = None,
+            *,
+            output_columns: list[str] | None = None,
     ) -> None:
         """Explode a column of type ``pl.List`` into one column for each list component.
 
@@ -402,13 +415,67 @@ class GazeDataFrame:
             Name of input columns to be unnested into several component columns.
         output_columns:
             Name of the resulting tuple columns.
+        output_suffixes:
+            Suffixes to append to the column names.
+
+        Raises
+        ------
+        ValueError
+            If both output_columns and output_suffixes are specified.
+            If number of output columns / suffixes does not match number of components.
+            If output columns / suffixes are not unique.
+        AttributeError
+            If number of components is not 2, 4 or 6.
         """
+
+        checks.check_is_mutual_exclusive(
+            output_columns=output_columns,
+            output_suffixes=output_suffixes,
+        )
+        _check_n_components(self.n_components)
+
+        col_names = output_columns if output_columns is not None else []
+
+        if output_columns is None and output_suffixes is None:
+            if self.n_components == 2:
+                output_suffixes = ['_x', '_y']
+            elif self.n_components == 4:
+                output_suffixes = ['_xl', '_yl', '_xr', '_yr']
+            else:  # This must be 6 as we already have checked our n_components.
+                output_suffixes = ['_xl', '_yl', '_xr', '_yr', '_xa', '_ya']
+
+        if output_suffixes:
+            col_names = [f'{column}{suffix}' for suffix in output_suffixes]
+
+        if len(col_names) != self.n_components:
+            raise ValueError(
+                f'Number of output columns / suffixes ({len(col_names)}) '
+                f'must match number of components ({self.n_components})',
+            )
+        if len(set(col_names)) != len(col_names):
+            raise ValueError('Output columns / suffixes must be unique')
+
         self.frame = self.frame.with_columns(
             [
-                pl.col(column).list.get(component_id).alias(output_column)
-                for component_id, output_column in enumerate(output_columns)
+                pl.col(column).list.get(component_id).alias(col_names)
+                for component_id, col_names in enumerate(col_names)
             ],
         ).drop(column)
+
+    def copy(self) -> GazeDataFrame:
+        """Return a copy of the GazeDataFrame.
+
+        Returns
+        -------
+        GazeDataFrame
+            A copy of the GazeDataFrame.
+        """
+        gaze = GazeDataFrame(
+            data=self.frame.clone(),
+            experiment=deepcopy(self.experiment),
+        )
+        gaze.n_components = self.n_components
+        return gaze
 
     def _check_experiment(self) -> None:
         """Check if experiment attribute has been set."""

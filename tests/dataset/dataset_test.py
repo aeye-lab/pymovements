@@ -583,10 +583,49 @@ def test_pos2vel(dataset_configuration):
         ),
         pytest.param(
             {
+                'method': pm.events.fill,
+                'eye': 'auto',
+            },
+            id='fill_class',
+        ),
+        pytest.param(
+            {
                 'method': 'fill',
                 'eye': 'auto',
             },
             id='fill_string',
+        ),
+        pytest.param(
+            {
+                'method': 'ivt',
+                'velocity_threshold': 1,
+                'minimum_duration': 1,
+                'eye': 'auto',
+            },
+            id='ivt_string',
+        ),
+        pytest.param(
+            {
+                'method': pm.events.ivt,
+                'velocity_threshold': 1,
+                'minimum_duration': 1,
+                'eye': 'auto',
+            },
+            id='ivt_class',
+        ),
+        pytest.param(
+            {
+                'method': 'idt',
+                'eye': 'auto',
+            },
+            id='idt_string',
+        ),
+        pytest.param(
+            {
+                'method': pm.events.idt,
+                'eye': 'auto',
+            },
+            id='idt_class',
         ),
     ],
 )
@@ -987,19 +1026,24 @@ def test_save_preprocessed_directory_exists(
     )
 
 
-def test_save_preprocessed_no_tuple_columns(dataset_configuration):
+@pytest.mark.parametrize(
+    'drop_column',
+    [
+        'time',
+        'pixel',
+        'position',
+        'velocity',
+        'acceleration',
+    ],
+)
+def test_save_preprocessed(dataset_configuration, drop_column):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
     dataset.pos2acc()
 
-    # This is not implemented yet
-    # dataset.gaze[0].unnest(['pixel', 'position', 'velocity', 'acceleration'])
-    dataset.gaze[0].frame = dataset.gaze[0].frame.rename({'time': 'ttt'})
-    dataset.gaze[0].frame = dataset.gaze[0].frame.drop(
-        ['pixel', 'position', 'velocity', 'acceleration'],
-    )
+    dataset.gaze[0].frame = dataset.gaze[0].frame.drop(drop_column)
 
     preprocessed_dirname = 'preprocessed-test'
     shutil.rmtree(dataset.path / Path(preprocessed_dirname), ignore_errors=True)
@@ -1010,6 +1054,37 @@ def test_save_preprocessed_no_tuple_columns(dataset_configuration):
     assert (dataset.path / preprocessed_dirname).is_dir(), (
         f'data was not written to {dataset.path / Path(preprocessed_dirname)}'
     )
+
+
+@pytest.mark.parametrize(
+    'drop_column',
+    [
+        'time',
+        'pixel',
+        'position',
+        'velocity',
+        'acceleration',
+    ],
+)
+def test_save_preprocessed_has_no_side_effect(dataset_configuration, drop_column):
+    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+    dataset.pos2vel()
+    dataset.pos2acc()
+
+    dataset.gaze[0].frame = dataset.gaze[0].frame.drop(drop_column)
+
+    old_frame = dataset.gaze[0].frame.clone()
+
+    preprocessed_dirname = 'preprocessed-test'
+    shutil.rmtree(dataset.path / Path(preprocessed_dirname), ignore_errors=True)
+    shutil.rmtree(dataset.path / Path(preprocessed_dirname), ignore_errors=True)
+    dataset.save_preprocessed(preprocessed_dirname, extension='csv')
+
+    new_frame = dataset.gaze[0].frame.clone()
+
+    assert_frame_equal(old_frame, new_frame)
 
 
 @pytest.mark.parametrize(

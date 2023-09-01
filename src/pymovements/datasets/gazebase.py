@@ -153,4 +153,8 @@ class GazeBase(DatasetDefinition):
         },
     )
 
-    custom_read_kwargs: dict[str, Any] = field(default_factory=dict)
+    custom_read_kwargs: dict[str, Any] = field(
+        default_factory=lambda: {
+            'null_values': 'NaN',
+        },
+    )
