@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import inspect
 from collections.abc import Callable
+from copy import deepcopy
 from typing import Any
 
 import polars as pl
@@ -460,6 +461,19 @@ class GazeDataFrame:
                 for component_id, col_names in enumerate(col_names)
             ],
         ).drop(column)
+
+    def copy(self) -> GazeDataFrame:
+        """Return a copy of the GazeDataFrame.
+
+        Returns
+        -------
+        GazeDataFrame
+            A copy of the GazeDataFrame.
+        """
+        return GazeDataFrame(
+            data=self.frame.clone(),
+            experiment=deepcopy(self.experiment),
+        )
 
     def _check_experiment(self) -> None:
         """Check if experiment attribute has been set."""
