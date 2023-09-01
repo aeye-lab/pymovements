@@ -1044,12 +1044,23 @@ def test_save_preprocessed(dataset_configuration):
     )
 
 
-def test_save_preprocessed_has_no_side_effect(dataset_configuration):
+@pytest.mark.parametrize(
+    'drop_column',
+    [
+        'pixel',
+        'position',
+        'velocity',
+        'acceleration',
+    ],
+)
+def test_save_preprocessed_has_no_side_effect(dataset_configuration, drop_column):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
     dataset.pos2acc()
+
+    dataset.gaze[0].frame = dataset.gaze[0].frame.drop(drop_column)
 
     old_frame = dataset.gaze[0].frame.clone()
 
