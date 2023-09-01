@@ -28,6 +28,7 @@ import polars as pl
 
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
+from pymovements.utils import checks
 
 
 class GazeDataFrame:
@@ -399,7 +400,9 @@ class GazeDataFrame:
     def unnest(
             self,
             column: str,
-            output_columns: list[str],
+            output_suffixes: list[str] | None = None,
+            *,
+            output_columns: list[str] | None = None,
     ) -> None:
         """Explode a column of type ``pl.List`` into one column for each list component.
 
@@ -411,11 +414,50 @@ class GazeDataFrame:
             Name of input columns to be unnested into several component columns.
         output_columns:
             Name of the resulting tuple columns.
+        output_suffixes:
+            Suffixes to append to the column names.
+
+        Raises
+        ------
+        ValueError
+            If both output_columns and output_suffixes are specified.
+            If number of output columns / suffixes does not match number of components.
+            If output columns / suffixes are not unique.
+        AttributeError
+            If number of components is not 2, 4 or 6.
         """
+
+        checks.check_is_mutual_exclusive(
+            output_columns=output_columns,
+            output_suffixes=output_suffixes,
+        )
+        _check_n_components(self.n_components)
+
+        col_names = output_columns if output_columns is not None else []
+
+        if output_columns is None and output_suffixes is None:
+            if self.n_components == 2:
+                output_suffixes = ['_x', '_y']
+            elif self.n_components == 4:
+                output_suffixes = ['_xl', '_yl', '_xr', '_yr']
+            else:  # This must be 6 as we already have checked our n_components.
+                output_suffixes = ['_xl', '_yl', '_xr', '_yr', '_xa', '_ya']
+
+        if output_suffixes:
+            col_names = [f'{column}{suffix}' for suffix in output_suffixes]
+
+        if len(col_names) != self.n_components:
+            raise ValueError(
+                f'Number of output columns / suffixes ({len(col_names)}) '
+                f'must match number of components ({self.n_components})',
+            )
+        if len(set(col_names)) != len(col_names):
+            raise ValueError('Output columns / suffixes must be unique')
+
         self.frame = self.frame.with_columns(
             [
-                pl.col(column).list.get(component_id).alias(output_column)
-                for component_id, output_column in enumerate(output_columns)
+                pl.col(column).list.get(component_id).alias(col_names)
+                for component_id, col_names in enumerate(col_names)
             ],
         ).drop(column)
 
