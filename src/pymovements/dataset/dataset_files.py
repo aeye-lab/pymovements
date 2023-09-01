@@ -213,6 +213,8 @@ def load_gaze_files(
             custom_read_kwargs=definition.custom_read_kwargs,
         )
 
+        gaze_data = gaze_data.rename(definition.column_map)
+
         # Add fileinfo columns to dataframe.
         gaze_data = add_fileinfo(
             definition=definition,
@@ -467,6 +469,8 @@ def save_preprocessed(
     disable_progressbar = not verbose
 
     for file_id, gaze_df in enumerate(tqdm(gaze, disable=disable_progressbar)):
+        gaze_df = gaze_df.copy()
+
         raw_filepath = paths.raw / Path(fileinfo[file_id, 'filepath'])
         preprocessed_filepath = paths.get_preprocessed_filepath(
             raw_filepath, preprocessed_dirname=preprocessed_dirname,
@@ -486,19 +490,18 @@ def save_preprocessed(
             if 'acceleration' in gaze_df.frame.columns:
                 gaze_df.unnest('acceleration')
 
-        gaze_df_out = gaze_df.frame.clone()
         for column in gaze_df.columns:
             if column in fileinfo.columns:
-                gaze_df_out = gaze_df_out.drop(column)
+                gaze_df.frame = gaze_df.frame.drop(column)
 
         if verbose >= 2:
             print('Save file to', preprocessed_filepath)
 
         preprocessed_filepath.parent.mkdir(parents=True, exist_ok=True)
         if extension == 'feather':
-            gaze_df_out.write_ipc(preprocessed_filepath)
+            gaze_df.frame.write_ipc(preprocessed_filepath)
         elif extension == 'csv':
-            gaze_df_out.write_csv(preprocessed_filepath)
+            gaze_df.frame.write_csv(preprocessed_filepath)
         else:
             valid_extensions = ['csv', 'feather']
             raise ValueError(
