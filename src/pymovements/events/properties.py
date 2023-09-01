@@ -24,7 +24,6 @@ from collections.abc import Callable
 
 import polars as pl
 
-
 EVENT_PROPERTIES: dict[str, Callable] = {}
 
 
@@ -45,13 +44,12 @@ def amplitude(
     The amplitude is calculated as:
 
     .. math::
-        \\text{Amplitude} = \\sqrt{(x_{\text{max}} - x_{\\text{min}})^2 +
+        \\text{Amplitude} = \\sqrt{(x_{\\text{max}} - x_{\\text{min}})^2 +
         (y_{\\text{max}} - y_{\\text{min}})^2}
 
-    Where :math:`x_{\\text{max}}` and :math:`x_{\\text{min}}` are the maximum and minimum values of
-    the :math`x` component of the event positions and :math:`y_{\\text{max}}` and
-    :math:`y_{\\text{min}}` are the maximum and minimum values of the :math`y` component
-    of the event positions.
+    where :math:`(x_{\\text{min}},\\; x_{\\text{max}})` and
+    :math:`(y_{\\text{min}},\\; y_{\\text{max}})` are the minimum and maximum values of the
+    :math:`x` and :math:`y` components of the gaze positions during an event.
 
     Parameters
     ----------
@@ -90,10 +88,9 @@ def dispersion(
     .. math::
         \\text{Dispersion} = x_{\\text{max}} - x_{\\text{min}} + y_{\\text{max}} - y_{\\text{min}}
 
-    Where :math:`x_{\\text{max}}` and :math:`x_{\\text{min}}` are the maximum and minimum values of
-    the :math`x` component of the event positions and :math:`y_{\\text{max}}`
-    and :math:`y_{\\text{min}}` are the maximum and minimum values of the :math`y` component
-    of the event positions.
+    where :math:`(x_{\\text{min}},\\; x_{\\text{max}})` and
+    :math:`(y_{\\text{min}},\\; y_{\\text{max}})` are the minimum and maximum values of the
+    :math:`x` and :math:`y` components of the gaze positions during an event.
 
     Parameters
     ----------
@@ -123,9 +120,11 @@ def disposition(
 ) -> pl.Expr:
     """Disposition of an event.
 
-    :math:`\\sqrt{(x_0 - x_n)^2 + (y_0 - y_n)^2)}` where :math:`x_0` and :math:`y_0` are the
-    coordinates of the first position and :math:`x_n` and :math:`y_n` are the coordinates of the
-    last position.
+    .. math::
+        \\text{Disposition} = \\sqrt{(x_0 - x_n)^2 + (y_0 - y_n)^2}
+
+    where :math:`x_0` and :math:`y_0` are the coordinates of the starting position and
+    :math:`x_n` and :math:`y_n` are the coordinates of the ending position of an event.
 
     Parameters
     ----------
@@ -177,7 +176,8 @@ def location(
     For method ``median`` the location is calculated as:
 
     .. math::
-        \\text{Location} = median \\left(\\text{position}_1, \\ldots, \\text{position}_n \\right)
+        \\text{Location} = \\text{median} \\left(\\text{position}_1, \\ldots,
+         \\text{position}_n \\right)
 
 
     Parameters
@@ -234,7 +234,7 @@ def peak_velocity(
     .. math::
         \\text{Peak Velocity} = \\max \\left(\\sqrt{v_x^2 + v_y^2} \\right)
 
-    Where :math:`v_x` and :math:`v_y` are the velocity components in :math:`x` and :math:`y`
+    where :math:`v_x` and :math:`v_y` are the velocity components in :math:`x` and :math:`y`
     direction, respectively.
 
     Parameters
