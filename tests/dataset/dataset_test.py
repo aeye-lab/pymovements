@@ -1047,6 +1047,7 @@ def test_save_preprocessed(dataset_configuration):
 @pytest.mark.parametrize(
     'drop_column',
     [
+        'time',
         'pixel',
         'position',
         'velocity',
