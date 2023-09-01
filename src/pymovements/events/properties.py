@@ -120,6 +120,8 @@ def disposition(
 ) -> pl.Expr:
     """Disposition of an event.
 
+    The disposition is calculated as:
+
     .. math::
         \\text{Disposition} = \\sqrt{(x_0 - x_n)^2 + (y_0 - y_n)^2}
 
