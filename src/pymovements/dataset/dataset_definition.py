@@ -85,8 +85,3 @@ class DatasetDefinition:
     position_columns: list[str] | None = None
     velocity_columns: list[str] | None = None
     acceleration_columns: list[str] | None = None
-
-    def __post_init__(self) -> None:
-        if len(self.column_map) > 0:
-            self.custom_read_kwargs['columns'] = list(self.column_map.keys())
-            self.custom_read_kwargs['new_columns'] = list(self.column_map.values())

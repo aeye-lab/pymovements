@@ -213,6 +213,8 @@ def load_gaze_files(
             custom_read_kwargs=definition.custom_read_kwargs,
         )
 
+        gaze_data = gaze_data.rename(definition.column_map)
+
         # Add fileinfo columns to dataframe.
         gaze_data = add_fileinfo(
             definition=definition,
