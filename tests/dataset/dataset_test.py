@@ -1026,12 +1026,24 @@ def test_save_preprocessed_directory_exists(
     )
 
 
-def test_save_preprocessed(dataset_configuration):
+@pytest.mark.parametrize(
+    'drop_column',
+    [
+        'time',
+        'pixel',
+        'position',
+        'velocity',
+        'acceleration',
+    ],
+)
+def test_save_preprocessed(dataset_configuration, drop_column):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
     dataset.pos2acc()
+
+    dataset.gaze[0].frame = dataset.gaze[0].frame.drop(drop_column)
 
     preprocessed_dirname = 'preprocessed-test'
     shutil.rmtree(dataset.path / Path(preprocessed_dirname), ignore_errors=True)
