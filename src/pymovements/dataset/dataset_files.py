@@ -229,8 +229,6 @@ def load_gaze_files(
             )
 
         elif preprocessed and extension == 'csv':
-            # Workaround for preprocessed column names
-            # https://github.com/aeye-lab/pymovements/pull/443
             time_column = None
             if 'time' in gaze_data.columns:
                 time_column = 'time'
@@ -238,26 +236,15 @@ def load_gaze_files(
             pixel_columns: list[str] = list(
                 set(GazeDataFrame.valid_pixel_position_columns) & set(gaze_data.columns),
             )
-            if not pixel_columns:
-                pixel_columns = None  # type: ignore
-
             position_columns: list[str] = list(
                 set(GazeDataFrame.valid_position_columns) & set(gaze_data.columns),
             )
-            if not position_columns:
-                position_columns = None  # type: ignore
-
             velocity_columns: list[str] = list(
                 set(GazeDataFrame.valid_velocity_columns) & set(gaze_data.columns),
             )
-            if not velocity_columns:
-                velocity_columns = None  # type: ignore
-
             acceleration_columns: list[str] = list(
                 set(GazeDataFrame.valid_acceleration_columns) & set(gaze_data.columns),
             )
-            if not acceleration_columns:
-                acceleration_columns = None  # type: ignore
 
             gaze_df = GazeDataFrame(
                 gaze_data,
@@ -487,44 +474,17 @@ def save_preprocessed(
         )
 
         if extension == 'csv':
-            # this is just a work-around until merged columns are standard behavior
-            # https://github.com/aeye-lab/pymovements/pull/443
-            unnested_columns = {}
             if 'pixel' in gaze_df.frame.columns:
-                unnested_columns_pix = [
-                    'x_left_pix', 'y_left_pix',
-                    'x_right_pix', 'y_right_pix',
-                    'x_avg_pix', 'y_avg_pix',
-                ][:gaze_df.n_components]
-                gaze_df.unnest('pixel', unnested_columns_pix)
-                unnested_columns['pixel'] = unnested_columns_pix
+                gaze_df.unnest('pixel')
 
             if 'position' in gaze_df.frame.columns:
-                unnested_columns_pos = [
-                    'x_left_pos', 'y_left_pos',
-                    'x_right_pos', 'y_right_pos',
-                    'x_avg_pos', 'y_avg_pos',
-                ][:gaze_df.n_components]
-                gaze_df.unnest('position', unnested_columns_pos)
-                unnested_columns['position'] = unnested_columns_pos
+                gaze_df.unnest('position')
 
             if 'velocity' in gaze_df.frame.columns:
-                unnested_columns_vel = [
-                    'x_left_vel', 'y_left_vel',
-                    'x_right_vel', 'y_right_vel',
-                    'x_avg_vel', 'y_avg_vel',
-                ][:gaze_df.n_components]
-                gaze_df.unnest('velocity', unnested_columns_vel)
-                unnested_columns['velocity'] = unnested_columns_vel
+                gaze_df.unnest('velocity')
 
             if 'acceleration' in gaze_df.frame.columns:
-                unnested_columns_vel = [
-                    'x_left_acc', 'y_left_acc',
-                    'x_right_acc', 'y_right_acc',
-                    'x_avg_acc', 'y_avg_acc',
-                ][:gaze_df.n_components]
-                gaze_df.unnest('acceleration', unnested_columns_vel)
-                unnested_columns['acceleration'] = unnested_columns_vel
+                gaze_df.unnest('acceleration')
 
         gaze_df_out = gaze_df.frame.clone()
         for column in gaze_df.columns:
