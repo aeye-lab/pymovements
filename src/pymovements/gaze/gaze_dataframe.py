@@ -95,6 +95,11 @@ class GazeDataFrame:
             A dataframe to be transformed to a polars dataframe.
         experiment : Experiment
             The experiment definition.
+        trial_columns:
+            The name of the trial columns in the input data frame. If the list is empty or None,
+            the input data frame is assumed to contain only one trial. If the list is not empty,
+            the input data frame is assumed to contain multiple trials and the transformation
+            methods will be applied to each trial separately.
         time_column:
             The name if the timestamp column in the input data frame.
         pixel_columns:
