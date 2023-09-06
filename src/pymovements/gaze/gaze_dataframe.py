@@ -101,7 +101,7 @@ class GazeDataFrame:
             the input data frame is assumed to contain multiple trials and the transformation
             methods will be applied to each trial separately.
         time_column:
-            The name if the timestamp column in the input data frame.
+            The name of the timestamp column in the input data frame.
         pixel_columns:
             The name of the pixel position columns in the input data frame. These columns will be
             nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
