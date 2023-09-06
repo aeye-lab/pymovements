@@ -114,5 +114,5 @@ jobs:
       - name: Upload documentation
         uses: actions/upload-artifact@v3
         with:
-          name: html-docs
+          name: html-docs-${{ matrix.os }}
           path: docs/build/
