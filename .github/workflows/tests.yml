@@ -111,3 +111,8 @@ jobs:
         run: tox -vv --notest -e docs
       - name: Run test
         run: tox --skip-pkg-install -e docs
+      - name: Upload documentation
+        uses: actions/upload-artifact@v3
+        with:
+          name: html-docs
+          path: docs/build/
