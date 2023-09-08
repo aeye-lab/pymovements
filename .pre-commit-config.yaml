@@ -47,6 +47,11 @@ repos:
     rev: 0.6.1
     hooks:
     -   id: nbstripout
+-   repo: https://github.com/jsh9/pydoclint
+    rev: 0.3.2
+    hooks:
+    -   id: pydoclint
+        args: ["--config=pyproject.toml"]
 -   repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.5.4
     hooks:
