@@ -32,20 +32,20 @@ from pymovements.utils import checks
 
 
 def from_numpy(
-        data: np.ndarray = None,
+        data: np.ndarray | None = None,
         time: np.ndarray | None = None,
         pixel: np.ndarray | list[np.ndarray] | None = None,
         position: np.ndarray | list[np.ndarray] | None = None,
         velocity: np.ndarray | list[np.ndarray] | None = None,
         acceleration: np.ndarray | list[np.ndarray] | None = None,
-        schema: list[str] = None,
+        schema: list[str] | None = None,
         experiment: Experiment | None = None,
         orient: Literal['col', 'row'] = 'col',
         time_column: str | None = None,
-        pixel_columns: list[str] | list[int] | None = None,
-        position_columns: list[str] | list[int] | None = None,
-        velocity_columns: list[str] | list[int] | None = None,
-        acceleration_columns: list[str] | list[int] | None = None,
+        pixel_columns: list[str] | None = None,
+        position_columns: list[str] | None = None,
+        velocity_columns: list[str] | None = None,
+        acceleration_columns: list[str] | None = None,
 ) -> GazeDataFrame:
     """Construct a :py:class:`~pymovements.gaze.gaze_dataframe.GazeDataFrame`
     from a numpy array.
@@ -105,41 +105,49 @@ def from_numpy(
             acceleration_columns=acceleration_columns,
         )
 
-    n_components: int = 0
-    columns: pl.Series = []
+    dfs: pl.Series = []
 
+    time_column = None
     if time is not None:
-        column = pl.from_numpy(data=time, schema=['time'], orient=orient)['time']
-        columns.append(column)
+        df = pl.from_numpy(data=time, schema=['time'], orient=orient)
+        dfs.append(df)
+        time_column = 'time'
 
+    pixel_columns = None
     if pixel is not None:
-        column = pl.from_numpy(data=pixel, schema=['pixel'], orient=orient)['pixel']
-        columns.append(column)
-        n_components = column.list.lengths()[0]
+        df = pl.from_numpy(data=pixel, orient=orient).select(pl.all().prefix('pixel_'))
+        dfs.append(df)
+        pixel_columns = df.columns
 
+    position_columns = None
     if position is not None:
-        column = pl.from_numpy(data=position, schema=['position'], orient=orient)['position']
-        columns.append(column)
-        n_components = column.list.lengths()[0]
+        df = pl.from_numpy(data=position, orient=orient).select(pl.all().prefix('position_'))
+        dfs.append(df)
+        position_columns = df.columns
 
+    velocity_columns = None
     if velocity is not None:
-        column = pl.from_numpy(data=velocity, schema=['velocity'], orient=orient)['velocity']
-        columns.append(column)
-        n_components = column.list.lengths()[0]
+        df = pl.from_numpy(data=velocity, orient=orient).select(pl.all().prefix('velocity_'))
+        dfs.append(df)
+        velocity_columns = df.columns
 
+    acceleration_columns = None
     if acceleration is not None:
-        column = pl.from_numpy(
-            data=acceleration, schema=['acceleration'], orient=orient,
-        )['acceleration']
-        columns.append(column)
-        n_components = column.list.lengths()[0]
+        df = pl.from_numpy(data=acceleration, orient=orient)
+        df = df.select(pl.all().prefix('acceleration_'))
+        dfs.append(df)
+        acceleration_columns = df.columns
 
-    df = pl.DataFrame(columns)
+    df = pl.concat(dfs, how='horizontal')
     gaze = GazeDataFrame(
         data=df,
         experiment=experiment,
+        time_column=time_column,
+        pixel_columns=pixel_columns,
+        position_columns=position_columns,
+        velocity_columns=velocity_columns,
+        acceleration_columns=acceleration_columns,
     )
-    gaze.n_components = n_components
 
     return gaze
 
