@@ -28,18 +28,24 @@ import polars as pl
 
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
+from pymovements.utils import checks
 
 
 def from_numpy(
-        data: np.ndarray,
-        schema: list[str],
+        data: np.ndarray = None,
+        time: np.ndarray | None = None,
+        pixel: np.ndarray | list[np.ndarray] | None = None,
+        position: np.ndarray | list[np.ndarray] | None = None,
+        velocity: np.ndarray | list[np.ndarray] | None = None,
+        acceleration: np.ndarray | list[np.ndarray] | None = None,
+        schema: list[str] = None,
         experiment: Experiment | None = None,
         orient: Literal['col', 'row'] = 'col',
         time_column: str | None = None,
-        pixel_columns: list[str] | None = None,
-        position_columns: list[str] | None = None,
-        velocity_columns: list[str] | None = None,
-        acceleration_columns: list[str] | None = None,
+        pixel_columns: list[str] | list[int] | None = None,
+        position_columns: list[str] | list[int] | None = None,
+        velocity_columns: list[str] | list[int] | None = None,
+        acceleration_columns: list[str] | list[int] | None = None,
 ) -> GazeDataFrame:
     """Construct a :py:class:`~pymovements.gaze.gaze_dataframe.GazeDataFrame`
     from a numpy array.
@@ -48,6 +54,16 @@ def from_numpy(
     ----------
     data:
         Two-dimensional data represented as a numpy ndarray.
+    time:
+        Array of timestamps.
+    pixel:
+        Array of gaze pixel positions.
+    position:
+        Array of gaze positions in degrees of visual angle.
+    velocity:
+        Array of gaze velocities in degrees of visual angle per second.
+    acceleration:
+        Array of gaze accelerations in degrees of visual angle per square second.
     schema:
         A list of column names.
     orient:
@@ -70,16 +86,62 @@ def from_numpy(
     -------
     py:class:`~pymovements.GazeDataFrame`
     """
-    df = pl.from_numpy(data=data, schema=schema, orient=orient)
-    return GazeDataFrame(
+
+    if data is not None:
+        checks.check_is_mutual_exclusive(data=data, time=time)
+        checks.check_is_mutual_exclusive(data=data, pixel=pixel)
+        checks.check_is_mutual_exclusive(data=data, position=position)
+        checks.check_is_mutual_exclusive(data=data, velocity=velocity)
+        checks.check_is_mutual_exclusive(data=data, acceleration=acceleration)
+
+        df = pl.from_numpy(data=data, schema=schema, orient=orient)
+        return GazeDataFrame(
+            data=df,
+            experiment=experiment,
+            time_column=time_column,
+            pixel_columns=pixel_columns,
+            position_columns=position_columns,
+            velocity_columns=velocity_columns,
+            acceleration_columns=acceleration_columns,
+        )
+
+    n_components: int = 0
+    columns: pl.Series = []
+
+    if time is not None:
+        column = pl.from_numpy(data=time, schema=['time'], orient=orient)['time']
+        columns.append(column)
+
+    if pixel is not None:
+        column = pl.from_numpy(data=pixel, schema=['pixel'], orient=orient)['pixel']
+        columns.append(column)
+        n_components = column.list.lengths()[0]
+
+    if position is not None:
+        column = pl.from_numpy(data=position, schema=['position'], orient=orient)['position']
+        columns.append(column)
+        n_components = column.list.lengths()[0]
+
+    if velocity is not None:
+        column = pl.from_numpy(data=velocity, schema=['velocity'], orient=orient)['velocity']
+        columns.append(column)
+        n_components = column.list.lengths()[0]
+
+    if acceleration is not None:
+        column = pl.from_numpy(
+            data=acceleration, schema=['acceleration'], orient=orient,
+        )['acceleration']
+        columns.append(column)
+        n_components = column.list.lengths()[0]
+
+    df = pl.DataFrame(columns)
+    gaze = GazeDataFrame(
         data=df,
         experiment=experiment,
-        time_column=time_column,
-        pixel_columns=pixel_columns,
-        position_columns=position_columns,
-        velocity_columns=velocity_columns,
-        acceleration_columns=acceleration_columns,
     )
+    gaze.n_components = n_components
+
+    return gaze
 
 
 def from_pandas(
