@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-This module holds basic checks which will be reused in other modules.
-"""
+"""This module holds basic checks which will be reused in other modules."""
 from __future__ import annotations
 
 from collections.abc import Sized
@@ -29,9 +27,7 @@ import numpy as np
 
 
 def check_no_zeros(variable: Any, name: str = 'variable') -> None:
-    """
-    Check if variable, or if it is iterable, any of its components are zero.
-    """
+    """Check if variable, or if it is iterable, any of its components are zero."""
     # construct error message first
     error_message = f'{name} must not be zero'
 
@@ -54,9 +50,7 @@ def check_no_zeros(variable: Any, name: str = 'variable') -> None:
 
 
 def check_nan_both_channels(arr: np.ndarray) -> None:
-    """
-    Checks if all nans occur at the same time steps for both channels.
-    """
+    """Check if all nans occur at the same time steps for both channels."""
     # sanity check: horizontal and vertical gaze coordinates missing
     # values at the same time (Eyelink eyetracker never records only
     # one coordinate)
@@ -67,7 +61,7 @@ def check_nan_both_channels(arr: np.ndarray) -> None:
 
 
 def check_shapes(**kwargs: Any) -> None:
-    """Checks if all provided arrays are of shape ``(N, 2)`` and shape is equal for all arrays.
+    """Check if all provided arrays are of shape ``(N, 2)`` and shape is equal for all arrays.
 
     Parameters
     ----------
@@ -79,7 +73,6 @@ def check_shapes(**kwargs: Any) -> None:
     ValueError
         If any of the arrays is not of shape ``(N, 2)`` or if the shapes are not equal.
     """
-
     for key, array in kwargs.items():
         if array.ndim != 2 or array.shape[1] != 2:
             raise ValueError(f'{key} must have shape (N, 2) but have shape {array.shape}')

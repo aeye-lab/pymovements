@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-This module holds string specific funtions.
-"""
+"""This module holds string specific funtions."""
 from __future__ import annotations
 
 import re
@@ -30,8 +28,8 @@ CURLY_TO_REGEX = re.compile(
 
 
 def curly_to_regex(s: str) -> re.Pattern:
-    """
-    Returns regex pattern converted from provided python formatting style pattern.
+    """Return regex pattern converted from provided python formatting style pattern.
+
     By default all parameters are strings, if you want to specify number you can do: {num:d}
     If you want to specify parameter's length you can do: {two_symbols:2} or {four_digits:4d}
     Characters { and } can be escaped the same way as in python: {{ and }}

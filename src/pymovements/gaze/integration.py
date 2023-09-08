@@ -40,8 +40,7 @@ def from_numpy(
         velocity_columns: list[str] | None = None,
         acceleration_columns: list[str] | None = None,
 ) -> GazeDataFrame:
-    """Construct a :py:class:`~pymovements.gaze.gaze_dataframe.GazeDataFrame`
-    from a numpy array.
+    """Get a :py:class:`~pymovements.gaze.gaze_dataframe.GazeDataFrame` from a numpy array.
 
     Parameters
     ----------
@@ -85,8 +84,7 @@ def from_pandas(
         velocity_columns: list[str] | None = None,
         acceleration_columns: list[str] | None = None,
 ) -> GazeDataFrame:
-    """Construct a :py:class:`~pymovements.gaze.gaze_dataframe.GazeDataFrame`
-    from a pandas DataFrame.
+    """Get a :py:class:`~pymovements.gaze.gaze_dataframe.GazeDataFrame` from a pandas DataFrame.
 
     Parameters
     ----------
