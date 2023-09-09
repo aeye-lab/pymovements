@@ -522,7 +522,7 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
         ),
         pytest.param(
             {
-                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'data': pl.from_dict({'x': [0.1], 'y': [0.2]}),
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
                 'acceleration_columns': ['x', 'y'],
             },
@@ -603,7 +603,7 @@ def test_gaze_dataframe_pos2acc_creates_acceleration_column(data, experiment, po
         ),
         pytest.param(
             {
-                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'data': pl.from_dict({'x': [0.1], 'y': [0.2]}),
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
                 'pixel_columns': ['x', 'y'],
             },
@@ -684,7 +684,7 @@ def test_gaze_dataframe_pos2vel_creates_velocity_column(data, experiment, positi
         ),
         pytest.param(
             {
-                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'data': pl.from_dict({'x': [0.1], 'y': [0.2]}),
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
                 'pixel_columns': ['x', 'y'],
             },
