@@ -138,7 +138,7 @@ def from_numpy(
         acceleration_columns = df.columns
 
     df = pl.concat(dfs, how='horizontal')
-    gaze = GazeDataFrame(
+    return GazeDataFrame(
         data=df,
         experiment=experiment,
         time_column=time_column,
@@ -147,8 +147,6 @@ def from_numpy(
         velocity_columns=velocity_columns,
         acceleration_columns=acceleration_columns,
     )
-
-    return gaze
 
 
 def from_pandas(
