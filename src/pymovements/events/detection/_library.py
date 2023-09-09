@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-This module holds the EventDataFrame class.
-"""
+"""This module holds the EventDetectionLibrary class."""
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -32,7 +30,7 @@ class EventDetectionLibrary:
 
     Attributes
     ----------
-    methods:
+    `methods`:
         Dictionary of event detection methods.
     """
 

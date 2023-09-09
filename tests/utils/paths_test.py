@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-Test pymovements paths.
-"""
+"""Test pymovements paths."""
 import pathlib
 import re
 import unittest
@@ -32,9 +30,7 @@ from pymovements.utils.paths import match_filepaths
 
 
 def test_get_filepaths_mut_excl_extension_and_regex_error():
-    """
-    Test mutually exclusive extension and regex in get_filepaths.
-    """
+    """Test mutually exclusive extension and regex in get_filepaths."""
     with pytest.raises(ValueError) as excinfo:
         get_filepaths(path='tmp', extension='extension', regex=re.compile('regex'))
     msg, = excinfo.value.args

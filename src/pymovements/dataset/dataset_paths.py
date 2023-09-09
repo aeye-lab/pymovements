@@ -184,7 +184,6 @@ class DatasetPaths:
 
         Example
         -------
-
         By passing a `str` or a `Path` as `path` during initialization you can explicitly set the
         directory path of the dataset:
         >>> import pymovements as pm
@@ -242,7 +241,6 @@ class DatasetPaths:
 
         Example
         -------
-
         >>> import pymovements as pm
         >>>
         >>> dataset = pm.Dataset("ToyDataset", path='/path/to/your/dataset/')
@@ -273,7 +271,6 @@ class DatasetPaths:
 
         Example
         -------
-
         >>> import pymovements as pm
         >>>
         >>> dataset = pm.Dataset("ToyDataset", path='/path/to/your/dataset/')
@@ -306,7 +303,6 @@ class DatasetPaths:
 
         Example
         -------
-
         >>> import pymovements as pm
         >>>
         >>> dataset = pm.Dataset("ToyDataset", path='/path/to/your/dataset/')

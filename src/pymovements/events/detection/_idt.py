@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-This module holds the implementation for idt algorithm.
-"""
+"""This module holds the implementation for I-DT algorithm."""
 from __future__ import annotations
 
 import numpy as np
@@ -60,8 +58,7 @@ def idt(
         include_nan: bool = False,
         name: str = 'fixation',
 ) -> EventDataFrame:
-    """
-    Fixation identification based on dispersion threshold.
+    """Fixation identification based on dispersion threshold (I-DT).
 
     The algorithm identifies fixations by grouping consecutive points
     within a maximum separation (dispersion) threshold and a minimum duration threshold.

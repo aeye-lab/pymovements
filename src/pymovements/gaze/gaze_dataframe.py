@@ -141,7 +141,6 @@ class GazeDataFrame:
 
         Examples
         --------
-
         First let's create an example `DataFrame` with three columns:
         the timestamp ``t`` and ``x`` and ``y`` for the pixel position.
 
@@ -432,7 +431,6 @@ class GazeDataFrame:
         AttributeError
             If number of components is not 2, 4 or 6.
         """
-
         checks.check_is_mutual_exclusive(
             output_columns=output_columns,
             output_suffixes=output_suffixes,

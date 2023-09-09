@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Module for py:func:`pymovements.gaze.transforms`"""
+"""Module for py:func:`pymovements.gaze.transforms."""
 from __future__ import annotations
 
 from functools import partial
@@ -40,7 +40,7 @@ class TransformLibrary:
 
     Attributes
     ----------
-    methods:
+    `methods`:
         Dictionary of transformation methods.
     """
 
@@ -175,7 +175,7 @@ def pix2deg(
         pixel_column: str = 'pixel',
         position_column: str = 'position',
 ) -> pl.Expr:
-    """Converts pixel screen coordinates to degrees of visual angle.
+    """Convert pixel screen coordinates to degrees of visual angle.
 
     Parameters
     ----------
@@ -223,7 +223,7 @@ def pix2deg(
 
 
 def _arctan2_helper(distance: float) -> Callable:
-    """Returns single-argument lambda function with fixed second argument."""
+    """Return single-argument lambda function with fixed second argument."""
     return lambda s: np.arctan2(s, distance)
 
 
@@ -436,7 +436,7 @@ def savitzky_golay(
         derivative: int = 0,
         padding: str | float | int | None = 'nearest',
 ) -> pl.Expr:
-    """Apply a 1-D Savitzky-Golay filter to a column. :cite:p:`SavitzkyGolay1964`
+    """Apply a 1-D Savitzky-Golay filter to a column|_|:cite:p:`SavitzkyGolay1964`.
 
     Parameters
     ----------

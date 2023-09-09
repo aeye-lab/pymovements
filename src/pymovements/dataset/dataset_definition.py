@@ -62,6 +62,7 @@ class DatasetDefinition:
     custom_read_kwargs : dict[str, Any], optional
         If specified, these keyword arguments will be passed to the file reading function.
     """
+
     # pylint: disable=too-many-instance-attributes
     name: str = '.'
 

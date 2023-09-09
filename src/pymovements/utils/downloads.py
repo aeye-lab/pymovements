@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-Utils module for downloading files.
-"""
+"""Utils module for downloading files."""
 from __future__ import annotations
 
 import hashlib
@@ -218,7 +216,10 @@ class _DownloadProgressBar(tqdm):  # pylint: disable=inconsistent-mro
         super().__init__(unit='B', unit_scale=True, unit_divisor=1024, miniters=1, **kwargs)
 
     def update_to(self, b: int = 1, bsize: int = 1, tsize: None | int = None) -> bool | None:
-        """
+        """Update progress bar.
+
+        Parameters
+        ----------
         b  : int, optional
             Number of blocks transferred so far [default: 1].
         bsize  : int, optional
