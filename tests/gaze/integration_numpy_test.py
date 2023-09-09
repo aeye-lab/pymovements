@@ -70,7 +70,7 @@ def test_from_numpy_with_schema():
             [2, 3, 4, 5],
             [6, 7, 8, 9],
         ],
-        dtype=np.int64,
+        dtype=np.float64,
     )
 
     schema = ['t', 'x_pix', 'y_pix', 'x_pos', 'y_pos', 'x_vel', 'y_vel', 'x_acc', 'y_acc']
@@ -96,13 +96,22 @@ def test_from_numpy_with_schema():
         acceleration_columns=['x_acc', 'y_acc'],
     )
 
-    expected = pl.DataFrame({
-        'time': [101, 102, 103, 104],
-        'pixel': [[0, 4], [1, 5], [2, 6], [3, 7]],
-        'position': [[9, 5], [8, 4], [7, 3], [6, 2]],
-        'velocity': [[1, 5], [2, 6], [3, 7], [4, 8]],
-        'acceleration': [[2, 6], [3, 7], [4, 8], [5, 9]],
-    })
+    expected = pl.DataFrame(
+        {
+            'time': [101, 102, 103, 104],
+            'pixel': [[0, 4], [1, 5], [2, 6], [3, 7]],
+            'position': [[9, 5], [8, 4], [7, 3], [6, 2]],
+            'velocity': [[1, 5], [2, 6], [3, 7], [4, 8]],
+            'acceleration': [[2, 6], [3, 7], [4, 8], [5, 9]],
+        },
+        schema={
+            'time': pl.Float64,
+            'pixel': pl.List(pl.Float64),
+            'position': pl.List(pl.Float64),
+            'velocity': pl.List(pl.Float64),
+            'acceleration': pl.List(pl.Float64),
+        },
+    )
 
     assert_frame_equal(gaze.frame, expected)
     assert gaze.n_components == 2
