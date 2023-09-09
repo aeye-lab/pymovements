@@ -85,7 +85,6 @@ def from_numpy(
     -------
     py:class:`~pymovements.GazeDataFrame`
     """
-
     if data is not None:
         checks.check_is_mutual_exclusive(data=data, time=time)
         checks.check_is_mutual_exclusive(data=data, pixel=pixel)
