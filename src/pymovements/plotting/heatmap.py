@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-Heatmap module.
-"""
+"""Heatmap module."""
 from __future__ import annotations
 
 import matplotlib.pyplot as plt
@@ -95,7 +93,6 @@ def heatmap(
     plt.Figure
         The heatmap figure.
     """
-
     # Extract x and y positions from the gaze dataframe
     x = gaze.frame[position_column].list.get(0).to_numpy()
     y = gaze.frame[position_column].list.get(1).to_numpy()

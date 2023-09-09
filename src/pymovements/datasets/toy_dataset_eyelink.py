@@ -90,6 +90,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
 
     >>> dataset.load()# doctest: +SKIP
     """
+
     # pylint: disable=similarities
     # The DatasetDefinition child classes potentially share code chunks for definitions.
 

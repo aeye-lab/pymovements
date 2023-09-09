@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-This module holds utils for developers and is not part of the user API.
-"""
+"""This module holds utils for developers and is not part of the user API."""
 from __future__ import annotations
 
 from typing import Any
@@ -29,9 +27,7 @@ ClassT = TypeVar('ClassT')
 
 
 def auto_str(cls: type[ClassT]) -> type[ClassT]:
-    """
-    Automatically generate __str__() to include all arguments. Can be used as a decorator.
-    """
+    """Automatically generate __str__() to include all arguments. Can be used as a decorator."""
     def shorten(value: Any) -> str:
         if isinstance(value, float):
             value = f'{value:.2f}'

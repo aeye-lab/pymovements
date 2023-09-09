@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-Test pymovements checks.
-"""
+"""Test pymovements checks."""
 import numpy as np
 import pytest
 
@@ -53,9 +51,7 @@ from pymovements.utils import checks
     ],
 )
 def test_check_no_zeros_raises_error(variable, expected_error, expected_err_msg):
-    """
-    Test that check_no_zeros() only raises an Exception if there are zeros in the input array.
-    """
+    """Test that check_no_zeros() only raises an Exception if there are zeros in the input array."""
     if expected_error is None:
         checks.check_no_zeros(variable)
     else:
@@ -101,9 +97,9 @@ def test_check_no_zeros_raises_error(variable, expected_error, expected_err_msg)
     ],
 )
 def test_check_nan_both_channels_raises_error(arr, expected_error, expected_err_msg):
-    """
-    Test that check_nan_both_channels() only raises an Exception if all nans
-    occur at the same time step for both channels.
+    """Test that check_nan_both_channels() raises an Exception.
+
+    Only iff all nans occur at the same time step for both channels.
     """
     if expected_error is None:
         checks.check_nan_both_channels(arr)
@@ -186,10 +182,10 @@ def test_check_nan_both_channels_raises_error(arr, expected_error, expected_err_
     ],
 )
 def test_check_shapes_raises_error(kwargs, expected_error, expected_err_msg):
-    """
-    Test that check_shapes() only raises an Exception if
-    the shapes of the positions and velocities are not (N, 2) or if the lengths
-    of the positions and velocities are not equal.
+    """Test that check_shapes() raises an Exception.
+
+    Only if the shapes of the positions and velocities are not (N, 2) or if the lengths of the
+    positions and velocities are not equal.
     """
     if expected_error is None:
         checks.check_shapes(**kwargs)
