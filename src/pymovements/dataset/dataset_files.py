@@ -347,7 +347,6 @@ def add_fileinfo(
     pl.DataFrame:
         Dataframe with added columns from fileinfo dictionary keys.
     """
-
     df = df.select(
         [
             pl.lit(value).alias(column)

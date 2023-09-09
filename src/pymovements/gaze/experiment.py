@@ -29,12 +29,10 @@ from pymovements.utils import decorators
 
 @decorators.auto_str
 class Experiment:
-    """
-    Experiment class for holding experiment properties.
+    """Experiment class for holding experiment properties.
 
     Attributes
     ----------
-
     screen : Screen
         Screen object for experiment
     sampling_rate : float
@@ -46,12 +44,10 @@ class Experiment:
             screen_width_cm: float, screen_height_cm: float,
             distance_cm: float, origin: str, sampling_rate: float,
     ):
-        """
-        Initializes Experiment.
+        """Initialize Experiment.
 
         Parameters
         ----------
-
         screen_width_px : int
             Screen width in pixels
         screen_height_px : int

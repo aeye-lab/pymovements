@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-Utils module for extracting archives and decompressing files.
-"""
+"""Utils module for extracting archives and decompressing files."""
 from __future__ import annotations
 
 import bz2
@@ -42,6 +40,7 @@ def extract_archive(
         verbose: int = 1,
 ) -> Path:
     """Extract an archive.
+
     The archive type and a possible compression is automatically detected from the file name.
     If the file is compressed but not an archive the call is dispatched to :func:`_decompress`.
 

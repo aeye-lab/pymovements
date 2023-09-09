@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-This module holds the EventDataFrame class.
-"""
+"""This module holds the EventDataFrame class."""
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -126,9 +124,11 @@ class EventDataFrame:
         return self.frame.schema
 
     def __len__(self) -> int:
+        """Get number of events in dataframe."""
         return self.frame.__len__()
 
     def __getitem__(self, *args: Any, **kwargs: Any) -> Any:
+        """Get item."""
         return self.frame.__getitem__(*args, **kwargs)
 
     @property
@@ -137,7 +137,7 @@ class EventDataFrame:
         return self.frame.columns
 
     def _add_duration_property(self) -> None:
-        """Adds duration property column to dataframe."""
+        """Add duration property column to dataframe."""
         self.frame = self.frame.select([pl.all(), duration().alias('duration')])
 
     def add_event_properties(

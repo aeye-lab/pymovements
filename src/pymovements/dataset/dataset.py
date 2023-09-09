@@ -870,7 +870,6 @@ class Dataset:
 
         Example
         -------
-
         By passing a `str` or a `Path` as `path` during initialization you can explicitly set the
         directory path of the dataset:
         >>> import pymovements as pm
