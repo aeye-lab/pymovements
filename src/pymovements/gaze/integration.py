@@ -35,6 +35,7 @@ def from_numpy(
         schema: list[str],
         experiment: Experiment | None = None,
         orient: Literal['col', 'row'] = 'col',
+        time_column: str | None = None,
         pixel_columns: list[str] | None = None,
         position_columns: list[str] | None = None,
         velocity_columns: list[str] | None = None,
@@ -52,6 +53,9 @@ def from_numpy(
         Whether to interpret the two-dimensional data as columns or as rows.
     experiment : Experiment
         The experiment definition.
+            time_column: str | None = None,
+    time_column:
+        The name of the timestamp column in the input data frame.
     pixel_columns:
         The name of the pixel position columns in the input data frame.
     position_columns:
@@ -69,6 +73,7 @@ def from_numpy(
     return GazeDataFrame(
         data=df,
         experiment=experiment,
+        time_column=time_column,
         pixel_columns=pixel_columns,
         position_columns=position_columns,
         velocity_columns=velocity_columns,
@@ -79,6 +84,7 @@ def from_numpy(
 def from_pandas(
         data: pd.DataFrame,
         experiment: Experiment | None = None,
+        time_column: str | None = None,
         pixel_columns: list[str] | None = None,
         position_columns: list[str] | None = None,
         velocity_columns: list[str] | None = None,
@@ -92,6 +98,8 @@ def from_pandas(
         Data represented as a pandas DataFrame.
     experiment : Experiment
         The experiment definition.
+    time_column:
+        The name of the timestamp column in the input data frame.
     pixel_columns:
         The name of the pixel position columns in the input data frame.
     position_columns:
@@ -109,6 +117,7 @@ def from_pandas(
     return GazeDataFrame(
         data=df,
         experiment=experiment,
+        time_column=time_column,
         pixel_columns=pixel_columns,
         position_columns=position_columns,
         velocity_columns=velocity_columns,
