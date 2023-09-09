@@ -49,6 +49,14 @@ def from_numpy(
 ) -> GazeDataFrame:
     """Get a :py:class:`~pymovements.gaze.gaze_dataframe.GazeDataFrame` from a numpy array.
 
+    There are two mutually exclusive ways of conversion.
+
+    Case 1: Pass a single numpy array via `data` and specify its schema and orientation.
+    You can then additionally pass column specifiers, e.g. `time_column` and `position_columns`.
+
+    Case 2: For each type of signal, you can pass the numpy array explicitly,  e.g. `position` or
+    `velocity`. You don't need to
+
     Parameters
     ----------
     data:
@@ -84,6 +92,10 @@ def from_numpy(
     Returns
     -------
     py:class:`~pymovements.GazeDataFrame`
+
+    Examples
+    --------
+
     """
     if data is not None:
         checks.check_is_mutual_exclusive(data=data, time=time)
