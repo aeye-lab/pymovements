@@ -118,11 +118,11 @@ def test_from_numpy_with_schema():
 
 
 def test_from_numpy_explicit_columns():
-    time = np.array([101, 102, 103, 104])
+    time = np.array([101, 102, 103, 104], dtype=np.int64)
     pixel = np.array([[0, 1, 2, 3], [4, 5, 6, 7]], dtype=np.int64)
-    position = np.array([[9, 8, 7, 6], [5, 4, 3, 2]], dtype=np.int64)
-    velocity = np.array([[1, 2, 3, 4], [5, 6, 7, 8]], dtype=np.int64)
-    acceleration = np.array([[2, 3, 4, 5], [6, 7, 8, 9]], dtype=np.int64)
+    position = np.array([[9, 8, 7, 6], [5, 4, 3, 2]], dtype=np.float64)
+    velocity = np.array([[1, 2, 3, 4], [5, 6, 7, 8]], dtype=np.float64)
+    acceleration = np.array([[2, 3, 4, 5], [6, 7, 8, 9]], dtype=np.float64)
 
     experiment = pm.Experiment(
         screen_width_px=1280,
@@ -143,13 +143,22 @@ def test_from_numpy_explicit_columns():
         experiment=experiment,
     )
 
-    expected = pl.DataFrame({
-        'time': [101, 102, 103, 104],
-        'pixel': [[0, 4], [1, 5], [2, 6], [3, 7]],
-        'position': [[9, 5], [8, 4], [7, 3], [6, 2]],
-        'velocity': [[1, 5], [2, 6], [3, 7], [4, 8]],
-        'acceleration': [[2, 6], [3, 7], [4, 8], [5, 9]],
-    })
+    expected = pl.DataFrame(
+        {
+            'time': [101, 102, 103, 104],
+            'pixel': [[0, 4], [1, 5], [2, 6], [3, 7]],
+            'position': [[9, 5], [8, 4], [7, 3], [6, 2]],
+            'velocity': [[1, 5], [2, 6], [3, 7], [4, 8]],
+            'acceleration': [[2, 6], [3, 7], [4, 8], [5, 9]],
+        },
+        schema={
+            'time': pl.Int64,
+            'pixel': pl.List(pl.Int64),
+            'position': pl.List(pl.Float64),
+            'velocity': pl.List(pl.Float64),
+            'acceleration': pl.List(pl.Float64),
+        },
+    )
 
     assert_frame_equal(gaze.frame, expected)
     assert gaze.n_components == 2
