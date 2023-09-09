@@ -60,6 +60,7 @@ def test_from_numpy():
 def test_from_numpy_with_schema():
     array = np.array(
         [
+            [101, 102, 103, 104],
             [0, 1, 2, 3],
             [4, 5, 6, 7],
             [9, 8, 7, 6],
@@ -72,7 +73,7 @@ def test_from_numpy_with_schema():
         dtype=np.int64,
     )
 
-    schema = ['x_pix', 'y_pix', 'x_pos', 'y_pos', 'x_vel', 'y_vel', 'x_acc', 'y_acc']
+    schema = ['t', 'x_pix', 'y_pix', 'x_pos', 'y_pos', 'x_vel', 'y_vel', 'x_acc', 'y_acc']
 
     experiment = pm.Experiment(
         screen_width_px=1280,
@@ -88,6 +89,7 @@ def test_from_numpy_with_schema():
         data=array,
         schema=schema,
         experiment=experiment,
+        time_column='t',
         pixel_columns=['x_pix', 'y_pix'],
         position_columns=['x_pos', 'y_pos'],
         velocity_columns=['x_vel', 'y_vel'],
@@ -95,6 +97,7 @@ def test_from_numpy_with_schema():
     )
 
     expected = pl.DataFrame({
+        'time': [101, 102, 103, 104],
         'pixel': [[0, 4], [1, 5], [2, 6], [3, 7]],
         'position': [[9, 5], [8, 4], [7, 3], [6, 2]],
         'velocity': [[1, 5], [2, 6], [3, 7], [4, 8]],
@@ -102,7 +105,6 @@ def test_from_numpy_with_schema():
     })
 
     assert_frame_equal(gaze.frame, expected)
-
     assert gaze.n_components == 2
 
 
@@ -141,5 +143,27 @@ def test_from_numpy_explicit_columns():
     })
 
     assert_frame_equal(gaze.frame, expected)
-
     assert gaze.n_components == 2
+
+
+def test_init_all_none():
+    gaze = pm.gaze.from_numpy(
+        data=None,
+        schema=None,
+        experiment=None,
+        time=None,
+        pixel=None,
+        position=None,
+        velocity=None,
+        acceleration=None,
+        time_column=None,
+        pixel_columns=None,
+        position_columns=None,
+        velocity_columns=None,
+        acceleration_columns=None,
+    )
+
+    expected = pl.DataFrame()
+
+    assert_frame_equal(gaze.frame, expected)
+    assert gaze.n_components is None

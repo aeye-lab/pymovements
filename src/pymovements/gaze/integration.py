@@ -105,7 +105,8 @@ def from_numpy(
             acceleration_columns=acceleration_columns,
         )
 
-    dfs: pl.Series = []
+    # Initialize with an empty DataFrame, as every column specifier could be None.
+    dfs: list[pl.DataFrame] = [pl.DataFrame()]
 
     time_column = None
     if time is not None:
