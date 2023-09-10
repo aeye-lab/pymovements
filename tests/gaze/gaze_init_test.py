@@ -1153,6 +1153,24 @@ def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, exp
             'column y_acc from acceleration_columns is not available in dataframe',
             id='acceleration_columns_missing_column',
         ),
+
+        pytest.param(
+            {
+                'data': pl.DataFrame(
+                    schema={
+                        'x': pl.Float64, 'y': pl.Float64,
+                        'xr': pl.Float64, 'yr': pl.Float64,
+                        'xl': pl.Float64, 'yl': pl.Float64,
+                    },
+                ),
+                'pixel_columns': ['x', 'y'],
+                'position_columns': ['xl', 'yl', 'xr', 'yr'],
+            },
+            ValueError,
+            'inconsistent number of components inferred: {2, 4}',
+            id='inconsistent_number_of_components',
+        ),
+
     ],
 )
 def test_gaze_dataframe_init_exceptions(init_kwargs, exception, exception_msg):
