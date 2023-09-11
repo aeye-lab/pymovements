@@ -33,7 +33,7 @@ import pymovements as pm
             {'column': 'pixel', 'output_columns': ['x', 'y']},
             pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
             id='empty_df_with_schema_two_pixel_columns',
-            marks=pytest.mark.xfail(reason='###'),
+            marks=pytest.mark.xfail(reason='#522'),
         ),
 
         pytest.param(
@@ -41,7 +41,7 @@ import pymovements as pm
             {'column': 'pixel', 'output_columns': ['x', 'y']},
             pl.DataFrame(schema={'abc': pl.Int64, 'x': pl.Float64, 'y': pl.Float64}),
             id='empty_df_with_three_column_schema_two_pixel_columns',
-            marks=pytest.mark.xfail(reason='###'),
+            marks=pytest.mark.xfail(reason='#522'),
         ),
 
         pytest.param(
@@ -53,7 +53,7 @@ import pymovements as pm
                 },
             ),
             id='empty_df_with_schema_four_pixel_columns',
-            marks=pytest.mark.xfail(reason='###'),
+            marks=pytest.mark.xfail(reason='#522'),
         ),
 
         pytest.param(
@@ -67,7 +67,7 @@ import pymovements as pm
                 },
             ),
             id='empty_df_with_schema_six_pixel_columns',
-            marks=pytest.mark.xfail(reason='###'),
+            marks=pytest.mark.xfail(reason='#522'),
         ),
 
         pytest.param(
@@ -103,7 +103,7 @@ import pymovements as pm
             {'column': 'pixel', 'output_suffixes': ['_x', '_y'], 'output_columns': None},
             pl.DataFrame(schema={'pixel_x': pl.Float64, 'pixel_y': pl.Float64}),
             id='empty_df_with_schema_two_pixel_suffixes_columns_none',
-            marks=pytest.mark.xfail(reason='###'),
+            marks=pytest.mark.xfail(reason='#522'),
         ),
 
         pytest.param(
@@ -111,7 +111,7 @@ import pymovements as pm
             {'column': 'pixel', 'output_suffixes': ['_x', '_y'], 'output_columns': None},
             pl.DataFrame(schema={'abc': pl.Int64, 'pixel_x': pl.Float64, 'pixel_y': pl.Float64}),
             id='empty_df_with_three_column_schema_two_pixel_suffixes_columns_none',
-            marks=pytest.mark.xfail(reason='###'),
+            marks=pytest.mark.xfail(reason='#522'),
         ),
 
         pytest.param(
@@ -128,7 +128,7 @@ import pymovements as pm
                 },
             ),
             id='empty_df_with_schema_four_pixel_suffixes_columns_none',
-            marks=pytest.mark.xfail(reason='###'),
+            marks=pytest.mark.xfail(reason='#522'),
         ),
 
         pytest.param(
@@ -142,7 +142,7 @@ import pymovements as pm
                 },
             ),
             id='empty_df_with_schema_six_pixel_columns',
-            marks=pytest.mark.xfail(reason='###'),
+            marks=pytest.mark.xfail(reason='#522'),
         ),
 
         pytest.param(
