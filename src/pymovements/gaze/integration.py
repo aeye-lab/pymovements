@@ -56,7 +56,8 @@ def from_numpy(
     `position_columns`.
 
     **Column specific arrays**: For each type of signal, you can pass the numpy array explicitly,
-    e.g. `position` or `velocity`. You must not pass `data` or any column specifiers.
+    e.g. `position` or `velocity`. You must not pass `data` or any column list specifiers using this
+    method.
 
     Parameters
     ----------
