@@ -51,11 +51,12 @@ def from_numpy(
 
     There are two mutually exclusive ways of conversion.
 
-    Case 1: Pass a single numpy array via `data` and specify its schema and orientation.
-    You can then additionally pass column specifiers, e.g. `time_column` and `position_columns`.
+    **Single data array**: Pass a single numpy array via `data` and specify its schema and
+    orientation. You can then additionally pass column specifiers, e.g. `time_column` and
+    `position_columns`.
 
-    Case 2: For each type of signal, you can pass the numpy array explicitly,  e.g. `position` or
-    `velocity`. You don't need to
+    **Column specific arrays**: For each type of signal, you can pass the numpy array explicitly,
+    e.g. `position` or `velocity`. You must not pass `data` or any column specifiers.
 
     Parameters
     ----------
@@ -95,15 +96,105 @@ def from_numpy(
 
     Examples
     --------
+    Creating an example numpy array with 4 columns and 100 rows. We call this layout column
+    orientation.
+    >>> import numpy as np
+    >>> import pymovements as pm
+    >>>
+    >>> arr = np.zeros((3, 100))
+    >>> arr.shape
+    (3, 100)
 
+    Specifying the underlying schema:
+    >>> schema = ['t', 'x', 'y']
+
+    Pass the array as ``data`` to ``pm.gaze.from_numpy()``, by specifying schema and components.
+    >>> gaze = pm.gaze.from_numpy(
+    ...     arr,
+    ...     schema=schema,
+    ...     time_column='t',
+    ...     position_columns=['x', 'y'],
+    ...     orient='col',
+    ... )
+    >>> gaze.frame
+    shape: (100, 2)
+    ┌──────┬────────────┐
+    │ time ┆ position   │
+    │ ---  ┆ ---        │
+    │ f64  ┆ list[f64]  │
+    ╞══════╪════════════╡
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ …    ┆ …          │
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0.0  ┆ [0.0, 0.0] │
+    └──────┴────────────┘
+
+    Use the ``orient`` keyword argument to specify the layout of your array.
+    >>> arr.T.shape
+    (100, 3)
+
+    >>> gaze = pm.gaze.from_numpy(
+    ...     arr.T,
+    ...     schema=schema,
+    ...     time_column='t',
+    ...     position_columns=['x', 'y'],
+    ...     orient='row',
+    ... )
+    >>> gaze.frame
+    shape: (100, 2)
+    ┌──────┬────────────┐
+    │ time ┆ position   │
+    │ ---  ┆ ---        │
+    │ f64  ┆ list[f64]  │
+    ╞══════╪════════════╡
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ …    ┆ …          │
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0.0  ┆ [0.0, 0.0] │
+    └──────┴────────────┘
+
+    Pass the data explicitly via the specific keyword arguments, without having to specify a schema.
+    >>> gaze = pm.gaze.from_numpy(
+    ...     time=arr[0],
+    ...     position=arr[[1, 2]],
+    ...     orient='col',
+    ... )
+    >>> gaze.frame
+    shape: (100, 2)
+    ┌──────┬────────────┐
+    │ time ┆ position   │
+    │ ---  ┆ ---        │
+    │ f64  ┆ list[f64]  │
+    ╞══════╪════════════╡
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ …    ┆ …          │
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0.0  ┆ [0.0, 0.0] │
+    └──────┴────────────┘
     """
-    if data is not None:
-        checks.check_is_mutual_exclusive(data=data, time=time)
-        checks.check_is_mutual_exclusive(data=data, pixel=pixel)
-        checks.check_is_mutual_exclusive(data=data, position=position)
-        checks.check_is_mutual_exclusive(data=data, velocity=velocity)
-        checks.check_is_mutual_exclusive(data=data, acceleration=acceleration)
+    # Either data or {time, pixel, position, velocity, acceleration} must be None.
+    checks.check_is_mutual_exclusive(data=data, time=time)
+    checks.check_is_mutual_exclusive(data=data, pixel=pixel)
+    checks.check_is_mutual_exclusive(data=data, position=position)
+    checks.check_is_mutual_exclusive(data=data, velocity=velocity)
+    checks.check_is_mutual_exclusive(data=data, acceleration=acceleration)
 
+    if data is not None:
         df = pl.from_numpy(data=data, schema=schema, orient=orient)
         return GazeDataFrame(
             data=df,
