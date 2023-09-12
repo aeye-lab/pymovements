@@ -542,6 +542,111 @@ def savitzky_golay(
     ).alias(output_column)
 
 
+@register_transform
+def smooth(
+        *,
+        method: str,
+        window_length: int,
+        n_components: int,
+        degree: int | None = None,
+        column: str = 'position',
+        padding: str | float | int | None = 'nearest',
+) -> pl.Expr:
+    """
+    Smooth data in a column.
+
+    Parameters
+    ----------
+    method:
+        The method to use for smoothing.
+    window_length
+        For ``moving_average`` this is the window size to calculate the mean of the subsequent
+        samples. For ``savitzky_golay`` this is the window size to use for the polynomial fit.
+        For ``exponential_moving_average`` this is the span parameter.
+    column
+        The input column name to which the smoothing is applied.
+    n_components:
+        Number of components in input column.
+    degree:
+        The degree of the polynomial to use. This has only an effect if using ``savitzky_golay`` as
+        smoothing method.
+    padding:
+        The padding to use.  This has only an effect if using ``savitzky_golay`` as smoothing
+        method.
+
+    Returns
+    -------
+    polars.Expr
+        The respective polars expression.
+
+    Notes
+    -----
+    There following methods are available for smoothing:
+
+    * ``savitzky_golay``: Smooth data by applying a Savitzky-Golay filter.
+    See :py:func:`~pymovements.gaze.transforms.savitzky_golay` for further details.
+    * ``moving_average``: Smooth data by calculating the mean of the subsequent samples.
+    Each smoothed sample is calculated by the mean of the samples in the window around the sample.
+    * ``exponential_moving_average``: Smooth data by
+    """
+
+    if method == 'moving_average':
+        pad_func = partial(
+            np.pad,
+            pad_width=window_length // 2,
+            mode=padding
+        )
+
+        return pl.concat_list(
+            [
+                pl.col(column).list.get(component).map(pad_func).rolling_mean(
+                    window_size=window_length,
+                    center=True
+                )
+                for component in range(n_components)
+            ],
+        ).alias(column)
+
+    if method == 'exponential_moving_average':
+        pad_func = partial(
+            np.pad,
+            pad_width=window_length // 2,
+            mode=padding
+        )
+
+        return pl.concat_list(
+            [
+                pl.col(column).list.get(component).map(pad_func).ewm_mean(
+                    span=window_length,
+                    adjust=False,
+                    min_periods=window_length,
+                ).mean()
+                for component in range(n_components)
+            ],
+        ).alias(column)
+
+    if method == 'savitzky_golay':
+        if degree is None:
+            raise TypeError("'degree' must not be none for method 'savitzky_golay'")
+
+        return savitzky_golay(
+            window_length=window_length,
+            degree=degree,
+            sampling_rate=1,
+            padding=padding,
+            derivative=0,
+            n_components=n_components,
+            input_column=column,
+            output_column=None,
+        )
+
+    supported_methods = ['moving_average', 'savitzky_golay']
+
+    raise ValueError(
+        f"Unknown method '{method}'. Supported methods are: {supported_methods}",
+    )
+
+
 def _check_window_length(window_length: Any) -> None:
     """Check that window length is an integer and greater than zero."""
     checks.check_is_not_none(window_length=window_length)
