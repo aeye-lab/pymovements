@@ -131,7 +131,7 @@ check_untyped_defs = false
 disallow_untyped_defs = false
 
 [tool.pytest.ini_options]
-addopts = "-ra -l -v --doctest-modules"
+addopts = "-ra -l --tb=long --doctest-modules"
 doctest_optionflags = "NORMALIZE_WHITESPACE"
 filterwarnings = ['ignore::DeprecationWarning:pkg_resources.*:']
 testpaths = ['tests', 'src']
