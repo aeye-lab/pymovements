@@ -528,8 +528,9 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
             },
             pl.exceptions.ColumnNotFoundError,
             (
-                'pixel\n\nError originated just after this operation:\nDF ["acceleration"]; '
-                'PROJECT */1 COLUMNS; SELECTION: "None"'
+                "Neither 'position' is in the columns of the dataframe: ['acceleration'] "
+                'nor is the pixel column specified. You can specify the pixel column via: '
+                'pix2deg(pixel_column=name_of_your_pixel_column).'
             ),
             id='no_pixel_column',
         ),
@@ -609,8 +610,23 @@ def test_gaze_dataframe_pos2acc_creates_acceleration_column(data, experiment, po
             },
             pl.exceptions.ColumnNotFoundError,
             (
-                'position\n\nError originated just after this operation:\nDF ["pixel"]; '
-                'PROJECT */1 COLUMNS; SELECTION: "None"'
+                "Neither 'position' is in the columns of the dataframe: ['pixel'] nor is the "
+                "position column specified. Since the dataframe has a 'pixel' column, "
+                'consider running pix2deg() before pos2acc(). If you want to calculate pixel '
+                "transformations, you can do so by using pos2acc(position_column='pixel')."
+            ),
+            id='no_position_column',
+        ),
+        pytest.param(
+            {
+                'data': pl.from_dict({'x': [0.1], 'y': [0.2]}),
+                'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+                'acceleration_columns': ['x', 'y'],
+            },
+            pl.exceptions.ColumnNotFoundError,
+            (
+                "Neither 'position' is in the columns of the dataframe: ['acceleration'] nor "
+                'is the position column specified.'
             ),
             id='no_position_column',
         ),
@@ -690,8 +706,23 @@ def test_gaze_dataframe_pos2vel_creates_velocity_column(data, experiment, positi
             },
             pl.exceptions.ColumnNotFoundError,
             (
-                'position\n\nError originated just after this operation:\nDF ["pixel"]; '
-                'PROJECT */1 COLUMNS; SELECTION: "None"'
+                "Neither 'position' is in the columns of the dataframe: ['pixel'] nor is the "
+                "position column specified. Since the dataframe has a 'pixel' column, "
+                'consider running pix2deg() before pos2vel(). If you want to calculate pixel '
+                "transformations, you can do so by using pos2vel(position_column='pixel')."
+            ),
+            id='no_position_column',
+        ),
+        pytest.param(
+            {
+                'data': pl.from_dict({'x': [0.1], 'y': [0.2]}),
+                'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+                'acceleration_columns': ['x', 'y'],
+            },
+            pl.exceptions.ColumnNotFoundError,
+            (
+                "Neither 'position' is in the columns of the dataframe: ['acceleration'] nor "
+                'is the position column specified.'
             ),
             id='no_position_column',
         ),
