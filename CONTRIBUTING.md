@@ -93,6 +93,8 @@ cd pymovements
 pip install -e .
 ```
 
+If you have a problem e.g. `command not found: pip`, check whether you have activated a virtual enviroment.
+
 
 ### Creating a Branch
 
@@ -125,11 +127,22 @@ We use [`flake8`](https://pypi.org/project/flake8/) for quick style checks and
 [`pylint`](https://pypi.org/project/pylint/) for thorough style checks and [`mypy`](
 https://pypi.org/project/mypy/) for checking type annotations.
 
+You can check your code style by using [pre-commit](https://www.pre-commit.com). You can install `pre-commit` via pip:
+
+```bash
+pip install pre-commit
+pre-commit install
+```
 
 ### Testing
 
 Tests are written using [Pytest](https://docs.pytest.org) and executed
 in a separate environment using [Tox](https://tox.readthedocs.io/en/latest/).
+
+If you have not yet installed `tox` you can do so via
+```bash
+pip install tox
+```
 
 A full style check and all tests can be run by simply calling `tox` in the repository root.
 ```bash
@@ -145,7 +158,7 @@ functionality. We try to keep our code coverage close to 100%.
 It is possible to limit the scope of testing to specific environments and files. For example, to
 only test event related functionality using the Python 3.7 environment use:
 ```bash
-tox -e py37 tests/events
+tox -e py38 tests/events
 ```
 
 
