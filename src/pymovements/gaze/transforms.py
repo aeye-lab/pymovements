@@ -31,7 +31,6 @@ import scipy
 
 from pymovements.utils import checks
 
-
 TransformMethod = TypeVar('TransformMethod', bound=Callable[..., pl.Expr])
 
 
@@ -392,10 +391,10 @@ def pos2vel(
         return pl.concat_list(
             [
                 (
-                    pl.col(position_column).shift(periods=-2).list.get(component)
-                    + pl.col(position_column).shift(periods=-1).list.get(component)
-                    - pl.col(position_column).shift(periods=1).list.get(component)
-                    - pl.col(position_column).shift(periods=2).list.get(component)
+                        pl.col(position_column).shift(periods=-2).list.get(component)
+                        + pl.col(position_column).shift(periods=-1).list.get(component)
+                        - pl.col(position_column).shift(periods=1).list.get(component)
+                        - pl.col(position_column).shift(periods=2).list.get(component)
                 ) * (sampling_rate / 6)
                 for component in range(n_components)
             ],
@@ -558,7 +557,7 @@ def smooth(
     Parameters
     ----------
     method:
-        The method to use for smoothing.
+        The method to use for smoothing. See Notes for more details.
     window_length
         For ``moving_average`` this is the window size to calculate the mean of the subsequent
         samples. For ``savitzky_golay`` this is the window size to use for the polynomial fit.
@@ -571,8 +570,12 @@ def smooth(
         The degree of the polynomial to use. This has only an effect if using ``savitzky_golay`` as
         smoothing method.
     padding:
-        The padding to use.  This has only an effect if using ``savitzky_golay`` as smoothing
-        method.
+        Must be either ``None``, a scalar or one of the strings ``mirror``, ``nearest`` or ``wrap``.
+        This determines the type of extension to use for the padded signal to
+        which the filter is applied.
+        When passing ``None``, no extension padding is used.
+        When passing a scalar value, data will be padded using the passed value.
+        See the Notes for more details on the padding methods.
 
     Returns
     -------
@@ -588,42 +591,87 @@ def smooth(
     * ``moving_average``: Smooth data by calculating the mean of the subsequent samples.
     Each smoothed sample is calculated by the mean of the samples in the window around the sample.
     * ``exponential_moving_average``: Smooth data by
+
+    Details on the `padding` options:
+
+    * ``None``: No padding extension is used.
+    * scalar value (int or float): The padding extension contains the specified scalar value.
+    * ``mirror``: Repeats the values at the edges in reverse order. The value closest to the edge is
+      not included.
+    * ``nearest``: The padding extension contains the nearest input value.
+    * ``wrap``: The padding extension contains the values from the other end of the array.
+
+    Given the input is ``[1, 2, 3, 4, 5, 6, 7, 8]``, and
+    `window_length` is 7, the following table shows the padded data for
+    the various ``padding`` options:
+
+    +-------------+-------------+----------------------------+-------------+
+    | mode        |   padding   |           input            |   padding   |
+    +=============+=============+============================+=============+
+    | ``None``    | ``-  -  -`` | ``1  2  3  4  5  6  7  8`` | ``-  -  -`` |
+    +-------------+-------------+----------------------------+-------------+
+    | ``0``       | ``0  0  0`` | ``1  2  3  4  5  6  7  8`` | ``0  0  0`` |
+    +-------------+-------------+----------------------------+-------------+
+    | ``1``       | ``1  1  1`` | ``1  2  3  4  5  6  7  8`` | ``1  1  1`` |
+    +-------------+-------------+----------------------------+-------------+
+    | ``nearest`` | ``1  1  1`` | ``1  2  3  4  5  6  7  8`` | ``8  8  8`` |
+    +-------------+-------------+----------------------------+-------------+
+    | ``mirror``  | ``4  3  2`` | ``1  2  3  4  5  6  7  8`` | ``7  6  5`` |
+    +-------------+-------------+----------------------------+-------------+
+    | ``wrap``    | ``6  7  8`` | ``1  2  3  4  5  6  7  8`` | ``1  2  3`` |
+    +-------------+-------------+----------------------------+-------------+
+
     """
 
-    if method == 'moving_average':
-        pad_func = partial(
-            np.pad,
-            pad_width=window_length // 2,
-            mode=padding
-        )
+    _check_window_length(window_length=window_length)
+    _check_padding(padding=padding)
 
-        return pl.concat_list(
-            [
-                pl.col(column).list.get(component).map(pad_func).rolling_mean(
-                    window_size=window_length,
-                    center=True
-                )
-                for component in range(n_components)
-            ],
-        ).alias(column)
+    if method in {'moving_average', 'exponential_moving_average'}:
+        pad_kwargs = {}
+        pad_func = _identity
 
-    if method == 'exponential_moving_average':
-        pad_func = partial(
-            np.pad,
-            pad_width=window_length // 2,
-            mode=padding
-        )
+        if isinstance(padding, (int, float)):
+            pad_kwargs['constant_values'] = padding
+            padding = 'constant'
+        elif padding == 'nearest':
+            # option 'nearest' is called 'edge' for np.pad
+            padding = 'edge'
+        elif padding == 'mirror':
+            # option 'mirror' is called 'reflect' for np.pad
+            padding = 'reflect'
 
-        return pl.concat_list(
-            [
-                pl.col(column).list.get(component).map(pad_func).ewm_mean(
-                    span=window_length,
-                    adjust=False,
-                    min_periods=window_length,
-                ).mean()
-                for component in range(n_components)
-            ],
-        ).alias(column)
+        if padding is not None:
+            pad_kwargs['mode'] = padding
+            pad_kwargs['pad_width'] = window_length // 2
+
+            pad_func = partial(
+                np.pad,
+                **pad_kwargs
+            )
+
+        if method == 'moving_average':
+
+            return pl.concat_list(
+                [
+                    pl.col(column).list.get(component).map(pad_func).rolling_mean(
+                        window_size=window_length,
+                        center=True
+                    )
+                    for component in range(n_components)
+                ],
+            ).alias(column)
+
+        if method == 'exponential_moving_average':
+            return pl.concat_list(
+                [
+                    pl.col(column).list.get(component).map(pad_func).ewm_mean(
+                        span=window_length,
+                        adjust=False,
+                        min_periods=window_length,
+                    ).mean()
+                    for component in range(n_components)
+                ],
+            ).alias(column)
 
     if method == 'savitzky_golay':
         if degree is None:
@@ -640,11 +688,16 @@ def smooth(
             output_column=None,
         )
 
-    supported_methods = ['moving_average', 'savitzky_golay']
+    supported_methods = ['moving_average', 'exponential_moving_average', 'savitzky_golay']
 
     raise ValueError(
         f"Unknown method '{method}'. Supported methods are: {supported_methods}",
     )
+
+
+def _identity(x: Any):
+    """Identity function as placeholder for None as padding"""
+    return x
 
 
 def _check_window_length(window_length: Any) -> None:
