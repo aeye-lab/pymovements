@@ -266,6 +266,33 @@ class GazeDataFrame:
                 _check_n_components(self.n_components)
                 kwargs['n_components'] = self.n_components
 
+            if transform_method.__name__ in {'pos2vel', 'pos2acc'}:
+                if 'position' not in self.frame.columns and 'position_column' not in kwargs:
+                    if 'pixel' in self.frame.columns:
+                        raise pl.exceptions.ColumnNotFoundError(
+                            "Neither 'position' is in the columns of the dataframe: "
+                            f'{self.frame.columns} nor is the position column specified. '
+                            "Since the dataframe has a 'pixel' column, consider running "
+                            f'pix2deg() before {transform_method.__name__}(). If you want '
+                            'to calculate pixel transformations, you can do so by using '
+                            f"{transform_method.__name__}(position_column='pixel'). "
+                            f'Available dataframe columns are {self.frame.columns}',
+                        )
+                    raise pl.exceptions.ColumnNotFoundError(
+                        "Neither 'position' is in the columns of the dataframe: "
+                        f'{self.frame.columns} nor is the position column specified. '
+                        f'Available dataframe columns are {self.frame.columns}',
+                    )
+            if transform_method.__name__ in {'pix2deg'}:
+                if 'pixel' not in self.frame.columns and 'pixel_column' not in kwargs:
+                    raise pl.exceptions.ColumnNotFoundError(
+                        "Neither 'position' is in the columns of the dataframe: "
+                        f'{self.frame.columns} nor is the pixel column specified. '
+                        'You can specify the pixel column via: '
+                        f'{transform_method.__name__}(pixel_column="name_of_your_pixel_column"). '
+                        f'Available dataframe columns are {self.frame.columns}',
+                    )
+
             if self.trial_columns is None:
                 self.frame = self.frame.with_columns(transform_method(**kwargs))
             else:
