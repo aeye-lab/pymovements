@@ -28,7 +28,7 @@ import numpy as np
 from matplotlib import colors
 from matplotlib.collections import LineCollection
 
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
+from pymovements.gaze import GazeDataFrame
 
 
 # This is really a dirty workaround to use the Agg backend if runnning pytest.

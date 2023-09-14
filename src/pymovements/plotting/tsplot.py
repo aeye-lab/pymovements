@@ -26,7 +26,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import polars as pl
 
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
+from pymovements.gaze import GazeDataFrame
 
 
 def tsplot(

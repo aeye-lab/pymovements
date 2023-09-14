@@ -25,7 +25,7 @@ import polars as pl
 from matplotlib.collections import Collection
 from polars import ColumnNotFoundError
 
-from pymovements.events.frame import EventDataFrame
+from pymovements.events import EventDataFrame
 
 
 def main_sequence_plot(
