@@ -37,7 +37,7 @@ from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events.detection import EventDetectionLibrary
 from pymovements.events.frame import EventDataFrame
 from pymovements.events.processing import EventGazeProcessor
-from pymovements.gaze import GazeDataFrame
+from pymovements.gaze.gaze_dataframe import GazeDataFrame
 
 
 class Dataset:

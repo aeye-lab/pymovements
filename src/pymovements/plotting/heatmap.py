@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import colors
 
-from pymovements.gaze import GazeDataFrame
+from pymovements.gaze.gaze_dataframe import GazeDataFrame
 
 
 def heatmap(
