@@ -211,7 +211,7 @@ def test_from_numpy_all_none():
             id='saccade',
         ),
 
-    ]
+    ],
 )
 def test_from_numpy_events(events):
     if events is None:
