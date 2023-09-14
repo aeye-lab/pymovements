@@ -1195,8 +1195,6 @@ def test_gaze_copy_init_has_same_n_components():
     assert gaze.n_components == gaze_copy.n_components
 
 
-
-
 @pytest.mark.parametrize(
     ('events', 'init_kwargs'),
     [
