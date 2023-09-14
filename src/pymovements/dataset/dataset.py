@@ -36,7 +36,6 @@ from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events.frame import EventDataFrame
 from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import GazeDataFrame
-from pymovements.gaze.transforms import TransformLibrary
 
 
 class Dataset:
@@ -245,11 +244,8 @@ class Dataset:
         self._check_gaze_dataframe()
 
         disable_progressbar = not verbose
-        for gaze_df in tqdm(self.gaze, disable=disable_progressbar):
-            if method in TransformLibrary:
-                gaze_df.transform(method, **kwargs)
-            else:
-                raise ValueError(method)
+        for gaze in tqdm(self.gaze, disable=disable_progressbar):
+            gaze.apply(method, **kwargs)
 
         return self
 
