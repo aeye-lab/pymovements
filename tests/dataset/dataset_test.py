@@ -756,7 +756,7 @@ def test_detect_events_multiple_calls(
             {
                 'method': 'microsaccades',
                 'threshold': 1,
-                'eye': 'left',
+                'eye': 'auto',
                 'clear': False,
                 'verbose': True,
             },
@@ -771,7 +771,7 @@ def test_detect_events_alias(dataset_configuration, detect_kwargs, monkeypatch):
     dataset.pos2vel()
 
     mock = Mock()
-    monkeypatch.setattr(dataset, 'detect_events', mock)
+    monkeypatch.setattr(dataset, 'detect', mock)
 
     dataset.detect(**detect_kwargs)
     mock.assert_called_with(**detect_kwargs)
@@ -801,9 +801,8 @@ def test_detect_events_attribute_error(dataset_configuration):
         pytest.param(
             {'position': 'custom_position'},
             {
-                'method': pm.events.microsaccades,
+                'method': pm.events.idt,
                 'threshold': 1,
-                'eye': 'right',
             },
             (
                 "Column 'position' not found. Available columns are: "
@@ -816,7 +815,6 @@ def test_detect_events_attribute_error(dataset_configuration):
             {
                 'method': pm.events.microsaccades,
                 'threshold': 1,
-                'eye': 'right',
             },
             (
                 "Column 'velocity' not found. Available columns are: "
@@ -834,7 +832,8 @@ def test_detect_events_raises_column_not_found_error(
     dataset.pix2deg()
     dataset.pos2vel()
 
-    dataset.gaze[0].frame = dataset.gaze[0].frame.rename(rename_arg)
+    for file_id, _ in enumerate(dataset.gaze):
+        dataset.gaze[file_id].frame = dataset.gaze[file_id].frame.rename(rename_arg)
 
     with pytest.raises(pl.exceptions.ColumnNotFoundError) as excinfo:
         dataset.detect_events(**detect_event_kwargs)

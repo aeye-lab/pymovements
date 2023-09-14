@@ -23,7 +23,7 @@ import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
+import pymovements as pm
 
 
 @pytest.mark.parametrize(
@@ -704,7 +704,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
     ],
 )
 def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, expected_n_components):
-    gaze = GazeDataFrame(**init_kwargs)
+    gaze = pm.GazeDataFrame(**init_kwargs)
     assert_frame_equal(gaze.frame, expected_frame)
     assert gaze.n_components == expected_n_components
 
@@ -1175,7 +1175,7 @@ def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, exp
 )
 def test_gaze_dataframe_init_exceptions(init_kwargs, exception, exception_msg):
     with pytest.raises(exception) as excinfo:
-        GazeDataFrame(**init_kwargs)
+        pm.GazeDataFrame(**init_kwargs)
 
     msg, = excinfo.value.args
     assert msg == exception_msg
@@ -1187,9 +1187,71 @@ def test_gaze_copy_init_has_same_n_components():
     Refers to issue #514.
     """
     df_orig = pl.from_numpy(np.zeros((2, 1000)), orient='col', schema=['x', 'y'])
-    gaze = GazeDataFrame(df_orig, position_columns=['x', 'y'])
+    gaze = pm.GazeDataFrame(df_orig, position_columns=['x', 'y'])
 
     df_copy = gaze.frame.clone()
-    gaze_copy = GazeDataFrame(df_copy)
+    gaze_copy = pm.GazeDataFrame(df_copy)
 
     assert gaze.n_components == gaze_copy.n_components
+
+
+@pytest.mark.parametrize(
+    ('events', 'init_kwargs'),
+    [
+        pytest.param(
+            None,
+            {
+                'data': pl.from_dict(
+                    {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'position_columns': ['x', 'y'],
+            },
+            id='data_with_no_events',
+        ),
+
+        pytest.param(
+            pm.EventDataFrame(),
+            {
+                'data': pl.from_dict(
+                    {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'position_columns': ['x', 'y'],
+            },
+            id='data_empty_events',
+        ),
+
+        pytest.param(
+            pm.EventDataFrame(),
+            {},
+            id='no_data_empty_events',
+        ),
+
+        pytest.param(
+            pm.EventDataFrame(name='saccade', onsets=[0], offsets=[10]),
+            {},
+            id='no_data_with_saccades',
+        ),
+
+        pytest.param(
+            pm.EventDataFrame(name='fixation', onsets=[100], offsets=[910]),
+            {
+                'data': pl.from_dict(
+                    {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'position_columns': ['x', 'y'],
+            },
+            id='data_with_fixations',
+        ),
+    ],
+)
+def test_gaze_init_events(events, init_kwargs):
+    if events is None:
+        expected_events = pm.EventDataFrame().frame
+    else:
+        expected_events = events.frame
+
+    gaze = pm.GazeDataFrame(events=events, **init_kwargs)
+
+    assert_frame_equal(gaze.events.frame, expected_events)
+    # We don't want the events point to the same reference.
+    assert gaze.events.frame is not expected_events
