@@ -391,10 +391,10 @@ def pos2vel(
         return pl.concat_list(
             [
                 (
-                        pl.col(position_column).shift(periods=-2).list.get(component)
-                        + pl.col(position_column).shift(periods=-1).list.get(component)
-                        - pl.col(position_column).shift(periods=1).list.get(component)
-                        - pl.col(position_column).shift(periods=2).list.get(component)
+                    pl.col(position_column).shift(periods=-2).list.get(component)
+                    + pl.col(position_column).shift(periods=-1).list.get(component)
+                    - pl.col(position_column).shift(periods=1).list.get(component)
+                    - pl.col(position_column).shift(periods=2).list.get(component)
                 ) * (sampling_rate / 6)
                 for component in range(n_components)
             ],
@@ -627,7 +627,7 @@ def smooth(
     _check_padding(padding=padding)
 
     if method in {'moving_average', 'exponential_moving_average'}:
-        pad_kwargs = {"pad_width": 0}
+        pad_kwargs = {'pad_width': 0}
         pad_func = _identity
 
         if isinstance(padding, (int, float)):
@@ -646,7 +646,7 @@ def smooth(
 
             pad_func = partial(
                 np.pad,
-                **pad_kwargs
+                **pad_kwargs,
             )
 
         if method == 'moving_average':
@@ -654,7 +654,7 @@ def smooth(
             return pl.concat_list(
                 [
                     pl.col(column).list.get(component).map(pad_func).list.explode()
-                    .rolling_mean(window_size=window_length,center=True)
+                    .rolling_mean(window_size=window_length, center=True)
                     .shift(periods=pad_kwargs['pad_width'])
                     .slice(pad_kwargs['pad_width'] * 2)
                     for component in range(n_components)
