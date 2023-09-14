@@ -627,7 +627,7 @@ def smooth(
     _check_padding(padding=padding)
 
     if method in {'moving_average', 'exponential_moving_average'}:
-        pad_kwargs = {}
+        pad_kwargs = {"pad_width": 0}
         pad_func = _identity
 
         if isinstance(padding, (int, float)):
@@ -653,10 +653,10 @@ def smooth(
 
             return pl.concat_list(
                 [
-                    pl.col(column).list.get(component).map(pad_func).rolling_mean(
-                        window_size=window_length,
-                        center=True
-                    )
+                    pl.col(column).list.get(component).map(pad_func).list.explode()
+                    .rolling_mean(window_size=window_length,center=True)
+                    .shift(periods=pad_kwargs['pad_width'])
+                    .slice(pad_kwargs['pad_width'] * 2)
                     for component in range(n_components)
                 ],
             ).alias(column)
@@ -668,7 +668,8 @@ def smooth(
                         span=window_length,
                         adjust=False,
                         min_periods=window_length,
-                    ).mean()
+                    ).shift(periods=pad_kwargs['pad_width'])
+                    .slice(pad_kwargs['pad_width'] * 2)
                     for component in range(n_components)
                 ],
             ).alias(column)
