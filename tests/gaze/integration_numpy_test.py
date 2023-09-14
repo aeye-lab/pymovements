@@ -189,7 +189,7 @@ def test_from_numpy_all_none():
 
 
 @pytest.mark.parametrize(
-    ('events'),
+    'events',
     [
         pytest.param(
             None,

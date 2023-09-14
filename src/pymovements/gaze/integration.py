@@ -262,6 +262,8 @@ def from_numpy(
 def from_pandas(
         data: pd.DataFrame,
         experiment: Experiment | None = None,
+        events: pm.EventDataFrame | None = None,
+        *,
         time_column: str | None = None,
         pixel_columns: list[str] | None = None,
         position_columns: list[str] | None = None,
@@ -276,6 +278,8 @@ def from_pandas(
         Data represented as a pandas DataFrame.
     experiment : Experiment
         The experiment definition.
+    events: EventDataFrame
+        A dataframe of events in the gaze signal.
     time_column:
         The name of the timestamp column in the input data frame.
     pixel_columns:
@@ -295,6 +299,7 @@ def from_pandas(
     return GazeDataFrame(
         data=df,
         experiment=experiment,
+        events=events,
         time_column=time_column,
         pixel_columns=pixel_columns,
         position_columns=position_columns,
