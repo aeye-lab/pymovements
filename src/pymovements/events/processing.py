@@ -26,7 +26,7 @@ from typing import Any
 
 import polars as pl
 
-import pymovements as pm
+import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.events.frame import EventDataFrame
 from pymovements.events.properties import EVENT_PROPERTIES
 from pymovements.exceptions import InvalidProperty

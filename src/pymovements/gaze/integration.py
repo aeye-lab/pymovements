@@ -26,7 +26,7 @@ import numpy as np
 import pandas as pd
 import polars as pl
 
-import pymovements as pm
+from pymovements.events.frame import EventDataFrame
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
 from pymovements.utils import checks
@@ -35,7 +35,7 @@ from pymovements.utils import checks
 def from_numpy(
         data: np.ndarray | None = None,
         experiment: Experiment | None = None,
-        events: pm.EventDataFrame | None = None,
+        events: EventDataFrame | None = None,
         *,
         time: np.ndarray | None = None,
         pixel: np.ndarray | None = None,
@@ -262,7 +262,7 @@ def from_numpy(
 def from_pandas(
         data: pd.DataFrame,
         experiment: Experiment | None = None,
-        events: pm.EventDataFrame | None = None,
+        events: EventDataFrame | None = None,
         *,
         time_column: str | None = None,
         pixel_columns: list[str] | None = None,
