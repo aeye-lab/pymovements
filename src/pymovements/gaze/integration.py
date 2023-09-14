@@ -26,8 +26,7 @@ import numpy as np
 import pandas as pd
 import polars as pl
 
-from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
+import pymovements as pm
 from pymovements.utils import checks
 
 
@@ -39,14 +38,14 @@ def from_numpy(
         velocity: np.ndarray | None = None,
         acceleration: np.ndarray | None = None,
         schema: list[str] | None = None,
-        experiment: Experiment | None = None,
+        experiment: pm.Experiment | None = None,
         orient: Literal['col', 'row'] = 'col',
         time_column: str | None = None,
         pixel_columns: list[str] | None = None,
         position_columns: list[str] | None = None,
         velocity_columns: list[str] | None = None,
         acceleration_columns: list[str] | None = None,
-) -> GazeDataFrame:
+) -> pm.GazeDataFrame:
     """Get a :py:class:`~pymovements.gaze.gaze_dataframe.GazeDataFrame` from a numpy array.
 
     There are two mutually exclusive ways of conversion.
@@ -197,7 +196,7 @@ def from_numpy(
 
     if data is not None:
         df = pl.from_numpy(data=data, schema=schema, orient=orient)
-        return GazeDataFrame(
+        return pm.GazeDataFrame(
             data=df,
             experiment=experiment,
             time_column=time_column,
@@ -242,7 +241,7 @@ def from_numpy(
         acceleration_columns = df.columns
 
     df = pl.concat(dfs, how='horizontal')
-    return GazeDataFrame(
+    return pm.GazeDataFrame(
         data=df,
         experiment=experiment,
         time_column=time_column,
@@ -255,13 +254,13 @@ def from_numpy(
 
 def from_pandas(
         data: pd.DataFrame,
-        experiment: Experiment | None = None,
+        experiment: pm.Experiment | None = None,
         time_column: str | None = None,
         pixel_columns: list[str] | None = None,
         position_columns: list[str] | None = None,
         velocity_columns: list[str] | None = None,
         acceleration_columns: list[str] | None = None,
-) -> GazeDataFrame:
+) -> pm.GazeDataFrame:
     """Get a :py:class:`~pymovements.gaze.gaze_dataframe.GazeDataFrame` from a pandas DataFrame.
 
     Parameters
@@ -286,7 +285,7 @@ def from_pandas(
     py:class:`~pymovements.GazeDataFrame`
     """
     df = pl.from_pandas(data=data)
-    return GazeDataFrame(
+    return pm.GazeDataFrame(
         data=df,
         experiment=experiment,
         time_column=time_column,

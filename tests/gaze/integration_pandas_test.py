@@ -35,15 +35,7 @@ def test_from_pandas():
         },
     )
 
-    experiment = pm.Experiment(
-        screen_width_px=1280,
-        screen_height_px=1024,
-        screen_width_cm=38,
-        screen_height_cm=30,
-        distance_cm=68,
-        origin='lower left',
-        sampling_rate=1000.0,
-    )
+    experiment = pm.Experiment(1280, 1024, 38, 30, 68, 'lower left', 1000.0)
 
     gaze = pm.gaze.from_pandas(
         data=pandas_df,
@@ -64,15 +56,7 @@ def test_from_pandas_explicit_columns():
         },
     )
 
-    experiment = pm.Experiment(
-        screen_width_px=1280,
-        screen_height_px=1024,
-        screen_width_cm=38,
-        screen_height_cm=30,
-        distance_cm=68,
-        origin='lower left',
-        sampling_rate=1000.0,
-    )
+    experiment = pm.Experiment(1280, 1024, 38, 30, 68, 'lower left', 1000.0)
 
     gaze = pm.gaze.from_pandas(
         data=pandas_df,
