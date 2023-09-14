@@ -26,6 +26,7 @@ import numpy as np
 import pandas as pd
 import polars as pl
 
+import pymovements as pm
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
 from pymovements.utils import checks
@@ -33,13 +34,15 @@ from pymovements.utils import checks
 
 def from_numpy(
         data: np.ndarray | None = None,
+        experiment: Experiment | None = None,
+        events: pm.EventDataFrame | None = None,
+        *,
         time: np.ndarray | None = None,
         pixel: np.ndarray | None = None,
         position: np.ndarray | None = None,
         velocity: np.ndarray | None = None,
         acceleration: np.ndarray | None = None,
         schema: list[str] | None = None,
-        experiment: Experiment | None = None,
         orient: Literal['col', 'row'] = 'col',
         time_column: str | None = None,
         pixel_columns: list[str] | None = None,
@@ -63,6 +66,10 @@ def from_numpy(
     ----------
     data:
         Two-dimensional data represented as a numpy ndarray.
+    experiment : Experiment
+        The experiment definition.
+    events: EventDataFrame
+        A dataframe of events in the gaze signal.
     time:
         Array of timestamps.
     pixel:
@@ -77,9 +84,6 @@ def from_numpy(
         A list of column names.
     orient:
         Whether to interpret the two-dimensional data as columns or as rows.
-    experiment : Experiment
-        The experiment definition.
-            time_column: str | None = None,
     time_column:
         The name of the timestamp column in the input data frame.
     pixel_columns:
@@ -200,6 +204,7 @@ def from_numpy(
         return GazeDataFrame(
             data=df,
             experiment=experiment,
+            events=events,
             time_column=time_column,
             pixel_columns=pixel_columns,
             position_columns=position_columns,
@@ -245,6 +250,7 @@ def from_numpy(
     return GazeDataFrame(
         data=df,
         experiment=experiment,
+        events=events,
         time_column=time_column,
         pixel_columns=pixel_columns,
         position_columns=position_columns,

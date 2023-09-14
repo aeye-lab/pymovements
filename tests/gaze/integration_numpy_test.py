@@ -20,6 +20,7 @@
 """Test from gaze.from_numpy."""
 import numpy as np
 import polars as pl
+import pytest
 from polars.testing import assert_frame_equal
 
 import pymovements as pm
@@ -164,7 +165,7 @@ def test_from_numpy_explicit_columns():
     assert gaze.n_components == 2
 
 
-def test_init_all_none():
+def test_from_numpy_all_none():
     gaze = pm.gaze.from_numpy(
         data=None,
         schema=None,
@@ -185,3 +186,41 @@ def test_init_all_none():
 
     assert_frame_equal(gaze.frame, expected)
     assert gaze.n_components is None
+
+
+@pytest.mark.parametrize(
+    ('events'),
+    [
+        pytest.param(
+            None,
+            id='events_none',
+        ),
+
+        pytest.param(
+            pm.EventDataFrame(),
+            id='events_empty',
+        ),
+
+        pytest.param(
+            pm.EventDataFrame(name='fixation', onsets=[123], offsets=[345]),
+            id='fixation',
+        ),
+
+        pytest.param(
+            pm.EventDataFrame(name='saccade', onsets=[34123], offsets=[67345]),
+            id='saccade',
+        ),
+
+    ]
+)
+def test_from_numpy_events(events):
+    if events is None:
+        expected_events = pm.EventDataFrame().frame
+    else:
+        expected_events = events.frame
+
+    gaze = pm.gaze.from_numpy(events=events)
+
+    assert_frame_equal(gaze.events.frame, expected_events)
+    # We don't want the events point to the same reference.
+    assert gaze.events.frame is not expected_events
