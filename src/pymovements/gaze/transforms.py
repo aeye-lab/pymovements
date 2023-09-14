@@ -622,7 +622,6 @@ def smooth(
     +-------------+-------------+----------------------------+-------------+
 
     """
-
     _check_window_length(window_length=window_length)
     _check_padding(padding=padding)
 
@@ -698,7 +697,7 @@ def smooth(
 
 
 def _identity(x: Any) -> Any:
-    """Identity function as placeholder for None as padding"""
+    """Identity function as placeholder for None as padding."""
     return x
 
 
