@@ -697,7 +697,7 @@ def smooth(
     )
 
 
-def _identity(x: Any):
+def _identity(x: Any) -> Any:
     """Identity function as placeholder for None as padding"""
     return x
 
