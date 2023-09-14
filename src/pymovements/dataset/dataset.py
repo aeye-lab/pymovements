@@ -36,6 +36,7 @@ from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events.frame import EventDataFrame
 from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import GazeDataFrame
+from pymovements.gaze.transforms import TransformLibrary
 
 
 class Dataset:
@@ -234,6 +235,24 @@ class Dataset:
         )
         return self
 
+    def apply(
+            self,
+            method: str,
+            *,
+            verbose: bool = True,
+            **kwargs: Any,
+    ) -> Dataset:
+        self._check_gaze_dataframe()
+
+        disable_progressbar = not verbose
+        for gaze_df in tqdm(self.gaze, disable=disable_progressbar):
+            if method in TransformLibrary:
+                gaze_df.transform(method, **kwargs)
+            else:
+                raise ValueError(method)
+
+        return self
+
     def pix2deg(self, verbose: bool = True) -> Dataset:
         """Compute gaze positions in degrees of visual angle from pixel coordinates.
 
@@ -257,13 +276,7 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
-        self._check_gaze_dataframe()
-
-        disable_progressbar = not verbose
-        for gaze_df in tqdm(self.gaze, disable=disable_progressbar):
-            gaze_df.pix2deg()
-
-        return self
+        return self.apply('pix2deg', verbose=verbose)
 
     def pos2acc(
             self,
@@ -301,17 +314,13 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
-        self._check_gaze_dataframe()
-
-        disable_progressbar = not verbose
-        for gaze_df in tqdm(self.gaze, disable=disable_progressbar):
-            gaze_df.pos2acc(
-                window_length=window_length,
-                degree=degree,
-                padding=padding,
-            )
-
-        return self
+        return self.apply(
+            'pos2acc',
+            window_length=window_length,
+            degree=degree,
+            padding=padding,
+            verbose=verbose,
+        )
 
     def pos2vel(
             self,
@@ -346,13 +355,7 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
-        self._check_gaze_dataframe()
-
-        disable_progressbar = not verbose
-        for gaze_df in tqdm(self.gaze, disable=disable_progressbar):
-            gaze_df.pos2vel(method=method, **kwargs)
-
-        return self
+        return self.apply('pos2vel', method=method, verbose=verbose, **kwargs)
 
     def detect_events(
             self,
