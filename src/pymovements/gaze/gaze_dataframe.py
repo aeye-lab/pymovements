@@ -27,6 +27,7 @@ from typing import Any
 
 import polars as pl
 
+import pymovements as pm
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
 from pymovements.utils import checks
@@ -79,6 +80,7 @@ class GazeDataFrame:
             self,
             data: pl.DataFrame | None = None,
             experiment: Experiment | None = None,
+            events: pm.EventDataFrame | None = None,
             *,
             trial_columns: str | list[str] | None = None,
             time_column: str | None = None,
@@ -95,6 +97,8 @@ class GazeDataFrame:
             A dataframe to be transformed to a polars dataframe.
         experiment : Experiment
             The experiment definition.
+        events: EventDataFrame
+            A dataframe of events in the gaze signal.
         trial_columns:
             The name of the trial columns in the input data frame. If the list is empty or None,
             the input data frame is assumed to contain only one trial. If the list is not empty,
@@ -213,6 +217,11 @@ class GazeDataFrame:
 
         self.n_components = _infer_n_components(self.frame, column_specifiers)
         self.experiment = experiment
+
+        if events is None:
+            self.events = pm.EventDataFrame()
+        else:
+            self.events = events.clone()
 
     def transform(
             self,
