@@ -627,7 +627,7 @@ def smooth(
     _check_padding(padding=padding)
 
     if method in {'moving_average', 'exponential_moving_average'}:
-        pad_kwargs = {'pad_width': 0}
+        pad_kwargs : dict[str, Any] = {'pad_width': 0.0}
         pad_func = _identity
 
         if isinstance(padding, (int, float)):
