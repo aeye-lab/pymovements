@@ -221,7 +221,7 @@ class GazeDataFrame:
         if events is None:
             self.events = pm.EventDataFrame()
         else:
-            self.events = events.clone()
+            self.events = events.copy()
 
     def transform(
             self,
