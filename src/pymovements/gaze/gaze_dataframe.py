@@ -27,7 +27,7 @@ from typing import Any
 
 import polars as pl
 
-import pymovements as pm
+import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
 from pymovements.utils import checks
