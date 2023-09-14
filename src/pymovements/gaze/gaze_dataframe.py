@@ -224,6 +224,27 @@ class GazeDataFrame:
         else:
             self.events = events.copy()
 
+    def apply(
+            self,
+            method: str,
+            **kwargs: Any,
+    ) -> None:
+        """Apply preprocessing method to GazeDataFrame.
+
+        Parameters
+        ----------
+        method: str
+            Name of the preprocessing method to apply.
+        kwargs:
+            kwargs that will be forwarded when calling the preprocessing method.
+        """
+        if transforms.TransformLibrary.__contains__(method):
+            self.transform(method, **kwargs)
+        elif pm.events.EventDetectionLibrary.__contains__(method):
+            self.detect(method, **kwargs)
+        else:
+            raise ValueError(f"unsupported method '{method}'")
+
     def transform(
             self,
             transform_method: str | Callable[..., pl.Expr],
