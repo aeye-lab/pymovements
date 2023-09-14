@@ -664,7 +664,8 @@ def smooth(
         if method == 'exponential_moving_average':
             return pl.concat_list(
                 [
-                    pl.col(column).list.get(component).map(pad_func).ewm_mean(
+                    pl.col(column).list.get(component).map(pad_func).list.explode()
+                    .ewm_mean(
                         span=window_length,
                         adjust=False,
                         min_periods=window_length,
