@@ -254,7 +254,22 @@ def test_idt_raises_error(kwargs, expected_error):
                 onsets=[1000],
                 offsets=[1099],
             ),
-            id='constant_position_single_fixation_with_timesteps_float',
+            id='constant_position_single_fixation_with_timesteps_float_no_decimal',
+        ),
+        pytest.param(
+            {
+                'positions': step_function(length=100, steps=[0], values=[(0, 0)]),
+                'timesteps': np.arange(1000, 1010, 0.1, dtype=float),
+                'dispersion_threshold': 1,
+                'minimum_duration': 2,
+            },
+            pm.events.EventDataFrame(
+                name='fixation',
+                onsets=[1000],
+                offsets=[1099],
+            ),
+            id='constant_position_single_fixation_with_timesteps_float_with_decimal',
+            marks=pytest.mark.xfail(reason='#532'),
         ),
     ],
 )
