@@ -27,20 +27,24 @@ import pymovements as pm
     ('kwargs', 'shape'),
     [
         pytest.param(
-            {'file': 'tests/gaze/io/files/monocular_example.csv',
-                'time_column': 'time', 'pixel_columns': ['x_left_pix', 'y_left_pix']},
+            {
+                'file': 'tests/gaze/io/files/monocular_example.csv',
+                'time_column': 'time', 'pixel_columns': ['x_left_pix', 'y_left_pix'],
+            },
             (10, 2),
             id='csv_mono_shape',
         ),
         pytest.param(
-            {'file': 'tests/gaze/io/files/binocular_example.csv',
+            {
+                'file': 'tests/gaze/io/files/binocular_example.csv',
                 'time_column': 'time',
                 'pixel_columns': ['x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix'],
-                'position_columns': ['x_left_pos', 'y_left_pos', 'x_right_pos', 'y_right_pos']},
+                'position_columns': ['x_left_pos', 'y_left_pos', 'x_right_pos', 'y_right_pos'],
+            },
             (10, 3),
             id='csv_bino_shape',
         ),
-    ]
+    ],
 )
 def test_shapes(kwargs, shape):
     gaze_dataframe = pm.gaze.from_csv(**kwargs)
