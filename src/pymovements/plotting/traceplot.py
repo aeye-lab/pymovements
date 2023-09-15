@@ -21,11 +21,14 @@
 from __future__ import annotations
 
 import sys
+from typing import Literal
+from typing import Sequence
+from typing import TypeAlias
 
-import matplotlib
+import matplotlib.colors
 import matplotlib.pyplot as plt
+import matplotlib.scale
 import numpy as np
-from matplotlib import colors
 from matplotlib.collections import LineCollection
 
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
@@ -37,44 +40,59 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
 if 'pytest' in sys.modules:  # pragma: no cover
     matplotlib.use('Agg')
 
-DEFAULT_SEGMENTDATA = {
+LinearSegmentedColormapType: TypeAlias = dict[
+    Literal['red', 'green', 'blue', 'alpha'], Sequence[tuple[float, ...]],
+]
+
+DEFAULT_SEGMENTDATA: LinearSegmentedColormapType = {
     'red': [
-        [0.0, 0.0, 0.0],
-        [0.5, 1.0, 1.0],
-        [1.0, 1.0, 1.0],
+        (0.0, 0.0, 0.0),
+        (0.5, 1.0, 1.0),
+        (1.0, 1.0, 1.0),
     ],
     'green': [
-        [0.0, 0.0, 0.0],
-        [0.5, 1.0, 1.0],
-        [1.0, 0.0, 0.0],
+        (0.0, 0.0, 0.0),
+        (0.5, 1.0, 1.0),
+        (1.0, 0.0, 0.0),
     ],
     'blue': [
-        [0.0, 0.0, 0.0],
-        [0.5, 0.0, 0.0],
-        [1.0, 0.0, 0.0],
+        (0.0, 0.0, 0.0),
+        (0.5, 0.0, 0.0),
+        (1.0, 0.0, 0.0),
+    ],
+    'alpha': [
+        (1.0, 1.0, 1.0),
+        (1.0, 1.0, 1.0),
+        (1.0, 1.0, 1.0),
     ],
 }
 
 
-DEFAULT_SEGMENTDATA_TWOSLOPE = {
+DEFAULT_SEGMENTDATA_TWOSLOPE: LinearSegmentedColormapType = {
     'red': [
-        [0.0, 0.0, 0.0],
-        [0.5, 0.0, 0.0],
-        [0.75, 1.0, 1.0],
-        [1.0, 1.0, 1.0],
+        (0.0, 0.0, 0.0),
+        (0.5, 0.0, 0.0),
+        (0.75, 1.0, 1.0),
+        (1.0, 1.0, 1.0),
     ],
     'green': [
-        [0.0, 0.0, 0.0],
-        [0.25, 1.0, 1.0],
-        [0.5, 0.0, 0.0],
-        [0.75, 1.0, 1.0],
-        [1.0, 0.0, 0.0],
+        (0.0, 0.0, 0.0),
+        (0.25, 1.0, 1.0),
+        (0.5, 0.0, 0.0),
+        (0.75, 1.0, 1.0),
+        (1.0, 0.0, 0.0),
     ],
     'blue': [
-        [0.0, 1.0, 1.0],
-        [0.25, 1.0, 1.0],
-        [0.5, 0.0, 0.0],
-        [1.0, 0.0, 0.0],
+        (0.0, 1.0, 1.0),
+        (0.25, 1.0, 1.0),
+        (0.5, 0.0, 0.0),
+        (1.0, 0.0, 0.0),
+    ],
+    'alpha': [
+        (1.0, 1.0, 1.0),
+        (1.0, 1.0, 1.0),
+        (1.0, 1.0, 1.0),
+        (1.0, 1.0, 1.0),
     ],
 }
 
@@ -83,9 +101,9 @@ def traceplot(
         gaze: GazeDataFrame,
         position_column: str = 'pixel',
         cval: np.ndarray | None = None,  # pragma: no cover
-        cmap: colors.Colormap | None = None,
-        cmap_norm: colors.Normalize | str | None = None,
-        cmap_segmentdata: dict[str, list[list[float]]] | None = None,
+        cmap: matplotlib.colors.Colormap | None = None,
+        cmap_norm: matplotlib.colors.Normalize | str | None = None,
+        cmap_segmentdata: LinearSegmentedColormapType | None = None,
         cbar_label: str | None = None,
         show_cbar: bool = False,
         padding: float | None = None,
@@ -148,7 +166,7 @@ def traceplot(
         show_cbar = False
 
     cval_max = np.nanmax(np.abs(cval))
-    cval_min = np.nanmin(cval)
+    cval_min = np.nanmin(cval).astype(float)
 
     if cmap_norm is None:
         if cval_max and cval_min < 0:
@@ -218,7 +236,8 @@ def traceplot(
         # sm.set_array(cval)
         fig.colorbar(line, label=cbar_label, ax=ax)
 
-    ax.set_title(title)
+    if title:
+        ax.set_title(title)
 
     if savepath is not None:
         fig.savefig(savepath)
