@@ -21,15 +21,17 @@
 from __future__ import annotations
 
 import sys
+from typing import Dict
 from typing import Literal
 from typing import Sequence
-from typing import TypeAlias
+from typing import Tuple
 
 import matplotlib.colors
 import matplotlib.pyplot as plt
 import matplotlib.scale
 import numpy as np
 from matplotlib.collections import LineCollection
+from typing_extensions import TypeAlias
 
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
 
@@ -40,8 +42,8 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
 if 'pytest' in sys.modules:  # pragma: no cover
     matplotlib.use('Agg')
 
-LinearSegmentedColormapType: TypeAlias = dict[
-    Literal['red', 'green', 'blue', 'alpha'], Sequence[tuple[float, ...]],
+LinearSegmentedColormapType: TypeAlias = Dict[
+    Literal['red', 'green', 'blue', 'alpha'], Sequence[Tuple[float, ...]],
 ]
 
 DEFAULT_SEGMENTDATA: LinearSegmentedColormapType = {
@@ -201,7 +203,10 @@ def traceplot(
     elif isinstance(cmap_norm, str):
         # pylint: disable=protected-access
 
-        if (scale_class := matplotlib.scale._scale_mapping.get(cmap_norm, None)) is None:
+        # to handle after https://github.com/pydata/xarray/pull/8030 is merged
+        if (
+            scale_class := matplotlib.scale._scale_mapping.get(cmap_norm, None)  # type: ignore
+        ) is None:
             raise ValueError(f'cmap_norm string {cmap_norm} is not supported')
 
         norm_class = matplotlib.colors.make_norm_from_scale(scale_class)

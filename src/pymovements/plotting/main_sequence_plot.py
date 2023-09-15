@@ -110,7 +110,7 @@ def main_sequence_plot(
         alpha=alpha,
         s=marker_size,
         marker=marker,
-        # XXX to handle after  https://github.com/pydata/xarray/pull/8030 is merged
+        # to handle after  https://github.com/pydata/xarray/pull/8030 is merged
         **kwargs,  # type: ignore
     )
 
