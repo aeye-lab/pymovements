@@ -168,6 +168,38 @@ from pymovements.synthetic import step_function
             id='pix2deg_origin_center',
         ),
 
+        pytest.param(
+            'pos2vel',
+            {'method': 'preceding'},
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'trial_id': [1, 1, 1, 2, 2, 2],
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
+                        'x': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                        'y': [1.0, 1.1, 1.2, 1.0, 1.1, 1.2],
+                    },
+                ),
+                experiment=pm.Experiment(100, 100, 100, 100, 100, 'center', 1000),
+                trial_columns='trial_id',
+                position_columns=['x', 'y'],
+            ),
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'trial_id': [1, 1, 1, 2, 2, 2],
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
+                        'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                        'y_dva': [1.0, 1.1, 1.2, 1.0, 1.1, 1.2],
+                        'x_vel': [None, 0.0, 0.0, None, 0.0, 0.0],
+                        'y_vel': [None, 100.0, 100.0, None, 100.0, 100.0],
+                    },
+                ),
+                position_columns=['x_dva', 'y_dva'],
+                velocity_columns=['x_vel', 'y_vel'],
+            ),
+            id='pos2vel_preceding_trialize_single_column_str',
+        ),
     ],
 )
 def test_gaze_apply(method, kwargs, gaze, expected):
