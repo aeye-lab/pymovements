@@ -30,6 +30,7 @@ from matplotlib.collections import LineCollection
 
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
 
+
 # This is really a dirty workaround to use the Agg backend if runnning pytest.
 # This is needed as Windows workers on GitHub fail randomly with other backends.
 # Unfortunately the Agg module cannot show plots in jupyter notebooks.
