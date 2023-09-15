@@ -25,8 +25,8 @@ from typing import Any
 
 import polars as pl
 
-from pymovements.gaze import Experiment
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
+from pymovements.gaze import Experiment  # pylint: disable=cyclic-import
+from pymovements.gaze.gaze_dataframe import GazeDataFrame  # pylint: disable=cyclic-import
 
 
 def from_csv(
