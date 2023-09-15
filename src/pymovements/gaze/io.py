@@ -97,7 +97,8 @@ def from_csv(
 
     Examples
     --------
-    First let's assume a CSV file stored `tests/gaze/io/files/monocular_example.csv` with the following content:
+    First let's assume a CSV file stored `tests/gaze/io/files/monocular_example.csv`
+    with the following content:
     shape: (10, 3)
     ┌──────┬────────────┬────────────┐
     │ time ┆ x_left_pix ┆ y_left_pix │
@@ -118,7 +119,8 @@ def from_csv(
     We can now load the data into a ``GazeDataFrame`` by specyfing the experimental setting
     and the names of the pixel position columns.
 
-    >>> gaze = from_csv(file='tests/gaze/io/files/monocular_example.csv',
+    >>> gaze = from_csv(
+    ...     file='tests/gaze/io/files/monocular_example.csv',
     ...     time_column = 'time',
     ...     pixel_columns = ['x_left_pix','y_left_pix'],)
     >>> gaze.frame
