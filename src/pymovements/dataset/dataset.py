@@ -236,16 +236,27 @@ class Dataset:
 
     def apply(
             self,
-            method: str,
+            function: str,
             *,
             verbose: bool = True,
             **kwargs: Any,
     ) -> Dataset:
+        """Apply preprocessing method to all GazeDataFrames in Dataset.
+
+        Parameters
+        ----------
+        function: str
+            Name of the preprocessing function to apply.
+        verbose : bool
+            If True, show progress bar of computation.
+        kwargs:
+            kwargs that will be forwarded when calling the preprocessing method.
+        """
         self._check_gaze_dataframe()
 
         disable_progressbar = not verbose
         for gaze in tqdm(self.gaze, disable=disable_progressbar):
-            gaze.apply(method, **kwargs)
+            gaze.apply(function, **kwargs)
 
         return self
 
