@@ -119,8 +119,8 @@ def from_csv(
     and the names of the pixel position columns.
 
     >>> gaze = from_csv(file='sample.csv',
-                         time_column = 'time',
-                         pixel_columns = ['x_left_pix','y_left_pix'],)
+    ...     time_column = 'time',
+    ...     pixel_columns = ['x_left_pix','y_left_pix'],)
     >>> gaze.frame
     shape: (10, 2)
     ┌──────┬───────────┐
