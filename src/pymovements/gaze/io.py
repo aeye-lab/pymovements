@@ -119,6 +119,7 @@ def from_csv(
     We can now load the data into a ``GazeDataFrame`` by specyfing the experimental setting
     and the names of the pixel position columns.
 
+    >>> from pymovements.gaze.io import from_csv
     >>> gaze = from_csv(
     ...     file='tests/gaze/io/files/monocular_example.csv',
     ...     time_column = 'time',
