@@ -169,7 +169,7 @@ def pix2deg(
         *,
         screen_resolution: tuple[int, int],
         screen_size: tuple[float, float],
-        distance: float,
+        distance: float | str,
         origin: str,
         n_components: int,
         pixel_column: str = 'pixel',
@@ -184,7 +184,9 @@ def pix2deg(
     screen_size:
         Screen size in centimeters as tuple (width, height).
     distance:
-        Eye-to-screen distance in centimeters
+        Must be either a scalar or a string. If a scalar is passed, it is interpreted as the
+        Eye-to-screen distance in centimeters. If a string is passed, it is interpreted as the name
+        of a column containing the Eye-to-screen distance in centimeters for each sample.
     origin:
         The location of the pixel origin. Supported values: ``center``, ``lower left``. See also
         py:func:`~pymovements.gaze.transform.center_origin` for more information.
@@ -197,7 +199,6 @@ def pix2deg(
     """
     _check_screen_resolution(screen_resolution)
     _check_screen_size(screen_size)
-    _check_distance(distance)
 
     centered_pixels = center_origin(
         screen_resolution=screen_resolution,
@@ -206,18 +207,32 @@ def pix2deg(
         pixel_column=pixel_column,
     )
 
-    # Compute eye-to-screen-distance in pixel units.
-    distance_pixels = tuple(
-        distance * (screen_px / screen_cm)
-        for screen_px, screen_cm in zip(screen_resolution, screen_size)
-    )
+    if isinstance(distance, (float, int)):
+        _check_distance(distance)
 
-    degree_components = [
-        centered_pixels.list.get(component).map(
-            _arctan2_helper(distance_pixels[component % 2]),
-        ) * (180 / np.pi)
-        for component in range(n_components)
-    ]
+        # distance is a scalar.
+        # Compute eye-to-screen-distance in pixel units.
+        distance_pixels = tuple(
+            distance * (screen_px / screen_cm)
+            for screen_px, screen_cm in zip(screen_resolution, screen_size)
+        )
+
+        degree_components = [
+            centered_pixels.list.get(component).map(
+                _arctan2_helper(distance_pixels[component % 2]),
+            ) * (180 / np.pi)
+            for component in range(n_components)
+        ]
+
+    elif isinstance(distance, str):
+        # distance is a column name
+        degree_components = [
+            pl.arctan2(
+                centered_pixels.list.get(component),
+                pl.col(distance).mul(screen_resolution[component % 2] / screen_size[component % 2]),
+            ) * (180 / np.pi)
+            for component in range(n_components)
+        ]
 
     return pl.concat_list(list(degree_components)).alias(position_column)
 

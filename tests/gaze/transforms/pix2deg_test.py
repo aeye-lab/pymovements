@@ -307,7 +307,7 @@ def test_pix2deg_raises_error(kwargs, series, exception, msg_substrings):
             {
                 'screen_resolution': (100, 100),
                 'screen_size': (100, 100),
-                'distance': 100,
+                'distance': 100.,
                 'origin': 'center',
                 'pixel_column': 'pixel',
                 'position_column': 'position',
@@ -501,13 +501,27 @@ def test_pix2deg_raises_error(kwargs, series, exception, msg_substrings):
         ),
     ],
 )
-def test_pix2deg_returns(kwargs, series, expected_df):
-    df = series.to_frame()
+def test_pix2deg_returns(kwargs, series, expected_df, distance_as_column):
+    df = series.to_frame().clone()
+    kwargs = kwargs.copy()
+
+    # Decide whether to pass distance as column or scalar
+    if distance_as_column:
+        df = df.with_columns(
+            pl.Series('distance', [float(kwargs['distance'])], pl.Float64),
+        )
+
+        kwargs['distance'] = 'distance'
 
     result_df = df.select(
         pm.gaze.transforms.pix2deg(**kwargs),
     )
     assert_frame_equal(result_df, expected_df.to_frame())
+
+
+@pytest.fixture(params=[True, False], ids=['column_distance', 'scalar_distance'])
+def distance_as_column(request):
+    return request.param
 
 
 def test__arctan2_helper():
