@@ -568,7 +568,7 @@ def smooth(
         Number of components in input column.
     degree:
         The degree of the polynomial to use. This has only an effect if using ``savitzky_golay`` as
-        smoothing method.
+        smoothing method. `degree` must be less than `window_length`.
     padding:
         Must be either ``None``, a scalar or one of the strings ``mirror``, ``nearest`` or ``wrap``.
         This determines the type of extension to use for the padded signal to
@@ -626,7 +626,7 @@ def smooth(
     _check_padding(padding=padding)
 
     if method in {'moving_average', 'exponential_moving_average'}:
-        pad_kwargs: dict[str, Any] = {'pad_width': 0.0}
+        pad_kwargs: dict[str, Any] = {'pad_width': 0}
         pad_func = _identity
 
         if isinstance(padding, (int, float)):
@@ -641,7 +641,7 @@ def smooth(
 
         if padding is not None:
             pad_kwargs['mode'] = padding
-            pad_kwargs['pad_width'] = window_length // 2
+            pad_kwargs['pad_width'] = np.ceil(window_length / 2).astype(int)
 
             pad_func = partial(
                 np.pad,
