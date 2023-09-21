@@ -660,7 +660,7 @@ def smooth(
                 ],
             ).alias(column)
 
-        if method == 'exponential_moving_average':
+        elif method == 'exponential_moving_average':
             return pl.concat_list(
                 [
                     pl.col(column).list.get(component).map(pad_func).list.explode()
