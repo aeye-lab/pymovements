@@ -23,6 +23,8 @@ from __future__ import annotations
 import bz2
 import gzip
 import lzma
+import os
+import shutil
 import tarfile
 import zipfile
 from collections.abc import Callable
@@ -37,6 +39,7 @@ def extract_archive(
         destination_path: Path | None = None,
         recursive: bool = True,
         remove_finished: bool = False,
+        remove_top_level: bool = True,
         verbose: int = 1,
 ) -> Path:
     """Extract an archive.
@@ -55,11 +58,12 @@ def extract_archive(
         Recursively extract archives which are included in extracted archive.
     remove_finished : bool
         If ``True``, remove the file after the extraction.
+    remove_top_level: bool
+        If ``True``, remove the top-level directory if it has only one child.
     verbose:
         Verbosity levels: (1) Print messages for extracting each dataset resource without printing
         messages for recursive archives. (2) Print additional messages for each recursive archive
         extract.
-
     Returns
     -------
     Path :
@@ -109,6 +113,13 @@ def extract_archive(
                 remove_finished=remove_finished,
                 verbose=0 if verbose < 2 else 2,
             )
+
+    if remove_top_level:
+        # Check if top-level directory has a single child
+        if len([f.path for f in os.scandir(destination_path)]) == 1:
+            single_child = [f.path for f in os.scandir(destination_path)][0]
+            shutil.copytree(single_child, destination_path, dirs_exist_ok=True)
+            shutil.rmtree(single_child)
 
     return destination_path
 

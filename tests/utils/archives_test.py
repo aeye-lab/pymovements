@@ -296,3 +296,18 @@ def test_decompress_unknown_compression_suffix():
         _decompress(pathlib.Path('test.zip.zip'))
     msg, = excinfo.value.args
     assert msg == "Couldn't detect a compression from suffix .zip."
+
+
+@pytest.mark.parametrize(
+    'remove_top_level',
+    [
+        pytest.param(False, id='remove_top_level_false'),
+        pytest.param(True, id='remove_top_level_true'),
+    ],
+)
+def test_remove_top_level(remove_top_level, archive):
+    extract_archive(
+        source_path=archive,
+        destination_path=None,
+        remove_top_level=remove_top_level,
+    )
