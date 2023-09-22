@@ -397,15 +397,17 @@ def pos2vel(
     velocity_column: str
         The output velocity column name.
 
-    Raises
-    ------
-    ValueError
-        If method is unknown.
-
     Returns
     -------
     pl.Expr
         Velocity values as polars expression.
+
+    Raises
+    ------
+    ValueError
+        If method is unknown.
+    TypeError
+        If degree or window length is not provided when choosing Savitzky Golay method.
 
     Notes
     -----

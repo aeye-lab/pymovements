@@ -46,6 +46,8 @@ class GazeDataFrame:
         A dataframe to be transformed to a polars dataframe.
     experiment : Experiment | None
         The experiment definition.
+    events : pm.EventDataFrame | None
+        An optional dataframes with events.
     trial_columns: str | list[str] | None
         The name of the trial columns in the input data frame. If the list is empty or None,
         the input data frame is assumed to contain only one trial. If the list is not empty,
@@ -231,8 +233,13 @@ class GazeDataFrame:
         ----------
         function: str
             Name of the preprocessing method to apply.
-        kwargs:
+        **kwargs: Any
             kwargs that will be forwarded when calling the preprocessing method.
+
+        Raises
+        ------
+        ValueError
+            If function is not supported.
         """
         if transforms.TransformLibrary.__contains__(function):
             self.transform(function, **kwargs)
@@ -330,7 +337,7 @@ class GazeDataFrame:
                     ],
                 )
 
-    def pix1deg(self) -> None:
+    def pix2deg(self) -> None:
         """Compute gaze positions in degrees of visual angle from pixel position coordinates.
 
         This method requires a properly initialized :py:attr:`~.GazeDataFrame.experiment` attribute.
@@ -398,7 +405,7 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        method : EventDetectionCallable
+        method : Callable[..., pm.EventDataFrame] | str
             The event detection method to be applied.
         eye : str
             Select which eye to choose. Valid options are ``auto``, ``left``, ``right`` or ``None``.
@@ -407,7 +414,7 @@ class GazeDataFrame:
         clear : bool
             If ``True``, event DataFrame will be overwritten with new DataFrame instead of being
              merged into the existing one.
-        **kwargs :
+        **kwargs : Any
             Additional keyword arguments to be passed to the event detection method.
         """
         if not self.events or clear:
@@ -591,12 +598,12 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        column_specifiers:
+        column_specifiers: list[list[str]]
             List of list of column specifiers.
 
         Returns
         -------
-        int or None
+        int | None
             Number of components
 
         Raises
@@ -634,6 +641,18 @@ class GazeDataFrame:
         eye: str
             String specificer for inferring eye components. Supported values are: auto, mono, left
             right, cyclops. Default: auto.
+
+        Returns
+        -------
+        tuple[int, int]
+            Returns columns corresponding to eye string.
+
+        Raises
+        ------
+        ValueError
+            If provided eye string is unknown.
+        AttributeError
+            If not enough components provided.
         """
         self._check_n_components()
 
@@ -682,12 +701,22 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        method: Callable
+        method: Callable[..., pm.EventDataFrame]
             The method for which the keyword argument dictionary will be filled.
         eye: str
             The string specifier for the eye to choose.
-        kwargs:
+        **kwargs: Any
             The source keyword arguments passed to the `GazeDataFrame.detect()` method.
+
+        Returns
+        -------
+        dict[str, Any]
+            Event detection kwargs.
+
+        Raises
+        ------
+        pl.exceptions.ColumnNotFoundError
+            If velocity column is not found.
         """
         # Automatically infer eye to use for event detection.
         method_args = inspect.getfullargspec(method).args
