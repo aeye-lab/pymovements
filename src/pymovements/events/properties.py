@@ -53,15 +53,15 @@ def amplitude(
 
     Parameters
     ----------
-    position_column
+    position_column: str
         The column name of the position tuples.
-    n_components:
+    n_components: int
         Number of positional components. Usually these are the two components yaw and pitch.
 
-    Raises
-    ------
-    ValueError
-        If number of components is not 2.
+    Returns
+    -------
+    pl.Expr
+        Amplitude of the event.
     """
     _check_has_two_componenents(n_components)
 
@@ -94,15 +94,15 @@ def dispersion(
 
     Parameters
     ----------
-    position_column
+    position_column: str
         The column name of the position tuples.
-    n_components:
+    n_components: int
         Number of positional components. Usually these are the two components yaw and pitch.
 
-    Raises
-    ------
-    ValueError
-        If number of components is not 2.
+    Returns
+    -------
+    pl.Expr
+        Calculate dispersion of event.
     """
     _check_has_two_componenents(n_components)
 
@@ -130,16 +130,16 @@ def disposition(
 
     Parameters
     ----------
-    position_column
+    position_column: str
         The column name of the position tuples.
-    n_components:
+    n_components: int
         Number of positional components. Usually these are the two components yaw and pitch.
 
-    Raises
-    ------
-    TypeError
-        If position_columns not of type tuple, position_columns not of length 2, or elements of
-        position_columns not of type str.
+    Returns
+    -------
+    pl.Expr
+        Calculate disposition from first to last time step within event.
+
     """
     _check_has_two_componenents(n_components)
 
@@ -184,13 +184,18 @@ def location(
 
     Parameters
     ----------
-    method
+    method: str
         The centroid method to be used for calculation. Supported methods are ``mean``, ``median``.
         Defaults to 'mean'.
-    position_column
+    position_column: str
         The column name of the position tuples.
-    n_components:
+    n_components: int
         Number of positional components. Usually these are the two components yaw and pitch.
+
+    Returns
+    -------
+    pl.Expr
+        Calculate event location based on method selected.
 
     Raises
     ------
@@ -241,15 +246,15 @@ def peak_velocity(
 
     Parameters
     ----------
-    velocity_column
+    velocity_column: str
         The column name of the velocity tuples.
-    n_components:
+    n_components: int
         Number of positional components. Usually these are the two components yaw and pitch.
 
-    Raises
-    ------
-    ValueError
-        If number of components is not 2.
+    Returns
+    -------
+    pl.Expr
+        Calculate 2D peak velcoity
     """
     _check_has_two_componenents(n_components)
 

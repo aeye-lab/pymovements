@@ -52,23 +52,23 @@ def tsplot(
 
     Parameters
     ----------
-    gaze:
+    gaze: GazeDataFrame
         The GazeDataFrame to plot.
-    channels: list, optional
+    channels: list[str] | None
         list of channel names
-    n_cols: int
-        Number of channel subplot colunms. If None, it will be automatically inferred.
-    n_rows: int
-        Number of channel subplot rows. If None, it will be automatically inferred.
-    xlabel: str, optional
+    xlabel: str | None
         set x label
+    n_cols: int | None
+        Number of channel subplot colunms. If None, it will be automatically inferred.
+    n_rows: int | None
+        Number of channel subplot rows. If None, it will be automatically inferred.
     rotate_ylabels: bool
         set to rotate ylabels
     share_y: bool
         set if y-axes should share common axis
     zero_centered_yaxis: bool
         set if y-axis should be zero centered
-    line_color: tuple, str
+    line_color: tuple[int, int, int] | str
         set line color
     line_width: int
         set line width
@@ -76,19 +76,15 @@ def tsplot(
         set to show grid
     show_yticks: bool
         set to show yticks
-    figsize: tuple
+    figsize: tuple[int, int]
         Figure size.
-    title: str, optional
+    title: str | None
         Figure title.
-    savepath: str, optional
+    savepath: str | None
         If given, figure will be saved to this path.
     show: bool
         If True, figure will be shown.
 
-    Raises
-    ------
-    ValueError
-        If array has more than two dimensions.
     """
     if channels is None:
         channels = [c for c in gaze.frame.columns if gaze.frame[c].dtype != pl.List]

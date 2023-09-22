@@ -48,21 +48,21 @@ def extract_archive(
     ----------
     source_path : Path
         Path to the file to be extracted.
-    destination_path : Path, optional
+    destination_path : Path | None
         Path to the directory the file will be extracted to. If omitted, the directory of the file
         is used.
     recursive : bool
         Recursively extract archives which are included in extracted archive.
     remove_finished : bool
         If ``True``, remove the file after the extraction.
-    verbose:
+    verbose : int
         Verbosity levels: (1) Print messages for extracting each dataset resource without printing
         messages for recursive archives. (2) Print additional messages for each recursive archive
         extract.
 
     Returns
     -------
-    Path :
+    Path : Path
         Path to the directory the file was extracted to.
     """
     archive_type, compression_type = _detect_file_type(source_path)
@@ -126,7 +126,7 @@ def _extract_tar(
         Path to the file to be extracted.
     destination_path : Path
         Path to the directory the file will be extracted to.
-    compression : str, optional
+    compression : str | None
         Compression filename suffix.
     """
     with tarfile.open(source_path, f'r:{compression[1:]}' if compression else 'r') as archive:
@@ -146,7 +146,7 @@ def _extract_zip(
         Path to the file to be extracted.
     destination_path : Path
         Path to the directory the file will be extracted to.
-    compression : str, optional
+    compression : str | None
         Compression filename suffix.
     """
     compression_id = _ZIP_COMPRESSION_MAP[compression] if compression else zipfile.ZIP_STORED
@@ -187,7 +187,7 @@ def _detect_file_type(filepath: Path) -> tuple[str | None, str | None]:
 
     Returns
     -------
-    tuple[str, str] :
+    tuple[str | None, str | None]
         Tuple of archive type, and compression type.
 
     Raises
@@ -252,14 +252,15 @@ def _decompress(
     ----------
     source_path : Path
         Path to the file to be decompressed.
-    destination_path : Path
+    destination_path : Path | None
         Path to the decompressed file.
     remove_finished : bool
         If ``True``, remove the source file after decompression.
 
     Returns
     -------
-    Path : Path to the decompressed file.
+    Path : Path
+        Path to the decompressed file.
 
     Raises
     ------

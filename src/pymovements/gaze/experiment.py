@@ -31,12 +31,39 @@ from pymovements.utils import decorators
 class Experiment:
     """Experiment class for holding experiment properties.
 
-    Attributes
+    Parameters
     ----------
-    screen : Screen
-        Screen object for experiment
+    screen_width_px : int
+        Screen width in pixels
+    screen_height_px : int
+        Screen height in pixels
+    screen_width_cm : float
+        Screen width in centimeters
+    screen_height_cm : float
+        Screen height in centimeters
+    distance_cm : float
+        Eye-to-screen distance in centimeters
+    origin : str
+        Specifies the screen location of the origin of the pixel coordinate system.
     sampling_rate : float
         Sampling rate in Hz
+
+    Examples
+    --------
+    >>> experiment = Experiment(
+    ...     screen_width_px=1280,
+    ...     screen_height_px=1024,
+    ...     screen_width_cm=38,
+    ...     screen_height_cm=30,
+    ...     distance_cm=68,
+    ...     origin='lower left',
+    ...     sampling_rate=1000.0,
+    ... )
+    >>> print(experiment)
+    Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38,
+    height_cm=30, distance_cm=68, origin=lower left, x_max_dva=15.60, y_max_dva=12.43,
+    x_min_dva=-15.60, y_min_dva=-12.43), sampling_rate=1000.00)
+
     """
 
     def __init__(
@@ -44,42 +71,7 @@ class Experiment:
             screen_width_cm: float, screen_height_cm: float,
             distance_cm: float, origin: str, sampling_rate: float,
     ):
-        """Initialize Experiment.
 
-        Parameters
-        ----------
-        screen_width_px : int
-            Screen width in pixels
-        screen_height_px : int
-            Screen height in pixels
-        screen_width_cm : float
-            Screen width in centimeters
-        screen_height_cm : float
-            Screen height in centimeters
-        distance_cm : float
-            Eye-to-screen distance in centimeters
-        origin : str
-            Specifies the screen location of the origin of the pixel coordinate system.
-        sampling_rate : float
-            Sampling rate in Hz
-
-        Examples
-        --------
-        >>> experiment = Experiment(
-        ...     screen_width_px=1280,
-        ...     screen_height_px=1024,
-        ...     screen_width_cm=38,
-        ...     screen_height_cm=30,
-        ...     distance_cm=68,
-        ...     origin='lower left',
-        ...     sampling_rate=1000.0,
-        ... )
-        >>> print(experiment)
-        Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38,
-        height_cm=30, distance_cm=68, origin=lower left, x_max_dva=15.60, y_max_dva=12.43,
-        x_min_dva=-15.60, y_min_dva=-12.43), sampling_rate=1000.00)
-
-        """
         self.screen = Screen(
             width_px=screen_width_px,
             height_px=screen_height_px,
@@ -103,23 +95,17 @@ class Experiment:
 
         Parameters
         ----------
-        arr : array_like
+        arr : list[float] | list[list[float]] | np.ndarray
             Continuous 2D position time series
         method : str
             Computation method. See :func:`~transforms.pos2vel` for details, default: smooth.
-        kwargs: dict
+        **kwargs: int | float | str
             Additional keyword arguments used for savitzky golay method.
 
         Returns
         -------
-        velocities : array_like
+        velocities : np.ndarray
             Velocity time series in input_unit / sec
-
-        Raises
-        ------
-        ValueError
-            If selected method is invalid, input array is too short for the
-            selected method or the sampling rate is below zero
 
         Examples
         --------

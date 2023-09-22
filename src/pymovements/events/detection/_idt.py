@@ -38,7 +38,7 @@ def dispersion(positions: list[list[float]] | np.ndarray) -> float:
 
     Parameters
     ----------
-    positions: array-like
+    positions: list[list[float]] | np.ndarray
         Continuous 2D position time series.
 
     Returns
@@ -71,11 +71,13 @@ def idt(
 
     Parameters
     ----------
-    positions: array-like, shape (N, 2)
+    positions: list[list[float]] | list[tuple[float, float]] | np.ndarray
         Continuous 2D position time series
-    timesteps: array-like, shape (N, )
+        shape (N, 2)
+    timesteps: list[int] | np.ndarray | None
         Corresponding continuous 1D timestep time series. If None, sample based timesteps are
         assumed.
+        shape (N, )
     minimum_duration: int
         Minimum fixation duration. The duration is specified in the units used in ``timesteps``.
          If ``timesteps`` is None, then ``minimum_duration`` is specified in numbers of samples.
@@ -83,12 +85,12 @@ def idt(
         Threshold for dispersion for a group of consecutive samples to be identified as fixation
     include_nan: bool
         Indicator, whether we want to split events on missing/corrupt value (np.nan)
-    name:
+    name: str
         Name for detected events in EventDataFrame.
 
     Returns
     -------
-    pl.DataFrame
+    EventDataFrame
         A dataframe with detected fixations as rows.
 
     Raises

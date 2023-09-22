@@ -50,11 +50,13 @@ def ivt(
 
     Parameters
     ----------
-    velocities: array-like, shape (N, 2)
+    velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray
         Corresponding continuous 2D velocity time series.
-    timesteps: array-like, shape (N, )
+        shape (N, 2)
+    timesteps:  list[int] | np.ndarray | None
         Corresponding continuous 1D timestep time series. If None, sample based timesteps are
         assumed.
+        shape (N, )
     minimum_duration: int
         Minimum fixation duration. The duration is specified in the units used in ``timesteps``.
          If ``timesteps`` is None, then ``minimum_duration`` is specified in numbers of samples.
@@ -63,12 +65,12 @@ def ivt(
         velocity is below the threshold, the point is classified as a fixation.
     include_nan: bool
         Indicator, whether we want to split events on missing/corrupt value (np.nan)
-    name:
+    name: str
         Name for detected events in EventDataFrame.
 
     Returns
     -------
-    pl.DataFrame
+    EventDataFrame
         A dataframe with detected fixations as rows.
 
     Raises

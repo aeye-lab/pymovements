@@ -33,7 +33,7 @@ class Screen:
 
      Also transforms pixel coordinates to degrees of visual angle.
 
-    Attributes
+    Parameters
     ----------
     width_px : int
         Screen width in pixels
@@ -47,15 +47,22 @@ class Screen:
         Eye-to-screen distance in centimeters
     origin : str
         Specifies the screen location of the origin of the pixel coordinate system.
-    x_max_dva : float
-        Maximum screen x-coordinate in degrees of visual angle
-    y_max_dva : float
-        Minimum screen y-coordinate in degrees of visual angle
-    x_min_dva : float
-        Maximum screen x-coordinate in degrees of visual angle
-    y_min_dva : float
-        Minimum screen y-coordinate in degrees of visual angle
 
+    Examples
+    --------
+    >>> screen = Screen(
+    ...     width_px=1280,
+    ...     height_px=1024,
+    ...     width_cm=38.0,
+    ...     height_cm=30.0,
+    ...     distance_cm=68.0,
+    ...     origin='lower left',
+    ... )
+    >>> print(screen)
+    Screen(width_px=1280, height_px=1024, width_cm=38.00,
+    height_cm=30.00, distance_cm=68.00, origin=lower left,
+    x_max_dva=15.60, y_max_dva=12.43, x_min_dva=-15.60,
+    y_min_dva=-12.43)
     """
 
     def __init__(
@@ -67,39 +74,6 @@ class Screen:
             distance_cm: float,
             origin: str,
     ):
-        """Initialize Screen.
-
-        Parameters
-        ----------
-        width_px : int
-            Screen width in pixels
-        height_px : int
-            Screen height in pixels
-        width_cm : float
-            Screen width in centimeters
-        height_cm : float
-            Screen height in centimeters
-        distance_cm : float
-            Eye-to-screen distance in centimeters
-        origin : str
-            Specifies the screen location of the origin of the pixel coordinate system.
-
-        Examples
-        --------
-        >>> screen = Screen(
-        ...     width_px=1280,
-        ...     height_px=1024,
-        ...     width_cm=38.0,
-        ...     height_cm=30.0,
-        ...     distance_cm=68.0,
-        ...     origin='lower left',
-        ... )
-        >>> print(screen)
-        Screen(width_px=1280, height_px=1024, width_cm=38.00,
-        height_cm=30.00, distance_cm=68.00, origin=lower left,
-        x_max_dva=15.60, y_max_dva=12.43, x_min_dva=-15.60,
-        y_min_dva=-12.43)
-        """
         checks.check_no_zeros(width_px, 'width_px')
         checks.check_no_zeros(height_px, 'height_px')
         checks.check_no_zeros(width_cm, 'width_cm')
@@ -139,18 +113,13 @@ class Screen:
 
         Parameters
         ----------
-        arr : float, array_like
+        arr:  float | list[float] | list[list[float]] | np.ndarray
             Pixel coordinates to transform into degrees of visual angle
 
         Returns
         -------
         degrees_of_visual_angle : np.ndarray
             Coordinates in degrees of visual angle
-
-        Raises
-        ------
-        ValueError
-            If positions aren't two-dimensional.
 
         Examples
         --------

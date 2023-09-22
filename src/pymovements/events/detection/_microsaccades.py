@@ -53,15 +53,17 @@ def microsaccades(
 
     Parameters
     ----------
-    velocities : np.ndarray, shape (N, 2)
+    velocities : list[list[float]] | list[tuple[float, float]] | np.ndarray
         x and y velocities of N samples in chronological order
-    timesteps: array-like, shape (N, )
+        shape (N, 2)
+    timesteps: list[int] | np.ndarray | None
         Corresponding continuous 1D timestep time series. If None, sample based timesteps are
         assumed.
+        shape (N, )
     minimum_duration: int
         Minimum saccade duration. The duration is specified in the units used in ``timesteps``.
          If ``timesteps`` is None, then ``minimum_duration`` is specified in numbers of samples.
-    threshold : np.ndarray, tuple[float, float] or str
+    threshold : np.ndarray | tuple[float, float] | str
         If tuple of floats then use this as explicit elliptic threshold. If str, then use
         a data-driven velocity threshold method. See :func:`~events.engbert.compute_threshold` for
         a reference of valid methods. Default: `engbert2015`
@@ -72,12 +74,12 @@ def microsaccades(
         Default: 1e-10
     include_nan: bool
         Indicator, whether we want to split events on missing/corrupt value (np.nan)
-    name:
+    name: str
         Name for detected events in EventDataFrame.
 
     Returns
     -------
-    pl.DataFrame
+    EventDataFrame
         A dataframe with detected saccades as rows.
 
     Raises

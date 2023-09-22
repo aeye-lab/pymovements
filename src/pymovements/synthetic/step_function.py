@@ -41,9 +41,9 @@ def step_function(
         Length of the output sequence.
     steps : list[int]
         Indices for each step to happen.
-    values : list[float]
+    values : list[float | tuple[float, ...]]
         Array values to set at each step.
-    start_value: int
+    start_value: float | tuple[float, ...]
         Array value to start with.
     noise: float
         If greater than zero, gaussian noise is scaled according to value and superimposed on the

@@ -39,11 +39,11 @@ def pix2deg(
 
     Parameters
     ----------
-    arr : float, array_like
+    arr : float | list[float] | list[list[float]] | np.ndarray
         Pixel coordinates to transform into degrees of visual angle
-    screen_px : int, int
+    screen_px : float | list[float] | tuple[float, float] | np.ndarray
         Screen dimension in pixels
-    screen_cm : float, float
+    screen_cm : float | list[float] | tuple[float, float] | np.ndarray
         Screen dimension in centimeters
     distance_cm : float
         Eye-to-screen distance in centimeters
@@ -181,23 +181,27 @@ def pos2acc(
 
     Parameters
     ----------
-    arr : array_like
+    arr : list[float] | list[list[float]] | np.ndarray
         Continuous 2D position time series
-    sampling_rate:
+    sampling_rate: float
         Sampling rate of input time series.
-    degree:
-        The degree of the polynomial to use.
-    window_length:
+    window_length: int
         The window size to use.
-    mode:
+    degree: int
+        The degree of the polynomial to use.
+    mode: str
         The padding mode to use.
-    cval:
+    cval: float
         A constant value for padding.
 
     Returns
     -------
     np.ndarray
-        Velocity time series in input_unit / sec
+        Velocity time series in input_unit / sec.
+    Raises
+    ------
+    ValueError
+        If selected method is invalid, input array has not the correct dimensions.
 
     Examples
     --------
@@ -255,7 +259,7 @@ def pos2acc(
 
 def pos2vel(
         arr: list[float] | list[list[float]] | np.ndarray,
-        sampling_rate: float = 1000,
+        sampling_rate: float = 1000.,
         method: str = 'smooth',
         **kwargs: int | float | str,
 ) -> np.ndarray:
@@ -266,9 +270,9 @@ def pos2vel(
 
     Parameters
     ----------
-    arr : array_like
+    arr : list[float] | list[list[float]] | np.ndarray
         Continuous 2D position time series
-    sampling_rate : int
+    sampling_rate : float
         Sampling rate of input time series
     method : str
         Following methods are available:
@@ -278,7 +282,7 @@ def pos2vel(
         sample and the preceding sample
         * *preceding*: velocity is calculated from the difference of the current
         sample to the preceding sample
-    kwargs: dict
+    **kwargs: int | float | str
         Additional keyword arguments used for savitzky golay method.
 
     Returns
@@ -394,12 +398,13 @@ def norm(arr: np.ndarray, axis: int | None = None) -> np.ndarray | Any:
     ----------
     arr: np.ndarray
         velocity sequence
-    axis: int, optional
+    axis: int | None
         axis to take norm. If None it is inferred from arr.shape.
 
     Returns
     -------
-    np.ndarray
+    np.ndarray | Any
+        Returns the l2-norm of the vector.
 
     Raises
     ------

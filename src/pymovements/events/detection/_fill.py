@@ -38,18 +38,19 @@ def fill(
 
     Parameters
     ----------
-    events:
+    events: EventDataFrame
         The already detected events.
-    timesteps: array-like, shape (N, )
+    timesteps: list[int] | np.ndarray
         Continuous 1D timestep time series.
+        shape (N, )
     minimum_duration: int
         Minimum fixation duration. The duration is specified in the units used in ``timesteps``.
-    name:
+    name: str
         Name for detected events in EventDataFrame.
 
     Returns
     -------
-    pl.DataFrame
+    EventDataFrame
         A dataframe with detected fixations as rows.
     """
     timesteps = np.array(timesteps)

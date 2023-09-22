@@ -35,20 +35,18 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
 class EventProcessor:
     """Processes event and gaze dataframes.
 
-    Attributes
+    Parameters
     ----------
-    event_properties: list[str]
-        A list of property names.
+    event_properties: str | list[str]
+        List of event property names.
+
+    Raises
+    ------
+    InvalidProperty
+        If property is invalid.
     """
 
     def __init__(self, event_properties: str | list[str]):
-        """Initialize processor with event property definitions.
-
-        Parameters
-        ----------
-        event_properties:
-            List of event property names.
-        """
         if isinstance(event_properties, str):
             event_properties = [event_properties]
 
@@ -66,7 +64,7 @@ class EventProcessor:
 
         Parameters
         ----------
-        events:
+        events: EventDataFrame
             Event data to process event properties from.
 
         Returns
@@ -75,11 +73,6 @@ class EventProcessor:
             :py:class:`polars.DataFrame` with properties as columns and rows refering to the rows in
             the source dataframe.
 
-        Raises
-        ------
-        InvalidProperty
-            If ``property_name`` is not a valid property. See
-            :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
         """
         property_expressions: dict[str, Callable[[], pl.Expr]] = {
             property_name: EVENT_PROPERTIES[property_name]
@@ -97,10 +90,15 @@ class EventProcessor:
 class EventGazeProcessor:
     """Processes event and gaze dataframes.
 
-    Attributes
+    Parameters
     ----------
-    event_properties: list[str]
-        A list of property names.
+    event_properties: str | tuple[str, dict[str, Any]] | list[str | tuple[str, dict[str, Any]]]
+        List of event property names.
+
+    Raises
+    ------
+    InvalidProperty
+        if property is not supported.
     """
 
     def __init__(
@@ -108,13 +106,6 @@ class EventGazeProcessor:
             event_properties: str | tuple[str, dict[str, Any]]
             | list[str | tuple[str, dict[str, Any]]],
     ):
-        """Initialize processor with event property definitions.
-
-        Parameters
-        ----------
-        event_properties:
-            List of event property names.
-        """
         if isinstance(event_properties, (str, tuple)):
             event_properties = [event_properties]
 
@@ -148,13 +139,13 @@ class EventGazeProcessor:
 
         Parameters
         ----------
-        events:
+        events: EventDataFrame
             Event data to process event properties from.
-        gaze:
+        gaze: GazeDataFrame
             Gaze data to process event properties from.
-        identifiers:
+        identifiers: str | list[str]
             Column names to join on events and gaze dataframes.
-        name:
+        name: str | None
             Process only events that match the name.
 
         Returns

@@ -101,29 +101,29 @@ def traceplot(
     ----------
     gaze: GazeDataFrame
         The GazeDataFrame to plot.
-    position_column : str, optional
+    position_column : str
         The column name of the x and y position data
-    cval: np.ndarray
+    cval: np.ndarray | None
         line color values.
-    cmap: matplotlib.colors.Colormap, optional
+    cmap: colors.Colormap | None
         color map for line color values
-    cmap_norm: matplotlib.colors.Normalize, str, optional
+    cmap_norm: colors.Normalize | str | None
         normalization for color values.
-    cmap_segmentdata: dict, optional
+    cmap_segmentdata: dict[str, list[list[float]]] | None
         color map segmentation to build color map
-    cbar_label: str, optional
+    cbar_label: str | None
         string label for color bar
     show_cbar: bool
         Shows color bar if True.
-    padding: float, optional
+    padding: float | None
         Absolute padding value. If None it is inferred from pad_factor and limits.
-    pad_factor: float, optional
+    pad_factor: float | None
         Relative padding factor to construct padding value if not given.
-    figsize: tuple
+    figsize: tuple[int, int]
         Figure size.
-    title: str, optional
+    title: str | None
         Figure title.
-    savepath: str, optional
+    savepath: str | None
         If given, figure will be saved to this path.
     show: bool
         If True, figure will be shown.

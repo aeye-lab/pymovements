@@ -44,6 +44,11 @@ def check_nan(sample_location: str) -> float:
     ----------
     sample_location: str
         Sample location as extracted from ascii file.
+
+    Returns
+    -------
+    float
+        np.nan if not convertable to float, otherwise value as type float
     """
     try:
         ret = float(sample_location)
@@ -57,8 +62,18 @@ def compile_patterns(patterns: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
     Parameters
     ----------
-    patterns:
+    patterns: list[dict[str, Any]]
         The list of patterns to compile.
+
+    Returns
+    -------
+    list[dict[str, Any]]
+        List of possible patterns as a dict.
+
+    Raises
+    ------
+    ValueError
+        If pattern is invalid
     """
     msg_prefix = r'MSG\s+\d+\s+'
 
@@ -94,7 +109,19 @@ def compile_patterns(patterns: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def get_additional_columns(compiled_patterns: list[dict[str, Any]]) -> set[str]:
-    """Get additionally needed columns from compiled patterns."""
+    """Get additionally needed columns from compiled patterns.
+
+    Parameters
+    ----------
+    compiled_patterns: list[dict[str, Any]]
+        List of compiled patterns to match for additional columns.
+
+    Returns
+    -------
+    set[str]
+        Set of patterns.
+
+    """
     additional_columns = set()
 
     for compiled_pattern_dict in compiled_patterns:
@@ -109,19 +136,24 @@ def get_additional_columns(compiled_patterns: list[dict[str, Any]]) -> set[str]:
 
 def parse_eyelink(
         filepath: Path,
-        patterns: list | None = None,
-        schema: dict | None = None,
+        patterns: list[dict[str, Any]] | None = None,
+        schema: dict[str, pl.Float64 | pl.Int64] | None = None,
 ) -> pl.DataFrame:
     """Process EyeLink asc file.
 
     Parameters
     ----------
-    filepath:
+    filepath: Path
         file name of ascii file to convert.
-    patterns:
+    patterns: list[dict[str, Any]] | None
         list of patterns to match for additional columns.
-    schema:
+    schema: dict[str, pl.Float64 | pl.Int64] | None
         Dictionary to optionally specify types of columns parsed by patterns.
+
+    Returns
+    -------
+    pl.DataFrame
+        DataFrame with Eyelink data.
 
     """
     if patterns is None:
@@ -129,7 +161,7 @@ def parse_eyelink(
     compiled_patterns = compile_patterns(patterns)
 
     additional_columns = get_additional_columns(compiled_patterns)
-    additional: dict[str, list] = {
+    additional: dict[str, list[str]] = {
         additional_column: [] for additional_column in additional_columns
     }
     current_additional = {

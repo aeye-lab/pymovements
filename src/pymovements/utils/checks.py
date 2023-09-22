@@ -27,7 +27,29 @@ import numpy as np
 
 
 def check_no_zeros(variable: Any, name: str = 'variable') -> None:
-    """Check if variable, or if it is iterable, any of its components are zero."""
+    """Check if variable, or if it is iterable, any of its components are zero.
+
+    Parameters
+    ----------
+    variable: Any
+        input to check whether it has zeros
+    name: str
+        name of the variable
+
+    Raises
+    ------
+    TypeError
+        If variable is not iterable
+    ValueError
+        If variable has zeros
+
+    Examples
+    --------
+    >>> check_no_zeros(
+    ...    variable=[(123.0, 865.0)],
+    ...    name='variable',
+    ... )
+    """
     # construct error message first
     error_message = f'{name} must not be zero'
 
@@ -65,7 +87,7 @@ def check_shapes(**kwargs: Any) -> None:
 
     Parameters
     ----------
-    kwargs
+    **kwargs: Any
         Keyword argument dictionary with 2 keyword arguments.
 
     Raises
@@ -91,7 +113,7 @@ def check_two_kwargs(**kwargs: Any) -> None:
 
     Parameters
     ----------
-    kwargs
+    **kwargs: Any
         Keyword argument dictionary.
 
     Raises
@@ -108,7 +130,7 @@ def check_is_mutual_exclusive(**kwargs: Any) -> None:
 
     Parameters
     ----------
-    kwargs
+    **kwargs: Any
         Keyword argument dictionary with 2 keyword arguments.
 
     Raises
@@ -134,7 +156,7 @@ def check_is_none_is_mutual(**kwargs: Any) -> None:
 
     Parameters
     ----------
-    kwargs
+    **kwargs: Any
         Keyword argument dictionary with 2 keyword arguments.
 
     Raises
@@ -161,7 +183,7 @@ def check_is_length_matching(**kwargs: Sized) -> None:
 
     Parameters
     ----------
-    kwargs
+    **kwargs: Sized
         Keyword argument dictionary with 2 keyword arguments. Both values must be sequences.
 
     Raises
@@ -184,7 +206,7 @@ def check_is_not_none(**kwargs: Any) -> None:
 
     Parameters
     ----------
-    kwargs
+    **kwargs: Any
         Keyword argument dictionary.
 
     Raises
@@ -202,7 +224,7 @@ def check_is_int(**kwargs: Any) -> None:
 
     Parameters
     ----------
-    kwargs
+    **kwargs: Any
         Keyword argument dictionary.
 
     Raises
@@ -222,7 +244,7 @@ def check_is_scalar(**kwargs: Any) -> None:
 
     Parameters
     ----------
-    kwargs
+    **kwargs: Any
         Keyword argument dictionary.
 
     Raises
@@ -242,7 +264,7 @@ def check_is_greater_than_zero(**kwargs: float | int) -> None:
 
     Parameters
     ----------
-    kwargs
+    **kwargs: float | int
         Keyword argument dictionary.
 
     Raises
@@ -260,7 +282,7 @@ def check_is_positive_value(**kwargs: float | int) -> None:
 
     Parameters
     ----------
-    kwargs
+    **kwargs: float | int
         Keyword argument dictionary.
 
     Raises

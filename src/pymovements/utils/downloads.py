@@ -50,11 +50,11 @@ def download_and_extract_archive(
         URL of archive file to be downloaded.
     download_dirpath : Path
         Path to directory where file will be saved to.
-    download_filename : str, optional
+    download_filename : str
         Target filename of saved file.
-    extract_dirpath : Path, optional
+    extract_dirpath : Path | None
         Path to directory where archive files will be extracted to.
-    md5 : str, optional
+    md5 : str | None
         MD5 checksum of downloaded file. If None, do not check.
     recursive : bool
         Recursively extract archives which are included in extracted archive.
@@ -64,12 +64,6 @@ def download_and_extract_archive(
         Verbosity levels: (1) Show download progress bar and print info messages on downloading
         and extracting archive files without printing messages for recursive archive extraction.
         (2) Print additional messages for each recursive archive extract.
-
-    Raises
-    ------
-    RuntimeError
-        If the downloaded file has no suffix or suffix is not supported, or in case of a
-        specified MD5 checksum which doesn't match the checksum of the downloaded file.
     """
     archive_path = download_file(
         url=url,
@@ -109,16 +103,16 @@ def download_file(
         Path to directory where file will be saved to.
     filename : str
         Target filename of saved file.
-    md5 : str, optional
+    md5 : str | None
         MD5 checksum of downloaded file. If None, do not check.
-    max_redirect_hops : int, optional
+    max_redirect_hops : int
         Maximum number of redirect hops allowed.
     verbose : bool
         If True, show progress bar and print info messages on downloading file.
 
     Returns
     -------
-    pathlib.Path :
+    Path
         Filepath to downloaded file.
 
     Raises
@@ -180,7 +174,8 @@ def _get_redirected_url(url: str, max_hops: int = 3) -> str:
 
     Returns
     -------
-    str : Final URL after all redirections.
+    str
+        Final URL after all redirections.
 
     Raises
     ------
@@ -215,17 +210,22 @@ class _DownloadProgressBar(tqdm):  # pylint: disable=inconsistent-mro
     def __init__(self, **kwargs: Any):
         super().__init__(unit='B', unit_scale=True, unit_divisor=1024, miniters=1, **kwargs)
 
-    def update_to(self, b: int = 1, bsize: int = 1, tsize: None | int = None) -> bool | None:
+    def update_to(self, b: int = 1, bsize: int = 1, tsize: int | None = None) -> bool | None:
         """Update progress bar.
 
         Parameters
         ----------
-        b  : int, optional
+        b  : int
             Number of blocks transferred so far [default: 1].
-        bsize  : int, optional
+        bsize  : int
             Size of each block (in tqdm units) [default: 1].
-        tsize  : int, optional
+        tsize  : int | None
             Total size (in tqdm units). If None it remains unchanged [default: None].
+
+        Returns
+        -------
+        bool | None
+            Returns updated progress bar
         """
         if tsize is not None:
             self.total = tsize
@@ -256,12 +256,13 @@ def _check_integrity(filepath: Path, md5: str | None = None) -> bool:
     ----------
     filepath : Path
         Path to file.
-    md5 : str, optional
+    md5 : str | None
         Expected MD5 checksum of file. If None, do not check.
 
     Returns
     -------
-    bool : True if file checksum matches passed `md5` or if passed `md5` is None. False if file
+    bool
+        True if file checksum matches passed `md5` or if passed `md5` is None. False if file
         checksum does not match passed `md5` or `filepath` doesn't exist.
     """
     if not filepath.is_file():
@@ -286,7 +287,8 @@ def _calculate_md5(filepath: Path, chunk_size: int = 1024 * 1024) -> str:
 
     Returns
     -------
-    str : Calculated MD5 checksum.
+    str
+        Calculated MD5 checksum.
     """
     # Setting the `usedforsecurity` flag does not change anything about the functionality, but
     # indicates that we are not using the MD5 checksum for cryptography.

@@ -45,29 +45,28 @@ def from_numpy(
 
     Parameters
     ----------
-    data:
+    data: np.ndarray
         Two-dimensional data represented as a numpy ndarray.
-    schema:
+    schema: list[str]
         A list of column names.
-    orient:
-        Whether to interpret the two-dimensional data as columns or as rows.
-    experiment : Experiment
+    experiment : Experiment | None
         The experiment definition.
-            time_column: str | None = None,
-    time_column:
+    orient: Literal['col', 'row']
+        Whether to interpret the two-dimensional data as columns or as rows.
+    time_column: str | None
         The name of the timestamp column in the input data frame.
-    pixel_columns:
+    pixel_columns: list[str] | None
         The name of the pixel position columns in the input data frame.
-    position_columns:
+    position_columns: list[str] | None
         The name of the dva position columns in the input data frame.
-    velocity_columns:
+    velocity_columns: list[str] | None
         The name of the dva velocity columns in the input data frame.
-    acceleration_columns:
+    acceleration_columns: list[str] | None
         The name of the dva acceleration columns in the input data frame.
 
     Returns
     -------
-    py:class:`~pymovements.GazeDataFrame`
+    GazeDataFrame
     """
     df = pl.from_numpy(data=data, schema=schema, orient=orient)
     return GazeDataFrame(
@@ -94,24 +93,24 @@ def from_pandas(
 
     Parameters
     ----------
-    data:
+    data: pd.DataFrame
         Data represented as a pandas DataFrame.
-    experiment : Experiment
+    experiment : Experiment | None
         The experiment definition.
-    time_column:
+    time_column: str | None
         The name of the timestamp column in the input data frame.
-    pixel_columns:
+    pixel_columns: list[str] | None
         The name of the pixel position columns in the input data frame.
-    position_columns:
+    position_columns: list[str] | None
         The name of the dva position columns in the input data frame.
-    velocity_columns:
+    velocity_columns: list[str] | None
         The name of the dva velocity columns in the input data frame.
-    acceleration_columns:
+    acceleration_columns: list[str] | None
         The name of the dva acceleration columns in the input data frame.
 
     Returns
     -------
-    py:class:`~pymovements.GazeDataFrame`
+    GazeDataFrame
     """
     df = pl.from_pandas(data=data)
     return GazeDataFrame(

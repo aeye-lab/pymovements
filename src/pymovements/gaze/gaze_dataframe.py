@@ -37,6 +37,93 @@ class GazeDataFrame:
 
     Each row is a sample at a specific timestep.
     Each column is a channel in the gaze time series.
+
+    Parameters
+    ----------
+    data: pl.DataFrame | None
+        A dataframe to be transformed to a polars dataframe.
+    experiment : Experiment | None
+        The experiment definition.
+    trial_columns: str | list[str] | None
+        The name of the trial columns in the input data frame. If the list is empty or None,
+        the input data frame is assumed to contain only one trial. If the list is not empty,
+        the input data frame is assumed to contain multiple trials and the transformation
+        methods will be applied to each trial separately.
+    time_column: str | None
+        The name of the timestamp column in the input data frame.
+    pixel_columns: list[str] | None
+        The name of the pixel position columns in the input data frame. These columns will be
+        nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
+        column will not be created.
+    position_columns: list[str] | None
+        The name of the dva position columns in the input data frame. These columns will be
+        nested into the column ``position``. If the list is empty or None, the nested
+        ``position`` column will not be created.
+    velocity_columns: list[str] | None
+        The name of the velocity columns in the input data frame. These columns will be nested
+        into the column ``velocity``. If the list is empty or None, the nested ``velocity``
+        column will not be created.
+    acceleration_columns: list[str] | None
+        The name of the acceleration columns in the input data frame. These columns will be
+        nested into the column ``acceleration``. If the list is empty or None, the nested
+        ``acceleration`` column will not be created.
+
+    Notes
+    -----
+    About using the arguments ``pixel_columns``, ``position_columns``, ``velocity_columns``,
+    and ``acceleration_columns``:
+
+    By passing a list of columns as any of these arguments, these columns will be merged into a
+    single column with the corresponding name , e.g. using `pixel_columns` will merge the
+    respective columns into the column `pixel`.
+
+    The supported number of component columns with the expected order are:
+
+    * zero columns: No nested component column will be created.
+    * two columns: monocular data; expected order: x-component, y-component
+    * four columns: binocular data; expected order: x-component left eye, y-component left eye,
+      x-component right eye, y-component right eye,
+    * six columns: binocular data with additional cyclopian data; expected order: x-component
+      left eye, y-component left eye, x-component right eye, y-component right eye,
+      x-component cyclopian eye, y-component cyclopian eye,
+
+
+    Examples
+    --------
+    First let's create an example `DataFrame` with three columns:
+    the timestamp ``t`` and ``x`` and ``y`` for the pixel position.
+
+    >>> df = pl.from_dict(
+    ...     data={'t': [1000, 1001, 1002], 'x': [0.1, 0.2, 0.3], 'y': [0.1, 0.2, 0.3]},
+    ... )
+    >>> df
+    shape: (3, 3)
+    ┌──────┬─────┬─────┐
+    │ t    ┆ x   ┆ y   │
+    │ ---  ┆ --- ┆ --- │
+    │ i64  ┆ f64 ┆ f64 │
+    ╞══════╪═════╪═════╡
+    │ 1000 ┆ 0.1 ┆ 0.1 │
+    │ 1001 ┆ 0.2 ┆ 0.2 │
+    │ 1002 ┆ 0.3 ┆ 0.3 │
+    └──────┴─────┴─────┘
+
+    We can now initialize our ``GazeDataFrame`` by specyfing the names of the pixel position
+    columns.
+
+    >>> gaze = GazeDataFrame(data=df, pixel_columns=['x', 'y'])
+    >>> gaze.frame
+    shape: (3, 2)
+    ┌──────┬────────────┐
+    │ t    ┆ pixel      │
+    │ ---  ┆ ---        │
+    │ i64  ┆ list[f64]  │
+    ╞══════╪════════════╡
+    │ 1000 ┆ [0.1, 0.1] │
+    │ 1001 ┆ [0.2, 0.2] │
+    │ 1002 ┆ [0.3, 0.3] │
+    └──────┴────────────┘
+
     """
 
     valid_pixel_position_columns = [
@@ -87,95 +174,6 @@ class GazeDataFrame:
             velocity_columns: list[str] | None = None,
             acceleration_columns: list[str] | None = None,
     ):
-        """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
-
-        Parameters
-        ----------
-        data: pl.DataFrame
-            A dataframe to be transformed to a polars dataframe.
-        experiment : Experiment
-            The experiment definition.
-        trial_columns:
-            The name of the trial columns in the input data frame. If the list is empty or None,
-            the input data frame is assumed to contain only one trial. If the list is not empty,
-            the input data frame is assumed to contain multiple trials and the transformation
-            methods will be applied to each trial separately.
-        time_column:
-            The name of the timestamp column in the input data frame.
-        pixel_columns:
-            The name of the pixel position columns in the input data frame. These columns will be
-            nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
-            column will not be created.
-        position_columns:
-            The name of the dva position columns in the input data frame. These columns will be
-            nested into the column ``position``. If the list is empty or None, the nested
-            ``position`` column will not be created.
-        velocity_columns:
-            The name of the velocity columns in the input data frame. These columns will be nested
-            into the column ``velocity``. If the list is empty or None, the nested ``velocity``
-            column will not be created.
-        acceleration_columns:
-            The name of the acceleration columns in the input data frame. These columns will be
-            nested into the column ``acceleration``. If the list is empty or None, the nested
-            ``acceleration`` column will not be created.
-
-        Notes
-        -----
-        About using the arguments ``pixel_columns``, ``position_columns``, ``velocity_columns``,
-        and ``acceleration_columns``:
-
-        By passing a list of columns as any of these arguments, these columns will be merged into a
-        single column with the corresponding name , e.g. using `pixel_columns` will merge the
-        respective columns into the column `pixel`.
-
-        The supported number of component columns with the expected order are:
-
-        * zero columns: No nested component column will be created.
-        * two columns: monocular data; expected order: x-component, y-component
-        * four columns: binocular data; expected order: x-component left eye, y-component left eye,
-          x-component right eye, y-component right eye,
-        * six columns: binocular data with additional cyclopian data; expected order: x-component
-          left eye, y-component left eye, x-component right eye, y-component right eye,
-          x-component cyclopian eye, y-component cyclopian eye,
-
-
-        Examples
-        --------
-        First let's create an example `DataFrame` with three columns:
-        the timestamp ``t`` and ``x`` and ``y`` for the pixel position.
-
-        >>> df = pl.from_dict(
-        ...     data={'t': [1000, 1001, 1002], 'x': [0.1, 0.2, 0.3], 'y': [0.1, 0.2, 0.3]},
-        ... )
-        >>> df
-        shape: (3, 3)
-        ┌──────┬─────┬─────┐
-        │ t    ┆ x   ┆ y   │
-        │ ---  ┆ --- ┆ --- │
-        │ i64  ┆ f64 ┆ f64 │
-        ╞══════╪═════╪═════╡
-        │ 1000 ┆ 0.1 ┆ 0.1 │
-        │ 1001 ┆ 0.2 ┆ 0.2 │
-        │ 1002 ┆ 0.3 ┆ 0.3 │
-        └──────┴─────┴─────┘
-
-        We can now initialize our ``GazeDataFrame`` by specyfing the names of the pixel position
-        columns.
-
-        >>> gaze = GazeDataFrame(data=df, pixel_columns=['x', 'y'])
-        >>> gaze.frame
-        shape: (3, 2)
-        ┌──────┬────────────┐
-        │ t    ┆ pixel      │
-        │ ---  ┆ ---        │
-        │ i64  ┆ list[f64]  │
-        ╞══════╪════════════╡
-        │ 1000 ┆ [0.1, 0.1] │
-        │ 1001 ┆ [0.2, 0.2] │
-        │ 1002 ┆ [0.3, 0.3] │
-        └──────┴────────────┘
-
-        """
         if data is None:
             data = pl.DataFrame()
         else:
@@ -300,18 +298,13 @@ class GazeDataFrame:
                     ],
                 )
 
-    def pix2deg(self) -> None:
+    def pix1deg(self) -> None:
         """Compute gaze positions in degrees of visual angle from pixel position coordinates.
 
         This method requires a properly initialized :py:attr:`~.GazeDataFrame.experiment` attribute.
 
         After success, the gaze dataframe is extended by the resulting dva position columns.
 
-        Raises
-        ------
-        AttributeError
-            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
-            if experiment is None.
         """
         self.transform('pix2deg')
 
@@ -330,18 +323,13 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        window_length:
-            The window size to use.
-        degree:
+        degree: int
             The degree of the polynomial to use.
-        padding:
+        window_length: int
+            The window size to use.
+        padding: str | float | int | None
             The padding method to use. See ``savitzky_golay`` for details.
 
-        Raises
-        ------
-        AttributeError
-            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
-            if experiment is None.
         """
         self.transform('pos2acc', window_length=window_length, degree=degree, padding=padding)
 
@@ -360,14 +348,9 @@ class GazeDataFrame:
         ----------
         method : str
             Computation method. See :func:`~transforms.pos2vel()` for details, default: fivepoint.
-        **kwargs
+        **kwargs: int | float | str
             Additional keyword arguments to be passed to the :func:`~transforms.pos2vel()` method.
 
-        Raises
-        ------
-        AttributeError
-            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
-            if experiment is None.
         """
         self.transform('pos2vel', method=method, **kwargs)
 
@@ -392,9 +375,9 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        input_columns:
+        input_columns: list[str]
             Names of input columns to be merged into a single tuple column.
-        output_column:
+        output_column: str
             Name of the resulting tuple column.
         """
         self.frame = self.frame.with_columns(
@@ -415,12 +398,12 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        column:
+        column: str
             Name of input columns to be unnested into several component columns.
-        output_columns:
-            Name of the resulting tuple columns.
-        output_suffixes:
+        output_suffixes: list[str] | None
             Suffixes to append to the column names.
+        output_columns: list[str] | None
+            Name of the resulting tuple columns.
 
         Raises
         ------

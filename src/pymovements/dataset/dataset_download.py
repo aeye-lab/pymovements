@@ -50,9 +50,9 @@ def download_dataset(
 
     Parameters
     ----------
-    definition:
+    definition: DatasetDefinition
         The dataset definition.
-    paths:
+    paths: DatasetPaths
         The dataset paths.
     extract : bool
         Extract dataset archive files.
@@ -128,13 +128,13 @@ def extract_dataset(
 
     Parameters
     ----------
-    definition:
+    definition: DatasetDefinition
         The dataset definition.
-    paths:
+    paths: DatasetPaths
         The dataset paths.
     remove_finished : bool
         Remove archive files after extraction.
-    verbose:
+    verbose: int
         Verbosity levels: (1) Print messages for extracting each dataset resource without printing
         messages for recursive archives. (2) Print messages for extracting each dataset resource and
         each recursive archive extract.

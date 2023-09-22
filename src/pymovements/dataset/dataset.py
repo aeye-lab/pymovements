@@ -41,23 +41,23 @@ from pymovements.gaze import GazeDataFrame
 
 
 class Dataset:
-    """Dataset base class."""
+    """Dataset base class.
+
+    Parameters
+    ----------
+    definition : str | DatasetDefinition | type[DatasetDefinition]
+        Dataset definition to initialize dataset with.
+    path : str | Path | DatasetPaths
+        Path to the dataset directory. You can set up a custom directory structure by passing a
+        :py:class:`~pymovements.DatasetPaths` instance.
+    """
 
     def __init__(
             self,
             definition: str | DatasetDefinition | type[DatasetDefinition],
             path: str | Path | DatasetPaths,
     ):
-        """Initialize the dataset object.
 
-        Parameters
-        ----------
-        definition : str, DatasetDefinition
-            Dataset definition to initialize dataset with.
-        path : DatasetPaths, optional
-            Path to the dataset directory. You can set up a custom directory structure by passing a
-            :py:class:`~pymovements.DatasetPaths` instance.
-        """
         self.fileinfo: pl.DataFrame = pl.DataFrame()
         self.gaze: list[GazeDataFrame] = []
         self.events: list[EventDataFrame] = []
@@ -95,21 +95,21 @@ class Dataset:
             If ``True``, load previously saved event data.
         preprocessed : bool
             If ``True``, load previously saved preprocessed data, otherwise load raw data.
-        subset : dict, optional
+        subset : None | dict[str, float | int | str | list[float | int | str]]
             If specified, load only a subset of the dataset. All keys in the dictionary must be
             present in the fileinfo dataframe inferred by `scan()`. Values can be either
             float, int , str or a list of these.
-        events_dirname : str
+        events_dirname : str | None
             One-time usage of an alternative directory name to save data relative to
             :py:meth:`pymovements.Dataset.path`.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.events_rootpath`.
-        preprocessed_dirname : str
+        preprocessed_dirname : str | None
             One-time usage of an alternative directory name to save data relative to
             :py:meth:`pymovements.Dataset.path`.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
-        extension:
+        extension: str
             Specifies the file format for loading data. Valid options are: `csv`, `feather`.
             :Default: `feather`.
 
@@ -141,13 +141,6 @@ class Dataset:
         -------
         Dataset
             Returns self, useful for method cascading.
-
-        Raises
-        ------
-        AttributeError
-            If no regular expression for parsing filenames is defined.
-        RuntimeError
-            If an error occurred during matching filenames or no files have been found.
         """
         self.fileinfo = dataset_files.scan_dataset(definition=self.definition, paths=self.paths)
         return self
@@ -164,12 +157,12 @@ class Dataset:
         ----------
         preprocessed : bool
             If ``True``, saved preprocessed data will be loaded, otherwise raw data will be loaded.
-        preprocessed_dirname : str
+        preprocessed_dirname : str | None
             One-time usage of an alternative directory name to save data relative to
             :py:meth:`pymovements.Dataset.path`.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
-        extension:
+        extension: str
             Specifies the file format for loading data. Valid options are: `csv`, `feather`.
             :Default: `feather`.
 
@@ -178,12 +171,6 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
 
-        Raises
-        ------
-        AttributeError
-            If `fileinfo` is None or the `fileinfo` dataframe is empty.
-        RuntimeError
-            If file type of gaze file is not supported.
         """
         self._check_fileinfo()
         self.gaze = dataset_files.load_gaze_files(
@@ -205,26 +192,20 @@ class Dataset:
 
         Parameters
         ----------
-        events_dirname : str
+        events_dirname : str | None
             One-time usage of an alternative directory name to save data relative to
             :py:meth:`pymovements.Dataset.path`.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.events_rootpath`.
-        extension:
+        extension: str
             Specifies the file format for loading data. Valid options are: `csv`, `feather`.
             :Default: `feather`.
 
         Returns
         -------
-        list[EventDataFrame]
+        Dataset
             List of event dataframes.
 
-        Raises
-        ------
-        AttributeError
-            If `fileinfo` is None or the `fileinfo` dataframe is empty.
-        ValueError
-            If extension is not in list of valid extensions.
         """
         self._check_fileinfo()
         self.events = dataset_files.load_event_files(
@@ -247,12 +228,6 @@ class Dataset:
         ----------
         verbose : bool
             If True, show progress of computation.
-
-        Raises
-        ------
-        AttributeError
-            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
-            if experiment is None.
 
         Returns
         -------
@@ -283,20 +258,14 @@ class Dataset:
 
         Parameters
         ----------
-        window_length:
-            The window size to use.
-        degree:
+        degree: int
             The degree of the polynomial to use.
-        padding:
+        window_length: int
+            The window size to use.
+        padding: str | float | int | None
             The padding method to use. See ``savitzky_golay`` for details.
         verbose : bool
             If True, show progress of computation.
-
-        Raises
-        ------
-        AttributeError
-            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
-            if experiment is None.
 
         Returns
         -------
@@ -334,14 +303,8 @@ class Dataset:
             Computation method. See :func:`~transforms.pos2vel()` for details, default: smooth.
         verbose : bool
             If True, show progress of computation.
-        **kwargs
+        **kwargs: Any
             Additional keyword arguments to be passed to the :func:`~transforms.pos2vel()` method.
-
-        Raises
-        ------
-        AttributeError
-            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
-            if experiment is None.
 
         Returns
         -------
@@ -369,9 +332,9 @@ class Dataset:
 
         Parameters
         ----------
-        method : EventDetectionCallable
+        method : Callable[..., EventDataFrame] | str
             The event detection method to be applied.
-        eye : str
+        eye : str | None
             Select which eye to choose. Valid options are ``auto``, ``left``, ``right`` or ``None``.
             If ``auto`` is passed, eye is inferred in the order ``['right', 'left', 'eye']`` from
             the available :py:attr:`~.Dataset.gaze` dataframe columns.
@@ -380,7 +343,7 @@ class Dataset:
              merged into the existing one.
         verbose : bool
             If ``True``, show progress bar.
-        **kwargs :
+        **kwargs : Any
             Additional keyword arguments to be passed to the event detection method.
 
         Raises
@@ -531,9 +494,9 @@ class Dataset:
 
         Parameters
         ----------
-        method : EventDetectionCallable
+        method : Callable[..., EventDataFrame] | str
             The event detection method to be applied.
-        eye : str
+        eye : str | None
             Select which eye to choose. Valid options are ``auto``, ``left``, ``right`` or ``None``.
             If ``auto`` is passed, eye is inferred in the order ``['right', 'left', 'eye']`` from
             the available :py:attr:`~.Dataset.gaze` dataframe columns.
@@ -542,13 +505,8 @@ class Dataset:
              merged into the existing one.
         verbose : bool
             If ``True``, show progress bar.
-        **kwargs :
+        **kwargs : Any
             Additional keyword arguments to be passed to the event detection method.
-
-        Raises
-        ------
-        AttributeError
-            If gaze files have not been loaded yet or gaze files do not contain the right columns.
 
         Returns
         -------
@@ -574,20 +532,12 @@ class Dataset:
 
         Parameters
         ----------
-        event_properties:
+        event_properties: str | tuple[str, dict[str, Any]] | list[str | tuple[str, dict[str, Any]]]
             The event properties to compute.
-        name:
+        name: str | None
             Process only events that match the name.
         verbose : bool
             If ``True``, show progress bar.
-
-        Raises
-        ------
-        InvalidProperty
-            If ``property_name`` is not a valid property. See
-            :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
-        RuntimeError
-            If specified event name ``name`` is missing from ``events``.
 
         Returns
         -------
@@ -621,18 +571,12 @@ class Dataset:
 
         Parameters
         ----------
-        event_properties:
+        event_properties: str | tuple[str, dict[str, Any]] | list[str | tuple[str, dict[str, Any]]]
             The event properties to compute.
-        name:
+        name: str | None
             Process only events that match the name.
         verbose : bool
             If ``True``, show progress bar.
-
-        Raises
-        ------
-        InvalidProperty
-            If ``property_name`` is not a valid property. See
-            :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
 
         Returns
         -------
@@ -675,17 +619,17 @@ class Dataset:
 
         Parameters
         ----------
-        events_dirname : str
+        events_dirname : str | None
             One-time usage of an alternative directory name to save data relative to dataset path.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.events_rootpath`.
-        preprocessed_dirname : str
+        preprocessed_dirname : str | None
             One-time usage of an alternative directory name to save data relative to dataset path.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
         verbose : int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
-        extension:
+        extension: str
             extension specifies the fileformat to store the data
 
         Returns
@@ -710,20 +654,15 @@ class Dataset:
 
         Parameters
         ----------
-        events_dirname : str
+        events_dirname : str | None
             One-time usage of an alternative directory name to save data relative to dataset path.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.events_rootpath`.
         verbose : int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
-        extension:
+        extension: str
             Specifies the file format for loading data. Valid options are: `csv`, `feather`.
             :Default: `feather`.
-
-        Raises
-        ------
-        ValueError
-            If extension is not in list of valid extensions.
 
         Returns
         -------
@@ -753,20 +692,15 @@ class Dataset:
 
         Parameters
         ----------
-        preprocessed_dirname : str
+        preprocessed_dirname : str | None
             One-time usage of an alternative directory name to save data relative to dataset path.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
         verbose : int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
-        extension:
+        extension: str
             Specifies the file format for loading data. Valid options are: `csv`, `feather`.
             :Default: `feather`.
-
-        Raises
-        ------
-        ValueError
-            If extension is not in list of valid extensions.
 
         Returns
         -------
@@ -814,16 +748,9 @@ class Dataset:
             and extracting archive files without printing messages for recursive archive extraction.
             (2) Print additional messages for each recursive archive extract.
 
-        Raises
-        ------
-        AttributeError
-            If number of mirrors or number of resources specified for dataset is zero.
-        RuntimeError
-            If downloading a resource failed for all given mirrors.
-
         Returns
         -------
-        PublicDataset
+        Dataset
             Returns self, useful for method cascading.
         """
         dataset_download.download_dataset(
@@ -849,7 +776,7 @@ class Dataset:
 
         Returns
         -------
-        PublicDataset
+        Dataset
             Returns self, useful for method cascading.
         """
         dataset_download.extract_dataset(
@@ -867,6 +794,11 @@ class Dataset:
         The dataset path points to the dataset directory under the root path. Per default the
         dataset path points to the exact same directory as the root path. Add ``dataset_dirname``
         to your initialization call to specify an explicit dataset directory in your root path.
+
+        Returns
+        -------
+        Path
+            Returns dataset path.
 
         Example
         -------
