@@ -405,6 +405,31 @@ class GazeDataFrame:
         """
         self.transform('pos2vel', method=method, **kwargs)
 
+
+    def smooth(
+            self,
+            column: str = 'position',
+            method: str = 'savitzky_golay',
+            degree: int = 2,
+            window_length: int = 7,
+            padding: str | float | int | None = 'nearest',
+            **kwargs: int | float | str,
+    ) -> None:
+        """ Smooth data in a column.
+
+        See :func:`~transforms.smooth()` for details and description of parameters.
+
+        """
+        self.transform(
+            'smooth',
+            column=column,
+            method=method,
+            degree=degree,
+            window_length=window_length,
+            padding=padding,
+            **kwargs,
+        )
+
     def detect(
             self,
             method: Callable[..., pm.EventDataFrame] | str,
