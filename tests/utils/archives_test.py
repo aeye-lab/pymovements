@@ -239,7 +239,6 @@ def fixture_unsupported_archive(request, tmp_path):
                 os.path.join('toplevel', 'recursive'),
                 os.path.join('toplevel', 'recursive', 'test.file'),
             ),
-            ('toplevel', 'toplevel/recursive', 'toplevel/recursive/test.file'),
             id='recursive_true_remove_finished_true',
         ),
     ],
