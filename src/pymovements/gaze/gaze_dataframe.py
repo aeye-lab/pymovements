@@ -25,8 +25,10 @@ from collections.abc import Callable
 from copy import deepcopy
 from typing import Any
 
+import numpy as np
 import polars as pl
 
+import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
 from pymovements.utils import checks
@@ -166,6 +168,7 @@ class GazeDataFrame:
             self,
             data: pl.DataFrame | None = None,
             experiment: Experiment | None = None,
+            events: pm.EventDataFrame | None = None,
             *,
             trial_columns: str | list[str] | None = None,
             time_column: str | None = None,
@@ -185,56 +188,58 @@ class GazeDataFrame:
         if time_column is not None:
             self.frame = self.frame.rename({time_column: 'time'})
 
-        n_components = None
+        # List of passed not-None column specifier lists.
+        # The list will be used for inferring n_components.
+        column_specifiers: list[list[str]] = []
+
         if pixel_columns:
-            _check_component_columns(
-                frame=self.frame,
-                pixel_columns=pixel_columns,
-            )
-            self.nest(
-                input_columns=pixel_columns,
-                output_column='pixel',
-            )
-            n_components = len(pixel_columns)
+            self._check_component_columns(pixel_columns=pixel_columns)
+            self.nest(pixel_columns, output_column='pixel')
+            column_specifiers.append(pixel_columns)
 
         if position_columns:
-            _check_component_columns(
-                frame=self.frame,
-                position_columns=position_columns,
-            )
-
-            self.nest(
-                input_columns=position_columns,
-                output_column='position',
-            )
-            n_components = len(position_columns)
+            self._check_component_columns(position_columns=position_columns)
+            self.nest(position_columns, output_column='position')
+            column_specifiers.append(position_columns)
 
         if velocity_columns:
-            _check_component_columns(
-                frame=self.frame,
-                velocity_columns=velocity_columns,
-            )
-
-            self.nest(
-                input_columns=velocity_columns,
-                output_column='velocity',
-            )
-            n_components = len(velocity_columns)
+            self._check_component_columns(velocity_columns=velocity_columns)
+            self.nest(velocity_columns, output_column='velocity')
+            column_specifiers.append(velocity_columns)
 
         if acceleration_columns:
-            _check_component_columns(
-                frame=self.frame,
-                acceleration_columns=acceleration_columns,
-            )
+            self._check_component_columns(acceleration_columns=acceleration_columns)
+            self.nest(acceleration_columns, output_column='acceleration')
+            column_specifiers.append(acceleration_columns)
 
-            self.nest(
-                input_columns=acceleration_columns,
-                output_column='acceleration',
-            )
-            n_components = len(acceleration_columns)
-
-        self.n_components = n_components
+        self.n_components = self._infer_n_components(column_specifiers)
         self.experiment = experiment
+
+        if events is None:
+            self.events = pm.EventDataFrame()
+        else:
+            self.events = events.copy()
+
+    def apply(
+            self,
+            function: str,
+            **kwargs: Any,
+    ) -> None:
+        """Apply preprocessing method to GazeDataFrame.
+
+        Parameters
+        ----------
+        function: str
+            Name of the preprocessing method to apply.
+        kwargs:
+            kwargs that will be forwarded when calling the preprocessing method.
+        """
+        if transforms.TransformLibrary.__contains__(function):
+            self.transform(function, **kwargs)
+        elif pm.events.EventDetectionLibrary.__contains__(function):
+            self.detect(function, **kwargs)
+        else:
+            raise ValueError(f"unsupported method '{function}'")
 
     def transform(
             self,
@@ -285,8 +290,35 @@ class GazeDataFrame:
                 kwargs['sampling_rate'] = self.experiment.sampling_rate
 
             if 'n_components' in method_kwargs and 'n_components' not in kwargs:
-                _check_n_components(self.n_components)
+                self._check_n_components()
                 kwargs['n_components'] = self.n_components
+
+            if transform_method.__name__ in {'pos2vel', 'pos2acc'}:
+                if 'position' not in self.frame.columns and 'position_column' not in kwargs:
+                    if 'pixel' in self.frame.columns:
+                        raise pl.exceptions.ColumnNotFoundError(
+                            "Neither 'position' is in the columns of the dataframe: "
+                            f'{self.frame.columns} nor is the position column specified. '
+                            "Since the dataframe has a 'pixel' column, consider running "
+                            f'pix2deg() before {transform_method.__name__}(). If you want '
+                            'to calculate pixel transformations, you can do so by using '
+                            f"{transform_method.__name__}(position_column='pixel'). "
+                            f'Available dataframe columns are {self.frame.columns}',
+                        )
+                    raise pl.exceptions.ColumnNotFoundError(
+                        "Neither 'position' is in the columns of the dataframe: "
+                        f'{self.frame.columns} nor is the position column specified. '
+                        f'Available dataframe columns are {self.frame.columns}',
+                    )
+            if transform_method.__name__ in {'pix2deg'}:
+                if 'pixel' not in self.frame.columns and 'pixel_column' not in kwargs:
+                    raise pl.exceptions.ColumnNotFoundError(
+                        "Neither 'position' is in the columns of the dataframe: "
+                        f'{self.frame.columns} nor is the pixel column specified. '
+                        'You can specify the pixel column via: '
+                        f'{transform_method.__name__}(pixel_column="name_of_your_pixel_column"). '
+                        f'Available dataframe columns are {self.frame.columns}',
+                    )
 
             if self.trial_columns is None:
                 self.frame = self.frame.with_columns(transform_method(**kwargs))
@@ -354,6 +386,44 @@ class GazeDataFrame:
         """
         self.transform('pos2vel', method=method, **kwargs)
 
+    def detect(
+            self,
+            method: Callable[..., pm.EventDataFrame] | str,
+            *,
+            eye: str = 'auto',
+            clear: bool = False,
+            **kwargs: Any,
+    ) -> None:
+        """Detect events by applying a specific event detection method.
+
+        Parameters
+        ----------
+        method : EventDetectionCallable
+            The event detection method to be applied.
+        eye : str
+            Select which eye to choose. Valid options are ``auto``, ``left``, ``right`` or ``None``.
+            If ``auto`` is passed, eye is inferred in the order ``['right', 'left', 'eye']`` from
+            the available :py:attr:`~.Dataset.gaze` dataframe columns.
+        clear : bool
+            If ``True``, event DataFrame will be overwritten with new DataFrame instead of being
+             merged into the existing one.
+        **kwargs :
+            Additional keyword arguments to be passed to the event detection method.
+        """
+        if not self.events or clear:
+            self.events = pm.EventDataFrame()
+
+        if isinstance(method, str):
+            method = pm.events.EventDetectionLibrary.get(method)
+
+        method_kwargs = self._fill_event_detection_kwargs(method, eye, **kwargs)
+        new_events = method(**method_kwargs)
+
+        self.events.frame = pl.concat(
+            [self.events.frame, new_events.frame],
+            how='diagonal',
+        )
+
     @property
     def schema(self) -> pl.type_aliases.SchemaDict:
         """Schema of event dataframe."""
@@ -380,6 +450,8 @@ class GazeDataFrame:
         output_column: str
             Name of the resulting tuple column.
         """
+        self._check_component_columns(**{output_column: input_columns})
+
         self.frame = self.frame.with_columns(
             pl.concat_list([pl.col(component) for component in input_columns])
             .alias(output_column),
@@ -418,7 +490,7 @@ class GazeDataFrame:
             output_columns=output_columns,
             output_suffixes=output_suffixes,
         )
-        _check_n_components(self.n_components)
+        self._check_n_components()
 
         col_names = output_columns if output_columns is not None else []
 
@@ -468,44 +540,191 @@ class GazeDataFrame:
         if self.experiment is None:
             raise AttributeError('experiment must not be None for this method to work')
 
-
-def _check_component_columns(
-        frame: pl.DataFrame,
-        **kwargs: list[str],
-) -> None:
-    """Check if component columns are in valid format."""
-    for component_type, columns in kwargs.items():
-        if not isinstance(columns, list):
-            raise TypeError(
-                f'{component_type} must be of type list, but is of type {type(columns).__name__}',
+    def _check_n_components(self) -> None:
+        """Check that n_components is either 2, 4 or 6."""
+        if self.n_components not in {2, 4, 6}:
+            raise AttributeError(
+                f'n_components must be either 2, 4 or 6 but is {self.n_components}',
             )
 
-        for column in columns:
-            if not isinstance(column, str):
+    def _check_component_columns(self, **kwargs: list[str]) -> None:
+        """Check if component columns are in valid format."""
+        for component_type, columns in kwargs.items():
+            if not isinstance(columns, list):
                 raise TypeError(
-                    f'all elements in {component_type} must be of type str, '
-                    f'but one of the elements is of type {type(column).__name__}',
+                    f'{component_type} must be of type list, '
+                    f'but is of type {type(columns).__name__}',
                 )
 
-        if len(columns) not in [2, 4, 6]:
+            for column in columns:
+                if not isinstance(column, str):
+                    raise TypeError(
+                        f'all elements in {component_type} must be of type str, '
+                        f'but one of the elements is of type {type(column).__name__}',
+                    )
+
+            if len(columns) not in [2, 4, 6]:
+                raise ValueError(
+                    f'{component_type} must contain either 2, 4 or 6 columns, '
+                    f'but has {len(columns)}',
+                )
+
+            for column in columns:
+                if column not in self.frame.columns:
+                    raise pl.exceptions.ColumnNotFoundError(
+                        f'column {column} from {component_type} is not available in dataframe',
+                    )
+
+            if len(set(self.frame[columns].dtypes)) != 1:
+                types_list = sorted([str(t) for t in set(self.frame[columns].dtypes)])
+                raise ValueError(
+                    f'all columns in {component_type} must be of same type, '
+                    f'but types are {types_list}',
+                )
+
+    def _infer_n_components(self, column_specifiers: list[list[str]]) -> int | None:
+        """Infer number of components from DataFrame.
+
+        Method checks nested columns `pixel`, `position`, `velocity` and `acceleration` for number
+        of components by getting their list lenghts, which must be equal for all else a ValueError
+        is raised. Additionally, a list of list of column specifiers is checked for consistency.
+
+        Parameters
+        ----------
+        column_specifiers:
+            List of list of column specifiers.
+
+        Returns
+        -------
+        int or None
+            Number of components
+
+        Raises
+        ------
+        ValueError
+            If number of components is not equal for all considered columns and rows.
+        """
+        all_considered_columns = ['pixel', 'position', 'velocity', 'acceleration']
+        considered_columns = [
+            column for column in all_considered_columns if column in self.frame.columns
+        ]
+
+        list_lengths = {
+            list_length
+            for column in considered_columns
+            for list_length in self.frame.get_column(column).list.lengths().unique().to_list()
+        }
+
+        for column_specifier_list in column_specifiers:
+            list_lengths.add(len(column_specifier_list))
+
+        if len(list_lengths) > 1:
+            raise ValueError(f'inconsistent number of components inferred: {list_lengths}')
+
+        if len(list_lengths) == 0:
+            return None
+
+        return next(iter(list_lengths))
+
+    def _infer_eye_components(self, eye: str) -> tuple[int, int]:
+        """Infer eye components from eye string.
+
+        Parameters
+        ----------
+        eye: str
+            String specificer for inferring eye components. Supported values are: auto, mono, left
+            right, cyclops. Default: auto.
+        """
+        self._check_n_components()
+
+        if eye == 'auto':
+            # Order of inference: cyclops, right, left.
+            if self.n_components == 6:
+                eye_components = 4, 5
+            elif self.n_components == 4:
+                eye_components = 2, 3
+            else:  # We already checked number of components, must be 2.
+                eye_components = 0, 1
+        elif eye == 'left':
+            if isinstance(self.n_components, int) and self.n_components < 4:
+                # Left only makes sense if there are at least two eyes.
+                raise AttributeError(
+                    'left eye is only supported for data with at least 4 components',
+                )
+            eye_components = 0, 1
+        elif eye == 'right':
+            if isinstance(self.n_components, int) and self.n_components < 4:
+                # Right only makes sense if there are at least two eyes.
+                raise AttributeError(
+                    'right eye is only supported for data with at least 4 components',
+                )
+            eye_components = 2, 3
+        elif eye == 'cyclops':
+            if isinstance(self.n_components, int) and self.n_components < 6:
+                raise AttributeError(
+                    'cyclops eye is only supported for data with at least 6 components',
+                )
+            eye_components = 4, 5
+        else:
             raise ValueError(
-                f'{component_type} must contain either 2, 4 or 6 columns, but has {len(columns)}',
+                f"unknown eye '{eye}'. Supported values are: ['auto', 'left', 'right', 'cyclops']",
             )
 
-        for column in columns:
-            if column not in frame.columns:
+        return eye_components
+
+    def _fill_event_detection_kwargs(
+            self,
+            method: Callable[..., pm.EventDataFrame],
+            eye: str,
+            **kwargs: Any,
+    ) -> dict[str, Any]:
+        """Fill event detection kwargs with gaze attributes.
+
+        Parameters
+        ----------
+        method: Callable
+            The method for which the keyword argument dictionary will be filled.
+        eye: str
+            The string specifier for the eye to choose.
+        kwargs:
+            The source keyword arguments passed to the `GazeDataFrame.detect()` method.
+        """
+        # Automatically infer eye to use for event detection.
+        method_args = inspect.getfullargspec(method).args
+
+        if 'positions' in method_args:
+            if 'position' not in self.frame.columns:
                 raise pl.exceptions.ColumnNotFoundError(
-                    f'column {column} from {component_type} is not available in dataframe',
+                    f'Column \'position\' not found.'
+                    f' Available columns are: {self.frame.columns}',
+                )
+            eye_components = self._infer_eye_components(eye)
+            kwargs['positions'] = np.vstack(
+                [
+                    self.frame.get_column('position').list.get(eye_component)
+                    for eye_component in eye_components
+                ],
+            ).transpose()
+
+        if 'velocities' in method_args:
+            if 'velocity' not in self.frame.columns:
+                raise pl.exceptions.ColumnNotFoundError(
+                    f'Column \'velocity\' not found.'
+                    f' Available columns are: {self.frame.columns}',
                 )
 
-        if len(set(frame[columns].dtypes)) != 1:
-            types_list = sorted([str(t) for t in set(frame[columns].dtypes)])
-            raise ValueError(
-                f'all columns in {component_type} must be of same type, but types are {types_list}',
-            )
+            eye_components = self._infer_eye_components(eye)
+            kwargs['velocities'] = np.vstack(
+                [
+                    self.frame.get_column('velocity').list.get(eye_component)
+                    for eye_component in eye_components
+                ],
+            ).transpose()
 
+        if 'events' in method_args:
+            kwargs['events'] = self.events
 
-def _check_n_components(n_components: Any) -> None:
-    """Check that n_components is either 2, 4 or 6."""
-    if n_components not in {2, 4, 6}:
-        raise AttributeError(f'n_components must be either 2, 4 or 6 but is {n_components}')
+        if 'timesteps' in method_args and 'time' in self.frame.columns:
+            kwargs['timesteps'] = self.frame.get_column('time').to_numpy()
+
+        return kwargs

@@ -345,7 +345,7 @@ def add_fileinfo(
         [
             pl.lit(value).alias(column)
             for column, value in fileinfo.items()
-            if column != 'filepath'
+            if column != 'filepath' and column not in df.columns
         ] + [pl.all()],
     )
 

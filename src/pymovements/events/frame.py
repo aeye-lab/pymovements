@@ -157,6 +157,16 @@ class EventDataFrame:
         event_property_columns -= set(self._additional_columns)
         return list(event_property_columns)
 
+    def copy(self) -> EventDataFrame:
+        """Return a copy of the EventDataFrame.
+
+        Returns
+        -------
+        EventDataFrame
+            A copy of the EventDataFrame.
+        """
+        return EventDataFrame(data=self.frame.clone())
+
     def _add_minimal_schema_columns(self, df: pl.DataFrame) -> pl.DataFrame:
         """Add minimal schema columns to :py:class:`polars.DataFrame` if they are missing."""
         if len(df) == 0:

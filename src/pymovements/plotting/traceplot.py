@@ -21,14 +21,20 @@
 from __future__ import annotations
 
 import sys
+from typing import Dict
+from typing import Literal
+from typing import Sequence
+from typing import Tuple
 
-import matplotlib
+import matplotlib.colors
 import matplotlib.pyplot as plt
+import matplotlib.scale
 import numpy as np
-from matplotlib import colors
 from matplotlib.collections import LineCollection
+from typing_extensions import TypeAlias
 
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
+
 
 # This is really a dirty workaround to use the Agg backend if runnning pytest.
 # This is needed as Windows workers on GitHub fail randomly with other backends.
@@ -36,44 +42,59 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
 if 'pytest' in sys.modules:  # pragma: no cover
     matplotlib.use('Agg')
 
-DEFAULT_SEGMENTDATA = {
+LinearSegmentedColormapType: TypeAlias = Dict[
+    Literal['red', 'green', 'blue', 'alpha'], Sequence[Tuple[float, ...]],
+]
+
+DEFAULT_SEGMENTDATA: LinearSegmentedColormapType = {
     'red': [
-        [0.0, 0.0, 0.0],
-        [0.5, 1.0, 1.0],
-        [1.0, 1.0, 1.0],
+        (0.0, 0.0, 0.0),
+        (0.5, 1.0, 1.0),
+        (1.0, 1.0, 1.0),
     ],
     'green': [
-        [0.0, 0.0, 0.0],
-        [0.5, 1.0, 1.0],
-        [1.0, 0.0, 0.0],
+        (0.0, 0.0, 0.0),
+        (0.5, 1.0, 1.0),
+        (1.0, 0.0, 0.0),
     ],
     'blue': [
-        [0.0, 0.0, 0.0],
-        [0.5, 0.0, 0.0],
-        [1.0, 0.0, 0.0],
+        (0.0, 0.0, 0.0),
+        (0.5, 0.0, 0.0),
+        (1.0, 0.0, 0.0),
+    ],
+    'alpha': [
+        (1.0, 1.0, 1.0),
+        (1.0, 1.0, 1.0),
+        (1.0, 1.0, 1.0),
     ],
 }
 
 
-DEFAULT_SEGMENTDATA_TWOSLOPE = {
+DEFAULT_SEGMENTDATA_TWOSLOPE: LinearSegmentedColormapType = {
     'red': [
-        [0.0, 0.0, 0.0],
-        [0.5, 0.0, 0.0],
-        [0.75, 1.0, 1.0],
-        [1.0, 1.0, 1.0],
+        (0.0, 0.0, 0.0),
+        (0.5, 0.0, 0.0),
+        (0.75, 1.0, 1.0),
+        (1.0, 1.0, 1.0),
     ],
     'green': [
-        [0.0, 0.0, 0.0],
-        [0.25, 1.0, 1.0],
-        [0.5, 0.0, 0.0],
-        [0.75, 1.0, 1.0],
-        [1.0, 0.0, 0.0],
+        (0.0, 0.0, 0.0),
+        (0.25, 1.0, 1.0),
+        (0.5, 0.0, 0.0),
+        (0.75, 1.0, 1.0),
+        (1.0, 0.0, 0.0),
     ],
     'blue': [
-        [0.0, 1.0, 1.0],
-        [0.25, 1.0, 1.0],
-        [0.5, 0.0, 0.0],
-        [1.0, 0.0, 0.0],
+        (0.0, 1.0, 1.0),
+        (0.25, 1.0, 1.0),
+        (0.5, 0.0, 0.0),
+        (1.0, 0.0, 0.0),
+    ],
+    'alpha': [
+        (1.0, 1.0, 1.0),
+        (1.0, 1.0, 1.0),
+        (1.0, 1.0, 1.0),
+        (1.0, 1.0, 1.0),
     ],
 }
 
@@ -82,9 +103,9 @@ def traceplot(
         gaze: GazeDataFrame,
         position_column: str = 'pixel',
         cval: np.ndarray | None = None,  # pragma: no cover
-        cmap: colors.Colormap | None = None,
-        cmap_norm: colors.Normalize | str | None = None,
-        cmap_segmentdata: dict[str, list[list[float]]] | None = None,
+        cmap: matplotlib.colors.Colormap | None = None,
+        cmap_norm: matplotlib.colors.Normalize | str | None = None,
+        cmap_segmentdata: LinearSegmentedColormapType | None = None,
         cbar_label: str | None = None,
         show_cbar: bool = False,
         padding: float | None = None,
@@ -147,7 +168,7 @@ def traceplot(
         show_cbar = False
 
     cval_max = np.nanmax(np.abs(cval))
-    cval_min = np.nanmin(cval)
+    cval_min = np.nanmin(cval).astype(float)
 
     if cmap_norm is None:
         if cval_max and cval_min < 0:
@@ -182,7 +203,10 @@ def traceplot(
     elif isinstance(cmap_norm, str):
         # pylint: disable=protected-access
 
-        if (scale_class := matplotlib.scale._scale_mapping.get(cmap_norm, None)) is None:
+        # to handle after https://github.com/pydata/xarray/pull/8030 is merged
+        if (
+            scale_class := matplotlib.scale._scale_mapping.get(cmap_norm, None)  # type: ignore
+        ) is None:
             raise ValueError(f'cmap_norm string {cmap_norm} is not supported')
 
         norm_class = matplotlib.colors.make_norm_from_scale(scale_class)
@@ -217,7 +241,8 @@ def traceplot(
         # sm.set_array(cval)
         fig.colorbar(line, label=cbar_label, ax=ax)
 
-    ax.set_title(title)
+    if title:
+        ax.set_title(title)
 
     if savepath is not None:
         fig.savefig(savepath)

@@ -17,42 +17,36 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module holds all dataset definitions.
+"""Test read from csv."""
+import pytest
 
-.. rubric:: Dataset Definitions
-
-.. autosummary::
-   :toctree:
-   :template: class.rst
-
-    pymovements.datasets.GazeBase
-    pymovements.datasets.GazeBaseVR
-    pymovements.datasets.GazeOnFaces
-    pymovements.datasets.JuDo1000
+import pymovements as pm
 
 
-.. rubric:: Example Datasets
+@pytest.mark.parametrize(
+    ('kwargs', 'shape'),
+    [
+        pytest.param(
+            {
+                'file': 'tests/gaze/io/files/monocular_example.csv',
+                'time_column': 'time', 'pixel_columns': ['x_left_pix', 'y_left_pix'],
+            },
+            (10, 2),
+            id='csv_mono_shape',
+        ),
+        pytest.param(
+            {
+                'file': 'tests/gaze/io/files/binocular_example.csv',
+                'time_column': 'time',
+                'pixel_columns': ['x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix'],
+                'position_columns': ['x_left_pos', 'y_left_pos', 'x_right_pos', 'y_right_pos'],
+            },
+            (10, 3),
+            id='csv_bino_shape',
+        ),
+    ],
+)
+def test_shapes(kwargs, shape):
+    gaze_dataframe = pm.gaze.from_csv(**kwargs)
 
-.. autosummary::
-   :toctree:
-   :template: class.rst
-
-    pymovements.datasets.ToyDataset
-    pymovements.datasets.ToyDatasetEyeLink
-"""
-from pymovements.datasets.gaze_on_faces import GazeOnFaces
-from pymovements.datasets.gazebase import GazeBase
-from pymovements.datasets.gazebasevr import GazeBaseVR
-from pymovements.datasets.judo1000 import JuDo1000
-from pymovements.datasets.toy_dataset import ToyDataset
-from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
-
-
-__all__ = [
-    'GazeBase',
-    'GazeBaseVR',
-    'GazeOnFaces',
-    'JuDo1000',
-    'ToyDataset',
-    'ToyDatasetEyeLink',
-]
+    assert gaze_dataframe.frame.shape == shape

@@ -32,11 +32,11 @@ classifiers = [
   "Typing :: Typed"
 ]
 dependencies = [
-  "matplotlib>=3.0.0,<4",
+  "matplotlib>=3.0.0,<3.8",
   "numpy>=1.10.0,<2",
   "pandas>1.0.0,<3",
-  "polars>=0.18.3,<0.19.0",
-  "pyarrow>=11.0.0,<12",
+  "polars>=0.19.0,<0.20.0",
+  "pyarrow>=11.0.0,<14",
   "scipy>=1.5.4,<2",
   "tqdm>=4.0.0,<5"
 ]
@@ -61,7 +61,8 @@ test = [
   "pybtex",
   "pytest>=6.0.0",
   "pytest-cov>=4.0.0",
-  "types-tqdm"
+  "types-tqdm",
+  "typing_extensions"
 ]
 
 [project.urls]
@@ -110,7 +111,6 @@ check_untyped_defs = true
 disallow_incomplete_defs = true
 disallow_untyped_defs = true
 warn_redundant_casts = true
-warn_unused_ignores = true
 
 [[tool.mypy.overrides]]
 module = "scipy.*"
@@ -137,7 +137,7 @@ ignore = "D103,D107,D213"
 ignore = "D103,D107,D213"
 
 [tool.pytest.ini_options]
-addopts = "-ra -l -v --doctest-modules"
+addopts = "-ra -l --tb=long --doctest-modules"
 doctest_optionflags = "NORMALIZE_WHITESPACE"
 filterwarnings = ['ignore::DeprecationWarning:pkg_resources.*:']
 testpaths = ['tests', 'src']

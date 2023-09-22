@@ -14,17 +14,17 @@ repos:
     -   id: add-trailing-comma
         args: [--py36-plus]
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v3.10.1
+    rev: v3.11.0
     hooks:
     -   id: pyupgrade
         args: [--py38-plus]
 -   repo: https://github.com/asottile/reorder-python-imports
-    rev: v3.10.0
+    rev: v3.11.0
     hooks:
     -   id: reorder-python-imports
         args: [--application-directories=src, --py38-plus]
 -   repo: https://github.com/asottile/reorder-python-imports
-    rev: v3.10.0
+    rev: v3.11.0
     hooks:
     -   id: reorder-python-imports
         files: ^src/
@@ -72,7 +72,7 @@ repos:
     rev: v1.5.1
     hooks:
     -   id: mypy
-        additional_dependencies: [types-all]
+        additional_dependencies: [types-all, pandas-stubs, types-tqdm]
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:

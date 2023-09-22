@@ -113,6 +113,9 @@ def ivt(
     if include_nan:
         candidates = filter_candidates_remove_nans(candidates=candidates, values=velocities)
 
+    # Remove empty candidates.
+    candidates = [candidate for candidate in candidates if len(candidate) > 0]
+
     # Filter all candidates by minimum duration.
     candidates = [
         candidate for candidate in candidates

@@ -18,21 +18,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test GazeDataFrame initialization."""
+import numpy as np
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
+import pymovements as pm
 
 
 @pytest.mark.parametrize(
-    ('init_kwargs', 'expected_frame'),
+    ('init_kwargs', 'expected_frame', 'expected_n_components'),
     [
         pytest.param(
             {
                 'data': pl.DataFrame(),
             },
             pl.DataFrame(),
+            None,
             id='empty_df_no_schema',
         ),
 
@@ -41,6 +43,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 'data': pl.DataFrame(schema={'abc': pl.Int64}),
             },
             pl.DataFrame(schema={'abc': pl.Int64}),
+            None,
             id='empty_df_with_schema_no_component_columns',
         ),
 
@@ -53,6 +56,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 'acceleration_columns': [],
             },
             pl.DataFrame(schema={'abc': pl.Int64}),
+            None,
             id='empty_df_with_schema_all_component_columns_empty_lists',
         ),
 
@@ -62,6 +66,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 'pixel_columns': ['x', 'y'],
             },
             pl.DataFrame(schema={'pixel': pl.List(pl.Float64)}),
+            2,
             id='empty_df_with_schema_two_pixel_columns',
         ),
 
@@ -71,6 +76,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 'pixel_columns': ['x', 'y'],
             },
             pl.DataFrame(schema={'abc': pl.Int64, 'pixel': pl.List(pl.Float64)}),
+            2,
             id='empty_df_with_three_column_schema_two_pixel_columns',
         ),
 
@@ -84,6 +90,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 'pixel_columns': ['xr', 'yr', 'xl', 'yl'],
             },
             pl.DataFrame(schema={'pixel': pl.List(pl.Float64)}),
+            4,
             id='empty_df_with_schema_four_pixel_columns',
         ),
 
@@ -101,6 +108,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 ],
             },
             pl.DataFrame(schema={'pixel': pl.List(pl.Float64)}),
+            6,
             id='empty_df_with_schema_six_pixel_columns',
         ),
 
@@ -115,6 +123,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 {'pixel': [[1.23, 4.56]]},
                 schema={'pixel': pl.List(pl.Float64)},
             ),
+            2,
             id='df_single_row_two_pixel_columns',
         ),
 
@@ -130,6 +139,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 {'abc': [1], 'pixel': [[1.23, 4.56]]},
                 schema={'abc': pl.Int64, 'pixel': pl.List(pl.Float64)},
             ),
+            2,
             id='df_single_row_three_columns_two_pixel_columns',
         ),
 
@@ -145,6 +155,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 {'pixel': [[1.2, 3.4, 5.6, 7.8]]},
                 schema={'pixel': pl.List(pl.Float64)},
             ),
+            4,
             id='df_single_row_four_pixel_columns',
         ),
 
@@ -170,6 +181,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 {'pixel': [[0.1, 0.2, 0.3, 0.4, 0.5, 0.6]]},
                 schema={'pixel': pl.List(pl.Float64)},
             ),
+            6,
             id='df_single_row_six_pixel_columns',
         ),
 
@@ -179,6 +191,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 'position_columns': ['x', 'y'],
             },
             pl.DataFrame(schema={'position': pl.List(pl.Float64)}),
+            2,
             id='empty_df_with_schema_two_position_columns',
         ),
 
@@ -188,6 +201,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 'position_columns': ['x', 'y'],
             },
             pl.DataFrame(schema={'abc': pl.Int64, 'position': pl.List(pl.Float64)}),
+            2,
             id='empty_df_with_three_column_schema_two_position_columns',
         ),
 
@@ -201,6 +215,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 'position_columns': ['xr', 'yr', 'xl', 'yl'],
             },
             pl.DataFrame(schema={'position': pl.List(pl.Float64)}),
+            4,
             id='empty_df_with_schema_four_position_columns',
         ),
 
@@ -218,6 +233,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 ],
             },
             pl.DataFrame(schema={'position': pl.List(pl.Float64)}),
+            6,
             id='empty_df_with_schema_six_position_columns',
         ),
 
@@ -232,6 +248,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 {'position': [[1.23, 4.56]]},
                 schema={'position': pl.List(pl.Float64)},
             ),
+            2,
             id='df_single_row_two_position_columns',
         ),
 
@@ -247,6 +264,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 {'abc': [1], 'position': [[1.23, 4.56]]},
                 schema={'abc': pl.Int64, 'position': pl.List(pl.Float64)},
             ),
+            2,
             id='df_single_row_three_columns_two_position_columns',
         ),
 
@@ -262,6 +280,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 {'position': [[1.2, 3.4, 5.6, 7.8]]},
                 schema={'position': pl.List(pl.Float64)},
             ),
+            4,
             id='df_single_row_four_position_columns',
         ),
 
@@ -287,6 +306,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 {'position': [[0.1, 0.2, 0.3, 0.4, 0.5, 0.6]]},
                 schema={'position': pl.List(pl.Float64)},
             ),
+            6,
             id='df_single_row_six_position_columns',
         ),
 
@@ -296,6 +316,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 'velocity_columns': ['x_vel', 'y_vel'],
             },
             pl.DataFrame(schema={'velocity': pl.List(pl.Float64)}),
+            2,
             id='empty_df_with_schema_two_velocity_columns',
         ),
 
@@ -309,6 +330,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 'velocity_columns': ['x_vel', 'y_vel'],
             },
             pl.DataFrame(schema={'abc': pl.Int64, 'velocity': pl.List(pl.Float64)}),
+            2,
             id='empty_df_with_three_column_schema_two_velocity_columns',
         ),
 
@@ -323,6 +345,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 'velocity_columns': ['xr_vel', 'yr_vel', 'xl_vel', 'yl_vel'],
             },
             pl.DataFrame(schema={'velocity': pl.List(pl.Float64)}),
+            4,
             id='empty_df_with_schema_four_velocity_columns',
         ),
 
@@ -342,6 +365,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 ],
             },
             pl.DataFrame(schema={'velocity': pl.List(pl.Float64)}),
+            6,
             id='empty_df_with_schema_six_velocity_columns',
         ),
 
@@ -357,6 +381,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 {'velocity': [[1.23, 4.56]]},
                 schema={'velocity': pl.List(pl.Float64)},
             ),
+            2,
             id='df_single_row_two_velocity_columns',
         ),
 
@@ -372,6 +397,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 {'abc': [1], 'velocity': [[1.23, 4.56]]},
                 schema={'abc': pl.Int64, 'velocity': pl.List(pl.Float64)},
             ),
+            2,
             id='df_single_row_three_columns_two_velocity_columns',
         ),
 
@@ -393,6 +419,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 {'velocity': [[1.2, 3.4, 5.6, 7.8]]},
                 schema={'velocity': pl.List(pl.Float64)},
             ),
+            4,
             id='df_single_row_four_velocity_columns',
         ),
 
@@ -420,6 +447,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 {'velocity': [[0.1, 0.2, 0.3, 0.4, 0.5, 0.6]]},
                 schema={'velocity': pl.List(pl.Float64)},
             ),
+            6,
             id='df_single_row_six_velocity_columns',
         ),
 
@@ -429,6 +457,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 'acceleration_columns': ['x_acc', 'y_acc'],
             },
             pl.DataFrame(schema={'acceleration': pl.List(pl.Float64)}),
+            2,
             id='empty_df_with_schema_two_acceleration_columns',
         ),
 
@@ -442,6 +471,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 'acceleration_columns': ['x_acc', 'y_acc'],
             },
             pl.DataFrame(schema={'abc': pl.Int64, 'acceleration': pl.List(pl.Float64)}),
+            2,
             id='empty_df_with_three_column_schema_two_acceleration_columns',
         ),
 
@@ -456,6 +486,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 'acceleration_columns': ['xr_acc', 'yr_acc', 'xl_acc', 'yl_acc'],
             },
             pl.DataFrame(schema={'acceleration': pl.List(pl.Float64)}),
+            4,
             id='empty_df_with_schema_four_acceleration_columns',
         ),
 
@@ -475,6 +506,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 ],
             },
             pl.DataFrame(schema={'acceleration': pl.List(pl.Float64)}),
+            6,
             id='empty_df_with_schema_six_acceleration_columns',
         ),
 
@@ -490,6 +522,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 {'acceleration': [[1.23, 4.56]]},
                 schema={'acceleration': pl.List(pl.Float64)},
             ),
+            2,
             id='df_single_row_two_acceleration_columns',
         ),
 
@@ -505,6 +538,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 {'abc': [1], 'acceleration': [[1.23, 4.56]]},
                 schema={'abc': pl.Int64, 'acceleration': pl.List(pl.Float64)},
             ),
+            2,
             id='df_single_row_three_columns_two_acceleration_columns',
         ),
 
@@ -526,6 +560,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 {'acceleration': [[1.2, 3.4, 5.6, 7.8]]},
                 schema={'acceleration': pl.List(pl.Float64)},
             ),
+            4,
             id='df_single_row_four_acceleration_columns',
         ),
 
@@ -553,6 +588,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                 {'acceleration': [[0.1, 0.2, 0.3, 0.4, 0.5, 0.6]]},
                 schema={'acceleration': pl.List(pl.Float64)},
             ),
+            6,
             id='df_single_row_six_acceleration_columns',
         ),
 
@@ -591,6 +627,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                     'acceleration': pl.List(pl.Float64),
                 },
             ),
+            2,
             id='df_single_row_all_types_two_columns',
         ),
 
@@ -661,13 +698,15 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
                     'acceleration': pl.List(pl.Float64),
                 },
             ),
+            6,
             id='df_single_row_all_types_six_columns',
         ),
     ],
 )
-def test_init_gaze_dataframe_has_expected_frame(init_kwargs, expected_frame):
-    gaze = GazeDataFrame(**init_kwargs)
+def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, expected_n_components):
+    gaze = pm.GazeDataFrame(**init_kwargs)
     assert_frame_equal(gaze.frame, expected_frame)
+    assert gaze.n_components == expected_n_components
 
 
 @pytest.mark.parametrize(
@@ -1114,11 +1153,105 @@ def test_init_gaze_dataframe_has_expected_frame(init_kwargs, expected_frame):
             'column y_acc from acceleration_columns is not available in dataframe',
             id='acceleration_columns_missing_column',
         ),
+
+        pytest.param(
+            {
+                'data': pl.DataFrame(
+                    schema={
+                        'x': pl.Float64, 'y': pl.Float64,
+                        'xr': pl.Float64, 'yr': pl.Float64,
+                        'xl': pl.Float64, 'yl': pl.Float64,
+                    },
+                ),
+                'pixel_columns': ['x', 'y'],
+                'position_columns': ['xl', 'yl', 'xr', 'yr'],
+            },
+            ValueError,
+            'inconsistent number of components inferred: {2, 4}',
+            id='inconsistent_number_of_components',
+        ),
+
     ],
 )
-def test_event_dataframe_init_exceptions(init_kwargs, exception, exception_msg):
+def test_gaze_dataframe_init_exceptions(init_kwargs, exception, exception_msg):
     with pytest.raises(exception) as excinfo:
-        GazeDataFrame(**init_kwargs)
+        pm.GazeDataFrame(**init_kwargs)
 
     msg, = excinfo.value.args
     assert msg == exception_msg
+
+
+def test_gaze_copy_init_has_same_n_components():
+    """Tests if gaze initialization with frame with nested columns has correct n_components.
+
+    Refers to issue #514.
+    """
+    df_orig = pl.from_numpy(np.zeros((2, 1000)), orient='col', schema=['x', 'y'])
+    gaze = pm.GazeDataFrame(df_orig, position_columns=['x', 'y'])
+
+    df_copy = gaze.frame.clone()
+    gaze_copy = pm.GazeDataFrame(df_copy)
+
+    assert gaze.n_components == gaze_copy.n_components
+
+
+@pytest.mark.parametrize(
+    ('events', 'init_kwargs'),
+    [
+        pytest.param(
+            None,
+            {
+                'data': pl.from_dict(
+                    {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'position_columns': ['x', 'y'],
+            },
+            id='data_with_no_events',
+        ),
+
+        pytest.param(
+            pm.EventDataFrame(),
+            {
+                'data': pl.from_dict(
+                    {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'position_columns': ['x', 'y'],
+            },
+            id='data_empty_events',
+        ),
+
+        pytest.param(
+            pm.EventDataFrame(),
+            {},
+            id='no_data_empty_events',
+        ),
+
+        pytest.param(
+            pm.EventDataFrame(name='saccade', onsets=[0], offsets=[10]),
+            {},
+            id='no_data_with_saccades',
+        ),
+
+        pytest.param(
+            pm.EventDataFrame(name='fixation', onsets=[100], offsets=[910]),
+            {
+                'data': pl.from_dict(
+                    {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'position_columns': ['x', 'y'],
+            },
+            id='data_with_fixations',
+        ),
+    ],
+)
+def test_gaze_init_events(events, init_kwargs):
+    if events is None:
+        expected_events = pm.EventDataFrame().frame
+    else:
+        expected_events = events.frame
+
+    gaze = pm.GazeDataFrame(events=events, **init_kwargs)
+
+    assert_frame_equal(gaze.events.frame, expected_events)
+    # We don't want the events point to the same reference.
+    assert gaze.events.frame is not expected_events
