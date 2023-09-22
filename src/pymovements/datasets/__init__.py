@@ -27,8 +27,8 @@
 
     pymovements.datasets.GazeBase
     pymovements.datasets.GazeBaseVR
-    pymovements.datasets.JuDo1000
     pymovements.datasets.GazeOnFaces
+    pymovements.datasets.JuDo1000
 
 
 .. rubric:: Example Datasets
@@ -51,8 +51,8 @@ from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
 __all__ = [
     'GazeBase',
     'GazeBaseVR',
-    'JuDo1000',
     'GazeOnFaces',
+    'JuDo1000',
     'ToyDataset',
     'ToyDatasetEyeLink',
 ]
