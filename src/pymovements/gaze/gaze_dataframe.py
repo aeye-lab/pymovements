@@ -417,7 +417,6 @@ class GazeDataFrame:
         """ Smooth data in a column.
 
         See :func:`~transforms.smooth()` for details and description of parameters.
-
         """
         self.transform(
             'smooth',
