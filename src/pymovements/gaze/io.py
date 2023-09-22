@@ -106,14 +106,14 @@ def from_csv(
     │ i64  ┆ i64        ┆ i64        │
     ╞══════╪════════════╪════════════╡
     │ 0    ┆ 0          ┆ 0          │
-    │ 0    ┆ 0          ┆ 0          │
-    │ 0    ┆ 0          ┆ 0          │
-    │ 0    ┆ 0          ┆ 0          │
+    │ 1    ┆ 0          ┆ 0          │
+    │ 2    ┆ 0          ┆ 0          │
+    │ 3    ┆ 0          ┆ 0          │
     │ …    ┆ …          ┆ …          │
-    │ 0    ┆ 0          ┆ 0          │
-    │ 0    ┆ 0          ┆ 0          │
-    │ 0    ┆ 0          ┆ 0          │
-    │ 0    ┆ 0          ┆ 0          │
+    │ 6    ┆ 0          ┆ 0          │
+    │ 7    ┆ 0          ┆ 0          │
+    │ 8    ┆ 0          ┆ 0          │
+    │ 9    ┆ 0          ┆ 0          │
     └──────┴────────────┴────────────┘
 
     We can now load the data into a ``GazeDataFrame`` by specyfing the experimental setting
@@ -132,14 +132,14 @@ def from_csv(
     │ i64  ┆ list[i64] │
     ╞══════╪═══════════╡
     │ 0    ┆ [0, 0]    │
-    │ 0    ┆ [0, 0]    │
-    │ 0    ┆ [0, 0]    │
-    │ 0    ┆ [0, 0]    │
+    │ 1    ┆ [0, 0]    │
+    │ 2    ┆ [0, 0]    │
+    │ 3    ┆ [0, 0]    │
     │ …    ┆ …         │
-    │ 0    ┆ [0, 0]    │
-    │ 0    ┆ [0, 0]    │
-    │ 0    ┆ [0, 0]    │
-    │ 0    ┆ [0, 0]    │
+    │ 6    ┆ [0, 0]    │
+    │ 7    ┆ [0, 0]    │
+    │ 8    ┆ [0, 0]    │
+    │ 9    ┆ [0, 0]    │
     └──────┴───────────┘
 
     """
@@ -156,5 +156,69 @@ def from_csv(
         position_columns=position_columns,
         velocity_columns=velocity_columns,
         acceleration_columns=acceleration_columns,
+    )
+    return gaze_df
+
+
+def from_ipc(
+        file: str | Path,
+        experiment: Experiment | None = None,
+        *,
+        trial_columns: list[str] | None = None,
+        time_column: str | None = None,
+        pixel_columns: list[str] | None = None,
+        position_columns: list[str] | None = None,
+        velocity_columns: list[str] | None = None,
+        acceleration_columns: list[str] | None = None,
+        **read_csv_kwargs: Any,
+) -> GazeDataFrame:
+    """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
+
+    Parameters
+    ----------
+    file:
+        Path of IPC/feather file.
+    experiment : Experiment
+        The experiment definition.
+    **read_csv_kwargs:
+            Additional keyword arguments to be passed to polars to read in the csv.
+
+    Examples
+    --------
+    First let's assume a IPC file stored `tests/gaze/io/files/monocular_example.feather`
+
+    We can now load the data into a ``GazeDataFrame`` by specyfing the experimental setting
+
+    >>> from pymovements.gaze.io import from_ipc
+    >>> gaze = from_ipc(
+    ...     file='tests/gaze/io/files/monocular_example.csv',
+    ...     )
+    >>> gaze.frame
+    shape: (10, 2)
+    ┌──────┬───────────┐
+    │ time ┆ pixel     │
+    │ ---  ┆ ---       │
+    │ i64  ┆ list[i64] │
+    ╞══════╪═══════════╡
+    │ 0    ┆ [0, 0]    │
+    │ 1    ┆ [0, 0]    │
+    │ 2    ┆ [0, 0]    │
+    │ 3    ┆ [0, 0]    │
+    │ …    ┆ …         │
+    │ 6    ┆ [0, 0]    │
+    │ 7    ┆ [0, 0]    │
+    │ 8    ┆ [0, 0]    │
+    │ 9    ┆ [0, 0]    │
+    └──────┴───────────┘
+
+    """
+    # read data
+    gaze_data = pl.read_ipc(file, **read_csv_kwargs)
+
+    # create gaze data frame
+    gaze_df = GazeDataFrame(
+        gaze_data,
+        experiment=experiment,
+        trial_columns=trial_columns,
     )
     return gaze_df
