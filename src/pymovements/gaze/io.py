@@ -178,9 +178,8 @@ def from_ipc(
 
     Examples
     --------
-    First let's assume a IPC file stored `tests/gaze/io/files/monocular_example.feather`
-
-    We can now load the data into a ``GazeDataFrame``
+    Let's assume we have an IPC file stored at `tests/gaze/io/files/monocular_example.feather`.
+    We can then load the data into a ``GazeDataFrame``:
 
     >>> from pymovements.gaze.io import from_ipc
     >>> gaze = from_ipc(
