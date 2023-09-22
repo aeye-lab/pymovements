@@ -29,9 +29,9 @@ from pymovements.utils import decorators
 
 @decorators.auto_str
 class Screen:
-    """
-    Screen class for holding screen properties and transforming pixel
-    coordinates to degrees of visual angle.
+    """Screen class for holding screen properties.
+
+     Also transforms pixel coordinates to degrees of visual angle.
 
     Attributes
     ----------
@@ -67,8 +67,7 @@ class Screen:
             distance_cm: float,
             origin: str,
     ):
-        """
-        Initializes Screen.
+        """Initialize Screen.
 
         Parameters
         ----------
@@ -100,7 +99,6 @@ class Screen:
         height_cm=30.00, distance_cm=68.00, origin=lower left,
         x_max_dva=15.60, y_max_dva=12.43, x_min_dva=-15.60,
         y_min_dva=-12.43)
-
         """
         checks.check_no_zeros(width_px, 'width_px')
         checks.check_no_zeros(height_px, 'height_px')
@@ -137,8 +135,7 @@ class Screen:
             self,
             arr: float | list[float] | list[list[float]] | np.ndarray,
     ) -> np.ndarray:
-        """
-        Converts pixel screen coordinates to degrees of visual angle.
+        """Convert pixel screen coordinates to degrees of visual angle.
 
         Parameters
         ----------

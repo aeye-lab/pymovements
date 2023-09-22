@@ -21,6 +21,7 @@
 from pymovements import _version
 from pymovements import datasets
 from pymovements import events
+from pymovements import exceptions
 from pymovements import gaze
 from pymovements import plotting
 from pymovements import synthetic
@@ -56,6 +57,7 @@ __all__ = [
     'Screen',
     'GazeDataFrame',
 
+    'exceptions',
     'plotting',
     'synthetic',
     'utils',

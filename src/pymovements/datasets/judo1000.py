@@ -89,6 +89,7 @@ class JuDo1000(DatasetDefinition):
 
     >>> dataset.load()# doctest: +SKIP
     """
+
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 

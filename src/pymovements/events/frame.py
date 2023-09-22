@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-This module holds the EventDataFrame class.
-"""
+"""This module holds the EventDataFrame class."""
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -126,9 +124,11 @@ class EventDataFrame:
         return self.frame.schema
 
     def __len__(self) -> int:
+        """Get number of events in dataframe."""
         return self.frame.__len__()
 
     def __getitem__(self, *args: Any, **kwargs: Any) -> Any:
+        """Get item."""
         return self.frame.__getitem__(*args, **kwargs)
 
     @property
@@ -137,7 +137,7 @@ class EventDataFrame:
         return self.frame.columns
 
     def _add_duration_property(self) -> None:
-        """Adds duration property column to dataframe."""
+        """Add duration property column to dataframe."""
         self.frame = self.frame.select([pl.all(), duration().alias('duration')])
 
     def add_event_properties(
@@ -163,6 +163,16 @@ class EventDataFrame:
         event_property_columns -= set(list(self._minimal_schema.keys()))
         event_property_columns -= set(self._additional_columns)
         return list(event_property_columns)
+
+    def copy(self) -> EventDataFrame:
+        """Return a copy of the EventDataFrame.
+
+        Returns
+        -------
+        EventDataFrame
+            A copy of the EventDataFrame.
+        """
+        return EventDataFrame(data=self.frame.clone())
 
     def _add_minimal_schema_columns(self, df: pl.DataFrame) -> pl.DataFrame:
         """Add minimal schema columns to :py:class:`polars.DataFrame` if they are missing."""

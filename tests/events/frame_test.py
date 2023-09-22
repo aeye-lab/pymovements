@@ -186,3 +186,13 @@ def test_event_dataframe_columns_same_as_frame():
     event_df = pm.EventDataFrame(**init_kwargs)
 
     assert event_df.columns == event_df.frame.columns
+
+
+def test_event_dataframe_copy():
+    events = pm.EventDataFrame(name='saccade', onsets=[0], offsets=[123])
+    events_copy = events.copy()
+
+    # We want to have separate dataframes but with the exact same data.
+    assert events is not events_copy
+    assert events.frame is not events_copy.frame
+    assert_frame_equal(events.frame, events_copy.frame)

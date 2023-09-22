@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-This module holds the implementation of the ivt algorithm.
-"""
+"""This module holds the implementation of the I-VT algorithm."""
 from __future__ import annotations
 
 import numpy as np
@@ -41,8 +39,7 @@ def ivt(
         include_nan: bool = False,
         name: str = 'fixation',
 ) -> EventDataFrame:
-    """
-    Identification of fixations based on velocity-threshold
+    """Identification of fixations based on velocity-threshold (I-VT).
 
     The algorithm classifies each point as a fixation if the velocity is below
     the given velocity threshold. Consecutive fixation points are merged into
@@ -113,6 +110,9 @@ def ivt(
     # Remove leading and trailing nan values from candidates.
     if include_nan:
         candidates = filter_candidates_remove_nans(candidates=candidates, values=velocities)
+
+    # Remove empty candidates.
+    candidates = [candidate for candidate in candidates if len(candidate) > 0]
 
     # Filter all candidates by minimum duration.
     candidates = [
