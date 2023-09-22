@@ -405,7 +405,6 @@ class GazeDataFrame:
         """
         self.transform('pos2vel', method=method, **kwargs)
 
-
     def smooth(
             self,
             column: str = 'position',
