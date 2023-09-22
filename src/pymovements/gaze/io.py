@@ -163,7 +163,7 @@ def from_csv(
 def from_ipc(
         file: str | Path,
         experiment: Experiment | None = None,
-        **read_csv_kwargs: Any,
+        **read_ipc_kwargs: Any,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
 
@@ -173,14 +173,14 @@ def from_ipc(
         Path of IPC/feather file.
     experiment : Experiment
         The experiment definition.
-    **read_csv_kwargs:
-            Additional keyword arguments to be passed to polars to read in the csv.
+    **read_ipc_kwargs:
+            Additional keyword arguments to be passed to polars to read in the ipc file.
 
     Examples
     --------
     First let's assume a IPC file stored `tests/gaze/io/files/monocular_example.feather`
 
-    We can now load the data into a ``GazeDataFrame`` by specyfing the experimental setting
+    We can now load the data into a ``GazeDataFrame``
 
     >>> from pymovements.gaze.io import from_ipc
     >>> gaze = from_ipc(
@@ -206,7 +206,7 @@ def from_ipc(
 
     """
     # read data
-    gaze_data = pl.read_ipc(file, **read_csv_kwargs)
+    gaze_data = pl.read_ipc(file, **read_ipc_kwargs)
 
     # create gaze data frame
     gaze_df = GazeDataFrame(
