@@ -163,7 +163,6 @@ def from_csv(
 def from_ipc(
         file: str | Path,
         experiment: Experiment | None = None,
-        *,
         **read_csv_kwargs: Any,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
@@ -213,6 +212,5 @@ def from_ipc(
     gaze_df = GazeDataFrame(
         gaze_data,
         experiment=experiment,
-        trial_columns=trial_columns,
     )
     return gaze_df
