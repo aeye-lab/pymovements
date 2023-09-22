@@ -75,6 +75,7 @@ class DatasetDefinition:
         pass `custom_read_kwargs={'columns': ['col1', 'col2']}`.
 
     """
+
     # pylint: disable=too-many-instance-attributes
     name: str = '.'
 

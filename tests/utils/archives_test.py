@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-Test pymovements utils archives.
-"""
+"""Test pymovements utils archives."""
 import bz2
 import gzip
 import lzma
@@ -35,9 +33,7 @@ from pymovements.utils.archives import extract_archive
 
 
 def test_extract_archive_wrong_suffix():
-    """
-    Test unsupported suffix for extract_archive()
-    """
+    """Test unsupported suffix for extract_archive()."""
     with pytest.raises(RuntimeError) as excinfo:
         extract_archive(pathlib.Path('test.jpg'))
     msg, = excinfo.value.args
@@ -46,9 +42,7 @@ Supported suffixes are: '['.bz2', '.gz', '.tar', '.tbz', '.tbz2', '.tgz', '.xz',
 
 
 def test_detect_file_type_no_suffixes():
-    """
-    Test extract_archive() for no files with suffix
-    """
+    """Test extract_archive() for no files with suffix."""
     with pytest.raises(RuntimeError) as excinfo:
         extract_archive(pathlib.Path('test'))
     msg, = excinfo.value.args

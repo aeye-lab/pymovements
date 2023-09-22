@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test public dataset definitions"""
+"""Test public dataset definitions."""
 from __future__ import annotations
 
 import pytest
@@ -31,6 +31,7 @@ import pymovements as pm
         pytest.param(pm.datasets.ToyDataset, 'ToyDataset', id='ToyDataset'),
         pytest.param(pm.datasets.GazeBase, 'GazeBase', id='GazeBase'),
         pytest.param(pm.datasets.GazeBaseVR, 'GazeBaseVR', id='GazeBaseVR'),
+        pytest.param(pm.datasets.GazeOnFaces, 'GazeOnFaces', id='GazeOnFaces'),
         pytest.param(pm.datasets.JuDo1000, 'JuDo1000', id='JuDo1000'),
     ],
 )
@@ -46,6 +47,7 @@ def test_public_dataset_registered(definition_class, dataset_name):
         pytest.param(pm.datasets.ToyDataset, id='ToyDataset'),
         pytest.param(pm.datasets.GazeBase, id='GazeBase'),
         pytest.param(pm.datasets.GazeBaseVR, id='GazeBaseVR'),
+        pytest.param(pm.datasets.GazeOnFaces, id='GazeOnFaces'),
         pytest.param(pm.datasets.JuDo1000, id='JuDo1000'),
     ],
 )

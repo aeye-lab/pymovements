@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-This module holds filter specific funtions.
-"""
+"""This module holds filter specific funtions."""
 from __future__ import annotations
 
 import numpy as np
@@ -31,8 +29,7 @@ def filter_candidates_remove_nans(
         candidates: list[np.ndarray],
         values: np.ndarray,
 ) -> list[np.ndarray]:
-    """
-    Filters a list of candidates for an event-detection algorithm
+    """Filter a list of candidates for an event-detection algorithm.
 
     Removes leading and ending np.nans for all candidates in candidates
 
@@ -69,8 +66,7 @@ def events_split_nans(
         candidates: list[np.ndarray],
         values: np.ndarray,
 ) -> list[np.ndarray]:
-    """
-    Filters a list of candidates for an event-detection algorithm
+    """Filter a list of candidates for an event-detection algorithm.
 
     Splits events if np.nans are within an event
 

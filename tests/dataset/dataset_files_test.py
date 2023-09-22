@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-""" Tests pymovements asc to csv processing"""
+"""Tests pymovements asc to csv processing."""
 # flake8: noqa: E101, W191, E501
 # pylint: disable=duplicate-code
 import numpy as np

@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test all download and extract functionality of pymovements.Dataset"""
+"""Test all download and extract functionality of pymovements.Dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass

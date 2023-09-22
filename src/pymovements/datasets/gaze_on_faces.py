@@ -17,11 +17,14 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides an interface to the JuDo1000 dataset."""
+"""This module provides an interface to the GazeOnFaces dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
 from dataclasses import field
+from typing import Any
+
+import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import register_dataset
@@ -30,16 +33,18 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 @register_dataset
-class JuDo1000(DatasetDefinition):
-    """JuDo1000 dataset :cite:p:`JuDo1000`.
+class GazeOnFaces(DatasetDefinition):
+    """GazeBaseVR dataset :cite:p:`GazeOnFaces`.
 
-    This dataset includes binocular eye tracking data from 150 participants in four sessions with an
-    interval of at least one week between two sessions. Eye movements are recorded at a sampling
-    frequency of 1000 Hz using an EyeLink Portable Duo video-based eye tracker and are provided as
-    pixel coordinates. Participants are instructed to watch a random jumping dot on a computer
-    screen.
+    This dataset includes monocular eye tracking data from single participants in a single
+    session. Eye movements are recorded at a sampling frequency of 60 Hz
+    using an EyeLink 1000 video-based eye tracker and are provided as pixel coordinates.
 
-    Check the respective `repository <https://osf.io/5zpvk/>`_ for details.
+    Participants were sat 57 cm away from the screen (19inch LCD monitor,
+    screen res=1280×1024, 60 Hz). Recordings of the eye movements of one eye in monocular
+    pupil/corneal reflection tracking mode.
+
+    Check the respective paper for details :cite:p:`GazeOnFaces`.
 
     Attributes
     ----------
@@ -75,11 +80,11 @@ class JuDo1000(DatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.JuDo1000` definition:
+    :py:class:`~pymovements.GazeOnFaces` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("JuDo1000", path='data/JuDo1000')
+    >>> dataset = pm.Dataset("GazeOnFaces", path='data/GazeOnFaces')
 
     Download the dataset resources resources:
 
@@ -93,17 +98,17 @@ class JuDo1000(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'JuDo1000'
+    name: str = 'GazeOnFaces'
 
     mirrors: tuple[str, ...] = (
-        'https://osf.io/download/',
+        'https://uncloud.univ-nantes.fr/index.php/s/',
     )
 
     resources: tuple[dict[str, str], ...] = (
         {
-            'resource': '4wy7s/',
-            'filename': 'JuDo1000.zip',
-            'md5': 'b8b9e5bb65b78d6f2bd260451cdd89f8',
+            'resource': '8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip',
+            'filename': 'gaze_csv.zip',
+            'md5': 'fe219f07c9253cd9aaee6bd50233c034',
         },
     )
 
@@ -111,41 +116,34 @@ class JuDo1000(DatasetDefinition):
         screen_width_px=1280,
         screen_height_px=1024,
         screen_width_cm=38,
-        screen_height_cm=30.2,
-        distance_cm=68,
-        origin='lower left',
-        sampling_rate=1000,
+        screen_height_cm=30,
+        distance_cm=57,
+        origin='center',
+        sampling_rate=60,
     )
 
-    filename_format: str = r'{subject_id:d}_{session_id:d}.csv'
+    filename_format: str = r'gaze_sub{sub_id:d}_trial{trial_id:d}.csv'
 
     filename_format_dtypes: dict[str, type] = field(
         default_factory=lambda: {
-            'subject_id': int,
-            'session_id': int,
+            'sub_id': int,
+            'trial_id': int,
         },
     )
 
-    trial_columns: list[str] = field(
-        default_factory=lambda: ['subject_id', 'session_id', 'trial_id'],
-    )
+    trial_columns: list[str] = field(default_factory=lambda: ['sub_id', 'trial_id'])
 
-    time_column: str = 'time'
-    pixel_columns: list[str] = field(
-        default_factory=lambda: [
-            'x_left', 'y_left', 'x_right', 'y_right',
-        ],
-    )
+    time_column: Any = None
 
-    column_map: dict[str, str] = field(
+    pixel_columns: list[str] = field(default_factory=lambda: ['x', 'y'])
+
+    column_map: dict[str, str] = field(default_factory=lambda: {})
+
+    custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
-            'trialId': 'trial_id',
-            'pointId': 'point_id',
-        },
-    )
-
-    custom_read_kwargs: dict[str, str] = field(
-        default_factory=lambda: {
-            'separator': '\t',
+            'separator': ',',
+            'has_header': False,
+            'new_columns': ['x', 'y'],
+            'dtypes': [pl.Float32, pl.Float32],
         },
     )

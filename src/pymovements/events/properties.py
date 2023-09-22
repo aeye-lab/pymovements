@@ -24,7 +24,6 @@ from collections.abc import Callable
 
 import polars as pl
 
-
 EVENT_PROPERTIES: dict[str, Callable] = {}
 
 
@@ -40,7 +39,17 @@ def amplitude(
         position_column: str = 'position',
         n_components: int = 2,
 ) -> pl.Expr:
-    """Amplitude of an event.
+    r"""Amplitude of an event.
+
+    The amplitude is calculated as:
+
+    .. math::
+        \text{Amplitude} = \sqrt{(x_{\text{max}} - x_{\text{min}})^2 +
+        (y_{\text{max}} - y_{\text{min}})^2}
+
+    where :math:`(x_{\text{min}},\; x_{\text{max}})` and
+    :math:`(y_{\text{min}},\; y_{\text{max}})` are the minimum and maximum values of the
+    :math:`x` and :math:`y` components of the gaze positions during an event.
 
     Parameters
     ----------
@@ -71,7 +80,17 @@ def dispersion(
         position_column: str = 'position',
         n_components: int = 2,
 ) -> pl.Expr:
-    """Dispersion of an event.
+    r"""
+    Dispersion of an event.
+
+    The dispersion is calculated as:
+
+    .. math::
+        \text{Dispersion} = x_{\text{max}} - x_{\text{min}} + y_{\text{max}} - y_{\text{min}}
+
+    where :math:`(x_{\text{min}},\; x_{\text{max}})` and
+    :math:`(y_{\text{min}},\; y_{\text{max}})` are the minimum and maximum values of the
+    :math:`x` and :math:`y` components of the gaze positions during an event.
 
     Parameters
     ----------
@@ -99,7 +118,15 @@ def disposition(
         position_column: str = 'position',
         n_components: int = 2,
 ) -> pl.Expr:
-    """Disposition of an event.
+    r"""Disposition of an event.
+
+    The disposition is calculated as:
+
+    .. math::
+        \text{Disposition} = \sqrt{(x_0 - x_n)^2 + (y_0 - y_n)^2}
+
+    where :math:`x_0` and :math:`y_0` are the coordinates of the starting position and
+    :math:`x_n` and :math:`y_n` are the coordinates of the ending position of an event.
 
     Parameters
     ----------
@@ -141,7 +168,19 @@ def location(
         position_column: str = 'position',
         n_components: int = 2,
 ) -> pl.Expr:
-    """Location of an event.
+    r"""Location of an event.
+
+    For method ``mean`` the location is calculated as:
+
+    .. math::
+        \text{Location} = \frac{1}{n} \sum_{i=1}^n \text{position}_i
+
+    For method ``median`` the location is calculated as:
+
+    .. math::
+        \text{Location} = \text{median} \left(\text{position}_1, \ldots,
+         \text{position}_n \right)
+
 
     Parameters
     ----------
@@ -190,7 +229,15 @@ def peak_velocity(
         velocity_column: str = 'velocity',
         n_components: int = 2,
 ) -> pl.Expr:
-    """Peak velocity of an event.
+    r"""Peak velocity of an event.
+
+    The peak velocity is calculated as:
+
+    .. math::
+        \text{Peak Velocity} = \max \left(\sqrt{v_x^2 + v_y^2} \right)
+
+    where :math:`v_x` and :math:`v_y` are the velocity components in :math:`x` and :math:`y`
+    direction, respectively.
 
     Parameters
     ----------

@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-This module holds the traceplot.
-"""
+"""This module holds the traceplot."""
 from __future__ import annotations
 
 import sys
@@ -31,6 +29,7 @@ from matplotlib import colors
 from matplotlib.collections import LineCollection
 
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
+
 
 # This is really a dirty workaround to use the Agg backend if runnning pytest.
 # This is needed as Windows workers on GitHub fail randomly with other backends.

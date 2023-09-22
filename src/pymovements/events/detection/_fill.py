@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-This module holds the implementation of the ivt algorithm.
-"""
+"""This module holds the implementation of the event fill function."""
 from __future__ import annotations
 
 import numpy as np
@@ -36,8 +34,7 @@ def fill(
         minimum_duration: int = 1,
         name: str = 'unclassified',
 ) -> EventDataFrame:
-    """
-    Classify all previously unclassified timesteps as events.
+    """Classify all previously unclassified timesteps as events.
 
     Parameters
     ----------
@@ -55,7 +52,6 @@ def fill(
     pl.DataFrame
         A dataframe with detected fixations as rows.
     """
-
     timesteps = np.array(timesteps)
 
     # Create binary mask where each existing event is marked.

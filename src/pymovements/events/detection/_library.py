@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-This module holds the EventDataFrame class.
-"""
+"""This module holds the EventDetectionLibrary class."""
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -32,7 +30,7 @@ class EventDetectionLibrary:
 
     Attributes
     ----------
-    methods:
+    `methods`:
         Dictionary of event detection methods.
     """
 
@@ -59,6 +57,22 @@ class EventDetectionLibrary:
             Name of the event detection method in the library.
         """
         return cls.methods[name]
+
+    @classmethod
+    def __contains__(cls, name: str) -> bool:
+        """Check if class contains method of given name.
+
+        Parameters
+        ----------
+        name: str
+            Name of the method to check.
+
+        Returns
+        -------
+        bool
+            True if EventDetectionLibrary contains method with given name, else False.
+        """
+        return name in cls.methods
 
 
 def register_event_detection(

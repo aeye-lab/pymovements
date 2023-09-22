@@ -347,12 +347,11 @@ def add_fileinfo(
     pl.DataFrame:
         Dataframe with added columns from fileinfo dictionary keys.
     """
-
     df = df.select(
         [
             pl.lit(value).alias(column)
             for column, value in fileinfo.items()
-            if column != 'filepath'
+            if column != 'filepath' and column not in df.columns
         ] + [pl.all()],
     )
 

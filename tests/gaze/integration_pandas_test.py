@@ -20,6 +20,7 @@
 """Test from gaze.from_pandas."""
 import pandas as pd
 import polars as pl
+import pytest
 from polars.testing import assert_frame_equal
 
 import pymovements as pm
@@ -35,15 +36,7 @@ def test_from_pandas():
         },
     )
 
-    experiment = pm.Experiment(
-        screen_width_px=1280,
-        screen_height_px=1024,
-        screen_width_cm=38,
-        screen_height_cm=30,
-        distance_cm=68,
-        origin='lower left',
-        sampling_rate=1000.0,
-    )
+    experiment = pm.Experiment(1280, 1024, 38, 30, 68, 'lower left', 1000.0)
 
     gaze = pm.gaze.from_pandas(
         data=pandas_df,
@@ -64,15 +57,7 @@ def test_from_pandas_explicit_columns():
         },
     )
 
-    experiment = pm.Experiment(
-        screen_width_px=1280,
-        screen_height_px=1024,
-        screen_width_cm=38,
-        screen_height_cm=30,
-        distance_cm=68,
-        origin='lower left',
-        sampling_rate=1000.0,
-    )
+    experiment = pm.Experiment(1280, 1024, 38, 30, 68, 'lower left', 1000.0)
 
     gaze = pm.gaze.from_pandas(
         data=pandas_df,
@@ -87,3 +72,45 @@ def test_from_pandas_explicit_columns():
     })
 
     assert_frame_equal(gaze.frame, expected)
+
+
+@pytest.mark.parametrize(
+    ('df', 'events'),
+    [
+        pytest.param(
+            pd.DataFrame(),
+            None,
+            id='events_none',
+        ),
+
+        pytest.param(
+            pd.DataFrame(),
+            pm.EventDataFrame(),
+            id='events_empty',
+        ),
+
+        pytest.param(
+            pd.DataFrame(),
+            pm.EventDataFrame(name='fixation', onsets=[123], offsets=[345]),
+            id='fixation',
+        ),
+
+        pytest.param(
+            pd.DataFrame(),
+            pm.EventDataFrame(name='saccade', onsets=[34123], offsets=[67345]),
+            id='saccade',
+        ),
+
+    ],
+)
+def test_from_pandas_events(df, events):
+    if events is None:
+        expected_events = pm.EventDataFrame().frame
+    else:
+        expected_events = events.frame
+
+    gaze = pm.gaze.from_pandas(data=df, events=events)
+
+    assert_frame_equal(gaze.events.frame, expected_events)
+    # We don't want the events point to the same reference.
+    assert gaze.events.frame is not expected_events
