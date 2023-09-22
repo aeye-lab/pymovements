@@ -164,12 +164,6 @@ def from_ipc(
         file: str | Path,
         experiment: Experiment | None = None,
         *,
-        trial_columns: list[str] | None = None,
-        time_column: str | None = None,
-        pixel_columns: list[str] | None = None,
-        position_columns: list[str] | None = None,
-        velocity_columns: list[str] | None = None,
-        acceleration_columns: list[str] | None = None,
         **read_csv_kwargs: Any,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
