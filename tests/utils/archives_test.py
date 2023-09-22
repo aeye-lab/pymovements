@@ -209,35 +209,35 @@ def fixture_unsupported_archive(request, tmp_path):
         pytest.param(
             False, False,
             (
-                    'toplevel',
-                    os.path.join('toplevel', 'recursive.zip'),
+                'toplevel',
+                os.path.join('toplevel', 'recursive.zip'),
             ),
             id='recursive_false_remove_finished_false',
         ),
         pytest.param(
             False, True,
             (
-                    'toplevel',
-                    os.path.join('toplevel', 'recursive.zip'),
+                'toplevel',
+                os.path.join('toplevel', 'recursive.zip'),
             ),
             id='recursive_false_remove_finished_true',
         ),
         pytest.param(
             True, False,
             (
-                    'toplevel',
-                    os.path.join('toplevel', 'recursive.zip'),
-                    os.path.join('toplevel', 'recursive'),
-                    os.path.join('toplevel', 'recursive', 'test.file'),
+                'toplevel',
+                os.path.join('toplevel', 'recursive.zip'),
+                os.path.join('toplevel', 'recursive'),
+                os.path.join('toplevel', 'recursive', 'test.file'),
             ),
             id='recursive_true_remove_finished_false',
         ),
         pytest.param(
             True, True,
             (
-                    'toplevel',
-                    os.path.join('toplevel', 'recursive'),
-                    os.path.join('toplevel', 'recursive', 'test.file'),
+                'toplevel',
+                os.path.join('toplevel', 'recursive'),
+                os.path.join('toplevel', 'recursive', 'test.file'),
             ),
             ('toplevel', 'toplevel/recursive', 'toplevel/recursive/test.file'),
             id='recursive_true_remove_finished_true',
@@ -328,35 +328,35 @@ Supported suffixes are: '['.tar', '.zip']'."""
         pytest.param(
             False, False,
             (
-                    'toplevel',
-                    os.path.join('toplevel', 'recursive.zip'),
+                'toplevel',
+                os.path.join('toplevel', 'recursive.zip'),
             ),
             id='recursive_false_remove_finished_false',
         ),
         pytest.param(
             False, True,
             (
-                    'toplevel',
-                    os.path.join('toplevel', 'recursive.zip'),
+                'toplevel',
+                os.path.join('toplevel', 'recursive.zip'),
             ),
             id='recursive_false_remove_finished_true',
         ),
         pytest.param(
             True, False,
             (
-                    'toplevel',
-                    os.path.join('toplevel', 'recursive.zip'),
-                    os.path.join('toplevel', 'recursive'),
-                    os.path.join('toplevel', 'recursive', 'test.file'),
+                'toplevel',
+                os.path.join('toplevel', 'recursive.zip'),
+                os.path.join('toplevel', 'recursive'),
+                os.path.join('toplevel', 'recursive', 'test.file'),
             ),
             id='recursive_true_remove_finished_false',
         ),
         pytest.param(
             True, True,
             (
-                    'toplevel',
-                    os.path.join('toplevel', 'recursive'),
-                    os.path.join('toplevel', 'recursive', 'test.file'),
+                'toplevel',
+                os.path.join('toplevel', 'recursive'),
+                os.path.join('toplevel', 'recursive', 'test.file'),
             ),
             id='recursive_true_remove_finished_true',
         ),
