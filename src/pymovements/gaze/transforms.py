@@ -186,7 +186,7 @@ def pix2deg(
     distance:
         Must be either a scalar or a string. If a scalar is passed, it is interpreted as the
         Eye-to-screen distance in centimeters. If a string is passed, it is interpreted as the name
-        of a column containing the Eye-to-screen distance in centimeters for each sample.
+        of a column containing the Eye-to-screen distance in millimiters for each sample.
     origin:
         The location of the pixel origin. Supported values: ``center``, ``lower left``. See also
         py:func:`~pymovements.gaze.transform.center_origin` for more information.
@@ -229,7 +229,9 @@ def pix2deg(
         degree_components = [
             pl.arctan2(
                 centered_pixels.list.get(component),
-                pl.col(distance).mul(screen_resolution[component % 2] / screen_size[component % 2]),
+                pl.col(distance).truediv(10).mul(
+                    screen_resolution[component % 2] / screen_size[component % 2]
+                ),
             ) * (180 / np.pi)
             for component in range(n_components)
         ]

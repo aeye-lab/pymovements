@@ -507,8 +507,12 @@ def test_pix2deg_returns(kwargs, series, expected_df, distance_as_column):
 
     # Decide whether to pass distance as column or scalar
     if distance_as_column:
+
+        # unit of distance values has to be in mm when passing as column
+        distance_value = kwargs['distance'] * 10
+
         df = df.with_columns(
-            pl.Series('distance', [float(kwargs['distance'])], pl.Float64),
+            pl.Series('distance', [distance_value], pl.Float64),
         )
 
         kwargs['distance'] = 'distance'
