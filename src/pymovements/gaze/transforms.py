@@ -660,19 +660,18 @@ def smooth(
                 ],
             ).alias(column)
 
-        else:
-            return pl.concat_list(
-                [
-                    pl.col(column).list.get(component).map(pad_func).list.explode()
-                    .ewm_mean(
-                        span=window_length,
-                        adjust=False,
-                        min_periods=window_length,
-                    ).shift(periods=pad_kwargs['pad_width'])
-                    .slice(pad_kwargs['pad_width'] * 2)
-                    for component in range(n_components)
-                ],
-            ).alias(column)
+        return pl.concat_list(
+            [
+                pl.col(column).list.get(component).map(pad_func).list.explode()
+                .ewm_mean(
+                    span=window_length,
+                    adjust=False,
+                    min_periods=window_length,
+                ).shift(periods=pad_kwargs['pad_width'])
+                .slice(pad_kwargs['pad_width'] * 2)
+                for component in range(n_components)
+            ],
+        ).alias(column)
 
     if method == 'savitzky_golay':
         if degree is None:
