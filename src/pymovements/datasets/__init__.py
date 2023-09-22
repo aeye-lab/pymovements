@@ -27,6 +27,7 @@
 
     pymovements.datasets.GazeBase
     pymovements.datasets.GazeBaseVR
+    pymovements.datasets.GazeOnFaces
     pymovements.datasets.JuDo1000
     pymovements.datasets.GazeOnFaces
 
@@ -40,6 +41,7 @@
     pymovements.datasets.ToyDataset
     pymovements.datasets.ToyDatasetEyeLink
 """
+from pymovements.datasets.gaze_on_faces import GazeOnFaces
 from pymovements.datasets.gazebase import GazeBase
 from pymovements.datasets.gazebasevr import GazeBaseVR
 from pymovements.datasets.judo1000 import JuDo1000
@@ -51,6 +53,7 @@ from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
 __all__ = [
     'GazeBase',
     'GazeBaseVR',
+    'GazeOnFaces',
     'JuDo1000',
     'GazeOnFaces',
     'ToyDataset',
