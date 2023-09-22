@@ -170,6 +170,31 @@ def test_main_sequence_plot_not_show(input_df, show, monkeypatch):
 
 
 @pytest.mark.parametrize(
+    ('input_df', 'title'),
+    [
+        pytest.param(
+            EventDataFrame(
+                pl.DataFrame(
+                    {
+                        'amplitude': np.arange(100),
+                        'peak_velocity': np.linspace(10, 50, num=100),
+                        'name': ['saccade' for _ in range(100)],
+                    },
+                ),
+            ),
+            'foo',
+            id='do_not_show_plot',
+        ),
+    ],
+)
+def test_main_sequence_plot_set_title(input_df, title, monkeypatch):
+    mock_function = Mock()
+    monkeypatch.setattr(plt, 'title', mock_function)
+    main_sequence_plot(input_df, title=title)
+    plt.close()
+
+
+@pytest.mark.parametrize(
     ('input_df', 'expected_error', 'error_msg'),
     [
         pytest.param(
