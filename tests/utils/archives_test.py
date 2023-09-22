@@ -21,6 +21,7 @@
 import bz2
 import gzip
 import lzma
+import os
 import pathlib
 import tarfile
 import zipfile
@@ -85,7 +86,7 @@ def fixture_archive(request, tmp_path):
     test_filepath = rootpath / 'test.file'
     test_filepath.write_text('test')
 
-    top_level_directory = 'toplevel/'
+    top_level_directory = 'toplevel'
 
     # add additional archive
     filepath = rootpath / 'recursive.zip'
@@ -102,16 +103,16 @@ def fixture_archive(request, tmp_path):
 
     if compression is None and extension == 'zip':
         with zipfile.ZipFile(archive_path, 'w') as zip_open:
-            zip_open.write(filepath, arcname=top_level_directory + filepath.name)
+            zip_open.write(filepath, arcname=os.path.join(top_level_directory, filepath.name))
 
     elif compression is not None and extension == 'zip':
         comp_type = _ZIP_COMPRESSION_MAP[f'.{compression}']
         with zipfile.ZipFile(archive_path, 'w', compression=comp_type) as zip_open:
-            zip_open.write(filepath, arcname=top_level_directory + filepath.name)
+            zip_open.write(filepath, arcname=os.path.join(top_level_directory, filepath.name))
 
     elif compression is None and extension == 'tar':
         with tarfile.TarFile.open(archive_path, 'w') as fp:
-            fp.add(filepath, arcname=top_level_directory + filepath.name)
+            fp.add(filepath, arcname=os.path.join(top_level_directory, filepath.name))
 
     elif (
         (compression is not None and extension == 'tar') or
@@ -122,7 +123,7 @@ def fixture_archive(request, tmp_path):
         if compression in {'tgz'}:
             compression = 'gz'
         with tarfile.TarFile.open(archive_path, f'w:{compression}') as fp:
-            fp.add(filepath, arcname=top_level_directory + filepath.name)
+            fp.add(filepath, arcname=os.path.join(top_level_directory, filepath.name))
 
     else:
         raise ValueError(f'{request.param} not supported for archive fixture')
