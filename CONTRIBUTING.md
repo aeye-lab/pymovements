@@ -157,9 +157,9 @@ If you add a new feature, please also include appropriate tests to verify its in
 functionality. We try to keep our code coverage close to 100%.
 
 It is possible to limit the scope of testing to specific environments and files. For example, to
-only test event related functionality using the Python 3.8 environment use:
+only test event related functionality using the Python 3.9 environment use:
 ```bash
-tox -e py38 tests/events
+tox -e py39 tests/events
 ```
 
 
