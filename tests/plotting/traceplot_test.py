@@ -109,6 +109,10 @@ def gaze_fixture():
             {'cval': np.arange(0, 200), 'show_cbar': False},
             id='show_cbar_false',
         ),
+        pytest.param(
+            {'cval': np.arange(0, 200), 'title': 'foo'},
+            id='set_title',
+        ),
     ],
 )
 def test_traceplot_show(gaze, kwargs, monkeypatch):
