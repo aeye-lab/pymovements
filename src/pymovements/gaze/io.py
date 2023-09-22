@@ -191,7 +191,7 @@ def from_ipc(
 
     >>> from pymovements.gaze.io import from_ipc
     >>> gaze = from_ipc(
-    ...     file='tests/gaze/io/files/monocular_example.csv',
+    ...     file='tests/gaze/io/files/monocular_example.feather',
     ...     )
     >>> gaze.frame
     shape: (10, 2)
