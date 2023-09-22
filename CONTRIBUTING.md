@@ -131,6 +131,7 @@ You can check your code style by using [pre-commit](https://www.pre-commit.com).
 
 ```bash
 pip install pre-commit
+pip install pylint
 pre-commit install
 ```
 
