@@ -414,7 +414,7 @@ class GazeDataFrame:
             padding: str | float | int | None = 'nearest',
             **kwargs: int | float | str,
     ) -> None:
-        """ Smooth data in a column.
+        """Smooth data in a column.
 
         See :func:`~transforms.smooth()` for details and description of parameters.
         """
