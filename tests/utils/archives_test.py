@@ -22,7 +22,6 @@ import bz2
 import gzip
 import lzma
 import pathlib
-import shutil
 import tarfile
 import zipfile
 
