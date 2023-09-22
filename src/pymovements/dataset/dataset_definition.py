@@ -56,9 +56,6 @@ class DatasetDefinition:
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
-    column_map : dict[str, str]
-        The keys are the columns to read, the values are the names to which they should be renamed.
-
     custom_read_kwargs : dict[str, Any], optional
         If specified, these keyword arguments will be passed to the file reading function. The
         behavior of this argument depends on the file extension of the dataset files.
@@ -67,13 +64,13 @@ class DatasetDefinition:
             :py:func:`polars.read_csv`.
         - If the file extension is `.asc` the keyword arguments will be passed to
             :py:func:`pymovements.utils.parsing.parse_eyelink`.
-        - If the file extension is `.feather` the keyword arguments will be passed to
-            :py:func:`polars.read_ipc`.
 
         For example, if you want to read a csv file with a custom separator, you can pass
         `custom_read_kwargs={'sep': ';'}`. If you want to read just a subset of columns, you can
         pass `custom_read_kwargs={'columns': ['col1', 'col2']}`.
-
+        
+    column_map : dict[str, str]
+        The keys are the columns to read, the values are the names to which they should be renamed.
     """
 
     # pylint: disable=too-many-instance-attributes
