@@ -68,6 +68,22 @@ class TransformLibrary:
         """
         return cls.methods[name]
 
+    @classmethod
+    def __contains__(cls, name: str) -> bool:
+        """Check if class contains method of given name.
+
+        Parameters
+        ----------
+        name: str
+            Name of the method to check.
+
+        Returns
+        -------
+        bool
+            True if TransformsLibrary contains method with given name, else False.
+        """
+        return name in cls.methods
+
 
 def register_transform(method: TransformMethod) -> TransformMethod:
     """Register a transform method."""
