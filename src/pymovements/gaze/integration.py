@@ -64,12 +64,24 @@ def from_numpy(
 
     Parameters
     ----------
-    data: np.ndarray
+    data: np.ndarray | None
         Two-dimensional data represented as a numpy ndarray.
-    schema: list[str]
-        A list of column names.
     experiment : Experiment | None
         The experiment definition.
+    events: EventDataFrame | None
+        Optional event dataframe.
+    time: np.ndarray | None
+        Array containing time stamps.
+    pixel: np.ndarray | None
+        Array containing pixel coordinates.
+    position: np.ndarray | None
+        Array containing event positions.
+    velocity: np.ndarray | None
+        Array containing velocities.
+    acceleration: np.ndarray | None
+        Array containing velocities.
+    schema: list[str] | None
+        A list of column names.
     orient: Literal['col', 'row']
         Whether to interpret the two-dimensional data as columns or as rows.
     time_column: str | None
@@ -266,7 +278,7 @@ def from_pandas(
         Data represented as a pandas DataFrame.
     experiment : Experiment | None
         The experiment definition.
-    events: EventDataFrame
+    events: EventDataFrame | None
         A dataframe of events in the gaze signal.
     time_column: str | None
         The name of the timestamp column in the input data frame.

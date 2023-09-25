@@ -45,35 +45,40 @@ def from_csv(
 
     Parameters
     ----------
-    file:
+    file: str | Path
         Path of gaze file.
-    experiment : Experiment
+    experiment : Experiment | None
         The experiment definition.
-    trial_columns:
+    trial_columns: list[str] | None
         The name of the trial columns in the input data frame. If the list is empty or None,
         the input data frame is assumed to contain only one trial. If the list is not empty,
         the input data frame is assumed to contain multiple trials and the transformation
         methods will be applied to each trial separately.
-    time_column:
+    time_column: str | None
         The name of the timestamp column in the input data frame.
-    pixel_columns:
+    pixel_columns: list[str] | None
         The name of the pixel position columns in the input data frame. These columns will be
         nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
         column will not be created.
-    position_columns:
+    position_columns: list[str] | None
         The name of the dva position columns in the input data frame. These columns will be
         nested into the column ``position``. If the list is empty or None, the nested
         ``position`` column will not be created.
-    velocity_columns:
+    velocity_columns: list[str] | None
         The name of the velocity columns in the input data frame. These columns will be nested
         into the column ``velocity``. If the list is empty or None, the nested ``velocity``
         column will not be created.
-    acceleration_columns:
+    acceleration_columns: list[str] | None
         The name of the acceleration columns in the input data frame. These columns will be
         nested into the column ``acceleration``. If the list is empty or None, the nested
         ``acceleration`` column will not be created.
-    **read_csv_kwargs:
+    **read_csv_kwargs: Any
             Additional keyword arguments to be passed to polars to read in the csv.
+
+    Returns
+    -------
+    GazeDataFrame
+        Gaza dataframe.
 
     Notes
     -----
@@ -169,12 +174,17 @@ def from_ipc(
 
     Parameters
     ----------
-    file:
+    file: str | Path
         Path of IPC/feather file.
-    experiment : Experiment
+    experiment : Experiment | None
         The experiment definition.
-    **read_ipc_kwargs:
+    **read_ipc_kwargs: Any
             Additional keyword arguments to be passed to polars to read in the ipc file.
+
+    Returns
+    -------
+    GazeDataFrame
+        Returns loaded GazeDataFrame.
 
     Examples
     --------

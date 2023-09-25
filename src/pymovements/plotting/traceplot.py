@@ -126,11 +126,11 @@ def traceplot(
         The column name of the x and y position data
     cval: np.ndarray | None
         line color values.
-    cmap: colors.Colormap | None
+    cmap: matplotlib.colors.Colormap | None
         color map for line color values
-    cmap_norm: colors.Normalize | str | None
+    cmap_norm: matplotlib.colors.Normalize | str | None
         normalization for color values.
-    cmap_segmentdata: dict[str, list[list[float]]] | None
+    cmap_segmentdata: LinearSegmentedColormapType | None
         color map segmentation to build color map
     cbar_label: str | None
         string label for color bar

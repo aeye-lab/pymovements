@@ -332,7 +332,7 @@ class Dataset:
         ----------
         method : Callable[..., EventDataFrame] | str
             The event detection method to be applied.
-        eye : str | None
+        eye : str
             Select which eye to choose. Valid options are ``auto``, ``left``, ``right`` or ``None``.
             If ``auto`` is passed, eye is inferred in the order ``['right', 'left', 'eye']`` from
             the available :py:attr:`~.Dataset.gaze` dataframe columns.
@@ -343,11 +343,6 @@ class Dataset:
             If ``True``, show progress bar.
         **kwargs : Any
             Additional keyword arguments to be passed to the event detection method.
-
-        Raises
-        ------
-        AttributeError
-            If gaze files have not been loaded yet or gaze files do not contain the right columns.
 
         Returns
         -------
@@ -379,7 +374,7 @@ class Dataset:
         ----------
         method : Callable[..., EventDataFrame] | str
             The event detection method to be applied.
-        eye : str | None
+        eye : str
             Select which eye to choose. Valid options are ``auto``, ``left``, ``right`` or ``None``.
             If ``auto`` is passed, eye is inferred in the order ``['right', 'left', 'eye']`` from
             the available :py:attr:`~.Dataset.gaze` dataframe columns.
