@@ -34,6 +34,7 @@ class EventDataFrame:
     """A DataFrame for event data.
 
     Each row has at least an event name with its onset and offset specified.
+
     Parameters
     ----------
     data: pl.DataFrame | None
