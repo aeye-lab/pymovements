@@ -130,11 +130,8 @@ module = "docs.*"
 check_untyped_defs = false
 disallow_untyped_defs = false
 
-[tool.pydoclint]
-ignore = "D103,D107,D213"
-
 [tool.pydocstyle]
-ignore = "D103,D107,D213"
+add-ignore = "D103,D107,D213"
 
 [tool.pytest.ini_options]
 addopts = "-ra -l --tb=long --doctest-modules"
