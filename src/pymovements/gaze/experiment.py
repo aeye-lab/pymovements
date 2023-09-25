@@ -42,7 +42,7 @@ class Experiment:
     def __init__(
             self, screen_width_px: int, screen_height_px: int,
             screen_width_cm: float, screen_height_cm: float,
-            distance_cm: float, origin: str, sampling_rate: float,
+            distance_cm: float | None, origin: str, sampling_rate: float,
     ):
         """Initialize Experiment.
 
@@ -56,8 +56,10 @@ class Experiment:
             Screen width in centimeters
         screen_height_cm : float
             Screen height in centimeters
-        distance_cm : float
-            Eye-to-screen distance in centimeters
+        distance_cm : float | None
+            Eye-to-screen distance in centimeters. If None, a `distance_column` must be provided
+            in the `DatasetDefinition` or `GazeDataFrame`, which contains the eye-to-screen
+            distance for each sample in millimeters.
         origin : str
             Specifies the screen location of the origin of the pixel coordinate system.
         sampling_rate : float
