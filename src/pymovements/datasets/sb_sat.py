@@ -119,7 +119,7 @@ class SBSAT(DatasetDefinition):
         origin='center',
         sampling_rate=1000,
     )
-    
+
     filename_format: str = r'msd{subject_id:d}.csv'
 
     filename_format_dtypes: dict[str, type] = field(
@@ -136,12 +136,12 @@ class SBSAT(DatasetDefinition):
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 
-    custom_read_kwargs: dict[str, str] = field(
+    custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
             'separator': '\t',
             'columns': ['time', 'book_name', 'screen_id',
                         'x_left', 'y_left', 'pupil_left'],
-            'dtypes':[pl.Int64, pl.Utf8, pl.Int64,
-                      pl.Float64, pl.Float64, pl.Float64],
+            'dtypes': [pl.Int64, pl.Utf8, pl.Int64,
+                       pl.Float64, pl.Float64, pl.Float64],
         },
     )
