@@ -139,9 +139,13 @@ class SBSAT(DatasetDefinition):
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
             'separator': '\t',
-            'columns': ['time', 'book_name', 'screen_id',
-                        'x_left', 'y_left', 'pupil_left'],
-            'dtypes': [pl.Int64, pl.Utf8, pl.Int64,
-                       pl.Float64, pl.Float64, pl.Float64],
+            'columns': [
+                'time', 'book_name', 'screen_id',
+                'x_left', 'y_left', 'pupil_left',
+            ],
+            'dtypes': [
+                pl.Int64, pl.Utf8, pl.Int64,
+                pl.Float64, pl.Float64, pl.Float64,
+            ],
         },
     )
