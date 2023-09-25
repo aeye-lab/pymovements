@@ -33,6 +33,7 @@ class DatasetLibrary:
     ----------
     definitions:
         Dictionary of :py:class:`~pymovements.DatasetDefinition`.
+
     """
 
     definitions: dict[str, type[DatasetDefinition]] = {}
