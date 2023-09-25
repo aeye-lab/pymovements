@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides an interface to the SB-SAT dataset."""
+"""This module provides an interface to the HBN dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -33,16 +33,17 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 @register_dataset
-class SBSAT(DatasetDefinition):
-    """SB-SAT dataset :cite:p:`SB-SAT`.
+class HBN(DatasetDefinition):
+    """HBN dataset :cite:p:`HBN`.
 
-    This dataset includes monocular eye tracking data from a single participants in a single
-    session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
-    eye tracker and are provided as pixel coordinates.
+    This dataset consists of recordings from children
+    watching four different age-appropriate videos: (1) an 41
+    educational video clip (Fun with Fractals), (2) a short animated
+    film (The Present), (3) a short clip of an animated film (Despicable Me),
+    and (4) a trailer for a feature-length movie (Diary of a Wimpy Kid).
+    The eye gaze was recorded at a sampling rate of 120 Hz.
 
-    The participant is instructed to read texts and answer questions.
-
-    Check the respective paper for details :cite:p:`SB-SAT`.
+    Check the respective paper for details :cite:p:`HBN`.
 
     Attributes
     ----------
@@ -78,11 +79,11 @@ class SBSAT(DatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.GazeOnFaces` definition:
+    :py:class:`~pymovements.HBN` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("SBSAT", path='data/SBSAT')
+    >>> dataset = pm.Dataset("HBN", path='data/HBN')
 
     Download the dataset resources resources:
 
@@ -96,52 +97,55 @@ class SBSAT(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'SBSAT'
+    name: str = 'HBN'
 
     mirrors: tuple[str, ...] = (
-        'https://files.de-1.osf.io/v1/resources/cdx69/providers/osfstorage/',
+        'https://files.osf.io/v1/resources/qknuv/providers/osfstorage/',
     )
 
     resources: tuple[dict[str, str], ...] = (
         {
-            'resource': '64525979230ea6163c031267/?zip=',
-            'filename': 'csvs.zip',
-            'md5': '3cf074c93266b723437cf887f948c993',
+            'resource': '651190031e76a453918a9971',
+            'filename': 'data.zip',
+            'md5': '2c523e911022ffc0eab700e34e9f7f30',
         },
     )
 
     experiment: Experiment = Experiment(
-        screen_width_px=768,
-        screen_height_px=1024,
-        screen_width_cm=42.4,
-        screen_height_cm=44.5,
-        distance_cm=70,
+        screen_width_px=800,
+        screen_height_px=600,
+        screen_width_cm=33.8,
+        screen_height_cm=27.0,
+        distance_cm=63.5,
         origin='center',
-        sampling_rate=1000,
+        sampling_rate=120,
     )
 
-    filename_format: str = r'msd{subject_id:d}.csv'
+    filename_format: str = r'{subject_id:12}_{video_id}.csv'
 
     filename_format_dtypes: dict[str, type] = field(
         default_factory=lambda: {
-            'subject_id': int,
+            'subject_id': str,
+            'video_id': str,
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: ['book_name', 'screen_id'])
+    trial_columns: list[str] = field(default_factory=lambda: [])
 
     time_column: str = 'time'
 
-    pixel_columns: list[str] = field(default_factory=lambda: ['x_left', 'y_left'])
+    pixel_columns: list[str] = field(default_factory=lambda: ['x_pix', 'y_pix'])
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
-            'separator': '\t',
-            'columns': ['time', 'book_name', 'screen_id',
-                        'x_left', 'y_left', 'pupil_left'],
-            'dtypes': [pl.Int64, pl.Utf8, pl.Int64,
-                       pl.Float64, pl.Float64, pl.Float64],
+            'separator': ',',
+            'columns': [
+                'time', 'x_pix', 'y_pix',
+            ],
+            'dtypes': [
+                pl.Float64, pl.Float64, pl.Float64,
+            ],
         },
     )
