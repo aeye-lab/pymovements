@@ -578,13 +578,13 @@ def smooth(
         For ``moving_average`` this is the window size to calculate the mean of the subsequent
         samples. For ``savitzky_golay`` this is the window size to use for the polynomial fit.
         For ``exponential_moving_average`` this is the span parameter.
-    column
-        The input column name to which the smoothing is applied.
     n_components:
         Number of components in input column.
     degree:
         The degree of the polynomial to use. This has only an effect if using ``savitzky_golay`` as
         smoothing method. `degree` must be less than `window_length`.
+    column:
+        The input column name to which the smoothing is applied.
     padding:
         Must be either ``None``, a scalar or one of the strings ``mirror``, ``nearest`` or ``wrap``.
         This determines the type of extension to use for the padded signal to
@@ -606,7 +606,7 @@ def smooth(
     See :py:func:`~pymovements.gaze.transforms.savitzky_golay` for further details.
     * ``moving_average``: Smooth data by calculating the mean of the subsequent samples.
     Each smoothed sample is calculated by the mean of the samples in the window around the sample.
-    * ``exponential_moving_average``: Smooth data by
+    * ``exponential_moving_average``: Smooth data by exponentially weighted moving average.
 
     Details on the `padding` options:
 
