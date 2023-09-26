@@ -130,7 +130,7 @@ class HBN(DatasetDefinition):
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: [])
+    trial_columns: list[str] = field(default_factory=lambda: ['video_id'])
 
     time_column: str = 'time'
 
