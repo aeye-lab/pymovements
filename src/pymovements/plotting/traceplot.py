@@ -21,10 +21,8 @@
 from __future__ import annotations
 
 import sys
-from typing import Dict
+from collections.abc import Sequence
 from typing import Literal
-from typing import Sequence
-from typing import Tuple
 
 import matplotlib.colors
 import matplotlib.pyplot as plt
@@ -42,8 +40,8 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
 if 'pytest' in sys.modules:  # pragma: no cover
     matplotlib.use('Agg')
 
-LinearSegmentedColormapType: TypeAlias = Dict[
-    Literal['red', 'green', 'blue', 'alpha'], Sequence[Tuple[float, ...]],
+LinearSegmentedColormapType: TypeAlias = dict[
+    Literal['red', 'green', 'blue', 'alpha'], Sequence[tuple[float, ...]],
 ]
 
 DEFAULT_SEGMENTDATA: LinearSegmentedColormapType = {
