@@ -176,6 +176,7 @@ You can build the documentation locally using the respective tox environment:
 tox -e docs
 ```
 It will appear in the `build/docs` directory.
+Please note that in order to reproduce the documentation locally, you may need to install `pandoc`. If necessary, please refer to the [installation guide](https://pandoc.org/installing.html) for detailed instructions.
 
 To rebuild the full documentation use
 ```bash
