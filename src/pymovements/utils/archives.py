@@ -97,14 +97,16 @@ def extract_archive(
         # Check if top-level directory has a single child
         if len(children) == 1:
             single_child = children[0]
-            shutil.copytree(single_child, destination_path, dirs_exist_ok=True)
-            shutil.rmtree(single_child)
+            if os.path.isdir(single_child):
+                shutil.copytree(single_child, destination_path, dirs_exist_ok=True)
+                shutil.rmtree(single_child)
         # Check if top-level directory has just the two children archive and extracted archive
         elif len(children) == 2 and destination_path == source_path.parent:
             # Name of extracted archive is shorter because it has no extension
             single_child = children[0] if (len(children[0]) < len(children[1])) else children[1]
-            shutil.copytree(single_child, destination_path, dirs_exist_ok=True)
-            shutil.rmtree(single_child)
+            if os.path.isdir(single_child):
+                shutil.copytree(single_child, destination_path, dirs_exist_ok=True)
+                shutil.rmtree(single_child)
 
     if recursive:
         # Get filepaths of all archives in extracted directory.
@@ -125,7 +127,7 @@ def extract_archive(
                 destination_path=extract_destination,
                 recursive=recursive,
                 remove_finished=remove_finished,
-                remove_top_level=False,
+                remove_top_level=remove_top_level,
                 verbose=0 if verbose < 2 else 2,
             )
 
