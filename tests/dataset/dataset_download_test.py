@@ -246,6 +246,7 @@ def test_dataset_extract_remove_finished_false(
             destination_path=tmp_path / 'raw',
             recursive=True,
             remove_finished=False,
+            remove_top_level=True,
             verbose=1,
         ),
     ])
