@@ -102,8 +102,8 @@ def extract_archive(
                 shutil.rmtree(single_child)
         # Check if top-level directory has just the two children archive and extracted archive
         elif len(children) == 2 and destination_path == source_path.parent:
-            # Name of extracted archive is shorter because it has no extension
-            single_child = children[0] if (len(children[0]) < len(children[1])) else children[1]
+            # Name of extracted archive has no suffix
+            single_child = children[1] if (Path(children[0]).suffixes != []) else children[0]
             if os.path.isdir(single_child):
                 shutil.copytree(single_child, destination_path, dirs_exist_ok=True)
                 shutil.rmtree(single_child)
