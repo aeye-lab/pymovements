@@ -93,7 +93,7 @@ def extract_archive(
         source_path.unlink()
 
     if remove_top_level:
-        children = [f.path for f in os.scandir(destination_path)]
+        children = [str(file) for file in destination_path.glob('*')]
         # Check if top-level directory has a single child
         if len(children) == 1:
             single_child = children[0]
