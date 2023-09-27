@@ -23,7 +23,6 @@ from __future__ import annotations
 import bz2
 import gzip
 import lzma
-import os
 import shutil
 import tarfile
 import zipfile
@@ -97,14 +96,14 @@ def extract_archive(
         # Check if top-level directory has a single child
         if len(children) == 1:
             single_child = children[0]
-            if os.path.isdir(single_child):
+            if Path.is_dir(Path(single_child)):
                 shutil.copytree(single_child, destination_path, dirs_exist_ok=True)
                 shutil.rmtree(single_child)
         # Check if top-level directory has just the two children archive and extracted archive
         elif len(children) == 2 and destination_path == source_path.parent:
             # Name of extracted archive has no suffix
-            single_child = children[1] if (Path(children[0]).suffixes != []) else children[0]
-            if os.path.isdir(single_child):
+            single_child = children[0] if (Path(children[0]).suffixes == []) else children[1]
+            if Path.is_dir(Path(single_child)):
                 shutil.copytree(single_child, destination_path, dirs_exist_ok=True)
                 shutil.rmtree(single_child)
 
