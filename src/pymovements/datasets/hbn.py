@@ -37,7 +37,7 @@ class HBN(DatasetDefinition):
     """HBN dataset :cite:p:`HBN`.
 
     This dataset consists of recordings from children
-    watching four different age-appropriate videos: (1) an 41
+    watching four different age-appropriate videos: (1) an
     educational video clip (Fun with Fractals), (2) a short animated
     film (The Present), (3) a short clip of an animated film (Despicable Me),
     and (4) a trailer for a feature-length movie (Diary of a Wimpy Kid).
