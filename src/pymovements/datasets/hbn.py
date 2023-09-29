@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides an interface to the GazeOnFaces dataset."""
+"""This module provides an interface to the HBN dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -33,18 +33,17 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 @register_dataset
-class GazeOnFaces(DatasetDefinition):
-    """GazeOnFaces dataset :cite:p:`GazeOnFaces`.
+class HBN(DatasetDefinition):
+    """HBN dataset :cite:p:`HBN`.
 
-    This dataset includes monocular eye tracking data from single participants in a single
-    session. Eye movements are recorded at a sampling frequency of 60 Hz
-    using an EyeLink 1000 video-based eye tracker and are provided as pixel coordinates.
+    This dataset consists of recordings from children
+    watching four different age-appropriate videos: (1) an
+    educational video clip (Fun with Fractals), (2) a short animated
+    film (The Present), (3) a short clip of an animated film (Despicable Me),
+    and (4) a trailer for a feature-length movie (Diary of a Wimpy Kid).
+    The eye gaze was recorded at a sampling rate of 120 Hz.
 
-    Participants were sat 57 cm away from the screen (19inch LCD monitor,
-    screen res=1280×1024, 60 Hz). Recordings of the eye movements of one eye in monocular
-    pupil/corneal reflection tracking mode.
-
-    Check the respective paper for details :cite:p:`GazeOnFaces`.
+    Check the respective paper for details :cite:p:`HBN`.
 
     Attributes
     ----------
@@ -80,11 +79,11 @@ class GazeOnFaces(DatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.GazeOnFaces` definition:
+    :py:class:`~pymovements.HBN` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("GazeOnFaces", path='data/GazeOnFaces')
+    >>> dataset = pm.Dataset("HBN", path='data/HBN')
 
     Download the dataset resources resources:
 
@@ -98,52 +97,55 @@ class GazeOnFaces(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'GazeOnFaces'
+    name: str = 'HBN'
 
     mirrors: tuple[str, ...] = (
-        'https://uncloud.univ-nantes.fr/index.php/s/',
+        'https://files.osf.io/v1/resources/qknuv/providers/osfstorage/',
     )
 
     resources: tuple[dict[str, str], ...] = (
         {
-            'resource': '8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip',
-            'filename': 'gaze_csv.zip',
-            'md5': 'fe219f07c9253cd9aaee6bd50233c034',
+            'resource': '651190031e76a453918a9971',
+            'filename': 'data.zip',
+            'md5': '2c523e911022ffc0eab700e34e9f7f30',
         },
     )
 
     experiment: Experiment = Experiment(
-        screen_width_px=1280,
-        screen_height_px=1024,
-        screen_width_cm=38,
-        screen_height_cm=30,
-        distance_cm=57,
+        screen_width_px=800,
+        screen_height_px=600,
+        screen_width_cm=33.8,
+        screen_height_cm=27.0,
+        distance_cm=63.5,
         origin='center',
-        sampling_rate=60,
+        sampling_rate=120,
     )
 
-    filename_format: str = r'gaze_sub{sub_id:d}_trial{trial_id:d}.csv'
+    filename_format: str = r'{subject_id:12}_{video_id}.csv'
 
     filename_format_dtypes: dict[str, type] = field(
         default_factory=lambda: {
-            'sub_id': int,
-            'trial_id': int,
+            'subject_id': str,
+            'video_id': str,
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: ['sub_id', 'trial_id'])
+    trial_columns: list[str] = field(default_factory=lambda: ['video_id'])
 
-    time_column: Any = None
+    time_column: str = 'time'
 
-    pixel_columns: list[str] = field(default_factory=lambda: ['x', 'y'])
+    pixel_columns: list[str] = field(default_factory=lambda: ['x_pix', 'y_pix'])
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
             'separator': ',',
-            'has_header': False,
-            'new_columns': ['x', 'y'],
-            'dtypes': [pl.Float32, pl.Float32],
+            'columns': [
+                'time', 'x_pix', 'y_pix',
+            ],
+            'dtypes': [
+                pl.Float64, pl.Float64, pl.Float64,
+            ],
         },
     )
