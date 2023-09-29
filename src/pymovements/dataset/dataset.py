@@ -251,6 +251,23 @@ class Dataset:
             If True, show progress bar of computation.
         kwargs:
             kwargs that will be forwarded when calling the preprocessing method.
+
+        Examples
+        --------
+        Let's load in our dataset first,
+        >>> import pymovements as pm
+        >>>
+        >>> dataset = pm.Dataset("ToyDataset", path='toy_dataset')
+        >>> dataset.load()
+
+        Use apply for your gaze transformations:
+        >>> dataset.apply('pix2deg')
+        >>> dataset.apply('pos2deg', method='savitzky_golay', degree=2, window=7)
+
+        Use apply for your event detection:
+        >>> dataset.apply('ivt')
+        >>> dataset.apply('microsaccades', minimum_duration=8)
+
         """
         self._check_gaze_dataframe()
 
