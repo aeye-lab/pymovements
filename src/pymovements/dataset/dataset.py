@@ -259,9 +259,9 @@ class Dataset:
         >>>
         >>> dataset = pm.Dataset("ToyDataset", path='toy_dataset')
         >>> dataset.download()# doctest:+ELLIPSIS
-        Downloading ... to toy_dataset/downloads/...
+        Downloading ... to toy_dataset...downloads...
         Checking integrity of ...
-        Extracting ... to toy_dataset/raw
+        Extracting ... to toy_dataset...raw
         <pymovements.dataset.dataset.Dataset object at ...>
         >>> dataset.load()# doctest:+ELLIPSIS
         <pymovements.dataset.dataset.Dataset object at ...>
