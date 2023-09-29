@@ -19,6 +19,7 @@
 # SOFTWARE.
 """Test read from csv."""
 import pytest
+import polars as pl
 
 import pymovements as pm
 
