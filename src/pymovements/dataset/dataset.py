@@ -258,16 +258,26 @@ class Dataset:
         >>> import pymovements as pm
         >>>
         >>> dataset = pm.Dataset("ToyDataset", path='toy_dataset')
-        >>> dataset.download()# doctest: +IGNORE_RESULT
-        >>> dataset.load()
+        >>> dataset.download()# doctest:+ELLIPSIS
+        Using already downloaded and verified file: ...
+        Extracting ... to toy_dataset/raw
+        <pymovements.dataset.dataset.Dataset object at ...>
+        >>> dataset.load()# doctest:+ELLIPSIS
+        <pymovements.dataset.dataset.Dataset object at ...>
 
         Use apply for your gaze transformations:
-        >>> dataset.apply('pix2deg')
-        >>> dataset.apply('pos2deg', method='savitzky_golay', degree=2, window=7)
+        >>> dataset.apply('pix2deg')# doctest:+ELLIPSIS
+        <pymovements.dataset.dataset.Dataset object at ...>
+
+        >>> dataset.apply('pos2vel', method='savitzky_golay', degree=2, window_length=7)# doctest:+ELLIPSIS
+        <pymovements.dataset.dataset.Dataset object at ...>
 
         Use apply for your event detection:
-        >>> dataset.apply('ivt')
-        >>> dataset.apply('microsaccades', minimum_duration=8)
+        >>> dataset.apply('ivt')# doctest:+ELLIPSIS
+        <pymovements.dataset.dataset.Dataset object at ...>
+
+        >>> dataset.apply('microsaccades', minimum_duration=8)# doctest:+ELLIPSIS
+        <pymovements.dataset.dataset.Dataset object at ...>
         """
         self._check_gaze_dataframe()
 
