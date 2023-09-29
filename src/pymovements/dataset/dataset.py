@@ -269,7 +269,7 @@ class Dataset:
         >>> dataset.apply('pix2deg')# doctest:+ELLIPSIS
         <pymovements.dataset.dataset.Dataset object at ...>
 
-        >>> dataset.apply('pos2vel', method='savitzky_golay', degree=2, window_length=7)# doctest:+ELLIPSIS
+        >>> dataset.apply('pos2vel', method='neighbors')# doctest:+ELLIPSIS
         <pymovements.dataset.dataset.Dataset object at ...>
 
         Use apply for your event detection:
