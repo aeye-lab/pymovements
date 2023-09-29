@@ -258,6 +258,7 @@ class Dataset:
         >>> import pymovements as pm
         >>>
         >>> dataset = pm.Dataset("ToyDataset", path='toy_dataset')
+        >>> dataset.download()
         >>> dataset.load()
 
         Use apply for your gaze transformations:
