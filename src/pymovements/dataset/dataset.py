@@ -267,7 +267,6 @@ class Dataset:
         Use apply for your event detection:
         >>> dataset.apply('ivt')
         >>> dataset.apply('microsaccades', minimum_duration=8)
-
         """
         self._check_gaze_dataframe()
 
