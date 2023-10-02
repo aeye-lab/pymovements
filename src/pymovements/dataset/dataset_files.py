@@ -232,8 +232,13 @@ def load_gaze_files(
 
         elif preprocessed and extension == 'csv':
             time_column = None
+            distance_column = None
+
             if 'time' in gaze_data.columns:
                 time_column = 'time'
+
+            if 'distance' in gaze_data.columns:
+                distance_column = 'distance'
 
             pixel_columns: list[str] = list(
                 set(GazeDataFrame.valid_pixel_position_columns) & set(gaze_data.columns),
@@ -253,6 +258,7 @@ def load_gaze_files(
                 experiment=definition.experiment,
                 trial_columns=definition.trial_columns,
                 time_column=time_column,
+                distance_column=distance_column,
                 pixel_columns=pixel_columns,
                 position_columns=position_columns,
                 velocity_columns=velocity_columns,
@@ -265,6 +271,7 @@ def load_gaze_files(
                 experiment=definition.experiment,
                 trial_columns=definition.trial_columns,
                 time_column=definition.time_column,
+                distance_column=definition.distance_column,
                 pixel_columns=definition.pixel_columns,
                 position_columns=definition.position_columns,
                 velocity_columns=definition.velocity_columns,
