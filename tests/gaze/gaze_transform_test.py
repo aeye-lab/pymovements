@@ -712,8 +712,8 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
                 'pixel_columns': ['x', 'y'],
             },
             AttributeError,
-            'Neither eye-to-screen distance column nor experiment eye-to-screen '
-            'distance is specified.',
+            'Neither eye-to-screen distance is in the columns of the dataframe '
+            'nor experiment eye-to-screen distance is specified.',
             id='no_distance_column_no_experiment_distance',
         ),
         # Test distance column specified but no distance column in dataframe
@@ -724,11 +724,9 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
                 'pixel_columns': ['x', 'y'],
                 'distance_column': 'distance',
             },
-            pl.exceptions.ColumnNotFoundError,
-            (
-                'Specified eye-to-screen distance column '
-                "'distance' is not in the columns of the dataframe: ['pixel']"
-            ),
+            AttributeError,
+            'Neither eye-to-screen distance is in the columns of the dataframe '
+            'nor experiment eye-to-screen distance is specified.',
             id='distance_column_not_in_dataframe',
         ),
     ],

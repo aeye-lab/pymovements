@@ -198,6 +198,9 @@ class GazeDataFrame:
         if time_column is not None:
             self.frame = self.frame.rename({time_column: 'time'})
 
+        if distance_column is not None:
+            self.frame = self.frame.rename({distance_column: 'distance'})
+
         # List of passed not-None column specifier lists.
         # The list will be used for inferring n_components.
         column_specifiers: list[list[str]] = []
@@ -230,7 +233,6 @@ class GazeDataFrame:
         else:
             self.events = events.copy()
 
-        self.distance_column = distance_column
 
     def transform(
             self,
@@ -274,29 +276,22 @@ class GazeDataFrame:
                 self._check_experiment()
                 assert self.experiment is not None
 
-                if self.distance_column:
-                    if self.distance_column not in self.frame.columns:
-                        raise pl.exceptions.ColumnNotFoundError(
-                            "Specified eye-to-screen distance column "
-                            f"'{self.distance_column}' is not in the columns of the dataframe: "
-                            f'{self.frame.columns}',
-                        )
+                if 'distance' in self.frame.columns:
+                    kwargs['distance'] = 'distance'
 
                     if self.experiment.screen.distance_cm:
                         warnings.warn(
-                            "Both distance_column and experiment's"
+                            "Both a distance column and experiment's"
                             "eye-to-screen distance are specified. "
-                            "Using eye-to-screen distances from the distance_column"
-                            f"'{self.distance_column}' in the dataframe.",
+                            "Using eye-to-screen distances from column"
+                            "'distance' in the dataframe.",
                         )
-
-                    kwargs['distance'] = self.distance_column
                 elif self.experiment.screen.distance_cm:
                     kwargs['distance'] = self.experiment.screen.distance_cm
                 else:
                     raise AttributeError(
-                        'Neither eye-to-screen distance column nor experiment eye-to-screen '
-                        'distance is specified.',
+                        'Neither eye-to-screen distance is in the columns of the dataframe '
+                        'nor experiment eye-to-screen distance is specified.',
                     )
 
             if 'sampling_rate' in method_kwargs and 'sampling_rate' not in kwargs:
