@@ -86,3 +86,4 @@ class DatasetDefinition:
     position_columns: list[str] | None = None
     velocity_columns: list[str] | None = None
     acceleration_columns: list[str] | None = None
+    distance_column: str | None = None
