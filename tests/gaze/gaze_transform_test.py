@@ -600,6 +600,50 @@ pytest.param(
             ),
             id='pos2vel_preceding_trialize_single_column_str',
         ),
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                        'y_dva': [2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
+                    },
+                ),
+                'position_columns': ['x_dva', 'y_dva'],
+            },
+            'smooth', {'method': 'moving_average', 'window_length': 3},
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                        'y_dva': [2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
+                    },
+                ),
+                position_columns=['x_dva', 'y_dva'],
+            ),
+            id='smooth',
+        ),
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                        'y_dva': [2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
+                    },
+                ),
+                'position_columns': ['x_dva', 'y_dva'],
+            },
+            pm.gaze.transforms.smooth, {'method': 'moving_average', 'window_length': 3},
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                        'y_dva': [2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
+                    },
+                ),
+                position_columns=['x_dva', 'y_dva'],
+            ),
+            id='smooth_method_pass',
+        ),
 
     ],
 )
@@ -935,3 +979,75 @@ def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg)
 
     msg, = excinfo.value.args
     assert msg == expected_msg
+
+
+@pytest.mark.parametrize(
+    ('gaze_init_kwargs', 'kwargs', 'expected'),
+    [
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'x_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
+                        'y_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
+                        'x_dva': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
+                        'y_dva': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
+                    },
+                ),
+                'pixel_columns': ['x_pix', 'y_pix'],
+                'position_columns': ['x_dva', 'y_dva'],
+            },
+            {'method': 'moving_average', 'column': 'pixel', 'window_length': 3},
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+
+                        'x_pix': [1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3],
+                        'y_pix': [1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3],
+                        'x_dva': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
+                        'y_dva': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
+                    },
+                ),
+                pixel_columns=['x_pix', 'y_pix'],
+                position_columns=['x_dva', 'y_dva'],
+            ),
+            id='pixel',
+        ),
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'x_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
+                        'y_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
+                        'x_dva': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
+                        'y_dva': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
+                    },
+                ),
+                'pixel_columns': ['x_pix', 'y_pix'],
+                'position_columns': ['x_dva', 'y_dva'],
+            },
+            {'method': 'moving_average', 'column': 'position', 'window_length': 3},
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+
+                        'x_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
+                        'y_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
+                        'x_dva': [1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3],
+                        'y_dva': [1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3],
+                    },
+                ),
+                pixel_columns=['x_pix', 'y_pix'],
+                position_columns=['x_dva', 'y_dva'],
+            ),
+            id='position',
+        ),
+    ],
+)
+def test_gaze_dataframe_smooth_expected_column(
+        gaze_init_kwargs, kwargs, expected,
+):
+    gaze = pm.GazeDataFrame(**gaze_init_kwargs)
+    gaze.smooth(**kwargs)
+
+    assert_frame_equal(gaze.frame, expected.frame)

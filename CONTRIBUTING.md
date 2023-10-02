@@ -131,6 +131,7 @@ You can check your code style by using [pre-commit](https://www.pre-commit.com).
 
 ```bash
 pip install pre-commit
+pip install pylint
 pre-commit install
 ```
 
@@ -156,9 +157,9 @@ If you add a new feature, please also include appropriate tests to verify its in
 functionality. We try to keep our code coverage close to 100%.
 
 It is possible to limit the scope of testing to specific environments and files. For example, to
-only test event related functionality using the Python 3.8 environment use:
+only test event related functionality using the Python 3.9 environment use:
 ```bash
-tox -e py38 tests/events
+tox -e py39 tests/events
 ```
 
 
@@ -175,6 +176,7 @@ You can build the documentation locally using the respective tox environment:
 tox -e docs
 ```
 It will appear in the `build/docs` directory.
+Please note that in order to reproduce the documentation locally, you may need to install `pandoc`. If necessary, please refer to the [installation guide](https://pandoc.org/installing.html) for detailed instructions.
 
 To rebuild the full documentation use
 ```bash

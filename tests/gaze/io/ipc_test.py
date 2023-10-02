@@ -17,48 +17,32 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module holds all dataset definitions.
+"""Test read from IPC/feather."""
+import pytest
 
-.. rubric:: Dataset Definitions
-
-.. autosummary::
-   :toctree:
-   :template: class.rst
-
-    pymovements.datasets.GazeBase
-    pymovements.datasets.GazeBaseVR
-    pymovements.datasets.GazeOnFaces
-    pymovements.datasets.HBN
-    pymovements.datasets.JuDo1000
-    pymovements.datasets.SBSAT
+import pymovements as pm
 
 
-.. rubric:: Example Datasets
+@pytest.mark.parametrize(
+    ('kwargs', 'shape'),
+    [
+        pytest.param(
+            {
+                'file': 'tests/gaze/io/files/monocular_example.feather',
+            },
+            (10, 2),
+            id='feather_mono_shape',
+        ),
+        pytest.param(
+            {
+                'file': 'tests/gaze/io/files/binocular_example.feather',
+            },
+            (10, 3),
+            id='feather_bino_shape',
+        ),
+    ],
+)
+def test_shapes(kwargs, shape):
+    gaze_dataframe = pm.gaze.from_ipc(**kwargs)
 
-.. autosummary::
-   :toctree:
-   :template: class.rst
-
-    pymovements.datasets.ToyDataset
-    pymovements.datasets.ToyDatasetEyeLink
-"""
-from pymovements.datasets.gaze_on_faces import GazeOnFaces
-from pymovements.datasets.gazebase import GazeBase
-from pymovements.datasets.gazebasevr import GazeBaseVR
-from pymovements.datasets.hbn import HBN
-from pymovements.datasets.judo1000 import JuDo1000
-from pymovements.datasets.sb_sat import SBSAT
-from pymovements.datasets.toy_dataset import ToyDataset
-from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
-
-
-__all__ = [
-    'GazeBase',
-    'GazeBaseVR',
-    'GazeOnFaces',
-    'HBN',
-    'JuDo1000',
-    'SBSAT',
-    'ToyDataset',
-    'ToyDatasetEyeLink',
-]
+    assert gaze_dataframe.frame.shape == shape

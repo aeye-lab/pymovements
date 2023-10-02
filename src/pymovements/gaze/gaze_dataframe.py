@@ -233,6 +233,26 @@ class GazeDataFrame:
         else:
             self.events = events.copy()
 
+    def apply(
+            self,
+            function: str,
+            **kwargs: Any,
+    ) -> None:
+        """Apply preprocessing method to GazeDataFrame.
+
+        Parameters
+        ----------
+        function: str
+            Name of the preprocessing method to apply.
+        kwargs:
+            kwargs that will be forwarded when calling the preprocessing method.
+        """
+        if transforms.TransformLibrary.__contains__(function):
+            self.transform(function, **kwargs)
+        elif pm.events.EventDetectionLibrary.__contains__(function):
+            self.detect(function, **kwargs)
+        else:
+            raise ValueError(f"unsupported method '{function}'")
 
     def transform(
             self,
@@ -410,6 +430,52 @@ class GazeDataFrame:
             if experiment is None.
         """
         self.transform('pos2vel', method=method, **kwargs)
+
+    def smooth(
+            self,
+            method: str = 'savitzky_golay',
+            window_length: int = 7,
+            degree: int = 2,
+            column: str = 'position',
+            padding: str | float | int | None = 'nearest',
+            **kwargs: int | float | str,
+    ) -> None:
+        """Smooth data in a column.
+
+        Parameters
+        ----------
+        method:
+            The method to use for smoothing. Choose from ``savitzky_golay``, ``moving_average``,
+            ``exponential_moving_average``. See :func:`~transforms.smooth()` for details.
+        window_length:
+            For ``moving_average`` this is the window size to calculate the mean of the subsequent
+            samples. For ``savitzky_golay`` this is the window size to use for the polynomial fit.
+            For ``exponential_moving_average`` this is the span parameter.
+        degree:
+            The degree of the polynomial to use. This has only an effect if using
+            ``savitzky_golay`` as smoothing method. `degree` must be less than `window_length`.
+        column:
+            The input column name to which the smoothing is applied.
+        padding:
+            Must be either ``None``, a scalar or one of the strings
+            ``mirror``, ``nearest`` or ``wrap``.
+            This determines the type of extension to use for the padded signal to
+            which the filter is applied.
+            When passing ``None``, no extension padding is used.
+            When passing a scalar value, data will be padded using the passed value.
+            See :func:`~transforms.smooth()` for details on the padding methods.
+        **kwargs:
+            Additional keyword arguments to be passed to the :func:`~transforms.smooth()` method.
+        """
+        self.transform(
+            'smooth',
+            column=column,
+            method=method,
+            degree=degree,
+            window_length=window_length,
+            padding=padding,
+            **kwargs,
+        )
 
     def detect(
             self,
