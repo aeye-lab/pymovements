@@ -130,7 +130,7 @@ class Screen:
                 screen_cm=self.width_cm,
                 distance_cm=self.distance_cm,
                 origin=self.origin,
-            )
+            ),
         )
 
     @property
@@ -146,7 +146,7 @@ class Screen:
                 screen_cm=self.height_cm,
                 distance_cm=self.distance_cm,
                 origin=self.origin,
-            )
+            ),
         )
 
     @property
@@ -162,7 +162,7 @@ class Screen:
                 screen_cm=self.width_cm,
                 distance_cm=self.distance_cm,
                 origin=self.origin,
-            )
+            ),
         )
 
     @property
@@ -178,7 +178,7 @@ class Screen:
                 screen_cm=self.height_cm,
                 distance_cm=self.distance_cm,
                 origin=self.origin,
-            )
+            ),
         )
 
     def pix2deg(
@@ -242,5 +242,5 @@ class Screen:
         """Check if distance_cm is not None."""
         if self.distance_cm is None:
             raise ValueError(
-                'distance_cm must not be None when using this method'
+                'distance_cm must not be None when using this method',
             )

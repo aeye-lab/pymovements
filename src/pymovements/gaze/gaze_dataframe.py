@@ -21,13 +21,13 @@
 from __future__ import annotations
 
 import inspect
+import warnings
 from collections.abc import Callable
 from copy import deepcopy
 from typing import Any
 
 import numpy as np
 import polars as pl
-import warnings
 
 import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.gaze import transforms
@@ -303,8 +303,8 @@ class GazeDataFrame:
                     if self.experiment.screen.distance_cm:
                         warnings.warn(
                             "Both a distance column and experiment's"
-                            "eye-to-screen distance are specified. "
-                            "Using eye-to-screen distances from column"
+                            'eye-to-screen distance are specified. '
+                            'Using eye-to-screen distances from column'
                             "'distance' in the dataframe.",
                         )
                 elif self.experiment.screen.distance_cm:

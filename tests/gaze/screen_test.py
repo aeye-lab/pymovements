@@ -18,22 +18,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test for Screen class"""
-
 import pytest
 
 import pymovements as pm
 
 
-@pytest.mark.parametrize("property_name", ["x_max_dva", "y_max_dva", "x_min_dva", "y_min_dva"])
+@pytest.mark.parametrize('property_name', ['x_max_dva', 'y_max_dva', 'x_min_dva', 'y_min_dva'])
 def test_dva_properties_with_no_distance_cm(property_name):
-    screen = pm.Screen(1920, 1080, 30, 20, None, "lower left")
+    screen = pm.Screen(1920, 1080, 30, 20, None, 'lower left')
     with pytest.raises(ValueError):
         getattr(screen, property_name)
 
 
-@pytest.mark.parametrize("property_name", ["x_max_dva", "y_max_dva", "x_min_dva", "y_min_dva"])
+@pytest.mark.parametrize('property_name', ['x_max_dva', 'y_max_dva', 'x_min_dva', 'y_min_dva'])
 def test_dva_properties_with_distance_cm(property_name):
-    screen = pm.Screen(1920, 1080, 30, 20, 60, "lower left")
+    screen = pm.Screen(1920, 1080, 30, 20, 60, 'lower left')
     try:
         getattr(screen, property_name)
     except ValueError:
@@ -41,13 +40,13 @@ def test_dva_properties_with_distance_cm(property_name):
 
 
 def test_screen_pix2deg_with_no_distance_cm():
-    screen = pm.Screen(1920, 1080, 30, 20, None, "lower left")
+    screen = pm.Screen(1920, 1080, 30, 20, None, 'lower left')
     with pytest.raises(ValueError):
         screen.pix2deg([[0, 0]])
 
 
 def test_screen_pix2deg_with_distance_cm():
-    screen = pm.Screen(1920, 1080, 30, 20, 60, "lower left")
+    screen = pm.Screen(1920, 1080, 30, 20, 60, 'lower left')
     try:
         screen.pix2deg([[0, 0]])
     except ValueError:

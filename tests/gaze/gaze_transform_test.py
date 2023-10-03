@@ -294,7 +294,7 @@ def fixture_experiment():
                         'time': [1000, 1000],
                         'x_pix': [(100 - 1) / 2, (100 - 1) / 2],
                         'y_pix': [0.0, 0.0],
-                        'distance': [1000, 1000]
+                        'distance': [1000, 1000],
                     },
                 ),
                 'experiment': pm.Experiment(
@@ -307,7 +307,7 @@ def fixture_experiment():
                     origin='center',
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
-                'distance_column': 'distance'
+                'distance_column': 'distance',
             },
             'pix2deg', {},
             pm.GazeDataFrame(
@@ -318,7 +318,7 @@ def fixture_experiment():
                         'y_pix': [0.0, 0.0],
                         'x_dva': [26.3354, 26.3354],
                         'y_dva': [0.0, 0.0],
-                        'distance': [1000, 1000]
+                        'distance': [1000, 1000],
                     },
                 ),
                 pixel_columns=['x_pix', 'y_pix'],
@@ -334,7 +334,7 @@ def fixture_experiment():
                         'time': [1000, 1000],
                         'x_pix': [(100 - 1) / 2, (100 - 1) / 2],
                         'y_pix': [0.0, 0.0],
-                        'distance': [1000, 1000]
+                        'distance': [1000, 1000],
                     },
                 ),
                 'experiment': pm.Experiment(
@@ -358,7 +358,7 @@ def fixture_experiment():
                         'y_pix': [0.0, 0.0],
                         'x_dva': [26.3354, 26.3354],
                         'y_dva': [0.0, 0.0],
-                        'distance': [1000, 1000]
+                        'distance': [1000, 1000],
                     },
                 ),
                 pixel_columns=['x_pix', 'y_pix'],
@@ -368,14 +368,14 @@ def fixture_experiment():
             id='pix2deg_origin_center_explicit_n_components_distance_column',
         ),
 
-pytest.param(
+        pytest.param(
             {
                 'data': pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_pix': [(100 - 1) / 2, (100 - 1) / 2],
                         'y_pix': [0.0, 0.0],
-                        'distance': [1000, 1000]
+                        'distance': [1000, 1000],
                     },
                 ),
                 'experiment': pm.Experiment(
@@ -398,7 +398,7 @@ pytest.param(
                         'y_pix': [0.0, 0.0],
                         'x_dva': [26.3354, 26.3354],
                         'y_dva': [0.0, 0.0],
-                        'distance': [1000, 1000]
+                        'distance': [1000, 1000],
                     },
                 ),
                 pixel_columns=['x_pix', 'y_pix'],
@@ -414,7 +414,7 @@ pytest.param(
                         'time': [1000],
                         'x_pix': [(100 - 1) / 2],
                         'y_pix': [0.0],
-                        'distance': [1000]
+                        'distance': [1000],
                     },
                 ),
                 'experiment': pm.Experiment(
@@ -427,7 +427,7 @@ pytest.param(
                     origin='lower left',
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
-                'distance_column': 'distance'
+                'distance_column': 'distance',
             },
             'pix2deg', {},
             pm.GazeDataFrame(
@@ -438,7 +438,7 @@ pytest.param(
                         'y_pix': [0.0],
                         'x_dva': [0.0],
                         'y_dva': [-26.3354],
-                        'distance': [1000]
+                        'distance': [1000],
                     },
                 ),
                 pixel_columns=['x_pix', 'y_pix'],
