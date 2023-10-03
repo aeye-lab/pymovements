@@ -47,7 +47,7 @@ class Experiment:
             screen_height_cm: float,
             origin: str,
             sampling_rate: float,
-            distance_cm: float | None = None
+            distance_cm: float | None = None,
     ):
         """Initialize Experiment.
 
