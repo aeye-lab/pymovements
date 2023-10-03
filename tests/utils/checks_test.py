@@ -204,3 +204,8 @@ def test_check_two_kwargs_with_three_kwargs_raises_value_error() -> None:
 def test_check_is_not_none_raises_type_error() -> None:
     with pytest.raises(TypeError):
         checks.check_is_not_none(a=1, b=None)
+
+
+def test_check_is_scalar_raises_type_error() -> None:
+    with pytest.raises(TypeError):
+        checks.check_is_scalar(a=1, b=None)

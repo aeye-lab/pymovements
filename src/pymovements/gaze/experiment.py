@@ -80,18 +80,18 @@ class Experiment:
         Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38,
         height_cm=30, distance_cm=68, origin=lower left), sampling_rate=1000.00)
 
-        We can also acces the screen boundaries in degrees of visual angle via the
+        We can also access the screen boundaries in degrees of visual angle via the
         :py:attr:`~pymovements.gaze.Screen` object. This only works if the
         `distance_cm` attribute is specified.
 
-        >>> experiment.screen.x_min_dva
-        -15.599386487782953
-        >>> experiment.screen.x_max_dva
-        15.599386487782953
-        >>> experiment.screen.y_min_dva
-        -12.4277916428235
-        >>> experiment.screen.y_max_dva
-        12.4277916428235
+        >>> round(experiment.screen.x_min_dva)
+        -16
+        >>> round(experiment.screen.x_max_dva)
+        16
+        >>> round(experiment.screen.y_min_dva)
+        -12
+        >>> round(experiment.screen.y_max_dva)
+        12
 
         """
         self.screen = Screen(

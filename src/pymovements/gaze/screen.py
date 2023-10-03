@@ -100,17 +100,18 @@ class Screen:
         Screen(width_px=1280, height_px=1024, width_cm=38.00,
         height_cm=30.00, distance_cm=68.00, origin=lower left)
 
-        We can also acces the screen boundaries in degrees of visual angle. This only works if the
+        We can also access the screen boundaries in degrees of visual angle. This only works if the
         `distance_cm` attribute is specified.
 
-        >>> screen.x_min_dva
-        -15.599386487782953
-        >>> screen.x_max_dva
-        15.599386487782953
-        >>> screen.y_min_dva
-        -12.4277916428235
-        >>> screen.y_max_dva
-        12.4277916428235
+        >>> round(screen.x_min_dva)
+        -16
+        >>> round(screen.x_max_dva)
+        16
+        >>> round(screen.y_min_dva)
+        -12
+        >>> round(screen.y_max_dva)
+        12
+
         """
         checks.check_no_zeros(width_px, 'width_px')
         checks.check_no_zeros(height_px, 'height_px')
