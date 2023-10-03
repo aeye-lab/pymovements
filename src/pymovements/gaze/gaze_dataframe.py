@@ -21,7 +21,6 @@
 from __future__ import annotations
 
 import inspect
-import warnings
 from collections.abc import Callable
 from copy import deepcopy
 from typing import Any
@@ -301,10 +300,10 @@ class GazeDataFrame:
                     kwargs['distance'] = 'distance'
 
                     if self.experiment.screen.distance_cm:
-                        warnings.warn(
-                            "Both a distance column and experiment's"
+                        print(
+                            "Both a distance column and experiment's "
                             'eye-to-screen distance are specified. '
-                            'Using eye-to-screen distances from column'
+                            'Using eye-to-screen distances from column '
                             "'distance' in the dataframe.",
                         )
                 elif self.experiment.screen.distance_cm:
