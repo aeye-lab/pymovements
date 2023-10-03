@@ -253,7 +253,8 @@ def pix2deg(
 
     else:
         raise TypeError(
-            f'`distance` must be of type `float`, `int` or `str`, but is of type `{type(distance).__name__}`',
+            f'`distance` must be of type `float`, `int` or `str`, but is of type'
+            f'`{type(distance).__name__}`',
         )
 
     return pl.concat_list(list(degree_components)).alias(position_column)

@@ -238,7 +238,7 @@ class Screen:
             origin=self.origin,
         )
 
-    def _check_distance_cm(self):
+    def _check_distance_cm(self) -> None:
         """Check if distance_cm is not None."""
         if self.distance_cm is None:
             raise ValueError(
