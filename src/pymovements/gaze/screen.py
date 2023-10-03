@@ -64,8 +64,8 @@ class Screen:
             height_px: int,
             width_cm: float,
             height_cm: float,
-            distance_cm: float | None,
             origin: str,
+            distance_cm: float | None = None,
     ):
         """Initialize Screen.
 
