@@ -75,7 +75,7 @@ def test_from_numpy_with_schema():
         dtype=np.float64,
     )
 
-    schema = ['t', 'd', 'x_pix', 'y_pix', 'x_pos', 'y_pos', 'x_vel', 'y_vel', 'x_acc', 'y_acc', ]
+    schema = ['t', 'd', 'x_pix', 'y_pix', 'x_pos', 'y_pos', 'x_vel', 'y_vel', 'x_acc', 'y_acc']
 
     experiment = pm.Experiment(
         screen_width_px=1280,

@@ -245,7 +245,7 @@ def pix2deg(
             pl.arctan2(
                 centered_pixels.list.get(component),
                 pl.col(distance).truediv(10).mul(
-                    screen_resolution[component % 2] / screen_size[component % 2]
+                    screen_resolution[component % 2] / screen_size[component % 2],
                 ),
             ) * (180 / np.pi)
             for component in range(n_components)

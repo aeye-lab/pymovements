@@ -606,7 +606,7 @@ def test_pix2deg_returns(kwargs, series, expected_df, distance_as_column):
                 'distance': [250., 500., 1000.],
             },
             pl.Series(
-                'position', [[0., 63.4349], [0., 45.], [0., 26.5650]], pl.List(pl.Float64)
+                'position', [[0., 63.4349], [0., 45.], [0., 26.5650]], pl.List(pl.Float64),
             ),
             id='origin_center_constant_pixel_centered_x_changing_distance_returns',
         ),
@@ -624,11 +624,11 @@ def test_pix2deg_returns(kwargs, series, expected_df, distance_as_column):
                 'distance': [250., 500., 1000.],
             },
             pl.Series(
-                'position', [[63.4349, 0.], [45., 0.], [26.5650, 0.]], pl.List(pl.Float64)
+                'position', [[63.4349, 0.], [45., 0.], [26.5650, 0.]], pl.List(pl.Float64),
             ),
             id='origin_center_constant_pixel_centered_y_changing_distance_returns',
         ),
-    ]
+    ],
 )
 def test_pix2deg_distance_as_colum_returns(kwargs, data, expected_df):
     df = pl.DataFrame(
