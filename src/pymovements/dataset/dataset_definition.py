@@ -61,6 +61,12 @@ class DatasetDefinition:
 
     custom_read_kwargs : dict[str, Any], optional
         If specified, these keyword arguments will be passed to the file reading function.
+
+    distance_column : str | None
+        The name of the column containing eye-to-screen distance in millimeters for each sample
+        in the input data frame. If specified, the column will be used for pixel to dva
+        transformations. If not specified, the constant eye-to-screen distance will be taken from
+        the experiment definition.
     """
 
     # pylint: disable=too-many-instance-attributes

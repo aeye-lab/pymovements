@@ -126,9 +126,10 @@ class GazeDataFrame:
             nested into the column ``acceleration``. If the list is empty or None, the nested
             ``acceleration`` column will not be created.
         distance_column:
-            The name of the eye-to-screen distance column in the input data frame. If specified,
-            the column will be used for pixel to dva transformations. If not specified, the
-            constant eye-to-screen distance will be taken from the experiment definition.
+            The name of the column containing eye-to-screen distance in millimeters for each sample
+            in the input data frame. If specified, the column will be used for pixel to dva
+            transformations. If not specified, the constant eye-to-screen distance will be taken
+            from the experiment definition.
 
         Notes
         -----
