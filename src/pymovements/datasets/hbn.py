@@ -116,9 +116,9 @@ class HBN(DatasetDefinition):
         screen_height_px=600,
         screen_width_cm=33.8,
         screen_height_cm=27.0,
-        distance_cm=63.5,
         origin='center',
         sampling_rate=120,
+        distance_cm=63.5,
     )
 
     filename_format: str = r'{subject_id:12}_{video_id}.csv'

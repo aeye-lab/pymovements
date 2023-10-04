@@ -36,7 +36,7 @@ def test_from_pandas():
         },
     )
 
-    experiment = pm.Experiment(1280, 1024, 38, 30, 68, 'lower left', 1000.0)
+    experiment = pm.Experiment(1280, 1024, 38, 30, 'lower left', 1000.0, 68)
 
     gaze = pm.gaze.from_pandas(
         data=pandas_df,
@@ -57,7 +57,7 @@ def test_from_pandas_explicit_columns():
         },
     )
 
-    experiment = pm.Experiment(1280, 1024, 38, 30, 68, 'lower left', 1000.0)
+    experiment = pm.Experiment(1280, 1024, 38, 30, 'lower left', 1000.0, 68)
 
     gaze = pm.gaze.from_pandas(
         data=pandas_df,

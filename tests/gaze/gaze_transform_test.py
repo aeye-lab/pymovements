@@ -28,7 +28,7 @@ import pymovements as pm
 
 @pytest.fixture(name='experiment')
 def fixture_experiment():
-    return pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000)
+    return pm.Experiment(1024, 768, 38, 30, 'center', 1000, 60)
 
 
 @pytest.mark.parametrize(
@@ -118,13 +118,13 @@ def fixture_experiment():
                     },
                 ),
                 'experiment': pm.Experiment(
-                    sampling_rate=1000,
                     screen_width_px=100,
                     screen_height_px=100,
                     screen_width_cm=100,
                     screen_height_cm=100,
-                    distance_cm=100,
                     origin='center',
+                    sampling_rate=1000,
+                    distance_cm=100
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
@@ -152,13 +152,13 @@ def fixture_experiment():
                     },
                 ),
                 'experiment': pm.Experiment(
-                    sampling_rate=1000,
                     screen_width_px=100,
                     screen_height_px=100,
                     screen_width_cm=100,
                     screen_height_cm=100,
-                    distance_cm=100,
                     origin='lower left',
+                    sampling_rate=1000,
+                    distance_cm=100
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
@@ -186,13 +186,13 @@ def fixture_experiment():
                     },
                 ),
                 'experiment': pm.Experiment(
-                    sampling_rate=1000,
                     screen_width_px=100,
                     screen_height_px=100,
                     screen_width_cm=100,
                     screen_height_cm=100,
-                    distance_cm=100,
                     origin='center',
+                    sampling_rate=1000,
+                    distance_cm=100
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
@@ -223,13 +223,13 @@ def fixture_experiment():
                     },
                 ),
                 'experiment': pm.Experiment(
-                    sampling_rate=1000,
                     screen_width_px=100,
                     screen_height_px=100,
                     screen_width_cm=100,
                     screen_height_cm=100,
-                    distance_cm=100,
                     origin='center',
+                    sampling_rate=1000,
+                    distance_cm=100
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
@@ -260,13 +260,13 @@ def fixture_experiment():
                     },
                 ),
                 'experiment': pm.Experiment(
-                    sampling_rate=1000,
                     screen_width_px=100,
                     screen_height_px=100,
                     screen_width_cm=100,
                     screen_height_cm=100,
-                    distance_cm=100,
                     origin='lower left',
+                    sampling_rate=1000,
+                    distance_cm=100
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
@@ -298,13 +298,13 @@ def fixture_experiment():
                     },
                 ),
                 'experiment': pm.Experiment(
-                    sampling_rate=1000,
                     screen_width_px=100,
                     screen_height_px=100,
                     screen_width_cm=100,
                     screen_height_cm=100,
-                    distance_cm=None,
                     origin='center',
+                    sampling_rate=1000,
+                    distance_cm=None
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
                 'distance_column': 'distance',
@@ -338,13 +338,13 @@ def fixture_experiment():
                     },
                 ),
                 'experiment': pm.Experiment(
-                    sampling_rate=1000,
                     screen_width_px=100,
                     screen_height_px=100,
                     screen_width_cm=100,
                     screen_height_cm=100,
-                    distance_cm=None,
                     origin='center',
+                    sampling_rate=1000,
+                    distance_cm=None
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
                 'distance_column': 'distance',
@@ -379,13 +379,13 @@ def fixture_experiment():
                     },
                 ),
                 'experiment': pm.Experiment(
-                    sampling_rate=1000,
                     screen_width_px=100,
                     screen_height_px=100,
                     screen_width_cm=100,
                     screen_height_cm=100,
-                    distance_cm=None,
                     origin='center',
+                    sampling_rate=1000,
+                    distance_cm=None
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
@@ -418,13 +418,13 @@ def fixture_experiment():
                     },
                 ),
                 'experiment': pm.Experiment(
-                    sampling_rate=1000,
                     screen_width_px=100,
                     screen_height_px=100,
                     screen_width_cm=100,
                     screen_height_cm=100,
-                    distance_cm=None,
                     origin='lower left',
+                    sampling_rate=1000,
+                    distance_cm=None
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
                 'distance_column': 'distance',
@@ -459,13 +459,13 @@ def fixture_experiment():
                     },
                 ),
                 'experiment': pm.Experiment(
-                    sampling_rate=1000,
                     screen_width_px=100,
                     screen_height_px=100,
                     screen_width_cm=100,
                     screen_height_cm=100,
-                    distance_cm=1,
                     origin='lower left',
+                    sampling_rate=1000,
+                    distance_cm=1
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
                 'distance_column': 'distance',
@@ -500,13 +500,13 @@ def fixture_experiment():
                     },
                 ),
                 'experiment': pm.Experiment(
-                    sampling_rate=1000,
                     screen_width_px=100,
                     screen_height_px=100,
                     screen_width_cm=100,
                     screen_height_cm=100,
-                    distance_cm=100,
                     origin='lower left',
+                    sampling_rate=1000,
+                    distance_cm=100
                 ),
                 'position_columns': ['x_dva', 'y_dva'],
             },
@@ -538,13 +538,13 @@ def fixture_experiment():
                     },
                 ),
                 'experiment': pm.Experiment(
-                    sampling_rate=1000,
                     screen_width_px=100,
                     screen_height_px=100,
                     screen_width_cm=100,
                     screen_height_cm=100,
-                    distance_cm=100,
                     origin='lower left',
+                    sampling_rate=1000,
+                    distance_cm=100
                 ),
                 'position_columns': ['x_dva', 'y_dva'],
             },
@@ -575,13 +575,13 @@ def fixture_experiment():
                     },
                 ),
                 'experiment': pm.Experiment(
-                    sampling_rate=1000,
                     screen_width_px=100,
                     screen_height_px=100,
                     screen_width_cm=100,
                     screen_height_cm=100,
-                    distance_cm=100,
                     origin='lower left',
+                    sampling_rate=1000,
+                    distance_cm=100
                 ),
                 'position_columns': ['x_dva', 'y_dva'],
             },
@@ -613,13 +613,13 @@ def fixture_experiment():
                     },
                 ),
                 'experiment': pm.Experiment(
-                    sampling_rate=1000,
                     screen_width_px=100,
                     screen_height_px=100,
                     screen_width_cm=100,
                     screen_height_cm=100,
-                    distance_cm=100,
                     origin='lower left',
+                    sampling_rate=1000,
+                    distance_cm=100
                 ),
                 'position_columns': ['x_dva', 'y_dva'],
                 'trial_columns': 'trial_id',
@@ -760,7 +760,7 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
         pytest.param(
             {
                 'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
-                'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+                'experiment': pm.Experiment(1024, 768, 38, 30, 'center', 1000, 60),
             },
             AttributeError,
             'n_components must be either 2, 4 or 6 but is None',
@@ -769,7 +769,7 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
         pytest.param(
             {
                 'data': pl.from_dict({'x': [0.1], 'y': [0.2]}),
-                'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+                'experiment': pm.Experiment(1024, 768, 38, 30, 'center', 1000, 60),
                 'acceleration_columns': ['x', 'y'],
             },
             pl.exceptions.ColumnNotFoundError,
@@ -793,7 +793,7 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
         pytest.param(
             {
                 'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
-                'experiment': pm.Experiment(1024, 768, 38, 30, None, 'center', 1000),
+                'experiment': pm.Experiment(1024, 768, 38, 30, 'center', 1000, None),
                 'pixel_columns': ['x', 'y'],
             },
             AttributeError,
@@ -804,7 +804,7 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
         pytest.param(
             {
                 'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
-                'experiment': pm.Experiment(1024, 768, 38, 30, None, 'center', 1000),
+                'experiment': pm.Experiment(1024, 768, 38, 30, 'center', 1000, None),
                 'pixel_columns': ['x', 'y'],
                 'distance_column': 'distance',
             },
@@ -866,7 +866,7 @@ def test_gaze_dataframe_pos2acc_creates_acceleration_column(data, experiment, po
         pytest.param(
             {
                 'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
-                'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+                'experiment': pm.Experiment(1024, 768, 38, 30, 'center', 1000, 60),
             },
             AttributeError,
             'n_components must be either 2, 4 or 6 but is None',
@@ -875,7 +875,7 @@ def test_gaze_dataframe_pos2acc_creates_acceleration_column(data, experiment, po
         pytest.param(
             {
                 'data': pl.from_dict({'x': [0.1], 'y': [0.2]}),
-                'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+                'experiment': pm.Experiment(1024, 768, 38, 30, 'center', 1000, 60),
                 'pixel_columns': ['x', 'y'],
             },
             pl.exceptions.ColumnNotFoundError,
@@ -891,7 +891,7 @@ def test_gaze_dataframe_pos2acc_creates_acceleration_column(data, experiment, po
         pytest.param(
             {
                 'data': pl.from_dict({'x': [0.1], 'y': [0.2]}),
-                'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+                'experiment': pm.Experiment(1024, 768, 38, 30, 'center', 1000, 60),
                 'acceleration_columns': ['x', 'y'],
             },
             pl.exceptions.ColumnNotFoundError,
@@ -964,7 +964,7 @@ def test_gaze_dataframe_pos2vel_creates_velocity_column(data, experiment, positi
         pytest.param(
             {
                 'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
-                'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+                'experiment': pm.Experiment(1024, 768, 38, 30, 'center', 1000, 60),
             },
             AttributeError,
             'n_components must be either 2, 4 or 6 but is None',
@@ -973,7 +973,7 @@ def test_gaze_dataframe_pos2vel_creates_velocity_column(data, experiment, positi
         pytest.param(
             {
                 'data': pl.from_dict({'x': [0.1], 'y': [0.2]}),
-                'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+                'experiment': pm.Experiment(1024, 768, 38, 30, 'center', 1000, 60),
                 'pixel_columns': ['x', 'y'],
             },
             pl.exceptions.ColumnNotFoundError,
@@ -989,7 +989,7 @@ def test_gaze_dataframe_pos2vel_creates_velocity_column(data, experiment, positi
         pytest.param(
             {
                 'data': pl.from_dict({'x': [0.1], 'y': [0.2]}),
-                'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+                'experiment': pm.Experiment(1024, 768, 38, 30, 'center', 1000, 60),
                 'acceleration_columns': ['x', 'y'],
             },
             pl.exceptions.ColumnNotFoundError,

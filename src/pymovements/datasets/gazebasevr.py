@@ -120,9 +120,9 @@ class GazeBaseVR(DatasetDefinition):
         screen_height_px=1050,
         screen_width_cm=47.4,
         screen_height_cm=29.7,
-        distance_cm=55,
         origin='center',
         sampling_rate=250,
+        distance_cm=55
     )
 
     filename_format: str = (

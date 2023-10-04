@@ -42,14 +42,14 @@ from pymovements.synthetic import step_function
                     length=100, steps=[0, 10], values=[(1, 1, 1, 1, 0, 0), (0, 0, 0, 0, 0, 0)],
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 'center', 10, 60),
             ),
             pm.gaze.from_numpy(
                 velocity=step_function(
                     length=100, steps=[0, 10], values=[(1, 1, 1, 1, 0, 0), (0, 0, 0, 0, 0, 0)],
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 'center', 10, 60),
                 events=pm.events.EventDataFrame(
                     name='fixation',
                     onsets=[0],
@@ -72,7 +72,7 @@ from pymovements.synthetic import step_function
                     start_value=(0, 0),
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 'center', 10, 60),
             ),
             pm.gaze.from_numpy(
                 velocity=step_function(
@@ -82,7 +82,7 @@ from pymovements.synthetic import step_function
                     start_value=(0, 0),
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 'center', 10, 60),
                 events=pm.EventDataFrame(
                     name='saccade',
                     onsets=[20, 70],
@@ -149,7 +149,7 @@ from pymovements.synthetic import step_function
                         'y_pix': [0.0, 0.0],
                     },
                 ),
-                experiment=pm.Experiment(100, 100, 100, 100, 100, 'center', 1000),
+                experiment=pm.Experiment(100, 100, 100, 100, 'center', 1000, 100),
                 pixel_columns=['x_pix', 'y_pix'],
             ),
             pm.GazeDataFrame(
@@ -180,7 +180,7 @@ from pymovements.synthetic import step_function
                         'y': [1.0, 1.1, 1.2, 1.0, 1.1, 1.2],
                     },
                 ),
-                experiment=pm.Experiment(100, 100, 100, 100, 100, 'center', 1000),
+                experiment=pm.Experiment(100, 100, 100, 100, 'center', 1000, 100),
                 trial_columns='trial_id',
                 position_columns=['x', 'y'],
             ),
@@ -219,7 +219,7 @@ def test_gaze_apply(method, kwargs, gaze, expected):
                     length=100, steps=[0, 10], values=[(1, 1, 1, 1, 0, 0), (0, 0, 0, 0, 0, 0)],
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 'center', 10, 60),
             ),
             ValueError,
             "unsupported method 'foobar'",

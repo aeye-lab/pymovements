@@ -93,12 +93,12 @@ class Screen:
         ...     height_px=1024,
         ...     width_cm=38.0,
         ...     height_cm=30.0,
-        ...     distance_cm=68.0,
         ...     origin='lower left',
+        ...     distance_cm=68.0,
         ... )
         >>> print(screen)
         Screen(width_px=1280, height_px=1024, width_cm=38.00,
-        height_cm=30.00, distance_cm=68.00, origin=lower left)
+        height_cm=30.00, origin=lower left, distance_cm=68.00)
 
         We can also access the screen boundaries in degrees of visual angle. This only works if the
         `distance_cm` attribute is specified.
@@ -221,8 +221,8 @@ class Screen:
         ...     height_px=1024,
         ...     width_cm=38.0,
         ...     height_cm=30.0,
-        ...     distance_cm=68.0,
         ...     origin='lower left',
+        ...     distance_cm=68.0,
         ... )
         >>> screen.pix2deg(arr=arr)
         array([[-12.70732231, 8.65963972]])
@@ -232,8 +232,8 @@ class Screen:
         ...     height_px=1024,
         ...     width_cm=38.0,
         ...     height_cm=30.0,
-        ...     distance_cm=68.0,
         ...     origin='center',
+        ...     distance_cm=68.0,
         ... )
         >>> screen.pix2deg(arr=arr)
         array([[ 3.07379946, 20.43909054]])

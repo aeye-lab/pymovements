@@ -169,7 +169,7 @@ def test_gaze_dataframe_position_columns(init_df, position_columns):
 def test_gaze_dataframe_copy_with_experiment():
     gaze = pm.GazeDataFrame(
         pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
-        experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+        experiment=pm.Experiment(1024, 768, 38, 30, 'center', 1000, 60),
         position_columns=['x', 'y'],
     )
 
