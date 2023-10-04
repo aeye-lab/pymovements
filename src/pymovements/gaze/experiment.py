@@ -105,7 +105,7 @@ class Experiment:
             width_cm=screen_width_cm,
             height_cm=screen_height_cm,
             origin=origin,
-            distance_cm=distance_cm
+            distance_cm=distance_cm,
         )
         self.sampling_rate = sampling_rate
 

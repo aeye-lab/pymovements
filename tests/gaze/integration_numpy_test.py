@@ -45,7 +45,7 @@ def test_from_numpy():
         screen_height_cm=30,
         origin='lower left',
         sampling_rate=1000.0,
-        distance_cm=68
+        distance_cm=68,
     )
 
     gaze = pm.gaze.from_numpy(
@@ -84,7 +84,7 @@ def test_from_numpy_with_schema():
         screen_height_cm=30,
         origin='lower left',
         sampling_rate=1000.0,
-        distance_cm=68
+        distance_cm=68,
     )
 
     gaze = pm.gaze.from_numpy(
@@ -137,7 +137,7 @@ def test_from_numpy_explicit_columns():
         screen_height_cm=30,
         origin='lower left',
         sampling_rate=1000.0,
-        distance_cm=68
+        distance_cm=68,
     )
 
     gaze = pm.gaze.from_numpy(
