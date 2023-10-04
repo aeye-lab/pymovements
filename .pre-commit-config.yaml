@@ -13,17 +13,17 @@ repos:
     hooks:
     -   id: add-trailing-comma
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v3.13.0
+    rev: v3.14.0
     hooks:
     -   id: pyupgrade
         args: [--py39-plus]
 -   repo: https://github.com/asottile/reorder-python-imports
-    rev: v3.11.0
+    rev: v3.12.0
     hooks:
     -   id: reorder-python-imports
         args: [--application-directories=src, --py39-plus]
 -   repo: https://github.com/asottile/reorder-python-imports
-    rev: v3.11.0
+    rev: v3.12.0
     hooks:
     -   id: reorder-python-imports
         files: ^src/
@@ -112,7 +112,7 @@ repos:
             '--ignore=D103,D213',
           ]
 -   repo: https://github.com/PyCQA/pylint
-    rev: v3.0.0a7
+    rev: v3.0.0
     hooks:
       - id: pylint
         name: pylint
