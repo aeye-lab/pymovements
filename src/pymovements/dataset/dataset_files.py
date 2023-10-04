@@ -307,7 +307,7 @@ def load_gaze_file(
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
 
-    if filepath.suffix in ['.csv', '.txt']:
+    if filepath.suffix in {'.csv', '.txt'}:
         if preprocessed:
             gaze_df = pl.read_csv(filepath)
         else:
