@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test read from csv."""
+import polars as pl
 import pytest
 
 import pymovements as pm
@@ -43,6 +44,67 @@ import pymovements as pm
             },
             (10, 3),
             id='csv_bino_shape',
+        ),
+        pytest.param(
+            {
+                'file': 'tests/gaze/io/files/hbn_example.csv',
+                'time_column': 'time',
+                'pixel_columns': ['x_pix', 'y_pix'],
+            },
+            (10, 2),
+            id='hbn_dataset_example',
+        ),
+        pytest.param(
+            {
+                'file': 'tests/gaze/io/files/sbsat_example.csv',
+                'time_column': 'time',
+                'pixel_columns': ['x_left', 'y_left'],
+                'separator': '\t',
+            },
+            (10, 5),
+            id='sbsat_dataset_example',
+        ),
+        pytest.param(
+            {
+                'file': 'tests/gaze/io/files/gazebase_example.csv',
+                'time_column': 'n',
+                'position_columns': ['x', 'y'],
+                'null_values': 'NaN',
+            },
+            (10, 7),
+            id='gazebase_dataset_example',
+        ),
+        pytest.param(
+            {
+                'file': 'tests/gaze/io/files/gaze_on_faces_example.csv',
+                'time_column': None,
+                'pixel_columns': ['x', 'y'],
+                'separator': ',',
+                'has_header': False,
+                'new_columns': ['x', 'y'],
+                'dtypes': [pl.Float32, pl.Float32],
+            },
+            (10, 1),
+            id='gaze_on_faces_dataset_example',
+        ),
+        pytest.param(
+            {
+                'file': 'tests/gaze/io/files/gazebase_vr_example.csv',
+                'time_column': 'n',
+                'position_columns': ['lx', 'ly', 'rx', 'ry', 'x', 'y'],
+            },
+            (10, 11),
+            id='gazebase_vr_dataset_example',
+        ),
+        pytest.param(
+            {
+                'file': 'tests/gaze/io/files/judo1000_example.csv',
+                'time_column': 'time',
+                'pixel_columns': ['x_left', 'y_left', 'x_right', 'y_right'],
+                'separator': '\t',
+            },
+            (10, 4),
+            id='judo1000_dataset_example',
         ),
     ],
 )
