@@ -271,7 +271,7 @@ def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
             screen_height_cm=30.2,
             origin='lower left',
             sampling_rate=1000,
-            distance_cm=distance_cm
+            distance_cm=distance_cm,
         ),
         filename_format=r'{subject_id:d}.' + raw_fileformat,
         filename_format_dtypes={'subject_id': pl.Int64},

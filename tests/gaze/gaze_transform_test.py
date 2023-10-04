@@ -124,7 +124,7 @@ def fixture_experiment():
                     screen_height_cm=100,
                     origin='center',
                     sampling_rate=1000,
-                    distance_cm=100
+                    distance_cm=100,
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
@@ -158,7 +158,7 @@ def fixture_experiment():
                     screen_height_cm=100,
                     origin='lower left',
                     sampling_rate=1000,
-                    distance_cm=100
+                    distance_cm=100,
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
@@ -192,7 +192,7 @@ def fixture_experiment():
                     screen_height_cm=100,
                     origin='center',
                     sampling_rate=1000,
-                    distance_cm=100
+                    distance_cm=100,
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
@@ -229,7 +229,7 @@ def fixture_experiment():
                     screen_height_cm=100,
                     origin='center',
                     sampling_rate=1000,
-                    distance_cm=100
+                    distance_cm=100,
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
@@ -266,7 +266,7 @@ def fixture_experiment():
                     screen_height_cm=100,
                     origin='lower left',
                     sampling_rate=1000,
-                    distance_cm=100
+                    distance_cm=100,
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
@@ -304,7 +304,7 @@ def fixture_experiment():
                     screen_height_cm=100,
                     origin='center',
                     sampling_rate=1000,
-                    distance_cm=None
+                    distance_cm=None,
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
                 'distance_column': 'distance',
@@ -344,7 +344,7 @@ def fixture_experiment():
                     screen_height_cm=100,
                     origin='center',
                     sampling_rate=1000,
-                    distance_cm=None
+                    distance_cm=None,
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
                 'distance_column': 'distance',
@@ -385,7 +385,7 @@ def fixture_experiment():
                     screen_height_cm=100,
                     origin='center',
                     sampling_rate=1000,
-                    distance_cm=None
+                    distance_cm=None,
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
@@ -424,7 +424,7 @@ def fixture_experiment():
                     screen_height_cm=100,
                     origin='lower left',
                     sampling_rate=1000,
-                    distance_cm=None
+                    distance_cm=None,
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
                 'distance_column': 'distance',
@@ -465,7 +465,7 @@ def fixture_experiment():
                     screen_height_cm=100,
                     origin='lower left',
                     sampling_rate=1000,
-                    distance_cm=1
+                    distance_cm=1,
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
                 'distance_column': 'distance',
@@ -506,7 +506,7 @@ def fixture_experiment():
                     screen_height_cm=100,
                     origin='lower left',
                     sampling_rate=1000,
-                    distance_cm=100
+                    distance_cm=100,
                 ),
                 'position_columns': ['x_dva', 'y_dva'],
             },
@@ -544,7 +544,7 @@ def fixture_experiment():
                     screen_height_cm=100,
                     origin='lower left',
                     sampling_rate=1000,
-                    distance_cm=100
+                    distance_cm=100,
                 ),
                 'position_columns': ['x_dva', 'y_dva'],
             },
@@ -581,7 +581,7 @@ def fixture_experiment():
                     screen_height_cm=100,
                     origin='lower left',
                     sampling_rate=1000,
-                    distance_cm=100
+                    distance_cm=100,
                 ),
                 'position_columns': ['x_dva', 'y_dva'],
             },
@@ -619,7 +619,7 @@ def fixture_experiment():
                     screen_height_cm=100,
                     origin='lower left',
                     sampling_rate=1000,
-                    distance_cm=100
+                    distance_cm=100,
                 ),
                 'position_columns': ['x_dva', 'y_dva'],
                 'trial_columns': 'trial_id',
