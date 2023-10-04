@@ -307,7 +307,7 @@ def load_gaze_file(
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
 
-    if filepath.suffix == '.csv':
+    if filepath.suffix in ['.csv', '.txt']:
         if preprocessed:
             gaze_df = pl.read_csv(filepath)
         else:
@@ -317,7 +317,7 @@ def load_gaze_file(
     elif filepath.suffix == '.asc':
         gaze_df = parse_eyelink(filepath, **custom_read_kwargs)
     else:
-        valid_extensions = ['csv', 'feather', 'asc']
+        valid_extensions = ['csv', 'txt', 'feather', 'asc']
         raise ValueError(
             f'unsupported file format "{filepath.suffix}".'
             f'Supported formats are: {valid_extensions}',
