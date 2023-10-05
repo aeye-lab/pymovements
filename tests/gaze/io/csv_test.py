@@ -29,7 +29,8 @@ import pymovements as pm
         pytest.param(
             {
                 'file': 'tests/gaze/io/files/monocular_example.csv',
-                'time_column': 'time', 'pixel_columns': ['x_left_pix', 'y_left_pix'],
+                'time_column': 'time',
+                'pixel_columns': ['x_left_pix', 'y_left_pix'],
             },
             (10, 2),
             id='csv_mono_shape',
@@ -44,9 +45,66 @@ import pymovements as pm
             (10, 3),
             id='csv_bino_shape',
         ),
+        pytest.param(
+            {
+                'file': 'tests/gaze/io/files/hbn_example.csv',
+                'time_column': pm.datasets.HBN().time_column,
+                'pixel_columns': pm.datasets.HBN().pixel_columns,
+            },
+            (10, 2),
+            id='hbn_dataset_example',
+        ),
+        pytest.param(
+            {
+                'file': 'tests/gaze/io/files/sbsat_example.csv',
+                'time_column': pm.datasets.SBSAT().time_column,
+                'pixel_columns': pm.datasets.SBSAT().pixel_columns,
+                **pm.datasets.SBSAT().custom_read_kwargs,
+            },
+            (10, 5),
+            id='sbsat_dataset_example',
+        ),
+        pytest.param(
+            {
+                'file': 'tests/gaze/io/files/gazebase_example.csv',
+                'time_column': pm.datasets.GazeBase().time_column,
+                'position_columns': pm.datasets.GazeBase().position_columns,
+                **pm.datasets.GazeBase().custom_read_kwargs,
+            },
+            (10, 7),
+            id='gazebase_dataset_example',
+        ),
+        pytest.param(
+            {
+                'file': 'tests/gaze/io/files/gaze_on_faces_example.csv',
+                'time_column': pm.datasets.GazeOnFaces().time_column,
+                'pixel_columns': pm.datasets.GazeOnFaces().pixel_columns,
+                **pm.datasets.GazeOnFaces().custom_read_kwargs,
+            },
+            (10, 1),
+            id='gaze_on_faces_dataset_example',
+        ),
+        pytest.param(
+            {
+                'file': 'tests/gaze/io/files/gazebase_vr_example.csv',
+                'time_column': pm.datasets.GazeBaseVR().time_column,
+                'position_columns': pm.datasets.GazeBaseVR().position_columns,
+            },
+            (10, 11),
+            id='gazebase_vr_dataset_example',
+        ),
+        pytest.param(
+            {
+                'file': 'tests/gaze/io/files/judo1000_example.csv',
+                'time_column': pm.datasets.JuDo1000().time_column,
+                'pixel_columns': pm.datasets.JuDo1000().pixel_columns,
+                **pm.datasets.JuDo1000().custom_read_kwargs,
+            },
+            (10, 4),
+            id='judo1000_dataset_example',
+        ),
     ],
 )
 def test_shapes(kwargs, shape):
     gaze_dataframe = pm.gaze.from_csv(**kwargs)
-
     assert gaze_dataframe.frame.shape == shape

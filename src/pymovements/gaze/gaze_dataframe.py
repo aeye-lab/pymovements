@@ -244,7 +244,7 @@ class GazeDataFrame:
         Parameters
         ----------
         function: str
-            Name of the preprocessing method to apply.
+            Name of the preprocessing function to apply.
         kwargs:
             kwargs that will be forwarded when calling the preprocessing method.
         """
