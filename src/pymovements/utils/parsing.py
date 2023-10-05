@@ -108,7 +108,7 @@ def get_additional_columns(compiled_patterns: list[dict[str, Any]]) -> set[str]:
 
 
 def parse_eyelink(
-        filepath: Path,
+        filepath: Path | str,
         patterns: list | None = None,
         schema: dict | None = None,
 ) -> pl.DataFrame:

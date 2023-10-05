@@ -32,6 +32,7 @@ import pymovements as pm
         'csv_binocular',
         'ipc_monocular',
         'ipc_binocular',
+        'eyelink_monocular',
         'hbn',
         'sbsat',
         'gaze_on_faces',
@@ -61,6 +62,10 @@ def fixture_gaze_init_kwargs(request):
         'ipc_binocular': {
             'file': 'tests/files/binocular_example.feather',
             'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+        },
+        'eyelink_monocular': {
+            'file': 'tests/files/eyelink_monocular_example.asc',
+            'experiment': pm.datasets.ToyDatasetEyeLink().experiment,
         },
         'hbn': {
             'file': 'tests/files/hbn_example.csv',
@@ -114,6 +119,8 @@ def test_gaze_file_processing(gaze_from_kwargs):
         gaze = pm.gaze.from_csv(**gaze_from_kwargs)
     elif file_extension in {'.feather', '.ipc'}:
         gaze = pm.gaze.from_ipc(**gaze_from_kwargs)
+    elif file_extension == '.asc':
+        gaze = pm.gaze.from_eyelink_asc(**gaze_from_kwargs)
 
     assert gaze is not None
 

@@ -27,6 +27,7 @@ import polars as pl
 
 from pymovements.gaze import Experiment  # pylint: disable=cyclic-import
 from pymovements.gaze.gaze_dataframe import GazeDataFrame  # pylint: disable=cyclic-import
+from pymovements.utils.parsing import parse_eyelink
 
 
 def from_csv(
@@ -121,7 +122,7 @@ def from_csv(
 
     >>> from pymovements.gaze.io import from_csv
     >>> gaze = from_csv(
-    ...     file='tests/gaze/io/files/monocular_example.csv',
+    ...     file='tests/files/monocular_example.csv',
     ...     time_column = 'time',
     ...     pixel_columns = ['x_left_pix','y_left_pix'],)
     >>> gaze.frame
@@ -143,10 +144,10 @@ def from_csv(
     └──────┴───────────┘
 
     """
-    # read data
+    # Read data.
     gaze_data = pl.read_csv(file, **read_csv_kwargs)
 
-    # create gaze data frame
+    # Create gaze data frame.
     gaze_df = GazeDataFrame(
         gaze_data,
         experiment=experiment,
@@ -156,6 +157,67 @@ def from_csv(
         position_columns=position_columns,
         velocity_columns=velocity_columns,
         acceleration_columns=acceleration_columns,
+    )
+    return gaze_df
+
+
+def from_eyelink_asc(
+        file: str | Path,
+        *,
+        patterns: list | None = None,
+        schema: dict | None = None,
+        experiment: Experiment | None = None,
+) -> GazeDataFrame:
+    """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
+
+    Parameters
+    ----------
+    file:
+        Path of IPC/feather file.
+    patterns:
+        list of patterns to match for additional columns.
+    schema:
+        Dictionary to optionally specify types of columns parsed by patterns.
+    experiment : Experiment
+        The experiment definition.
+
+    Examples
+    --------
+    Let's assume we have an IPC file stored at `tests/gaze/io/files/monocular_example.feather`.
+    We can then load the data into a ``GazeDataFrame``:
+
+    >>> from pymovements.gaze.io import from_eyelink_asc
+    >>> gaze = from_eyelink_asc(
+    ...     file='tests/files/eyelink_monocular_example.asc',
+    ...     )
+    >>> gaze.frame
+    shape: (208, 3)
+    ┌─────────┬───────┬────────────────┐
+    │ time    ┆ pupil ┆ pixel          │
+    │ ---     ┆ ---   ┆ ---            │
+    │ i64     ┆ f64   ┆ list[f64]      │
+    ╞═════════╪═══════╪════════════════╡
+    │ 2154556 ┆ 778.0 ┆ [138.1, 132.8] │
+    │ 2154557 ┆ 778.0 ┆ [138.2, 132.7] │
+    │ 2154558 ┆ 778.0 ┆ [138.2, 132.3] │
+    │ 2154559 ┆ 778.0 ┆ [138.1, 131.9] │
+    │ …       ┆ …     ┆ …              │
+    │ 2339288 ┆ 619.0 ┆ [637.9, 531.8] │
+    │ 2339289 ┆ 618.0 ┆ [637.8, 531.6] │
+    │ 2339290 ┆ 618.0 ┆ [637.6, 531.4] │
+    │ 2339291 ┆ 618.0 ┆ [637.3, 531.2] │
+    └─────────┴───────┴────────────────┘
+
+    """
+    # Read data.
+    gaze_data = parse_eyelink(file, patterns=patterns, schema=schema)
+
+    # Create gaze data frame.
+    gaze_df = GazeDataFrame(
+        gaze_data,
+        experiment=experiment,
+        time_column='time',
+        pixel_columns=['x_pix', 'y_pix'],
     )
     return gaze_df
 
@@ -183,7 +245,7 @@ def from_ipc(
 
     >>> from pymovements.gaze.io import from_ipc
     >>> gaze = from_ipc(
-    ...     file='tests/gaze/io/files/monocular_example.feather',
+    ...     file='tests/files/monocular_example.feather',
     ...     )
     >>> gaze.frame
     shape: (10, 2)
@@ -204,10 +266,10 @@ def from_ipc(
     └──────┴───────────┘
 
     """
-    # read data
+    # Read data.
     gaze_data = pl.read_ipc(file, **read_ipc_kwargs)
 
-    # create gaze data frame
+    # Create gaze data frame.
     gaze_df = GazeDataFrame(
         gaze_data,
         experiment=experiment,
