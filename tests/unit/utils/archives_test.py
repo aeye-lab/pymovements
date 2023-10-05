@@ -243,9 +243,7 @@ def fixture_unsupported_archive(request, tmp_path):
         ),
     ],
 )
-def test_extract_archive_destination_path_None(
-        recursive, remove_finished, expected_files, archive, tmp_path,
-):
+def test_extract_archive_destination_path_None(recursive, remove_finished, expected_files, archive):
     extract_archive(
         source_path=archive,
         destination_path=None,
@@ -271,9 +269,7 @@ def test_extract_archive_destination_path_None(
         pytest.param(True, True, id='recursive_true_remove_finished_true'),
     ],
 )
-def test_extract_compressed_file_destination_path_None(
-        recursive, remove_finished, compressed_file, tmp_path,
-):
+def test_extract_compressed_file_destination_path_None(recursive, remove_finished, compressed_file):
     extract_archive(
         source_path=compressed_file,
         destination_path=None,

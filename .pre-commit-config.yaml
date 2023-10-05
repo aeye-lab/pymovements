@@ -134,6 +134,9 @@ repos:
         args:
           [
             '--output-format=parseable',
-            '--disable=missing-class-docstring,missing-function-docstring,protected-access',
+            '--disable=duplicate-code',
+            '--disable=missing-class-docstring',
+            '--disable=missing-function-docstring',
+            '--disable=protected-access',
             '--rcfile=pylintrc',
           ]
