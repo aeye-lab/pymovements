@@ -830,7 +830,7 @@ def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg)
     [
         pytest.param(
             {
-                'data': pl.DataFrame(schema={'d': pl.Float64,'x': pl.Float64, 'y': pl.Float64}),
+                'data': pl.DataFrame(schema={'d': pl.Float64, 'x': pl.Float64, 'y': pl.Float64}),
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
                 'pixel_columns': ['x', 'y'],
                 'distance_column': 'd',

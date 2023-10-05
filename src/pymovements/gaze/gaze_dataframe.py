@@ -21,10 +21,10 @@
 from __future__ import annotations
 
 import inspect
+import warnings
 from collections.abc import Callable
 from copy import deepcopy
 from typing import Any
-import warnings
 
 import numpy as np
 import polars as pl
