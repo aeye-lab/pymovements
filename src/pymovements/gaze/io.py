@@ -121,7 +121,7 @@ def from_csv(
 
     >>> from pymovements.gaze.io import from_csv
     >>> gaze = from_csv(
-    ...     file='tests/gaze/io/files/monocular_example.csv',
+    ...     file='tests/files/monocular_example.csv',
     ...     time_column = 'time',
     ...     pixel_columns = ['x_left_pix','y_left_pix'],)
     >>> gaze.frame
@@ -183,7 +183,7 @@ def from_ipc(
 
     >>> from pymovements.gaze.io import from_ipc
     >>> gaze = from_ipc(
-    ...     file='tests/gaze/io/files/monocular_example.feather',
+    ...     file='tests/files/monocular_example.feather',
     ...     )
     >>> gaze.frame
     shape: (10, 2)
