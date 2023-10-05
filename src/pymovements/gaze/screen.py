@@ -64,8 +64,8 @@ class Screen:
             height_px: int,
             width_cm: float,
             height_cm: float,
-            origin: str,
             distance_cm: float | None = None,
+            origin: str = 'lower left',
     ):
         """Initialize Screen.
 
@@ -103,14 +103,14 @@ class Screen:
         We can also access the screen boundaries in degrees of visual angle. This only works if the
         `distance_cm` attribute is specified.
 
-        >>> round(screen.x_min_dva)
-        -16
-        >>> round(screen.x_max_dva)
-        16
-        >>> round(screen.y_min_dva)
-        -12
-        >>> round(screen.y_max_dva)
-        12
+        >>> screen.x_min_dva# doctest:+ELLIPSIS
+        -15.59...
+        >>> screen.x_max_dva# doctest:+ELLIPSIS
+        15.59...
+        >>> screen.y_min_dva# doctest:+ELLIPSIS
+        -12.42...
+        >>> screen.y_max_dva# doctest:+ELLIPSIS
+        12.42...
 
         """
         checks.check_no_zeros(width_px, 'width_px')

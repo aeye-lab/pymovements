@@ -314,6 +314,7 @@ def from_pandas(
         in the input data frame. If specified, the column will be used for pixel to dva
         transformations. If not specified, the constant eye-to-screen distance will be taken from
         the experiment definition.
+
     Returns
     -------
     py:class:`~pymovements.GazeDataFrame`

@@ -82,7 +82,7 @@ def test_from_numpy_with_schema():
         screen_height_px=1024,
         screen_width_cm=38,
         screen_height_cm=30,
-        distance_cm=68,
+        distance_cm=None,
         origin='lower left',
         sampling_rate=1000.0,
     )
@@ -135,7 +135,7 @@ def test_from_numpy_explicit_columns():
         screen_height_px=1024,
         screen_width_cm=38,
         screen_height_cm=30,
-        distance_cm=68,
+        distance_cm=None,
         origin='lower left',
         sampling_rate=1000.0,
     )

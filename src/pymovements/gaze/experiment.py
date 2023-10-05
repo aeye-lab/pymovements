@@ -25,6 +25,7 @@ import numpy as np
 from pymovements.gaze import transforms_numpy
 from pymovements.gaze.screen import Screen
 from pymovements.utils import decorators
+from pymovements.utils import checks
 
 
 @decorators.auto_str
@@ -45,9 +46,9 @@ class Experiment:
             screen_height_px: int,
             screen_width_cm: float,
             screen_height_cm: float,
-            origin: str,
-            sampling_rate: float,
             distance_cm: float | None = None,
+            origin: str = 'lower left',
+            sampling_rate: float | None = None,
     ):
         """Initialize Experiment.
 
@@ -61,14 +62,14 @@ class Experiment:
             Screen width in centimeters
         screen_height_cm : float
             Screen height in centimeters
-        origin : str
-            Specifies the screen location of the origin of the pixel coordinate system.
-        sampling_rate : float
-            Sampling rate in Hz
         distance_cm : float | None
             Eye-to-screen distance in centimeters. If None, a `distance_column` must be provided
             in the `DatasetDefinition` or `GazeDataFrame`, which contains the eye-to-screen
             distance for each sample in millimeters.
+        origin : str
+            Specifies the screen location of the origin of the pixel coordinate system.
+        sampling_rate : float
+            Sampling rate in Hz
 
         Examples
         --------
@@ -89,14 +90,14 @@ class Experiment:
         :py:attr:`~pymovements.gaze.Screen` object. This only works if the
         `distance_cm` attribute is specified.
 
-        >>> round(experiment.screen.x_min_dva)
-        -16
-        >>> round(experiment.screen.x_max_dva)
-        16
-        >>> round(experiment.screen.y_min_dva)
-        -12
-        >>> round(experiment.screen.y_max_dva)
-        12
+        >>> experiment.screen.x_min_dva# doctest:+ELLIPSIS
+        -15.59...
+        >>> experiment.screen.x_max_dva# doctest:+ELLIPSIS
+        15.59...
+        >>> experiment.screen.y_min_dva# doctest:+ELLIPSIS
+        -12.42...
+        >>> experiment.screen.y_max_dva# doctest:+ELLIPSIS
+        12.42...
 
         """
         self.screen = Screen(
@@ -107,6 +108,12 @@ class Experiment:
             distance_cm=distance_cm,
             origin=origin,
         )
+
+        checks.check_is_not_none(sampling_rate=sampling_rate)
+        assert sampling_rate is not None
+
+        checks.check_is_greater_than_zero(sampling_rate=sampling_rate)
+
         self.sampling_rate = sampling_rate
 
     def pos2vel(

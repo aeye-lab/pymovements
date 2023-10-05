@@ -242,6 +242,7 @@ def pix2deg(
     elif isinstance(distance, str):
         # distance is a column name
         degree_components = [
+            # True division by 10 is needed to convert distance from mm to cm
             pl.arctan2(
                 centered_pixels.list.get(component),
                 pl.col(distance).truediv(10).mul(
