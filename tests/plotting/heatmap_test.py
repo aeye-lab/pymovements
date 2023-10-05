@@ -35,7 +35,7 @@ from pymovements.plotting import heatmap
 
 @pytest.fixture(name='experiment_fixture')
 def fixture_experiment():
-    return Experiment(1024, 768, 38, 30, 'center', 1000, 60)
+    return Experiment(1024, 768, 38, 30, 60, 'center', 1000)
 
 
 @pytest.fixture(name='args', params=['pix', 'pos'])

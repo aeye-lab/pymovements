@@ -115,9 +115,9 @@ class SBSAT(DatasetDefinition):
         screen_height_px=1024,
         screen_width_cm=42.4,
         screen_height_cm=44.5,
+        distance_cm=70,
         origin='center',
         sampling_rate=1000,
-        distance_cm=70,
     )
 
     filename_format: str = r'msd{subject_id:d}.csv'

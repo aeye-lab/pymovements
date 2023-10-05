@@ -77,13 +77,13 @@ class Experiment:
         ...     screen_height_px=1024,
         ...     screen_width_cm=38,
         ...     screen_height_cm=30,
+        ...     distance_cm=68,
         ...     origin='lower left',
         ...     sampling_rate=1000.0,
-        ...     distance_cm=68,
         ... )
         >>> print(experiment)
-        Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38, height_cm=30,
-        distance_cm=68, origin=lower left), sampling_rate=1000.00)
+        Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38,
+        height_cm=30, distance_cm=68, origin=lower left), sampling_rate=1000.00)
 
         We can also access the screen boundaries in degrees of visual angle via the
         :py:attr:`~pymovements.gaze.Screen` object. This only works if the
@@ -104,8 +104,8 @@ class Experiment:
             height_px=screen_height_px,
             width_cm=screen_width_cm,
             height_cm=screen_height_cm,
-            origin=origin,
             distance_cm=distance_cm,
+            origin=origin,
         )
         self.sampling_rate = sampling_rate
 
@@ -147,9 +147,9 @@ class Experiment:
         ...     screen_height_px=1024,
         ...     screen_width_cm=38,
         ...     screen_height_cm=30,
+        ...     distance_cm=68,
         ...     origin='lower left',
         ...     sampling_rate=1000.0,
-        ...     distance_cm=68,
         ... )
         >>> arr = [[0., 0.], [1., 1.], [2., 2.], [3., 3.], [4., 4.], [5., 5.]]
         >>> experiment.pos2vel(
