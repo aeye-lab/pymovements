@@ -826,6 +826,35 @@ def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg)
 
 
 @pytest.mark.parametrize(
+    ('init_kwargs', 'warning', 'expected_msg'),
+    [
+        pytest.param(
+            {
+                'data': pl.DataFrame(schema={'d': pl.Float64,'x': pl.Float64, 'y': pl.Float64}),
+                'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+                'pixel_columns': ['x', 'y'],
+                'distance_column': 'd',
+            },
+            UserWarning,
+            "Both a distance column and experiment's "
+            'eye-to-screen distance are specified. '
+            'Using eye-to-screen distances from column '
+            "'distance' in the dataframe.",
+            id='both_distance_column_and_experiment_distance',
+        ),
+    ],
+)
+def test_gaze_dataframe_pix2deg_warnings(init_kwargs, warning, expected_msg):
+    gaze_df = pm.GazeDataFrame(**init_kwargs)
+
+    with pytest.warns(warning) as excinfo:
+        gaze_df.pix2deg()
+
+    msg = excinfo[0].message.args[0]
+    assert expected_msg == msg
+
+
+@pytest.mark.parametrize(
     ('data', 'position_columns'),
     [
         pytest.param(
