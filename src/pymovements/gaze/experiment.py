@@ -24,8 +24,8 @@ import numpy as np
 
 from pymovements.gaze import transforms_numpy
 from pymovements.gaze.screen import Screen
-from pymovements.utils import decorators
 from pymovements.utils import checks
+from pymovements.utils import decorators
 
 
 @decorators.auto_str
