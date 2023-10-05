@@ -645,11 +645,3 @@ def test_pix2deg_distance_as_colum_returns(kwargs, data, expected_df):
 @pytest.fixture(params=[True, False], ids=['column_distance', 'scalar_distance'])
 def distance_as_column(request):
     return request.param
-
-
-def test__arctan2_helper():
-    x1 = 2
-    x2 = 100
-
-    f = pm.gaze.transforms._arctan2_helper(x2)
-    assert np.allclose(f(x1), np.arctan2(x1, x2))
