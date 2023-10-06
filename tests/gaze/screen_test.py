@@ -45,7 +45,4 @@ def test_screen_pix2deg_with_no_distance_cm():
 
 def test_screen_pix2deg_with_distance_cm():
     screen = pm.Screen(1920, 1080, 30, 20, 60, 'lower left')
-    try:
-        screen.pix2deg([[0, 0]])
-    except ValueError:
-        pytest.fail()
+    screen.pix2deg([[0, 0]])
