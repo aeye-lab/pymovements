@@ -190,7 +190,7 @@ def from_asc(
 
     Examples
     --------
-    Let's assume we have an IPC file stored at `tests/files/monocular_example.feather`.
+    Let's assume we have an EyeLink asc file stored at `tests/files/eyelink_monocular_example.asc`.
     We can then load the data into a ``GazeDataFrame``:
 
     >>> from pymovements.gaze.io import from_asc
