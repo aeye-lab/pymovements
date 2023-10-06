@@ -78,7 +78,17 @@ def from_csv(
         the column will be used for pixel to dva transformations. If not specified, the
         constant eye-to-screen distance will be taken from the experiment definition.
     **read_csv_kwargs:
-            Additional keyword arguments to be passed to polars to read in the csv.
+        Additional keyword arguments to be passed to :py:func:`polars.read_csv` to read in the csv.
+
+        For example, if you want to read a csv file with a custom separator, you can pass
+        `read_csv_kwargs={'sep': ';'}`. If you want to read just a subset of columns, you can
+        pass `read_csv_kwargs={'columns': ['col1', 'col2']}`.
+
+        When reading `.csv` files it may be nessesary to specify the `dtype` of the columns as
+        :py:func:`polars.read_csv` will try to infer by only a fixed number of rows. This
+        can be done by passing a dictionary to `custom_read_kwargs` with the column names as keys
+        and the respective datatypes as values.
+        For example: `read_csv_kwargs={'dtypes': {'col1': 'Int64', 'col2': 'Float64'}}`
 
     Notes
     -----
