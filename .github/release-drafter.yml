@@ -1,0 +1,73 @@
+name-template: pymovements $RESOLVED_VERSION
+
+version-resolver:
+  minor:
+    labels:
+      - deprecation
+      - enhancement
+      - breaking
+  default: patch
+
+categories:
+  - title: 🏆 Highlights
+    labels: highlight
+  - title: 💥 Breaking Changes
+    labels: breaking
+  - title: ⚠️ Deprecations
+    labels: deprecation
+  - title: ✨ Enhancements
+    labels: enhancement
+  - title: 🐞 Bug Fixes
+    labels: fix
+  - title: 🛠️ Maintenance
+    labels:
+      - build
+      - internal
+      - docs
+
+exclude-labels:
+  - skip changelog
+
+exclude-contributors:
+  - dependabot
+  - pre-commit-ci
+
+change-template: '- $TITLE (#$NUMBER)'
+change-title-escapes: '\<*_&'
+replacers:
+  # Remove conventional commits from titles
+  - search: '/- (build|chore|ci|depr|docs|feat|fix|perf|refactor|release|test)(\(.*\))?(\!)?\: /g'
+    replace: '- '
+
+autolabeler:
+  - label: breaking
+    title:
+      # Example: feat!: ...
+      - '/^(build|chore|ci|depr|docs|feat|fix|perf|refactor|release|test)(\(.*\))?\!\: /'
+  - label: build
+    title:
+      - '/^build/'
+  - label: internal
+    title:
+      - '/^(chore|ci|perf|refactor|test)/'
+  - label: deprecation
+    title:
+      - '/^depr/'
+  - label: documentation
+    title:
+      - '/^docs/'
+  - label: enhancement
+    title:
+      - '/^feat/'
+  - label: fix
+    title:
+      - '/^fix/'
+  - label: release
+    title:
+      - '/^release/'
+
+template: |
+  $CHANGES
+
+  Shoutout to all our contributors for making this release possible!
+  $CONTRIBUTORS
