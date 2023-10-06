@@ -42,6 +42,7 @@ def from_numpy(
         position: np.ndarray | None = None,
         velocity: np.ndarray | None = None,
         acceleration: np.ndarray | None = None,
+        distance: np.ndarray | None = None,
         schema: list[str] | None = None,
         orient: Literal['col', 'row'] = 'col',
         time_column: str | None = None,
@@ -49,6 +50,7 @@ def from_numpy(
         position_columns: list[str] | None = None,
         velocity_columns: list[str] | None = None,
         acceleration_columns: list[str] | None = None,
+        distance_column: str | None = None,
 ) -> GazeDataFrame:
     """Get a :py:class:`~pymovements.gaze.gaze_dataframe.GazeDataFrame` from a numpy array.
 
@@ -80,6 +82,8 @@ def from_numpy(
         Array of gaze velocities in degrees of visual angle per second.
     acceleration:
         Array of gaze accelerations in degrees of visual angle per square second.
+    distance:
+        Array of eye-to-screen distances in millimiters.
     schema:
         A list of column names.
     orient:
@@ -94,6 +98,11 @@ def from_numpy(
         The name of the dva velocity columns in the input data frame.
     acceleration_columns:
         The name of the dva acceleration columns in the input data frame.
+    distance_column:
+        The name of the column containing eye-to-screen distance in millimiters for each sample
+        in the input data frame. If specified, the column will be used for pixel to dva
+        transformations. If not specified, the constant eye-to-screen distance will be taken from
+        the experiment definition.
 
     Returns
     -------
@@ -198,6 +207,7 @@ def from_numpy(
     checks.check_is_mutual_exclusive(data=data, position=position)
     checks.check_is_mutual_exclusive(data=data, velocity=velocity)
     checks.check_is_mutual_exclusive(data=data, acceleration=acceleration)
+    checks.check_is_mutual_exclusive(data=data, distance=distance)
 
     if data is not None:
         df = pl.from_numpy(data=data, schema=schema, orient=orient)
@@ -210,6 +220,7 @@ def from_numpy(
             position_columns=position_columns,
             velocity_columns=velocity_columns,
             acceleration_columns=acceleration_columns,
+            distance_column=distance_column,
         )
 
     # Initialize with an empty DataFrame, as every column specifier could be None.
@@ -246,6 +257,12 @@ def from_numpy(
         dfs.append(df)
         acceleration_columns = df.columns
 
+    distance_column = None
+    if distance is not None:
+        df = pl.from_numpy(data=distance, schema=['distance'], orient=orient)
+        dfs.append(df)
+        distance_column = 'distance'
+
     df = pl.concat(dfs, how='horizontal')
     return GazeDataFrame(
         data=df,
@@ -256,6 +273,7 @@ def from_numpy(
         position_columns=position_columns,
         velocity_columns=velocity_columns,
         acceleration_columns=acceleration_columns,
+        distance_column=distance_column,
     )
 
 
@@ -269,6 +287,7 @@ def from_pandas(
         position_columns: list[str] | None = None,
         velocity_columns: list[str] | None = None,
         acceleration_columns: list[str] | None = None,
+        distance_column: str | None = None,
 ) -> GazeDataFrame:
     """Get a :py:class:`~pymovements.gaze.gaze_dataframe.GazeDataFrame` from a pandas DataFrame.
 
@@ -290,6 +309,11 @@ def from_pandas(
         The name of the dva velocity columns in the input data frame.
     acceleration_columns:
         The name of the dva acceleration columns in the input data frame.
+    distance_column:
+        The name of the column containing eye-to-screen distance in millimeters for each sample
+        in the input data frame. If specified, the column will be used for pixel to dva
+        transformations. If not specified, the constant eye-to-screen distance will be taken from
+        the experiment definition.
 
     Returns
     -------
@@ -305,4 +329,5 @@ def from_pandas(
         position_columns=position_columns,
         velocity_columns=velocity_columns,
         acceleration_columns=acceleration_columns,
+        distance_column=distance_column,
     )

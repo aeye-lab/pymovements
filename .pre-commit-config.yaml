@@ -7,6 +7,8 @@ ci:
     autoupdate_commit_msg: 'ci: pre-commit autoupdate'
     skip: [pylint]
 
+default_stages: [push]
+
 repos:
 -   repo: https://github.com/asottile/add-trailing-comma
     rev: v3.1.0

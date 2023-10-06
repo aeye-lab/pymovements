@@ -127,13 +127,46 @@ We use [`flake8`](https://pypi.org/project/flake8/) for quick style checks and
 [`pylint`](https://pypi.org/project/pylint/) for thorough style checks and [`mypy`](
 https://pypi.org/project/mypy/) for checking type annotations.
 
-You can check your code style by using [pre-commit](https://www.pre-commit.com). You can install `pre-commit` via pip:
+You can check your code style by using [pre-commit](https://www.pre-commit.com).
+You can install `pre-commit` via pip:
 
 ```bash
 pip install pre-commit
 pip install pylint
-pre-commit install
 ```
+
+To always run style checks when pushing commits upstream you can register a pre-push hook by
+```bash
+pre-commit install --hook-type pre-push
+```
+
+If you want to run pre-commit for all your currently staged files simply use
+```bash
+pre-commit
+```
+You can find the names of all defined hooks in the file `.pre-commit-config.yaml`.
+
+If you want to run a specific hook you can use
+```bash
+pre-commit run mypy
+pre-commit run pydocstyle
+```
+
+If you want to run a specific hook on a single file you can use
+```bash
+pre-commit run mypy --files src/pymovements/gaze/transforms.py
+```
+
+If you want to run all hooks on all git repository files use
+```bash
+pre-commit run -a
+```
+
+For running a specific hook on all git repository files use
+```bash
+pre-commit run mypy -a
+```
+
 
 ### Testing
 
@@ -145,7 +178,7 @@ If you have not yet installed `tox` you can do so via
 pip install tox
 ```
 
-A full style check and all tests can be run by simply calling `tox` in the repository root.
+You can run all tests on all supported python versions run by simply calling `tox` in the repository root.
 ```bash
 tox
 ```
@@ -176,7 +209,9 @@ You can build the documentation locally using the respective tox environment:
 tox -e docs
 ```
 It will appear in the `build/docs` directory.
-Please note that in order to reproduce the documentation locally, you may need to install `pandoc`. If necessary, please refer to the [installation guide](https://pandoc.org/installing.html) for detailed instructions.
+Please note that in order to reproduce the documentation locally, you may need to install `pandoc`.
+If necessary, please refer to the [installation guide](https://pandoc.org/installing.html) for
+detailed instructions.
 
 To rebuild the full documentation use
 ```bash
