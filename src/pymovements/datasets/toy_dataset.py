@@ -22,6 +22,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from dataclasses import field
+from typing import Any
+
+import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import register_dataset
@@ -132,8 +135,16 @@ class ToyDataset(DatasetDefinition):
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 
-    custom_read_kwargs: dict[str, str] = field(
+    custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
+            'columns': ['timestamp', 'x', 'y', 'stimuli_x', 'stimuli_y'],
+            'dtypes': {
+                'timestamp': pl.Int64,
+                'x': pl.Float32,
+                'y': pl.Float32,
+                'stimuli_x': pl.Float32,
+                'stimuli_y': pl.Float32,
+            },
             'separator': '\t',
             'null_values': '-32768.00',
         },

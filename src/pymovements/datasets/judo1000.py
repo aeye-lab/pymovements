@@ -152,7 +152,7 @@ class JuDo1000(DatasetDefinition):
             'dtypes': {
                 'trialId': pl.Int32,
                 'pointId': pl.Int32,
-                'time': pl.Int32,
+                'time': pl.Int64,
                 'x_left': pl.Float32,
                 'y_left': pl.Float32,
                 'x_right': pl.Float32,

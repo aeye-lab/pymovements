@@ -160,7 +160,7 @@ class GazeBase(DatasetDefinition):
         default_factory=lambda: {
             'null_values': 'NaN',
             'dtypes': {
-                'n': pl.Int32,
+                'n': pl.Int64,
                 'x': pl.Float32,
                 'y': pl.Float32,
                 'val': pl.Int32,
