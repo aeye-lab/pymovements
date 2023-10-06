@@ -142,7 +142,7 @@ pre-commit install --hook-type pre-push
 
 If you want to run pre-commit for all your staged files use
 ```bash
-pre-commit run --all-files
+pre-commit run -a
 ```
 
 
