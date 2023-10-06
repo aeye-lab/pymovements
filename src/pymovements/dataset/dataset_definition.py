@@ -92,17 +92,17 @@ class DatasetDefinition:
         nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
         column will not be created.
 
-    position_columns:
+    position_columns: list[str] | None
         The name of the dva position columns in the input data frame. These columns will be
         nested into the column ``position``. If the list is empty or None, the nested
         ``position`` column will not be created.
 
-    velocity_columns:
+    velocity_columns: list[str] | None
         The name of the velocity columns in the input data frame. These columns will be nested
         into the column ``velocity``. If the list is empty or None, the nested ``velocity``
         column will not be created.
 
-    acceleration_columns:
+    acceleration_columns: list[str] | None
         The name of the acceleration columns in the input data frame. These columns will be
         nested into the column ``acceleration``. If the list is empty or None, the nested
         ``acceleration`` column will not be created.
