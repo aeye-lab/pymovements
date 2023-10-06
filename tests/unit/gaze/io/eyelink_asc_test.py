@@ -30,7 +30,7 @@ import pymovements as pm
             {
                 'file': 'tests/files/eyelink_monocular_example.asc',
             },
-            (10, 2),
+            (16, 3),
             id='eyelink_asc_mono',
         ),
     ],
