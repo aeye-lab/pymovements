@@ -110,10 +110,12 @@ def main_sequence_plot(
         alpha=alpha,
         s=marker_size,
         marker=marker,
-        **kwargs,
+        # to handle after  https://github.com/pydata/xarray/pull/8030 is merged
+        **kwargs,  # type: ignore
     )
 
-    plt.title(title)
+    if title:
+        plt.title(title)
     plt.xlabel('Amplitude [dva]')
     plt.ylabel('Peak Velocity [dva/s]')
 

@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import inspect
+import warnings
 from collections.abc import Callable
 from copy import deepcopy
 from typing import Any
@@ -89,6 +90,7 @@ class GazeDataFrame:
             position_columns: list[str] | None = None,
             velocity_columns: list[str] | None = None,
             acceleration_columns: list[str] | None = None,
+            distance_column: str | None = None,
     ):
         """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
 
@@ -123,6 +125,11 @@ class GazeDataFrame:
             The name of the acceleration columns in the input data frame. These columns will be
             nested into the column ``acceleration``. If the list is empty or None, the nested
             ``acceleration`` column will not be created.
+        distance_column:
+            The name of the column containing eye-to-screen distance in millimeters for each sample
+            in the input data frame. If specified, the column will be used for pixel to dva
+            transformations. If not specified, the constant eye-to-screen distance will be taken
+            from the experiment definition.
 
         Notes
         -----
@@ -192,6 +199,9 @@ class GazeDataFrame:
         if time_column is not None:
             self.frame = self.frame.rename({time_column: 'time'})
 
+        if distance_column is not None:
+            self.frame = self.frame.rename({distance_column: 'distance'})
+
         # List of passed not-None column specifier lists.
         # The list will be used for inferring n_components.
         column_specifiers: list[list[str]] = []
@@ -234,7 +244,7 @@ class GazeDataFrame:
         Parameters
         ----------
         function: str
-            Name of the preprocessing method to apply.
+            Name of the preprocessing function to apply.
         kwargs:
             kwargs that will be forwarded when calling the preprocessing method.
         """
@@ -286,7 +296,24 @@ class GazeDataFrame:
             if 'distance' in method_kwargs and 'distance' not in kwargs:
                 self._check_experiment()
                 assert self.experiment is not None
-                kwargs['distance'] = self.experiment.screen.distance_cm
+
+                if 'distance' in self.frame.columns:
+                    kwargs['distance'] = 'distance'
+
+                    if self.experiment.screen.distance_cm:
+                        warnings.warn(
+                            "Both a distance column and experiment's "
+                            'eye-to-screen distance are specified. '
+                            'Using eye-to-screen distances from column '
+                            "'distance' in the dataframe.",
+                        )
+                elif self.experiment.screen.distance_cm:
+                    kwargs['distance'] = self.experiment.screen.distance_cm
+                else:
+                    raise AttributeError(
+                        'Neither eye-to-screen distance is in the columns of the dataframe '
+                        'nor experiment eye-to-screen distance is specified.',
+                    )
 
             if 'sampling_rate' in method_kwargs and 'sampling_rate' not in kwargs:
                 self._check_experiment()
@@ -404,6 +431,52 @@ class GazeDataFrame:
             if experiment is None.
         """
         self.transform('pos2vel', method=method, **kwargs)
+
+    def smooth(
+            self,
+            method: str = 'savitzky_golay',
+            window_length: int = 7,
+            degree: int = 2,
+            column: str = 'position',
+            padding: str | float | int | None = 'nearest',
+            **kwargs: int | float | str,
+    ) -> None:
+        """Smooth data in a column.
+
+        Parameters
+        ----------
+        method:
+            The method to use for smoothing. Choose from ``savitzky_golay``, ``moving_average``,
+            ``exponential_moving_average``. See :func:`~transforms.smooth()` for details.
+        window_length:
+            For ``moving_average`` this is the window size to calculate the mean of the subsequent
+            samples. For ``savitzky_golay`` this is the window size to use for the polynomial fit.
+            For ``exponential_moving_average`` this is the span parameter.
+        degree:
+            The degree of the polynomial to use. This has only an effect if using
+            ``savitzky_golay`` as smoothing method. `degree` must be less than `window_length`.
+        column:
+            The input column name to which the smoothing is applied.
+        padding:
+            Must be either ``None``, a scalar or one of the strings
+            ``mirror``, ``nearest`` or ``wrap``.
+            This determines the type of extension to use for the padded signal to
+            which the filter is applied.
+            When passing ``None``, no extension padding is used.
+            When passing a scalar value, data will be padded using the passed value.
+            See :func:`~transforms.smooth()` for details on the padding methods.
+        **kwargs:
+            Additional keyword arguments to be passed to the :func:`~transforms.smooth()` method.
+        """
+        self.transform(
+            'smooth',
+            column=column,
+            method=method,
+            degree=degree,
+            window_length=window_length,
+            padding=padding,
+            **kwargs,
+        )
 
     def detect(
             self,

@@ -32,7 +32,9 @@ import pymovements as pm
         pytest.param(pm.datasets.GazeBase, 'GazeBase', id='GazeBase'),
         pytest.param(pm.datasets.GazeBaseVR, 'GazeBaseVR', id='GazeBaseVR'),
         pytest.param(pm.datasets.GazeOnFaces, 'GazeOnFaces', id='GazeOnFaces'),
+        pytest.param(pm.datasets.HBN, 'HBN', id='HBN'),
         pytest.param(pm.datasets.JuDo1000, 'JuDo1000', id='JuDo1000'),
+        pytest.param(pm.datasets.SBSAT, 'SBSAT', id='SBSAT'),
     ],
 )
 def test_public_dataset_registered(definition_class, dataset_name):
@@ -48,7 +50,9 @@ def test_public_dataset_registered(definition_class, dataset_name):
         pytest.param(pm.datasets.GazeBase, id='GazeBase'),
         pytest.param(pm.datasets.GazeBaseVR, id='GazeBaseVR'),
         pytest.param(pm.datasets.GazeOnFaces, id='GazeOnFaces'),
+        pytest.param(pm.datasets.HBN, id='HBN'),
         pytest.param(pm.datasets.JuDo1000, id='JuDo1000'),
+        pytest.param(pm.datasets.SBSAT, id='SBSAT'),
     ],
 )
 def test_public_dataset_registered_correct_attributes(dataset_definition_class):

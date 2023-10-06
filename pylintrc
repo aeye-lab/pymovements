@@ -54,7 +54,7 @@ unsafe-load-any-extension=no
 extension-pkg-allow-list=
 
 # Minimum supported python version
-py-version = 3.8.0
+py-version = 3.9.0
 
 # Control the amount of potential inferred values when inferring a single
 # object. This can help the performance when dealing with large functions or
@@ -520,7 +520,7 @@ overgeneral-exceptions=builtins.Exception
 # **exclusively** for type checking of an application, you're probably fine.
 # For libraries, evaluate if some users what to access the type hints at
 # runtime first, e.g., through ``typing.get_type_hints``. Applies to Python
-# versions 3.8 - 3.10
+# versions 3.9 - 3.11
 runtime-typing = no
 
 

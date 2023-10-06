@@ -68,9 +68,15 @@ class DatasetDefinition:
         For example, if you want to read a csv file with a custom separator, you can pass
         `custom_read_kwargs={'sep': ';'}`. If you want to read just a subset of columns, you can
         pass `custom_read_kwargs={'columns': ['col1', 'col2']}`.
-        
+
     column_map : dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
+
+    distance_column : str | None
+        The name of the column containing eye-to-screen distance in millimeters for each sample
+        in the input data frame. If specified, the column will be used for pixel to dva
+        transformations. If not specified, the constant eye-to-screen distance will be taken from
+        the experiment definition.
     """
 
     # pylint: disable=too-many-instance-attributes
@@ -96,3 +102,4 @@ class DatasetDefinition:
     position_columns: list[str] | None = None
     velocity_columns: list[str] | None = None
     acceleration_columns: list[str] | None = None
+    distance_column: str | None = None

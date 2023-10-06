@@ -17,48 +17,32 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module holds all dataset definitions.
+"""Test for Screen class."""
+import pytest
 
-.. rubric:: Dataset Definitions
-
-.. autosummary::
-   :toctree:
-   :template: class.rst
-
-    pymovements.datasets.GazeBase
-    pymovements.datasets.GazeBaseVR
-    pymovements.datasets.GazeOnFaces
-    pymovements.datasets.HBN
-    pymovements.datasets.JuDo1000
-    pymovements.datasets.SBSAT
+import pymovements as pm
 
 
-.. rubric:: Example Datasets
-
-.. autosummary::
-   :toctree:
-   :template: class.rst
-
-    pymovements.datasets.ToyDataset
-    pymovements.datasets.ToyDatasetEyeLink
-"""
-from pymovements.datasets.gaze_on_faces import GazeOnFaces
-from pymovements.datasets.gazebase import GazeBase
-from pymovements.datasets.gazebasevr import GazeBaseVR
-from pymovements.datasets.hbn import HBN
-from pymovements.datasets.judo1000 import JuDo1000
-from pymovements.datasets.sb_sat import SBSAT
-from pymovements.datasets.toy_dataset import ToyDataset
-from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
+@pytest.mark.parametrize('property_name', ['x_max_dva', 'y_max_dva', 'x_min_dva', 'y_min_dva'])
+def test_dva_properties_with_no_distance_cm(property_name):
+    screen = pm.Screen(1920, 1080, 30, 20, None, 'lower left')
+    with pytest.raises(ValueError):
+        getattr(screen, property_name)
 
 
-__all__ = [
-    'GazeBase',
-    'GazeBaseVR',
-    'GazeOnFaces',
-    'HBN',
-    'JuDo1000',
-    'SBSAT',
-    'ToyDataset',
-    'ToyDatasetEyeLink',
-]
+@pytest.mark.parametrize('property_name', ['x_max_dva', 'y_max_dva', 'x_min_dva', 'y_min_dva'])
+def test_dva_properties_with_distance_cm(property_name):
+    screen = pm.Screen(1920, 1080, 30, 20, 60, 'lower left')
+
+    getattr(screen, property_name)
+
+
+def test_screen_pix2deg_with_no_distance_cm():
+    screen = pm.Screen(1920, 1080, 30, 20, None, 'lower left')
+    with pytest.raises(ValueError):
+        screen.pix2deg([[0, 0]])
+
+
+def test_screen_pix2deg_with_distance_cm():
+    screen = pm.Screen(1920, 1080, 30, 20, 60, 'lower left')
+    screen.pix2deg([[0, 0]])
