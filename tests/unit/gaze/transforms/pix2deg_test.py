@@ -501,6 +501,13 @@ def test_pix2deg_raises_error(kwargs, series, exception, msg_substrings):
         ),
     ],
 )
+@pytest.mark.parametrize(
+    'distance_as_column',
+    [
+        pytest.param(True, id='column_distance'),
+        pytest.param(False, id='scalar_distance'),
+    ],
+)
 def test_pix2deg_returns(kwargs, series, expected_df, distance_as_column):
     df = series.to_frame().clone()
     kwargs = kwargs.copy()
@@ -640,8 +647,3 @@ def test_pix2deg_distance_as_colum_returns(kwargs, data, expected_df):
     )
 
     assert_frame_equal(result_df, expected_df.to_frame())
-
-
-@pytest.fixture(params=[True, False], ids=['column_distance', 'scalar_distance'])
-def distance_as_column(request):
-    return request.param

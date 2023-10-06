@@ -28,14 +28,14 @@ import pymovements as pm
     [
         pytest.param(
             {
-                'file': 'tests/gaze/io/files/monocular_example.feather',
+                'file': 'tests/files/monocular_example.feather',
             },
             (10, 2),
             id='feather_mono_shape',
         ),
         pytest.param(
             {
-                'file': 'tests/gaze/io/files/binocular_example.feather',
+                'file': 'tests/files/binocular_example.feather',
             },
             (10, 3),
             id='feather_bino_shape',
