@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test basic preprocessing on all registered public datasets."""
+import shutil
+
 import pytest
 
 import pymovements as pm
@@ -46,3 +48,5 @@ def test_public_dataset_processing(dataset_name, tmp_path):
         assert 'position' in gaze.columns
         assert 'velocity' in gaze.columns
         assert 'acceleration' in gaze.columns
+
+    shutil.rmtree(dataset_path, ignore_errors=True)
