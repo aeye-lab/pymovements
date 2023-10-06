@@ -103,7 +103,7 @@ def from_csv(
 
     Examples
     --------
-    First let's assume a CSV file stored `tests/gaze/io/files/monocular_example.csv`
+    First let's assume a CSV file stored `tests/files/monocular_example.csv`
     with the following content:
     shape: (10, 3)
     ┌──────┬────────────┬────────────┐
@@ -167,10 +167,10 @@ def from_csv(
     return gaze_df
 
 
-def from_eyelink_asc(
+def from_asc(
         file: str | Path,
         *,
-        patterns: list | None = None,
+        patterns: str | list | None = 'eyelink',
         schema: dict | None = None,
         experiment: Experiment | None = None,
 ) -> GazeDataFrame:
@@ -181,7 +181,8 @@ def from_eyelink_asc(
     file:
         Path of IPC/feather file.
     patterns:
-        list of patterns to match for additional columns.
+        list of patterns to match for additional columns or a key identifier of eye tracker specific
+        default patterns. Supported values are: eyelink.
     schema:
         Dictionary to optionally specify types of columns parsed by patterns.
     experiment : Experiment
@@ -189,13 +190,11 @@ def from_eyelink_asc(
 
     Examples
     --------
-    Let's assume we have an IPC file stored at `tests/gaze/io/files/monocular_example.feather`.
+    Let's assume we have an IPC file stored at `tests/files/monocular_example.feather`.
     We can then load the data into a ``GazeDataFrame``:
 
-    >>> from pymovements.gaze.io import from_eyelink_asc
-    >>> gaze = from_eyelink_asc(
-    ...     file='tests/files/eyelink_monocular_example.asc',
-    ...     )
+    >>> from pymovements.gaze.io import from_asc
+    >>> gaze = from_asc(file='tests/files/eyelink_monocular_example.asc', patterns='eyelink')
     >>> gaze.frame
     shape: (16, 3)
     ┌─────────┬───────┬────────────────┐
@@ -215,6 +214,13 @@ def from_eyelink_asc(
     └─────────┴───────┴────────────────┘
 
     """
+    if isinstance(patterns, str):
+        if patterns == 'eyelink':
+            # We use the default patterns of parse_eyelink then.
+            patterns = None
+        else:
+            raise ValueError(f"unknown pattern key '{patterns}'. Supported keys are: eyelink")
+
     # Read data.
     gaze_data = parse_eyelink(file, patterns=patterns, schema=schema)
 
@@ -246,13 +252,11 @@ def from_ipc(
 
     Examples
     --------
-    Let's assume we have an IPC file stored at `tests/gaze/io/files/monocular_example.feather`.
+    Let's assume we have an IPC file stored at `tests/files/monocular_example.feather`.
     We can then load the data into a ``GazeDataFrame``:
 
     >>> from pymovements.gaze.io import from_ipc
-    >>> gaze = from_ipc(
-    ...     file='tests/files/monocular_example.feather',
-    ...     )
+    >>> gaze = from_ipc(file='tests/files/monocular_example.feather')
     >>> gaze.frame
     shape: (10, 2)
     ┌──────┬───────────┐
