@@ -62,6 +62,7 @@ def test_from_numpy_with_schema():
     array = np.array(
         [
             [101, 102, 103, 104],
+            [100, 100, 100, 100],
             [0, 1, 2, 3],
             [4, 5, 6, 7],
             [9, 8, 7, 6],
@@ -74,14 +75,14 @@ def test_from_numpy_with_schema():
         dtype=np.float64,
     )
 
-    schema = ['t', 'x_pix', 'y_pix', 'x_pos', 'y_pos', 'x_vel', 'y_vel', 'x_acc', 'y_acc']
+    schema = ['t', 'd', 'x_pix', 'y_pix', 'x_pos', 'y_pos', 'x_vel', 'y_vel', 'x_acc', 'y_acc']
 
     experiment = pm.Experiment(
         screen_width_px=1280,
         screen_height_px=1024,
         screen_width_cm=38,
         screen_height_cm=30,
-        distance_cm=68,
+        distance_cm=None,
         origin='lower left',
         sampling_rate=1000.0,
     )
@@ -91,6 +92,7 @@ def test_from_numpy_with_schema():
         schema=schema,
         experiment=experiment,
         time_column='t',
+        distance_column='d',
         pixel_columns=['x_pix', 'y_pix'],
         position_columns=['x_pos', 'y_pos'],
         velocity_columns=['x_vel', 'y_vel'],
@@ -100,6 +102,7 @@ def test_from_numpy_with_schema():
     expected = pl.DataFrame(
         {
             'time': [101, 102, 103, 104],
+            'distance': [100, 100, 100, 100],
             'pixel': [[0, 4], [1, 5], [2, 6], [3, 7]],
             'position': [[9, 5], [8, 4], [7, 3], [6, 2]],
             'velocity': [[1, 5], [2, 6], [3, 7], [4, 8]],
@@ -107,6 +110,7 @@ def test_from_numpy_with_schema():
         },
         schema={
             'time': pl.Float64,
+            'distance': pl.Float64,
             'pixel': pl.List(pl.Float64),
             'position': pl.List(pl.Float64),
             'velocity': pl.List(pl.Float64),
@@ -120,6 +124,7 @@ def test_from_numpy_with_schema():
 
 def test_from_numpy_explicit_columns():
     time = np.array([101, 102, 103, 104], dtype=np.int64)
+    distance = np.array([100, 100, 100, 100], dtype=np.float64)
     pixel = np.array([[0, 1, 2, 3], [4, 5, 6, 7]], dtype=np.int64)
     position = np.array([[9, 8, 7, 6], [5, 4, 3, 2]], dtype=np.float64)
     velocity = np.array([[1, 2, 3, 4], [5, 6, 7, 8]], dtype=np.float64)
@@ -130,13 +135,14 @@ def test_from_numpy_explicit_columns():
         screen_height_px=1024,
         screen_width_cm=38,
         screen_height_cm=30,
-        distance_cm=68,
+        distance_cm=None,
         origin='lower left',
         sampling_rate=1000.0,
     )
 
     gaze = pm.gaze.from_numpy(
         time=time,
+        distance=distance,
         pixel=pixel,
         position=position,
         velocity=velocity,
@@ -147,6 +153,7 @@ def test_from_numpy_explicit_columns():
     expected = pl.DataFrame(
         {
             'time': [101, 102, 103, 104],
+            'distance': [100, 100, 100, 100],
             'pixel': [[0, 4], [1, 5], [2, 6], [3, 7]],
             'position': [[9, 5], [8, 4], [7, 3], [6, 2]],
             'velocity': [[1, 5], [2, 6], [3, 7], [4, 8]],
@@ -154,6 +161,7 @@ def test_from_numpy_explicit_columns():
         },
         schema={
             'time': pl.Int64,
+            'distance': pl.Float64,
             'pixel': pl.List(pl.Int64),
             'position': pl.List(pl.Float64),
             'velocity': pl.List(pl.Float64),

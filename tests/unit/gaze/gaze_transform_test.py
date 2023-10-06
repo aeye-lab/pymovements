@@ -291,6 +291,208 @@ def fixture_experiment():
             {
                 'data': pl.from_dict(
                     {
+                        'time': [1000, 1000],
+                        'x_pix': [(100 - 1) / 2, (100 - 1) / 2],
+                        'y_pix': [0.0, 0.0],
+                        'distance': [1000, 1000],
+                    },
+                ),
+                'experiment': pm.Experiment(
+                    sampling_rate=1000,
+                    screen_width_px=100,
+                    screen_height_px=100,
+                    screen_width_cm=100,
+                    screen_height_cm=100,
+                    distance_cm=None,
+                    origin='center',
+                ),
+                'pixel_columns': ['x_pix', 'y_pix'],
+                'distance_column': 'distance',
+            },
+            'pix2deg', {},
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'time': [1000, 1000],
+                        'x_pix': [49.5, 49.5],
+                        'y_pix': [0.0, 0.0],
+                        'x_dva': [26.3354, 26.3354],
+                        'y_dva': [0.0, 0.0],
+                        'distance': [1000, 1000],
+                    },
+                ),
+                pixel_columns=['x_pix', 'y_pix'],
+                position_columns=['x_dva', 'y_dva'],
+            ),
+            id='pix2deg_origin_center_distance_column',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1000, 1000],
+                        'x_pix': [(100 - 1) / 2, (100 - 1) / 2],
+                        'y_pix': [0.0, 0.0],
+                        'distance': [1000, 1000],
+                    },
+                ),
+                'experiment': pm.Experiment(
+                    sampling_rate=1000,
+                    screen_width_px=100,
+                    screen_height_px=100,
+                    screen_width_cm=100,
+                    screen_height_cm=100,
+                    distance_cm=None,
+                    origin='center',
+                ),
+                'pixel_columns': ['x_pix', 'y_pix'],
+                'distance_column': 'distance',
+            },
+            'pix2deg', {'n_components': 2},
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'time': [1000, 1000],
+                        'x_pix': [49.5, 49.5],
+                        'y_pix': [0.0, 0.0],
+                        'x_dva': [26.3354, 26.3354],
+                        'y_dva': [0.0, 0.0],
+                        'distance': [1000, 1000],
+                    },
+                ),
+                pixel_columns=['x_pix', 'y_pix'],
+                position_columns=['x_dva', 'y_dva'],
+                distance_column='distance',
+            ),
+            id='pix2deg_origin_center_explicit_n_components_distance_column',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1000, 1000],
+                        'x_pix': [(100 - 1) / 2, (100 - 1) / 2],
+                        'y_pix': [0.0, 0.0],
+                        'distance': [1000, 1000],
+                    },
+                ),
+                'experiment': pm.Experiment(
+                    sampling_rate=1000,
+                    screen_width_px=100,
+                    screen_height_px=100,
+                    screen_width_cm=100,
+                    screen_height_cm=100,
+                    distance_cm=None,
+                    origin='center',
+                ),
+                'pixel_columns': ['x_pix', 'y_pix'],
+            },
+            'pix2deg', {'distance': 'distance'},
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'time': [1000, 1000],
+                        'x_pix': [49.5, 49.5],
+                        'y_pix': [0.0, 0.0],
+                        'x_dva': [26.3354, 26.3354],
+                        'y_dva': [0.0, 0.0],
+                        'distance': [1000, 1000],
+                    },
+                ),
+                pixel_columns=['x_pix', 'y_pix'],
+                position_columns=['x_dva', 'y_dva'],
+            ),
+            id='pix2deg_origin_center_explicit_distance_column',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1000],
+                        'x_pix': [(100 - 1) / 2],
+                        'y_pix': [0.0],
+                        'distance': [1000],
+                    },
+                ),
+                'experiment': pm.Experiment(
+                    sampling_rate=1000,
+                    screen_width_px=100,
+                    screen_height_px=100,
+                    screen_width_cm=100,
+                    screen_height_cm=100,
+                    distance_cm=None,
+                    origin='lower left',
+                ),
+                'pixel_columns': ['x_pix', 'y_pix'],
+                'distance_column': 'distance',
+            },
+            'pix2deg', {},
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'time': [1000],
+                        'x_pix': [49.5],
+                        'y_pix': [0.0],
+                        'x_dva': [0.0],
+                        'y_dva': [-26.3354],
+                        'distance': [1000],
+                    },
+                ),
+                pixel_columns=['x_pix', 'y_pix'],
+                position_columns=['x_dva', 'y_dva'],
+                distance_column='distance',
+            ),
+            id='pix2deg_origin_lower_left_distance_column',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1000],
+                        'x_pix': [(100 - 1) / 2],
+                        'y_pix': [0.0],
+                        'distance': [1000],
+                    },
+                ),
+                'experiment': pm.Experiment(
+                    sampling_rate=1000,
+                    screen_width_px=100,
+                    screen_height_px=100,
+                    screen_width_cm=100,
+                    screen_height_cm=100,
+                    distance_cm=1,
+                    origin='lower left',
+                ),
+                'pixel_columns': ['x_pix', 'y_pix'],
+                'distance_column': 'distance',
+            },
+            'pix2deg', {},
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'time': [1000],
+                        'x_pix': [49.5],
+                        'y_pix': [0.0],
+                        'x_dva': [0.0],
+                        'y_dva': [-26.3354],
+                        'distance': [1000],
+                    },
+                ),
+                pixel_columns=['x_pix', 'y_pix'],
+                position_columns=['x_dva', 'y_dva'],
+                distance_column='distance',
+            ),
+            id='pix2deg_distance_experiment_and_distance_column_defaults_to_column',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
                         'trial_id': [1, 1, 1, 2, 2, 2],
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
@@ -588,6 +790,29 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
             'experiment must not be None for this method to work',
             id='no_experiment',
         ),
+        pytest.param(
+            {
+                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'experiment': pm.Experiment(1024, 768, 38, 30, None, 'center', 1000),
+                'pixel_columns': ['x', 'y'],
+            },
+            AttributeError,
+            'Neither eye-to-screen distance is in the columns of the dataframe '
+            'nor experiment eye-to-screen distance is specified.',
+            id='no_distance_column_no_experiment_distance',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'experiment': pm.Experiment(1024, 768, 38, 30, None, 'center', 1000),
+                'pixel_columns': ['x', 'y'],
+                'distance_column': 'distance',
+            },
+            AttributeError,
+            'Neither eye-to-screen distance is in the columns of the dataframe '
+            'nor experiment eye-to-screen distance is specified.',
+            id='distance_column_not_in_dataframe',
+        ),
     ],
 )
 def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg):
@@ -598,6 +823,35 @@ def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg)
 
     msg, = excinfo.value.args
     assert msg == expected_msg
+
+
+@pytest.mark.parametrize(
+    ('init_kwargs', 'warning', 'expected_msg'),
+    [
+        pytest.param(
+            {
+                'data': pl.DataFrame(schema={'d': pl.Float64, 'x': pl.Float64, 'y': pl.Float64}),
+                'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+                'pixel_columns': ['x', 'y'],
+                'distance_column': 'd',
+            },
+            UserWarning,
+            "Both a distance column and experiment's "
+            'eye-to-screen distance are specified. '
+            'Using eye-to-screen distances from column '
+            "'distance' in the dataframe.",
+            id='both_distance_column_and_experiment_distance',
+        ),
+    ],
+)
+def test_gaze_dataframe_pix2deg_warnings(init_kwargs, warning, expected_msg):
+    gaze_df = pm.GazeDataFrame(**init_kwargs)
+
+    with pytest.warns(warning) as excinfo:
+        gaze_df.pix2deg()
+
+    msg = excinfo[0].message.args[0]
+    assert expected_msg == msg
 
 
 @pytest.mark.parametrize(
