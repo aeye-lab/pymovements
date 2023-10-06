@@ -24,6 +24,8 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
 
+import polars as pl
+
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import register_dataset
 from pymovements.gaze.experiment import Experiment
@@ -154,4 +156,25 @@ class GazeBaseVR(DatasetDefinition):
         },
     )
 
-    custom_read_kwargs: dict[str, Any] = field(default_factory=dict)
+    custom_read_kwargs: dict[str, Any] = field(
+        default_factory=lambda: {
+            'dtypes': {
+                'n': pl.Int32,
+                'x': pl.Float32,
+                'y': pl.Float32,
+                'lx': pl.Float32,
+                'ly': pl.Float32,
+                'rx': pl.Float32,
+                'ry': pl.Float32,
+                'xT': pl.Float32,
+                'yT': pl.Float32,
+                'zT': pl.Float32,
+                'clx': pl.Float32,
+                'cly': pl.Float32,
+                'clz': pl.Float32,
+                'crx': pl.Float32,
+                'cry': pl.Float32,
+                'crz': pl.Float32,
+            },
+        },
+    )

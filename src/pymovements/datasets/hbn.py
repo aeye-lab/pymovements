@@ -144,8 +144,10 @@ class HBN(DatasetDefinition):
             'columns': [
                 'time', 'x_pix', 'y_pix',
             ],
-            'dtypes': [
-                pl.Float64, pl.Float64, pl.Float64,
-            ],
+            'dtypes': {
+                'time': pl.Int32,
+                'x_pix': pl.Float32,
+                'y_pix': pl.Float32,
+            },
         },
     )
