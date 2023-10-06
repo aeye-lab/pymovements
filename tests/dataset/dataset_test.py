@@ -72,7 +72,7 @@ def create_event_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):
         gaze_df.write_ipc(rootpath / filepath)
 
 
-def mock_toy(rootpath, raw_fileformat, eyes):
+def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
     subject_ids = list(range(1, 21))
 
     fileinfo = pl.DataFrame(data={'subject_id': subject_ids}, schema={'subject_id': pl.Int64})
@@ -184,6 +184,17 @@ def mock_toy(rootpath, raw_fileformat, eyes):
         else:
             raise ValueError(f'invalid value for eyes: {eyes}')
 
+        if remote:
+            gaze_df = gaze_df.with_columns([
+                pl.lit(680.).alias('distance'),
+            ])
+
+            distance_column = 'distance'
+            distance_cm = None
+        else:
+            distance_column = None
+            distance_cm = 68
+
         gaze_dfs.append(gaze_df)
 
     create_raw_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath / 'raw')
@@ -258,13 +269,14 @@ def mock_toy(rootpath, raw_fileformat, eyes):
             screen_height_px=1024,
             screen_width_cm=38,
             screen_height_cm=30.2,
-            distance_cm=68,
+            distance_cm=distance_cm,
             origin='lower left',
             sampling_rate=1000,
         ),
         filename_format=r'{subject_id:d}.' + raw_fileformat,
         filename_format_dtypes={'subject_id': pl.Int64},
         time_column='time',
+        distance_column=distance_column,
         pixel_columns=pixel_columns,
     )
 
@@ -283,7 +295,7 @@ def mock_toy(rootpath, raw_fileformat, eyes):
 
 @pytest.fixture(
     name='dataset_configuration',
-    params=['ToyMono', 'ToyBino', 'ToyLeft', 'ToyRight', 'ToyBino+Avg'],
+    params=['ToyMono', 'ToyBino', 'ToyLeft', 'ToyRight', 'ToyBino+Avg', 'ToyRemote'],
 )
 def fixture_dataset(request, tmp_path):
     rootpath = tmp_path
@@ -300,6 +312,8 @@ def fixture_dataset(request, tmp_path):
         dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='right')
     elif request.param == 'ToyMat':
         dataset_dict = mock_toy(rootpath, raw_fileformat='mat', eyes='both')
+    elif request.param == 'ToyRemote':
+        dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='both', remote=True)
     else:
         raise ValueError(f'{request.param} not supported as dataset mock')
 

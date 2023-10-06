@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import inspect
+import warnings
 from collections.abc import Callable
 from copy import deepcopy
 from typing import Any
@@ -89,6 +90,7 @@ class GazeDataFrame:
             position_columns: list[str] | None = None,
             velocity_columns: list[str] | None = None,
             acceleration_columns: list[str] | None = None,
+            distance_column: str | None = None,
     ):
         """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
 
@@ -123,6 +125,11 @@ class GazeDataFrame:
             The name of the acceleration columns in the input data frame. These columns will be
             nested into the column ``acceleration``. If the list is empty or None, the nested
             ``acceleration`` column will not be created.
+        distance_column:
+            The name of the column containing eye-to-screen distance in millimeters for each sample
+            in the input data frame. If specified, the column will be used for pixel to dva
+            transformations. If not specified, the constant eye-to-screen distance will be taken
+            from the experiment definition.
 
         Notes
         -----
@@ -191,6 +198,9 @@ class GazeDataFrame:
 
         if time_column is not None:
             self.frame = self.frame.rename({time_column: 'time'})
+
+        if distance_column is not None:
+            self.frame = self.frame.rename({distance_column: 'distance'})
 
         # List of passed not-None column specifier lists.
         # The list will be used for inferring n_components.
@@ -286,7 +296,24 @@ class GazeDataFrame:
             if 'distance' in method_kwargs and 'distance' not in kwargs:
                 self._check_experiment()
                 assert self.experiment is not None
-                kwargs['distance'] = self.experiment.screen.distance_cm
+
+                if 'distance' in self.frame.columns:
+                    kwargs['distance'] = 'distance'
+
+                    if self.experiment.screen.distance_cm:
+                        warnings.warn(
+                            "Both a distance column and experiment's "
+                            'eye-to-screen distance are specified. '
+                            'Using eye-to-screen distances from column '
+                            "'distance' in the dataframe.",
+                        )
+                elif self.experiment.screen.distance_cm:
+                    kwargs['distance'] = self.experiment.screen.distance_cm
+                else:
+                    raise AttributeError(
+                        'Neither eye-to-screen distance is in the columns of the dataframe '
+                        'nor experiment eye-to-screen distance is specified.',
+                    )
 
             if 'sampling_rate' in method_kwargs and 'sampling_rate' not in kwargs:
                 self._check_experiment()
