@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    name: test ${{ matrix.tox_env }} (${{ matrix.os }})
+    name: ${{ matrix.tox_env }} / ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     env:
       MPLBACKEND: Agg
@@ -52,56 +52,3 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-
-  pylint:
-    name: pylint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Install base python for tox
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.9"
-      - name: Install tox
-        run: python -m pip install tox
-      - name: Setup test environment
-        run: tox -vv --notest -e pylint
-      - name: Run test
-        run: tox --skip-pkg-install -e pylint
-
-
-  docs:
-    name: docs (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - macos-latest
-          - ubuntu-latest
-          - windows-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Install pandoc
-        uses: r-lib/actions/setup-pandoc@v2
-        with:
-          pandoc-version: '2.19.2'
-      - name: Install base python for tox
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.9"
-      - name: Install tox
-        run: python -m pip install tox
-      - name: Setup test environment
-        run: tox -vv --notest -e docs
-      - name: Run test
-        run: tox --skip-pkg-install -e docs
-      - name: Upload documentation
-        uses: actions/upload-artifact@v3
-        with:
-          name: html-docs-${{ matrix.os }}
-          path: docs/build/
