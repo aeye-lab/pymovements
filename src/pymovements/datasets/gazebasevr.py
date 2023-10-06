@@ -159,7 +159,7 @@ class GazeBaseVR(DatasetDefinition):
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
             'dtypes': {
-                'n': pl.Int64,
+                'n': pl.Float32,
                 'x': pl.Float32,
                 'y': pl.Float32,
                 'lx': pl.Float32,

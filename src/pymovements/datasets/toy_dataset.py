@@ -139,7 +139,7 @@ class ToyDataset(DatasetDefinition):
         default_factory=lambda: {
             'columns': ['timestamp', 'x', 'y', 'stimuli_x', 'stimuli_y'],
             'dtypes': {
-                'timestamp': pl.Int64,
+                'timestamp': pl.Float32,
                 'x': pl.Float32,
                 'y': pl.Float32,
                 'stimuli_x': pl.Float32,
