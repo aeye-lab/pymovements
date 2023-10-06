@@ -300,7 +300,6 @@ def test_pix2deg_raises_error(kwargs, series, exception, msg_substrings):
         assert msg_substring.lower() in msg.lower()
 
 
-@pytest.mark.parametrize('distance_as_column', [True, False])
 @pytest.mark.parametrize(
     ('kwargs', 'series', 'expected_df'),
     [
@@ -500,6 +499,13 @@ def test_pix2deg_raises_error(kwargs, series, exception, msg_substrings):
             pl.Series('position', [[45, 63.4349]], pl.List(pl.Float64)),
             id='screen_size_different_values',
         ),
+    ],
+)
+@pytest.mark.parametrize(
+    'distance_as_column',
+    [
+        pytest.param(True, id='column_distance'),
+        pytest.param(False, id='scalar_distance'),
     ],
 )
 def test_pix2deg_returns(kwargs, series, expected_df, distance_as_column):
