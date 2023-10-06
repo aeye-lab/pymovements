@@ -29,7 +29,6 @@ exclude-labels:
   - skip changelog
 
 exclude-contributors:
-  - dependabot
   - pre-commit-ci
 
 change-template: '- $TITLE (#$NUMBER)'
