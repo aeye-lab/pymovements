@@ -135,14 +135,36 @@ pip install pre-commit
 pip install pylint
 ```
 
-To run all our style for your pushed files simply use
+To always run style checks when pushing commits upstream you can register a pre-push hook by
 ```bash
 pre-commit install --hook-type pre-push
 ```
 
-If you want to run pre-commit for all your staged files use
+If you want to run pre-commit for all your currently staged files simply use
+```bash
+pre-commit
+```
+You can find the names of all defined hooks in the file `.pre-commit-config.yaml`.
+
+If you want to run a specific hook you can use
+```bash
+pre-commit run mypy
+pre-commit run pydocstyle
+```
+
+If you want to run a specific hook on a single file you can use
+```bash
+pre-commit run mypy --files src/pymovements/gaze/transforms.py
+```
+
+If you want to run all hooks on all git repository files use
 ```bash
 pre-commit run -a
+```
+
+For running a specific hook on all git repository files use
+```bash
+pre-commit run mypy -a
 ```
 
 
