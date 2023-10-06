@@ -564,7 +564,8 @@ class GazeDataFrame:
         ----------
         input_columns:
             Name(s) of input column(s) to be unnested into several component columns.
-            If None all list columns 'pixel', 'position', 'velocity' and 'acceleration' will be unnested if existing.
+            If None all list columns 'pixel', 'position', 'velocity' and
+            'acceleration' will be unnested if existing.
         output_columns:
             Name of the resulting tuple columns.
         output_suffixes:
@@ -597,8 +598,8 @@ class GazeDataFrame:
 
         # no support for custom output columns if more than one input column will be unnested
         if output_columns is not None and not len(input_columns) == 1:
-            raise ValueError("You cannot specify output columns if you want to unnest more than one input column. "
-                             "Please specify output suffixes instead or none")
+            raise ValueError("You cannot specify output columns if you want to unnest more than "
+                             "one input column. Please specify output suffixes instead or none")
 
         checks.check_is_mutual_exclusive(
             output_columns=output_columns,
@@ -618,15 +619,21 @@ class GazeDataFrame:
                 output_suffixes = ['_xl', '_yl', '_xr', '_yr', '_xa', '_ya']
 
         if output_suffixes:
-            col_names = [[f'{input_col}{suffix}' for suffix in output_suffixes] for input_col in input_columns]
+            col_names = [
+                [f'{input_col}{suffix}' for suffix in output_suffixes]
+                for input_col in input_columns
+            ]
 
-        if len([name for name_list in col_names for name in name_list]) != self.n_components * len(input_columns):
+        if len([
+            name for name_list in col_names for name in name_list
+        ]) != self.n_components * len(input_columns):
             raise ValueError(
                 f'Number of output columns / suffixes ({len(col_names[0])}) '
                 f'must be a multiple of components ({self.n_components})',
             )
 
-        if len(set([name for name_list in col_names for name in name_list])) != len([name for name_list in col_names for name in name_list]):
+        if len({name for name_list in col_names for name in name_list}) != len(
+                [name for name_list in col_names for name in name_list]):
             raise ValueError('Output columns / suffixes must be unique')
 
         for input_col, column_names in zip(input_columns, col_names):
