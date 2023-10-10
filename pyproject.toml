@@ -128,7 +128,10 @@ disallow_untyped_defs = false
 [tool.pytest.ini_options]
 addopts = "-ra -l --tb=long --doctest-modules"
 doctest_optionflags = "NORMALIZE_WHITESPACE"
-filterwarnings = "error"
+filterwarnings = [
+  "error",
+  "ignore::DeprecationWarning:pkg_resources.*:",
+]
 testpaths = ['tests', 'src']
 
 [tool.setuptools-git-versioning]
