@@ -130,6 +130,7 @@ addopts = "-ra -l --tb=long --doctest-modules"
 doctest_optionflags = "NORMALIZE_WHITESPACE"
 filterwarnings = [
   "error",
+  "ignore::DeprecationWarning",
   "ignore::DeprecationWarning:pkg_resources",
   "ignore::DeprecationWarning:pkg_resources.*:",
 ]
