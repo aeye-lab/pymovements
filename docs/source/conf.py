@@ -30,7 +30,6 @@
 import inspect
 import os
 import sys
-from pathlib import Path
 from subprocess import CalledProcessError
 from subprocess import run
 
