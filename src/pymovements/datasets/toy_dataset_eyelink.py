@@ -175,6 +175,11 @@ class ToyDatasetEyeLink(DatasetDefinition):
                     'value': None,
                 },
             ],
-            'schema': {'trial_id': pl.Int64},
+            'schema': {
+                'trial_id': pl.Int64,
+                'screen_id': pl.Int64,
+                'point_id': pl.Int64,
+                'task': pl.Utf8,
+            },
         },
     )
