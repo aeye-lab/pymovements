@@ -132,6 +132,8 @@ filterwarnings = [
   "error",
   "ignore:Both a distance column and experiment.*:UserWarning",
   "ignore:pkg_resources is deprecated.*:DeprecationWarning",
+  "ignore:`groupby` is deprecated. It has been renamed to `group_by`.:DeprecationWarning",
+  "ignore:`map` is deprecated. It has been renamed to `map_batches`.:DeprecationWarning",
 ]
 testpaths = ['tests', 'src']
 
