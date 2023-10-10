@@ -30,10 +30,33 @@ import pymovements as pm
         pytest.param(
             {
                 'file': 'tests/files/eyelink_monocular_example.asc',
+                'patterns': 'eyelink',
             },
             (16, 3),
-            {'time': pl.Int64, 'pupil': pl.Float64, 'pixel': pl.List(pl.Float64)},
-            id='eyelink_asc_mono',
+            {
+                'time': pl.Int64,
+                'pupil': pl.Float64,
+                'pixel': pl.List(pl.Float64),
+            },
+            id='eyelink_asc_mono_pattern_eyelink',
+        ),
+        pytest.param(
+            {
+                'file': 'tests/files/eyelink_monocular_example.asc',
+                'patterns': pm.datasets.ToyDatasetEyeLink().custom_read_kwargs['patterns'],
+                'schema': pm.datasets.ToyDatasetEyeLink().custom_read_kwargs['schema'],
+            },
+            (16, 7),
+            {
+                'time': pl.Int64,
+                'pupil': pl.Float64,
+                'pixel': pl.List(pl.Float64),
+                'trial_id': pl.Int64,
+                'point_id': pl.Int64,
+                'screen_id': pl.Int64,
+                'task': pl.Utf8,
+            },
+            id='eyelink_asc_mono_pattern_list',
         ),
     ],
 )
