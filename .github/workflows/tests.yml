@@ -73,7 +73,7 @@ jobs:
 
 
   minimum-requirements:
-    name: check minimum requirements
+    name: minimum requirements
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
