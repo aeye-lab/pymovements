@@ -31,6 +31,7 @@ import importlib.metadata
 import inspect
 import os
 import sys
+from pathlib import Path
 from subprocess import CalledProcessError
 from subprocess import run
 
@@ -216,7 +217,7 @@ def linkcode_resolve(domain, info):
             return None
 
     try:
-        modpath = importlib.metadata.requires(topmodulename)[0].location
+        modpath = Path(importlib.metadata.requires(topmodulename)[0]).location
         filepath = os.path.relpath(inspect.getsourcefile(obj), modpath)
         if filepath is None:
             return
