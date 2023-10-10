@@ -26,18 +26,12 @@ import pymovements as pm
 
 
 @pytest.mark.parametrize(
-    ('kwargs', 'shape', 'schema', 'frame'),
+    ('kwargs', 'expected_frame'),
     [
         pytest.param(
             {
                 'file': 'tests/files/eyelink_monocular_example.asc',
                 'patterns': 'eyelink',
-            },
-            (16, 3),
-            {
-                'time': pl.Int64,
-                'pupil': pl.Float64,
-                'pixel': pl.List(pl.Float64),
             },
             pl.from_dict(
                 data={
@@ -69,16 +63,6 @@ import pymovements as pm
                 'file': 'tests/files/eyelink_monocular_example.asc',
                 'patterns': pm.datasets.ToyDatasetEyeLink().custom_read_kwargs['patterns'],
                 'schema': pm.datasets.ToyDatasetEyeLink().custom_read_kwargs['schema'],
-            },
-            (16, 7),
-            {
-                'time': pl.Int64,
-                'pupil': pl.Float64,
-                'pixel': pl.List(pl.Float64),
-                'trial_id': pl.Int64,
-                'point_id': pl.Int64,
-                'screen_id': pl.Int64,
-                'task': pl.Utf8,
             },
             pl.DataFrame(
                 data={
@@ -115,12 +99,10 @@ import pymovements as pm
         ),
     ],
 )
-def test_from_asc_has_shape_and_schema(kwargs, shape, schema, frame):
+def test_from_asc_has_shape_and_schema(kwargs, expected_frame):
     gaze = pm.gaze.from_asc(**kwargs)
 
-    assert gaze.frame.shape == shape
-    assert gaze.frame.schema == schema
-    assert_frame_equal(gaze.frame, frame, check_column_order=False)
+    assert_frame_equal(gaze.frame, expected_frame, check_column_order=False)
 
 
 @pytest.mark.parametrize(
