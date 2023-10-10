@@ -22,6 +22,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from dataclasses import field
+from typing import Any
+
+import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import register_dataset
@@ -89,6 +92,7 @@ class JuDo1000(DatasetDefinition):
 
     >>> dataset.load()# doctest: +SKIP
     """
+
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
@@ -143,8 +147,17 @@ class JuDo1000(DatasetDefinition):
         },
     )
 
-    custom_read_kwargs: dict[str, str] = field(
+    custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
+            'dtypes': {
+                'trialId': pl.Int32,
+                'pointId': pl.Int32,
+                'time': pl.Int64,
+                'x_left': pl.Float32,
+                'y_left': pl.Float32,
+                'x_right': pl.Float32,
+                'y_right': pl.Float32,
+            },
             'separator': '\t',
         },
     )

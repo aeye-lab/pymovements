@@ -19,14 +19,11 @@ jobs:
           - ubuntu-latest
           - windows-latest
         tox_env:
-          - py38
           - py39
           - py310
           - py311
           - py312
         include:
-          - tox_env: py38
-            python: "3.8"
           - tox_env: py39
             python: "3.9"
           - tox_env: py310
@@ -59,18 +56,9 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-  check:
-    name: check ${{ matrix.tox_env }} (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - ubuntu-latest
-        tox_env:
-          - flake8
-          - pylint
-          - mypy
+  pylint:
+    name: pylint
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -82,9 +70,10 @@ jobs:
       - name: Install tox
         run: python -m pip install tox
       - name: Setup test environment
-        run: tox -vv --notest -e ${{ matrix.tox_env }}
+        run: tox -vv --notest -e pylint
       - name: Run test
-        run: tox --skip-pkg-install -e ${{ matrix.tox_env }}
+        run: tox --skip-pkg-install -e pylint
+
 
   docs:
     name: docs (${{ matrix.os }})
@@ -107,10 +96,15 @@ jobs:
       - name: Install base python for tox
         uses: actions/setup-python@v4
         with:
-          python-version: "3.8"
+          python-version: "3.9"
       - name: Install tox
         run: python -m pip install tox
       - name: Setup test environment
         run: tox -vv --notest -e docs
       - name: Run test
         run: tox --skip-pkg-install -e docs
+      - name: Upload documentation
+        uses: actions/upload-artifact@v3
+        with:
+          name: html-docs-${{ matrix.os }}
+          path: docs/build/

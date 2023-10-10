@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-This module holds the implementation of the ivt algorithm.
-"""
+"""This module holds the implementation of the event fill function."""
 from __future__ import annotations
 
 import numpy as np
@@ -27,35 +25,25 @@ import numpy as np
 from pymovements.events.detection._library import register_event_detection
 from pymovements.events.frame import EventDataFrame
 from pymovements.gaze.transforms_numpy import consecutive
-from pymovements.utils import checks
 
 
 @register_event_detection
 def fill(
         events: EventDataFrame,
-        positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
-        velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
-        timesteps: list[int] | np.ndarray | None = None,
+        timesteps: list[int] | np.ndarray,
         minimum_duration: int = 1,
         name: str = 'unclassified',
 ) -> EventDataFrame:
-    """
-    Classify all previously unclassified timesteps as events.
+    """Classify all previously unclassified timesteps as events.
 
     Parameters
     ----------
     events:
         The already detected events.
-    positions: array-like, shape (N, 2)
-        Continuous 2D position time series.
-    velocities: array-like, shape (N, 2)
-        Corresponding continuous 2D velocity time series.
     timesteps: array-like, shape (N, )
-        Corresponding continuous 1D timestep time series. If None, sample based timesteps are
-        assumed.
+        Continuous 1D timestep time series.
     minimum_duration: int
         Minimum fixation duration. The duration is specified in the units used in ``timesteps``.
-         If ``timesteps`` is None, then ``minimum_duration`` is specified in numbers of samples.
     name:
         Name for detected events in EventDataFrame.
 
@@ -63,28 +51,11 @@ def fill(
     -------
     pl.DataFrame
         A dataframe with detected fixations as rows.
-
-    Raises
-    ------
-    ValueError
-        If positions or velocities are None
-        If positions or velocities do not have shape (N, 2)
-        If positions and velocities have different shapes
-        If velocity threshold is None.
-        If velocity threshold is not greater than 0.
     """
-    positions = np.array(positions)
-    velocities = np.array(velocities)
-
-    checks.check_shapes_positions_velocities(positions=positions, velocities=velocities)
-
-    if timesteps is None:
-        timesteps = np.arange(len(velocities), dtype=np.int64)
     timesteps = np.array(timesteps)
-    checks.check_is_length_matching(velocities=velocities, timesteps=timesteps)
 
     # Create binary mask where each existing event is marked.
-    events_mask = np.zeros(len(positions), dtype=bool)
+    events_mask = np.zeros(len(timesteps), dtype=bool)
 
     for row in events.frame.iter_rows(named=True):
         idx_onset = np.where(timesteps == row['onset'])[0][0]

@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-""" Converts ascii to csv files."""
+"""Module for parsing input data."""
 from __future__ import annotations
 
 import re
@@ -38,14 +38,13 @@ EYE_TRACKING_SAMPLE = re.compile(
 
 
 def check_nan(sample_location: str) -> float:
-    """Returns position as float or np.nan depending on validity of sample
+    """Return position as float or np.nan depending on validity of sample.
 
     Parameters
     ----------
     sample_location: str
         Sample location as extracted from ascii file.
     """
-
     try:
         ret = float(sample_location)
     except ValueError:
@@ -113,7 +112,7 @@ def parse_eyelink(
         patterns: list | None = None,
         schema: dict | None = None,
 ) -> pl.DataFrame:
-    """Processes ascii files to csv.
+    """Process EyeLink asc file.
 
     Parameters
     ----------

@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-This module holds the implementation for idt algorithm.
-"""
+"""This module holds the implementation for I-DT algorithm."""
 from __future__ import annotations
 
 import numpy as np
@@ -54,15 +52,13 @@ def dispersion(positions: list[list[float]] | np.ndarray) -> float:
 @register_event_detection
 def idt(
         positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
-        velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         timesteps: list[int] | np.ndarray | None = None,
         minimum_duration: int = 100,
         dispersion_threshold: float = 1.0,
         include_nan: bool = False,
         name: str = 'fixation',
 ) -> EventDataFrame:
-    """
-    Fixation identification based on dispersion threshold.
+    """Fixation identification based on dispersion threshold (I-DT).
 
     The algorithm identifies fixations by grouping consecutive points
     within a maximum separation (dispersion) threshold and a minimum duration threshold.
@@ -77,8 +73,6 @@ def idt(
     ----------
     positions: array-like, shape (N, 2)
         Continuous 2D position time series
-    velocities: array-like, shape (N, 2)
-        Corresponding continuous 2D velocity time series.
     timesteps: array-like, shape (N, )
         Corresponding continuous 1D timestep time series. If None, sample based timesteps are
         assumed.
@@ -107,11 +101,11 @@ def idt(
         If duration_threshold is not greater than 0
     """
     positions = np.array(positions)
-    velocities = np.array(velocities)
-    checks.check_shapes_positions_velocities(positions=positions, velocities=velocities)
+
+    checks.check_shapes(positions=positions)
 
     if timesteps is None:
-        timesteps = np.arange(len(velocities), dtype=np.int64)
+        timesteps = np.arange(len(positions), dtype=np.int64)
     timesteps = np.array(timesteps).flatten()
 
     # Check that timesteps are integers or are floats without a fractional part.
@@ -120,7 +114,7 @@ def idt(
         raise TypeError('timesteps must be of type int')
     timesteps = timesteps_int
 
-    checks.check_is_length_matching(velocities=velocities, timesteps=timesteps)
+    checks.check_is_length_matching(positions=positions, timesteps=timesteps)
 
     if dispersion_threshold <= 0:
         raise ValueError('dispersion_threshold must be greater than 0')

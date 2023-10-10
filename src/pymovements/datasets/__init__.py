@@ -27,7 +27,10 @@
 
     pymovements.datasets.GazeBase
     pymovements.datasets.GazeBaseVR
+    pymovements.datasets.GazeOnFaces
+    pymovements.datasets.HBN
     pymovements.datasets.JuDo1000
+    pymovements.datasets.SBSAT
 
 
 .. rubric:: Example Datasets
@@ -39,9 +42,12 @@
     pymovements.datasets.ToyDataset
     pymovements.datasets.ToyDatasetEyeLink
 """
+from pymovements.datasets.gaze_on_faces import GazeOnFaces
 from pymovements.datasets.gazebase import GazeBase
 from pymovements.datasets.gazebasevr import GazeBaseVR
+from pymovements.datasets.hbn import HBN
 from pymovements.datasets.judo1000 import JuDo1000
+from pymovements.datasets.sb_sat import SBSAT
 from pymovements.datasets.toy_dataset import ToyDataset
 from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
 
@@ -49,7 +55,10 @@ from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
 __all__ = [
     'GazeBase',
     'GazeBaseVR',
+    'GazeOnFaces',
+    'HBN',
     'JuDo1000',
+    'SBSAT',
     'ToyDataset',
     'ToyDatasetEyeLink',
 ]

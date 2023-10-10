@@ -20,7 +20,6 @@
 """This module provides the base dataset class."""
 from __future__ import annotations
 
-import inspect
 from collections.abc import Callable
 from copy import deepcopy
 from pathlib import Path
@@ -34,7 +33,6 @@ from pymovements.dataset import dataset_files
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_paths import DatasetPaths
-from pymovements.events.detection import EventDetectionLibrary
 from pymovements.events.frame import EventDataFrame
 from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import GazeDataFrame
@@ -236,6 +234,60 @@ class Dataset:
         )
         return self
 
+    def apply(
+            self,
+            function: str,
+            *,
+            verbose: bool = True,
+            **kwargs: Any,
+    ) -> Dataset:
+        """Apply preprocessing method to all GazeDataFrames in Dataset.
+
+        Parameters
+        ----------
+        function: str
+            Name of the preprocessing function to apply.
+        verbose : bool
+            If True, show progress bar of computation.
+        kwargs:
+            kwargs that will be forwarded when calling the preprocessing method.
+
+        Examples
+        --------
+        Let's load in our dataset first,
+        >>> import pymovements as pm
+        >>>
+        >>> dataset = pm.Dataset("ToyDataset", path='toy_dataset')
+        >>> dataset.download()# doctest:+ELLIPSIS
+        Downloading ... to toy_dataset...downloads...
+        Checking integrity of ...
+        Extracting ... to toy_dataset...raw
+        <pymovements.dataset.dataset.Dataset object at ...>
+        >>> dataset.load()# doctest:+ELLIPSIS
+        <pymovements.dataset.dataset.Dataset object at ...>
+
+        Use apply for your gaze transformations:
+        >>> dataset.apply('pix2deg')# doctest:+ELLIPSIS
+        <pymovements.dataset.dataset.Dataset object at ...>
+
+        >>> dataset.apply('pos2vel', method='neighbors')# doctest:+ELLIPSIS
+        <pymovements.dataset.dataset.Dataset object at ...>
+
+        Use apply for your event detection:
+        >>> dataset.apply('ivt')# doctest:+ELLIPSIS
+        <pymovements.dataset.dataset.Dataset object at ...>
+
+        >>> dataset.apply('microsaccades', minimum_duration=8)# doctest:+ELLIPSIS
+        <pymovements.dataset.dataset.Dataset object at ...>
+        """
+        self._check_gaze_dataframe()
+
+        disable_progressbar = not verbose
+        for gaze in tqdm(self.gaze, disable=disable_progressbar):
+            gaze.apply(function, **kwargs)
+
+        return self
+
     def pix2deg(self, verbose: bool = True) -> Dataset:
         """Compute gaze positions in degrees of visual angle from pixel coordinates.
 
@@ -259,13 +311,7 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
-        self._check_gaze_dataframe()
-
-        disable_progressbar = not verbose
-        for gaze_df in tqdm(self.gaze, disable=disable_progressbar):
-            gaze_df.pix2deg()
-
-        return self
+        return self.apply('pix2deg', verbose=verbose)
 
     def pos2acc(
             self,
@@ -303,17 +349,13 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
-        self._check_gaze_dataframe()
-
-        disable_progressbar = not verbose
-        for gaze_df in tqdm(self.gaze, disable=disable_progressbar):
-            gaze_df.pos2acc(
-                window_length=window_length,
-                degree=degree,
-                padding=padding,
-            )
-
-        return self
+        return self.apply(
+            'pos2acc',
+            window_length=window_length,
+            degree=degree,
+            padding=padding,
+            verbose=verbose,
+        )
 
     def pos2vel(
             self,
@@ -348,19 +390,13 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
-        self._check_gaze_dataframe()
-
-        disable_progressbar = not verbose
-        for gaze_df in tqdm(self.gaze, disable=disable_progressbar):
-            gaze_df.pos2vel(method=method, **kwargs)
-
-        return self
+        return self.apply('pos2vel', method=method, verbose=verbose, **kwargs)
 
     def detect_events(
             self,
             method: Callable[..., EventDataFrame] | str,
             *,
-            eye: str | None = 'auto',
+            eye: str = 'auto',
             clear: bool = False,
             verbose: bool = True,
             **kwargs: Any,
@@ -393,126 +429,19 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
-        self._check_gaze_dataframe()
-
-        if isinstance(method, str):
-            method = EventDetectionLibrary.get(method)
-
-        # this is just a work-around until merged columns are standard behavior
-        # https://github.com/aeye-lab/pymovements/pull/443
-        unnested_columns = {}
-        if 'position' in self.gaze[0].frame.columns:
-            unnested_columns_pos = [
-                'x_left_pos', 'y_left_pos',
-                'x_right_pos', 'y_right_pos',
-                'x_avg_pos', 'y_avg_pos',
-            ][:self.gaze[0].n_components]
-            unnested_columns['position'] = unnested_columns_pos
-        else:
-            raise pl.exceptions.ColumnNotFoundError(
-                f'Column \'position\' not found.'
-                f' Available columns are: {self.gaze[0].frame.columns}',
-            )
-
-        if 'velocity' in self.gaze[0].frame.columns:
-            unnested_columns_vel = [
-                'x_left_vel', 'y_left_vel',
-                'x_right_vel', 'y_right_vel',
-                'x_avg_vel', 'y_avg_vel',
-            ][:self.gaze[0].n_components]
-            unnested_columns['velocity'] = unnested_columns_vel
-        else:
-            raise pl.exceptions.ColumnNotFoundError(
-                f'Column \'velocity\' not found.'
-                f' Available columns are: {self.gaze[0].frame.columns}',
-            )
-
-        self.gaze[0].unnest('position', unnested_columns['position'])
-        self.gaze[0].unnest('velocity', unnested_columns['velocity'])
-
-        if (
-                isinstance(self.gaze[0].n_components, int)
-                and self.gaze[0].n_components < 4
-                and eye not in [None, 'auto']
-        ):
-            raise AttributeError()
-
-        # Automatically infer eye to use for event detection.
-        if eye == 'auto':
-            if 'x_avg_pos' in self.gaze[0].columns:
-                eye = 'avg'
-            elif 'x_right_pos' in self.gaze[0].columns:
-                eye = 'right'
-            else:
-                eye = 'left'
-
-        position_columns = [f'x_{eye}_pos', f'y_{eye}_pos']
-        velocity_columns = [f'x_{eye}_vel', f'y_{eye}_vel']
-
-        # this is just a work-around until merged columns are standard behavior
-        # https://github.com/aeye-lab/pymovements/pull/443
-        self.gaze[0].nest(
-            input_columns=unnested_columns['position'],
-            output_column='position',
+        return self.detect(
+            method=method,
+            eye=eye,
+            clear=clear,
+            verbose=verbose,
+            **kwargs,
         )
-        self.gaze[0].nest(
-            input_columns=unnested_columns['velocity'],
-            output_column='velocity',
-        )
-
-        disable_progressbar = not verbose
-
-        if not self.events or clear:
-            self.events = [EventDataFrame() for _ in self.fileinfo.iter_rows()]
-
-        for file_id, (gaze_df, fileinfo_row) in tqdm(
-                enumerate(zip(self.gaze, self.fileinfo.to_dicts())), disable=disable_progressbar,
-        ):
-            # this is just a work-around until merged columns are standard behavior
-            # https://github.com/aeye-lab/pymovements/pull/443
-            gaze_df.unnest('position', unnested_columns['position'])
-            gaze_df.unnest('velocity', unnested_columns['velocity'])
-
-            positions = gaze_df.frame.select(position_columns).to_numpy()
-            velocities = gaze_df.frame.select(velocity_columns).to_numpy()
-            timesteps = gaze_df.frame.get_column('time').to_numpy()
-
-            if 'events' in inspect.getfullargspec(method).args:
-                kwargs['events'] = self.events[file_id]
-
-            new_event_df = method(
-                positions=positions, velocities=velocities, timesteps=timesteps, **kwargs,
-            )
-
-            new_event_df.frame = dataset_files.add_fileinfo(
-                definition=self.definition,
-                df=new_event_df.frame,
-                fileinfo=fileinfo_row,
-            )
-
-            self.events[file_id].frame = pl.concat(
-                [self.events[file_id].frame, new_event_df.frame],
-                how='diagonal',
-            )
-
-            # this is just a work-around until merged columns are standard behavior
-            # https://github.com/aeye-lab/pymovements/pull/443
-            gaze_df.nest(
-                input_columns=unnested_columns['position'],
-                output_column='position',
-            )
-            gaze_df.nest(
-                input_columns=unnested_columns['velocity'],
-                output_column='velocity',
-            )
-
-        return self
 
     def detect(
             self,
             method: Callable[..., EventDataFrame] | str,
             *,
-            eye: str | None = 'auto',
+            eye: str = 'auto',
             clear: bool = False,
             verbose: bool = True,
             **kwargs: Any,
@@ -547,13 +476,24 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
-        return self.detect_events(
-            method=method,
-            eye=eye,
-            clear=clear,
-            verbose=verbose,
-            **kwargs,
-        )
+        self._check_gaze_dataframe()
+
+        if not self.events:
+            self.events = [gaze.events for gaze in self.gaze]
+
+        disable_progressbar = not verbose
+        for file_id, (gaze, fileinfo_row) in tqdm(
+                enumerate(zip(self.gaze, self.fileinfo.to_dicts())), disable=disable_progressbar,
+        ):
+            gaze.detect(method, eye=eye, clear=clear, **kwargs)
+            # workaround until events are fully part of the GazeDataFrame
+            gaze.events.frame = dataset_files.add_fileinfo(
+                definition=self.definition,
+                df=gaze.events.frame,
+                fileinfo=fileinfo_row,
+            )
+            self.events[file_id] = gaze.events
+        return self
 
     def compute_event_properties(
             self,
@@ -862,7 +802,6 @@ class Dataset:
 
         Example
         -------
-
         By passing a `str` or a `Path` as `path` during initialization you can explicitly set the
         directory path of the dataset:
         >>> import pymovements as pm

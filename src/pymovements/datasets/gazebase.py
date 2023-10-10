@@ -24,6 +24,8 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
 
+import polars as pl
+
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import register_dataset
 from pymovements.gaze.experiment import Experiment
@@ -96,6 +98,7 @@ class GazeBase(DatasetDefinition):
 
     >>> dataset.load()# doctest: +SKIP
     """
+
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
@@ -153,4 +156,18 @@ class GazeBase(DatasetDefinition):
         },
     )
 
-    custom_read_kwargs: dict[str, Any] = field(default_factory=dict)
+    custom_read_kwargs: dict[str, Any] = field(
+        default_factory=lambda: {
+            'null_values': 'NaN',
+            'dtypes': {
+                'n': pl.Int64,
+                'x': pl.Float32,
+                'y': pl.Float32,
+                'val': pl.Int32,
+                'dP': pl.Float32,
+                'lab': pl.Int32,
+                'xT': pl.Float32,
+                'yT': pl.Float32,
+            },
+        },
+    )

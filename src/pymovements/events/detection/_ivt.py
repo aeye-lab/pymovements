@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-This module holds the implementation of the ivt algorithm.
-"""
+"""This module holds the implementation of the I-VT algorithm."""
 from __future__ import annotations
 
 import numpy as np
@@ -34,7 +32,6 @@ from pymovements.utils.filters import filter_candidates_remove_nans
 
 @register_event_detection
 def ivt(
-        positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
         timesteps: list[int] | np.ndarray | None = None,
         minimum_duration: int = 100,
@@ -42,8 +39,7 @@ def ivt(
         include_nan: bool = False,
         name: str = 'fixation',
 ) -> EventDataFrame:
-    """
-    Identification of fixations based on velocity-threshold
+    """Identification of fixations based on velocity-threshold (I-VT).
 
     The algorithm classifies each point as a fixation if the velocity is below
     the given velocity threshold. Consecutive fixation points are merged into
@@ -54,8 +50,6 @@ def ivt(
 
     Parameters
     ----------
-    positions: array-like, shape (N, 2)
-        Continuous 2D position time series.
     velocities: array-like, shape (N, 2)
         Corresponding continuous 2D velocity time series.
     timesteps: array-like, shape (N, )
@@ -80,16 +74,15 @@ def ivt(
     Raises
     ------
     ValueError
-        If positions or velocities are None
-        If positions or velocities do not have shape (N, 2)
-        If positions and velocities have different shapes
+        If velocities is None
+        If velocities does not have shape (N, 2)
         If velocity threshold is None.
         If velocity threshold is not greater than 0.
     """
-    positions = np.array(positions)
     velocities = np.array(velocities)
 
-    checks.check_shapes_positions_velocities(positions=positions, velocities=velocities)
+    checks.check_shapes(velocities=velocities)
+
     if velocity_threshold is None:
         raise ValueError('velocity threshold must not be None')
     if velocity_threshold <= 0:
@@ -117,6 +110,9 @@ def ivt(
     # Remove leading and trailing nan values from candidates.
     if include_nan:
         candidates = filter_candidates_remove_nans(candidates=candidates, values=velocities)
+
+    # Remove empty candidates.
+    candidates = [candidate for candidate in candidates if len(candidate) > 0]
 
     # Filter all candidates by minimum duration.
     candidates = [

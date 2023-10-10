@@ -17,9 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""
-Transforms module.
-"""
+"""Transforms module."""
 from __future__ import annotations
 
 from typing import Any
@@ -37,7 +35,7 @@ def pix2deg(
         distance_cm: float,
         origin: str,
 ) -> np.ndarray:
-    """Converts pixel screen coordinates to degrees of visual angle.
+    """Convert pixel screen coordinates to degrees of visual angle.
 
     Parameters
     ----------
@@ -387,7 +385,7 @@ def pos2vel(
 
 
 def norm(arr: np.ndarray, axis: int | None = None) -> np.ndarray | Any:
-    r"""Takes the norm of an array.
+    r"""Take the norm of an array.
 
     The norm is defined by :math:`\sqrt{x^2 + y^2}` with :math:`x` being the yaw component and
     :math:`y` being the pitch component of a coordinate.

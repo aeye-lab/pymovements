@@ -213,6 +213,8 @@ def load_gaze_files(
             custom_read_kwargs=definition.custom_read_kwargs,
         )
 
+        gaze_data = gaze_data.rename(definition.column_map)
+
         # Add fileinfo columns to dataframe.
         gaze_data = add_fileinfo(
             definition=definition,
@@ -229,41 +231,34 @@ def load_gaze_files(
             )
 
         elif preprocessed and extension == 'csv':
-            # Workaround for preprocessed column names
-            # https://github.com/aeye-lab/pymovements/pull/443
             time_column = None
+            distance_column = None
+
             if 'time' in gaze_data.columns:
                 time_column = 'time'
+
+            if 'distance' in gaze_data.columns:
+                distance_column = 'distance'
 
             pixel_columns: list[str] = list(
                 set(GazeDataFrame.valid_pixel_position_columns) & set(gaze_data.columns),
             )
-            if not pixel_columns:
-                pixel_columns = None  # type: ignore
-
             position_columns: list[str] = list(
                 set(GazeDataFrame.valid_position_columns) & set(gaze_data.columns),
             )
-            if not position_columns:
-                position_columns = None  # type: ignore
-
             velocity_columns: list[str] = list(
                 set(GazeDataFrame.valid_velocity_columns) & set(gaze_data.columns),
             )
-            if not velocity_columns:
-                velocity_columns = None  # type: ignore
-
             acceleration_columns: list[str] = list(
                 set(GazeDataFrame.valid_acceleration_columns) & set(gaze_data.columns),
             )
-            if not acceleration_columns:
-                acceleration_columns = None  # type: ignore
 
             gaze_df = GazeDataFrame(
                 gaze_data,
                 experiment=definition.experiment,
                 trial_columns=definition.trial_columns,
                 time_column=time_column,
+                distance_column=distance_column,
                 pixel_columns=pixel_columns,
                 position_columns=position_columns,
                 velocity_columns=velocity_columns,
@@ -276,6 +271,7 @@ def load_gaze_files(
                 experiment=definition.experiment,
                 trial_columns=definition.trial_columns,
                 time_column=definition.time_column,
+                distance_column=definition.distance_column,
                 pixel_columns=definition.pixel_columns,
                 position_columns=definition.position_columns,
                 velocity_columns=definition.velocity_columns,
@@ -318,7 +314,7 @@ def load_gaze_file(
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
 
-    if filepath.suffix == '.csv':
+    if filepath.suffix in {'.csv', '.txt'}:
         if preprocessed:
             gaze_df = pl.read_csv(filepath)
         else:
@@ -328,7 +324,7 @@ def load_gaze_file(
     elif filepath.suffix == '.asc':
         gaze_df = parse_eyelink(filepath, **custom_read_kwargs)
     else:
-        valid_extensions = ['csv', 'feather', 'asc']
+        valid_extensions = ['csv', 'txt', 'feather', 'asc']
         raise ValueError(
             f'unsupported file format "{filepath.suffix}".'
             f'Supported formats are: {valid_extensions}',
@@ -358,12 +354,11 @@ def add_fileinfo(
     pl.DataFrame:
         Dataframe with added columns from fileinfo dictionary keys.
     """
-
     df = df.select(
         [
             pl.lit(value).alias(column)
             for column, value in fileinfo.items()
-            if column != 'filepath'
+            if column != 'filepath' and column not in df.columns
         ] + [pl.all()],
     )
 
@@ -480,6 +475,8 @@ def save_preprocessed(
     disable_progressbar = not verbose
 
     for file_id, gaze_df in enumerate(tqdm(gaze, disable=disable_progressbar)):
+        gaze_df = gaze_df.copy()
+
         raw_filepath = paths.raw / Path(fileinfo[file_id, 'filepath'])
         preprocessed_filepath = paths.get_preprocessed_filepath(
             raw_filepath, preprocessed_dirname=preprocessed_dirname,
@@ -487,58 +484,30 @@ def save_preprocessed(
         )
 
         if extension == 'csv':
-            # this is just a work-around until merged columns are standard behavior
-            # https://github.com/aeye-lab/pymovements/pull/443
-            unnested_columns = {}
             if 'pixel' in gaze_df.frame.columns:
-                unnested_columns_pix = [
-                    'x_left_pix', 'y_left_pix',
-                    'x_right_pix', 'y_right_pix',
-                    'x_avg_pix', 'y_avg_pix',
-                ][:gaze_df.n_components]
-                gaze_df.unnest('pixel', unnested_columns_pix)
-                unnested_columns['pixel'] = unnested_columns_pix
+                gaze_df.unnest('pixel')
 
             if 'position' in gaze_df.frame.columns:
-                unnested_columns_pos = [
-                    'x_left_pos', 'y_left_pos',
-                    'x_right_pos', 'y_right_pos',
-                    'x_avg_pos', 'y_avg_pos',
-                ][:gaze_df.n_components]
-                gaze_df.unnest('position', unnested_columns_pos)
-                unnested_columns['position'] = unnested_columns_pos
+                gaze_df.unnest('position')
 
             if 'velocity' in gaze_df.frame.columns:
-                unnested_columns_vel = [
-                    'x_left_vel', 'y_left_vel',
-                    'x_right_vel', 'y_right_vel',
-                    'x_avg_vel', 'y_avg_vel',
-                ][:gaze_df.n_components]
-                gaze_df.unnest('velocity', unnested_columns_vel)
-                unnested_columns['velocity'] = unnested_columns_vel
+                gaze_df.unnest('velocity')
 
             if 'acceleration' in gaze_df.frame.columns:
-                unnested_columns_vel = [
-                    'x_left_acc', 'y_left_acc',
-                    'x_right_acc', 'y_right_acc',
-                    'x_avg_acc', 'y_avg_acc',
-                ][:gaze_df.n_components]
-                gaze_df.unnest('acceleration', unnested_columns_vel)
-                unnested_columns['acceleration'] = unnested_columns_vel
+                gaze_df.unnest('acceleration')
 
-        gaze_df_out = gaze_df.frame.clone()
         for column in gaze_df.columns:
             if column in fileinfo.columns:
-                gaze_df_out = gaze_df_out.drop(column)
+                gaze_df.frame = gaze_df.frame.drop(column)
 
         if verbose >= 2:
             print('Save file to', preprocessed_filepath)
 
         preprocessed_filepath.parent.mkdir(parents=True, exist_ok=True)
         if extension == 'feather':
-            gaze_df_out.write_ipc(preprocessed_filepath)
+            gaze_df.frame.write_ipc(preprocessed_filepath)
         elif extension == 'csv':
-            gaze_df_out.write_csv(preprocessed_filepath)
+            gaze_df.frame.write_csv(preprocessed_filepath)
         else:
             valid_extensions = ['csv', 'feather']
             raise ValueError(
