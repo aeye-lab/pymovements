@@ -120,7 +120,7 @@ def test_gaze_file_processing(gaze_from_kwargs):
     elif file_extension in {'.feather', '.ipc'}:
         gaze = pm.gaze.from_ipc(**gaze_from_kwargs)
     elif file_extension == '.asc':
-        gaze = pm.gaze.from_eyelink_asc(**gaze_from_kwargs)
+        gaze = pm.gaze.from_asc(**gaze_from_kwargs)
 
     assert gaze is not None
 
