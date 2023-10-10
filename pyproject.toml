@@ -132,8 +132,6 @@ filterwarnings = [
   "error",
   "ignore:Both a distance column and experiment.*:UserWarning",
   "ignore::DeprecationWarning",
-  "ignore::DeprecationWarning:pkg_resources",
-  "ignore::DeprecationWarning:pkg_resources.*:",
 ]
 testpaths = ['tests', 'src']
 
