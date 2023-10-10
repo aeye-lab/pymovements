@@ -36,7 +36,7 @@ dependencies = [
   "pandas>=1.2.0,<3",
   "polars>=0.19.0,<0.20.0",
   "pyarrow>=11.0.0,<14",
-  "pyopenssl>=13.0.0,<24.0.0",
+  "pyopenssl>=15.0.0,<24.0.0",
   "scipy>=1.8.0,<2",
   "tqdm>=4.27.0,<5"
 ]
