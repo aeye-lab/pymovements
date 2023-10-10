@@ -27,13 +27,13 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import importlib.metadata
 import inspect
 import os
 import sys
 from subprocess import CalledProcessError
 from subprocess import run
 
-import pkg_resources
 from pybtex.plugin import register_plugin
 from pybtex.style.formatting.plain import Style as PlainStyle
 from pybtex.style.labels import BaseLabelStyle
@@ -216,7 +216,7 @@ def linkcode_resolve(domain, info):
             return None
 
     try:
-        modpath = pkg_resources.require(topmodulename)[0].location
+        modpath = importlib.metadata.requires(topmodulename)[0].location
         filepath = os.path.relpath(inspect.getsourcefile(obj), modpath)
         if filepath is None:
             return
