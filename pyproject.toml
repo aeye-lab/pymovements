@@ -133,6 +133,7 @@ filterwarnings = [
   "error",
   "ignore:Both a distance column and experiment.*:UserWarning",
   "ignore:pkg_resources is deprecated.*:DeprecationWarning",
+  "ignore:Deprecated call to `pkg_resources.declare_namespace.*:DeprecationWarning",
   "ignore:distutils Version classes are deprecated. Use packaging.version instead.:DeprecationWarning",
   "ignore:`groupby` is deprecated. It has been renamed to `group_by`.:DeprecationWarning",
   "ignore:`lengths` is deprecated. It has been renamed to `len`.:DeprecationWarning",
