@@ -20,12 +20,13 @@
 """Test read from eyelink asc files."""
 import polars as pl
 import pytest
+from polars.testing import assert_frame_equal
 
 import pymovements as pm
 
 
 @pytest.mark.parametrize(
-    ('kwargs', 'shape', 'schema'),
+    ('kwargs', 'shape', 'schema', 'frame'),
     [
         pytest.param(
             {
@@ -38,6 +39,29 @@ import pymovements as pm
                 'pupil': pl.Float64,
                 'pixel': pl.List(pl.Float64),
             },
+            pl.from_dict(
+                data={
+                    'time': [
+                        2154556, 2154557, 2154563, 2154564, 2154597, 2154598, 2154599, 2154695,
+                        2154696, 2339227, 2339245, 2339246, 2339271, 2339272, 2339290, 2339291,
+                    ],
+                    'pupil': [
+                        778.0, 778.0, 777.0, 778.0, 784.0, 784.0, 784.0, 798.0,
+                        799.0, 619.0, 621.0, 622.0, 617.0, 617.0 ,618.0, 618.0,
+                    ],
+                    'pixel': [
+                        [138.1, 132.8], [138.2, 132.7], [137.9, 131.6], [138.1, 131.0],
+                        [139.6, 132.1], [139.5, 131.9], [139.5, 131.8], [147.2, 134.4],
+                        [147.3, 134.1], [673.2, 523.8], [629.0, 531.4], [629.9, 531.9],
+                        [639.4, 531.9], [639.0, 531.9], [637.6, 531.4], [637.3, 531.2],
+                    ],
+                },
+                schema={
+                    'time': pl.Int64,
+                    'pupil': pl.Float64,
+                    'pixel': pl.List(pl.Float64),
+                },
+            ),
             id='eyelink_asc_mono_pattern_eyelink',
         ),
         pytest.param(
@@ -56,15 +80,47 @@ import pymovements as pm
                 'screen_id': pl.Int64,
                 'task': pl.Utf8,
             },
+            pl.DataFrame(
+                data={
+                    'time': [
+                        2154556, 2154557, 2154560, 2154564, 2154597, 2154598, 2154599, 2154695,
+                        2154696, 2339227, 2339245, 2339246, 2339271, 2339272, 2339290, 2339291,
+                    ],
+                    'pupil': [
+                        778.0, 778.0, 777.0, 778.0, 784.0, 784.0, 784.0, 798.0,
+                        799.0, 619.0, 621.0, 622.0, 617.0, 617.0 ,618.0, 618.0,
+                    ],
+                    'pixel': [
+                        [138.1, 132.8], [138.2, 132.7], [137.9, 131.6], [138.1, 131.0],
+                        [139.6, 132.1], [139.5, 131.9], [139.5, 131.8], [147.2, 134.4],
+                        [147.3, 134.1], [673.2, 523.8], [629.0, 531.4], [629.9, 531.9],
+                        [639.4, 531.9], [639.0, 531.9], [637.6, 531.4], [637.3, 531.2],
+                    ],
+                    'trial_id': [0, 0, 0, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 4, 4, None],
+                    'point_id': 3 * [None] + [0, 1, 2, 3] + [None, 0] + [0, 0, 1, 2] + [0, 1, None],
+                    'screen_id': [None, 0, 1] + 13 * [None],
+                    'task': [None] + 2 * ['reading'] + 12 * ['judo'] + [None],
+                },
+                schema={
+                    'time': pl.Int64,
+                    'pupil': pl.Float64,
+                    'task': pl.Utf8,
+                    'trial_id': pl.Int64,
+                    'point_id': pl.Int64,
+                    'screen_id': pl.Int64,
+                    'pixel': pl.List(pl.Float64),
+                },
+            ),
             id='eyelink_asc_mono_pattern_list',
         ),
     ],
 )
-def test_from_asc_has_shape_and_schema(kwargs, shape, schema):
-    gaze_dataframe = pm.gaze.from_asc(**kwargs)
+def test_from_asc_has_shape_and_schema(kwargs, shape, schema, frame):
+    gaze = pm.gaze.from_asc(**kwargs)
 
-    assert gaze_dataframe.frame.shape == shape
-    assert gaze_dataframe.frame.schema == schema
+    assert gaze.frame.shape == shape
+    assert gaze.frame.schema == schema
+    assert_frame_equal(gaze.frame, frame, check_column_order=False)
 
 
 @pytest.mark.parametrize(
