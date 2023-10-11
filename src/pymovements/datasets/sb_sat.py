@@ -99,14 +99,14 @@ class SBSAT(DatasetDefinition):
     name: str = 'SBSAT'
 
     mirrors: tuple[str, ...] = (
-        'https://files.de-1.osf.io/v1/resources/cdx69/providers/osfstorage/',
+        'https://osf.io/download/',
     )
 
     resources: tuple[dict[str, str], ...] = (
         {
-            'resource': '64525979230ea6163c031267/?zip=',
+            'resource': 'jgae7/',
             'filename': 'csvs.zip',
-            'md5': '3cf074c93266b723437cf887f948c993',
+            'md5': 'a6ef1fb0ecced683cdb489c3bd3e1a5c',
         },
     )
 
