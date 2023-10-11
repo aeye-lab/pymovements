@@ -129,7 +129,17 @@ disallow_untyped_defs = false
 [tool.pytest.ini_options]
 addopts = "-ra -l --tb=long --doctest-modules"
 doctest_optionflags = "NORMALIZE_WHITESPACE"
-filterwarnings = ['ignore::DeprecationWarning:pkg_resources.*:']
+filterwarnings = [
+  "error",
+  "ignore:Both a distance column and experiment.*:UserWarning",
+  "ignore:pkg_resources is deprecated.*:DeprecationWarning",
+  "ignore:Deprecated call to `pkg_resources.declare_namespace.*:DeprecationWarning",
+  "ignore:distutils Version classes are deprecated. Use packaging.version instead.:DeprecationWarning",
+  "ignore:`groupby` is deprecated. It has been renamed to `group_by`.:DeprecationWarning",
+  "ignore:`lengths` is deprecated. It has been renamed to `len`.:DeprecationWarning",
+  "ignore:`map` is deprecated. It has been renamed to `map_batches`.:DeprecationWarning",
+  "ignore:FigureCanvasAgg is non-interactive, and thus cannot be shown:UserWarning",
+]
 testpaths = ['tests', 'src']
 
 [tool.setuptools-git-versioning]
