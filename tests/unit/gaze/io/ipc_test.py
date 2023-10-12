@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test read from csv."""
+"""Test read from IPC/feather."""
 import pytest
 
 import pymovements as pm
@@ -28,25 +28,21 @@ import pymovements as pm
     [
         pytest.param(
             {
-                'file': 'tests/gaze/io/files/monocular_example.csv',
-                'time_column': 'time', 'pixel_columns': ['x_left_pix', 'y_left_pix'],
+                'file': 'tests/files/monocular_example.feather',
             },
             (10, 2),
-            id='csv_mono_shape',
+            id='feather_mono_shape',
         ),
         pytest.param(
             {
-                'file': 'tests/gaze/io/files/binocular_example.csv',
-                'time_column': 'time',
-                'pixel_columns': ['x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix'],
-                'position_columns': ['x_left_pos', 'y_left_pos', 'x_right_pos', 'y_right_pos'],
+                'file': 'tests/files/binocular_example.feather',
             },
             (10, 3),
-            id='csv_bino_shape',
+            id='feather_bino_shape',
         ),
     ],
 )
 def test_shapes(kwargs, shape):
-    gaze_dataframe = pm.gaze.from_csv(**kwargs)
+    gaze_dataframe = pm.gaze.from_ipc(**kwargs)
 
     assert gaze_dataframe.frame.shape == shape

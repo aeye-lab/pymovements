@@ -39,6 +39,7 @@ def from_csv(
         position_columns: list[str] | None = None,
         velocity_columns: list[str] | None = None,
         acceleration_columns: list[str] | None = None,
+        distance_column: str | None = None,
         **read_csv_kwargs: Any,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
@@ -72,6 +73,10 @@ def from_csv(
         The name of the acceleration columns in the input data frame. These columns will be
         nested into the column ``acceleration``. If the list is empty or None, the nested
         ``acceleration`` column will not be created.
+    distance_column:
+        The name of the eye-to-screen distance column in the input data frame. If specified,
+        the column will be used for pixel to dva transformations. If not specified, the
+        constant eye-to-screen distance will be taken from the experiment definition.
     **read_csv_kwargs:
             Additional keyword arguments to be passed to polars to read in the csv.
 
@@ -121,7 +126,7 @@ def from_csv(
 
     >>> from pymovements.gaze.io import from_csv
     >>> gaze = from_csv(
-    ...     file='tests/gaze/io/files/monocular_example.csv',
+    ...     file='tests/files/monocular_example.csv',
     ...     time_column = 'time',
     ...     pixel_columns = ['x_left_pix','y_left_pix'],)
     >>> gaze.frame
@@ -156,6 +161,7 @@ def from_csv(
         position_columns=position_columns,
         velocity_columns=velocity_columns,
         acceleration_columns=acceleration_columns,
+        distance_column=distance_column,
     )
     return gaze_df
 
@@ -183,7 +189,7 @@ def from_ipc(
 
     >>> from pymovements.gaze.io import from_ipc
     >>> gaze = from_ipc(
-    ...     file='tests/gaze/io/files/monocular_example.feather',
+    ...     file='tests/files/monocular_example.feather',
     ...     )
     >>> gaze.frame
     shape: (10, 2)

@@ -17,32 +17,36 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test read from IPC/feather."""
+"""Test basic preprocessing on all registered public datasets."""
+import shutil
+
 import pytest
 
 import pymovements as pm
 
 
 @pytest.mark.parametrize(
-    ('kwargs', 'shape'),
-    [
-        pytest.param(
-            {
-                'file': 'tests/gaze/io/files/monocular_example.feather',
-            },
-            (10, 2),
-            id='feather_mono_shape',
-        ),
-        pytest.param(
-            {
-                'file': 'tests/gaze/io/files/binocular_example.feather',
-            },
-            (10, 3),
-            id='feather_bino_shape',
-        ),
-    ],
+    'dataset_name',
+    list(pm.dataset.DatasetLibrary.definitions.keys()),
 )
-def test_shapes(kwargs, shape):
-    gaze_dataframe = pm.gaze.from_ipc(**kwargs)
+def test_public_dataset_processing(dataset_name, tmp_path):
+    # Initialize dataset.
+    dataset_path = tmp_path / dataset_name
+    dataset = pm.Dataset(dataset_name, path=dataset_path)
 
-    assert gaze_dataframe.frame.shape == shape
+    # Download and load in dataset.
+    dataset.download()
+    dataset.load()
+
+    # Do some basic transformations.
+    if 'pixel' in dataset.gaze[0].columns:
+        dataset.pix2deg()
+    dataset.pos2vel()
+    dataset.pos2acc()
+
+    for gaze in dataset.gaze:
+        assert 'position' in gaze.columns
+        assert 'velocity' in gaze.columns
+        assert 'acceleration' in gaze.columns
+
+    shutil.rmtree(dataset_path, ignore_errors=True)

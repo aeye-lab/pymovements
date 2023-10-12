@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides an interface to the GazeOnFaces dataset."""
+"""This module provides an interface to the SB-SAT dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -139,13 +139,14 @@ class SBSAT(DatasetDefinition):
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
             'separator': '\t',
-            'columns': [
-                'time', 'book_name', 'screen_id',
-                'x_left', 'y_left', 'pupil_left',
-            ],
-            'dtypes': [
-                pl.Int64, pl.Utf8, pl.Int64,
-                pl.Float64, pl.Float64, pl.Float64,
-            ],
+            'columns': ['time', 'book_name', 'screen_id', 'x_left', 'y_left', 'pupil_left'],
+            'dtypes': {
+                'time': pl.Int64,
+                'book_name': pl.Utf8,
+                'screen_id': pl.Int32,
+                'x_left': pl.Float32,
+                'y_left': pl.Float32,
+                'pupil_left': pl.Float32,
+            },
         },
     )
