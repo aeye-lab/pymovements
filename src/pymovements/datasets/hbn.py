@@ -141,11 +141,11 @@ class HBN(DatasetDefinition):
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
             'separator': ',',
-            'columns': [
-                'time', 'x_pix', 'y_pix',
-            ],
-            'dtypes': [
-                pl.Float64, pl.Float64, pl.Float64,
-            ],
+            'columns': ['time', 'x_pix', 'y_pix'],
+            'dtypes': {
+                'time': pl.Int64,
+                'x_pix': pl.Float32,
+                'y_pix': pl.Float32,
+            },
         },
     )
