@@ -23,6 +23,7 @@ from __future__ import annotations
 import bz2
 import gzip
 import lzma
+import os
 import shutil
 import tarfile
 import zipfile
@@ -92,20 +93,18 @@ def extract_archive(
         source_path.unlink()
 
     if remove_top_level:
-        children = [str(file) for file in destination_path.glob('*')]
-        # Check if top-level directory has a single child
-        if len(children) == 1:
-            single_child = children[0]
-            if Path.is_dir(Path(single_child)):
-                shutil.copytree(single_child, destination_path, dirs_exist_ok=True)
-                shutil.rmtree(single_child)
-        # Check if top-level directory has just the two children archive and extracted archive
-        elif len(children) == 2 and destination_path == source_path.parent:
-            # Name of extracted archive has no suffix
-            single_child = children[0] if (Path(children[0]).suffixes == []) else children[1]
-            if Path.is_dir(Path(single_child)):
-                shutil.copytree(single_child, destination_path, dirs_exist_ok=True)
-                shutil.rmtree(single_child)
+        # path of extracted archive
+        extract_destination = destination_path / source_path.stem
+        if destination_path.stem == source_path.stem:
+            extract_destination = destination_path
+
+        # check if extracted archive has single child that is a directory
+        children = [str(file) for file in extract_destination.glob('*')]
+        if len(children) == 1 and os.path.isdir(children[0]):
+            # move contents of single child and remove it
+            for f in [str(file) for file in Path(children[0]).glob('*')]:
+                shutil.move(f, extract_destination)
+            Path(children[0]).rmdir()
 
     if recursive:
         # Get filepaths of all archives in extracted directory.
