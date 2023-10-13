@@ -107,6 +107,19 @@ git pull origin main
 git checkout -b feature/your-feature-branch
 ```
 
+To shorten this call you can create a git alias via
+
+```bash
+git config alias.newb '!f() { git checkout main; git pull; git checkout -b $1; }; f'
+```
+
+You can then update main and create new branches with this command:
+
+```bash
+git newb your-new-branch
+```
+
+
 We do not allow for pushing directly to the `main` branch and merge changes exclusively by
 [pull requests](#pull-requests).
 
