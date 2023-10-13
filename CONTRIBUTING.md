@@ -119,7 +119,6 @@ You can then update main and create new branches with this command:
 git newb your-new-branch
 ```
 
-
 We do not allow for pushing directly to the `main` branch and merge changes exclusively by
 [pull requests](#pull-requests).
 
