@@ -135,9 +135,6 @@ filterwarnings = [
   "ignore:pkg_resources is deprecated.*:DeprecationWarning",
   "ignore:Deprecated call to `pkg_resources.declare_namespace.*:DeprecationWarning",
   "ignore:distutils Version classes are deprecated. Use packaging.version instead.:DeprecationWarning",
-  "ignore:`groupby` is deprecated. It has been renamed to `group_by`.:DeprecationWarning",
-  "ignore:`lengths` is deprecated. It has been renamed to `len`.:DeprecationWarning",
-  "ignore:`map` is deprecated. It has been renamed to `map_batches`.:DeprecationWarning",
   "ignore:FigureCanvasAgg is non-interactive, and thus cannot be shown:UserWarning",
 ]
 testpaths = ['tests', 'src']
