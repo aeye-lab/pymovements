@@ -85,7 +85,8 @@ class DatasetDefinition:
             methods will be applied to each trial separately.
 
     time_column: str | None
-        The name of the timestamp column in the input data frame.
+        The name of the timestamp column in the input data frame. This column will be renamed to
+        ``time``.
 
     pixel_columns: list[str] | None
         The name of the pixel position columns in the input data frame. These columns will be
@@ -111,7 +112,8 @@ class DatasetDefinition:
         The name of the column containing eye-to-screen distance in millimeters for each sample
         in the input data frame. If specified, the column will be used for pixel to dva
         transformations. If not specified, the constant eye-to-screen distance will be taken from
-        the experiment definition.
+        the experiment definition. This column will be renamed to ``distance``.
+        
     """
 
     # pylint: disable=too-many-instance-attributes
