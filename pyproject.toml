@@ -34,7 +34,7 @@ dependencies = [
   "matplotlib>=3.5.0,<3.9",
   "numpy>=1.20.0,<2",
   "pandas>=1.2.0,<3",
-  "polars>=0.19.0,<0.20.0",
+  "polars>=0.19.8,<0.20.0",
   "pyarrow>=11.0.0,<14",
   "pyopenssl>=16.0.0,<24.0.0",
   "scipy>=1.8.0,<2",
@@ -135,10 +135,7 @@ filterwarnings = [
   "ignore:pkg_resources is deprecated.*:DeprecationWarning",
   "ignore:Deprecated call to `pkg_resources.declare_namespace.*:DeprecationWarning",
   "ignore:distutils Version classes are deprecated. Use packaging.version instead.:DeprecationWarning",
-  "ignore:`groupby` is deprecated. It has been renamed to `group_by`.:DeprecationWarning",
-  "ignore:`lengths` is deprecated. It has been renamed to `len`.:DeprecationWarning",
-  "ignore:`map` is deprecated. It has been renamed to `map_batches`.:DeprecationWarning",
-  "ignore:FigureCanvasAgg is non-interactive, and thus cannot be shown:UserWarning",
+  "ignore:FigureCanvasAgg is non-interactive, and thus cannot be shown:UserWarning"
 ]
 testpaths = ['tests', 'src']
 
