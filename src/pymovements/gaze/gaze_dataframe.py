@@ -357,7 +357,8 @@ class GazeDataFrame:
                 self.frame = pl.concat(
                     [
                         df.with_columns(transform_method(**kwargs))
-                        for group, df in self.frame.group_by(self.trial_columns, maintain_order=True)
+                        for group, df in
+                        self.frame.group_by(self.trial_columns, maintain_order=True)
                     ],
                 )
 
@@ -546,7 +547,7 @@ class GazeDataFrame:
 
         self.frame = self.frame.with_columns(
             pl.concat_list([pl.col(component) for component in input_columns])
-            .alias(output_column),
+                .alias(output_column),
         ).drop(input_columns)
 
     def unnest(
