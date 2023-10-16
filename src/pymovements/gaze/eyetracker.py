@@ -20,7 +20,6 @@
 """This module holds the Screen class."""
 from __future__ import annotations
 
-import numpy as np
 
 from pymovements.utils import decorators
 
