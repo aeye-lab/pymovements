@@ -547,7 +547,7 @@ class GazeDataFrame:
 
         self.frame = self.frame.with_columns(
             pl.concat_list([pl.col(component) for component in input_columns])
-                .alias(output_column),
+            .alias(output_column),
         ).drop(input_columns)
 
     def unnest(
