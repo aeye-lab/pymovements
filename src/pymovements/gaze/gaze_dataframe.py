@@ -705,7 +705,7 @@ class GazeDataFrame:
         list_lengths = {
             list_length
             for column in considered_columns
-            for list_length in self.frame.get_column(column).list.lengths().unique().to_list()
+            for list_length in self.frame.get_column(column).list.len().unique().to_list()
         }
 
         for column_specifier_list in column_specifiers:
