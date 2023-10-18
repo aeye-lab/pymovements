@@ -558,7 +558,7 @@ def savitzky_golay(
 
     return pl.concat_list(
         [
-            pl.col(input_column).list.get(component).map(func).list.explode()
+            pl.col(input_column).list.get(component).map_batches(func).list.explode()
             for component in range(n_components)
         ],
     ).alias(output_column)
@@ -675,7 +675,7 @@ def smooth(
 
             return pl.concat_list(
                 [
-                    pl.col(column).list.get(component).map(pad_func).list.explode()
+                    pl.col(column).list.get(component).map_batches(pad_func).list.explode()
                     .rolling_mean(window_size=window_length, center=True)
                     .shift(periods=pad_kwargs['pad_width'])
                     .slice(pad_kwargs['pad_width'] * 2)
@@ -685,7 +685,7 @@ def smooth(
 
         return pl.concat_list(
             [
-                pl.col(column).list.get(component).map(pad_func).list.explode()
+                pl.col(column).list.get(component).map_batches(pad_func).list.explode()
                 .ewm_mean(
                     span=window_length,
                     adjust=False,
