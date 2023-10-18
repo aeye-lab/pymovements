@@ -813,21 +813,6 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
             'nor experiment eye-to-screen distance is specified.',
             id='distance_column_not_in_dataframe',
         ),
-    ],
-)
-def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg):
-    gaze_df = pm.GazeDataFrame(**init_kwargs)
-
-    with pytest.raises(exception) as excinfo:
-        gaze_df.pix2deg()
-
-    msg, = excinfo.value.args
-    assert msg == expected_msg
-
-
-@pytest.mark.parametrize(
-    ('init_kwargs', 'warning', 'expected_msg'),
-    [
         pytest.param(
             {
                 'data': pl.DataFrame(schema={'d': pl.Float64, 'x': pl.Float64, 'y': pl.Float64}),
@@ -844,14 +829,14 @@ def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg)
         ),
     ],
 )
-def test_gaze_dataframe_pix2deg_warnings(init_kwargs, warning, expected_msg):
+def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg):
     gaze_df = pm.GazeDataFrame(**init_kwargs)
 
-    with pytest.warns(warning) as excinfo:
+    with pytest.raises(exception) as excinfo:
         gaze_df.pix2deg()
 
-    msg = excinfo[0].message.args[0]
-    assert expected_msg == msg
+    msg, = excinfo.value.args
+    assert msg == expected_msg
 
 
 @pytest.mark.parametrize(

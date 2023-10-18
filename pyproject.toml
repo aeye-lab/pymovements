@@ -131,7 +131,6 @@ addopts = "-ra -l --tb=long --doctest-modules"
 doctest_optionflags = "NORMALIZE_WHITESPACE"
 filterwarnings = [
   "error",
-  "ignore:Both a distance column and experiment.*:UserWarning",
   "ignore:pkg_resources is deprecated.*:DeprecationWarning",
   "ignore:Deprecated call to `pkg_resources.declare_namespace.*:DeprecationWarning",
   "ignore:distutils Version classes are deprecated. Use packaging.version instead.:DeprecationWarning",
