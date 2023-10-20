@@ -23,6 +23,8 @@ from __future__ import annotations
 import bz2
 import gzip
 import lzma
+import os
+import shutil
 import tarfile
 import zipfile
 from collections.abc import Callable
@@ -37,6 +39,7 @@ def extract_archive(
         destination_path: Path | None = None,
         recursive: bool = True,
         remove_finished: bool = False,
+        remove_top_level: bool = True,
         verbose: int = 1,
 ) -> Path:
     """Extract an archive.
@@ -55,11 +58,12 @@ def extract_archive(
         Recursively extract archives which are included in extracted archive.
     remove_finished : bool
         If ``True``, remove the file after the extraction.
+    remove_top_level: bool
+        If ``True``, remove the top-level directory if it has only one child.
     verbose:
         Verbosity levels: (1) Print messages for extracting each dataset resource without printing
         messages for recursive archives. (2) Print additional messages for each recursive archive
         extract.
-
     Returns
     -------
     Path :
@@ -88,6 +92,20 @@ def extract_archive(
     if remove_finished:
         source_path.unlink()
 
+    if remove_top_level:
+        # path of extracted archive
+        extract_destination = destination_path / source_path.stem
+        if destination_path.stem == source_path.stem:
+            extract_destination = destination_path
+
+        # check if extracted archive has single child that is a directory
+        children = [str(file) for file in extract_destination.glob('*')]
+        if len(children) == 1 and os.path.isdir(children[0]):
+            # move contents of single child and remove it
+            for f in [str(file) for file in Path(children[0]).glob('*')]:
+                shutil.move(f, extract_destination)
+            Path(children[0]).rmdir()
+
     if recursive:
         # Get filepaths of all archives in extracted directory.
         archive_extensions = [
@@ -107,6 +125,7 @@ def extract_archive(
                 destination_path=extract_destination,
                 recursive=recursive,
                 remove_finished=remove_finished,
+                remove_top_level=remove_top_level,
                 verbose=0 if verbose < 2 else 2,
             )
 
