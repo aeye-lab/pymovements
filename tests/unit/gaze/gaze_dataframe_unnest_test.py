@@ -346,14 +346,14 @@ def test_gaze_dataframe_unnest_has_expected_frame_multiple_unnest(init_data, unn
             pl.DataFrame({'pixel': [[1.23, 4.56]]}),
             {'input_columns': 'pixel', 'output_suffixes': ['_x', '_y', '_z']},
             ValueError,
-            'Number of output columns / suffixes (3) must be a multiple of components (2)',
+            'Number of output columns / suffixes (3) must match number of components (2)',
             id='df_single_row_two_pixel_components_three_output_suffixes',
         ),
         pytest.param(
             pl.DataFrame({'pixel': [[1.23, 4.56]]}),
             {'input_columns': 'pixel', 'output_columns': ['x']},
             ValueError,
-            'Number of output columns / suffixes (1) must be a multiple of components (2)',
+            'Number of output columns / suffixes (1) must match number of components (2)',
             id='df_single_row_two_pixel_components_one_output_column',
         ),
         pytest.param(
@@ -387,7 +387,7 @@ def test_gaze_dataframe_unnest_has_expected_frame_multiple_unnest(init_data, unn
             {'input_columns': ['position', 'acceleration'], 'output_columns': ['_x', '_y']},
             ValueError,
             "You cannot specify output columns if you want to unnest more than one input column. "
-            "Please specify output suffixes instead or none",
+            "Please specify output suffixes or use a single input column instead.",
             id='df_single_row_two_components_unnest_two_multiple_columns_columns_specified',
         ),
         pytest.param(
@@ -400,7 +400,7 @@ def test_gaze_dataframe_unnest_has_expected_frame_multiple_unnest(init_data, unn
             {'output_columns': ['_x', '_y']},
             ValueError,
             "You cannot specify output columns if you want to unnest more than one input column. "
-            "Please specify output suffixes instead or none",
+            "Please specify output suffixes or use a single input column instead.",
             id='df_single_row_two_components_unnest_all_default_values_multiple_columns_columns_specified',
         ),
         pytest.param(
@@ -413,7 +413,7 @@ def test_gaze_dataframe_unnest_has_expected_frame_multiple_unnest(init_data, unn
             {},
             ValueError,
             'No columns to unnest. '
-            'Please specify columns to unnest via the columns argument.',
+            'Please specify columns to unnest via the "input_columns" argument.',
             id='df_single_row_two_components_unnest_all_default_values_no_cols_to_unnest',
         ),
     ],

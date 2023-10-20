@@ -590,7 +590,7 @@ class GazeDataFrame:
             if len(input_columns) == 0:
                 raise ValueError(
                     'No columns to unnest. '
-                    'Please specify columns to unnest via the columns argument.',
+                    'Please specify columns to unnest via the "input_columns" argument.',
                 )
 
         if isinstance(input_columns, str):
@@ -599,7 +599,8 @@ class GazeDataFrame:
         # no support for custom output columns if more than one input column will be unnested
         if output_columns is not None and not len(input_columns) == 1:
             raise ValueError("You cannot specify output columns if you want to unnest more than "
-                             "one input column. Please specify output suffixes instead or none")
+                             "one input column. Please specify output suffixes or use a single "
+                             "input column instead.")
 
         checks.check_is_mutual_exclusive(
             output_columns=output_columns,
@@ -629,7 +630,7 @@ class GazeDataFrame:
         ]) != self.n_components * len(input_columns):
             raise ValueError(
                 f'Number of output columns / suffixes ({len(col_names[0])}) '
-                f'must be a multiple of components ({self.n_components})',
+                f'must match number of components ({self.n_components})',
             )
 
         if len({name for name_list in col_names for name in name_list}) != len(
