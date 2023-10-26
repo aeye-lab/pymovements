@@ -115,10 +115,10 @@ class Experiment:
             origin=origin,
         )
 
-        self.sampling_rate = sampling_rate
-
         if eyetracker is not None:
             self.sampling_rate = eyetracker.sampling_rate
+        elif sampling_rate is not None:
+            self.sampling_rate = sampling_rate
 
         checks.check_is_not_none(sampling_rate=self.sampling_rate)
         assert self.sampling_rate is not None
