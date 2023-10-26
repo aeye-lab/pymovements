@@ -20,7 +20,8 @@
 """This module holds the EyeTracker class."""
 from __future__ import annotations
 
-from pymovements.utils import decorators, checks
+from pymovements.utils import checks
+from pymovements.utils import decorators
 
 
 @decorators.auto_str
