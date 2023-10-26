@@ -30,13 +30,13 @@ def test_eyetracker_without_sampling_rate():
             None, False, True, 'EyeLink 1000 Plus', '1.5.3', 'Arm Mount / Monocular / Remote',
         )
         Experiment(
-            1280, 1024, 38, 30, 68, 'lower left', None, None
+            1280, 1024, 38, 30, 68, 'lower left', None, eyetracker=eyetracker,
         )
 
 
 def test_eyetracker_with_eyetracker():
     eyetracker = EyeTracker(
-        1000.0, False, True, 'EyeLink 1000 Plus','1.5.3', 'Arm Mount / Monocular / Remote',
+        1000.0, False, True, 'EyeLink 1000 Plus', '1.5.3', 'Arm Mount / Monocular / Remote',
     )
     experiment = Experiment(
         1280, 1024, 38, 30, 68, 'lower left', eyetracker=eyetracker,
