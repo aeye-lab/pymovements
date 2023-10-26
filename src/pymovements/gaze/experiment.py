@@ -166,6 +166,7 @@ class Experiment:
         ...     distance_cm=68,
         ...     origin='lower left',
         ...     sampling_rate=1000.0,
+        ...     eyetracker=None,
         ... )
         >>> arr = [[0., 0.], [1., 1.], [2., 2.], [3., 3.], [4., 4.], [5., 5.]]
         >>> experiment.pos2vel(

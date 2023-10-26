@@ -50,9 +50,9 @@ class EyeTracker:
             sampling_rate: float,
             left: bool,
             right: bool,
-            model: str,
-            version: str,
-            mount: str,
+            model: str | None = None,
+            version: str | None = None,
+            mount: str | None = None,
     ):
         """Initialize Eyetracker.
 
