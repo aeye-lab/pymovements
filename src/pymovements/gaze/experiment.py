@@ -23,8 +23,8 @@ from __future__ import annotations
 import numpy as np
 
 from pymovements.gaze import transforms_numpy
-from pymovements.gaze.screen import Screen
 from pymovements.gaze.eyetracker import EyeTracker
+from pymovements.gaze.screen import Screen
 from pymovements.utils import checks
 from pymovements.utils import decorators
 
@@ -124,7 +124,6 @@ class Experiment:
         assert self.sampling_rate is not None
 
         checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
-
 
     def pos2vel(
             self,
