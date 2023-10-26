@@ -17,10 +17,10 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module holds the Screen class."""
+"""This module holds the EyeTracker class."""
 from __future__ import annotations
 
-from pymovements.utils import decorators
+from pymovements.utils import decorators, checks
 
 
 @decorators.auto_str
@@ -29,10 +29,12 @@ class EyeTracker:
 
     Attributes
     ----------
-    sampling_rate_hz : int
+    sampling_rate : float
         Sample rate of recording (in Hz)
-    eyes : set[str]
-        Set of tracked eyes
+    left : bool
+        Whether the left eye is tracked
+    right : bool
+        Whether the right eye is tracked
     model : str
         EyeLink tracker model (e.g. 'EyeLink II', 'EyeLink 1000')
     version : str
@@ -44,8 +46,9 @@ class EyeTracker:
 
     def __init__(
             self,
-            sampling_rate_hz: int,
-            eyes: set[str],
+            sampling_rate: float,
+            left: bool,
+            right: bool,
             model: str,
             version: str,
             mount: str,
@@ -54,10 +57,12 @@ class EyeTracker:
 
         Parameters
         ----------
-        sampling_rate_hz : int
+        sampling_rate : float
             Sample rate of recording (in Hz)
-        eyes : set[str]
-            Set of tracked eyes
+        left : bool
+            Whether the left eye is tracked
+        right : bool
+            Whether the right eye is tracked
         model : str
             EyeLink tracker model (e.g. 'EyeLink II', 'EyeLink 1000')
         version : str
@@ -68,17 +73,26 @@ class EyeTracker:
         Examples
         --------
         >>> eyetracker = EyeTracker(
-        ...     sampling_rate_hz = 1000,
-        ...     eyes = {'right'},
+        ...     sampling_rate = 1000.0,
+        ...     left = False,
+        ...     right = True,
         ...     model = 'EyeLink 1000 Plus',
         ...     version = '1.5.3',
         ...     mount = 'Arm Mount / Monocular / Remote',
         ... )
         >>> print(eyetracker)
+        EyeTracker(sampling_rate=1000.00, left=False, right=True, model='EyeLink 1000 Plus',
+        version='1.5.3', mount='Arm Mount / Monocular / Remote')
 
         """
-        self.sampling_rate_hz = sampling_rate_hz
-        self.eyes = eyes
+        checks.check_is_not_none(sampling_rate=sampling_rate)
+        assert sampling_rate is not None
+
+        checks.check_is_greater_than_zero(sampling_rate=sampling_rate)
+
+        self.sampling_rate = sampling_rate
+        self.left = left
+        self.right = right
         self.model = model
         self.version = version
         self.mount = mount
