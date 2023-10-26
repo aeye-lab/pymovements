@@ -24,6 +24,7 @@ import numpy as np
 
 from pymovements.gaze import transforms_numpy
 from pymovements.gaze.screen import Screen
+from pymovements.gaze.eyetracker import EyeTracker
 from pymovements.utils import checks
 from pymovements.utils import decorators
 
@@ -49,6 +50,7 @@ class Experiment:
             distance_cm: float | None = None,
             origin: str = 'lower left',
             sampling_rate: float | None = None,
+            eyetracker: EyeTracker | None = None,
     ):
         """Initialize Experiment.
 
@@ -70,6 +72,8 @@ class Experiment:
             Specifies the screen location of the origin of the pixel coordinate system.
         sampling_rate : float
             Sampling rate in Hz
+        eyetracker : EyeTracker
+            EyeTracker object for experiment
 
         Examples
         --------
@@ -80,7 +84,9 @@ class Experiment:
         ...     screen_height_cm=30,
         ...     distance_cm=68,
         ...     origin='lower left',
-        ...     sampling_rate=1000.0,
+        ...     sampling_rate=None,
+        ...     eyetracker=EyeTracker(1000.0, False, True, 'EyeLink 1000 Plus', '1.5.3',
+        ...                           'Arm Mount / Monocular / Remote',),
         ... )
         >>> print(experiment)
         Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38,
@@ -109,12 +115,16 @@ class Experiment:
             origin=origin,
         )
 
-        checks.check_is_not_none(sampling_rate=sampling_rate)
-        assert sampling_rate is not None
+        if sampling_rate is not None:
+            self.sampling_rate = sampling_rate
+        elif eyetracker is not None:
+            self.sampling_rate = eyetracker.sampling_rate
 
-        checks.check_is_greater_than_zero(sampling_rate=sampling_rate)
+        checks.check_is_not_none(sampling_rate=self.sampling_rate)
+        assert self.sampling_rate is not None
 
-        self.sampling_rate = sampling_rate
+        checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
+
 
     def pos2vel(
             self,
