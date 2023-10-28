@@ -234,26 +234,26 @@ def from_numpy(
 
     pixel_columns = None
     if pixel is not None:
-        df = pl.from_numpy(data=pixel, orient=orient).select(pl.all().prefix('pixel_'))
+        df = pl.from_numpy(data=pixel, orient=orient).select(pl.all().name.prefix('pixel_'))
         dfs.append(df)
         pixel_columns = df.columns
 
     position_columns = None
     if position is not None:
-        df = pl.from_numpy(data=position, orient=orient).select(pl.all().prefix('position_'))
+        df = pl.from_numpy(data=position, orient=orient).select(pl.all().name.prefix('osition_'))
         dfs.append(df)
         position_columns = df.columns
 
     velocity_columns = None
     if velocity is not None:
-        df = pl.from_numpy(data=velocity, orient=orient).select(pl.all().prefix('velocity_'))
+        df = pl.from_numpy(data=velocity, orient=orient).select(pl.all().name.prefix('velocity_'))
         dfs.append(df)
         velocity_columns = df.columns
 
     acceleration_columns = None
     if acceleration is not None:
         df = pl.from_numpy(data=acceleration, orient=orient)
-        df = df.select(pl.all().prefix('acceleration_'))
+        df = df.select(pl.all().name.prefix('acceleration_'))
         dfs.append(df)
         acceleration_columns = df.columns
 
