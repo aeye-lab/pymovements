@@ -19,7 +19,6 @@
 # SOFTWARE.
 """Test basic preprocessing on various datasets."""
 
-import shutil
 import pytest
 
 import pymovements as pm
@@ -42,7 +41,7 @@ import pymovements as pm
 )
 def fixture_dataset_init_kwargs(request):
     init_param_dict = {
-        'csv_monocular':pm.dataset.DatasetDefinition(
+        'csv_monocular': pm.dataset.DatasetDefinition(
             time_column='time',
             pixel_columns=['x_left_pix', 'y_left_pix'],
             experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
@@ -66,7 +65,7 @@ def fixture_dataset_init_kwargs(request):
         'hbn': pm.datasets.HBN(
             filename_format='hbn_example.csv',
             filename_format_dtypes={},
-            trial_columns=None
+            trial_columns=None,
         ),
         'sbsat': pm.datasets.SBSAT(
             filename_format='sbsat_example.csv',
@@ -76,12 +75,12 @@ def fixture_dataset_init_kwargs(request):
         'gaze_on_faces': pm.datasets.GazeOnFaces(
             filename_format='gaze_on_faces_example.csv',
             filename_format_dtypes={},
-            trial_columns=None
+            trial_columns=None,
         ),
         'gazebase': pm.datasets.GazeBase(
             filename_format='gazebase_example.csv',
             filename_format_dtypes={},
-            trial_columns=None
+            trial_columns=None,
         ),
         'gazebase_vr': pm.datasets.GazeBaseVR(
             filename_format='gazebase_vr_example.csv',
@@ -92,7 +91,7 @@ def fixture_dataset_init_kwargs(request):
             filename_format='judo1000_example.csv',
             filename_format_dtypes={},
             trial_columns=['trial_id'],
-        )
+        ),
 
     }
     yield pm.dataset.Dataset(
