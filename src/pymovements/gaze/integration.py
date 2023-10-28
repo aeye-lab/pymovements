@@ -240,7 +240,7 @@ def from_numpy(
 
     position_columns = None
     if position is not None:
-        df = pl.from_numpy(data=position, orient=orient).select(pl.all().name.prefix('osition_'))
+        df = pl.from_numpy(data=position, orient=orient).select(pl.all().name.prefix('position_'))
         dfs.append(df)
         position_columns = df.columns
 
