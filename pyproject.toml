@@ -135,8 +135,7 @@ filterwarnings = [
   "ignore:pkg_resources is deprecated.*:DeprecationWarning",
   "ignore:Deprecated call to `pkg_resources.declare_namespace.*:DeprecationWarning",
   "ignore:distutils Version classes are deprecated. Use packaging.version instead.:DeprecationWarning",
-  "ignore:FigureCanvasAgg is non-interactive, and thus cannot be shown:UserWarning",
-  "ignore:`the argument periods` for `shift` is deprecated. It has been renamed to `n`:DeprecationWarning"
+  "ignore:FigureCanvasAgg is non-interactive, and thus cannot be shown:UserWarning"
 ]
 testpaths = ['tests', 'src']
 
