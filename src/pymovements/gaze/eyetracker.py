@@ -66,7 +66,7 @@ class EyeTracker:
     version: str = ''
     mount: str = ''
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Check that the sampling rate is a positive number."""
         checks.check_is_not_none(sampling_rate=self.sampling_rate)
         assert self.sampling_rate is not None
