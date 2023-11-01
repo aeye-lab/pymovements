@@ -55,8 +55,8 @@ class EyeTracker:
         ...     mount = 'Arm Mount / Monocular / Remote',
         ... )
         >>> print(eyetracker)
-        EyeTracker(sampling_rate=1000.00, left=False, right=True, model=EyeLink 1000 Plus,
-        version=1.5.3, mount=Arm Mount / Monocular / Remote)
+        EyeTracker(sampling_rate=1000.0, left=False, right=True, model='EyeLink 1000 Plus',
+        version='1.5.3', mount='Arm Mount / Monocular / Remote')
     """
 
     sampling_rate: float
