@@ -114,10 +114,11 @@ class Experiment:
             distance_cm=distance_cm,
             origin=origin,
         )
+        checks.check_is_mutual_exclusive(sampling_rate=sampling_rate, eyetracker=eyetracker)
 
         if sampling_rate is not None:
             self.sampling_rate = sampling_rate
-        if eyetracker is not None:
+        else:
             self.sampling_rate = eyetracker.sampling_rate
 
         checks.check_is_not_none(sampling_rate=self.sampling_rate)
