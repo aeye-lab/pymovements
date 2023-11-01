@@ -20,11 +20,11 @@
 """This module holds the EyeTracker class."""
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pymovements.utils import checks
-from pymovements.utils import decorators
 
 
-@decorators.auto_str
+@dataclass
 class EyeTracker:
     """EyeTracker class for holding eyetracker properties.
 
@@ -43,35 +43,7 @@ class EyeTracker:
     mount : str
         The mounting setup of the EyeLink (e.g. 'Desktop / Monocular / Remote')
 
-    """
-
-    def __init__(
-            self,
-            sampling_rate: float,
-            left: bool,
-            right: bool,
-            model: str = '',
-            version: str = '',
-            mount: str = '',
-    ):
-        """Initialize Eyetracker.
-
-        Parameters
-        ----------
-        sampling_rate : float
-            Sample rate of recording (in Hz)
-        left : bool
-            Whether the left eye is tracked
-        right : bool
-            Whether the right eye is tracked
-        model : str
-            EyeLink tracker model (e.g. 'EyeLink II', 'EyeLink 1000')
-        version : str
-            EyeLink software version number
-        mount : str
-            The mounting setup of the EyeLink (e.g. 'Desktop / Monocular / Remote')
-
-        Examples
+    Examples
         --------
         >>> eyetracker = EyeTracker(
         ...     sampling_rate = 1000.0,
@@ -84,16 +56,19 @@ class EyeTracker:
         >>> print(eyetracker)
         EyeTracker(sampling_rate=1000.00, left=False, right=True, model=EyeLink 1000 Plus,
         version=1.5.3, mount=Arm Mount / Monocular / Remote)
+    """
+    sampling_rate: float
+    left: bool
+    right: bool
+    model: str = ''
+    version: str = ''
+    mount: str = ''
+
+    def __post_init__(self):
+        """Checks that the sampling rate is a positive number.
 
         """
-        checks.check_is_not_none(sampling_rate=sampling_rate)
-        assert sampling_rate is not None
+        checks.check_is_not_none(sampling_rate=self.sampling_rate)
+        assert self.sampling_rate is not None
 
-        checks.check_is_greater_than_zero(sampling_rate=sampling_rate)
-
-        self.sampling_rate = sampling_rate
-        self.left = left
-        self.right = right
-        self.model = model
-        self.version = version
-        self.mount = mount
+        checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
