@@ -28,7 +28,6 @@ from pymovements.gaze.screen import Screen
 from pymovements.utils import checks
 from pymovements.utils import decorators
 
-
 @decorators.auto_str
 class Experiment:
     """Experiment class for holding experiment properties.

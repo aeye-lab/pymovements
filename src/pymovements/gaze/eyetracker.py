@@ -27,6 +27,7 @@ from pymovements.utils import checks
 
 @dataclass
 class EyeTracker:
+
     """EyeTracker class for holding eyetracker properties.
 
     Attributes
@@ -66,9 +67,7 @@ class EyeTracker:
     mount: str = ''
 
     def __post_init__(self):
-        """Checks that the sampling rate is a positive number.
-
-        """
+        """Checks that the sampling rate is a positive number. """
         checks.check_is_not_none(sampling_rate=self.sampling_rate)
         assert self.sampling_rate is not None
 
