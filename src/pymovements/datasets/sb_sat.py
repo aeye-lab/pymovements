@@ -99,14 +99,14 @@ class SBSAT(DatasetDefinition):
     name: str = 'SBSAT'
 
     mirrors: tuple[str, ...] = (
-        'https://files.de-1.osf.io/v1/resources/cdx69/providers/osfstorage/',
+        'https://osf.io/download/',
     )
 
     resources: tuple[dict[str, str], ...] = (
         {
-            'resource': '64525979230ea6163c031267/?zip=',
-            'filename': 'csvs.zip',
-            'md5': '3cf074c93266b723437cf887f948c993',
+            'resource': 'jgae7/',
+            'filename': 'sbsat_csvs.zip',
+            'md5': 'a6ef1fb0ecced683cdb489c3bd3e1a5c',
         },
     )
 
@@ -139,13 +139,14 @@ class SBSAT(DatasetDefinition):
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
             'separator': '\t',
-            'columns': [
-                'time', 'book_name', 'screen_id',
-                'x_left', 'y_left', 'pupil_left',
-            ],
-            'dtypes': [
-                pl.Int64, pl.Utf8, pl.Int64,
-                pl.Float64, pl.Float64, pl.Float64,
-            ],
+            'columns': ['time', 'book_name', 'screen_id', 'x_left', 'y_left', 'pupil_left'],
+            'dtypes': {
+                'time': pl.Int64,
+                'book_name': pl.Utf8,
+                'screen_id': pl.Int32,
+                'x_left': pl.Float32,
+                'y_left': pl.Float32,
+                'pupil_left': pl.Float32,
+            },
         },
     )

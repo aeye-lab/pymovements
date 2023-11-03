@@ -117,6 +117,7 @@ html_css_files = [
 ]
 
 html_theme_options = {
+    'navigation_with_keys': False,
     'external_links': [
         {
             'name': 'Contributing',

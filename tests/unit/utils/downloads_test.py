@@ -156,7 +156,14 @@ def test_download_and_extract_archive(tmp_path):
     md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
     extract_dirpath = tmp_path / 'extracted'
 
-    download_and_extract_archive(url, tmp_path, download_filename, extract_dirpath, md5)
+    download_and_extract_archive(
+        url,
+        tmp_path,
+        download_filename,
+        extract_dirpath,
+        md5,
+        remove_top_level=False,
+    )
 
     assert extract_dirpath.exists()
     assert (extract_dirpath / 'pymovements-0.4.0').exists()

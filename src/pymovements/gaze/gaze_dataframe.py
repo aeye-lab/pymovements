@@ -357,7 +357,8 @@ class GazeDataFrame:
                 self.frame = pl.concat(
                     [
                         df.with_columns(transform_method(**kwargs))
-                        for group, df in self.frame.groupby(self.trial_columns, maintain_order=True)
+                        for group, df in
+                        self.frame.group_by(self.trial_columns, maintain_order=True)
                     ],
                 )
 
@@ -737,7 +738,7 @@ class GazeDataFrame:
         list_lengths = {
             list_length
             for column in considered_columns
-            for list_length in self.frame.get_column(column).list.lengths().unique().to_list()
+            for list_length in self.frame.get_column(column).list.len().unique().to_list()
         }
 
         for column_specifier_list in column_specifiers:
