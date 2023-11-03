@@ -411,7 +411,7 @@ def test_gaze_dataframe_unnest_has_expected_frame_multiple_unnest(init_data, unn
                 'wrong_acceleration_name': [[1.23, 4.56]],
             }),
             {},
-            ValueError,
+            Warning,
             'No columns to unnest. '
             'Please specify columns to unnest via the "input_columns" argument.',
             id='df_single_row_two_components_unnest_all_default_values_no_cols_to_unnest',

@@ -588,7 +588,7 @@ class GazeDataFrame:
             input_columns = [col for col in cols if col in self.frame.columns]
 
             if len(input_columns) == 0:
-                raise ValueError(
+                raise Warning(
                     'No columns to unnest. '
                     'Please specify columns to unnest via the "input_columns" argument.',
                 )
