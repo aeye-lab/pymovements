@@ -399,8 +399,8 @@ def pos2vel(
         return pl.concat_list(
             [
                 (
-                    pl.col(position_column).shift(periods=-1).list.get(component)
-                    - pl.col(position_column).shift(periods=1).list.get(component)
+                    pl.col(position_column).shift(n=-1).list.get(component)
+                    - pl.col(position_column).shift(n=1).list.get(component)
                 ) * (sampling_rate / 2)
                 for component in range(n_components)
             ],
@@ -414,10 +414,10 @@ def pos2vel(
         return pl.concat_list(
             [
                 (
-                    pl.col(position_column).shift(periods=-2).list.get(component)
-                    + pl.col(position_column).shift(periods=-1).list.get(component)
-                    - pl.col(position_column).shift(periods=1).list.get(component)
-                    - pl.col(position_column).shift(periods=2).list.get(component)
+                    pl.col(position_column).shift(n=-2).list.get(component)
+                    + pl.col(position_column).shift(n=-1).list.get(component)
+                    - pl.col(position_column).shift(n=1).list.get(component)
+                    - pl.col(position_column).shift(n=2).list.get(component)
                 ) * (sampling_rate / 6)
                 for component in range(n_components)
             ],
@@ -664,7 +664,7 @@ def smooth(
 
         if padding is not None:
             pad_kwargs['mode'] = padding
-            pad_kwargs['pad_width'] = np.ceil(window_length / 2).astype(int)
+            pad_kwargs['pad_width'] = int(np.ceil(window_length / 2))
 
             pad_func = partial(
                 np.pad,
@@ -677,7 +677,7 @@ def smooth(
                 [
                     pl.col(column).list.get(component).map_batches(pad_func).list.explode()
                     .rolling_mean(window_size=window_length, center=True)
-                    .shift(periods=pad_kwargs['pad_width'])
+                    .shift(n=pad_kwargs['pad_width'])
                     .slice(pad_kwargs['pad_width'] * 2)
                     for component in range(n_components)
                 ],
@@ -690,7 +690,7 @@ def smooth(
                     span=window_length,
                     adjust=False,
                     min_periods=window_length,
-                ).shift(periods=pad_kwargs['pad_width'])
+                ).shift(n=pad_kwargs['pad_width'])
                 .slice(pad_kwargs['pad_width'] * 2)
                 for component in range(n_components)
             ],
