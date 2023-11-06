@@ -36,12 +36,14 @@ from pymovements.gaze.experiment import Experiment
 class GazeGraph(DatasetDefinition):
     """GazeGraph dataset :cite:p:`GazeGraph`.
 
-    TThe dataset is collected from eight subjects (four female and four male, aged between 24 and 35)
-    using the Pupil Core eye tracker. During data collection, the subjects wear the eye tracker and sit
-    in front of the computer screen (a 34-inch display) at a distance of approximately 50cm.
-    We conduct the manufacturer's default on-screen five-points calibration for each of the subjects.
-    Note that we have done only one calibration per subject, and the subjects can move their heads
-    and upper bodies freely during the experiment.
+    The dataset is collected from eight subjects (four female and four male,
+    aged between 24 and 35) using the Pupil Core eye tracker. During data collection,
+    the subjects wear the eye tracker and sit in front of the computer screen
+    (a 34-inch display) at a distance of approximately 50cm. We conduct the
+    manufacturer's default on-screen five-points calibration for each of
+    the subjects. 
+    Note that we have done only one calibration per subject, and the subjects
+    can move their heads and upper bodies freely during the experiment.
     The gaze is recorded at a 30Hz sampling rate.
 
     Check the respective paper for details :cite:p:`GazeGraph`.
