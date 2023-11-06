@@ -41,7 +41,7 @@ class GazeGraph(DatasetDefinition):
     the subjects wear the eye tracker and sit in front of the computer screen
     (a 34-inch display) at a distance of approximately 50cm. We conduct the
     manufacturer's default on-screen five-points calibration for each of
-    the subjects. 
+    the subjects.
     Note that we have done only one calibration per subject, and the subjects
     can move their heads and upper bodies freely during the experiment.
     The gaze is recorded at a 30Hz sampling rate.
