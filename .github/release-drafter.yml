@@ -1,4 +1,4 @@
-name-template: pymovements $RESOLVED_VERSION
+name-template: pymovements v$RESOLVED_VERSION
 
 version-resolver:
   minor:

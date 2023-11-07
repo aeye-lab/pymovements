@@ -767,13 +767,20 @@ class Dataset:
         )
         return self
 
-    def extract(self, remove_finished: bool = False, verbose: int = 1) -> Dataset:
+    def extract(
+            self,
+            remove_finished: bool = False,
+            remove_top_level: bool = True,
+            verbose: int = 1,
+    ) -> Dataset:
         """Extract downloaded dataset archive files.
 
         Parameters
         ----------
         remove_finished : bool
             Remove archive files after extraction.
+        remove_top_level: bool
+            If ``True``, remove the top-level directory if it has only one child.
         verbose : int
             Verbosity levels: (1) Print messages for extracting each dataset resource without
             printing messages for recursive archives. (2) Print additional messages for each
@@ -788,6 +795,7 @@ class Dataset:
             definition=self.definition,
             paths=self.paths,
             remove_finished=remove_finished,
+            remove_top_level=remove_top_level,
             verbose=verbose,
         )
         return self

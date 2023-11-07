@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides an interface to the SB-SAT dataset."""
+"""This module provides an interface to the GazeGraph dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -33,16 +33,20 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 @register_dataset
-class SBSAT(DatasetDefinition):
-    """SB-SAT dataset :cite:p:`SB-SAT`.
+class GazeGraph(DatasetDefinition):
+    """GazeGraph dataset :cite:p:`GazeGraph`.
 
-    This dataset includes monocular eye tracking data from a single participants in a single
-    session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
-    eye tracker and are provided as pixel coordinates.
+    The dataset is collected from eight subjects (four female and four male,
+    aged between 24 and 35) using the Pupil Core eye tracker. During data collection,
+    the subjects wear the eye tracker and sit in front of the computer screen
+    (a 34-inch display) at a distance of approximately 50cm. We conduct the
+    manufacturer's default on-screen five-points calibration for each of
+    the subjects.
+    Note that we have done only one calibration per subject, and the subjects
+    can move their heads and upper bodies freely during the experiment.
+    The gaze is recorded at a 30Hz sampling rate.
 
-    The participant is instructed to read texts and answer questions.
-
-    Check the respective paper for details :cite:p:`SB-SAT`.
+    Check the respective paper for details :cite:p:`GazeGraph`.
 
     Attributes
     ----------
@@ -78,11 +82,11 @@ class SBSAT(DatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.GazeOnFaces` definition:
+    :py:class:`~pymovements.GazeGraph` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("SBSAT", path='data/SBSAT')
+    >>> dataset = pm.Dataset("GazeGraph", path='data/GazeGraph')
 
     Download the dataset resources resources:
 
@@ -96,57 +100,53 @@ class SBSAT(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'SBSAT'
+    name: str = 'GazeGraph'
 
     mirrors: tuple[str, ...] = (
-        'https://osf.io/download/',
+        'https://codeload.github.com/GazeGraphResource/GazeGraph/zip/refs/heads/',
     )
 
     resources: tuple[dict[str, str], ...] = (
         {
-            'resource': 'jgae7/',
-            'filename': 'sbsat_csvs.zip',
-            'md5': 'a6ef1fb0ecced683cdb489c3bd3e1a5c',
+            'resource': 'master',
+            'filename': 'gaze_graph_data.zip',
+            'md5': '181f4b79477cee6e0267482d989610b0',
         },
     )
 
+    # no information about the resolution and screen size given. only 34-inch monitor
     experiment: Experiment = Experiment(
-        screen_width_px=768,
-        screen_height_px=1024,
-        screen_width_cm=42.4,
-        screen_height_cm=44.5,
-        distance_cm=70,
+        screen_width_px=3440,
+        screen_height_px=1440,
+        screen_width_cm=79.375,
+        screen_height_cm=34.0106,
+        distance_cm=50,
         origin='center',
-        sampling_rate=1000,
+        sampling_rate=30,
     )
 
-    filename_format: str = r'msd{subject_id:d}.csv'
+    filename_format: str = r'P{subject_id}_{task}.csv'
 
     filename_format_dtypes: dict[str, type] = field(
         default_factory=lambda: {
             'subject_id': int,
+            'task': str,
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: ['book_name', 'screen_id'])
+    trial_columns: list[str] = field(default_factory=lambda: ['task'])
 
-    time_column: str = 'time'
+    time_column: Any = None
 
-    pixel_columns: list[str] = field(default_factory=lambda: ['x_left', 'y_left'])
+    pixel_columns: list[str] = field(default_factory=lambda: ['x', 'y'])
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
-            'separator': '\t',
-            'columns': ['time', 'book_name', 'screen_id', 'x_left', 'y_left', 'pupil_left'],
-            'dtypes': {
-                'time': pl.Int64,
-                'book_name': pl.Utf8,
-                'screen_id': pl.Int32,
-                'x_left': pl.Float32,
-                'y_left': pl.Float32,
-                'pupil_left': pl.Float32,
-            },
+            'separator': ',',
+            'has_header': False,
+            'new_columns': ['x', 'y'],
+            'dtypes': [pl.Float32, pl.Float32],
         },
     )
