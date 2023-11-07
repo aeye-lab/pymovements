@@ -20,16 +20,16 @@
 """This module holds the Experiment class."""
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 
 from pymovements.gaze import transforms_numpy
 from pymovements.gaze.eyetracker import EyeTracker
 from pymovements.gaze.screen import Screen
 from pymovements.utils import checks
-from pymovements.utils import decorators
 
 
-@decorators.auto_str
 class Experiment:
     """Experiment class for holding experiment properties.
 
@@ -37,8 +37,10 @@ class Experiment:
     ----------
     screen : Screen
         Screen object for experiment
-    sampling_rate : float
+    _sampling_rate : float
         Sampling rate in Hz
+    eyetracker : EyeTracker | None
+        Eye tracker for experiment
     """
 
     def __init__(
@@ -86,11 +88,14 @@ class Experiment:
         ...     origin='lower left',
         ...     sampling_rate=None,
         ...     eyetracker=EyeTracker(1000.0, False, True, 'EyeLink 1000 Plus', '1.5.3',
-        ...                           'Arm Mount / Monocular / Remote',),
+        ...                           'EyeLink', 'Arm Mount / Monocular / Remote',),
         ... )
         >>> print(experiment)
         Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38,
-        height_cm=30, distance_cm=68, origin=lower left), sampling_rate=1000.00)
+        height_cm=30, distance_cm=68, origin=lower left), sampling_rate=1000.00,
+        eyetracker=EyeTracker(sampling_rate=1000.0, left=False, right=True,
+        model='EyeLink 1000 Plus', version='1.5.3', vendor='EyeLink',
+        mount='Arm Mount / Monocular / Remote'))
 
         We can also access the screen boundaries in degrees of visual angle via the
         :py:attr:`~pymovements.gaze.Screen` object. This only works if the
@@ -117,15 +122,21 @@ class Experiment:
 
         checks.check_is_mutual_exclusive(sampling_rate=sampling_rate, eyetracker=eyetracker)
 
-        if sampling_rate is not None:
-            self.sampling_rate = sampling_rate
-        if eyetracker is not None:
-            self.sampling_rate = eyetracker.sampling_rate
+        self.eyetracker = eyetracker
+
+        self._sampling_rate = sampling_rate
 
         checks.check_is_not_none(sampling_rate=self.sampling_rate)
         assert self.sampling_rate is not None
 
         checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
+
+    @property
+    def sampling_rate(self):
+        if self._sampling_rate is not None:
+            return self._sampling_rate
+
+        return self.eyetracker.sampling_rate
 
     def pos2vel(
             self,
@@ -185,3 +196,11 @@ class Experiment:
         return transforms_numpy.pos2vel(
             arr=arr, sampling_rate=self.sampling_rate, method=method, **kwargs,
         )
+
+    def __str__(self: Any) -> str:
+        def shorten(value: Any) -> str:
+            if isinstance(value, float):
+                value = f'{value:.2f}'
+            return value
+        attributes = ', '.join(f'{key}={shorten(value)}' for key, value in vars(self).items())
+        return f'{type(self).__name__}(sampling_rate={shorten(self.sampling_rate)}, {attributes})'
