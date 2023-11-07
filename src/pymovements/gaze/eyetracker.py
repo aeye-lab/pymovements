@@ -38,11 +38,13 @@ class EyeTracker:
     right : bool
         Whether the right eye is tracked
     model : str
-        EyeLink tracker model (e.g. 'EyeLink II', 'EyeLink 1000')
+        Eye tracker model (e.g. 'EyeLink II', 'Tobii Pro Spectrum')
     version : str
-        EyeLink software version number
+        Eye tracker software version number
+    vendor : str
+        Eye tracker vendor (e.g. 'EyeLink', 'Tobii')
     mount : str
-        The mounting setup of the EyeLink (e.g. 'Desktop / Monocular / Remote')
+        The mounting setup of the eye tracker (e.g. 'Desktop / Monocular / Remote')
 
     Examples
         --------
@@ -52,11 +54,12 @@ class EyeTracker:
         ...     right = True,
         ...     model = 'EyeLink 1000 Plus',
         ...     version = '1.5.3',
+        ...     vendor = 'EyeLink',
         ...     mount = 'Arm Mount / Monocular / Remote',
         ... )
         >>> print(eyetracker)
         EyeTracker(sampling_rate=1000.0, left=False, right=True, model='EyeLink 1000 Plus',
-        version='1.5.3', mount='Arm Mount / Monocular / Remote')
+        version='1.5.3', vendor='EyeLink', mount='Arm Mount / Monocular / Remote')
     """
 
     sampling_rate: float
@@ -64,6 +67,7 @@ class EyeTracker:
     right: bool
     model: str = ''
     version: str = ''
+    vendor: str = ''
     mount: str = ''
 
     def __post_init__(self) -> None:
