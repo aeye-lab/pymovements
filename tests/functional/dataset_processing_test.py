@@ -36,6 +36,7 @@ import pymovements as pm
         'gaze_on_faces',
         'gazebase',
         'gazebase_vr',
+        'gazegraph',
         'judo1000',
     ],
 )
@@ -84,6 +85,11 @@ def fixture_dataset_init_kwargs(request):
         ),
         'gazebase_vr': pm.datasets.GazeBaseVR(
             filename_format='gazebase_vr_example.csv',
+            filename_format_dtypes={},
+            trial_columns=None,
+        ),
+        'gazegraph': pm.datasets.GazeGraph(
+            filename_format='gazegraph_example.csv',
             filename_format_dtypes={},
             trial_columns=None,
         ),
