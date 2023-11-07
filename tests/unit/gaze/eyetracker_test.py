@@ -23,16 +23,33 @@ import pytest
 from pymovements.gaze.eyetracker import EyeTracker
 
 
-def test_eyetracker_without_sampling_rate():
-    with pytest.raises(TypeError):
-        EyeTracker(
-            None, False, True, 'EyeLink 1000 Plus',
-            '1.5.3', 'Arm Mount / Monocular / Remote',
-        )
-
-
 def test_eyetracker_with_sampling_rate():
     EyeTracker(
         1000.0, False, True, 'EyeLink 1000 Plus',
         '1.5.3', 'Arm Mount / Monocular / Remote',
     )
+
+
+@pytest.mark.parametrize(
+    ('sampling_rate', 'exception', 'exception_msg'),
+    [
+        pytest.param(
+            None,
+            TypeError,
+            "'sampling_rate' must not be None",
+            id='no_sampling_rate',
+        ),
+        pytest.param(
+            -1000.0,
+            ValueError,
+            "'sampling_rate' must be greater than zero but is -1000.0",
+            id='negative_sampling_rate',
+        ),
+    ],
+)
+def test_eyetracker_with_invalid_sampling_rate(sampling_rate, exception, exception_msg):
+    with pytest.raises(exception) as exc_info:
+        EyeTracker(sampling_rate)
+
+    msg, = exc_info.value.args
+    assert msg == exception_msg
