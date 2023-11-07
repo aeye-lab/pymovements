@@ -485,17 +485,7 @@ def save_preprocessed(
         )
 
         if extension == 'csv':
-            if 'pixel' in gaze_df.frame.columns:
-                gaze_df.unnest('pixel')
-
-            if 'position' in gaze_df.frame.columns:
-                gaze_df.unnest('position')
-
-            if 'velocity' in gaze_df.frame.columns:
-                gaze_df.unnest('velocity')
-
-            if 'acceleration' in gaze_df.frame.columns:
-                gaze_df.unnest('acceleration')
+            gaze_df.unnest()
 
         for column in gaze_df.columns:
             if column in fileinfo.columns:
