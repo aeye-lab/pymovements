@@ -132,7 +132,7 @@ class Experiment:
         checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
 
     @property
-    def sampling_rate(self):
+    def sampling_rate(self) -> float:
         if self._sampling_rate is not None:
             return self._sampling_rate
 
