@@ -452,47 +452,6 @@ def fixture_experiment():
             {
                 'data': pl.from_dict(
                     {
-                        'time': [1000],
-                        'x_pix': [(100 - 1) / 2],
-                        'y_pix': [0.0],
-                        'distance': [1000],
-                    },
-                ),
-                'experiment': pm.Experiment(
-                    sampling_rate=1000,
-                    screen_width_px=100,
-                    screen_height_px=100,
-                    screen_width_cm=100,
-                    screen_height_cm=100,
-                    distance_cm=1,
-                    origin='lower left',
-                ),
-                'pixel_columns': ['x_pix', 'y_pix'],
-                'distance_column': 'distance',
-            },
-            'pix2deg', {},
-            pm.GazeDataFrame(
-                data=pl.from_dict(
-                    {
-                        'time': [1000],
-                        'x_pix': [49.5],
-                        'y_pix': [0.0],
-                        'x_dva': [0.0],
-                        'y_dva': [-26.3354],
-                        'distance': [1000],
-                    },
-                ),
-                pixel_columns=['x_pix', 'y_pix'],
-                position_columns=['x_dva', 'y_dva'],
-                distance_column='distance',
-            ),
-            id='pix2deg_distance_experiment_and_distance_column_defaults_to_column',
-        ),
-
-        pytest.param(
-            {
-                'data': pl.from_dict(
-                    {
                         'trial_id': [1, 1, 1, 2, 2, 2],
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
@@ -698,6 +657,69 @@ def test_gaze_transform_expected_frame(
 
 
 @pytest.mark.parametrize(
+    (
+        'gaze_init_kwargs',
+        'transform_method',
+        'transform_kwargs',
+        'expected_result',
+        'expected_warning'
+    ),
+    [
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1000],
+                        'x_pix': [(100 - 1) / 2],
+                        'y_pix': [0.0],
+                        'distance': [1000],
+                    },
+                ),
+                'experiment': pm.Experiment(
+                    sampling_rate=1000,
+                    screen_width_px=100,
+                    screen_height_px=100,
+                    screen_width_cm=100,
+                    screen_height_cm=100,
+                    distance_cm=1,
+                    origin='lower left',
+                ),
+                'pixel_columns': ['x_pix', 'y_pix'],
+                'distance_column': 'distance',
+            },
+            'pix2deg', {},
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'time': [1000],
+                        'x_pix': [49.5],
+                        'y_pix': [0.0],
+                        'x_dva': [0.0],
+                        'y_dva': [-26.3354],
+                        'distance': [1000],
+                    },
+                ),
+                pixel_columns=['x_pix', 'y_pix'],
+                position_columns=['x_dva', 'y_dva'],
+                distance_column='distance',
+            ),
+            UserWarning,
+            id='pix2deg_distance_experiment_and_distance_column_defaults_to_column',
+        ),
+    ]
+)
+def test_gaze_transfrom_expected_frame_warning(
+        gaze_init_kwargs, transform_method, transform_kwargs, expected_result, expected_warning,
+):
+    with pytest.warns(expected_warning):
+        gaze = pm.GazeDataFrame(**gaze_init_kwargs)
+        gaze.transform(transform_method, **transform_kwargs)
+
+        assert_frame_equal(gaze.frame, expected_result.frame)
+
+
+
+@pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'exception_msg'),
     [
         pytest.param(
@@ -813,6 +835,21 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
             'nor experiment eye-to-screen distance is specified.',
             id='distance_column_not_in_dataframe',
         ),
+    ],
+)
+def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg):
+    gaze_df = pm.GazeDataFrame(**init_kwargs)
+
+    with pytest.raises(exception) as excinfo:
+        gaze_df.pix2deg()
+
+    msg, = excinfo.value.args
+    assert msg == expected_msg
+
+
+@pytest.mark.parametrize(
+    ('init_kwargs', 'warning', 'expected_msg'),
+    [
         pytest.param(
             {
                 'data': pl.DataFrame(schema={'d': pl.Float64, 'x': pl.Float64, 'y': pl.Float64}),
@@ -829,13 +866,13 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
         ),
     ],
 )
-def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg):
+def test_gaze_dataframe_pix2deg_warnings(init_kwargs, warning, expected_msg):
     gaze_df = pm.GazeDataFrame(**init_kwargs)
 
-    with pytest.raises(exception) as excinfo:
+    with pytest.warns(warning) as excinfo:
         gaze_df.pix2deg()
 
-    msg, = excinfo.value.args
+    msg = excinfo[0].message.args[0]
     assert msg == expected_msg
 
 
