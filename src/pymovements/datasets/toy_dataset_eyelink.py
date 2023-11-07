@@ -29,7 +29,7 @@ import polars as pl
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import register_dataset
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.experiment import EyeTracker
+from pymovements.gaze.eyetracker import EyeTracker
 
 
 @dataclass
@@ -121,6 +121,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
             left=True,
             right=True,
             model='EyeLink Portable Duo',
+            vendor='EyeLink',
         ),
     )
 
