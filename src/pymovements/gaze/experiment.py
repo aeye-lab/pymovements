@@ -136,7 +136,7 @@ class Experiment:
         """Assign sampling rate to experiment."""
         if self._sampling_rate is not None:
             return self._sampling_rate
-        elif self.eyetracker.sampling_rate is not None:
+        if self.eyetracker is not None:
             return self.eyetracker.sampling_rate
         else:
             raise ValueError('Sampling rate cannot be None')
