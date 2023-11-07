@@ -138,8 +138,8 @@ class Experiment:
             return self._sampling_rate
         if self.eyetracker is not None:
             return self.eyetracker.sampling_rate
-        else:
-            raise ValueError('Sampling rate cannot be None')
+
+        raise ValueError('Sampling rate cannot be None')
 
     def pos2vel(
             self,
