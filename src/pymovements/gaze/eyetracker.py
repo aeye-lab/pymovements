@@ -63,12 +63,12 @@ class EyeTracker:
     """
 
     sampling_rate: float
-    left: bool
-    right: bool
-    model: str = ''
-    version: str = ''
-    vendor: str = ''
-    mount: str = ''
+    left: bool | None = None
+    right: bool | None = None
+    model: str | None = None
+    version: str | None = None
+    vendor: str | None = None
+    mount: str | None = None
 
     def __post_init__(self) -> None:
         """Check that the sampling rate is a positive number."""
