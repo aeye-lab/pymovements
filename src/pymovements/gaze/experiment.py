@@ -133,6 +133,7 @@ class Experiment:
 
     @property
     def sampling_rate(self) -> float:
+        """Assign sampling rate to experiment."""
         if self._sampling_rate is not None:
             return self._sampling_rate
 
@@ -198,6 +199,7 @@ class Experiment:
         )
 
     def __str__(self: Any) -> str:
+        """Print experiment."""
         def shorten(value: Any) -> str:
             if isinstance(value, float):
                 value = f'{value:.2f}'
