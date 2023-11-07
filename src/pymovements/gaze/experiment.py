@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 from typing import Any
+from typing import Optional
 
 import numpy as np
 
@@ -132,7 +133,7 @@ class Experiment:
         checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
 
     @property
-    def sampling_rate(self) -> float:
+    def sampling_rate(self) -> Optional[float]:
         """Assign sampling rate to experiment."""
         if self._sampling_rate is not None:
             return self._sampling_rate
