@@ -139,8 +139,6 @@ class Experiment:
         if self.eyetracker is not None:
             return self.eyetracker.sampling_rate
 
-        raise ValueError('Sampling rate cannot be None')
-
     def pos2vel(
             self,
             arr: list[float] | list[list[float]] | np.ndarray,
