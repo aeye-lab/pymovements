@@ -91,11 +91,11 @@ class Experiment:
         ...                           'EyeLink', 'Arm Mount / Monocular / Remote',),
         ... )
         >>> print(experiment)
-        Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38,
-        height_cm=30, distance_cm=68, origin=lower left), sampling_rate=1000.00,
+        Experiment(sampling_rate=1000.00, screen=Screen(width_px=1280, height_px=1024, width_cm=38,
+        height_cm=30, distance_cm=68, origin=lower left),
         eyetracker=EyeTracker(sampling_rate=1000.0, left=False, right=True,
         model='EyeLink 1000 Plus', version='1.5.3', vendor='EyeLink',
-        mount='Arm Mount / Monocular / Remote'))
+        mount='Arm Mount / Monocular / Remote'), _sampling_rate=None)
 
         We can also access the screen boundaries in degrees of visual angle via the
         :py:attr:`~pymovements.gaze.Screen` object. This only works if the
