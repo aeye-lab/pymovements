@@ -142,7 +142,6 @@ class Experiment:
 
         raise TypeError("'self._sampling_rate' and 'self.eyetracker' must not both be None")
 
-
     def pos2vel(
             self,
             arr: list[float] | list[list[float]] | np.ndarray,
