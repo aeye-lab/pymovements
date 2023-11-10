@@ -134,8 +134,12 @@ class Experiment:
     @property
     def sampling_rate(self) -> float:
         """Assign sampling rate to experiment."""
+
         if self._sampling_rate is not None:
             return self._sampling_rate
+
+        if self.eyetracker.sampling_rate is None:
+            raise TypeError("'self._sampling_rate' and 'self.eyetracker.sampling_rate' must not both be None")
 
         return self.eyetracker.sampling_rate
 
