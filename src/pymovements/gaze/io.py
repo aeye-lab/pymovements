@@ -133,7 +133,8 @@ def from_csv(
     ...     file='tests/files/monocular_example.csv',
     ...     time_column = 'time',
     ...     pixel_columns = ['x_left_pix','y_left_pix'],
-    ...     read_csv_kwargs = {'sep': ','})
+    ...     sep = ',',
+    ...)
     >>> gaze.frame
     shape: (10, 2)
     ┌──────┬───────────┐
@@ -161,13 +162,7 @@ def from_csv(
     ...     file='tests/files/monocular_example.csv',
     ...     time_column = 'time',
     ...     pixel_columns = ['x_left_pix','y_left_pix'],
-    ...     read_csv_kwargs = {
-    ...         'dtype': {
-    ...             'time': 'Int64',
-    ...             'x_left_pix': 'Int64',
-    ...             'y_left_pix': 'Int64',
-    ...         },
-    ...     },
+    ...     dtype = {'time': 'Int64', 'x_left_pix': 'Int64', 'y_left_pix': 'Int64'},
     ... )
     >>> gaze.frame
     shape: (10, 2)
