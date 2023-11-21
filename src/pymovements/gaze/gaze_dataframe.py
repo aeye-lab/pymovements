@@ -357,7 +357,8 @@ class GazeDataFrame:
                 self.frame = pl.concat(
                     [
                         df.with_columns(transform_method(**kwargs))
-                        for group, df in self.frame.groupby(self.trial_columns, maintain_order=True)
+                        for group, df in
+                        self.frame.group_by(self.trial_columns, maintain_order=True)
                     ],
                 )
 
@@ -551,7 +552,7 @@ class GazeDataFrame:
 
     def unnest(
             self,
-            column: str,
+            input_columns: list[str] | str | None = None,
             output_suffixes: list[str] | None = None,
             *,
             output_columns: list[str] | None = None,
@@ -562,8 +563,10 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        column:
-            Name of input columns to be unnested into several component columns.
+        input_columns:
+            Name(s) of input column(s) to be unnested into several component columns.
+            If None all list columns 'pixel', 'position', 'velocity' and
+            'acceleration' will be unnested if existing.
         output_columns:
             Name of the resulting tuple columns.
         output_suffixes:
@@ -575,16 +578,41 @@ class GazeDataFrame:
             If both output_columns and output_suffixes are specified.
             If number of output columns / suffixes does not match number of components.
             If output columns / suffixes are not unique.
+            If no columns to unnest exist and none are specified.
+            If output columns are specified and more than one input column is specified.
         AttributeError
             If number of components is not 2, 4 or 6.
+        Warning
+            If no columns to unnest exist and none are specified.
         """
+
+        if input_columns is None:
+            cols = ['pixel', 'position', 'velocity', 'acceleration']
+            input_columns = [col for col in cols if col in self.frame.columns]
+
+            if len(input_columns) == 0:
+                raise Warning(
+                    'No columns to unnest. '
+                    'Please specify columns to unnest via the "input_columns" argument.',
+                )
+
+        if isinstance(input_columns, str):
+            input_columns = [input_columns]
+
+        # no support for custom output columns if more than one input column will be unnested
+        if output_columns is not None and not len(input_columns) == 1:
+            raise ValueError("You cannot specify output columns if you want to unnest more than "
+                             "one input column. Please specify output suffixes or use a single "
+                             "input column instead.")
+
         checks.check_is_mutual_exclusive(
             output_columns=output_columns,
             output_suffixes=output_suffixes,
         )
+
         self._check_n_components()
 
-        col_names = output_columns if output_columns is not None else []
+        col_names = [output_columns] if output_columns is not None else []
 
         if output_columns is None and output_suffixes is None:
             if self.n_components == 2:
@@ -595,22 +623,30 @@ class GazeDataFrame:
                 output_suffixes = ['_xl', '_yl', '_xr', '_yr', '_xa', '_ya']
 
         if output_suffixes:
-            col_names = [f'{column}{suffix}' for suffix in output_suffixes]
+            col_names = [
+                [f'{input_col}{suffix}' for suffix in output_suffixes]
+                for input_col in input_columns
+            ]
 
-        if len(col_names) != self.n_components:
+        if len([
+            name for name_list in col_names for name in name_list
+        ]) != self.n_components * len(input_columns):
             raise ValueError(
-                f'Number of output columns / suffixes ({len(col_names)}) '
+                f'Number of output columns / suffixes ({len(col_names[0])}) '
                 f'must match number of components ({self.n_components})',
             )
-        if len(set(col_names)) != len(col_names):
+
+        if len({name for name_list in col_names for name in name_list}) != len(
+                [name for name_list in col_names for name in name_list]):
             raise ValueError('Output columns / suffixes must be unique')
 
-        self.frame = self.frame.with_columns(
-            [
-                pl.col(column).list.get(component_id).alias(col_names)
-                for component_id, col_names in enumerate(col_names)
-            ],
-        ).drop(column)
+        for input_col, column_names in zip(input_columns, col_names):
+            self.frame = self.frame.with_columns(
+                [
+                    pl.col(input_col).list.get(component_id).alias(names)
+                    for component_id, names in enumerate(column_names)
+                ],
+            ).drop(input_col)
 
     def copy(self) -> GazeDataFrame:
         """Return a copy of the GazeDataFrame.
@@ -704,7 +740,7 @@ class GazeDataFrame:
         list_lengths = {
             list_length
             for column in considered_columns
-            for list_length in self.frame.get_column(column).list.lengths().unique().to_list()
+            for list_length in self.frame.get_column(column).list.len().unique().to_list()
         }
 
         for column_specifier_list in column_specifiers:
