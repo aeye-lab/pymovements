@@ -155,14 +155,14 @@ def from_csv(
 
     Please be aware that data types are inferred from a fixed number of rows. To ensure
     correct data types, you can pass a dictionary of column names and data types to the
-    `dtype` keyword argument of :py:func:`polars.read_csv`:
+    `dtypes` keyword argument of :py:func:`polars.read_csv`:
 
     >>> from pymovements.gaze.io import from_csv
     >>> gaze = from_csv(
     ...     file='tests/files/monocular_example.csv',
     ...     time_column = 'time',
     ...     pixel_columns = ['x_left_pix','y_left_pix'],
-    ...     dtype = {'time': 'Int64', 'x_left_pix': 'Int64', 'y_left_pix': 'Int64'},
+    ...     dtypes = {'time': 'Int64', 'x_left_pix': 'Int64', 'y_left_pix': 'Int64'},
     ... )
     >>> gaze.frame
     shape: (10, 2)
