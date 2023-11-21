@@ -134,7 +134,7 @@ def from_csv(
     ...     time_column = 'time',
     ...     pixel_columns = ['x_left_pix','y_left_pix'],
     ...     sep = ',',
-    ...)
+    ... )
     >>> gaze.frame
     shape: (10, 2)
     ┌──────┬───────────┐
