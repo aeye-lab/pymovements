@@ -59,11 +59,11 @@ class DatasetDefinition:
     custom_read_kwargs : dict[str, Any], optional
         If specified, these keyword arguments will be passed to the file reading function. The
         behavior of this argument depends on the file extension of the dataset files.
-        - If the file extension is `.csv` the keyword arguments will be passed
-        to :py:func:`polars.read_csv`.
-        - If the file extension is `.asc` the keyword arguments will be passed
-        to :py:func:`pymovements.utils.parsing.parse_eyelink`.
-        See Notes for more details on
+        If the file extension is `.csv` the keyword arguments will be passed
+        to :py:func:`polars.read_csv`. If the file extension is`.asc` the keyword arguments
+        will be passed to :py:func:`pymovements.utils.parsing.parse_eyelink`.
+        See Notes for more details on how to use this argument.
+
     column_map : dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
 
@@ -105,23 +105,23 @@ class DatasetDefinition:
 
     Notes
     -----
-    When working with the `custom_read_kwargs` attribute there are specific use cases and
+    When working with the ``custom_read_kwargs`` attribute there are specific use cases and
     considerations to keep in mind, especially for reading csv files:
 
     1. Custom separator
-    To read a csv file with a custom seperator, you can pass the `sep` keyword argument to
-    `custom_read_kwargs`. For example pass `custom_read_kwargs={'sep': ';'}` to read a semicolon
-    separated csv file.
+    To read a csv file with a custom separator, you can pass the `separator` keyword argument to
+    ``custom_read_kwargs``. For example pass ``custom_read_kwargs={'separator': ';'}`` to read a
+    semicolon-separated csv file.
 
     2. Reading subset of columns
-    To read only specific columns, specify them in `custom_read_kwargs`. For example:
-    `custom_read_kwargs={'columns': ['col1', 'col2']}`
+    To read only specific columns, specify them in ``custom_read_kwargs``. For example:
+    ``custom_read_kwargs={'columns': ['col1', 'col2']}``
 
     3. Specifying column datatypes
-    `polars.read_csv` infers data types from a fixed number of rows, which might not be accurate
+    ``polars.read_csv`` infers data types from a fixed number of rows, which might not be accurate
     for the entire dataset. To ensure correct data types, you can pass a dictionary to the `dtypes`
-    keyword argument in `custom_read_kwargs`.
-    For instance: `custom_read_kwargs={'dtypes': {'col1': 'Int64', 'col2': 'Float64'}}`
+    keyword argument in ``custom_read_kwargs``.
+    For instance: ``custom_read_kwargs={'dtypes': {'col1': 'Int64', 'col2': 'Float64'}}``
     """
 
     # pylint: disable=too-many-instance-attributes

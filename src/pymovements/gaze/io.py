@@ -125,7 +125,7 @@ def from_csv(
     └──────┴────────────┴────────────┘
 
     We can now load the data into a ``GazeDataFrame`` by specyfing the experimental setting
-    and the names of the pixel position columns. We can specify a custom seperator for the csv
+    and the names of the pixel position columns. We can specify a custom separator for the csv
     file by passing it as a keyword argument to :py:func:`polars.read_csv`:
 
     >>> from pymovements.gaze.io import from_csv
@@ -133,7 +133,7 @@ def from_csv(
     ...     file='tests/files/monocular_example.csv',
     ...     time_column = 'time',
     ...     pixel_columns = ['x_left_pix','y_left_pix'],
-    ...     sep = ',',
+    ...     separator = ',',
     ... )
     >>> gaze.frame
     shape: (10, 2)
