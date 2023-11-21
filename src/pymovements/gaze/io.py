@@ -80,16 +80,8 @@ def from_csv(
         constant eye-to-screen distance will be taken from the experiment definition.
     **read_csv_kwargs:
         Additional keyword arguments to be passed to :py:func:`polars.read_csv` to read in the csv.
-
-        For example, if you want to read a csv file with a custom separator, you can pass
-        `read_csv_kwargs={'sep': ';'}`. If you want to read just a subset of columns, you can
-        pass `read_csv_kwargs={'columns': ['col1', 'col2']}`.
-
-        When reading `.csv` files it may be nessesary to specify the `dtype` of the columns as
-        :py:func:`polars.read_csv` will try to infer by only a fixed number of rows. This
-        can be done by passing a dictionary to `custom_read_kwargs` with the column names as keys
-        and the respective datatypes as values.
-        For example: `read_csv_kwargs={'dtypes': {'col1': 'Int64', 'col2': 'Float64'}}`
+        These can include custom separators, a subset of columns, or specific data types
+        for columns.
 
     Notes
     -----
@@ -133,13 +125,50 @@ def from_csv(
     └──────┴────────────┴────────────┘
 
     We can now load the data into a ``GazeDataFrame`` by specyfing the experimental setting
-    and the names of the pixel position columns.
+    and the names of the pixel position columns. We can specify a custom seperator for the csv
+    file by passing it as a keyword argument to :py:func:`polars.read_csv`:
 
     >>> from pymovements.gaze.io import from_csv
     >>> gaze = from_csv(
     ...     file='tests/files/monocular_example.csv',
     ...     time_column = 'time',
-    ...     pixel_columns = ['x_left_pix','y_left_pix'],)
+    ...     pixel_columns = ['x_left_pix','y_left_pix'],
+    ...     read_csv_kwargs = {'sep': ','})
+    >>> gaze.frame
+    shape: (10, 2)
+    ┌──────┬───────────┐
+    │ time ┆ pixel     │
+    │ ---  ┆ ---       │
+    │ i64  ┆ list[i64] │
+    ╞══════╪═══════════╡
+    │ 0    ┆ [0, 0]    │
+    │ 1    ┆ [0, 0]    │
+    │ 2    ┆ [0, 0]    │
+    │ 3    ┆ [0, 0]    │
+    │ …    ┆ …         │
+    │ 6    ┆ [0, 0]    │
+    │ 7    ┆ [0, 0]    │
+    │ 8    ┆ [0, 0]    │
+    │ 9    ┆ [0, 0]    │
+    └──────┴───────────┘
+
+    Please be aware that data types are inferred from a fixed number of rows. To ensure
+    correct data types, you can pass a dictionary of column names and data types to the
+    `dtype` keyword argument of :py:func:`polars.read_csv`:
+
+    >>> from pymovements.gaze.io import from_csv
+    >>> gaze = from_csv(
+    ...     file='tests/files/monocular_example.csv',
+    ...     time_column = 'time',
+    ...     pixel_columns = ['x_left_pix','y_left_pix'],
+    ...     read_csv_kwargs = {
+    ...         'dtype': {
+    ...             'time': 'Int64',
+    ...             'x_left_pix': 'Int64',
+    ...             'y_left_pix': 'Int64',
+    ...         },
+    ...     },
+    ... )
     >>> gaze.frame
     shape: (10, 2)
     ┌──────┬───────────┐
