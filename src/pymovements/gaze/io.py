@@ -158,11 +158,12 @@ def from_csv(
     `dtypes` keyword argument of :py:func:`polars.read_csv`:
 
     >>> from pymovements.gaze.io import from_csv
+    >>> import polars as pl
     >>> gaze = from_csv(
     ...     file='tests/files/monocular_example.csv',
     ...     time_column = 'time',
     ...     pixel_columns = ['x_left_pix','y_left_pix'],
-    ...     dtypes = {'time': 'Int64', 'x_left_pix': 'Int64', 'y_left_pix': 'Int64'},
+    ...     dtypes = {'time': pl.Int64, 'x_left_pix': pl.Int64, 'y_left_pix': pl.Int64},
     ... )
     >>> gaze.frame
     shape: (10, 2)
