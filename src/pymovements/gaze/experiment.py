@@ -137,7 +137,7 @@ class Experiment:
         if self._sampling_rate is not None:
             return self._sampling_rate
 
-        return self.eyetracker.sampling_rate
+        return self.eyetracker.sampling_rate  # type: ignore [union-attr]
 
     def pos2vel(
             self,
@@ -200,9 +200,11 @@ class Experiment:
 
     def __str__(self: Any) -> str:
         """Print experiment."""
+
         def shorten(value: Any) -> str:
             if isinstance(value, float):
                 value = f'{value:.2f}'
             return value
+
         attributes = ', '.join(f'{key}={shorten(value)}' for key, value in vars(self).items())
         return f'{type(self).__name__}(sampling_rate={shorten(self.sampling_rate)}, {attributes})'
