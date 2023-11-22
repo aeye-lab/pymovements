@@ -134,13 +134,10 @@ class Experiment:
     @property
     def sampling_rate(self) -> float:
         """Assign sampling rate to experiment."""
-        try:
-            if self._sampling_rate is not None:
-                return self._sampling_rate
+        if self._sampling_rate is not None:
+            return self._sampling_rate
 
-            return self.eyetracker.sampling_rate
-        except:
-            print("'_sampling_rate' and 'eyetracker must not both be None")
+        return self.eyetracker.sampling_rate
 
     def pos2vel(
             self,
