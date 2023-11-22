@@ -29,6 +29,17 @@
     pymovements.gaze.Screen
     pymovements.gaze.GazeDataFrame
 
+.. rubric:: Integration and IO
+
+.. autosummary::
+    :toctree:
+
+    pymovements.gaze.integration.from_numpy
+    pymovements.gaze.integration.from_pandas
+    pymovements.gaze.io.from_asc
+    pymovements.gaze.io.from_csv
+    pymovements.gaze.io.from_ipc
+
 .. rubric:: Transformations
 
 .. autosummary::
