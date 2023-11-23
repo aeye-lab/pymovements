@@ -138,7 +138,7 @@ class Experiment:
         return self.eyetracker.sampling_rate
 
     @sampling_rate.setter
-    def sampling_rate(self, _sampling_rate) -> None:
+    def sampling_rate(self, _sampling_rate: float | None = None) -> None:
         """Set sampling rate of experiment."""
         self._sampling_rate = _sampling_rate
 
