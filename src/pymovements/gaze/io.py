@@ -79,7 +79,9 @@ def from_csv(
         the column will be used for pixel to dva transformations. If not specified, the
         constant eye-to-screen distance will be taken from the experiment definition.
     **read_csv_kwargs:
-            Additional keyword arguments to be passed to polars to read in the csv.
+        Additional keyword arguments to be passed to :py:func:`polars.read_csv` to read in the csv.
+        These can include custom separators, a subset of columns, or specific data types
+        for columns.
 
     Notes
     -----
@@ -123,13 +125,46 @@ def from_csv(
     └──────┴────────────┴────────────┘
 
     We can now load the data into a ``GazeDataFrame`` by specyfing the experimental setting
-    and the names of the pixel position columns.
+    and the names of the pixel position columns. We can specify a custom separator for the csv
+    file by passing it as a keyword argument to :py:func:`polars.read_csv`:
 
     >>> from pymovements.gaze.io import from_csv
     >>> gaze = from_csv(
     ...     file='tests/files/monocular_example.csv',
     ...     time_column = 'time',
-    ...     pixel_columns = ['x_left_pix','y_left_pix'],)
+    ...     pixel_columns = ['x_left_pix','y_left_pix'],
+    ...     separator = ',',
+    ... )
+    >>> gaze.frame
+    shape: (10, 2)
+    ┌──────┬───────────┐
+    │ time ┆ pixel     │
+    │ ---  ┆ ---       │
+    │ i64  ┆ list[i64] │
+    ╞══════╪═══════════╡
+    │ 0    ┆ [0, 0]    │
+    │ 1    ┆ [0, 0]    │
+    │ 2    ┆ [0, 0]    │
+    │ 3    ┆ [0, 0]    │
+    │ …    ┆ …         │
+    │ 6    ┆ [0, 0]    │
+    │ 7    ┆ [0, 0]    │
+    │ 8    ┆ [0, 0]    │
+    │ 9    ┆ [0, 0]    │
+    └──────┴───────────┘
+
+    Please be aware that data types are inferred from a fixed number of rows. To ensure
+    correct data types, you can pass a dictionary of column names and data types to the
+    `dtypes` keyword argument of :py:func:`polars.read_csv`:
+
+    >>> from pymovements.gaze.io import from_csv
+    >>> import polars as pl
+    >>> gaze = from_csv(
+    ...     file='tests/files/monocular_example.csv',
+    ...     time_column = 'time',
+    ...     pixel_columns = ['x_left_pix','y_left_pix'],
+    ...     dtypes = {'time': pl.Int64, 'x_left_pix': pl.Int64, 'y_left_pix': pl.Int64},
+    ... )
     >>> gaze.frame
     shape: (10, 2)
     ┌──────┬───────────┐
