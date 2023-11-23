@@ -37,8 +37,6 @@ class Experiment:
     ----------
     screen : Screen
         Screen object for experiment
-    _sampling_rate : float
-        Sampling rate in Hz
     eyetracker : EyeTracker | None
         Eye tracker for experiment
     """
@@ -72,9 +70,9 @@ class Experiment:
             distance for each sample in millimeters.
         origin : str
             Specifies the screen location of the origin of the pixel coordinate system.
-        sampling_rate : float
+        sampling_rate : float | None
             Sampling rate in Hz
-        eyetracker : EyeTracker
+        eyetracker : EyeTracker | None
             EyeTracker object for experiment
 
         Examples
@@ -132,12 +130,17 @@ class Experiment:
         checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
 
     @property
-    def sampling_rate(self) -> float:
-        """Assign sampling rate to experiment."""
+    def sampling_rate(self) -> float | None:
+        """Get sampling rate of experiment."""
         if self._sampling_rate is not None:
             return self._sampling_rate
 
-        return self.eyetracker.sampling_rate  # type: ignore [union-attr]
+        return self.eyetracker.sampling_rate
+
+    @sampling_rate.setter
+    def sampling_rate(self, _sampling_rate):
+        """Set sampling rate of experiment."""
+        self._sampling_rate = _sampling_rate
 
     def pos2vel(
             self,

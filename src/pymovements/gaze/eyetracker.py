@@ -31,19 +31,19 @@ class EyeTracker:
 
     Attributes
     ----------
-    sampling_rate : float
+    sampling_rate : float | None
         Sample rate of recording (in Hz)
-    left : bool
+    left : bool | None
         Whether the left eye is tracked
-    right : bool
+    right : bool | None
         Whether the right eye is tracked
-    model : str
+    model : str | None
         Eye tracker model (e.g. 'EyeLink II', 'Tobii Pro Spectrum')
-    version : str
+    version : str | None
         Eye tracker software version number
-    vendor : str
+    vendor : str | None
         Eye tracker vendor (e.g. 'EyeLink', 'Tobii')
-    mount : str
+    mount : str | None
         The mounting setup of the eye tracker (e.g. 'Desktop / Monocular / Remote')
 
     Examples
@@ -62,7 +62,7 @@ class EyeTracker:
         version='1.5.3', vendor='EyeLink', mount='Arm Mount / Monocular / Remote')
     """
 
-    sampling_rate: float
+    sampling_rate: float | None = None
     left: bool | None = None
     right: bool | None = None
     model: str | None = None
@@ -75,4 +75,5 @@ class EyeTracker:
         checks.check_is_not_none(sampling_rate=self.sampling_rate)
         assert self.sampling_rate is not None
 
-        checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
+        if self.sampling_rate is not None:
+            checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
