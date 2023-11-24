@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2022-2023 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides an interface to the pymovements example toy dataset."""
+"""This module provides an interface to the GazeGraph dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -33,14 +33,20 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 @register_dataset
-class ToyDataset(DatasetDefinition):
-    """Example toy dataset.
+class GazeGraph(DatasetDefinition):
+    """GazeGraph dataset :cite:p:`GazeGraph`.
 
-    This dataset includes monocular eye tracking data from a single participants in a single
-    session. Eye movements are recorded at a sampling frequency of 1000 Hz using an EyeLink Portable
-    Duo video-based eye tracker and are provided as pixel coordinates.
+    The dataset is collected from eight subjects (four female and four male,
+    aged between 24 and 35) using the Pupil Core eye tracker. During data collection,
+    the subjects wear the eye tracker and sit in front of the computer screen
+    (a 34-inch display) at a distance of approximately 50cm. We conduct the
+    manufacturer's default on-screen five-points calibration for each of
+    the subjects.
+    Note that we have done only one calibration per subject, and the subjects
+    can move their heads and upper bodies freely during the experiment.
+    The gaze is recorded at a 30Hz sampling rate.
 
-    The participant is instructed to read 4 texts with 5 screens each.
+    Check the respective paper for details :cite:p:`GazeGraph`.
 
     Attributes
     ----------
@@ -76,11 +82,11 @@ class ToyDataset(DatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.ToyDataset` definition:
+    :py:class:`~pymovements.GazeGraph` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("ToyDataset", path='data/ToyDataset')
+    >>> dataset = pm.Dataset("GazeGraph", path='data/GazeGraph')
 
     Download the dataset resources resources:
 
@@ -94,42 +100,43 @@ class ToyDataset(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'ToyDataset'
+    name: str = 'GazeGraph'
 
     mirrors: tuple[str, ...] = (
-        'http://github.com/aeye-lab/pymovements-toy-dataset/zipball/',
+        'https://codeload.github.com/GazeGraphResource/GazeGraph/zip/refs/heads/',
     )
 
     resources: tuple[dict[str, str], ...] = (
         {
-            'resource': '6cb5d663317bf418cec0c9abe1dde5085a8a8ebd/',
-            'filename': 'pymovements-toy-dataset.zip',
-            'md5': '4da622457637a8181d86601fe17f3aa8',
+            'resource': 'master',
+            'filename': 'gaze_graph_data.zip',
+            'md5': '181f4b79477cee6e0267482d989610b0',
         },
     )
 
+    # no information about the resolution and screen size given. only 34-inch monitor
     experiment: Experiment = Experiment(
-        screen_width_px=1280,
-        screen_height_px=1024,
-        screen_width_cm=38,
-        screen_height_cm=30.2,
-        distance_cm=68,
-        origin='lower left',
-        sampling_rate=1000,
+        screen_width_px=3440,
+        screen_height_px=1440,
+        screen_width_cm=79.375,
+        screen_height_cm=34.0106,
+        distance_cm=50,
+        origin='center',
+        sampling_rate=30,
     )
 
-    filename_format: str = r'trial_{text_id:d}_{page_id:d}.csv'
+    filename_format: str = r'P{subject_id}_{task}.csv'
 
     filename_format_dtypes: dict[str, type] = field(
         default_factory=lambda: {
-            'text_id': int,
-            'page_id': int,
+            'subject_id': int,
+            'task': str,
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: ['text_id', 'page_id'])
+    trial_columns: list[str] = field(default_factory=lambda: ['task'])
 
-    time_column: str = 'timestamp'
+    time_column: Any = None
 
     pixel_columns: list[str] = field(default_factory=lambda: ['x', 'y'])
 
@@ -137,15 +144,9 @@ class ToyDataset(DatasetDefinition):
 
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
-            'columns': ['timestamp', 'x', 'y', 'stimuli_x', 'stimuli_y'],
-            'dtypes': {
-                'timestamp': pl.Float32,
-                'x': pl.Float32,
-                'y': pl.Float32,
-                'stimuli_x': pl.Float32,
-                'stimuli_y': pl.Float32,
-            },
-            'separator': '\t',
-            'null_values': '-32768.00',
+            'separator': ',',
+            'has_header': False,
+            'new_columns': ['x', 'y'],
+            'dtypes': [pl.Float32, pl.Float32],
         },
     )

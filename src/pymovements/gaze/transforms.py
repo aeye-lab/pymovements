@@ -20,9 +20,9 @@
 """Module for py:func:`pymovements.gaze.transforms."""
 from __future__ import annotations
 
+from collections.abc import Callable
 from functools import partial
 from typing import Any
-from typing import Callable
 from typing import TypeVar
 
 import numpy as np
@@ -30,7 +30,6 @@ import polars as pl
 import scipy
 
 from pymovements.utils import checks
-
 
 TransformMethod = TypeVar('TransformMethod', bound=Callable[..., pl.Expr])
 
@@ -205,7 +204,7 @@ def pix2deg(
         *,
         screen_resolution: tuple[int, int],
         screen_size: tuple[float, float],
-        distance: float,
+        distance: float | str,
         origin: str,
         n_components: int,
         pixel_column: str = 'pixel',
@@ -219,8 +218,10 @@ def pix2deg(
         Pixel screen resolution as tuple (width, height).
     screen_size: tuple[float, float]
         Screen size in centimeters as tuple (width, height).
-    distance: float
-        Eye-to-screen distance in centimeters
+    distance: float | str
+        Must be either a scalar or a string. If a scalar is passed, it is interpreted as the
+        Eye-to-screen distance in centimeters. If a string is passed, it is interpreted as the name
+        of a column containing the Eye-to-screen distance in millimiters for each sample.
     origin: str
         The location of the pixel origin. Supported values: ``center``, ``lower left``. See also
         py:func:`~pymovements.gaze.transform.center_origin` for more information.
@@ -238,7 +239,6 @@ def pix2deg(
     """
     _check_screen_resolution(screen_resolution)
     _check_screen_size(screen_size)
-    _check_distance(distance)
 
     centered_pixels = center_origin(
         screen_resolution=screen_resolution,
@@ -247,25 +247,31 @@ def pix2deg(
         pixel_column=pixel_column,
     )
 
-    # Compute eye-to-screen-distance in pixel units.
-    distance_pixels = tuple(
-        distance * (screen_px / screen_cm)
-        for screen_px, screen_cm in zip(screen_resolution, screen_size)
-    )
+    if isinstance(distance, (float, int)):
+        _check_distance(distance)
+        distance_series = pl.lit(distance)
+    elif isinstance(distance, str):
+        # True division by 10 is needed to convert distance from mm to cm
+        distance_series = pl.col(distance).truediv(10)
+    else:
+        raise TypeError(
+            f'`distance` must be of type `float`, `int` or `str`, but is of type'
+            f'`{type(distance).__name__}`',
+        )
+
+    distance_pixels = pl.concat_list([
+        distance_series.mul(screen_resolution[component % 2] / screen_size[component % 2])
+        for component in range(n_components)
+    ])
 
     degree_components = [
-        centered_pixels.list.get(component).map(
-            _arctan2_helper(distance_pixels[component % 2]),
+        pl.arctan2(
+            centered_pixels.list.get(component), distance_pixels.list.get(component),
         ) * (180 / np.pi)
         for component in range(n_components)
     ]
 
     return pl.concat_list(list(degree_components)).alias(position_column)
-
-
-def _arctan2_helper(distance: float) -> Callable:
-    """Return single-argument lambda function with fixed second argument."""
-    return lambda s: np.arctan2(s, distance)
 
 
 def _check_distance(distance: float) -> None:
@@ -435,8 +441,8 @@ def pos2vel(
         return pl.concat_list(
             [
                 (
-                    pl.col(position_column).shift(periods=-1).list.get(component)
-                    - pl.col(position_column).shift(periods=1).list.get(component)
+                    pl.col(position_column).shift(n=-1).list.get(component)
+                    - pl.col(position_column).shift(n=1).list.get(component)
                 ) * (sampling_rate / 2)
                 for component in range(n_components)
             ],
@@ -450,10 +456,10 @@ def pos2vel(
         return pl.concat_list(
             [
                 (
-                    pl.col(position_column).shift(periods=-2).list.get(component)
-                    + pl.col(position_column).shift(periods=-1).list.get(component)
-                    - pl.col(position_column).shift(periods=1).list.get(component)
-                    - pl.col(position_column).shift(periods=2).list.get(component)
+                    pl.col(position_column).shift(n=-2).list.get(component)
+                    + pl.col(position_column).shift(n=-1).list.get(component)
+                    - pl.col(position_column).shift(n=1).list.get(component)
+                    - pl.col(position_column).shift(n=2).list.get(component)
                 ) * (sampling_rate / 6)
                 for component in range(n_components)
             ],
@@ -594,10 +600,169 @@ def savitzky_golay(
 
     return pl.concat_list(
         [
-            pl.col(input_column).list.get(component).map(func).list.explode()
+            pl.col(input_column).list.get(component).map_batches(func).list.explode()
             for component in range(n_components)
         ],
     ).alias(output_column)
+
+
+@register_transform
+def smooth(
+        *,
+        method: str,
+        window_length: int,
+        n_components: int,
+        degree: int | None = None,
+        column: str = 'position',
+        padding: str | float | int | None = 'nearest',
+) -> pl.Expr:
+    """
+    Smooth data in a column.
+
+    Parameters
+    ----------
+    method:
+        The method to use for smoothing. See Notes for more details.
+    window_length
+        For ``moving_average`` this is the window size to calculate the mean of the subsequent
+        samples. For ``savitzky_golay`` this is the window size to use for the polynomial fit.
+        For ``exponential_moving_average`` this is the span parameter.
+    n_components:
+        Number of components in input column.
+    degree:
+        The degree of the polynomial to use. This has only an effect if using ``savitzky_golay`` as
+        smoothing method. `degree` must be less than `window_length`.
+    column:
+        The input column name to which the smoothing is applied.
+    padding:
+        Must be either ``None``, a scalar or one of the strings ``mirror``, ``nearest`` or ``wrap``.
+        This determines the type of extension to use for the padded signal to
+        which the filter is applied.
+        When passing ``None``, no extension padding is used.
+        When passing a scalar value, data will be padded using the passed value.
+        See the Notes for more details on the padding methods.
+
+    Returns
+    -------
+    polars.Expr
+        The respective polars expression.
+
+    Notes
+    -----
+    There following methods are available for smoothing:
+
+    * ``savitzky_golay``: Smooth data by applying a Savitzky-Golay filter.
+    See :py:func:`~pymovements.gaze.transforms.savitzky_golay` for further details.
+    * ``moving_average``: Smooth data by calculating the mean of the subsequent samples.
+    Each smoothed sample is calculated by the mean of the samples in the window around the sample.
+    * ``exponential_moving_average``: Smooth data by exponentially weighted moving average.
+
+    Details on the `padding` options:
+
+    * ``None``: No padding extension is used.
+    * scalar value (int or float): The padding extension contains the specified scalar value.
+    * ``mirror``: Repeats the values at the edges in reverse order. The value closest to the edge is
+      not included.
+    * ``nearest``: The padding extension contains the nearest input value.
+    * ``wrap``: The padding extension contains the values from the other end of the array.
+
+    Given the input is ``[1, 2, 3, 4, 5, 6, 7, 8]``, and
+    `window_length` is 7, the following table shows the padded data for
+    the various ``padding`` options:
+
+    +-------------+-------------+----------------------------+-------------+
+    | mode        |   padding   |           input            |   padding   |
+    +=============+=============+============================+=============+
+    | ``None``    | ``-  -  -`` | ``1  2  3  4  5  6  7  8`` | ``-  -  -`` |
+    +-------------+-------------+----------------------------+-------------+
+    | ``0``       | ``0  0  0`` | ``1  2  3  4  5  6  7  8`` | ``0  0  0`` |
+    +-------------+-------------+----------------------------+-------------+
+    | ``1``       | ``1  1  1`` | ``1  2  3  4  5  6  7  8`` | ``1  1  1`` |
+    +-------------+-------------+----------------------------+-------------+
+    | ``nearest`` | ``1  1  1`` | ``1  2  3  4  5  6  7  8`` | ``8  8  8`` |
+    +-------------+-------------+----------------------------+-------------+
+    | ``mirror``  | ``4  3  2`` | ``1  2  3  4  5  6  7  8`` | ``7  6  5`` |
+    +-------------+-------------+----------------------------+-------------+
+    | ``wrap``    | ``6  7  8`` | ``1  2  3  4  5  6  7  8`` | ``1  2  3`` |
+    +-------------+-------------+----------------------------+-------------+
+
+    """
+    _check_window_length(window_length=window_length)
+    _check_padding(padding=padding)
+
+    if method in {'moving_average', 'exponential_moving_average'}:
+        pad_kwargs: dict[str, Any] = {'pad_width': 0}
+        pad_func = _identity
+
+        if isinstance(padding, (int, float)):
+            pad_kwargs['constant_values'] = padding
+            padding = 'constant'
+        elif padding == 'nearest':
+            # option 'nearest' is called 'edge' for np.pad
+            padding = 'edge'
+        elif padding == 'mirror':
+            # option 'mirror' is called 'reflect' for np.pad
+            padding = 'reflect'
+
+        if padding is not None:
+            pad_kwargs['mode'] = padding
+            pad_kwargs['pad_width'] = int(np.ceil(window_length / 2))
+
+            pad_func = partial(
+                np.pad,
+                **pad_kwargs,
+            )
+
+        if method == 'moving_average':
+
+            return pl.concat_list(
+                [
+                    pl.col(column).list.get(component).map_batches(pad_func).list.explode()
+                    .rolling_mean(window_size=window_length, center=True)
+                    .shift(n=pad_kwargs['pad_width'])
+                    .slice(pad_kwargs['pad_width'] * 2)
+                    for component in range(n_components)
+                ],
+            ).alias(column)
+
+        return pl.concat_list(
+            [
+                pl.col(column).list.get(component).map_batches(pad_func).list.explode()
+                .ewm_mean(
+                    span=window_length,
+                    adjust=False,
+                    min_periods=window_length,
+                ).shift(n=pad_kwargs['pad_width'])
+                .slice(pad_kwargs['pad_width'] * 2)
+                for component in range(n_components)
+            ],
+        ).alias(column)
+
+    if method == 'savitzky_golay':
+        if degree is None:
+            raise TypeError("'degree' must not be none for method 'savitzky_golay'")
+
+        return savitzky_golay(
+            window_length=window_length,
+            degree=degree,
+            sampling_rate=1,
+            padding=padding,
+            derivative=0,
+            n_components=n_components,
+            input_column=column,
+            output_column=None,
+        )
+
+    supported_methods = ['moving_average', 'exponential_moving_average', 'savitzky_golay']
+
+    raise ValueError(
+        f"Unknown method '{method}'. Supported methods are: {supported_methods}",
+    )
+
+
+def _identity(x: Any) -> Any:
+    """Identity function as placeholder for None as padding."""
+    return x
 
 
 def _check_window_length(window_length: Any) -> None:

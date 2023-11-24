@@ -20,7 +20,6 @@
 """DatasetLibrary module."""
 from __future__ import annotations
 
-from typing import Type
 from typing import TypeVar
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
@@ -61,7 +60,7 @@ class DatasetLibrary:
         return cls.definitions[name]
 
 
-DatsetDefinitionClass = TypeVar('DatsetDefinitionClass', bound=Type[DatasetDefinition])
+DatsetDefinitionClass = TypeVar('DatsetDefinitionClass', bound=type[DatasetDefinition])
 
 
 def register_dataset(cls: DatsetDefinitionClass) -> DatsetDefinitionClass:

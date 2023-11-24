@@ -205,7 +205,7 @@ class EventGazeProcessor:
         result = (
             joined_frame
             .filter(pl.col('time').is_between(pl.col('onset'), pl.col('offset')))
-            .groupby(event_identifiers, maintain_order=True)
+            .group_by(event_identifiers, maintain_order=True)
             .agg(
                 [
                     this_property_expression(**this_property_kwargs)

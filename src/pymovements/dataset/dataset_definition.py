@@ -56,11 +56,72 @@ class DatasetDefinition:
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
+    custom_read_kwargs : dict[str, Any], optional
+        If specified, these keyword arguments will be passed to the file reading function. The
+        behavior of this argument depends on the file extension of the dataset files.
+        If the file extension is `.csv` the keyword arguments will be passed
+        to :py:func:`polars.read_csv`. If the file extension is`.asc` the keyword arguments
+        will be passed to :py:func:`pymovements.utils.parsing.parse_eyelink`.
+        See Notes for more details on how to use this argument.
+
     column_map : dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
 
-    custom_read_kwargs : dict[str, Any], optional
-        If specified, these keyword arguments will be passed to the file reading function.
+    trial_columns: list[str] | None
+            The name of the trial columns in the input data frame. If the list is empty or None,
+            the input data frame is assumed to contain only one trial. If the list is not empty,
+            the input data frame is assumed to contain multiple trials and the transformation
+            methods will be applied to each trial separately.
+
+    time_column: str | None
+        The name of the timestamp column in the input data frame. This column will be renamed to
+        ``time``.
+
+    pixel_columns: list[str] | None
+        The name of the pixel position columns in the input data frame. These columns will be
+        nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
+        column will not be created.
+
+    position_columns: list[str] | None
+        The name of the dva position columns in the input data frame. These columns will be
+        nested into the column ``position``. If the list is empty or None, the nested
+        ``position`` column will not be created.
+
+    velocity_columns: list[str] | None
+        The name of the velocity columns in the input data frame. These columns will be nested
+        into the column ``velocity``. If the list is empty or None, the nested ``velocity``
+        column will not be created.
+
+    acceleration_columns: list[str] | None
+        The name of the acceleration columns in the input data frame. These columns will be
+        nested into the column ``acceleration``. If the list is empty or None, the nested
+        ``acceleration`` column will not be created.
+
+    distance_column : str | None
+        The name of the column containing eye-to-screen distance in millimeters for each sample
+        in the input data frame. If specified, the column will be used for pixel to dva
+        transformations. If not specified, the constant eye-to-screen distance will be taken from
+        the experiment definition. This column will be renamed to ``distance``.
+
+    Notes
+    -----
+    When working with the ``custom_read_kwargs`` attribute there are specific use cases and
+    considerations to keep in mind, especially for reading csv files:
+
+    1. Custom separator
+    To read a csv file with a custom separator, you can pass the `separator` keyword argument to
+    ``custom_read_kwargs``. For example pass ``custom_read_kwargs={'separator': ';'}`` to read a
+    semicolon-separated csv file.
+
+    2. Reading subset of columns
+    To read only specific columns, specify them in ``custom_read_kwargs``. For example:
+    ``custom_read_kwargs={'columns': ['col1', 'col2']}``
+
+    3. Specifying column datatypes
+    ``polars.read_csv`` infers data types from a fixed number of rows, which might not be accurate
+    for the entire dataset. To ensure correct data types, you can pass a dictionary to the
+    ``dtypes`` keyword argument in ``custom_read_kwargs``. Use data types from the `polars` library.
+    For instance: ``custom_read_kwargs={'dtypes': {'col1': polars.Int64, 'col2': polars.Float64}}``
     """
 
     # pylint: disable=too-many-instance-attributes
@@ -86,3 +147,4 @@ class DatasetDefinition:
     position_columns: list[str] | None = None
     velocity_columns: list[str] | None = None
     acceleration_columns: list[str] | None = None
+    distance_column: str | None = None

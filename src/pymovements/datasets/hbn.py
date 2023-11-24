@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2022-2023 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides an interface to the pymovements example toy dataset."""
+"""This module provides an interface to the HBN dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -33,14 +33,17 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 @register_dataset
-class ToyDataset(DatasetDefinition):
-    """Example toy dataset.
+class HBN(DatasetDefinition):
+    """HBN dataset :cite:p:`HBN`.
 
-    This dataset includes monocular eye tracking data from a single participants in a single
-    session. Eye movements are recorded at a sampling frequency of 1000 Hz using an EyeLink Portable
-    Duo video-based eye tracker and are provided as pixel coordinates.
+    This dataset consists of recordings from children
+    watching four different age-appropriate videos: (1) an
+    educational video clip (Fun with Fractals), (2) a short animated
+    film (The Present), (3) a short clip of an animated film (Despicable Me),
+    and (4) a trailer for a feature-length movie (Diary of a Wimpy Kid).
+    The eye gaze was recorded at a sampling rate of 120 Hz.
 
-    The participant is instructed to read 4 texts with 5 screens each.
+    Check the respective paper for details :cite:p:`HBN`.
 
     Attributes
     ----------
@@ -76,11 +79,11 @@ class ToyDataset(DatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.ToyDataset` definition:
+    :py:class:`~pymovements.HBN` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("ToyDataset", path='data/ToyDataset')
+    >>> dataset = pm.Dataset("HBN", path='data/HBN')
 
     Download the dataset resources resources:
 
@@ -94,58 +97,55 @@ class ToyDataset(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'ToyDataset'
+    name: str = 'HBN'
 
     mirrors: tuple[str, ...] = (
-        'http://github.com/aeye-lab/pymovements-toy-dataset/zipball/',
+        'https://files.osf.io/v1/resources/qknuv/providers/osfstorage/',
     )
 
     resources: tuple[dict[str, str], ...] = (
         {
-            'resource': '6cb5d663317bf418cec0c9abe1dde5085a8a8ebd/',
-            'filename': 'pymovements-toy-dataset.zip',
-            'md5': '4da622457637a8181d86601fe17f3aa8',
+            'resource': '651190031e76a453918a9971',
+            'filename': 'data.zip',
+            'md5': '2c523e911022ffc0eab700e34e9f7f30',
         },
     )
 
     experiment: Experiment = Experiment(
-        screen_width_px=1280,
-        screen_height_px=1024,
-        screen_width_cm=38,
-        screen_height_cm=30.2,
-        distance_cm=68,
-        origin='lower left',
-        sampling_rate=1000,
+        screen_width_px=800,
+        screen_height_px=600,
+        screen_width_cm=33.8,
+        screen_height_cm=27.0,
+        distance_cm=63.5,
+        origin='center',
+        sampling_rate=120,
     )
 
-    filename_format: str = r'trial_{text_id:d}_{page_id:d}.csv'
+    filename_format: str = r'{subject_id:12}_{video_id}.csv'
 
     filename_format_dtypes: dict[str, type] = field(
         default_factory=lambda: {
-            'text_id': int,
-            'page_id': int,
+            'subject_id': str,
+            'video_id': str,
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: ['text_id', 'page_id'])
+    trial_columns: list[str] = field(default_factory=lambda: ['video_id'])
 
-    time_column: str = 'timestamp'
+    time_column: str = 'time'
 
-    pixel_columns: list[str] = field(default_factory=lambda: ['x', 'y'])
+    pixel_columns: list[str] = field(default_factory=lambda: ['x_pix', 'y_pix'])
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
-            'columns': ['timestamp', 'x', 'y', 'stimuli_x', 'stimuli_y'],
+            'separator': ',',
+            'columns': ['time', 'x_pix', 'y_pix'],
             'dtypes': {
-                'timestamp': pl.Float32,
-                'x': pl.Float32,
-                'y': pl.Float32,
-                'stimuli_x': pl.Float32,
-                'stimuli_y': pl.Float32,
+                'time': pl.Int64,
+                'x_pix': pl.Float32,
+                'y_pix': pl.Float32,
             },
-            'separator': '\t',
-            'null_values': '-32768.00',
         },
     )

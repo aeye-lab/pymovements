@@ -19,13 +19,10 @@ jobs:
           - ubuntu-latest
           - windows-latest
         tox_env:
-          - py38
           - py39
           - py310
           - py311
         include:
-          - tox_env: py38
-            python: "3.8"
           - tox_env: py39
             python: "3.9"
           - tox_env: py310
@@ -36,16 +33,12 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Install base python for tox
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.9"
-      - name: Install tox
-        run: python -m pip install tox
-      - name: Install python for test
+      - name: Setup python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
+      - name: Install tox
+        run: python -m pip install tox
       - name: Setup test environment
         run: tox -vv --notest -e ${{ matrix.tox_env }}
       - name: Run test
@@ -56,18 +49,9 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-  check:
-    name: check ${{ matrix.tox_env }} (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - ubuntu-latest
-        tox_env:
-          - flake8
-          - pylint
-          - mypy
+  pylint:
+    name: pylint
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -79,9 +63,29 @@ jobs:
       - name: Install tox
         run: python -m pip install tox
       - name: Setup test environment
-        run: tox -vv --notest -e ${{ matrix.tox_env }}
+        run: tox -vv --notest -e pylint
       - name: Run test
-        run: tox --skip-pkg-install -e ${{ matrix.tox_env }}
+        run: tox --skip-pkg-install -e pylint
+
+
+  minimum-requirements:
+    name: minimum requirements
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+      - name: Install tox
+        run: python -m pip install tox-min-req
+      - name: Setup test environment
+        run: MIN_REQ=1 tox -vv --notest -e py39
+      - name: Run test
+        run: MIN_REQ=1 tox --skip-pkg-install -e py39
+
 
   docs:
     name: docs (${{ matrix.os }})
@@ -104,7 +108,7 @@ jobs:
       - name: Install base python for tox
         uses: actions/setup-python@v4
         with:
-          python-version: "3.8"
+          python-version: "3.9"
       - name: Install tox
         run: python -m pip install tox
       - name: Setup test environment

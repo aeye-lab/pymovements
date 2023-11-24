@@ -71,14 +71,62 @@ class Screen:
             height_px: int,
             width_cm: float,
             height_cm: float,
-            distance_cm: float,
-            origin: str,
+            distance_cm: float | None = None,
+            origin: str = 'lower left',
     ):
+        """Initialize Screen.
+
+        Parameters
+        ----------
+        width_px : int
+            Screen width in pixels
+        height_px : int
+            Screen height in pixels
+        width_cm : float
+            Screen width in centimeters
+        height_cm : float
+            Screen height in centimeters
+        distance_cm : float | None
+            Eye-to-screen distance in centimeters. If None, a `distance_column` must be provided
+            in the `DatasetDefinition` or `GazeDataFrame`, which contains the eye-to-screen
+            distance for each sample in millimeters.
+        origin : str
+            Specifies the screen location of the origin of the pixel coordinate system.
+
+        Examples
+        --------
+        >>> screen = Screen(
+        ...     width_px=1280,
+        ...     height_px=1024,
+        ...     width_cm=38.0,
+        ...     height_cm=30.0,
+        ...     distance_cm=68.0,
+        ...     origin='lower left',
+        ... )
+        >>> print(screen)
+        Screen(width_px=1280, height_px=1024, width_cm=38.00,
+        height_cm=30.00, distance_cm=68.00, origin=lower left)
+
+        We can also access the screen boundaries in degrees of visual angle. This only works if the
+        `distance_cm` attribute is specified.
+
+        >>> screen.x_min_dva# doctest:+ELLIPSIS
+        -15.59...
+        >>> screen.x_max_dva# doctest:+ELLIPSIS
+        15.59...
+        >>> screen.y_min_dva# doctest:+ELLIPSIS
+        -12.42...
+        >>> screen.y_max_dva# doctest:+ELLIPSIS
+        12.42...
+
+        """
         checks.check_no_zeros(width_px, 'width_px')
         checks.check_no_zeros(height_px, 'height_px')
         checks.check_no_zeros(width_cm, 'width_cm')
         checks.check_no_zeros(height_cm, 'height_cm')
-        checks.check_no_zeros(distance_cm, 'distance_cm')
+
+        if distance_cm is not None:
+            checks.check_no_zeros(distance_cm, 'distance_cm')
 
         self.width_px = width_px
         self.height_px = height_px
@@ -87,22 +135,68 @@ class Screen:
         self.distance_cm = distance_cm
         self.origin = origin
 
-        # calculate screen boundary coordinates in degrees of visual angle
-        self.x_max_dva = transforms_numpy.pix2deg(
-            width_px - 1,
-            screen_px=width_px, screen_cm=width_cm, distance_cm=distance_cm, origin=origin,
+    @property
+    def x_max_dva(self) -> float:
+        """Maximum screen x-coordinate in degrees of visual angle."""
+        self._check_distance_cm()
+        assert self.distance_cm is not None
+
+        return float(
+            transforms_numpy.pix2deg(
+                self.width_px - 1,
+                screen_px=self.width_px,
+                screen_cm=self.width_cm,
+                distance_cm=self.distance_cm,
+                origin=self.origin,
+            ),
         )
-        self.y_max_dva = transforms_numpy.pix2deg(
-            height_px - 1,
-            screen_px=height_px, screen_cm=height_cm, distance_cm=distance_cm, origin=origin,
+
+    @property
+    def y_max_dva(self) -> float:
+        """Maximum screen y-coordinate in degrees of visual angle."""
+        self._check_distance_cm()
+        assert self.distance_cm is not None
+
+        return float(
+            transforms_numpy.pix2deg(
+                self.height_px - 1,
+                screen_px=self.height_px,
+                screen_cm=self.height_cm,
+                distance_cm=self.distance_cm,
+                origin=self.origin,
+            ),
         )
-        self.x_min_dva = transforms_numpy.pix2deg(
-            0,
-            screen_px=width_px, screen_cm=width_cm, distance_cm=distance_cm, origin=origin,
+
+    @property
+    def x_min_dva(self) -> float:
+        """Minimum screen x-coordinate in degrees of visual angle."""
+        self._check_distance_cm()
+        assert self.distance_cm is not None
+
+        return float(
+            transforms_numpy.pix2deg(
+                0,
+                screen_px=self.width_px,
+                screen_cm=self.width_cm,
+                distance_cm=self.distance_cm,
+                origin=self.origin,
+            ),
         )
-        self.y_min_dva = transforms_numpy.pix2deg(
-            0,
-            screen_px=height_px, screen_cm=height_cm, distance_cm=distance_cm, origin=origin,
+
+    @property
+    def y_min_dva(self) -> float:
+        """Minimum screen y-coordinate in degrees of visual angle."""
+        self._check_distance_cm()
+        assert self.distance_cm is not None
+
+        return float(
+            transforms_numpy.pix2deg(
+                0,
+                screen_px=self.height_px,
+                screen_cm=self.height_cm,
+                distance_cm=self.distance_cm,
+                origin=self.origin,
+            ),
         )
 
     def pix2deg(
@@ -146,6 +240,9 @@ class Screen:
         >>> screen.pix2deg(arr=arr)
         array([[ 3.07379946, 20.43909054]])
         """
+        self._check_distance_cm()
+        assert self.distance_cm is not None
+
         return transforms_numpy.pix2deg(
             arr=arr,
             screen_px=(self.width_px, self.height_px),
@@ -153,3 +250,10 @@ class Screen:
             distance_cm=self.distance_cm,
             origin=self.origin,
         )
+
+    def _check_distance_cm(self) -> None:
+        """Check if distance_cm is not None."""
+        if self.distance_cm is None:
+            raise ValueError(
+                'distance_cm must not be None when using this method',
+            )

@@ -40,6 +40,7 @@ def download_and_extract_archive(
         md5: str | None = None,
         recursive: bool = True,
         remove_finished: bool = False,
+        remove_top_level: bool = True,
         verbose: int = 1,
 ) -> None:
     """Download and extract archive file.
@@ -60,6 +61,8 @@ def download_and_extract_archive(
         Recursively extract archives which are included in extracted archive.
     remove_finished : bool
         Remove downloaded file after successful extraction or decompression, default: False.
+    remove_top_level: bool
+        If ``True``, remove the top-level directory if it has only one child, default:True.
     verbose : int
         Verbosity levels: (1) Show download progress bar and print info messages on downloading
         and extracting archive files without printing messages for recursive archive extraction.
@@ -81,6 +84,7 @@ def download_and_extract_archive(
         destination_path=extract_dirpath,
         recursive=recursive,
         remove_finished=remove_finished,
+        remove_top_level=remove_top_level,
         verbose=verbose,
     )
 

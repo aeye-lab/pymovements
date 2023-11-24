@@ -207,7 +207,8 @@ def load_gaze_files(
             custom_read_kwargs=definition.custom_read_kwargs,
         )
 
-        gaze_data = gaze_data.rename(definition.column_map)
+        if not preprocessed:
+            gaze_data = gaze_data.rename(definition.column_map)
 
         # Add fileinfo columns to dataframe.
         gaze_data = add_fileinfo(
@@ -226,8 +227,13 @@ def load_gaze_files(
 
         elif preprocessed and extension == 'csv':
             time_column = None
+            distance_column = None
+
             if 'time' in gaze_data.columns:
                 time_column = 'time'
+
+            if 'distance' in gaze_data.columns:
+                distance_column = 'distance'
 
             pixel_columns: list[str] = list(
                 set(GazeDataFrame.valid_pixel_position_columns) & set(gaze_data.columns),
@@ -247,6 +253,7 @@ def load_gaze_files(
                 experiment=definition.experiment,
                 trial_columns=definition.trial_columns,
                 time_column=time_column,
+                distance_column=distance_column,
                 pixel_columns=pixel_columns,
                 position_columns=position_columns,
                 velocity_columns=velocity_columns,
@@ -259,6 +266,7 @@ def load_gaze_files(
                 experiment=definition.experiment,
                 trial_columns=definition.trial_columns,
                 time_column=definition.time_column,
+                distance_column=definition.distance_column,
                 pixel_columns=definition.pixel_columns,
                 position_columns=definition.position_columns,
                 velocity_columns=definition.velocity_columns,
@@ -301,7 +309,7 @@ def load_gaze_file(
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
 
-    if filepath.suffix == '.csv':
+    if filepath.suffix in {'.csv', '.txt'}:
         if preprocessed:
             gaze_df = pl.read_csv(filepath)
         else:
@@ -311,7 +319,7 @@ def load_gaze_file(
     elif filepath.suffix == '.asc':
         gaze_df = parse_eyelink(filepath, **custom_read_kwargs)
     else:
-        valid_extensions = ['csv', 'feather', 'asc']
+        valid_extensions = ['csv', 'txt', 'feather', 'asc']
         raise ValueError(
             f'unsupported file format "{filepath.suffix}".'
             f'Supported formats are: {valid_extensions}',
@@ -471,17 +479,7 @@ def save_preprocessed(
         )
 
         if extension == 'csv':
-            if 'pixel' in gaze_df.frame.columns:
-                gaze_df.unnest('pixel')
-
-            if 'position' in gaze_df.frame.columns:
-                gaze_df.unnest('position')
-
-            if 'velocity' in gaze_df.frame.columns:
-                gaze_df.unnest('velocity')
-
-            if 'acceleration' in gaze_df.frame.columns:
-                gaze_df.unnest('acceleration')
+            gaze_df.unnest()
 
         for column in gaze_df.columns:
             if column in fileinfo.columns:

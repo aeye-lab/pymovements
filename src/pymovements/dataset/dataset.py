@@ -215,6 +215,60 @@ class Dataset:
         )
         return self
 
+    def apply(
+            self,
+            function: str,
+            *,
+            verbose: bool = True,
+            **kwargs: Any,
+    ) -> Dataset:
+        """Apply preprocessing method to all GazeDataFrames in Dataset.
+
+        Parameters
+        ----------
+        function: str
+            Name of the preprocessing function to apply.
+        verbose : bool
+            If True, show progress bar of computation.
+        kwargs:
+            kwargs that will be forwarded when calling the preprocessing method.
+
+        Examples
+        --------
+        Let's load in our dataset first,
+        >>> import pymovements as pm
+        >>>
+        >>> dataset = pm.Dataset("ToyDataset", path='toy_dataset')
+        >>> dataset.download()# doctest:+ELLIPSIS
+        Downloading ... to toy_dataset...downloads...
+        Checking integrity of ...
+        Extracting ... to toy_dataset...raw
+        <pymovements.dataset.dataset.Dataset object at ...>
+        >>> dataset.load()# doctest:+ELLIPSIS
+        <pymovements.dataset.dataset.Dataset object at ...>
+
+        Use apply for your gaze transformations:
+        >>> dataset.apply('pix2deg')# doctest:+ELLIPSIS
+        <pymovements.dataset.dataset.Dataset object at ...>
+
+        >>> dataset.apply('pos2vel', method='neighbors')# doctest:+ELLIPSIS
+        <pymovements.dataset.dataset.Dataset object at ...>
+
+        Use apply for your event detection:
+        >>> dataset.apply('ivt')# doctest:+ELLIPSIS
+        <pymovements.dataset.dataset.Dataset object at ...>
+
+        >>> dataset.apply('microsaccades', minimum_duration=8)# doctest:+ELLIPSIS
+        <pymovements.dataset.dataset.Dataset object at ...>
+        """
+        self._check_gaze_dataframe()
+
+        disable_progressbar = not verbose
+        for gaze in tqdm(self.gaze, disable=disable_progressbar):
+            gaze.apply(function, **kwargs)
+
+        return self
+
     def pix2deg(self, verbose: bool = True) -> Dataset:
         """Compute gaze positions in degrees of visual angle from pixel coordinates.
 
@@ -232,13 +286,7 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
-        self._check_gaze_dataframe()
-
-        disable_progressbar = not verbose
-        for gaze_df in tqdm(self.gaze, disable=disable_progressbar):
-            gaze_df.pix2deg()
-
-        return self
+        return self.apply('pix2deg', verbose=verbose)
 
     def pos2acc(
             self,
@@ -270,17 +318,13 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
-        self._check_gaze_dataframe()
-
-        disable_progressbar = not verbose
-        for gaze_df in tqdm(self.gaze, disable=disable_progressbar):
-            gaze_df.pos2acc(
-                window_length=window_length,
-                degree=degree,
-                padding=padding,
-            )
-
-        return self
+        return self.apply(
+            'pos2acc',
+            window_length=window_length,
+            degree=degree,
+            padding=padding,
+            verbose=verbose,
+        )
 
     def pos2vel(
             self,
@@ -309,13 +353,7 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
-        self._check_gaze_dataframe()
-
-        disable_progressbar = not verbose
-        for gaze_df in tqdm(self.gaze, disable=disable_progressbar):
-            gaze_df.pos2vel(method=method, **kwargs)
-
-        return self
+        return self.apply('pos2vel', method=method, verbose=verbose, **kwargs)
 
     def detect_events(
             self,
@@ -651,13 +689,20 @@ class Dataset:
         )
         return self
 
-    def extract(self, remove_finished: bool = False, verbose: int = 1) -> Dataset:
+    def extract(
+            self,
+            remove_finished: bool = False,
+            remove_top_level: bool = True,
+            verbose: int = 1,
+    ) -> Dataset:
         """Extract downloaded dataset archive files.
 
         Parameters
         ----------
         remove_finished : bool
             Remove archive files after extraction.
+        remove_top_level: bool
+            If ``True``, remove the top-level directory if it has only one child.
         verbose : int
             Verbosity levels: (1) Print messages for extracting each dataset resource without
             printing messages for recursive archives. (2) Print additional messages for each
@@ -672,6 +717,7 @@ class Dataset:
             definition=self.definition,
             paths=self.paths,
             remove_finished=remove_finished,
+            remove_top_level=remove_top_level,
             verbose=verbose,
         )
         return self

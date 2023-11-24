@@ -211,17 +211,19 @@ def parse_eyelink(
             for additional_column in additional_columns:
                 samples[additional_column].append(current_additional[additional_column])
 
+    schema_overrides = {
+        'time': pl.Int64,
+        'x_pix': pl.Float64,
+        'y_pix': pl.Float64,
+        'pupil': pl.Float64,
+    }
+    if schema is not None:
+        for column, dtype in schema.items():
+            schema_overrides[column] = dtype
+
     df = pl.from_dict(
         data=samples,
-        schema_overrides={
-            'time': pl.Int64,
-            'x_pix': pl.Float64,
-            'y_pix': pl.Float64,
-            'pupil': pl.Float64,
-        },
+        schema_overrides=schema_overrides,
     )
-
-    if schema is not None:
-        df = df.with_columns([pl.col(column).cast(dtype) for column, dtype in schema.items()])
 
     return df

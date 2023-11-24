@@ -24,6 +24,7 @@ import numpy as np
 
 from pymovements.gaze import transforms_numpy
 from pymovements.gaze.screen import Screen
+from pymovements.utils import checks
 from pymovements.utils import decorators
 
 
@@ -67,11 +68,65 @@ class Experiment:
     """
 
     def __init__(
-            self, screen_width_px: int, screen_height_px: int,
-            screen_width_cm: float, screen_height_cm: float,
-            distance_cm: float, origin: str, sampling_rate: float,
+            self,
+            screen_width_px: int,
+            screen_height_px: int,
+            screen_width_cm: float,
+            screen_height_cm: float,
+            distance_cm: float | None = None,
+            origin: str = 'lower left',
+            sampling_rate: float | None = None,
     ):
+        """Initialize Experiment.
 
+        Parameters
+        ----------
+        screen_width_px : int
+            Screen width in pixels
+        screen_height_px : int
+            Screen height in pixels
+        screen_width_cm : float
+            Screen width in centimeters
+        screen_height_cm : float
+            Screen height in centimeters
+        distance_cm : float | None
+            Eye-to-screen distance in centimeters. If None, a `distance_column` must be provided
+            in the `DatasetDefinition` or `GazeDataFrame`, which contains the eye-to-screen
+            distance for each sample in millimeters.
+        origin : str
+            Specifies the screen location of the origin of the pixel coordinate system.
+        sampling_rate : float
+            Sampling rate in Hz
+
+        Examples
+        --------
+        >>> experiment = Experiment(
+        ...     screen_width_px=1280,
+        ...     screen_height_px=1024,
+        ...     screen_width_cm=38,
+        ...     screen_height_cm=30,
+        ...     distance_cm=68,
+        ...     origin='lower left',
+        ...     sampling_rate=1000.0,
+        ... )
+        >>> print(experiment)
+        Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38,
+        height_cm=30, distance_cm=68, origin=lower left), sampling_rate=1000.00)
+
+        We can also access the screen boundaries in degrees of visual angle via the
+        :py:attr:`~pymovements.gaze.Screen` object. This only works if the
+        `distance_cm` attribute is specified.
+
+        >>> experiment.screen.x_min_dva# doctest:+ELLIPSIS
+        -15.59...
+        >>> experiment.screen.x_max_dva# doctest:+ELLIPSIS
+        15.59...
+        >>> experiment.screen.y_min_dva# doctest:+ELLIPSIS
+        -12.42...
+        >>> experiment.screen.y_max_dva# doctest:+ELLIPSIS
+        12.42...
+
+        """
         self.screen = Screen(
             width_px=screen_width_px,
             height_px=screen_height_px,
@@ -80,6 +135,12 @@ class Experiment:
             distance_cm=distance_cm,
             origin=origin,
         )
+
+        checks.check_is_not_none(sampling_rate=sampling_rate)
+        assert sampling_rate is not None
+
+        checks.check_is_greater_than_zero(sampling_rate=sampling_rate)
+
         self.sampling_rate = sampling_rate
 
     def pos2vel(

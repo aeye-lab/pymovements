@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import inspect
+import warnings
 from collections.abc import Callable
 from copy import deepcopy
 from typing import Any
@@ -178,7 +179,105 @@ class GazeDataFrame:
             position_columns: list[str] | None = None,
             velocity_columns: list[str] | None = None,
             acceleration_columns: list[str] | None = None,
+            distance_column: str | None = None,
     ):
+        """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
+
+        Parameters
+        ----------
+        data: pl.DataFrame
+            A dataframe to be transformed to a polars dataframe.
+        experiment : Experiment
+            The experiment definition.
+        events: EventDataFrame
+            A dataframe of events in the gaze signal.
+        trial_columns:
+            The name of the trial columns in the input data frame. If the list is empty or None,
+            the input data frame is assumed to contain only one trial. If the list is not empty,
+            the input data frame is assumed to contain multiple trials and the transformation
+            methods will be applied to each trial separately.
+        time_column:
+            The name of the timestamp column in the input data frame. This column will be renamed to
+            ``time``.
+        pixel_columns:
+            The name of the pixel position columns in the input data frame. These columns will be
+            nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
+            column will not be created.
+        position_columns:
+            The name of the dva position columns in the input data frame. These columns will be
+            nested into the column ``position``. If the list is empty or None, the nested
+            ``position`` column will not be created.
+        velocity_columns:
+            The name of the velocity columns in the input data frame. These columns will be nested
+            into the column ``velocity``. If the list is empty or None, the nested ``velocity``
+            column will not be created.
+        acceleration_columns:
+            The name of the acceleration columns in the input data frame. These columns will be
+            nested into the column ``acceleration``. If the list is empty or None, the nested
+            ``acceleration`` column will not be created.
+        distance_column:
+            The name of the column containing eye-to-screen distance in millimeters for each sample
+            in the input data frame. If specified, the column will be used for pixel to dva
+            transformations. If not specified, the constant eye-to-screen distance will be taken
+            from the experiment definition. This column will be renamed to ``distance``.
+
+        Notes
+        -----
+        About using the arguments ``pixel_columns``, ``position_columns``, ``velocity_columns``,
+        and ``acceleration_columns``:
+
+        By passing a list of columns as any of these arguments, these columns will be merged into a
+        single column with the corresponding name , e.g. using `pixel_columns` will merge the
+        respective columns into the column `pixel`.
+
+        The supported number of component columns with the expected order are:
+
+        * zero columns: No nested component column will be created.
+        * two columns: monocular data; expected order: x-component, y-component
+        * four columns: binocular data; expected order: x-component left eye, y-component left eye,
+          x-component right eye, y-component right eye,
+        * six columns: binocular data with additional cyclopian data; expected order: x-component
+          left eye, y-component left eye, x-component right eye, y-component right eye,
+          x-component cyclopian eye, y-component cyclopian eye,
+
+
+        Examples
+        --------
+        First let's create an example `DataFrame` with three columns:
+        the timestamp ``t`` and ``x`` and ``y`` for the pixel position.
+
+        >>> df = pl.from_dict(
+        ...     data={'t': [1000, 1001, 1002], 'x': [0.1, 0.2, 0.3], 'y': [0.1, 0.2, 0.3]},
+        ... )
+        >>> df
+        shape: (3, 3)
+        ┌──────┬─────┬─────┐
+        │ t    ┆ x   ┆ y   │
+        │ ---  ┆ --- ┆ --- │
+        │ i64  ┆ f64 ┆ f64 │
+        ╞══════╪═════╪═════╡
+        │ 1000 ┆ 0.1 ┆ 0.1 │
+        │ 1001 ┆ 0.2 ┆ 0.2 │
+        │ 1002 ┆ 0.3 ┆ 0.3 │
+        └──────┴─────┴─────┘
+
+        We can now initialize our ``GazeDataFrame`` by specyfing the names of the pixel position
+        columns.
+
+        >>> gaze = GazeDataFrame(data=df, pixel_columns=['x', 'y'])
+        >>> gaze.frame
+        shape: (3, 2)
+        ┌──────┬────────────┐
+        │ t    ┆ pixel      │
+        │ ---  ┆ ---        │
+        │ i64  ┆ list[f64]  │
+        ╞══════╪════════════╡
+        │ 1000 ┆ [0.1, 0.1] │
+        │ 1001 ┆ [0.2, 0.2] │
+        │ 1002 ┆ [0.3, 0.3] │
+        └──────┴────────────┘
+
+        """
         if data is None:
             data = pl.DataFrame()
         else:
@@ -189,6 +288,9 @@ class GazeDataFrame:
 
         if time_column is not None:
             self.frame = self.frame.rename({time_column: 'time'})
+
+        if distance_column is not None:
+            self.frame = self.frame.rename({distance_column: 'distance'})
 
         # List of passed not-None column specifier lists.
         # The list will be used for inferring n_components.
@@ -289,7 +391,24 @@ class GazeDataFrame:
             if 'distance' in method_kwargs and 'distance' not in kwargs:
                 self._check_experiment()
                 assert self.experiment is not None
-                kwargs['distance'] = self.experiment.screen.distance_cm
+
+                if 'distance' in self.frame.columns:
+                    kwargs['distance'] = 'distance'
+
+                    if self.experiment.screen.distance_cm:
+                        warnings.warn(
+                            "Both a distance column and experiment's "
+                            'eye-to-screen distance are specified. '
+                            'Using eye-to-screen distances from column '
+                            "'distance' in the dataframe.",
+                        )
+                elif self.experiment.screen.distance_cm:
+                    kwargs['distance'] = self.experiment.screen.distance_cm
+                else:
+                    raise AttributeError(
+                        'Neither eye-to-screen distance is in the columns of the dataframe '
+                        'nor experiment eye-to-screen distance is specified.',
+                    )
 
             if 'sampling_rate' in method_kwargs and 'sampling_rate' not in kwargs:
                 self._check_experiment()
@@ -333,7 +452,8 @@ class GazeDataFrame:
                 self.frame = pl.concat(
                     [
                         df.with_columns(transform_method(**kwargs))
-                        for group, df in self.frame.groupby(self.trial_columns, maintain_order=True)
+                        for group, df in
+                        self.frame.group_by(self.trial_columns, maintain_order=True)
                     ],
                 )
 
@@ -392,6 +512,52 @@ class GazeDataFrame:
 
         """
         self.transform('pos2vel', method=method, **kwargs)
+
+    def smooth(
+            self,
+            method: str = 'savitzky_golay',
+            window_length: int = 7,
+            degree: int = 2,
+            column: str = 'position',
+            padding: str | float | int | None = 'nearest',
+            **kwargs: int | float | str,
+    ) -> None:
+        """Smooth data in a column.
+
+        Parameters
+        ----------
+        method:
+            The method to use for smoothing. Choose from ``savitzky_golay``, ``moving_average``,
+            ``exponential_moving_average``. See :func:`~transforms.smooth()` for details.
+        window_length:
+            For ``moving_average`` this is the window size to calculate the mean of the subsequent
+            samples. For ``savitzky_golay`` this is the window size to use for the polynomial fit.
+            For ``exponential_moving_average`` this is the span parameter.
+        degree:
+            The degree of the polynomial to use. This has only an effect if using
+            ``savitzky_golay`` as smoothing method. `degree` must be less than `window_length`.
+        column:
+            The input column name to which the smoothing is applied.
+        padding:
+            Must be either ``None``, a scalar or one of the strings
+            ``mirror``, ``nearest`` or ``wrap``.
+            This determines the type of extension to use for the padded signal to
+            which the filter is applied.
+            When passing ``None``, no extension padding is used.
+            When passing a scalar value, data will be padded using the passed value.
+            See :func:`~transforms.smooth()` for details on the padding methods.
+        **kwargs:
+            Additional keyword arguments to be passed to the :func:`~transforms.smooth()` method.
+        """
+        self.transform(
+            'smooth',
+            column=column,
+            method=method,
+            degree=degree,
+            window_length=window_length,
+            padding=padding,
+            **kwargs,
+        )
 
     def detect(
             self,
@@ -466,7 +632,7 @@ class GazeDataFrame:
 
     def unnest(
             self,
-            column: str,
+            input_columns: list[str] | str | None = None,
             output_suffixes: list[str] | None = None,
             *,
             output_columns: list[str] | None = None,
@@ -477,8 +643,16 @@ class GazeDataFrame:
 
         Parameters
         ----------
+
         column: str
             Name of input columns to be unnested into several component columns.
+        output_suffixes: list[str] | None
+        input_columns:
+            Name(s) of input column(s) to be unnested into several component columns.
+            If None all list columns 'pixel', 'position', 'velocity' and
+            'acceleration' will be unnested if existing.
+        output_columns:
+            Name of the resulting tuple columns.
         output_suffixes: list[str] | None
             Suffixes to append to the column names.
         output_columns: list[str] | None
@@ -490,16 +664,41 @@ class GazeDataFrame:
             If both output_columns and output_suffixes are specified.
             If number of output columns / suffixes does not match number of components.
             If output columns / suffixes are not unique.
+            If no columns to unnest exist and none are specified.
+            If output columns are specified and more than one input column is specified.
         AttributeError
             If number of components is not 2, 4 or 6.
+        Warning
+            If no columns to unnest exist and none are specified.
         """
+
+        if input_columns is None:
+            cols = ['pixel', 'position', 'velocity', 'acceleration']
+            input_columns = [col for col in cols if col in self.frame.columns]
+
+            if len(input_columns) == 0:
+                raise Warning(
+                    'No columns to unnest. '
+                    'Please specify columns to unnest via the "input_columns" argument.',
+                )
+
+        if isinstance(input_columns, str):
+            input_columns = [input_columns]
+
+        # no support for custom output columns if more than one input column will be unnested
+        if output_columns is not None and not len(input_columns) == 1:
+            raise ValueError("You cannot specify output columns if you want to unnest more than "
+                             "one input column. Please specify output suffixes or use a single "
+                             "input column instead.")
+
         checks.check_is_mutual_exclusive(
             output_columns=output_columns,
             output_suffixes=output_suffixes,
         )
+
         self._check_n_components()
 
-        col_names = output_columns if output_columns is not None else []
+        col_names = [output_columns] if output_columns is not None else []
 
         if output_columns is None and output_suffixes is None:
             if self.n_components == 2:
@@ -510,22 +709,30 @@ class GazeDataFrame:
                 output_suffixes = ['_xl', '_yl', '_xr', '_yr', '_xa', '_ya']
 
         if output_suffixes:
-            col_names = [f'{column}{suffix}' for suffix in output_suffixes]
+            col_names = [
+                [f'{input_col}{suffix}' for suffix in output_suffixes]
+                for input_col in input_columns
+            ]
 
-        if len(col_names) != self.n_components:
+        if len([
+            name for name_list in col_names for name in name_list
+        ]) != self.n_components * len(input_columns):
             raise ValueError(
-                f'Number of output columns / suffixes ({len(col_names)}) '
+                f'Number of output columns / suffixes ({len(col_names[0])}) '
                 f'must match number of components ({self.n_components})',
             )
-        if len(set(col_names)) != len(col_names):
+
+        if len({name for name_list in col_names for name in name_list}) != len(
+                [name for name_list in col_names for name in name_list]):
             raise ValueError('Output columns / suffixes must be unique')
 
-        self.frame = self.frame.with_columns(
-            [
-                pl.col(column).list.get(component_id).alias(col_names)
-                for component_id, col_names in enumerate(col_names)
-            ],
-        ).drop(column)
+        for input_col, column_names in zip(input_columns, col_names):
+            self.frame = self.frame.with_columns(
+                [
+                    pl.col(input_col).list.get(component_id).alias(names)
+                    for component_id, names in enumerate(column_names)
+                ],
+            ).drop(input_col)
 
     def copy(self) -> GazeDataFrame:
         """Return a copy of the GazeDataFrame.
@@ -619,7 +826,7 @@ class GazeDataFrame:
         list_lengths = {
             list_length
             for column in considered_columns
-            for list_length in self.frame.get_column(column).list.lengths().unique().to_list()
+            for list_length in self.frame.get_column(column).list.len().unique().to_list()
         }
 
         for column_specifier_list in column_specifiers:
