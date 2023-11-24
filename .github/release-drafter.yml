@@ -27,7 +27,7 @@ exclude-labels:
   - skip changelog
 
 exclude-contributors:
-  - pre-commit-ci[bot]
+  - pre-commit-ci
 
 change-template: '- $TITLE (#$NUMBER)'
 change-title-escapes: '\<*_&'
