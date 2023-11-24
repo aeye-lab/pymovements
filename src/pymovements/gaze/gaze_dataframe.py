@@ -108,7 +108,8 @@ class GazeDataFrame:
             the input data frame is assumed to contain multiple trials and the transformation
             methods will be applied to each trial separately.
         time_column:
-            The name of the timestamp column in the input data frame.
+            The name of the timestamp column in the input data frame. This column will be renamed to
+            ``time``.
         pixel_columns:
             The name of the pixel position columns in the input data frame. These columns will be
             nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
@@ -129,7 +130,7 @@ class GazeDataFrame:
             The name of the column containing eye-to-screen distance in millimeters for each sample
             in the input data frame. If specified, the column will be used for pixel to dva
             transformations. If not specified, the constant eye-to-screen distance will be taken
-            from the experiment definition.
+            from the experiment definition. This column will be renamed to ``distance``.
 
         Notes
         -----
