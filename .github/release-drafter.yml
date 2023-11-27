@@ -66,5 +66,6 @@ autolabeler:
 template: |
   $CHANGES
 
+  ## 👷👷‍♀️👷‍♂️ Contributors
   Shoutout to all our contributors for making this release possible!
   $CONTRIBUTORS
