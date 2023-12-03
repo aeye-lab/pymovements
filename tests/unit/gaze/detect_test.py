@@ -178,7 +178,7 @@ from pymovements.synthetic import step_function
                 'minimum_duration': 2,
             },
             pm.gaze.from_numpy(
-                time=np.reshape(np.arange(1000, 1100, dtype=int), (100, 1)),
+                time=np.arange(1000, 1100, dtype=int),
                 position=step_function(length=100, steps=[0], values=[(0, 0)]),
                 orient='row',
                 experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
@@ -337,7 +337,7 @@ from pymovements.synthetic import step_function
                 'minimum_duration': 2,
             },
             pm.gaze.from_numpy(
-                time=np.reshape(np.arange(1000, 1100, dtype=int), (100, 1)),
+                time=np.arange(1000, 1100, dtype=int),
                 velocity=step_function(length=100, steps=[0], values=[(0, 0)]),
                 orient='row',
                 experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
