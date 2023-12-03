@@ -23,7 +23,6 @@ from __future__ import annotations
 from typing import Literal
 
 import numpy as np
-import pandas as pd
 import polars as pl
 
 from pymovements.events.frame import EventDataFrame
@@ -278,7 +277,7 @@ def from_numpy(
 
 
 def from_pandas(
-        data: pd.DataFrame,
+        data,  # type: ignore
         experiment: Experiment | None = None,
         events: EventDataFrame | None = None,
         *,
