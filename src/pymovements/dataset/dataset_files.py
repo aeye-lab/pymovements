@@ -103,7 +103,8 @@ def load_event_files(
         This argument is used only for this single call and does not alter
         :py:meth:`pymovements.Dataset.events_rootpath`.
     extension:
-        Specifies the file format for loading data. Valid options are: `csv`, `feather`.
+        Specifies the file format for loading data. Valid options are: `csv`, `feather`,
+        `tsv`, `txt`.
         :Default: `feather`.
 
     Returns
@@ -132,10 +133,10 @@ def load_event_files(
 
         if extension == 'feather':
             event_df = pl.read_ipc(filepath)
-        elif extension == 'csv':
+        elif extension in {'csv', 'tsv', 'txt'}:
             event_df = pl.read_csv(filepath)
         else:
-            valid_extensions = ['csv', 'feather']
+            valid_extensions = ['csv', 'txt', 'tsv', 'feather']
             raise ValueError(
                 f'unsupported file format "{extension}".'
                 f'Supported formats are: {valid_extensions}',
@@ -180,7 +181,7 @@ def load_gaze_files(
         :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
     extension:
         Specifies the file format for loading data. Valid options are: `csv`, `feather`,
-        `.txt`, `.tsv`.
+        `txt`, `tsv`.
         :Default: `feather`.
 
     Returns
@@ -232,7 +233,7 @@ def load_gaze_files(
                 trial_columns=definition.trial_columns,
             )
 
-        elif preprocessed and extension in {'.csv', '.txt', '.tsv'}:
+        elif preprocessed and extension in {'csv', 'txt', 'tsv'}:
             time_column = None
             distance_column = None
 
@@ -316,7 +317,7 @@ def load_gaze_file(
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
 
-    if filepath.suffix in {'.csv', '.txt', '.tsv'}:
+    if filepath.suffix in {'csv', 'txt', 'tsv'}:
         if preprocessed:
             gaze_df = pl.read_csv(filepath)
         else:
@@ -326,7 +327,7 @@ def load_gaze_file(
     elif filepath.suffix == '.asc':
         gaze_df = parse_eyelink(filepath, **custom_read_kwargs)
     else:
-        valid_extensions = ['csv', '.tsv', 'txt', 'feather', 'asc']
+        valid_extensions = ['csv', 'tsv', 'txt', 'feather', 'asc']
         raise ValueError(
             f'unsupported file format "{filepath.suffix}".'
             f'Supported formats are: {valid_extensions}',
