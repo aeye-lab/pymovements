@@ -102,7 +102,7 @@ def fixture_dataset_init_kwargs(request):
         'potec': pm.datasets.PoTeC(
             filename_format='potec_example.tsv',
             filename_format_dtypes={},
-            trial_columns=['text_id'],
+            trial_columns=None,
         ),
 
     }
