@@ -115,7 +115,7 @@ class PoTeC(DatasetDefinition):
             'filename': 'PoTeC.zip',
             'md5': '7780904bf7b18ba7d30a811174750db3',
         },
-    )    
+    )
 
     experiment: Experiment = Experiment(
         screen_width_px=1680,
@@ -149,7 +149,7 @@ class PoTeC(DatasetDefinition):
 
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
-            'dtypes': { 
+            'dtypes': {
                 'time': pl.Int64,
                 'x': pl.Float32,
                 'y': pl.Float32,
