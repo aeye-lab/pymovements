@@ -108,7 +108,7 @@ def fixture_gaze_init_kwargs(request):
             **pm.datasets.JuDo1000().custom_read_kwargs,
         },
         'potec': {
-            'file': 'tests/files/potec_example.csv',
+            'file': 'tests/files/potec_example.tsv',
             'time_column': pm.datasets.PoTeC().time_column,
             'pixel_columns': pm.datasets.PoTeC().pixel_columns,
             'experiment': pm.datasets.PoTeC().experiment,
