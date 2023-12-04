@@ -39,6 +39,7 @@ import pymovements as pm
         'gazebase',
         'gazebase_vr',
         'judo1000',
+        'potec',
     ],
 )
 def fixture_gaze_init_kwargs(request):
@@ -106,6 +107,13 @@ def fixture_gaze_init_kwargs(request):
             'experiment': pm.datasets.JuDo1000().experiment,
             **pm.datasets.JuDo1000().custom_read_kwargs,
         },
+        'potec': {
+            'file': 'tests/files/potec_example.csv',
+            'time_column': pm.datasets.PoTeC().time_column,
+            'pixel_columns': pm.datasets.PoTeC().pixel_columns,
+            'experiment': pm.datasets.PoTeC().experiment,
+            **pm.datasets.PoTeC().custom_read_kwargs,
+        },
 
     }
     yield init_param_dict[request.param]
@@ -115,7 +123,7 @@ def test_gaze_file_processing(gaze_from_kwargs):
     # Load in gaze file.
     file_extension = os.path.splitext(gaze_from_kwargs['file'])[1]
     gaze = None
-    if file_extension in {'.txt', '.csv'}:
+    if file_extension in {'.txt', '.csv', '.tsv', '.txt'}:
         gaze = pm.gaze.from_csv(**gaze_from_kwargs)
     elif file_extension in {'.feather', '.ipc'}:
         gaze = pm.gaze.from_ipc(**gaze_from_kwargs)

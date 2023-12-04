@@ -31,6 +31,7 @@
     pymovements.datasets.GazeOnFaces
     pymovements.datasets.HBN
     pymovements.datasets.JuDo1000
+    pymovements.datasets.PoTeC
     pymovements.datasets.SBSAT
 
 
@@ -49,6 +50,7 @@ from pymovements.datasets.gazebasevr import GazeBaseVR
 from pymovements.datasets.gaze_graph import GazeGraph
 from pymovements.datasets.hbn import HBN
 from pymovements.datasets.judo1000 import JuDo1000
+from pymovements.datasets.potec import PoTeC
 from pymovements.datasets.sb_sat import SBSAT
 from pymovements.datasets.toy_dataset import ToyDataset
 from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
@@ -61,6 +63,7 @@ __all__ = [
     'GazeOnFaces',
     'HBN',
     'JuDo1000',
+    'PoTeC',
     'SBSAT',
     'ToyDataset',
     'ToyDatasetEyeLink',
