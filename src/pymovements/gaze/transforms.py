@@ -171,7 +171,7 @@ def downsample(
     checks.check_is_int(factor=factor)
     checks.check_is_positive_value(factor=factor)
 
-    return pl.all().take_every(n=factor)
+    return pl.all().gather_every(n=factor)
 
 
 @register_transform
