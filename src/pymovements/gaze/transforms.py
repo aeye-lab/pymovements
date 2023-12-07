@@ -190,7 +190,7 @@ def norm(
         *,
         columns: tuple[str, str],
 ) -> pl.Expr:
-    """Take the norm of a 2D series.
+    r"""Take the norm of a 2D series.
 
     The norm is defined by :math:`\sqrt{x^2 + y^2}` with :math:`x` being the yaw component and
     :math:`y` being the pitch component of a coordinate.
