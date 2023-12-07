@@ -43,7 +43,7 @@ class PoTeC(DatasetDefinition):
     factors. Reading comprehension was assessed using text comprehension questions. Moreover,
     background questions that required additional knowledge beyond the presented text tested the
     general domain knowledge.
-    The repository contains the eye-movement data (1000 Hz, right eye monocular) as well as the 
+    The repository contains the eye-movement data (1000 Hz, right eye monocular) as well as the
     stimulus text data     with extensive linguistic feature annotations at the sub-lexical,
     lexical und supra-lexical     level. Therefore, the PoTeC is ideal for studying cognitive
     processes related to sentence     comprehension at all linguistic levels (e.g. lexical,
