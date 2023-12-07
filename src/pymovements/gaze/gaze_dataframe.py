@@ -40,6 +40,101 @@ class GazeDataFrame:
 
     Each row is a sample at a specific timestep.
     Each column is a channel in the gaze time series.
+
+    Parameters
+    ----------
+    data: pl.DataFrame | None
+        A dataframe to be transformed to a polars dataframe. (default: None)
+    experiment : Experiment | None
+        The experiment definition. (default: None)
+    events: pm.EventDataFrame | None
+        A dataframe of events in the gaze signal. (default: None)
+    trial_columns: str | list[str] | None
+        The name of the trial columns in the input data frame. If the list is empty or None,
+        the input data frame is assumed to contain only one trial. If the list is not empty,
+        the input data frame is assumed to contain multiple trials and the transformation
+        methods will be applied to each trial separately. (default: None)
+    time_column: str | None
+        The name of the timestamp column in the input data frame. This column will be renamed to
+        ``time``. (default: None)
+    pixel_columns: list[str] | None
+        The name of the pixel position columns in the input data frame. These columns will be
+        nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
+        column will not be created. (default: None)
+    position_columns: list[str] | None
+        The name of the dva position columns in the input data frame. These columns will be
+        nested into the column ``position``. If the list is empty or None, the nested
+        ``position`` column will not be created. (default: None)
+    velocity_columns: list[str] | None
+        The name of the velocity columns in the input data frame. These columns will be nested
+        into the column ``velocity``. If the list is empty or None, the nested ``velocity``
+        column will not be created. (default: None)
+    acceleration_columns: list[str] | None
+        The name of the acceleration columns in the input data frame. These columns will be
+        nested into the column ``acceleration``. If the list is empty or None, the nested
+        ``acceleration`` column will not be created. (default: None)
+    distance_column: str | None
+        The name of the column containing eye-to-screen distance in millimeters for each sample
+        in the input data frame. If specified, the column will be used for pixel to dva
+        transformations. If not specified, the constant eye-to-screen distance will be taken
+        from the experiment definition. This column will be renamed to ``distance``. (default: None)
+
+    Notes
+    -----
+    About using the arguments ``pixel_columns``, ``position_columns``, ``velocity_columns``,
+    and ``acceleration_columns``:
+
+    By passing a list of columns as any of these arguments, these columns will be merged into a
+    single column with the corresponding name , e.g. using `pixel_columns` will merge the
+    respective columns into the column `pixel`.
+
+    The supported number of component columns with the expected order are:
+
+    * zero columns: No nested component column will be created.
+    * two columns: monocular data; expected order: x-component, y-component
+    * four columns: binocular data; expected order: x-component left eye, y-component left eye,
+        x-component right eye, y-component right eye,
+    * six columns: binocular data with additional cyclopian data; expected order: x-component
+        left eye, y-component left eye, x-component right eye, y-component right eye,
+        x-component cyclopian eye, y-component cyclopian eye,
+
+
+    Examples
+    --------
+    First let's create an example `DataFrame` with three columns:
+    the timestamp ``t`` and ``x`` and ``y`` for the pixel position.
+
+    >>> df = pl.from_dict(
+    ...     data={'t': [1000, 1001, 1002], 'x': [0.1, 0.2, 0.3], 'y': [0.1, 0.2, 0.3]},
+    ... )
+    >>> df
+    shape: (3, 3)
+    ┌──────┬─────┬─────┐
+    │ t    ┆ x   ┆ y   │
+    │ ---  ┆ --- ┆ --- │
+    │ i64  ┆ f64 ┆ f64 │
+    ╞══════╪═════╪═════╡
+    │ 1000 ┆ 0.1 ┆ 0.1 │
+    │ 1001 ┆ 0.2 ┆ 0.2 │
+    │ 1002 ┆ 0.3 ┆ 0.3 │
+    └──────┴─────┴─────┘
+
+    We can now initialize our ``GazeDataFrame`` by specyfing the names of the pixel position
+    columns.
+
+    >>> gaze = GazeDataFrame(data=df, pixel_columns=['x', 'y'])
+    >>> gaze.frame
+    shape: (3, 2)
+    ┌──────┬────────────┐
+    │ t    ┆ pixel      │
+    │ ---  ┆ ---        │
+    │ i64  ┆ list[f64]  │
+    ╞══════╪════════════╡
+    │ 1000 ┆ [0.1, 0.1] │
+    │ 1001 ┆ [0.2, 0.2] │
+    │ 1002 ┆ [0.3, 0.3] │
+    └──────┴────────────┘
+
     """
 
     valid_pixel_position_columns = [
@@ -92,103 +187,6 @@ class GazeDataFrame:
             acceleration_columns: list[str] | None = None,
             distance_column: str | None = None,
     ):
-        """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
-
-        Parameters
-        ----------
-        data: pl.DataFrame
-            A dataframe to be transformed to a polars dataframe.
-        experiment : Experiment
-            The experiment definition.
-        events: EventDataFrame
-            A dataframe of events in the gaze signal.
-        trial_columns:
-            The name of the trial columns in the input data frame. If the list is empty or None,
-            the input data frame is assumed to contain only one trial. If the list is not empty,
-            the input data frame is assumed to contain multiple trials and the transformation
-            methods will be applied to each trial separately.
-        time_column:
-            The name of the timestamp column in the input data frame. This column will be renamed to
-            ``time``.
-        pixel_columns:
-            The name of the pixel position columns in the input data frame. These columns will be
-            nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
-            column will not be created.
-        position_columns:
-            The name of the dva position columns in the input data frame. These columns will be
-            nested into the column ``position``. If the list is empty or None, the nested
-            ``position`` column will not be created.
-        velocity_columns:
-            The name of the velocity columns in the input data frame. These columns will be nested
-            into the column ``velocity``. If the list is empty or None, the nested ``velocity``
-            column will not be created.
-        acceleration_columns:
-            The name of the acceleration columns in the input data frame. These columns will be
-            nested into the column ``acceleration``. If the list is empty or None, the nested
-            ``acceleration`` column will not be created.
-        distance_column:
-            The name of the column containing eye-to-screen distance in millimeters for each sample
-            in the input data frame. If specified, the column will be used for pixel to dva
-            transformations. If not specified, the constant eye-to-screen distance will be taken
-            from the experiment definition. This column will be renamed to ``distance``.
-
-        Notes
-        -----
-        About using the arguments ``pixel_columns``, ``position_columns``, ``velocity_columns``,
-        and ``acceleration_columns``:
-
-        By passing a list of columns as any of these arguments, these columns will be merged into a
-        single column with the corresponding name , e.g. using `pixel_columns` will merge the
-        respective columns into the column `pixel`.
-
-        The supported number of component columns with the expected order are:
-
-        * zero columns: No nested component column will be created.
-        * two columns: monocular data; expected order: x-component, y-component
-        * four columns: binocular data; expected order: x-component left eye, y-component left eye,
-          x-component right eye, y-component right eye,
-        * six columns: binocular data with additional cyclopian data; expected order: x-component
-          left eye, y-component left eye, x-component right eye, y-component right eye,
-          x-component cyclopian eye, y-component cyclopian eye,
-
-
-        Examples
-        --------
-        First let's create an example `DataFrame` with three columns:
-        the timestamp ``t`` and ``x`` and ``y`` for the pixel position.
-
-        >>> df = pl.from_dict(
-        ...     data={'t': [1000, 1001, 1002], 'x': [0.1, 0.2, 0.3], 'y': [0.1, 0.2, 0.3]},
-        ... )
-        >>> df
-        shape: (3, 3)
-        ┌──────┬─────┬─────┐
-        │ t    ┆ x   ┆ y   │
-        │ ---  ┆ --- ┆ --- │
-        │ i64  ┆ f64 ┆ f64 │
-        ╞══════╪═════╪═════╡
-        │ 1000 ┆ 0.1 ┆ 0.1 │
-        │ 1001 ┆ 0.2 ┆ 0.2 │
-        │ 1002 ┆ 0.3 ┆ 0.3 │
-        └──────┴─────┴─────┘
-
-        We can now initialize our ``GazeDataFrame`` by specyfing the names of the pixel position
-        columns.
-
-        >>> gaze = GazeDataFrame(data=df, pixel_columns=['x', 'y'])
-        >>> gaze.frame
-        shape: (3, 2)
-        ┌──────┬────────────┐
-        │ t    ┆ pixel      │
-        │ ---  ┆ ---        │
-        │ i64  ┆ list[f64]  │
-        ╞══════╪════════════╡
-        │ 1000 ┆ [0.1, 0.1] │
-        │ 1001 ┆ [0.2, 0.2] │
-        │ 1002 ┆ [0.3, 0.3] │
-        └──────┴────────────┘
-
-        """
         if data is None:
             data = pl.DataFrame()
         else:
@@ -246,7 +244,7 @@ class GazeDataFrame:
         ----------
         function: str
             Name of the preprocessing function to apply.
-        kwargs:
+        **kwargs: Any
             kwargs that will be forwarded when calling the preprocessing method.
         """
         if transforms.TransformLibrary.__contains__(function):
@@ -261,7 +259,15 @@ class GazeDataFrame:
             transform_method: str | Callable[..., pl.Expr],
             **kwargs: Any,
     ) -> None:
-        """Apply transformation method."""
+        """Apply transformation method.
+
+        Parameters
+        ----------
+        transform_method: str | Callable[..., pl.Expr]
+            The transformation method to be applied.
+        **kwargs: Any
+            Additional keyword arguments to be passed to the transformation method.
+        """
         if isinstance(transform_method, str):
             transform_method = transforms.TransformLibrary.get(transform_method)
 
@@ -393,12 +399,12 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        window_length:
-            The window size to use.
-        degree:
-            The degree of the polynomial to use.
-        padding:
-            The padding method to use. See ``savitzky_golay`` for details.
+        degree: int
+            The degree of the polynomial to use. (default: 2)
+        window_length: int
+            The window size to use. (default: 7)
+        padding: str | float | int | None
+            The padding method to use. See ``savitzky_golay`` for details. (default: 'nearest')
 
         Raises
         ------
@@ -421,9 +427,10 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        method : str
+        method: str
             Computation method. See :func:`~transforms.pos2vel()` for details, default: fivepoint.
-        **kwargs
+            (default: 'fivepoint')
+        **kwargs: int | float | str
             Additional keyword arguments to be passed to the :func:`~transforms.pos2vel()` method.
 
         Raises
@@ -447,27 +454,27 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        method:
+        method: str
             The method to use for smoothing. Choose from ``savitzky_golay``, ``moving_average``,
-            ``exponential_moving_average``. See :func:`~transforms.smooth()` for details.
-        window_length:
+            ``exponential_moving_average``. See :func:`~transforms.smooth()` for details. (default: 'savitzky_golay')
+        window_length: int
             For ``moving_average`` this is the window size to calculate the mean of the subsequent
             samples. For ``savitzky_golay`` this is the window size to use for the polynomial fit.
-            For ``exponential_moving_average`` this is the span parameter.
-        degree:
+            For ``exponential_moving_average`` this is the span parameter. (default: 7)
+        degree: int
             The degree of the polynomial to use. This has only an effect if using
-            ``savitzky_golay`` as smoothing method. `degree` must be less than `window_length`.
-        column:
-            The input column name to which the smoothing is applied.
-        padding:
+            ``savitzky_golay`` as smoothing method. `degree` must be less than `window_length`. (default: 2)
+        column: str
+            The input column name to which the smoothing is applied. (default: 'position')
+        padding: str | float | int | None
             Must be either ``None``, a scalar or one of the strings
             ``mirror``, ``nearest`` or ``wrap``.
             This determines the type of extension to use for the padded signal to
             which the filter is applied.
             When passing ``None``, no extension padding is used.
             When passing a scalar value, data will be padded using the passed value.
-            See :func:`~transforms.smooth()` for details on the padding methods.
-        **kwargs:
+            See :func:`~transforms.smooth()` for details on the padding methods. (default: 'nearest')
+        **kwargs: int | float | str
             Additional keyword arguments to be passed to the :func:`~transforms.smooth()` method.
         """
         self.transform(
@@ -492,16 +499,16 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        method : EventDetectionCallable
+        method: Callable[..., pm.EventDataFrame] | str
             The event detection method to be applied.
-        eye : str
+        eye: str
             Select which eye to choose. Valid options are ``auto``, ``left``, ``right`` or ``None``.
             If ``auto`` is passed, eye is inferred in the order ``['right', 'left', 'eye']`` from
-            the available :py:attr:`~.Dataset.gaze` dataframe columns.
-        clear : bool
+            the available :py:attr:`~.Dataset.gaze` dataframe columns. (default: 'auto')
+        clear: bool
             If ``True``, event DataFrame will be overwritten with new DataFrame instead of being
-             merged into the existing one.
-        **kwargs :
+            merged into the existing one. (default: False)
+        **kwargs: Any
             Additional keyword arguments to be passed to the event detection method.
         """
         if not self.events or clear:
@@ -539,9 +546,9 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        input_columns:
+        input_columns: list[str]
             Names of input columns to be merged into a single tuple column.
-        output_column:
+        output_column: str
             Name of the resulting tuple column.
         """
         self._check_component_columns(**{output_column: input_columns})
@@ -564,14 +571,14 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        input_columns:
+        input_columns: list[str] | str | None
             Name(s) of input column(s) to be unnested into several component columns.
             If None all list columns 'pixel', 'position', 'velocity' and
-            'acceleration' will be unnested if existing.
-        output_columns:
-            Name of the resulting tuple columns.
-        output_suffixes:
-            Suffixes to append to the column names.
+            'acceleration' will be unnested if existing. (default: None)
+        output_suffixes: list[str] | None
+            Suffixes to append to the column names. (default: None)
+        output_columns: list[str] | None
+            Name of the resulting tuple columns. (default: None)
 
         Raises
         ------
@@ -665,19 +672,37 @@ class GazeDataFrame:
         return gaze
 
     def _check_experiment(self) -> None:
-        """Check if experiment attribute has been set."""
+        """Check if experiment attribute has been set.
+
+        Raises
+        ------
+        AttributeError
+            If experiment is None.
+        """
         if self.experiment is None:
             raise AttributeError('experiment must not be None for this method to work')
 
     def _check_n_components(self) -> None:
-        """Check that n_components is either 2, 4 or 6."""
+        """Check that n_components is either 2, 4 or 6.
+
+        Raises
+        ------
+        AttributeError
+            If n_components is not 2, 4 or 6.
+        """
         if self.n_components not in {2, 4, 6}:
             raise AttributeError(
                 f'n_components must be either 2, 4 or 6 but is {self.n_components}',
             )
 
     def _check_component_columns(self, **kwargs: list[str]) -> None:
-        """Check if component columns are in valid format."""
+        """Check if component columns are in valid format.
+
+        Parameters
+        ----------
+        **kwargs: list[str]
+            Keyword arguments of component columns.
+        """
         for component_type, columns in kwargs.items():
             if not isinstance(columns, list):
                 raise TypeError(
@@ -720,12 +745,12 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        column_specifiers:
+        column_specifiers: list[list[str]]
             List of list of column specifiers.
 
         Returns
         -------
-        int or None
+        int | None
             Number of components
 
         Raises
@@ -763,6 +788,11 @@ class GazeDataFrame:
         eye: str
             String specificer for inferring eye components. Supported values are: auto, mono, left
             right, cyclops. Default: auto.
+
+        Returns
+        -------
+        tuple[int, int]
+            Tuple of eye component indices.
         """
         self._check_n_components()
 
@@ -811,12 +841,17 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        method: Callable
+        method: Callable[..., pm.EventDataFrame]
             The method for which the keyword argument dictionary will be filled.
         eye: str
             The string specifier for the eye to choose.
-        kwargs:
+        **kwargs: Any
             The source keyword arguments passed to the `GazeDataFrame.detect()` method.
+
+        Returns
+        -------
+        dict[str, Any]
+            The filled keyword argument dictionary.
         """
         # Automatically infer eye to use for event detection.
         method_args = inspect.getfullargspec(method).args

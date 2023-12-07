@@ -52,38 +52,38 @@ def tsplot(
 
     Parameters
     ----------
-    gaze:
+    gaze: GazeDataFrame
         The GazeDataFrame to plot.
-    channels: list, optional
-        list of channel names
-    n_cols: int
-        Number of channel subplot colunms. If None, it will be automatically inferred.
-    n_rows: int
-        Number of channel subplot rows. If None, it will be automatically inferred.
-    xlabel: str, optional
-        set x label
+    channels: list[str] | None
+        List of channel names to plot. If None, all channels will be plotted. (default: None)
+    xlabel: str | None
+        Set the x label. (default: None)
+    n_cols: int | None
+        Number of channel subplot colunms. If None, it will be automatically inferred. (default: None)
+    n_rows: int | None
+        Number of channel subplot rows. If None, it will be automatically inferred. (default: None)
     rotate_ylabels: bool
-        set to rotate ylabels
+        Set whether to rotate ylabels. (default: True)
     share_y: bool
-        set if y-axes should share common axis
+        Set if y-axes should share common axis. (default: True)
     zero_centered_yaxis: bool
-        set if y-axis should be zero centered
-    line_color: tuple, str
-        set line color
+        Set if y-axis should be zero centered. (default: True)
+    line_color: tuple[int, int, int] | str
+        Set line color. (default: 'k')
     line_width: int
-        set line width
+        Set line width. (default: 1)
     show_grid: bool
-        set to show grid
+        Set whether to show the background grid. (default: True)
     show_yticks: bool
-        set to show yticks
-    figsize: tuple
-        Figure size.
-    title: str, optional
-        Figure title.
-    savepath: str, optional
-        If given, figure will be saved to this path.
+        Set whether to show yticks. (default: True)
+    figsize: tuple[int, int]
+        Figure size. (default: (15, 5))
+    title: str | None
+        Figure title. (default: None)
+    savepath: str | None
+        If given, figure will be saved to this path. (default: None)
     show: bool
-        If True, figure will be shown.
+        If True, figure will be shown. (default: True)
 
     Raises
     ------

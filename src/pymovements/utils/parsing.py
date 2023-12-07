@@ -44,6 +44,11 @@ def check_nan(sample_location: str) -> float:
     ----------
     sample_location: str
         Sample location as extracted from ascii file.
+
+    Returns
+    -------
+    float
+        Returns either the valid sample as a float or np.nan.
     """
     try:
         ret = float(sample_location)
@@ -57,8 +62,13 @@ def compile_patterns(patterns: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
     Parameters
     ----------
-    patterns:
+    patterns: list[dict[str, Any]]
         The list of patterns to compile.
+
+    Returns
+    -------
+    list[dict[str, Any]]
+        Returns from string compiled regex patterns.
     """
     msg_prefix = r'MSG\s+\d+\s+'
 
@@ -109,19 +119,24 @@ def get_additional_columns(compiled_patterns: list[dict[str, Any]]) -> set[str]:
 
 def parse_eyelink(
         filepath: Path | str,
-        patterns: list | None = None,
-        schema: dict | None = None,
+        patterns: list[dict[str, Any]] | None = None,
+        schema: dict[str, Any] | None = None,
 ) -> pl.DataFrame:
     """Process EyeLink asc file.
 
     Parameters
     ----------
-    filepath:
+    filepath: Path | str
         file name of ascii file to convert.
-    patterns:
-        list of patterns to match for additional columns.
-    schema:
-        Dictionary to optionally specify types of columns parsed by patterns.
+    patterns: list[dict[str, Any]] | None
+        list of patterns to match for additional columns. (default: None)
+    schema: dict[str, Any] | None
+        Dictionary to optionally specify types of columns parsed by patterns. (default: None)
+
+    Returns
+    -------
+    pl.DataFrame
+        Returns parsed eyelink polars dataframe.
 
     """
     if patterns is None:
@@ -129,14 +144,14 @@ def parse_eyelink(
     compiled_patterns = compile_patterns(patterns)
 
     additional_columns = get_additional_columns(compiled_patterns)
-    additional: dict[str, list] = {
+    additional: dict[str, list[Any]] = {
         additional_column: [] for additional_column in additional_columns
     }
     current_additional = {
         additional_column: None for additional_column in additional_columns
     }
 
-    samples: dict[str, list] = {
+    samples: dict[str, list[Any]] = {
         'time': [],
         'x_pix': [],
         'y_pix': [],

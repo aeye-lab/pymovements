@@ -40,14 +40,14 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
 
     Parameters
     ----------
-    definition
+    definition: DatasetDefinition
         The dataset definition.
-    paths
+    paths: DatasetPaths
         The dataset paths.
 
     Returns
     -------
-    pl.DataFrame :
+    pl.DataFrame
         File information dataframe.
 
     Raises
@@ -92,19 +92,19 @@ def load_event_files(
 
     Parameters
     ----------
-    definition:
+    definition: DatasetDefinition
         The dataset definition.
-    fileinfo:
+    fileinfo: pl.DataFrame
         A dataframe holding file information.
-    paths:
+    paths: DatasetPaths
         Path of directory containing event files.
-    events_dirname : str
+    events_dirname: str | None
         One-time usage of an alternative directory name to save data relative to dataset path.
         This argument is used only for this single call and does not alter
-        :py:meth:`pymovements.Dataset.events_rootpath`.
-    extension:
+        :py:meth:`pymovements.Dataset.events_rootpath`. (default: None)
+    extension: str
         Specifies the file format for loading data. Valid options are: `csv`, `feather`.
-        :Default: `feather`.
+        (default: 'feather')
 
     Returns
     -------
@@ -165,26 +165,27 @@ def load_gaze_files(
 
     Parameters
     ----------
-    definition:
+    definition: DatasetDefinition
         The dataset definition.
-    fileinfo:
+    fileinfo: pl.DataFrame
         A dataframe holding file information.
-    paths:
+    paths: DatasetPaths
         Path of directory containing event files.
     preprocessed : bool
         If ``True``, saved preprocessed data will be loaded, otherwise raw data will be loaded.
-    preprocessed_dirname : str
+        (default: False)
+    preprocessed_dirname : str | None
         One-time usage of an alternative directory name to save data relative to
         :py:meth:`pymovements.Dataset.path`.
         This argument is used only for this single call and does not alter
-        :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
-    extension:
+        :py:meth:`pymovements.Dataset.preprocessed_rootpath`. (default: None)
+    extension: str
         Specifies the file format for loading data. Valid options are: `csv`, `feather`.
-        :Default: `feather`.
+        :Default: `feather`. (default: 'feather')
 
     Returns
     -------
-    Dataset
+    list[GazeDataFrame]
         Returns self, useful for method cascading.
 
     Raises
@@ -293,12 +294,13 @@ def load_gaze_file(
 
     Parameters
     ----------
-    filepath:
+    filepath: Path
         Path of gaze file.
-    preprocessed:
+    preprocessed: bool
         If ``True``, saved preprocessed data will be loaded, otherwise raw data will be loaded.
-    custom_read_kwargs:
-        Dictionary of keyword arguments for reading gaze file.
+        (default: False)
+    custom_read_kwargs: dict[str, Any] | None
+        Dictionary of keyword arguments for reading gaze file. (default: None)
 
     Returns
     -------
@@ -343,16 +345,16 @@ def add_fileinfo(
 
     Parameters
     ----------
-    definition
+    definition: DatasetDefinition
         The dataset definition.
-    df : pl.DataFrame
+    df: pl.DataFrame
         Base dataframe to add fileinfo to.
     fileinfo : dict[str, Any]
         Dictionary of fileinfo row.
 
     Returns
     -------
-    pl.DataFrame:
+    pl.DataFrame
         Dataframe with added columns from fileinfo dictionary keys.
     """
     df = df.select(
@@ -386,21 +388,22 @@ def save_events(
 
     Parameters
     ----------
-    events:
+    events: list[EventDataFrame]
         The event dataframes to save.
-    fileinfo:
+    fileinfo: pl.DataFrame
         A dataframe holding file information.
-    paths:
+    paths: DatasetPaths
         Path of directory containing event files.
-    events_dirname : str
+    events_dirname: str | None
         One-time usage of an alternative directory name to save data relative to dataset path.
         This argument is used only for this single call and does not alter
-        :py:meth:`pymovements.Dataset.events_rootpath`.
-    verbose : int
+        :py:meth:`pymovements.Dataset.events_rootpath`. (default: None)
+    verbose: int
         Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
-    extension:
+        (default: 1)
+    extension: str
         Specifies the file format for loading data. Valid options are: `csv`, `feather`.
-        :Default: `feather`.
+        :Default: `feather`. (default: 'feather')
 
     Raises
     ------
@@ -452,21 +455,22 @@ def save_preprocessed(
 
     Parameters
     ----------
-    gaze:
+    gaze: list[GazeDataFrame]
         The gaze dataframes to save.
-    fileinfo:
+    fileinfo: pl.DataFrame
         A dataframe holding file information.
-    paths:
+    paths: DatasetPaths
         Path of directory containing event files.
-    preprocessed_dirname : str
+    preprocessed_dirname: str | None
         One-time usage of an alternative directory name to save data relative to dataset path.
         This argument is used only for this single call and does not alter
-        :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
-    verbose : int
+        :py:meth:`pymovements.Dataset.preprocessed_rootpath`. (default: None)
+    verbose: int
         Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
-    extension:
+        (default: 1)
+    extension: str
         Specifies the file format for loading data. Valid options are: `csv`, `feather`.
-        :Default: `feather`.
+        (default: 'feather')
 
     Raises
     ------
@@ -509,24 +513,24 @@ def save_preprocessed(
 
 def take_subset(
         fileinfo: pl.DataFrame,
-        subset: None | dict[
+        subset: dict[
             str, bool | float | int | str | list[bool | float | int | str],
-        ] = None,
+        ] | None = None,
 ) -> pl.DataFrame:
     """Take a subset of the fileinfo dataframe.
 
     Parameters
     ----------
-    fileinfo : pl.DataFrame
+    fileinfo: pl.DataFrame
         File information dataframe.
-    subset : dict, optional
+    subset: dict[str, bool | float | int | str | list[bool | float | int | str]] | None
         If specified, take a subset of the dataset. All keys in the dictionary must be
         present in the fileinfo dataframe inferred by `scan_dataset()`. Values can be either
-        bool, float, int , str or a list of these.
+        bool, float, int , str or a list of these. (default: None)
 
     Returns
     -------
-    pl.DataFrame:
+    pl.DataFrame
         Subset of file information dataframe.
 
     Raises
@@ -535,7 +539,6 @@ def take_subset(
         If dictionary key is not a column in the fileinfo dataframe.
     TypeError
         If dictionary key or value is not of valid type.
-
     """
     if subset is None:
         return fileinfo

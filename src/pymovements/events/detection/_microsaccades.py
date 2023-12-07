@@ -53,31 +53,34 @@ def microsaccades(
 
     Parameters
     ----------
-    velocities : np.ndarray, shape (N, 2)
+    velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray
+        shape (N, 2)
         x and y velocities of N samples in chronological order
-    timesteps: array-like, shape (N, )
+    timesteps: list[int] | np.ndarray | None
+        shape (N, )
         Corresponding continuous 1D timestep time series. If None, sample based timesteps are
-        assumed.
+        assumed. (default: None)
     minimum_duration: int
         Minimum saccade duration. The duration is specified in the units used in ``timesteps``.
          If ``timesteps`` is None, then ``minimum_duration`` is specified in numbers of samples.
-    threshold : np.ndarray, tuple[float, float] or str
+         (default: 6)
+    threshold: np.ndarray | tuple[float, float] | str
         If tuple of floats then use this as explicit elliptic threshold. If str, then use
         a data-driven velocity threshold method. See :func:`~events.engbert.compute_threshold` for
-        a reference of valid methods. Default: `engbert2015`
-    threshold_factor : float
-        factor for relative velocity threshold computation. Default: 6
-    minimum_threshold : float
+        a reference of valid methods. (default: 'engbert2015')
+    threshold_factor: float
+        factor for relative velocity threshold computation. (default: 6)
+    minimum_threshold: float
         minimal threshold value. Raises ValueError if calculated threshold is too low.
-        Default: 1e-10
+        (default: 1e-10)
     include_nan: bool
-        Indicator, whether we want to split events on missing/corrupt value (np.nan)
-    name:
-        Name for detected events in EventDataFrame.
+        Indicator, whether we want to split events on missing/corrupt value (np.nan) (default: False)
+    name: str
+        Name for detected events in EventDataFrame. (default: 'saccade')
 
     Returns
     -------
-    pl.DataFrame
+    EventDataFrame
         A dataframe with detected saccades as rows.
 
     Raises
@@ -158,7 +161,7 @@ def compute_threshold(arr: np.ndarray, method: str = 'engbert2015') -> np.ndarra
     arr : np.ndarray
         Array for which threshold is to be computed.
     method : str
-        Method for threshold computation.
+        Method for threshold computation. (default: 'engbert2015')
 
     Returns
     -------
