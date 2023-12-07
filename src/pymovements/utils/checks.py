@@ -27,7 +27,16 @@ import numpy as np
 
 
 def check_no_zeros(variable: Any, name: str = 'variable') -> None:
-    """Check if variable, or if it is iterable, any of its components are zero."""
+    """Check if variable, or if it is iterable, any of its components are zero.
+
+    Parameters
+    ----------
+    variable: Any
+        Variable to check for zeros.
+
+    name: str
+        Name of variable to be used in error message. (default: 'variable')
+    """
     # construct error message first
     error_message = f'{name} must not be zero'
 
@@ -50,7 +59,13 @@ def check_no_zeros(variable: Any, name: str = 'variable') -> None:
 
 
 def check_nan_both_channels(arr: np.ndarray) -> None:
-    """Check if all nans occur at the same time steps for both channels."""
+    """Check if all nans occur at the same time steps for both channels.
+
+    Parameters
+    ----------
+    arr: np.ndarray
+        Array of shape (N, 2) with horizontal and vertical gaze coordinates.
+    """
     # sanity check: horizontal and vertical gaze coordinates missing
     # values at the same time (Eyelink eyetracker never records only
     # one coordinate)
@@ -65,7 +80,7 @@ def check_shapes(**kwargs: Any) -> None:
 
     Parameters
     ----------
-    kwargs
+    **kwargs: Any
         Keyword argument dictionary with 2 keyword arguments.
 
     Raises
@@ -91,7 +106,7 @@ def check_two_kwargs(**kwargs: Any) -> None:
 
     Parameters
     ----------
-    kwargs
+    **kwargs: Any
         Keyword argument dictionary.
 
     Raises
@@ -108,7 +123,7 @@ def check_is_mutual_exclusive(**kwargs: Any) -> None:
 
     Parameters
     ----------
-    kwargs
+    **kwargs: Any
         Keyword argument dictionary with 2 keyword arguments.
 
     Raises
@@ -134,7 +149,7 @@ def check_is_none_is_mutual(**kwargs: Any) -> None:
 
     Parameters
     ----------
-    kwargs
+    **kwargs: Any
         Keyword argument dictionary with 2 keyword arguments.
 
     Raises
@@ -161,7 +176,7 @@ def check_is_length_matching(**kwargs: Sized) -> None:
 
     Parameters
     ----------
-    kwargs
+    **kwargs: Sized
         Keyword argument dictionary with 2 keyword arguments. Both values must be sequences.
 
     Raises
@@ -184,7 +199,7 @@ def check_is_not_none(**kwargs: Any) -> None:
 
     Parameters
     ----------
-    kwargs
+    **kwargs: Any
         Keyword argument dictionary.
 
     Raises
@@ -202,7 +217,7 @@ def check_is_int(**kwargs: Any) -> None:
 
     Parameters
     ----------
-    kwargs
+    **kwargs: Any
         Keyword argument dictionary.
 
     Raises
@@ -222,7 +237,7 @@ def check_is_scalar(**kwargs: Any) -> None:
 
     Parameters
     ----------
-    kwargs
+    **kwargs: Any
         Keyword argument dictionary.
 
     Raises
@@ -242,7 +257,7 @@ def check_is_greater_than_zero(**kwargs: float | int) -> None:
 
     Parameters
     ----------
-    kwargs
+    **kwargs: float | int
         Keyword argument dictionary.
 
     Raises
@@ -260,7 +275,7 @@ def check_is_positive_value(**kwargs: float | int) -> None:
 
     Parameters
     ----------
-    kwargs
+    **kwargs: float | int
         Keyword argument dictionary.
 
     Raises

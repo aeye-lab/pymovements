@@ -30,7 +30,7 @@ class DatasetLibrary:
 
     Attributes
     ----------
-    definitions:
+    definitions: dict[str, type[DatasetDefinition]]
         Dictionary of :py:class:`~pymovements.DatasetDefinition`.
     """
 
@@ -40,9 +40,9 @@ class DatasetLibrary:
     def add(cls, definition: type[DatasetDefinition]) -> None:
         """Add :py:class:`~pymovements.DatasetDefinition` to library.
 
-        Parameter
-        ---------
-        definition
+        Parameters
+        ----------
+        definition: type[DatasetDefinition]
             The :py:class:`~pymovements.DatasetDefinition` to add to the library.
         """
         cls.definitions[definition.name] = definition
@@ -51,10 +51,15 @@ class DatasetLibrary:
     def get(cls, name: str) -> type[DatasetDefinition]:
         """Get :py:class:`~pymovements.DatasetDefinition` py name.
 
-        Parameter
-        ---------
-        name
+        Parameters
+        ----------
+        name: str
             Name of the :py:class:`~pymovements.DatasetDefinition` in the library.
+
+        Returns
+        -------
+        type[DatasetDefinition]
+            The :py:class:`~pymovements.DatasetDefinition` in the library.
         """
         return cls.definitions[name]
 
@@ -63,6 +68,17 @@ DatsetDefinitionClass = TypeVar('DatsetDefinitionClass', bound=type[DatasetDefin
 
 
 def register_dataset(cls: DatsetDefinitionClass) -> DatsetDefinitionClass:
-    """Register a public dataset definition."""
+    """Register a public dataset definition.
+
+    Parameters
+    ----------
+    cls: DatsetDefinitionClass
+        The :py:class:`~pymovements.DatasetDefinition` to register.
+
+    Returns
+    -------
+    DatsetDefinitionClass
+        The :py:class:`~pymovements.DatasetDefinition` to register.
+    """
     DatasetLibrary.add(cls)
     return cls

@@ -34,6 +34,24 @@ class EventDataFrame:
     """A DataFrame for event data.
 
     Each row has at least an event name with its onset and offset specified.
+
+    Parameters
+    ----------
+    data: pl.DataFrame | None
+        A dataframe to be transformed to a polars dataframe. This argument is mutually
+        exclusive with all the other arguments. (default: None)
+    name: str | list[str] | None
+        Name of events. (default: None)
+    onsets: list[int] | np.ndarray | None
+        List of onsets. (default: None)
+    offsets: list[int] | np.ndarray | None
+        List of offsets. (default: None)
+
+    Raises
+    ------
+    ValueError
+        If list of onsets is passed but not a list of offsets, or vice versa, or if length of
+        onsets does not match length of offsets.
     """
 
     _minimal_schema = {'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64}
@@ -45,26 +63,6 @@ class EventDataFrame:
             onsets: list[int] | np.ndarray | None = None,
             offsets: list[int] | np.ndarray | None = None,
     ):
-        """Initialize an :py:class:`pymovements.events.event_dataframe.EventDataFrame`.
-
-        Parameters
-        ----------
-        data: pl.DataFrame
-            A dataframe to be transformed to a polars dataframe. This argument is mutually
-            exclusive with all the other arguments.
-        name: str
-            Name of events
-        onsets: list[int]
-            List of onsets
-        offsets; list[int]
-            List of offsets
-
-        Raises
-        ------
-        ValueError
-            If list of onsets is passed but not a list of offsets, or vice versa, or if length of
-            onsets does not match length of offsets.
-        """
         if data is not None:
             checks.check_is_mutual_exclusive(data=data, onsets=onsets)
             checks.check_is_mutual_exclusive(data=data, offsets=offsets)
@@ -149,16 +147,22 @@ class EventDataFrame:
 
         Parameters
         ----------
-        event_properties
+        event_properties: pl.DataFrame
             Dataframe with new event properties.
-        join_on
+        join_on: str | list[str]
             Columns to join event properties on.
         """
         self.frame = self.frame.join(event_properties, on=join_on, how='left')
 
     @property
     def event_property_columns(self) -> list[str]:
-        """Event property columns for this dataframe."""
+        """Event property columns for this dataframe.
+
+        Returns
+        -------
+        list[str]
+            List of event property columns.
+        """
         event_property_columns = set(self.frame.columns)
         event_property_columns -= set(list(self._minimal_schema.keys()))
         event_property_columns -= set(self._additional_columns)
@@ -175,7 +179,18 @@ class EventDataFrame:
         return EventDataFrame(data=self.frame.clone())
 
     def _add_minimal_schema_columns(self, df: pl.DataFrame) -> pl.DataFrame:
-        """Add minimal schema columns to :py:class:`polars.DataFrame` if they are missing."""
+        """Add minimal schema columns to :py:class:`polars.DataFrame` if they are missing.
+
+        Parameters
+        ----------
+        df: pl.DataFrame
+            A dataframe to be transformed to a polars dataframe.
+
+        Returns
+        -------
+        pl.DataFrame
+            A dataframe with minimal schema columns added.
+        """
         if len(df) == 0:
             return pl.DataFrame(schema={**self._minimal_schema, **df.schema})
 

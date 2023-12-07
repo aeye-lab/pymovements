@@ -66,47 +66,48 @@ def from_numpy(
 
     Parameters
     ----------
-    data:
-        Two-dimensional data represented as a numpy ndarray.
-    experiment : Experiment
-        The experiment definition.
-    events: EventDataFrame
-        A dataframe of events in the gaze signal.
-    time:
-        Array of timestamps.
-    pixel:
-        Array of gaze pixel positions.
-    position:
-        Array of gaze positions in degrees of visual angle.
-    velocity:
-        Array of gaze velocities in degrees of visual angle per second.
-    acceleration:
-        Array of gaze accelerations in degrees of visual angle per square second.
-    distance:
-        Array of eye-to-screen distances in millimiters.
-    schema:
-        A list of column names.
-    orient:
-        Whether to interpret the two-dimensional data as columns or as rows.
-    time_column:
-        The name of the timestamp column in the input data frame.
-    pixel_columns:
-        The name of the pixel position columns in the input data frame.
-    position_columns:
-        The name of the dva position columns in the input data frame.
-    velocity_columns:
-        The name of the dva velocity columns in the input data frame.
-    acceleration_columns:
-        The name of the dva acceleration columns in the input data frame.
-    distance_column:
+    data: np.ndarray | None
+        Two-dimensional data represented as a numpy ndarray. (default: None)
+    experiment: Experiment | None
+        The experiment definition. (default: None)
+    events: EventDataFrame | None
+        A dataframe of events in the gaze signal. (default: None)
+    time: np.ndarray | None
+        Array of timestamps. (default: None)
+    pixel: np.ndarray | None
+        Array of gaze pixel positions. (default: None)
+    position: np.ndarray | None
+        Array of gaze positions in degrees of visual angle. (default: None)
+    velocity: np.ndarray | None
+        Array of gaze velocities in degrees of visual angle per second. (default: None)
+    acceleration: np.ndarray | None
+        Array of gaze accelerations in degrees of visual angle per square second. (default: None)
+    distance: np.ndarray | None
+        Array of eye-to-screen distances in millimiters. (default: None)
+    schema: list[str] | None
+        A list of column names. (default: None)
+    orient: Literal['col', 'row']
+        Whether to interpret the two-dimensional data as columns or as rows. (default: 'col')
+    time_column: str | None
+        The name of the timestamp column in the input data frame. (default: None)
+    pixel_columns: list[str] | None
+        The name of the pixel position columns in the input data frame. (default: None)
+    position_columns: list[str] | None
+        The name of the dva position columns in the input data frame. (default: None)
+    velocity_columns: list[str] | None
+        The name of the dva velocity columns in the input data frame. (default: None)
+    acceleration_columns: list[str] | None
+        The name of the dva acceleration columns in the input data frame. (default: None)
+    distance_column: str | None
         The name of the column containing eye-to-screen distance in millimiters for each sample
         in the input data frame. If specified, the column will be used for pixel to dva
         transformations. If not specified, the constant eye-to-screen distance will be taken from
-        the experiment definition.
+        the experiment definition. (default: None)
 
     Returns
     -------
-    py:class:`~pymovements.GazeDataFrame`
+    GazeDataFrame
+        Returns gaze data frame read from numpy array.
 
     Examples
     --------
@@ -293,31 +294,32 @@ def from_pandas(
 
     Parameters
     ----------
-    data:
+    data: pd.DataFrame
         Data represented as a pandas DataFrame.
-    experiment : Experiment
-        The experiment definition.
-    events: EventDataFrame
-        A dataframe of events in the gaze signal.
-    time_column:
-        The name of the timestamp column in the input data frame.
-    pixel_columns:
-        The name of the pixel position columns in the input data frame.
-    position_columns:
-        The name of the dva position columns in the input data frame.
-    velocity_columns:
-        The name of the dva velocity columns in the input data frame.
-    acceleration_columns:
-        The name of the dva acceleration columns in the input data frame.
-    distance_column:
+    experiment : Experiment | None
+        The experiment definition. (default: None)
+    events: EventDataFrame | None
+        A dataframe of events in the gaze signal. (default: None)
+    time_column: str | None
+        The name of the timestamp column in the input data frame. (default: None)
+    pixel_columns: list[str] | None
+        The name of the pixel position columns in the input data frame. (default: None)
+    position_columns: list[str] | None
+        The name of the dva position columns in the input data frame. (default: None)
+    velocity_columns: list[str] | None
+        The name of the dva velocity columns in the input data frame. (default: None)
+    acceleration_columns: list[str] | None
+        The name of the dva acceleration columns in the input data frame. (default: None)
+    distance_column: str | None
         The name of the column containing eye-to-screen distance in millimeters for each sample
         in the input data frame. If specified, the column will be used for pixel to dva
         transformations. If not specified, the constant eye-to-screen distance will be taken from
-        the experiment definition.
+        the experiment definition. (default: None)
 
     Returns
     -------
-    py:class:`~pymovements.GazeDataFrame`
+    GazeDataFrame
+        Returns gaze data frame read from pandas data frame.
     """
     df = pl.from_pandas(data=data)
     return GazeDataFrame(

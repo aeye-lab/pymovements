@@ -54,6 +54,11 @@ repos:
     -   id: insert-license
         args: [--use-current-year]
         types: [python]
+-   repo: https://github.com/jsh9/pydoclint
+    rev: 0.3.8
+    hooks:
+    - id: pydoclint
+      args: ["--config=pyproject.toml"]
 -   repo: https://github.com/nbQA-dev/nbQA
     rev: 1.7.1
     hooks:

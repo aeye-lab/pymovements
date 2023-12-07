@@ -24,7 +24,29 @@ from pathlib import Path
 
 
 class DatasetPaths:
-    """Defines the paths of a dataset."""
+    """Defines the paths of a dataset.
+
+    Parameters
+    ----------
+    root: str | Path
+        Path to the root directory of the dataset. (default: 'data')
+    dataset: str | None
+        Dataset directory name under root path. Can be `.` if dataset is located in root path.
+        (default: None)
+    raw: str
+        Name of directory under dataset path that contains raw data. Can be `.` if raw data is
+        located in dataset path. We advise the user to keep the original raw data separate from
+        the preprocessed / event data. (default: 'raw')
+    events : str
+        Name of directory under dataset path that will be used to store event data. We advise
+        the user to keep the event data separate from the original raw data. (default: 'events')
+    preprocessed: str
+        Name of directory under dataset path that will be used to store preprocessed data. We
+        advise the user to keep the preprocessed data separate from the original raw data.
+        (default: 'preprocessed')
+    downloads : str
+        Name of directory to store downloaded data. (default: 'downloads')
+    """
 
     def __init__(
             self,
@@ -36,29 +58,6 @@ class DatasetPaths:
             preprocessed: str = 'preprocessed',
             downloads: str = 'downloads',
     ):
-        """Initialize a set of dataset paths.
-
-        Parameters
-        ----------
-        root : str, Path
-            Path to the root directory of the dataset.
-        dataset : str, optional
-            Dataset directory name under root path. Can be `.` if dataset is located in root path.
-            Default: `.`
-        raw ; str, optional
-            Name of directory under dataset path that contains raw data. Can be `.` if raw data is
-            located in dataset path. We advise the user to keep the original raw data separate from
-            the preprocessed / event data. Default: `raw`
-        preprocessed : str, optional
-            Name of directory under dataset path that will be used to store preprocessed data. We
-            advise the user to keep the preprocessed data separate from the original raw data.
-            Default: `preprocessed`
-        events : str, optional
-            Name of directory under dataset path that will be used to store event data. We advise
-            the user to keep the event data separate from the original raw data. Default: `events`
-        downloads : str, optional
-            Name of directory to store downloaded data.Default: `downloads`
-        """
         self._root = Path(root)
         self._dataset = dataset
         self._raw = raw
@@ -79,15 +78,15 @@ class DatasetPaths:
 
         Parameters
         ----------
-        raw_filepath : Path
+        raw_filepath: Path
             The Path to the raw file.
-        preprocessed_dirname : str
+        preprocessed_dirname: str | None
             One-time usage of an alternative directory name to save data relative to
             :py:meth:`pymovements.Dataset.path`.
             This argument is used only for this single call and does not alter
-            :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
-        extension:
-            extension specifies the fileformat to store the data
+            :py:meth:`pymovements.Dataset.preprocessed_rootpath`. (default: None)
+        extension: str
+            extension specifies the fileformat to store the data. (default: 'feather')
 
         Returns
         -------
@@ -122,15 +121,16 @@ class DatasetPaths:
 
         Parameters
         ----------
-        raw_filepath : Path
+        raw_filepath: Path
             The Path to the raw file.
-        events_dirname : str
+        events_dirname: str | None
             One-time usage of an alternative directory name to save data relative to
             :py:meth:`pymovements.Dataset.path`.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.events_rootpath`.
-        extension:
-            extension specifies the fileformat to store the data
+            (default: None)
+        extension: str
+            extension specifies the fileformat to store the data. (default: 'feather')
 
         Returns
         -------
@@ -155,6 +155,11 @@ class DatasetPaths:
     @property
     def root(self) -> Path:
         """The root path to your dataset.
+
+        Returns
+        -------
+        Path
+            The root path to your dataset.
 
         Example
         -------
@@ -181,6 +186,11 @@ class DatasetPaths:
     @property
     def dataset(self) -> Path:
         """The path to the dataset directory.
+
+        Returns
+        -------
+        Path
+            The path to the dataset directory.
 
         Example
         -------
@@ -226,7 +236,7 @@ class DatasetPaths:
 
         Parameters
         ----------
-        name
+        name: str
             Name to update dataset directory name with. The dataset directory name will only be
             updated if :py:attr:pymovements.DatasetPaths.dataset` is ``None``.
         """
@@ -238,6 +248,11 @@ class DatasetPaths:
         """The path to the directory of the event data.
 
         The path points to the events directory under the dataset path.
+
+        Returns
+        -------
+        Path
+            The path to the events directory.
 
         Example
         -------
@@ -268,6 +283,11 @@ class DatasetPaths:
         """The path to the directory of the preprocessed gaze data.
 
         The path points to the preprocessed data directory under the dataset path.
+
+        Returns
+        -------
+        Path
+            The path to the preprocessed data directory.
 
         Example
         -------
@@ -300,6 +320,11 @@ class DatasetPaths:
         """The path to the directory of the raw data.
 
         The path points to the raw data directory under the dataset path.
+
+        Returns
+        -------
+        Path
+            Path to the raw data directory.
 
         Example
         -------
@@ -338,6 +363,11 @@ class DatasetPaths:
         """The path to the directory of the raw data.
 
         The download path points to the download directory under the root path.
+
+        Returns
+        -------
+        Path
+            The path to the download directory under the root path.
 
         Example
         -------

@@ -126,6 +126,9 @@ module = "docs.*"
 check_untyped_defs = false
 disallow_untyped_defs = false
 
+[tool.pydoclint]
+skip-checking-raises = true
+
 [tool.pytest.ini_options]
 addopts = "-ra -l --tb=long --doctest-modules"
 doctest_optionflags = "NORMALIZE_WHITESPACE"
