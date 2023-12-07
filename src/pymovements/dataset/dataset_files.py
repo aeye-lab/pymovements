@@ -105,7 +105,7 @@ def load_event_files(
     extension:
         Specifies the file format for loading data. Valid options are: `csv`, `feather`,
         `tsv`, `txt`.
-        :Default: `feather`.
+        (default: 'feather')
 
     Returns
     -------
@@ -183,7 +183,7 @@ def load_gaze_files(
     extension:
         Specifies the file format for loading data. Valid options are: `csv`, `feather`,
         `txt`, `tsv`.
-        :Default: `feather`.
+        (default: 'feather')
 
     Returns
     -------
@@ -405,7 +405,7 @@ def save_events(
         (default: 1)
     extension: str
         Specifies the file format for loading data. Valid options are: `csv`, `feather`.
-        :Default: `feather`. (default: 'feather')
+        (default: 'feather')
 
     Raises
     ------
