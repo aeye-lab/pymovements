@@ -65,8 +65,8 @@ class Experiment:
     ...     sampling_rate=1000.0,
     ... )
     >>> print(experiment)
-    Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38,
-    height_cm=30, distance_cm=68, origin=lower left), sampling_rate=1000.00)
+    Experiment(sampling_rate=1000.00, screen=Screen(width_px=1280, height_px=1024, width_cm=38,
+    height_cm=30, distance_cm=68, origin=lower left), eyetracker=None, _sampling_rate=1000.00)
 
     We can also access the screen boundaries in degrees of visual angle via the
     :py:attr:`~pymovements.gaze.Screen` object. This only works if the
