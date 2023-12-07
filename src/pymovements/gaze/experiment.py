@@ -32,14 +32,62 @@ from pymovements.utils import decorators
 class Experiment:
     """Experiment class for holding experiment properties.
 
+    Parameters
+    ----------
+    screen_width_px: int
+        Screen width in pixels
+    screen_height_px: int
+        Screen height in pixels
+    screen_width_cm: float
+        Screen width in centimeters
+    screen_height_cm: float
+        Screen height in centimeters
+    distance_cm: float | None
+        Eye-to-screen distance in centimeters. If None, a `distance_column` must be provided
+        in the `DatasetDefinition` or `GazeDataFrame`, which contains the eye-to-screen
+        distance for each sample in millimeters. (default: None)
+    origin: str
+        Specifies the screen location of the origin of the pixel coordinate system.
+        (default: 'lower left')
+    sampling_rate: float | None
+        Sampling rate in Hz. (default: None)
+
+    Examples
+    --------
+    >>> experiment = Experiment(
+    ...     screen_width_px=1280,
+    ...     screen_height_px=1024,
+    ...     screen_width_cm=38,
+    ...     screen_height_cm=30,
+    ...     distance_cm=68,
+    ...     origin='lower left',
+    ...     sampling_rate=1000.0,
+    ... )
+    >>> print(experiment)
+    Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38,
+    height_cm=30, distance_cm=68, origin=lower left), sampling_rate=1000.00)
+
+    We can also access the screen boundaries in degrees of visual angle via the
+    :py:attr:`~pymovements.gaze.Screen` object. This only works if the
+    `distance_cm` attribute is specified.
+
+    >>> experiment.screen.x_min_dva# doctest:+ELLIPSIS
+    -15.59...
+    >>> experiment.screen.x_max_dva# doctest:+ELLIPSIS
+    15.59...
+    >>> experiment.screen.y_min_dva# doctest:+ELLIPSIS
+    -12.42...
+    >>> experiment.screen.y_max_dva# doctest:+ELLIPSIS
+    12.42...
+
+
     Attributes
     ----------
-    screen : Screen
+    screen: Screen
         Screen object for experiment
-    sampling_rate : float
+    sampling_rate: float
         Sampling rate in Hz
     """
-
     def __init__(
             self,
             screen_width_px: int,
@@ -50,56 +98,6 @@ class Experiment:
             origin: str = 'lower left',
             sampling_rate: float | None = None,
     ):
-        """Initialize Experiment.
-
-        Parameters
-        ----------
-        screen_width_px : int
-            Screen width in pixels
-        screen_height_px : int
-            Screen height in pixels
-        screen_width_cm : float
-            Screen width in centimeters
-        screen_height_cm : float
-            Screen height in centimeters
-        distance_cm : float | None
-            Eye-to-screen distance in centimeters. If None, a `distance_column` must be provided
-            in the `DatasetDefinition` or `GazeDataFrame`, which contains the eye-to-screen
-            distance for each sample in millimeters.
-        origin : str
-            Specifies the screen location of the origin of the pixel coordinate system.
-        sampling_rate : float
-            Sampling rate in Hz
-
-        Examples
-        --------
-        >>> experiment = Experiment(
-        ...     screen_width_px=1280,
-        ...     screen_height_px=1024,
-        ...     screen_width_cm=38,
-        ...     screen_height_cm=30,
-        ...     distance_cm=68,
-        ...     origin='lower left',
-        ...     sampling_rate=1000.0,
-        ... )
-        >>> print(experiment)
-        Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38,
-        height_cm=30, distance_cm=68, origin=lower left), sampling_rate=1000.00)
-
-        We can also access the screen boundaries in degrees of visual angle via the
-        :py:attr:`~pymovements.gaze.Screen` object. This only works if the
-        `distance_cm` attribute is specified.
-
-        >>> experiment.screen.x_min_dva# doctest:+ELLIPSIS
-        -15.59...
-        >>> experiment.screen.x_max_dva# doctest:+ELLIPSIS
-        15.59...
-        >>> experiment.screen.y_min_dva# doctest:+ELLIPSIS
-        -12.42...
-        >>> experiment.screen.y_max_dva# doctest:+ELLIPSIS
-        12.42...
-
-        """
         self.screen = Screen(
             width_px=screen_width_px,
             height_px=screen_height_px,
@@ -129,16 +127,16 @@ class Experiment:
 
         Parameters
         ----------
-        arr : array_like
-            Continuous 2D position time series
-        method : str
-            Computation method. See :func:`~transforms.pos2vel` for details, default: smooth.
-        kwargs: dict
+        arr: list[float] | list[list[float]] | np.ndarray
+            Continuous 2D position time series.
+        method: str
+            Computation method. See :func:`~transforms.pos2vel` for details. (default: 'smooth')
+        **kwargs: int | float | str
             Additional keyword arguments used for savitzky golay method.
 
         Returns
         -------
-        velocities : array_like
+        np.ndarray
             Velocity time series in input_unit / sec
 
         Raises

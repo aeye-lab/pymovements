@@ -120,32 +120,33 @@ def traceplot(
     ----------
     gaze: GazeDataFrame
         The GazeDataFrame to plot.
-    position_column : str, optional
-        The column name of the x and y position data
-    cval: np.ndarray
-        line color values.
-    cmap: matplotlib.colors.Colormap, optional
-        color map for line color values
-    cmap_norm: matplotlib.colors.Normalize, str, optional
-        normalization for color values.
-    cmap_segmentdata: dict, optional
-        color map segmentation to build color map
-    cbar_label: str, optional
-        string label for color bar
+    position_column: str
+        The column name of the x and y position data (default: 'pixel')
+    cval: np.ndarray | None
+        Line color values. (default: None)
+    cmap: matplotlib.colors.Colormap | None
+        Color map for line color values. (default: None)
+    cmap_norm: matplotlib.colors.Normalize | str | None
+        Normalization for color values. (default: None)
+    cmap_segmentdata: LinearSegmentedColormapType | None
+        Color map segmentation to build color map. (default: None)
+    cbar_label: str | None
+        String label for color bar. (default: None)
     show_cbar: bool
-        Shows color bar if True.
-    padding: float, optional
-        Absolute padding value. If None it is inferred from pad_factor and limits.
-    pad_factor: float, optional
-        Relative padding factor to construct padding value if not given.
-    figsize: tuple
-        Figure size.
-    title: str, optional
-        Figure title.
-    savepath: str, optional
-        If given, figure will be saved to this path.
+        Shows color bar if True. (default: False)
+    padding: float | None
+        Absolute padding value.
+        If None it is inferred from pad_factor and limits. (default: None)
+    pad_factor: float | None
+        Relative padding factor to construct padding value if not given. (default: None)
+    figsize: tuple[int, int]
+        Figure size. (default: (15, 5))
+    title: str | None
+        Set figure title. (default: None)
+    savepath: str | None
+        If given, figure will be saved to this path. (default: None)
     show: bool
-        If True, figure will be shown.
+        If True, figure will be shown. (default: True)
 
     Raises
     ------

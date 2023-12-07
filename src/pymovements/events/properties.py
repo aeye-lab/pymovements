@@ -28,7 +28,18 @@ EVENT_PROPERTIES: dict[str, Callable] = {}
 
 
 def register_event_property(function: Callable) -> Callable:
-    """Register a function as a valid property."""
+    """Register a function as a valid property.
+
+    Parameters
+    ----------
+    function: Callable
+        Function to be registered as a valid property.
+
+    Returns
+    -------
+    Callable
+        The function that was passed as an argument.
+    """
     EVENT_PROPERTIES[function.__name__] = function
     return function
 
@@ -53,10 +64,16 @@ def amplitude(
 
     Parameters
     ----------
-    position_column
-        The column name of the position tuples.
-    n_components:
+    position_column: str
+        The column name of the position tuples. (default: 'position')
+    n_components: int
         Number of positional components. Usually these are the two components yaw and pitch.
+        (default: 2)
+
+    Returns
+    -------
+    pl.Expr
+        The amplitude of the event.
 
     Raises
     ------
@@ -94,10 +111,16 @@ def dispersion(
 
     Parameters
     ----------
-    position_column
-        The column name of the position tuples.
-    n_components:
+    position_column: str
+        The column name of the position tuples. (default: 'position')
+    n_components: int
         Number of positional components. Usually these are the two components yaw and pitch.
+        (default: 2)
+
+    Returns
+    -------
+    pl.Expr
+        The dispersion of the event.
 
     Raises
     ------
@@ -130,10 +153,16 @@ def disposition(
 
     Parameters
     ----------
-    position_column
-        The column name of the position tuples.
-    n_components:
+    position_column: str
+        The column name of the position tuples. (default: 'position')
+    n_components: int
         Number of positional components. Usually these are the two components yaw and pitch.
+        (default: 2)
+
+    Returns
+    -------
+    pl.Expr
+        The disposition of the event.
 
     Raises
     ------
@@ -157,6 +186,11 @@ def duration() -> pl.Expr:
     """Duration of an event.
 
     The duration is defined as the difference between offset time and onset time.
+
+    Returns
+    -------
+    pl.Expr
+        The duration of the event.
     """
     return pl.col('offset') - pl.col('onset')
 
@@ -184,13 +218,19 @@ def location(
 
     Parameters
     ----------
-    method
+    method: str
         The centroid method to be used for calculation. Supported methods are ``mean``, ``median``.
-        Defaults to 'mean'.
-    position_column
-        The column name of the position tuples.
-    n_components:
+        (default: 'mean')
+    position_column: str
+        The column name of the position tuples. (default: 'position')
+    n_components: int
         Number of positional components. Usually these are the two components yaw and pitch.
+        (default: 2)
+
+    Returns
+    -------
+    pl.Expr
+        The location of the event.
 
     Raises
     ------
@@ -241,10 +281,16 @@ def peak_velocity(
 
     Parameters
     ----------
-    velocity_column
-        The column name of the velocity tuples.
-    n_components:
+    velocity_column: str
+        The column name of the velocity tuples. (default: 'velocity')
+    n_components: int
         Number of positional components. Usually these are the two components yaw and pitch.
+        (default: 2)
+
+    Returns
+    -------
+    pl.Expr
+        The peak velocity of the event.
 
     Raises
     ------
@@ -260,6 +306,12 @@ def peak_velocity(
 
 
 def _check_has_two_componenents(n_components: int) -> None:
-    """Check that number of componenents is two."""
+    """Check that number of componenents is two.
+
+    Parameters
+    ----------
+    n_components: int
+        Number of components.
+    """
     if n_components != 2:
         raise ValueError('data must have exactly two components')

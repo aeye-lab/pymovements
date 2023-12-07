@@ -30,7 +30,7 @@ class EventDetectionLibrary:
 
     Attributes
     ----------
-    `methods`:
+    methods: dict[str, Callable[..., EventDataFrame]]
         Dictionary of event detection methods.
     """
 
@@ -42,7 +42,7 @@ class EventDetectionLibrary:
 
         Parameter
         ---------
-        method
+        method: Callable[..., EventDataFrame]
             The event detection method to add to the library.
         """
         cls.methods[method.__name__] = method
@@ -53,7 +53,7 @@ class EventDetectionLibrary:
 
         Parameter
         ---------
-        name
+        name: str
             Name of the event detection method in the library.
         """
         return cls.methods[name]
@@ -78,6 +78,18 @@ class EventDetectionLibrary:
 def register_event_detection(
         method: Callable[..., EventDataFrame],
 ) -> Callable[..., EventDataFrame]:
-    """Register an event detection method."""
+    """Register an event detection method.
+
+    Parameters
+    ----------
+    method: Callable[..., EventDataFrame]
+        The event detection method to register.
+
+    Returns
+    -------
+    Callable[..., EventDataFrame]
+        The event detection method.
+
+    """
     EventDetectionLibrary.add(method)
     return method

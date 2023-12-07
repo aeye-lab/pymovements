@@ -37,21 +37,21 @@ def step_function(
 
     Parameters
     ----------
-    length : int
+    length: int
         Length of the output sequence.
-    steps : list[int]
+    steps: list[int]
         Indices for each step to happen.
-    values : list[float]
+    values: list[float | tuple[float, ...]]
         Array values to set at each step.
-    start_value: int
-        Array value to start with.
+    start_value: float | tuple[float, ...]
+        Array value to start with. (default: 0)
     noise: float
         If greater than zero, gaussian noise is scaled according to value and superimposed on the
-        output array.
+        output array. (default: 0)
 
     Returns
     -------
-    arr : np.ndarray
+    np.ndarray
         Output signal
 
     Raises
