@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides an interface to the JuDo1000 dataset."""
+"""This module provides an interface to the PoTeC dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -43,11 +43,11 @@ class PoTeC(DatasetDefinition):
     factors. Reading comprehension was assessed using text comprehension questions. Moreover,
     background questions that required additional knowledge beyond the presented text tested the
     general domain knowledge.
-    The repository contains the eye-movement data (1000 Hz) as well as the stimulus text data
-    with extensive linguistic feature annotations at the sub-lexical, lexical und supra-lexical
-    level. Therefore, the PoTeC is ideal for studying cognitive processes related to sentence
-    comprehension at all linguistic levels (e.g. lexical, syntactic, discourse) as well as
-    higher-level text comprehension.
+    The repository contains the eye-movement data (1000 Hz, right eye monocular) as well as the 
+    stimulus text data     with extensive linguistic feature annotations at the sub-lexical,
+    lexical und supra-lexical     level. Therefore, the PoTeC is ideal for studying cognitive
+    processes related to sentence     comprehension at all linguistic levels (e.g. lexical,
+    syntactic, discourse) as well as higher-level text comprehension.
 
     Check the respective `repository <https://osf.io/dn5hp/>`_ for details.
 
