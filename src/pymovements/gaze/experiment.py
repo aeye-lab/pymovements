@@ -47,7 +47,8 @@ class Experiment:
         in the `DatasetDefinition` or `GazeDataFrame`, which contains the eye-to-screen
         distance for each sample in millimeters. (default: None)
     origin: str
-        Specifies the screen location of the origin of the pixel coordinate system. (default: 'lower left')
+        Specifies the screen location of the origin of the pixel coordinate system.
+        (default: 'lower left')
     sampling_rate: float | None
         Sampling rate in Hz. (default: None)
 

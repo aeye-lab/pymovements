@@ -58,7 +58,8 @@ class DatasetDefinition:
         If the file extension is `.csv` the keyword arguments will be passed
         to :py:func:`polars.read_csv`. If the file extension is`.asc` the keyword arguments
         will be passed to :py:func:`pymovements.utils.parsing.parse_eyelink`.
-        See Notes for more details on how to use this argument. (default: field(default_factory=dict))
+        See Notes for more details on how to use this argument.
+        (default: field(default_factory=dict))
     column_map : dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
         (default: field(default_factory=dict))

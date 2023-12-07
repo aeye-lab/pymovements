@@ -67,7 +67,8 @@ def amplitude(
     position_column: str
         The column name of the position tuples. (default: 'position')
     n_components: int
-        Number of positional components. Usually these are the two components yaw and pitch. (default: 2)
+        Number of positional components. Usually these are the two components yaw and pitch.
+        (default: 2)
 
     Returns
     -------

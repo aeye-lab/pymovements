@@ -77,7 +77,8 @@ def from_csv(
     distance_column: str | None
         The name of the eye-to-screen distance column in the input data frame. If specified,
         the column will be used for pixel to dva transformations. If not specified, the
-        constant eye-to-screen distance will be taken from the experiment definition. (default: None)
+        constant eye-to-screen distance will be taken from the experiment definition.
+        (default: None)
     **read_csv_kwargs: Any
         Additional keyword arguments to be passed to :py:func:`polars.read_csv` to read in the csv.
         These can include custom separators, a subset of columns, or specific data types

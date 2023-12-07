@@ -60,7 +60,7 @@ def download_and_extract_archive(
     recursive: bool
         Recursively extract archives which are included in extracted archive. (default: True)
     remove_finished: bool
-        Remove downloaded file after successful extraction or decompression, default: False. (default: False)
+        Remove downloaded file after successful extraction or decompression. (default: False)
     remove_top_level: bool
         If ``True``, remove the top-level directory if it has only one child. (default: True)
     verbose: int

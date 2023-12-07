@@ -59,7 +59,8 @@ def tsplot(
     xlabel: str | None
         Set the x label. (default: None)
     n_cols: int | None
-        Number of channel subplot colunms. If None, it will be automatically inferred. (default: None)
+        Number of channel subplot colunms. If None, it will be automatically inferred.
+        (default: None)
     n_rows: int | None
         Number of channel subplot rows. If None, it will be automatically inferred. (default: None)
     rotate_ylabels: bool

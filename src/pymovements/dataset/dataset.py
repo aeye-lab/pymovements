@@ -381,7 +381,8 @@ class Dataset:
         Parameters
         ----------
         method: str
-            Computation method. See :func:`~transforms.pos2vel()` for details. (default: 'fivepoint')
+            Computation method. See :func:`~transforms.pos2vel()` for details.
+            (default: 'fivepoint')
         verbose: bool
             If True, show progress of computation. (default: True)
         **kwargs: Any

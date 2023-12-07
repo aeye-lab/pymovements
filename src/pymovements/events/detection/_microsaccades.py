@@ -74,7 +74,8 @@ def microsaccades(
         minimal threshold value. Raises ValueError if calculated threshold is too low.
         (default: 1e-10)
     include_nan: bool
-        Indicator, whether we want to split events on missing/corrupt value (np.nan) (default: False)
+        Indicator, whether we want to split events on missing/corrupt value (np.nan)
+        (default: False)
     name: str
         Name for detected events in EventDataFrame. (default: 'saccade')
 
