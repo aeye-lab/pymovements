@@ -50,17 +50,17 @@ def download_dataset(
 
     Parameters
     ----------
-    definition:
+    definition: DatasetDefinition
         The dataset definition.
-    paths:
+    paths: DatasetPaths
         The dataset paths.
-    extract : bool
-        Extract dataset archive files.
-    remove_finished : bool
-        Remove archive files after extraction.
-    verbose : bool
+    extract: bool
+        Extract dataset archive files. (default: True)
+    remove_finished: bool
+        Remove archive files after extraction. (default: False)
+    verbose: bool
         If True, show progress of download and print status messages for integrity checking and
-        file extraction.
+        file extraction. (default: True)
 
     Raises
     ------
@@ -129,18 +129,18 @@ def extract_dataset(
 
     Parameters
     ----------
-    definition:
+    definition: DatasetDefinition
         The dataset definition.
-    paths:
+    paths: DatasetPaths
         The dataset paths.
-    remove_finished : bool
-        Remove archive files after extraction.
+    remove_finished: bool
+        Remove archive files after extraction. (default: False)
     remove_top_level: bool
-        If ``True``, remove the top-level directory if it has only one child.
-    verbose:
+        If ``True``, remove the top-level directory if it has only one child. (default: True)
+    verbose: int
         Verbosity levels: (1) Print messages for extracting each dataset resource without printing
         messages for recursive archives. (2) Print messages for extracting each dataset resource and
-        each recursive archive extract.
+        each recursive archive extract. (default: 1)
     """
     paths.raw.mkdir(parents=True, exist_ok=True)
 

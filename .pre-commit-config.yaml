@@ -54,8 +54,13 @@ repos:
     -   id: insert-license
         args: [--use-current-year]
         types: [python]
+-   repo: https://github.com/jsh9/pydoclint
+    rev: 0.3.8
+    hooks:
+    - id: pydoclint
+      args: ["--config=pyproject.toml"]
 -   repo: https://github.com/nbQA-dev/nbQA
-    rev: 1.7.0
+    rev: 1.7.1
     hooks:
     -   id: nbqa-autopep8
     -   id: nbqa-flake8
@@ -65,7 +70,7 @@ repos:
     -   id: nbqa-pyupgrade
         args: ["--py39-plus"]
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.7.0
+    rev: v1.7.1
     hooks:
     -   id: mypy
         additional_dependencies: [types-all, pandas-stubs, types-tqdm]

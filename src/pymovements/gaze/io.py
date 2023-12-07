@@ -47,39 +47,47 @@ def from_csv(
 
     Parameters
     ----------
-    file:
+    file: str | Path
         Path of gaze file.
-    experiment : Experiment
-        The experiment definition.
-    trial_columns:
+    experiment : Experiment | None
+        The experiment definition. (default: None)
+    trial_columns: list[str] | None
         The name of the trial columns in the input data frame. If the list is empty or None,
         the input data frame is assumed to contain only one trial. If the list is not empty,
         the input data frame is assumed to contain multiple trials and the transformation
-        methods will be applied to each trial separately.
-    time_column:
-        The name of the timestamp column in the input data frame.
-    pixel_columns:
+        methods will be applied to each trial separately. (default: None)
+    time_column: str | None
+        The name of the timestamp column in the input data frame. (default: None)
+    pixel_columns: list[str] | None
         The name of the pixel position columns in the input data frame. These columns will be
         nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
-        column will not be created.
-    position_columns:
+        column will not be created. (default: None)
+    position_columns: list[str] | None
         The name of the dva position columns in the input data frame. These columns will be
         nested into the column ``position``. If the list is empty or None, the nested
-        ``position`` column will not be created.
-    velocity_columns:
+        ``position`` column will not be created. (default: None)
+    velocity_columns: list[str] | None
         The name of the velocity columns in the input data frame. These columns will be nested
         into the column ``velocity``. If the list is empty or None, the nested ``velocity``
-        column will not be created.
-    acceleration_columns:
+        column will not be created. (default: None)
+    acceleration_columns: list[str] | None
         The name of the acceleration columns in the input data frame. These columns will be
         nested into the column ``acceleration``. If the list is empty or None, the nested
-        ``acceleration`` column will not be created.
-    distance_column:
+        ``acceleration`` column will not be created. (default: None)
+    distance_column: str | None
         The name of the eye-to-screen distance column in the input data frame. If specified,
         the column will be used for pixel to dva transformations. If not specified, the
         constant eye-to-screen distance will be taken from the experiment definition.
-    **read_csv_kwargs:
-            Additional keyword arguments to be passed to polars to read in the csv.
+        (default: None)
+    **read_csv_kwargs: Any
+        Additional keyword arguments to be passed to :py:func:`polars.read_csv` to read in the csv.
+        These can include custom separators, a subset of columns, or specific data types
+        for columns.
+
+    Returns
+    -------
+    GazeDataFrame
+        The gaze data frame read from the csv file.
 
     Notes
     -----
@@ -123,13 +131,46 @@ def from_csv(
     └──────┴────────────┴────────────┘
 
     We can now load the data into a ``GazeDataFrame`` by specyfing the experimental setting
-    and the names of the pixel position columns.
+    and the names of the pixel position columns. We can specify a custom separator for the csv
+    file by passing it as a keyword argument to :py:func:`polars.read_csv`:
 
     >>> from pymovements.gaze.io import from_csv
     >>> gaze = from_csv(
     ...     file='tests/files/monocular_example.csv',
     ...     time_column = 'time',
-    ...     pixel_columns = ['x_left_pix','y_left_pix'],)
+    ...     pixel_columns = ['x_left_pix','y_left_pix'],
+    ...     separator = ',',
+    ... )
+    >>> gaze.frame
+    shape: (10, 2)
+    ┌──────┬───────────┐
+    │ time ┆ pixel     │
+    │ ---  ┆ ---       │
+    │ i64  ┆ list[i64] │
+    ╞══════╪═══════════╡
+    │ 0    ┆ [0, 0]    │
+    │ 1    ┆ [0, 0]    │
+    │ 2    ┆ [0, 0]    │
+    │ 3    ┆ [0, 0]    │
+    │ …    ┆ …         │
+    │ 6    ┆ [0, 0]    │
+    │ 7    ┆ [0, 0]    │
+    │ 8    ┆ [0, 0]    │
+    │ 9    ┆ [0, 0]    │
+    └──────┴───────────┘
+
+    Please be aware that data types are inferred from a fixed number of rows. To ensure
+    correct data types, you can pass a dictionary of column names and data types to the
+    `dtypes` keyword argument of :py:func:`polars.read_csv`:
+
+    >>> from pymovements.gaze.io import from_csv
+    >>> import polars as pl
+    >>> gaze = from_csv(
+    ...     file='tests/files/monocular_example.csv',
+    ...     time_column = 'time',
+    ...     pixel_columns = ['x_left_pix','y_left_pix'],
+    ...     dtypes = {'time': pl.Int64, 'x_left_pix': pl.Int64, 'y_left_pix': pl.Int64},
+    ... )
     >>> gaze.frame
     shape: (10, 2)
     ┌──────┬───────────┐
@@ -171,22 +212,27 @@ def from_asc(
         file: str | Path,
         *,
         patterns: str | list | None = 'eyelink',
-        schema: dict | None = None,
+        schema: dict[str, Any] | None = None,
         experiment: Experiment | None = None,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
 
     Parameters
     ----------
-    file:
+    file: str | Path
         Path of IPC/feather file.
-    patterns:
+    patterns: str | list | None
         list of patterns to match for additional columns or a key identifier of eye tracker specific
-        default patterns. Supported values are: eyelink.
-    schema:
-        Dictionary to optionally specify types of columns parsed by patterns.
-    experiment : Experiment
-        The experiment definition.
+        default patterns. Supported values are: eyelink. (default: 'eyelink')
+    schema: dict[str, Any] | None
+        Dictionary to optionally specify types of columns parsed by patterns. (default: None)
+    experiment: Experiment | None
+        The experiment definition. (default: None)
+
+    Returns
+    -------
+    GazeDataFrame
+        The gaze data frame read from the asc file.
 
     Examples
     --------
@@ -243,12 +289,17 @@ def from_ipc(
 
     Parameters
     ----------
-    file:
+    file: str | Path
         Path of IPC/feather file.
-    experiment : Experiment
-        The experiment definition.
-    **read_ipc_kwargs:
+    experiment : Experiment | None
+        The experiment definition. (default: None)
+    **read_ipc_kwargs: Any
             Additional keyword arguments to be passed to polars to read in the ipc file.
+
+    Returns
+    -------
+    GazeDataFrame
+        The gaze data frame read from the ipc file.
 
     Examples
     --------

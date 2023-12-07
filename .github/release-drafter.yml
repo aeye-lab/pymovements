@@ -3,8 +3,6 @@ name-template: pymovements v$RESOLVED_VERSION
 version-resolver:
   minor:
     labels:
-      - deprecation
-      - enhancement
       - breaking
   default: patch
 
@@ -68,5 +66,6 @@ autolabeler:
 template: |
   $CHANGES
 
+  ## 👷👷‍♀️👷‍♂️ Contributors
   Shoutout to all our contributors for making this release possible!
   $CONTRIBUTORS

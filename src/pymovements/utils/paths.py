@@ -37,10 +37,10 @@ def get_filepaths(
     ----------
     path: str | Path
         Root path to be traversed.
-    extension: str, list of str, optional
-        File extension to be filtered for.
-    regex: re.Pattern, optional
-        Regular expression filenames will be filtered for.
+    extension: str | list[str] | None
+        File extension to be filtered for. (default: None)
+    regex: re.Pattern | None
+        Regular expression filenames will be filtered for. (default: None)
 
     Returns
     -------
@@ -88,13 +88,13 @@ def match_filepaths(
     ----------
     path: str | Path
         Root path to be traversed.
-    regex: re.Pattern, optional
+    regex: re.Pattern
         Regular expression filenames will be matched against.
     relative: bool
-        If True, specify filepath as relative to root path.
-    relative_anchor: Path, optional
+        If True, specify filepath as relative to root path. (default: True)
+    relative_anchor: Path | None
         Specifies root path in case of ``relative == True``. If None, ``path`` will be chosen
-        as `relative_anchor` for recursive calls.
+        as `relative_anchor` for recursive calls. (default: None)
 
     Returns
     -------

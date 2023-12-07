@@ -35,15 +35,16 @@ def filter_candidates_remove_nans(
 
     Parameters
     ----------
-    candidates: list, list of candidates
+    candidates: list[np.ndarray]
         List of candidates; each candidate consists of a list of indices
-    values: array-like, shape (N, 1) or shape (N, 2)
+    values: np.ndarray
+        shape (N, 1) or shape (N, 2)
         Corresponding continuous 1D/2D values time series.
 
     Returns
     -------
-    list
-        a filtered list of candidates
+    list[np.ndarray]
+        Returns a filtered list of candidates.
     """
     values = np.array(values)
     return_candidates = []
@@ -72,15 +73,16 @@ def events_split_nans(
 
     Parameters
     ----------
-    candidates: list, list of candidates
+    candidates: list[np.ndarray]
         List of candidates; each candidate consists of a list of indices
-    values: array-like, shape (N, 1) or shape (N, 2)
+    values: np.ndarray
+        shape (N, 1) or shape (N, 2)
         Corresponding continuous 1D/2D values time series.
 
     Returns
     -------
-    list
-        a filtered list of candidates
+    list[np.ndarray]
+        Returns a filtered list of candidates.
     """
     values = np.array(values)
     return_candidates = []
