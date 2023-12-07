@@ -101,9 +101,10 @@ def load_event_files(
     events_dirname: str | None
         One-time usage of an alternative directory name to save data relative to dataset path.
         This argument is used only for this single call and does not alter
-        :py:meth:`pymovements.Dataset.events_rootpath`. (default: None)
-    extension: str
-        Specifies the file format for loading data. Valid options are: `csv`, `feather`.
+        :py:meth:`pymovements.Dataset.events_rootpath`.
+    extension:
+        Specifies the file format for loading data. Valid options are: `csv`, `feather`,
+        `tsv`, `txt`.
         (default: 'feather')
 
     Returns
@@ -132,10 +133,10 @@ def load_event_files(
 
         if extension == 'feather':
             event_df = pl.read_ipc(filepath)
-        elif extension == 'csv':
+        elif extension in {'csv', 'tsv', 'txt'}:
             event_df = pl.read_csv(filepath)
         else:
-            valid_extensions = ['csv', 'feather']
+            valid_extensions = ['csv', 'txt', 'tsv', 'feather']
             raise ValueError(
                 f'unsupported file format "{extension}".'
                 f'Supported formats are: {valid_extensions}',
@@ -178,10 +179,11 @@ def load_gaze_files(
         One-time usage of an alternative directory name to save data relative to
         :py:meth:`pymovements.Dataset.path`.
         This argument is used only for this single call and does not alter
-        :py:meth:`pymovements.Dataset.preprocessed_rootpath`. (default: None)
-    extension: str
-        Specifies the file format for loading data. Valid options are: `csv`, `feather`.
-        :Default: `feather`. (default: 'feather')
+        :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
+    extension:
+        Specifies the file format for loading data. Valid options are: `csv`, `feather`,
+        `txt`, `tsv`.
+        (default: 'feather')
 
     Returns
     -------
@@ -232,7 +234,7 @@ def load_gaze_files(
                 trial_columns=definition.trial_columns,
             )
 
-        elif preprocessed and extension == 'csv':
+        elif preprocessed and extension in {'csv', 'txt', 'tsv'}:
             time_column = None
             distance_column = None
 
@@ -317,7 +319,7 @@ def load_gaze_file(
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
 
-    if filepath.suffix in {'.csv', '.txt'}:
+    if filepath.suffix in {'.csv', '.txt', '.tsv'}:
         if preprocessed:
             gaze_df = pl.read_csv(filepath)
         else:
@@ -327,7 +329,7 @@ def load_gaze_file(
     elif filepath.suffix == '.asc':
         gaze_df = parse_eyelink(filepath, **custom_read_kwargs)
     else:
-        valid_extensions = ['csv', 'txt', 'feather', 'asc']
+        valid_extensions = ['csv', 'tsv', 'txt', 'feather', 'asc']
         raise ValueError(
             f'unsupported file format "{filepath.suffix}".'
             f'Supported formats are: {valid_extensions}',
@@ -403,7 +405,7 @@ def save_events(
         (default: 1)
     extension: str
         Specifies the file format for loading data. Valid options are: `csv`, `feather`.
-        :Default: `feather`. (default: 'feather')
+        (default: 'feather')
 
     Raises
     ------
