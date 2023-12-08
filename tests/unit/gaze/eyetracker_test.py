@@ -18,8 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test for EyeTracker class."""
-from pymovements.gaze.eyetracker import EyeTracker
 import pytest
+
+from pymovements.gaze.eyetracker import EyeTracker
 
 
 def test_eyetracker_with_sampling_rate():
