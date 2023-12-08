@@ -51,36 +51,36 @@ def heatmap(
 
     Parameters
     ----------
-    gaze : GazeDataFrame
+    gaze: GazeDataFrame
         A GazeDataFrame object.
-    position_column : str, optional
-        The column name of the x and y position data
-    gridsize : tuple[int, int], optional
-        The number of bins in the x and y dimensions.
-    cmap : colors.Colormap | str, optional
-        The colormap to use
-    interpolation : str, optional
+    position_column: str
+        The column name of the x and y position data. (default: 'pixel')
+    gridsize: tuple[int, int]
+        The number of bins in the x and y dimensions. (default: (10, 10))
+    cmap: colors.Colormap | str
+        The colormap to use. (default: 'jet')
+    interpolation: str
         The interpolation method to use for plotting the heatmap.
         See matplotlib.pyplot.imshow for more information on available methods
-        for interpolation. By default, 'gaussian' is used.
-    origin : str, optional
-        origin of y-axis, valid values are 'lower' or 'upper'
-    figsize : tuple[float, float], optional
-        Figure size
-    cbar_label : str | None, optional
-        Label for the colorbar
-    show_cbar : bool, optional
-        Whether to show the colorbar.
-    title : str | None, optional
-        Figure title
-    xlabel : str | None, optional
-        x-axis label
-    ylabel : str | None, optional
-        y-axis label
-    show : bool, optional
-        Whether to show the plot
-    savepath : str | None, optional
-        If provided, the figure will be saved to this path
+        for interpolation. (default: 'gaussian')
+    origin: str
+        Set origin of y-axis, valid values are 'lower' or 'upper'. (default: 'lower')
+    figsize: tuple[float, float]
+        Figure size. (default: (15, 10))
+    cbar_label: str | None
+        Label for the colorbar. (default: None)
+    show_cbar: bool
+        Whether to show the colorbar. (default: True)
+    title: str | None
+        Figure title. (default: None)
+    xlabel: str | None
+        Set x-axis label. (default: None)
+    ylabel: str | None
+        Set y-axis label. (default: None)
+    show: bool
+        Whether to show the plot. (default: True)
+    savepath: str | None
+        If provided, the figure will be saved to this path. (default: None)
 
     Raises
     ------

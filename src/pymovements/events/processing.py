@@ -39,16 +39,14 @@ class EventProcessor:
     ----------
     event_properties: list[str]
         A list of property names.
+
+    Parameters
+    ----------
+    event_properties: str | list[str]
+        List of event property names.
     """
 
     def __init__(self, event_properties: str | list[str]):
-        """Initialize processor with event property definitions.
-
-        Parameters
-        ----------
-        event_properties:
-            List of event property names.
-        """
         if isinstance(event_properties, str):
             event_properties = [event_properties]
 
@@ -66,7 +64,7 @@ class EventProcessor:
 
         Parameters
         ----------
-        events:
+        events: EventDataFrame
             Event data to process event properties from.
 
         Returns
@@ -101,6 +99,12 @@ class EventGazeProcessor:
     ----------
     event_properties: list[str]
         A list of property names.
+
+
+    Parameters
+    ----------
+    event_properties: str | tuple[str, dict[str, Any]] | list[str | tuple[str, dict[str, Any]]]
+        List of event property names.
     """
 
     def __init__(
@@ -108,13 +112,6 @@ class EventGazeProcessor:
             event_properties: str | tuple[str, dict[str, Any]]
             | list[str | tuple[str, dict[str, Any]]],
     ):
-        """Initialize processor with event property definitions.
-
-        Parameters
-        ----------
-        event_properties:
-            List of event property names.
-        """
         if isinstance(event_properties, (str, tuple)):
             event_properties = [event_properties]
 
@@ -148,14 +145,14 @@ class EventGazeProcessor:
 
         Parameters
         ----------
-        events:
+        events: EventDataFrame
             Event data to process event properties from.
-        gaze:
+        gaze: pm.GazeDataFrame
             Gaze data to process event properties from.
-        identifiers:
+        identifiers: str | list[str]
             Column names to join on events and gaze dataframes.
-        name:
-            Process only events that match the name.
+        name: str | None
+            Process only events that match the name. (default: None)
 
         Returns
         -------

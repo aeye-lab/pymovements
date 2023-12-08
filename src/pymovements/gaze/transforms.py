@@ -39,7 +39,7 @@ class TransformLibrary:
 
     Attributes
     ----------
-    `methods`:
+    methods: dict[str, Callable[..., pl.Expr]]
         Dictionary of transformation methods.
     """
 
@@ -49,9 +49,9 @@ class TransformLibrary:
     def add(cls, method: Callable[..., pl.Expr]) -> None:
         """Add a transformation method to the library.
 
-        Parameter
-        ---------
-        method
+        Parameters
+        ----------
+        method: Callable[..., pl.Expr]
             The transformation method to add to the library.
         """
         cls.methods[method.__name__] = method
@@ -60,10 +60,15 @@ class TransformLibrary:
     def get(cls, name: str) -> Callable[..., pl.Expr]:
         """Get transformation method py name.
 
-        Parameter
-        ---------
-        name
+        Parameters
+        ----------
+        name: str
             Name of the transformation method in the library.
+
+        Returns
+        -------
+        Callable[..., pl.Expr]
+            The transformation method.
         """
         return cls.methods[name]
 
@@ -85,7 +90,18 @@ class TransformLibrary:
 
 
 def register_transform(method: TransformMethod) -> TransformMethod:
-    """Register a transform method."""
+    """Register a transform method.
+
+    Parameters
+    ----------
+    method: TransformMethod
+        The transform method to register.
+
+    Returns
+    -------
+    TransformMethod
+        The registered transform method.
+    """
     TransformLibrary.add(method)
     return method
 
@@ -105,16 +121,21 @@ def center_origin(
 
     Parameters
     ----------
-    screen_resolution:
+    screen_resolution: tuple[int, int]
         Pixel screen resolution as tuple (width, height).
-    origin:
+    origin: str
         The location of the pixel origin. Supported values: ``center``, ``lower left``
-    n_components:
+    n_components: int
         Number of components in input column.
-    pixel_column:
-        Name of the input column with pixel data.
-    output_column:
-        Name of the output column with centered pixel data.
+    pixel_column: str
+        Name of the input column with pixel data. (default: 'pixel')
+    output_column: str | None
+        Name of the output column with centered pixel data. (default: None)
+
+    Returns
+    -------
+    pl.Expr
+        The respective polars expression.
     """
     if output_column is None:
         output_column = pixel_column
@@ -150,13 +171,18 @@ def downsample(
 
     Parameters
     ----------
-    factor:
+    factor: int
         Downsample factor.
+
+    Returns
+    -------
+    pl.Expr
+        The respective polars expression.
     """
     checks.check_is_int(factor=factor)
     checks.check_is_positive_value(factor=factor)
 
-    return pl.all().take_every(n=factor)
+    return pl.all().gather_every(n=factor)
 
 
 @register_transform
@@ -171,8 +197,13 @@ def norm(
 
     Parameters
     ----------
-    columns:
+    columns: tuple[str, str]
         Columns to take norm of.
+
+    Returns
+    -------
+    pl.Expr
+        The respective polars expression.
     """
     x = pl.col(columns[0])
     y = pl.col(columns[1])
@@ -194,23 +225,28 @@ def pix2deg(
 
     Parameters
     ----------
-    screen_resolution:
+    screen_resolution: tuple[int, int]
         Pixel screen resolution as tuple (width, height).
-    screen_size:
+    screen_size: tuple[float, float]
         Screen size in centimeters as tuple (width, height).
-    distance:
+    distance: float | str
         Must be either a scalar or a string. If a scalar is passed, it is interpreted as the
         Eye-to-screen distance in centimeters. If a string is passed, it is interpreted as the name
         of a column containing the Eye-to-screen distance in millimiters for each sample.
-    origin:
+    origin: str
         The location of the pixel origin. Supported values: ``center``, ``lower left``. See also
         py:func:`~pymovements.gaze.transform.center_origin` for more information.
-    n_components:
+    n_components: int
         Number of components in input column.
-    pixel_column:
-        The input pixel column name.
-    position_column:
-        The output position column name.
+    pixel_column: str
+        The input pixel column name. (default: 'pixel')
+    position_column: str
+        The output position column name. (default: 'position')
+
+    Returns
+    -------
+    pl.Expr
+        The respective polars expression.
     """
     _check_screen_resolution(screen_resolution)
     _check_screen_size(screen_size)
@@ -250,13 +286,25 @@ def pix2deg(
 
 
 def _check_distance(distance: float) -> None:
-    """Check if all screen values are scalars and are greather than zero."""
+    """Check if all screen values are scalars and are greather than zero.
+
+    Parameters
+    ----------
+    distance: float
+        The distance to check.
+    """
     checks.check_is_scalar(distance=distance)
     checks.check_is_greater_than_zero(distance=distance)
 
 
 def _check_screen_resolution(screen_resolution: tuple[int, int]) -> None:
-    """Check screen resolution value."""
+    """Check screen resolution value.
+
+    Parameters
+    ----------
+    screen_resolution: tuple[int, int]
+        The screen resolution to check.
+    """
     if screen_resolution is None:
         raise TypeError('screen_resolution must not be None')
 
@@ -277,7 +325,13 @@ def _check_screen_resolution(screen_resolution: tuple[int, int]) -> None:
 
 
 def _check_screen_size(screen_size: tuple[float, float]) -> None:
-    """Check screen size value."""
+    """Check screen size value.
+
+    Parameters
+    ----------
+    screen_size: tuple[float, float]
+        The screen size to check.
+    """
     if screen_size is None:
         raise TypeError('screen_size must not be None')
 
@@ -310,20 +364,25 @@ def pos2acc(
 
     Parameters
     ----------
-    sampling_rate:
+    sampling_rate: float
         Sampling rate of input time series.
-    degree:
-        The degree of the polynomial to use.
-    window_length:
-        The window size to use.
-    padding:
-        The padding method to use. See ``savitzky_golay`` for details.
-    n_components:
+    n_components: int
         Number of components in input column.
-    position_column:
-        The input position column name.
-    acceleration_column:
-        The output acceleration column name.
+    degree: int
+        The degree of the polynomial to use. (default: 2)
+    window_length: int
+        The window size to use. (default: 7)
+    padding: str | float | int | None
+        The padding method to use. See ``savitzky_golay`` for details. (default: 'nearest')
+    position_column: str
+        The input position column name. (default: 'position')
+    acceleration_column: str
+        The output acceleration column name. (default: 'acceleration')
+
+    Returns
+    -------
+    pl.Expr
+        The respective polars expression.
     """
     return savitzky_golay(
         window_length=window_length,
@@ -353,25 +412,30 @@ def pos2vel(
 
     Parameters
     ----------
-    sampling_rate:
+    sampling_rate: float
         Sampling rate of input time series.
-    method:
+    method: str
         The method to use for velocity calculation.
-    degree:
-        The degree of the polynomial to use. This has only an effect if using ``savitzky_golay`` as
-        calculation method.
-    window_length:
-        The window size to use. This has only an effect if using ``savitzky_golay`` as calculation
-        method.
-    padding:
-        The padding to use.  This has only an effect if using ``savitzky_golay`` as calculation
-        method.
-    n_components:
+    n_components: int
         Number of components in input column.
-    position_column:
-        The input position column name.
-    velocity_column:
-        The output velocity column name.
+    degree: int | None
+        The degree of the polynomial to use. This has only an effect if using ``savitzky_golay`` as
+        calculation method. (default: None)
+    window_length: int | None
+        The window size to use. This has only an effect if using ``savitzky_golay`` as calculation
+        method. (default: None)
+    padding: str | float | int | None
+        The padding to use.  This has only an effect if using ``savitzky_golay`` as calculation
+        method. (default: 'nearest')
+    position_column: str
+        The input position column name. (default: 'position')
+    velocity_column: str
+        The output velocity column name. (default: 'velocity')
+
+    Returns
+    -------
+    pl.Expr
+        The respective polars expression.
 
     Notes
     -----
@@ -462,23 +526,27 @@ def savitzky_golay(
 
     Parameters
     ----------
-    sampling_rate : float, optional
-        The spacing of the samples to which the filter will be applied.
-        This is only used if deriv > 0. Default is 1.0.
-    n_components:
-        Number of components in input column.
-    window_length : int
+    window_length: int
         The length of the filter window (i.e., the number of coefficients).
         If `padding` is ``None``, `window_length` must be less than or equal
         to the length of the input.
-    degree : int
+    degree: int
         The degree of the polynomial used to fit the samples.
         `degree` must be less than `window_length`.
-    derivative : int, optional
+    sampling_rate: float
+        The spacing of the samples to which the filter will be applied.
+        This is only used if deriv > 0. Default is 1.0.
+    n_components: int
+        Number of components in input column.
+    input_column: str
+        The input column name.
+    output_column: str | None
+        The output column name. (default: None)
+    derivative: int
         The order of the derivative to compute. This must be a
         nonnegative integer. The default is 0, which means to filter
-        the data without differentiating.
-    padding : str or float, optional
+        the data without differentiating. (default: 0)
+    padding: str | float | int | None
         Must be either ``None``, a scalar or one of the strings ``mirror``, ``nearest`` or ``wrap``.
         This determines the type of extension to use for the padded signal to
         which the filter is applied.
@@ -487,14 +555,11 @@ def savitzky_golay(
         evaluate the last ``window_length // 2`` output values.
         When passing a scalar value, data will be padded using the passed value.
         See the Notes for more details on the padding methods ``mirror``, ``nearest`` or ``wrap``.
-    input_column:
-        The input column name.
-    output_column:
-        The output column name.
+        (default: 'nearest')
 
     Returns
     -------
-    polars.Expr
+    pl.Expr
         The respective polars expression
 
     Notes
@@ -579,30 +644,31 @@ def smooth(
 
     Parameters
     ----------
-    method:
+    method: str
         The method to use for smoothing. See Notes for more details.
-    window_length
+    window_length: int
         For ``moving_average`` this is the window size to calculate the mean of the subsequent
         samples. For ``savitzky_golay`` this is the window size to use for the polynomial fit.
         For ``exponential_moving_average`` this is the span parameter.
-    n_components:
+    n_components: int
         Number of components in input column.
-    degree:
+    degree: int | None
         The degree of the polynomial to use. This has only an effect if using ``savitzky_golay`` as
-        smoothing method. `degree` must be less than `window_length`.
-    column:
-        The input column name to which the smoothing is applied.
-    padding:
+        smoothing method. `degree` must be less than `window_length`. (default: None)
+    column: str
+        The input column name to which the smoothing is applied. (default: 'position')
+    padding: str | float | int | None
         Must be either ``None``, a scalar or one of the strings ``mirror``, ``nearest`` or ``wrap``.
         This determines the type of extension to use for the padded signal to
         which the filter is applied.
         When passing ``None``, no extension padding is used.
         When passing a scalar value, data will be padded using the passed value.
         See the Notes for more details on the padding methods.
+        (default: 'nearest')
 
     Returns
     -------
-    polars.Expr
+    pl.Expr
         The respective polars expression.
 
     Notes
@@ -719,19 +785,45 @@ def smooth(
 
 
 def _identity(x: Any) -> Any:
-    """Identity function as placeholder for None as padding."""
+    """Identity function as placeholder for None as padding.
+
+    Parameters
+    ----------
+    x: Any
+        The value to return.
+
+    Returns
+    -------
+    Any
+        The value passed to the function.
+    """
     return x
 
 
 def _check_window_length(window_length: Any) -> None:
-    """Check that window length is an integer and greater than zero."""
+    """Check that window length is an integer and greater than zero.
+
+    Parameters
+    ----------
+    window_length: Any
+        The window length to check.
+    """
     checks.check_is_not_none(window_length=window_length)
     checks.check_is_int(window_length=window_length)
     checks.check_is_greater_than_zero(degree=window_length)
 
 
 def _check_degree(degree: Any, window_length: int) -> None:
-    """Check that polynomial degree is an integer, greater than zero and less than window_length."""
+    """Check that polynomial degree is an integer, greater than zero and less than window_length.
+
+    Parameters
+    ----------
+    degree: Any
+        The degree to check.
+
+    window_length: int
+        The window length to check against.
+    """
     checks.check_is_not_none(degree=degree)
     checks.check_is_int(degree=degree)
     checks.check_is_greater_than_zero(degree=degree)
@@ -741,7 +833,14 @@ def _check_degree(degree: Any, window_length: int) -> None:
 
 
 def _check_padding(padding: Any) -> None:
-    """Check if padding argument is valid."""
+    """Check if padding argument is valid.
+
+    Parameters
+    ----------
+    padding: Any
+        The padding to check.
+
+    """
     if not isinstance(padding, (float, int, str)) and padding is not None:
         raise TypeError(
             f"'padding' must be of type 'str', 'int', 'float' or None"
@@ -759,6 +858,12 @@ def _check_padding(padding: Any) -> None:
 
 
 def _check_derivative(derivative: Any) -> None:
-    """Check that derivative has a positive integer value."""
+    """Check that derivative has a positive integer value.
+
+    Parameters
+    ----------
+    derivative: Any
+        The derivative to check.
+    """
     checks.check_is_int(derivative=derivative)
     checks.check_is_positive_value(derivative=derivative)

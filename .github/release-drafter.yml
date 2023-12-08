@@ -3,8 +3,6 @@ name-template: pymovements v$RESOLVED_VERSION
 version-resolver:
   minor:
     labels:
-      - deprecation
-      - enhancement
       - breaking
   default: patch
 

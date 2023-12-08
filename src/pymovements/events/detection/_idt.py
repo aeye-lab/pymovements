@@ -38,12 +38,12 @@ def dispersion(positions: list[list[float]] | np.ndarray) -> float:
 
     Parameters
     ----------
-    positions: array-like
+    positions: list[list[float]] | np.ndarray
         Continuous 2D position time series.
 
     Returns
     -------
-    dispersion: float
+    float
         Dispersion of the group of points.
     """
     return sum(np.nanmax(positions, axis=0) - np.nanmin(positions, axis=0))
@@ -71,24 +71,29 @@ def idt(
 
     Parameters
     ----------
-    positions: array-like, shape (N, 2)
+    positions: list[list[float]] | list[tuple[float, float]] | np.ndarray
+        shape (N, 2)
         Continuous 2D position time series
-    timesteps: array-like, shape (N, )
+    timesteps: list[int] | np.ndarray | None
+        shape (N, )
         Corresponding continuous 1D timestep time series. If None, sample based timesteps are
-        assumed.
+        assumed. (default: None)
     minimum_duration: int
         Minimum fixation duration. The duration is specified in the units used in ``timesteps``.
-         If ``timesteps`` is None, then ``minimum_duration`` is specified in numbers of samples.
+        If ``timesteps`` is None, then ``minimum_duration`` is specified in numbers of samples.
+        (default: 100)
     dispersion_threshold: float
-        Threshold for dispersion for a group of consecutive samples to be identified as fixation
+        Threshold for dispersion for a group of consecutive samples to be identified as fixation.
+        (default: 1.0)
     include_nan: bool
-        Indicator, whether we want to split events on missing/corrupt value (np.nan)
-    name:
-        Name for detected events in EventDataFrame.
+        Indicator, whether we want to split events on missing/corrupt value (np.nan).
+        (default: False)
+    name: str
+        Name for detected events in EventDataFrame. (default: 'fixation')
 
     Returns
     -------
-    pl.DataFrame
+    EventDataFrame
         A dataframe with detected fixations as rows.
 
     Raises
