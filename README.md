@@ -35,7 +35,7 @@ and render plots to visually analyze your results.
 
 ## Getting Started
 
-With pymovements loading your eye movement datasets is just 4 lines of code away
+With pymovements loading your eye movement [datasets](https://pymovements.readthedocs.io/en/stable/reference/pymovements.datasets.html#module-pymovements.datasets) is just 4 lines of code away
 
 ```python
 import pymovements as pm
