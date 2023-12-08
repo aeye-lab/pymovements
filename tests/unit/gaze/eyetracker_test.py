@@ -19,6 +19,7 @@
 # SOFTWARE.
 """Test for EyeTracker class."""
 from pymovements.gaze.eyetracker import EyeTracker
+import pytest
 
 
 def test_eyetracker_with_sampling_rate():
@@ -26,3 +27,11 @@ def test_eyetracker_with_sampling_rate():
         1000.0, False, True, 'EyeLink 1000 Plus',
         '1.5.3', 'Arm Mount / Monocular / Remote',
     )
+
+
+def test_eyetracker_with_negative_sampling_rate():
+    with pytest.assertRaises(ValueError):
+        EyeTracker(
+            -500.0, False, True, 'EyeLink 1000 Plus',
+            '1.5.3', 'Arm Mount / Monocular / Remote',
+        )
