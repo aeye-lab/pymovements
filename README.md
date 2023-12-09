@@ -35,17 +35,17 @@ and render plots to visually analyze your results.
 
 ## Getting Started
 
-With pymovements loading your eye movement [datasets](https://pymovements.readthedocs.io/en/stable/reference/pymovements.datasets.html#module-pymovements.datasets) is just 4 lines of code away
+With pymovements loading your eye movement [datasets](https://pymovements.readthedocs.io/en/stable/reference/pymovements.datasets.html#module-pymovements.datasets) is just a few lines of code away
 
 ```python
 import pymovements as pm
 
 dataset = pm.Dataset(
-    'JuDo1000',                  # choose publicly available dataset
+    'JuDo1000',                  # choose a public dataset from our dataset library
     path='data/judo100',         # setup your local dataset path
 )
 dataset.download()               # download a public dataset from our dataset library
-dataset.load()                   # load the dataset into working memory
+dataset.load()                   # download the dataset
 ```
 
 calculate velocities on the fly
