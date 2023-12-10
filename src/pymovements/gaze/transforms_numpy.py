@@ -39,13 +39,13 @@ def pix2deg(
 
     Parameters
     ----------
-    arr : float, array_like
+    arr: float | list[float] | list[list[float]] | np.ndarray
         Pixel coordinates to transform into degrees of visual angle
-    screen_px : int, int
+    screen_px: float | list[float] | tuple[float, float] | np.ndarray
         Screen dimension in pixels
-    screen_cm : float, float
+    screen_cm: float | list[float] | tuple[float, float] | np.ndarray
         Screen dimension in centimeters
-    distance_cm : float
+    distance_cm: float
         Eye-to-screen distance in centimeters
     origin : str
         Specifies the screen location of the origin of the pixel coordinate system. Valid values
@@ -181,18 +181,18 @@ def pos2acc(
 
     Parameters
     ----------
-    arr : array_like
+    arr: list[float] | list[list[float]] | np.ndarray
         Continuous 2D position time series
-    sampling_rate:
+    sampling_rate: float
         Sampling rate of input time series.
-    degree:
-        The degree of the polynomial to use.
-    window_length:
-        The window size to use.
-    mode:
-        The padding mode to use.
-    cval:
-        A constant value for padding.
+    window_length: int
+        The window size to use. (default: 7)
+    degree: int
+        The degree of the polynomial to use. (default: 2)
+    mode: str
+        The padding mode to use. (default: 'interp')
+    cval: float
+        A constant value for padding. (default: 0.0)
 
     Returns
     -------
@@ -266,11 +266,11 @@ def pos2vel(
 
     Parameters
     ----------
-    arr : array_like
+    arr: list[float] | list[list[float]] | np.ndarray
         Continuous 2D position time series
-    sampling_rate : int
-        Sampling rate of input time series
-    method : str
+    sampling_rate: float
+        Sampling rate of input time series. (default: 1000)
+    method: str
         Following methods are available:
         * *smooth*: velocity is calculated from the difference of the mean values
         of the subsequent two samples and the preceding two samples
@@ -278,7 +278,8 @@ def pos2vel(
         sample and the preceding sample
         * *preceding*: velocity is calculated from the difference of the current
         sample to the preceding sample
-    kwargs: dict
+        (default: 'smooth')
+    **kwargs: int | float | str
         Additional keyword arguments used for savitzky golay method.
 
     Returns
@@ -393,13 +394,14 @@ def norm(arr: np.ndarray, axis: int | None = None) -> np.ndarray | Any:
     Parameters
     ----------
     arr: np.ndarray
-        velocity sequence
-    axis: int, optional
-        axis to take norm. If None it is inferred from arr.shape.
+        Input velocity sequence.
+    axis: int | None
+        Set axis to take norm. If None it is inferred from arr.shape. (default: None)
 
     Returns
     -------
-    np.ndarray
+    np.ndarray | Any
+        Norm of input array.
 
     Raises
     ------
@@ -451,7 +453,7 @@ def split(
         size of subsequences
     keep_padded: bool
         If True, last subsequence (if not of length `window_size`) is kept in the output array and
-        padded with np.nan.
+        padded with np.nan. (default: True)
 
     Returns
     -------

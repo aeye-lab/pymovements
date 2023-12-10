@@ -41,6 +41,11 @@ def curly_to_regex(s: str) -> re.Pattern:
     ----------
     s: str
         Pattern in python formatting style.
+
+    Returns
+    -------
+    re.Pattern
+        Converted regex patterns.
     """
 
     def replace_aux(match: re.Match) -> str:     # Auxiliary replacement function

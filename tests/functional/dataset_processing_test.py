@@ -38,6 +38,7 @@ import pymovements as pm
         'gazebase_vr',
         'gazegraph',
         'judo1000',
+        'potec',
     ],
 )
 def fixture_dataset_init_kwargs(request):
@@ -97,6 +98,11 @@ def fixture_dataset_init_kwargs(request):
             filename_format='judo1000_example.csv',
             filename_format_dtypes={},
             trial_columns=['trial_id'],
+        ),
+        'potec': pm.datasets.PoTeC(
+            filename_format='potec_example.tsv',
+            filename_format_dtypes={},
+            trial_columns=None,
         ),
 
     }

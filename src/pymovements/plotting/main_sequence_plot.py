@@ -44,25 +44,25 @@ def main_sequence_plot(
 
     Parameters
     ----------
-    event_df: Event dataframe
+    event_df: EventDataFrame
         It must contain columns "peak_velocity" and "amplitude".
     marker_size: float
-        Size of the marker symbol.
+        Size of the marker symbol. (default: 25)
     color: str
-        Color of the marker symbol.
+        Color of the marker symbol. (default: 'purple')
     alpha: float
-        Alpha value (=transparency) of the marker symbol. Between 0 and 1.
+        Alpha value (=transparency) of the marker symbol. Between 0 and 1. (default: 0.5)
     marker: str
-        Marker symbol. Possible values defined by matplotlib.markers.
-    figsize: tuple
-        Figure size.
-    title: str, optional
-        Figure title.
-    savepath: str, optional
-        If given, figure will be saved to this path.
+        Marker symbol. Possible values defined by matplotlib.markers. (default: 'o')
+    figsize: tuple[int, int]
+        Figure size. (default: (15, 5))
+    title: str | None
+        Figure title. (default: None)
+    savepath: str | None
+        If given, figure will be saved to this path. (default: None)
     show: bool
-        If True, figure will be shown.
-    **kwargs:
+        If True, figure will be shown. (default: True)
+    **kwargs: Collection
         Additional keyword arguments passed to matplotlib.pyplot.scatter.
 
     Raises

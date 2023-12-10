@@ -33,28 +33,72 @@ class Screen:
 
      Also transforms pixel coordinates to degrees of visual angle.
 
+    Parameters
+    ----------
+    width_px: int
+        Screen width in pixels
+    height_px: int
+        Screen height in pixels
+    width_cm: float
+        Screen width in centimeters
+    height_cm: float
+        Screen height in centimeters
+    distance_cm: float | None
+        Eye-to-screen distance in centimeters. If None, a `distance_column` must be provided
+        in the `DatasetDefinition` or `GazeDataFrame`, which contains the eye-to-screen
+        distance for each sample in millimeters. (default: None)
+    origin: str
+        Specifies the screen location of the origin of the pixel
+        coordinate system. (default: 'lower left')
+
     Attributes
     ----------
-    width_px : int
+    width_px: int
         Screen width in pixels
-    height_px : int
+    height_px: int
         Screen height in pixels
-    width_cm : float
+    width_cm: float
         Screen width in centimeters
-    height_cm : float
+    height_cm: float
         Screen height in centimeters
-    distance_cm : float
+    distance_cm: float
         Eye-to-screen distance in centimeters
-    origin : str
+    origin: str
         Specifies the screen location of the origin of the pixel coordinate system.
-    x_max_dva : float
+    x_max_dva: float
         Maximum screen x-coordinate in degrees of visual angle
-    y_max_dva : float
+    y_max_dva: float
         Minimum screen y-coordinate in degrees of visual angle
-    x_min_dva : float
+    x_min_dva: float
         Maximum screen x-coordinate in degrees of visual angle
-    y_min_dva : float
+    y_min_dva: float
         Minimum screen y-coordinate in degrees of visual angle
+
+    Examples
+    --------
+    >>> screen = Screen(
+    ...     width_px=1280,
+    ...     height_px=1024,
+    ...     width_cm=38.0,
+    ...     height_cm=30.0,
+    ...     distance_cm=68.0,
+    ...     origin='lower left',
+    ... )
+    >>> print(screen)
+    Screen(width_px=1280, height_px=1024, width_cm=38.00,
+    height_cm=30.00, distance_cm=68.00, origin=lower left)
+
+    We can also access the screen boundaries in degrees of visual angle. This only works if the
+    `distance_cm` attribute is specified.
+
+    >>> screen.x_min_dva# doctest:+ELLIPSIS
+    -15.59...
+    >>> screen.x_max_dva# doctest:+ELLIPSIS
+    15.59...
+    >>> screen.y_min_dva# doctest:+ELLIPSIS
+    -12.42...
+    >>> screen.y_max_dva# doctest:+ELLIPSIS
+    12.42...
 
     """
 
@@ -67,52 +111,6 @@ class Screen:
             distance_cm: float | None = None,
             origin: str = 'lower left',
     ):
-        """Initialize Screen.
-
-        Parameters
-        ----------
-        width_px : int
-            Screen width in pixels
-        height_px : int
-            Screen height in pixels
-        width_cm : float
-            Screen width in centimeters
-        height_cm : float
-            Screen height in centimeters
-        distance_cm : float | None
-            Eye-to-screen distance in centimeters. If None, a `distance_column` must be provided
-            in the `DatasetDefinition` or `GazeDataFrame`, which contains the eye-to-screen
-            distance for each sample in millimeters.
-        origin : str
-            Specifies the screen location of the origin of the pixel coordinate system.
-
-        Examples
-        --------
-        >>> screen = Screen(
-        ...     width_px=1280,
-        ...     height_px=1024,
-        ...     width_cm=38.0,
-        ...     height_cm=30.0,
-        ...     distance_cm=68.0,
-        ...     origin='lower left',
-        ... )
-        >>> print(screen)
-        Screen(width_px=1280, height_px=1024, width_cm=38.00,
-        height_cm=30.00, distance_cm=68.00, origin=lower left)
-
-        We can also access the screen boundaries in degrees of visual angle. This only works if the
-        `distance_cm` attribute is specified.
-
-        >>> screen.x_min_dva# doctest:+ELLIPSIS
-        -15.59...
-        >>> screen.x_max_dva# doctest:+ELLIPSIS
-        15.59...
-        >>> screen.y_min_dva# doctest:+ELLIPSIS
-        -12.42...
-        >>> screen.y_max_dva# doctest:+ELLIPSIS
-        12.42...
-
-        """
         checks.check_no_zeros(width_px, 'width_px')
         checks.check_no_zeros(height_px, 'height_px')
         checks.check_no_zeros(width_cm, 'width_cm')
@@ -200,12 +198,12 @@ class Screen:
 
         Parameters
         ----------
-        arr : float, array_like
+        arr: float | list[float] | list[list[float]] | np.ndarray
             Pixel coordinates to transform into degrees of visual angle
 
         Returns
         -------
-        degrees_of_visual_angle : np.ndarray
+        np.ndarray
             Coordinates in degrees of visual angle
 
         Raises
