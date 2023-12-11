@@ -93,7 +93,7 @@ def from_numpy(
         The name of the timestamp column in the input data frame. (default: None)
     time_unit: str | None
         The unit of the timestamps. Supported units are 's' for seconds, 'ms' for milliseconds and
-        'steps' for steps. If the unit is 'steps' the experiment definition must be specified. All
+        'step' for steps. If the unit is 'step' the experiment definition must be specified. All
         timestamps will be converted to milliseconds. (default: None)
     pixel_columns: list[str] | None
         The name of the pixel position columns in the input data frame. (default: None)
@@ -315,7 +315,7 @@ def from_pandas(
         The name of the timestamp column in the input data frame. (default: None)
     time_unit: str | None
         The unit of the timestamps in the input data frame. Supported units are 's' for seconds,
-        'ms' for milliseconds and 'steps' for steps. If the unit is 'steps' the experiment
+        'ms' for milliseconds and 'step' for steps. If the unit is 'step' the experiment
         definition must be specified. All timestamps will be converted to milliseconds.
     pixel_columns: list[str] | None
         The name of the pixel position columns in the input data frame. (default: None)

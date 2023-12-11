@@ -916,7 +916,7 @@ class GazeDataFrame:
             self.frame = self.frame.with_columns(pl.col('time').mul(1000))
         elif time_unit == 'step':
             if self.experiment is None:
-                raise ValueError("experiment must be specified if time_unit is 'steps'")
+                raise ValueError("experiment must be specified if time_unit is 'step'")
 
             self.frame = self.frame.with_columns(
                 pl.col('time').mul(1000).truediv(self.experiment.sampling_rate),
@@ -926,5 +926,5 @@ class GazeDataFrame:
             raise ValueError(
                 f'unknown time unit {time_unit}. '
                 "Supported units are 's' for seconds, 'ms' for milliseconds and "
-                "'steps' for steps.",
+                "'step' for steps.",
             )
