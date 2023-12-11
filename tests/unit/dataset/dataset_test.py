@@ -276,6 +276,7 @@ def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
         filename_format=r'{subject_id:d}.' + raw_fileformat,
         filename_format_dtypes={'subject_id': pl.Int64},
         time_column='time',
+        time_unit='ms',
         distance_column=distance_column,
         pixel_columns=pixel_columns,
     )

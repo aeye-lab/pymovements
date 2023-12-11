@@ -46,6 +46,7 @@ def from_numpy(
         schema: list[str] | None = None,
         orient: Literal['col', 'row'] = 'col',
         time_column: str | None = None,
+        time_unit: str | None = None,
         pixel_columns: list[str] | None = None,
         position_columns: list[str] | None = None,
         velocity_columns: list[str] | None = None,
@@ -90,6 +91,10 @@ def from_numpy(
         Whether to interpret the two-dimensional data as columns or as rows. (default: 'col')
     time_column: str | None
         The name of the timestamp column in the input data frame. (default: None)
+    time_unit: str | None
+        The unit of the timestamps. Supported units are 's' for seconds, 'ms' for milliseconds and
+        'steps' for steps. If the unit is 'steps' the experiment definition must be specified. All
+        timestamps will be converted to milliseconds. (default: None)
     pixel_columns: list[str] | None
         The name of the pixel position columns in the input data frame. (default: None)
     position_columns: list[str] | None
@@ -128,6 +133,7 @@ def from_numpy(
     ...     arr,
     ...     schema=schema,
     ...     time_column='t',
+    ...     time_unit='ms',
     ...     position_columns=['x', 'y'],
     ...     orient='col',
     ... )
@@ -157,6 +163,7 @@ def from_numpy(
     ...     arr.T,
     ...     schema=schema,
     ...     time_column='t',
+    ...     time_unit='ms',
     ...     position_columns=['x', 'y'],
     ...     orient='row',
     ... )
@@ -181,6 +188,7 @@ def from_numpy(
     Pass the data explicitly via the specific keyword arguments, without having to specify a schema.
     >>> gaze = pm.gaze.from_numpy(
     ...     time=arr[0],
+    ...     time_unit='ms',
     ...     position=arr[[1, 2]],
     ...     orient='col',
     ... )
@@ -217,6 +225,7 @@ def from_numpy(
             experiment=experiment,
             events=events,
             time_column=time_column,
+            time_unit=time_unit,
             pixel_columns=pixel_columns,
             position_columns=position_columns,
             velocity_columns=velocity_columns,
@@ -270,6 +279,7 @@ def from_numpy(
         experiment=experiment,
         events=events,
         time_column=time_column,
+        time_unit=time_unit,
         pixel_columns=pixel_columns,
         position_columns=position_columns,
         velocity_columns=velocity_columns,
@@ -284,6 +294,7 @@ def from_pandas(
         events: EventDataFrame | None = None,
         *,
         time_column: str | None = None,
+        time_unit: str | None = None,
         pixel_columns: list[str] | None = None,
         position_columns: list[str] | None = None,
         velocity_columns: list[str] | None = None,
@@ -302,6 +313,10 @@ def from_pandas(
         A dataframe of events in the gaze signal. (default: None)
     time_column: str | None
         The name of the timestamp column in the input data frame. (default: None)
+    time_unit: str | None
+        The unit of the timestamps in the input data frame. Supported units are 's' for seconds,
+        'ms' for milliseconds and 'steps' for steps. If the unit is 'steps' the experiment
+        definition must be specified. All timestamps will be converted to milliseconds.
     pixel_columns: list[str] | None
         The name of the pixel position columns in the input data frame. (default: None)
     position_columns: list[str] | None
@@ -327,6 +342,7 @@ def from_pandas(
         experiment=experiment,
         events=events,
         time_column=time_column,
+        time_unit=time_unit,
         pixel_columns=pixel_columns,
         position_columns=position_columns,
         velocity_columns=velocity_columns,

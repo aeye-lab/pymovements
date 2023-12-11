@@ -36,6 +36,7 @@ def from_csv(
         *,
         trial_columns: list[str] | None = None,
         time_column: str | None = None,
+        time_unit: str | None = None,
         pixel_columns: list[str] | None = None,
         position_columns: list[str] | None = None,
         velocity_columns: list[str] | None = None,
@@ -58,6 +59,11 @@ def from_csv(
         methods will be applied to each trial separately. (default: None)
     time_column: str | None
         The name of the timestamp column in the input data frame. (default: None)
+    time_unit: str | None
+        The unit of the timestamps in the timespamp column in the input data frame. Supported
+        units are 's' for seconds, 'ms' for milliseconds and 'steps' for steps. If the unit is
+        'steps' the experiment definition must be specified. All timestamps will be converted to
+        milliseconds. (default: None)
     pixel_columns: list[str] | None
         The name of the pixel position columns in the input data frame. These columns will be
         nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
@@ -138,6 +144,7 @@ def from_csv(
     >>> gaze = from_csv(
     ...     file='tests/files/monocular_example.csv',
     ...     time_column = 'time',
+    ...     time_unit='ms',
     ...     pixel_columns = ['x_left_pix','y_left_pix'],
     ...     separator = ',',
     ... )
@@ -168,6 +175,7 @@ def from_csv(
     >>> gaze = from_csv(
     ...     file='tests/files/monocular_example.csv',
     ...     time_column = 'time',
+    ...     time_unit='ms',
     ...     pixel_columns = ['x_left_pix','y_left_pix'],
     ...     dtypes = {'time': pl.Int64, 'x_left_pix': pl.Int64, 'y_left_pix': pl.Int64},
     ... )
@@ -199,6 +207,7 @@ def from_csv(
         experiment=experiment,
         trial_columns=trial_columns,
         time_column=time_column,
+        time_unit=time_unit,
         pixel_columns=pixel_columns,
         position_columns=position_columns,
         velocity_columns=velocity_columns,
@@ -275,6 +284,7 @@ def from_asc(
         gaze_data,
         experiment=experiment,
         time_column='time',
+        time_unit='ms',
         pixel_columns=['x_pix', 'y_pix'],
     )
     return gaze_df

@@ -133,6 +133,8 @@ class ToyDatasetEyeLink(DatasetDefinition):
 
     time_column: str = 'time'
 
+    time_unit: str = 'ms'
+
     pixel_columns: list[str] = field(default_factory=lambda: ['x_pix', 'y_pix'])
 
     custom_read_kwargs: dict[str, Any] = field(

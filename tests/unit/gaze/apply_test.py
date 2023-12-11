@@ -97,12 +97,14 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
+                time_unit='ms',
                 events=pm.EventDataFrame(
                     name=['fixation', 'saccade'], onsets=[0, 50], offsets=[40, 100],
                 ),
             ),
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
+                time_unit='ms',
                 events=pm.EventDataFrame(
                     name=['fixation', 'saccade', 'unclassified'],
                     onsets=[0, 50, 40],
@@ -119,6 +121,7 @@ from pymovements.synthetic import step_function
                 data=pl.from_dict(
                     {
                         'time': np.arange(1000, 1010, 1),
+                        'time_unit': 'ms',
                         'x_pix': np.arange(0, 1, 0.1),
                         'y_pix': np.arange(20, 21, 0.1),
                     },
@@ -129,6 +132,7 @@ from pymovements.synthetic import step_function
                 data=pl.from_dict(
                     {
                         'time': np.arange(1000, 1010, 2),
+                        'time_unit': 'ms',
                         'x_pix': np.arange(0, 1, 0.2),
                         'y_pix': [20.0, 20.2, 20.4, 20.6, 20.8],
                     },
@@ -145,6 +149,7 @@ from pymovements.synthetic import step_function
                 data=pl.from_dict(
                     {
                         'time': [1000, 1000],
+                        'time_unit': 'ms',
                         'x_pix': [(100 - 1) / 2, (100 - 1) / 2],
                         'y_pix': [0.0, 0.0],
                     },
@@ -156,6 +161,7 @@ from pymovements.synthetic import step_function
                 data=pl.from_dict(
                     {
                         'time': [1000, 1000],
+                        'time_unit': 'ms',
                         'x_pix': [49.5, 49.5],
                         'y_pix': [0.0, 0.0],
                         'x_dva': [26.3354, 26.3354],
@@ -176,6 +182,7 @@ from pymovements.synthetic import step_function
                     {
                         'trial_id': [1, 1, 1, 2, 2, 2],
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
+                        'time_unit': 'ms',
                         'x': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                         'y': [1.0, 1.1, 1.2, 1.0, 1.1, 1.2],
                     },
@@ -189,6 +196,7 @@ from pymovements.synthetic import step_function
                     {
                         'trial_id': [1, 1, 1, 2, 2, 2],
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
+                        'time_unit': 'ms',
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                         'y_dva': [1.0, 1.1, 1.2, 1.0, 1.1, 1.2],
                         'x_vel': [None, 0.0, 0.0, None, 0.0, 0.0],

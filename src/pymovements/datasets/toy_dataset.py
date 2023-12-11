@@ -131,6 +131,8 @@ class ToyDataset(DatasetDefinition):
 
     time_column: str = 'timestamp'
 
+    time_unit: str = 'ms'
+
     pixel_columns: list[str] = field(default_factory=lambda: ['x', 'y'])
 
     column_map: dict[str, str] = field(default_factory=lambda: {})

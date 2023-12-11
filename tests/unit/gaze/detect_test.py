@@ -38,6 +38,7 @@ from pymovements.synthetic import step_function
             },
             pm.gaze.from_numpy(
                 time=np.arange(0, 100, 1),
+                time_unit='ms',
                 position=np.stack([np.arange(0, 200, 2), np.arange(0, 200, 2)], axis=0),
                 experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
             ),
@@ -138,6 +139,7 @@ from pymovements.synthetic import step_function
             },
             pm.gaze.from_numpy(
                 time=np.arange(1000, 1100, dtype=int),
+                time_unit='ms',
                 position=step_function(length=100, steps=[0], values=[(0, 0)]),
                 orient='row',
                 experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
@@ -158,6 +160,7 @@ from pymovements.synthetic import step_function
             },
             pm.gaze.from_numpy(
                 time=np.arange(1000, 1010, 0.1, dtype=float),
+                time_unit='ms',
                 position=step_function(length=100, steps=[0], values=[(0, 0)]),
                 orient='row',
                 experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
@@ -179,6 +182,7 @@ from pymovements.synthetic import step_function
             },
             pm.gaze.from_numpy(
                 time=np.reshape(np.arange(1000, 1100, dtype=int), (100, 1)),
+                time_unit='ms',
                 position=step_function(length=100, steps=[0], values=[(0, 0)]),
                 orient='row',
                 experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
@@ -199,6 +203,7 @@ from pymovements.synthetic import step_function
             },
             pm.gaze.from_numpy(
                 time=np.arange(0, 100, 1),
+                time_unit='ms',
                 velocity=np.ones((2, 100)) * 20,
                 experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
             ),
@@ -297,6 +302,7 @@ from pymovements.synthetic import step_function
             },
             pm.gaze.from_numpy(
                 time=np.arange(1000, 1100, dtype=int),
+                time_unit='ms',
                 velocity=step_function(length=100, steps=[0], values=[(0, 0)]),
                 orient='row',
                 experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
@@ -317,6 +323,7 @@ from pymovements.synthetic import step_function
             },
             pm.gaze.from_numpy(
                 time=np.arange(1000, 1010, 0.1, dtype=float),
+                time_unit='ms',
                 velocity=step_function(length=100, steps=[0], values=[(0, 0)]),
                 orient='row',
                 experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
@@ -338,6 +345,7 @@ from pymovements.synthetic import step_function
             },
             pm.gaze.from_numpy(
                 time=np.reshape(np.arange(1000, 1100, dtype=int), (100, 1)),
+                time_unit='ms',
                 velocity=step_function(length=100, steps=[0], values=[(0, 0)]),
                 orient='row',
                 experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
@@ -483,6 +491,7 @@ from pymovements.synthetic import step_function
             },
             pm.gaze.from_numpy(
                 time=np.reshape(np.arange(1000, 1100, dtype=int), (100, 1)),
+                time_unit='ms',
                 velocity=step_function(length=100, steps=[40, 50], values=[(9, 9), (0, 0)]),
                 orient='row',
                 experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
@@ -607,6 +616,7 @@ from pymovements.synthetic import step_function
             },
             pm.gaze.from_numpy(
                 time=np.arange(1000, 1100, dtype=int),
+                time_unit='ms',
                 velocity=step_function(
                     length=100,
                     steps=[40, 50],
@@ -631,6 +641,7 @@ from pymovements.synthetic import step_function
             },
             pm.gaze.from_numpy(
                 time=np.arange(1000, 1100, dtype=int),
+                time_unit='ms',
                 velocity=step_function(
                     length=100,
                     steps=[40, 50],
@@ -649,6 +660,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
+                time_unit='ms',
                 events=pm.EventDataFrame(name='fixation', onsets=[0], offsets=[100]),
             ),
             pm.EventDataFrame(name='fixation', onsets=[0], offsets=[100]),
@@ -660,6 +672,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
+                time_unit='ms',
                 events=pm.EventDataFrame(name='fixation', onsets=[10], offsets=[100]),
             ),
             pm.EventDataFrame(
@@ -675,6 +688,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
+                time_unit='ms',
                 events=pm.EventDataFrame(name='fixation', onsets=[0], offsets=[90]),
             ),
             pm.EventDataFrame(
@@ -690,6 +704,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
+                time_unit='ms',
                 events=pm.EventDataFrame(name='fixation', onsets=[0, 50], offsets=[40, 100]),
             ),
             pm.EventDataFrame(
@@ -705,6 +720,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
+                time_unit='ms',
                 events=pm.EventDataFrame(
                     name=['fixation', 'saccade'], onsets=[0, 50], offsets=[40, 100],
                 ),

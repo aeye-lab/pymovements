@@ -92,6 +92,7 @@ def test_from_numpy_with_schema():
         schema=schema,
         experiment=experiment,
         time_column='t',
+        time_unit='ms',
         distance_column='d',
         pixel_columns=['x_pix', 'y_pix'],
         position_columns=['x_pos', 'y_pos'],
@@ -142,6 +143,7 @@ def test_from_numpy_explicit_columns():
 
     gaze = pm.gaze.from_numpy(
         time=time,
+        time_unit='ms',
         distance=distance,
         pixel=pixel,
         position=position,

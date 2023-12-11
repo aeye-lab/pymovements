@@ -138,6 +138,8 @@ class GazeGraph(DatasetDefinition):
 
     time_column: Any = None
 
+    time_unit: Any = None
+
     pixel_columns: list[str] = field(default_factory=lambda: ['x', 'y'])
 
     column_map: dict[str, str] = field(default_factory=lambda: {})

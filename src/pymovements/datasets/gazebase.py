@@ -146,6 +146,8 @@ class GazeBase(DatasetDefinition):
 
     time_column: str = 'n'
 
+    time_unit: str = 'ms'
+
     position_columns: list[str] = field(default_factory=lambda: ['x', 'y'])
 
     column_map: dict[str, str] = field(

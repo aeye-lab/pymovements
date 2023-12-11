@@ -45,6 +45,7 @@ def fixture_dataset_init_kwargs(request):
     init_param_dict = {
         'csv_monocular': pm.dataset.DatasetDefinition(
             time_column='time',
+            time_unit='ms',
             pixel_columns=['x_left_pix', 'y_left_pix'],
             experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             filename_format='monocular_example.csv',
@@ -52,6 +53,7 @@ def fixture_dataset_init_kwargs(request):
         'csv_binocular': pm.dataset.DatasetDefinition(
             filename_format='binocular_example.csv',
             time_column='time',
+            time_unit='ms',
             pixel_columns=['x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix'],
             position_columns=['x_left_pos', 'y_left_pos', 'x_right_pos', 'y_right_pos'],
             experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),

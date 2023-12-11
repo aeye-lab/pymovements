@@ -236,10 +236,12 @@ def load_gaze_files(
 
         elif preprocessed and extension in {'csv', 'txt', 'tsv'}:
             time_column = None
+            time_unit = None
             distance_column = None
 
             if 'time' in gaze_data.columns:
                 time_column = 'time'
+                time_unit = 'ms'
 
             if 'distance' in gaze_data.columns:
                 distance_column = 'distance'
@@ -262,6 +264,7 @@ def load_gaze_files(
                 experiment=definition.experiment,
                 trial_columns=definition.trial_columns,
                 time_column=time_column,
+                time_unit=time_unit,
                 distance_column=distance_column,
                 pixel_columns=pixel_columns,
                 position_columns=position_columns,
@@ -275,6 +278,7 @@ def load_gaze_files(
                 experiment=definition.experiment,
                 trial_columns=definition.trial_columns,
                 time_column=definition.time_column,
+                time_unit=definition.time_unit,
                 distance_column=definition.distance_column,
                 pixel_columns=definition.pixel_columns,
                 position_columns=definition.position_columns,
