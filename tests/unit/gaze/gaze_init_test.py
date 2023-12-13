@@ -701,6 +701,139 @@ import pymovements as pm
             6,
             id='df_single_row_all_types_six_columns',
         ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1.0, 1.5, 2.],
+                        'x': [0., 1., 2.],
+                        'y': [3., 4., 5.],
+                    },
+                    schema={'time': pl.Float64, 'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'pixel_columns': ['x', 'y'],
+                'time_unit': 'ms',
+                'time_column': 'time',
+            },
+            pl.from_dict(
+                {
+                    'time': [1.0, 1.5, 2.],
+                    'pixel': [[0., 3.], [1., 4.], [2., 5.]],
+                },
+                schema={'time': pl.Float64, 'pixel': pl.List(pl.Float64)},
+            ),
+            2,
+            id='time_column_float_millis_no_conversion',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1, 2, 3],
+                        'x': [0., 1., 2.],
+                        'y': [3., 4., 5.],
+                    },
+                    schema={'time': pl.Int64, 'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'pixel_columns': ['x', 'y'],
+                'time_unit': 'ms',
+                'time_column': 'time',
+            },
+            pl.from_dict(
+                {
+                    'time': [1, 2, 3],
+                    'pixel': [[0., 3.], [1., 4.], [2., 5.]],
+                },
+                schema={'time': pl.Int64, 'pixel': pl.List(pl.Float64)},
+            ),
+            2,
+            id='time_column_int_millis_no_conversion',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1.0, 1.1, 1.2],
+                        'x': [0., 1., 2.],
+                        'y': [3., 4., 5.],
+                    },
+                    schema={'time': pl.Float64, 'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'pixel_columns': ['x', 'y'],
+                'time_unit': 's',
+                'time_column': 'time',
+            },
+            pl.from_dict(
+                {
+                    'time': [1000, 1100, 1200],
+                    'pixel': [[0., 3.], [1., 4.], [2., 5.]],
+                },
+                schema={'time': pl.Int64, 'pixel': pl.List(pl.Float64)},
+            ),
+            2,
+            id='time_column_float_seconds_converts_to_int_millis',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1.0005, 1.001, 1.0015],
+                        'x': [0., 1., 2.],
+                        'y': [3., 4., 5.],
+                    },
+                    schema={'time': pl.Float64, 'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'pixel_columns': ['x', 'y'],
+                'time_unit': 's',
+                'time_column': 'time',
+            },
+            pl.from_dict(
+                {
+                    'time': [1000.5, 1001., 1001.5],
+                    'pixel': [[0., 3.], [1., 4.], [2., 5.]],
+                },
+                schema={'time': pl.Float64, 'pixel': pl.List(pl.Float64)},
+            ),
+            2,
+            id='time_column_float_seconds_converts_to_float_millis',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1, 2, 3],
+                        'x': [0., 1., 2.],
+                        'y': [3., 4., 5.],
+                    },
+                    schema={'time': pl.Int64, 'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'pixel_columns': ['x', 'y'],
+                'time_unit': 'step',
+                'time_column': 'time',
+                'experiment': pm.Experiment(
+                    screen_width_px=1,
+                    screen_width_cm=1,
+                    screen_height_px=1,
+                    screen_height_cm=1,
+                    sampling_rate=200
+                )
+            },
+            pl.from_dict(
+                {
+                    'time': [5, 10, 15],
+                    'pixel': [[0., 3.], [1., 4.], [2., 5.]],
+                },
+                schema={'time': pl.Int64, 'pixel': pl.List(pl.Float64)},
+            ),
+            2,
+            id='time_column_float_step_converts_to_int_millis',
+        ),
+
     ],
 )
 def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, expected_n_components):
@@ -1169,6 +1302,60 @@ def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, exp
             ValueError,
             'inconsistent number of components inferred: {2, 4}',
             id='inconsistent_number_of_components',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.DataFrame(
+                    schema={
+                        'x': pl.Float64, 'y': pl.Float64,
+                        'time': pl.Float64,
+                    },
+                ),
+                'pixel_columns': ['x', 'y'],
+                'time_column': 'time',
+            },
+            ValueError,
+            "time_unit must be specified if time_column is specified. "
+            "Supported units are 's' for seconds, 'ms' for milliseconds and "
+            "'step' for steps.",
+            id='time_column_no_time_unit',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.DataFrame(
+                    schema={
+                        'x': pl.Float64, 'y': pl.Float64,
+                        'time': pl.Float64,
+                    },
+                ),
+                'pixel_columns': ['x', 'y'],
+                'time_column': 'time',
+                'time_unit': 'step',
+            },
+            ValueError,
+            "experiment must be specified if time_unit is 'step'",
+            id='time_unit_step_no_experiment',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.DataFrame(
+                    schema={
+                        'x': pl.Float64, 'y': pl.Float64,
+                        'time': pl.Float64,
+                    },
+                ),
+                'pixel_columns': ['x', 'y'],
+                'time_column': 'time',
+                'time_unit': 'invalid',
+            },
+            ValueError,
+            f"unsupported time unit 'invalid'. "
+            "Supported units are 's' for seconds, 'ms' for milliseconds and "
+            "'step' for steps.",
+            id='time_unit_unsupported',
         ),
 
     ],
