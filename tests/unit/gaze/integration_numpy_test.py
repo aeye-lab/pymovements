@@ -110,7 +110,7 @@ def test_from_numpy_with_schema():
             'acceleration': [[2, 6], [3, 7], [4, 8], [5, 9]],
         },
         schema={
-            'time': pl.Float64,
+            'time': pl.Int64,
             'distance': pl.Float64,
             'pixel': pl.List(pl.Float64),
             'position': pl.List(pl.Float64),
