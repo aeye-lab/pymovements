@@ -907,13 +907,14 @@ class GazeDataFrame:
         """Converts the time column to milliseconds based on the specified time unit."""
         if time_unit is None:
             raise ValueError(
-                f'time_unit must be specified if time_column is specified. '
+                "time_unit must be specified if time_column is specified. "
                 "Supported units are 's' for seconds, 'ms' for milliseconds and "
                 "'step' for steps.",
             )
 
         if time_unit == 's':
             self.frame = self.frame.with_columns(pl.col('time').mul(1000))
+
         elif time_unit == 'step':
             if self.experiment is None:
                 raise ValueError("experiment must be specified if time_unit is 'step'")
@@ -924,7 +925,18 @@ class GazeDataFrame:
 
         elif time_unit != 'ms':
             raise ValueError(
-                f'unknown time unit {time_unit}. '
+                f"unsupported time unit '{time_unit}'. "
                 "Supported units are 's' for seconds, 'ms' for milliseconds and "
                 "'step' for steps.",
             )
+
+        # Convert to int if possible.
+        if self.frame.schema['time'] == pl.Float64:
+            all_decimals = self.frame.select(
+                pl.col('time').round().eq(pl.col('time')).all()
+            ).item()
+
+            if all_decimals:
+                self.frame = self.frame.with_columns(
+                    pl.col('time').cast(pl.Int64),
+                )
