@@ -119,7 +119,7 @@ repos:
             '--ignore=D103,D213',
           ]
 -   repo: https://github.com/PyCQA/pylint
-    rev: v3.0.1
+    rev: v3.0.3
     hooks:
       - id: pylint
         name: pylint
