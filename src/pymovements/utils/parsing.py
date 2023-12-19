@@ -203,7 +203,7 @@ def parse_eyelink(
     if schema is not None:
         for column, dtype in schema.items():
             schema_overrides[column] = dtype
-    print(samples['time'])
+
     df = pl.from_dict(
         data=samples,
         schema_overrides=schema_overrides,
