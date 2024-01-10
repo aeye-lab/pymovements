@@ -192,6 +192,22 @@ from pymovements.synthetic import step_function
         ),
 
         pytest.param(
+            'idt',
+            {
+                'dispersion_threshold': 1,
+                'minimum_duration': 2,
+            },
+            pm.gaze.from_numpy(
+                trial=np.array([1] * 50 + [2] * 50),
+                position=step_function(length=100, steps=[0], values=[(0, 0)]),
+                orient='row',
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+            ),
+            pm.EventDataFrame(name='fixation', onsets=[0, 50], offsets=[49, 99]),
+            id='idt_constant_position_single_fixation_per_trial',
+        ),
+
+        pytest.param(
             'ivt',
             {
                 'velocity_threshold': 1,
@@ -477,6 +493,21 @@ from pymovements.synthetic import step_function
         ),
 
         pytest.param(
+            'ivt',
+            {
+                'velocity_threshold': 1,
+                'minimum_duration': 1,
+            },
+            pm.gaze.from_numpy(
+                trial=np.array([1] * 50 + [2] * 50),
+                velocity=np.zeros((2, 100)),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+            ),
+            pm.EventDataFrame(name='fixation', onsets=[0, 50], offsets=[49, 99]),
+            id='ivt_constant_position_single_fixation_per_trial',
+        ),
+
+        pytest.param(
             'microsaccades',
             {
                 'threshold': 10,
@@ -645,6 +676,25 @@ from pymovements.synthetic import step_function
         ),
 
         pytest.param(
+            'microsaccades',
+            {
+                'threshold': 1e-5,
+            },
+            pm.gaze.from_numpy(
+                trial=np.array([1] * 50 + [2] * 50),
+                velocity=step_function(length=100, steps=[40, 60], values=[(9, 9), (0, 0)]),
+                orient='row',
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+            ),
+            pm.EventDataFrame(
+                name='saccade',
+                onsets=[40, 50],
+                offsets=[49, 59],
+            ),
+            id='microsaccades_two_steps_one_saccade_per_trial',
+        ),
+
+        pytest.param(
             'fill',
             {},
             pm.gaze.from_numpy(
@@ -716,11 +766,28 @@ from pymovements.synthetic import step_function
             ),
             id='fill_fixation_10_ms_break_then_saccade_until_end_single_fill',
         ),
+
+        pytest.param(
+            'fill',
+            {},
+            pm.gaze.from_numpy(
+                trial=np.array([1] * 50 + [2] * 50),
+                time=np.arange(0, 100),
+                events=pm.EventDataFrame(name='fixation', onsets=[0, 90], offsets=[10, 100]),
+            ),
+            pm.EventDataFrame(
+                name=['fixation', 'unclassified', 'unclassified', 'fixation'],
+                onsets=[0, 10, 50, 90],
+                offsets=[10, 49, 89, 100],
+            ),
+            id='fill_10ms_fixation_at_start_and_end_one_fill_per_trial',
+        ),
+
     ],
 )
 def test_gaze_detect(method, kwargs, gaze, expected):
     gaze.detect(method, **kwargs)
-    assert_frame_equal(gaze.events.frame, expected.frame)
+    assert_frame_equal(gaze.events.frame, expected.frame, check_row_order=False)
 
 
 def test_gaze_detect_custom_method_no_arguments():
