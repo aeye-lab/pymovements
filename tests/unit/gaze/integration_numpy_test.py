@@ -223,6 +223,35 @@ def test_from_numpy_explicit_columns():
     assert gaze.n_components == 2
 
 
+def test_from_numpy_explicit_columns_with_trial():
+    trial = np.array([1, 1, 2, 2], dtype=np.int64)
+    time = np.array([101, 102, 103, 104], dtype=np.int64)
+    pixel = np.array([[0, 1, 2, 3], [4, 5, 6, 7]], dtype=np.int64)
+
+    gaze = pm.gaze.from_numpy(
+        trial=trial,
+        time=time,
+        pixel=pixel,
+    )
+
+    expected = pl.DataFrame(
+        {
+            'trial': [1, 1, 2, 2],
+            'time': [101, 102, 103, 104],
+            'pixel': [[0, 4], [1, 5], [2, 6], [3, 7]],
+        },
+        schema={
+            'trial': pl.Int64,
+            'time': pl.Int64,
+            'pixel': pl.List(pl.Int64),
+        },
+    )
+
+    assert_frame_equal(gaze.frame, expected)
+    assert gaze.n_components == 2
+    assert gaze.trial_columns == 'trial'
+
+
 def test_from_numpy_all_none():
     gaze = pm.gaze.from_numpy(
         data=None,
