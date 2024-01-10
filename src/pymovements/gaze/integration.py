@@ -37,6 +37,7 @@ def from_numpy(
         experiment: Experiment | None = None,
         events: EventDataFrame | None = None,
         *,
+        trial: np.ndarray | None = None,
         time: np.ndarray | None = None,
         pixel: np.ndarray | None = None,
         position: np.ndarray | None = None,
@@ -73,6 +74,8 @@ def from_numpy(
         The experiment definition. (default: None)
     events: EventDataFrame | None
         A dataframe of events in the gaze signal. (default: None)
+    trial: np.ndarray | None
+        Array of trial identifiers for each timestep. (default: None)
     time: np.ndarray | None
         Array of timestamps. (default: None)
     pixel: np.ndarray | None
@@ -233,6 +236,12 @@ def from_numpy(
 
     # Initialize with an empty DataFrame, as every column specifier could be None.
     dfs: list[pl.DataFrame] = [pl.DataFrame()]
+
+    trial_columns = None
+    if trial is not None:
+        df = pl.from_numpy(data=trial, schema=['trial'], orient=orient)
+        dfs.append(df)
+        trial_columns = 'trial'
 
     time_column = None
     if time is not None:
