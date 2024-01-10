@@ -222,6 +222,7 @@ def from_numpy(
             data=df,
             experiment=experiment,
             events=events,
+            trial_columns=trial_columns,
             time_column=time_column,
             pixel_columns=pixel_columns,
             position_columns=position_columns,
