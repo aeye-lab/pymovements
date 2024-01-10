@@ -114,7 +114,7 @@ repos:
         files: ^src/
         args:
           [
-            '--ignore=D107',
+            '--ignore=D107,D213',
           ]
     -   id: pydocstyle
         files: ^tests/
