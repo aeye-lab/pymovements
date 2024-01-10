@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -195,7 +195,9 @@ class GazeDataFrame:
 
         self.trial_columns = trial_columns
 
-        if time_column is not None:
+        if time_column is None:
+            self.frame = self.frame.with_columns(time=pl.arange(0, len(self.frame)))
+        else:
             self.frame = self.frame.rename({time_column: 'time'})
 
         if distance_column is not None:
@@ -596,7 +598,6 @@ class GazeDataFrame:
         Warning
             If no columns to unnest exist and none are specified.
         """
-
         if input_columns is None:
             cols = ['pixel', 'position', 'velocity', 'acceleration']
             input_columns = [col for col in cols if col in self.frame.columns]
@@ -612,9 +613,11 @@ class GazeDataFrame:
 
         # no support for custom output columns if more than one input column will be unnested
         if output_columns is not None and not len(input_columns) == 1:
-            raise ValueError("You cannot specify output columns if you want to unnest more than "
-                             "one input column. Please specify output suffixes or use a single "
-                             "input column instead.")
+            raise ValueError(
+                'You cannot specify output columns if you want to unnest more than '
+                'one input column. Please specify output suffixes or use a single '
+                'input column instead.',
+            )
 
         checks.check_is_mutual_exclusive(
             output_columns=output_columns,
@@ -622,6 +625,7 @@ class GazeDataFrame:
         )
 
         self._check_n_components()
+        assert self.n_components in {2, 4, 6}
 
         col_names = [output_columns] if output_columns is not None else []
 
@@ -648,7 +652,8 @@ class GazeDataFrame:
             )
 
         if len({name for name_list in col_names for name in name_list}) != len(
-                [name for name_list in col_names for name in name_list]):
+                [name for name_list in col_names for name in name_list],
+        ):
             raise ValueError('Output columns / suffixes must be unique')
 
         for input_col, column_names in zip(input_columns, col_names):
