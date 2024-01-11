@@ -482,7 +482,7 @@ def save_preprocessed(
     disable_progressbar = not verbose
 
     for file_id, gaze_df in enumerate(tqdm(gaze, disable=disable_progressbar)):
-        gaze_df = gaze_df.copy()
+        gaze_df = gaze_df.clone()
 
         raw_filepath = paths.raw / Path(fileinfo[file_id, 'filepath'])
         preprocessed_filepath = paths.get_preprocessed_filepath(

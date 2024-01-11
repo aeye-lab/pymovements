@@ -173,7 +173,7 @@ def test_gaze_dataframe_copy_with_experiment():
         position_columns=['x', 'y'],
     )
 
-    gaze_copy = gaze.copy()
+    gaze_copy = gaze.clone()
 
     # We want to have separate dataframes but with the exact same data.
     assert gaze.frame is not gaze_copy.frame
@@ -197,7 +197,7 @@ def test_gaze_dataframe_copy_no_experiment():
         position_columns=['x', 'y'],
     )
 
-    gaze_copy = gaze.copy()
+    gaze_copy = gaze.clone()
 
     # We want to have separate dataframes but with the exact same data.
     assert gaze.frame is not gaze_copy.frame
