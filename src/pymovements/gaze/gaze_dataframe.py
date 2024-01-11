@@ -195,9 +195,11 @@ class GazeDataFrame:
 
         self.trial_columns = trial_columns
 
-        if time_column is None:
+        # In case the 'time' column is already present we don't need to do anything.
+        if time_column is None and 'time' not in self.frame.columns:
             self.frame = self.frame.with_columns(time=pl.arange(0, len(self.frame)))
-        else:
+
+        if time_column is not None:
             self.frame = self.frame.rename({time_column: 'time'})
 
         if distance_column is not None:
