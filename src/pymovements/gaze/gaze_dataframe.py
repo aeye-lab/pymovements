@@ -119,14 +119,14 @@ class GazeDataFrame:
     │ 1002 ┆ 0.3 ┆ 0.3 │
     └──────┴─────┴─────┘
 
-    We can now initialize our ``GazeDataFrame`` by specyfing the names of the pixel position
-    columns.
+    We can now initialize our ``GazeDataFrame`` by specyfing the names of the time and pixel
+    position columns.
 
-    >>> gaze = GazeDataFrame(data=df, pixel_columns=['x', 'y'])
+    >>> gaze = GazeDataFrame(data=df, time_column='t', pixel_columns=['x', 'y'])
     >>> gaze.frame
     shape: (3, 2)
     ┌──────┬────────────┐
-    │ t    ┆ pixel      │
+    │ time ┆ pixel      │
     │ ---  ┆ ---        │
     │ i64  ┆ list[f64]  │
     ╞══════╪════════════╡
