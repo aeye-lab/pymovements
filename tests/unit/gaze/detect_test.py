@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -715,6 +715,23 @@ from pymovements.synthetic import step_function
                 offsets=[40, 100, 49],
             ),
             id='fill_fixation_10_ms_break_then_saccade_until_end_single_fill',
+        ),
+
+        pytest.param(
+            'fill',
+            {},
+            pm.gaze.from_numpy(
+                time=np.arange(100, 200),
+                events=pm.EventDataFrame(
+                    name=['fixation', 'saccade'], onsets=[0, 50], offsets=[40, 100],
+                ),
+            ),
+            pm.EventDataFrame(
+                name=['fixation', 'saccade', 'unclassified'],
+                onsets=[0, 50, 100],
+                offsets=[40, 100, 199],
+            ),
+            id='fill_fixation_events_not_in_timesteps',
         ),
     ],
 )
