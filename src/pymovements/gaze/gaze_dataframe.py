@@ -623,6 +623,7 @@ class GazeDataFrame:
         )
 
         self._check_n_components()
+        assert self.n_components in {2, 4, 6}
 
         col_names = [output_columns] if output_columns is not None else []
 
