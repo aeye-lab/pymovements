@@ -596,7 +596,6 @@ class GazeDataFrame:
         Warning
             If no columns to unnest exist and none are specified.
         """
-
         if input_columns is None:
             cols = ['pixel', 'position', 'velocity', 'acceleration']
             input_columns = [col for col in cols if col in self.frame.columns]
