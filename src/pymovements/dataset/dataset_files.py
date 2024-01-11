@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -238,8 +238,8 @@ def load_gaze_files(
             time_column = None
             distance_column = None
 
-            if 'time' in gaze_data.columns:
-                time_column = 'time'
+            # Time column is always available after initlaizing GazeDataFrame.
+            time_column = 'time'
 
             if 'distance' in gaze_data.columns:
                 distance_column = 'distance'
