@@ -735,7 +735,7 @@ def test_gaze_detect(method, kwargs, gaze, expected):
             },
             pm.gaze.GazeDataFrame(None, pm.Experiment(1024, 768, 38, 30, 60, 'center', 10)),
             pl.exceptions.ColumnNotFoundError,
-            "Column 'velocity' not found. Available columns are: []",
+            "Column 'velocity' not found. Available columns are: ['time']",
             id='ivt_no_velocity_raises_column_not_found_error',
         ),
 
