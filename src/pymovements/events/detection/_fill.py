@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 The pymovements Project Authors
+# Copyright (c) 2022-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -60,8 +60,21 @@ def fill(
     events_mask = np.zeros(len(timesteps), dtype=bool)
 
     for row in events.frame.iter_rows(named=True):
-        idx_onset = np.where(timesteps == row['onset'])[0][0]
-        idx_offset = np.where(timesteps == row['offset'] - 1)[0][0]
+        if row['onset'] > np.max(timesteps):  # event onset after last timestep
+            continue
+
+        if row['offset'] - 1 < np.min(timesteps):  # event offset before first timestep
+            continue
+
+        if row['onset'] < np.min(timesteps):  # event onset before first timestep
+            idx_onset = 0
+        else:
+            idx_onset = np.where(timesteps == row['onset'])[0][0]
+
+        if row['offset'] > np.max(timesteps):  # event offset after last timestep
+            idx_offset = len(timesteps) - 1
+        else:
+            idx_offset = np.where(timesteps == row['offset'] - 1)[0][0]
 
         events_mask[idx_onset:idx_offset + 1] = True
 
