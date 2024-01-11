@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -118,8 +118,8 @@ import pymovements as pm
             pl.DataFrame(schema={'pixel': pl.List(pl.Float64)}),
             {
                 'input_columns': 'pixel', 'output_suffixes': [
-                '_xl', '_yl', '_xr', '_yr',
-            ], 'output_columns': None,
+                    '_xl', '_yl', '_xr', '_yr',
+                ], 'output_columns': None,
             },
             pl.DataFrame(
                 schema={
@@ -133,7 +133,8 @@ import pymovements as pm
 
         pytest.param(
             pl.DataFrame(schema={'pixel': pl.List(pl.Float64)}),
-            {'input_columns': 'pixel', 'output_suffixes': ['_xl', '_yl', '_xr', '_yr', '_xa', '_ya']},
+            {'input_columns': 'pixel', 'output_suffixes': [
+                '_xl', '_yl', '_xr', '_yr', '_xa', '_ya']},
             pl.DataFrame(
                 schema={
                     'pixel_xl': pl.Float64, 'pixel_yl': pl.Float64,
@@ -171,7 +172,8 @@ import pymovements as pm
 
         pytest.param(
             pl.DataFrame({'pixel': [[0.1, 0.2, 0.3, 0.4, 0.5, 0.6]]}),
-            {'input_columns': 'pixel', 'output_suffixes': ['_xl', '_yl', '_xr', '_yr', '_xa', '_ya']},
+            {'input_columns': 'pixel', 'output_suffixes': [
+                '_xl', '_yl', '_xr', '_yr', '_xa', '_ya']},
             pl.DataFrame({
                 'pixel_xl': [.1], 'pixel_yl': [.2],
                 'pixel_xr': [.3], 'pixel_yr': [.4],
@@ -333,7 +335,8 @@ def test_gaze_dataframe_unnest_has_expected_frame(init_data, unnest_kwargs, expe
         ),
     ],
 )
-def test_gaze_dataframe_unnest_has_expected_frame_multiple_unnest(init_data, unnest_kwargs, expected):
+def test_gaze_dataframe_unnest_has_expected_frame_multiple_unnest(
+        init_data, unnest_kwargs, expected):
     gaze = pm.GazeDataFrame(init_data)
     gaze.unnest(**unnest_kwargs)
     assert_frame_equal(gaze.frame, expected)
@@ -372,7 +375,8 @@ def test_gaze_dataframe_unnest_has_expected_frame_multiple_unnest(init_data, unn
         ),
         pytest.param(
             pl.DataFrame({'pixel': [[1.23, 4.56]]}),
-            {'input_columns': 'pixel', 'output_suffixes': ['_x', '_y'], 'output_columns': ['x', 'y']},
+            {'input_columns': 'pixel', 'output_suffixes': [
+                '_x', '_y'], 'output_columns': ['x', 'y']},
             ValueError,
             'The arguments "output_columns" and "output_suffixes" are mutually exclusive.',
             id='df_single_row_two_output_columns_and_suffixes',
@@ -386,8 +390,8 @@ def test_gaze_dataframe_unnest_has_expected_frame_multiple_unnest(init_data, unn
             }),
             {'input_columns': ['position', 'acceleration'], 'output_columns': ['_x', '_y']},
             ValueError,
-            "You cannot specify output columns if you want to unnest more than one input column. "
-            "Please specify output suffixes or use a single input column instead.",
+            'You cannot specify output columns if you want to unnest more than one input column. '
+            'Please specify output suffixes or use a single input column instead.',
             id='df_single_row_two_components_unnest_two_multiple_columns_columns_specified',
         ),
         pytest.param(
@@ -399,8 +403,8 @@ def test_gaze_dataframe_unnest_has_expected_frame_multiple_unnest(init_data, unn
             }),
             {'output_columns': ['_x', '_y']},
             ValueError,
-            "You cannot specify output columns if you want to unnest more than one input column. "
-            "Please specify output suffixes or use a single input column instead.",
+            'You cannot specify output columns if you want to unnest more than one input column. '
+            'Please specify output suffixes or use a single input column instead.',
             id='df_single_row_two_components_unnest_all_default_values_multiple_columns_columns_specified',
         ),
         pytest.param(

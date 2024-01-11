@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -612,9 +612,11 @@ class GazeDataFrame:
 
         # no support for custom output columns if more than one input column will be unnested
         if output_columns is not None and not len(input_columns) == 1:
-            raise ValueError("You cannot specify output columns if you want to unnest more than "
-                             "one input column. Please specify output suffixes or use a single "
-                             "input column instead.")
+            raise ValueError(
+                'You cannot specify output columns if you want to unnest more than '
+                'one input column. Please specify output suffixes or use a single '
+                'input column instead.',
+            )
 
         checks.check_is_mutual_exclusive(
             output_columns=output_columns,
@@ -648,7 +650,8 @@ class GazeDataFrame:
             )
 
         if len({name for name_list in col_names for name in name_list}) != len(
-                [name for name_list in col_names for name in name_list]):
+                [name for name_list in col_names for name in name_list],
+        ):
             raise ValueError('Output columns / suffixes must be unique')
 
         for input_col, column_names in zip(input_columns, col_names):
