@@ -723,6 +723,18 @@ def test_gaze_detect(method, kwargs, gaze, expected):
     assert_frame_equal(gaze.events.frame, expected.frame)
 
 
+def test_gaze_detect_custom_method_no_arguments():
+    def custom_method():
+        return pm.EventDataFrame()
+
+    gaze = pm.gaze.from_numpy()
+
+    expected = pm.EventDataFrame()
+
+    gaze.detect(custom_method)
+    assert_frame_equal(gaze.events.frame, expected.frame)
+
+
 @pytest.mark.parametrize(
     ('method', 'kwargs', 'gaze', 'exception', 'exception_msg'),
     [
