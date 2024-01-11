@@ -276,9 +276,12 @@ def test_gaze_dataframe_unnest_has_expected_frame(init_data, unnest_kwargs, expe
             }),
             {},
             pl.DataFrame({
-                'pixel_xl': [1.23], 'pixel_yl': [4.56], 'pixel_xr': [7.89], 'pixel_yr': [10.11],
-                'position_xl': [1.23], 'position_yl': [4.56], 'position_xr': [7.89], 'position_yr': [10.11],
-                'velocity_xl': [1.23], 'velocity_yl': [4.56], 'velocity_xr': [7.89], 'velocity_yr': [10.11],
+                'pixel_xl': [1.23], 'pixel_yl': [4.56],
+                'pixel_xr': [7.89], 'pixel_yr': [10.11],
+                'position_xl': [1.23], 'position_yl': [4.56],
+                'position_xr': [7.89], 'position_yr': [10.11],
+                'velocity_xl': [1.23], 'velocity_yl': [4.56],
+                'velocity_xr': [7.89], 'velocity_yr': [10.11],
                 'acceleration_xl': [1.23], 'acceleration_yl': [4.56],
                 'acceleration_xr': [7.89], 'acceleration_yr': [10.11],
             }),
@@ -293,11 +296,14 @@ def test_gaze_dataframe_unnest_has_expected_frame(init_data, unnest_kwargs, expe
             }),
             {},
             pl.DataFrame({
-                'pixel_xl': [1.23], 'pixel_yl': [4.56], 'pixel_xr': [7.89], 'pixel_yr': [10.11],
+                'pixel_xl': [1.23], 'pixel_yl': [4.56],
+                'pixel_xr': [7.89], 'pixel_yr': [10.11],
                 'pixel_xa': [12.13], 'pixel_ya': [14.15],
-                'position_xl': [1.23], 'position_yl': [4.56], 'position_xr': [7.89], 'position_yr': [10.11],
+                'position_xl': [1.23], 'position_yl': [4.56],
+                'position_xr': [7.89], 'position_yr': [10.11],
                 'position_xa': [12.13], 'position_ya': [14.15],
-                'velocity_xl': [1.23], 'velocity_yl': [4.56], 'velocity_xr': [7.89], 'velocity_yr': [10.11],
+                'velocity_xl': [1.23], 'velocity_yl': [4.56],
+                'velocity_xr': [7.89], 'velocity_yr': [10.11],
                 'velocity_xa': [12.13], 'velocity_ya': [14.15],
                 'acceleration_xl': [1.23], 'acceleration_yl': [4.56],
                 'acceleration_xr': [7.89], 'acceleration_yr': [10.11],
@@ -415,7 +421,7 @@ def test_gaze_dataframe_unnest_has_expected_frame_multiple_unnest(
             ValueError,
             'You cannot specify output columns if you want to unnest more than one input column. '
             'Please specify output suffixes or use a single input column instead.',
-            id='df_single_row_two_components_unnest_all_default_values_multiple_columns_columns_specified',
+            id='df_single_row_two_components_unnest_all_default_values_multiple_columns_specified',
         ),
         pytest.param(
             pl.DataFrame({
