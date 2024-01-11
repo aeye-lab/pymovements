@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 The pymovements Project Authors
+# Copyright (c) 2023 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -73,6 +73,36 @@ def test_from_pandas_explicit_columns():
     })
 
     assert_frame_equal(gaze.frame, expected)
+
+
+def test_from_pandas_with_trial_columnms():
+    pandas_df = pd.DataFrame(
+        {
+            'trial_id': [1, 1, 2, 2],
+            't': [101, 102, 103, 104],
+            'x_pix': [0, 1, 2, 3],
+            'y_pix': [4, 5, 6, 7],
+        },
+    )
+
+    experiment = pm.Experiment(1280, 1024, 38, 30, 68, 'lower left', 1000.0)
+
+    gaze = pm.gaze.from_pandas(
+        data=pandas_df,
+        experiment=experiment,
+        trial_columns='trial_id',
+        time_column='t',
+        pixel_columns=['x_pix', 'y_pix'],
+    )
+
+    expected = pl.DataFrame({
+        'trial_id': [1, 1, 2, 2],
+        'time': [101, 102, 103, 104],
+        'pixel': [[0, 4], [1, 5], [2, 6], [3, 7]],
+    })
+
+    assert_frame_equal(gaze.frame, expected)
+    assert gaze.trial_columns == 'trial_id'
 
 
 @pytest.mark.parametrize(

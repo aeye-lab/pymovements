@@ -122,6 +122,56 @@ def test_from_numpy_with_schema():
     assert gaze.n_components == 2
 
 
+def test_from_numpy_with_trial_id():
+    array = np.array(
+        [
+            [1, 1, 2, 2],
+            [101, 102, 103, 104],
+            [0, 1, 2, 3],
+            [4, 5, 6, 7],
+        ],
+        dtype=np.float64,
+    )
+
+    schema = ['trial_id', 't', 'x_pix', 'y_pix']
+
+    experiment = pm.Experiment(
+        screen_width_px=1280,
+        screen_height_px=1024,
+        screen_width_cm=38,
+        screen_height_cm=30,
+        distance_cm=None,
+        origin='lower left',
+        sampling_rate=1000.0,
+    )
+
+    gaze = pm.gaze.from_numpy(
+        data=array,
+        schema=schema,
+        experiment=experiment,
+        trial_columns='trial_id',
+        time_column='t',
+        pixel_columns=['x_pix', 'y_pix'],
+    )
+
+    expected = pl.DataFrame(
+        {
+            'trial_id': [1, 1, 2, 2],
+            'time': [101, 102, 103, 104],
+            'pixel': [[0, 4], [1, 5], [2, 6], [3, 7]],
+        },
+        schema={
+            'trial_id': pl.Float64,
+            'time': pl.Float64,
+            'pixel': pl.List(pl.Float64),
+        },
+    )
+
+    assert_frame_equal(gaze.frame, expected)
+    assert gaze.n_components == 2
+    assert gaze.trial_columns == 'trial_id'
+
+
 def test_from_numpy_explicit_columns():
     time = np.array([101, 102, 103, 104], dtype=np.int64)
     distance = np.array([100, 100, 100, 100], dtype=np.float64)

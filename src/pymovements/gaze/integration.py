@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -45,6 +45,7 @@ def from_numpy(
         distance: np.ndarray | None = None,
         schema: list[str] | None = None,
         orient: Literal['col', 'row'] = 'col',
+        trial_columns: str | list[str] | None = None,
         time_column: str | None = None,
         pixel_columns: list[str] | None = None,
         position_columns: list[str] | None = None,
@@ -88,6 +89,11 @@ def from_numpy(
         A list of column names. (default: None)
     orient: Literal['col', 'row']
         Whether to interpret the two-dimensional data as columns or as rows. (default: 'col')
+    trial_columns: str | list[str] | None
+        The name of the trial columns in the input data frame. If the list is empty or None,
+        the input data frame is assumed to contain only one trial. If the list is not empty,
+        the input data frame is assumed to contain multiple trials and the transformation
+        methods will be applied to each trial separately. (default: None)
     time_column: str | None
         The name of the timestamp column in the input data frame. (default: None)
     pixel_columns: list[str] | None
@@ -270,6 +276,7 @@ def from_numpy(
         experiment=experiment,
         events=events,
         time_column=time_column,
+        trial_columns=trial_columns,
         pixel_columns=pixel_columns,
         position_columns=position_columns,
         velocity_columns=velocity_columns,
@@ -283,6 +290,7 @@ def from_pandas(
         experiment: Experiment | None = None,
         events: EventDataFrame | None = None,
         *,
+        trial_columns: str | list[str] | None = None,
         time_column: str | None = None,
         pixel_columns: list[str] | None = None,
         position_columns: list[str] | None = None,
@@ -300,6 +308,11 @@ def from_pandas(
         The experiment definition. (default: None)
     events: EventDataFrame | None
         A dataframe of events in the gaze signal. (default: None)
+    trial_columns: str | list[str] | None
+        The name of the trial columns in the input data frame. If the list is empty or None,
+        the input data frame is assumed to contain only one trial. If the list is not empty,
+        the input data frame is assumed to contain multiple trials and the transformation
+        methods will be applied to each trial separately. (default: None)
     time_column: str | None
         The name of the timestamp column in the input data frame. (default: None)
     pixel_columns: list[str] | None
@@ -326,6 +339,7 @@ def from_pandas(
         data=df,
         experiment=experiment,
         events=events,
+        trial_columns=trial_columns,
         time_column=time_column,
         pixel_columns=pixel_columns,
         position_columns=position_columns,
