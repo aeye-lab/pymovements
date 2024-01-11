@@ -525,7 +525,10 @@ class GazeDataFrame:
         if isinstance(method, str):
             method = pm.events.EventDetectionLibrary.get(method)
 
-        eye_components = self._infer_eye_components(eye)
+        if self.n_components is not None:
+            eye_components = self._infer_eye_components(eye)
+        else:
+            eye_components = None
 
         if self.trial_columns is None:
             method_kwargs = _fill_event_detection_kwargs(
@@ -561,12 +564,10 @@ class GazeDataFrame:
                 new_events = method(**method_kwargs)
                 new_events_grouped.append(new_events.frame)
 
-            breakpoint()
             self.events.frame = pl.concat(
                 [self.events.frame, *new_events_grouped],
                 how='diagonal',
             )
-            breakpoint()
 
 
 
@@ -884,7 +885,7 @@ def _fill_event_detection_kwargs(
         method: Callable[..., pm.EventDataFrame],
         gaze: pl.DataFrame,
         events: pm.EventDataFrame,
-        eye_components: tuple[int, int],
+        eye_components: tuple[int, int] | None,
         **kwargs: Any,
 ) -> dict[str, Any]:
     """Fill event detection method kwargs with gaze attributes.
