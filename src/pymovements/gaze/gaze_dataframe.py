@@ -196,6 +196,7 @@ class GazeDataFrame:
         self.trial_columns = trial_columns
 
         # In case the 'time' column is already present we don't need to do anything.
+        # Otherwise, create a new time column starting with zero.
         if time_column is None and 'time' not in self.frame.columns:
             self.frame = self.frame.with_columns(time=pl.arange(0, len(self.frame)))
 
