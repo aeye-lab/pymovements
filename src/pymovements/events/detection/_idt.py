@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module holds the implementation for I-DT algorithm."""
+"""Provides the implementation for I-DT algorithm."""
 from __future__ import annotations
 
 import numpy as np
@@ -30,8 +30,7 @@ from pymovements.utils.filters import filter_candidates_remove_nans
 
 
 def dispersion(positions: list[list[float]] | np.ndarray) -> float:
-    """
-    Compute the dispersion of a group of consecutive points in a 2D position time series.
+    """Compute the dispersion of a group of consecutive points in a 2D position time series.
 
     The dispersion is defined as the sum of the differences between
     the points' maximum and minimum x and y values

@@ -598,7 +598,6 @@ class GazeDataFrame:
         Warning
             If no columns to unnest exist and none are specified.
         """
-
         if input_columns is None:
             cols = ['pixel', 'position', 'velocity', 'acceleration']
             input_columns = [col for col in cols if col in self.frame.columns]
@@ -626,6 +625,7 @@ class GazeDataFrame:
         )
 
         self._check_n_components()
+        assert self.n_components in {2, 4, 6}
 
         col_names = [output_columns] if output_columns is not None else []
 
@@ -664,7 +664,7 @@ class GazeDataFrame:
                 ],
             ).drop(input_col)
 
-    def copy(self) -> GazeDataFrame:
+    def clone(self) -> GazeDataFrame:
         """Return a copy of the GazeDataFrame.
 
         Returns

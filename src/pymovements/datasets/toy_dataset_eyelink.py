@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides an interface to the pymovements example eyelink toy dataset."""
+"""Provides a definition for the pymovements example eyelink toy dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass

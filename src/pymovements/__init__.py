@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides top-level access to all submodules."""
+"""Provides top-level access to submodules."""
 from pymovements import _version
 from pymovements import datasets
 from pymovements import events
