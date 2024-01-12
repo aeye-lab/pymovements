@@ -67,7 +67,7 @@ def test_from_pandas_explicit_columns():
     )
 
     expected = pl.DataFrame({
-        'time': [0, 1, 2, 3],
+        'time': [0.0, 1.0, 2.0, 3.0],
         'pixel': [[0, 4], [1, 5], [2, 6], [3, 7]],
         'position': [[9, 5], [8, 4], [7, 3], [6, 2]],
     })
