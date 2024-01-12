@@ -727,8 +727,8 @@ import pymovements as pm
                 'position_columns': ['x', 'y'],
             },
             pl.from_dict(
-                {'time': [0, 1, 2], 'position': [[1.23, 4.56], [2.34, 5.67], [3.45, 6.78]},
-                schema={'time': pl.Int64, 'position': pl.List(pl.Float64)},
+                {'time': [0, 1, 2], 'position': [[1.23, 4.56], [2.34, 5.67], [3.45, 6.78]]},
+                schema= {'time': pl.Int64, 'position': pl.List(pl.Float64)},
             ),
             2,
             id='df_three_rows_two_position_columns_no_time_no_experiment',
@@ -744,8 +744,8 @@ import pymovements as pm
                 'experiment': pm.Experiment(sampling_rate=100),
             },
             pl.from_dict(
-                {'time': [0.0, 10.0, 20.0], 'position': [[1.23, 4.56], [2.34, 5.67], [3.45, 6.78]},
-                schema={'time': pl.Int64, 'position': pl.List(pl.Float64)},
+                {'time': [0.0, 10.0, 20.0], 'position': [[1.23, 4.56], [2.34, 5.67], [3.45, 6.78]]},
+                schema= {'time': pl.Int64, 'position': pl.List(pl.Float64)},
             ),
             2,
             id='df_three_rows_two_position_columns_no_time_100_hz',
@@ -761,8 +761,8 @@ import pymovements as pm
                 'experiment': pm.Experiment(sampling_rate=1000),
             },
             pl.from_dict(
-                {'time': [0.0, 1.0, 2.0], 'position': [[1.23, 4.56], [2.34, 5.67], [3.45, 6.78]},
-                schema={'time': pl.Int64, 'position': pl.List(pl.Float64)},
+                {'time': [0.0, 1.0, 2.0], 'position': [[1.23, 4.56], [2.34, 5.67], [3.45, 6.78]]},
+                schema= {'time': pl.Int64, 'position': pl.List(pl.Float64)},
             ),
             2,
             id='df_three_rows_two_position_columns_no_time_1000_hz',
@@ -771,12 +771,12 @@ import pymovements as pm
     ],
 )
 def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, expected_n_components):
-    gaze = pm.GazeDataFrame(**init_kwargs)
+    gaze=pm.GazeDataFrame(**init_kwargs)
     assert_frame_equal(gaze.frame, expected_frame)
     assert gaze.n_components == expected_n_components
 
 
-@pytest.mark.parametrize(
+@ pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'exception_msg'),
     [
         pytest.param(
@@ -1253,16 +1253,16 @@ def test_gaze_copy_init_has_same_n_components():
 
     Refers to issue #514.
     """
-    df_orig = pl.from_numpy(np.zeros((2, 1000)), orient='col', schema=['x', 'y'])
-    gaze = pm.GazeDataFrame(df_orig, position_columns=['x', 'y'])
+    df_orig=pl.from_numpy(np.zeros((2, 1000)), orient='col', schema=['x', 'y'])
+    gaze=pm.GazeDataFrame(df_orig, position_columns=['x', 'y'])
 
-    df_copy = gaze.frame.clone()
-    gaze_copy = pm.GazeDataFrame(df_copy)
+    df_copy=gaze.frame.clone()
+    gaze_copy=pm.GazeDataFrame(df_copy)
 
     assert gaze.n_components == gaze_copy.n_components
 
 
-@pytest.mark.parametrize(
+@ pytest.mark.parametrize(
     ('events', 'init_kwargs'),
     [
         pytest.param(
@@ -1313,11 +1313,11 @@ def test_gaze_copy_init_has_same_n_components():
 )
 def test_gaze_init_events(events, init_kwargs):
     if events is None:
-        expected_events = pm.EventDataFrame().frame
+        expected_events=pm.EventDataFrame().frame
     else:
-        expected_events = events.frame
+        expected_events=events.frame
 
-    gaze = pm.GazeDataFrame(events=events, **init_kwargs)
+    gaze=pm.GazeDataFrame(events=events, **init_kwargs)
 
     assert_frame_equal(gaze.events.frame, expected_events)
     # We don't want the events point to the same reference.
