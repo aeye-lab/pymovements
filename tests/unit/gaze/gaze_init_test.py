@@ -745,7 +745,7 @@ import pymovements as pm
             },
             pl.from_dict(
                 {'time': [0.0, 10.0, 20.0], 'position': [[1.23, 4.56], [2.34, 5.67], [3.45, 6.78]]},
-                schema={'time': pl.Int64, 'position': pl.List(pl.Float64)},
+                schema={'time': pl.Float64, 'position': pl.List(pl.Float64)},
             ),
             2,
             id='df_three_rows_two_position_columns_no_time_100_hz',
@@ -762,7 +762,7 @@ import pymovements as pm
             },
             pl.from_dict(
                 {'time': [0.0, 1.0, 2.0], 'position': [[1.23, 4.56], [2.34, 5.67], [3.45, 6.78]]},
-                schema={'time': pl.Int64, 'position': pl.List(pl.Float64)},
+                schema={'time': pl.Float64, 'position': pl.List(pl.Float64)},
             ),
             2,
             id='df_three_rows_two_position_columns_no_time_1000_hz',
