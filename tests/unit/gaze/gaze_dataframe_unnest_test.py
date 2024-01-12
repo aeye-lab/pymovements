@@ -117,9 +117,9 @@ import pymovements as pm
         pytest.param(
             pl.DataFrame(schema={'pixel': pl.List(pl.Float64)}),
             {
-                'input_columns': 'pixel', 'output_suffixes': [
-                    '_xl', '_yl', '_xr', '_yr',
-                ], 'output_columns': None,
+                'input_columns': 'pixel',
+                'output_suffixes': ['_xl', '_yl', '_xr', '_yr'],
+                'output_columns': None,
             },
             pl.DataFrame(
                 schema={
@@ -134,9 +134,8 @@ import pymovements as pm
         pytest.param(
             pl.DataFrame(schema={'pixel': pl.List(pl.Float64)}),
             {
-                'input_columns': 'pixel', 'output_suffixes': [
-                    '_xl', '_yl', '_xr', '_yr', '_xa', '_ya',
-                ],
+                'input_columns': 'pixel',
+                'output_suffixes': ['_xl', '_yl', '_xr', '_yr', '_xa', '_ya'],
             },
             pl.DataFrame(
                 schema={
@@ -176,9 +175,8 @@ import pymovements as pm
         pytest.param(
             pl.DataFrame({'pixel': [[0.1, 0.2, 0.3, 0.4, 0.5, 0.6]]}),
             {
-                'input_columns': 'pixel', 'output_suffixes': [
-                    '_xl', '_yl', '_xr', '_yr', '_xa', '_ya',
-                ],
+                'input_columns': 'pixel',
+                'output_suffixes': ['_xl', '_yl', '_xr', '_yr', '_xa', '_ya'],
             },
             pl.DataFrame({
                 'pixel_xl': [.1], 'pixel_yl': [.2],
