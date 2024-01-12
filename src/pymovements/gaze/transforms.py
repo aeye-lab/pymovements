@@ -639,8 +639,7 @@ def smooth(
         column: str = 'position',
         padding: str | float | int | None = 'nearest',
 ) -> pl.Expr:
-    """
-    Smooth data in a column.
+    """Smooth data in a column.
 
     Parameters
     ----------

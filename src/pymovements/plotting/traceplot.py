@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module holds the traceplot."""
+"""Provides the traceplot plotting function."""
 from __future__ import annotations
 
 import sys
@@ -113,8 +113,7 @@ def traceplot(
         savepath: str | None = None,
         show: bool = True,
 ) -> None:
-    """
-    Plot eye gaze trace from positional data.
+    """Plot eye gaze trace from positional data.
 
     Parameters
     ----------

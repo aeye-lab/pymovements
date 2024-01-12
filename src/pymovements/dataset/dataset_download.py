@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides the abstract base public dataset class."""
+"""Provides private functions for downloading and extracting datasets."""
 from __future__ import annotations
 
 from urllib.error import URLError
