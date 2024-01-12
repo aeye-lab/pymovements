@@ -202,7 +202,7 @@ class GazeDataFrame:
 
             # In case we have an experiment with sampling rate given, we convert to milliseconds.
             if experiment is not None and experiment.sampling_rate is not None:
-                timesteps = timesteps * (1000 / experiment_sampling_rate)
+                timesteps = timesteps * (1000 / experiment.sampling_rate)
 
             self.frame = self.frame.with_columns(time=timesteps)
 
