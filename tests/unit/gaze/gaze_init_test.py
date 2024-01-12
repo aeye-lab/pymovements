@@ -717,6 +717,57 @@ import pymovements as pm
             6,
             id='df_single_row_all_types_six_columns',
         ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {'x': [1.23, 2.34, 3.45], 'y': [4.56, 5.67, 6.78]},
+                    schema={'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'position_columns': ['x', 'y'],
+            },
+            pl.from_dict(
+                {'time': [0, 1, 2], 'position': [[1.23, 4.56], [2.34, 5.67], [3.45, 6.78]},
+                schema={'time': pl.Int64, 'position': pl.List(pl.Float64)},
+            ),
+            2,
+            id='df_three_rows_two_position_columns_no_time_no_experiment',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {'x': [1.23, 2.34, 3.45], 'y': [4.56, 5.67, 6.78]},
+                    schema={'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'position_columns': ['x', 'y'],
+                'experiment': pm.Experiment(sampling_rate=100),
+            },
+            pl.from_dict(
+                {'time': [0.0, 10.0, 20.0], 'position': [[1.23, 4.56], [2.34, 5.67], [3.45, 6.78]},
+                schema={'time': pl.Int64, 'position': pl.List(pl.Float64)},
+            ),
+            2,
+            id='df_three_rows_two_position_columns_no_time_100_hz',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {'x': [1.23, 2.34, 3.45], 'y': [4.56, 5.67, 6.78]},
+                    schema={'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'position_columns': ['x', 'y'],
+                'experiment': pm.Experiment(sampling_rate=1000),
+            },
+            pl.from_dict(
+                {'time': [0.0, 1.0, 2.0], 'position': [[1.23, 4.56], [2.34, 5.67], [3.45, 6.78]},
+                schema={'time': pl.Int64, 'position': pl.List(pl.Float64)},
+            ),
+            2,
+            id='df_three_rows_two_position_columns_no_time_1000_hz',
+        ),
+
     ],
 )
 def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, expected_n_components):
