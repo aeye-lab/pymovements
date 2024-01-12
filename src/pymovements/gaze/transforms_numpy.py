@@ -532,8 +532,7 @@ def downsample(
         arr: np.ndarray,
         factor: int,
 ) -> np.ndarray:
-    """
-    Downsamples array by integer factor.
+    """Downsamples array by integer factor.
 
     Parameters
     ----------

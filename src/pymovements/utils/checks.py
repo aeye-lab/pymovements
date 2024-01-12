@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module holds basic checks which will be reused in other modules."""
+"""Provides basic checks to be reused in other modules."""
 from __future__ import annotations
 
 from collections.abc import Sized

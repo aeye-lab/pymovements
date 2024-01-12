@@ -102,7 +102,7 @@ def load_event_files(
         One-time usage of an alternative directory name to save data relative to dataset path.
         This argument is used only for this single call and does not alter
         :py:meth:`pymovements.Dataset.events_rootpath`.
-    extension:
+    extension: str
         Specifies the file format for loading data. Valid options are: `csv`, `feather`,
         `tsv`, `txt`.
         (default: 'feather')
@@ -180,7 +180,7 @@ def load_gaze_files(
         :py:meth:`pymovements.Dataset.path`.
         This argument is used only for this single call and does not alter
         :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
-    extension:
+    extension: str
         Specifies the file format for loading data. Valid options are: `csv`, `feather`,
         `txt`, `tsv`.
         (default: 'feather')

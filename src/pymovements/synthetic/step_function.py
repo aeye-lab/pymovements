@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module holds the synthetic eye gaze step function."""
+"""Provides the synthetic step function."""
 from __future__ import annotations
 
 from collections.abc import Sized
@@ -32,8 +32,7 @@ def step_function(
         start_value: float | tuple[float, ...] = 0,
         noise: float = 0,
 ) -> np.ndarray:
-    """
-    Create a synthetic eye gaze by using a simple step function.
+    """Create a synthetic eye gaze by using a simple step function.
 
     Parameters
     ----------
