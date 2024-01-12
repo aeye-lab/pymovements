@@ -110,11 +110,15 @@ repos:
     hooks:
     -   id: pydocstyle
         files: ^src/
+        args:
+          [
+            '--ignore=D107,D203,D213,D413',
+          ]
     -   id: pydocstyle
         files: ^tests/
         args:
           [
-            '--ignore=D103,D213',
+            '--ignore=D103,D107,D213',
           ]
 -   repo: https://github.com/PyCQA/pylint
     rev: v3.0.3
