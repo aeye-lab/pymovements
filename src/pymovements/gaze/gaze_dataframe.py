@@ -166,6 +166,20 @@ class GazeDataFrame:
     │ 20.0 ┆ [0.3, 0.3] │
     └──────┴────────────┘
 
+    Leaving out the experiment definition will create a continuous integer column in step units.
+    >>> gaze = GazeDataFrame(data=df_no_time, pixel_columns=['x', 'y'])
+    >>> gaze.frame
+    shape: (3, 2)
+    ┌──────┬────────────┐
+    │ time ┆ pixel      │
+    │ ---  ┆ ---        │
+    │ i64  ┆ list[f64]  │
+    ╞══════╪════════════╡
+    │ 0    ┆ [0.1, 0.1] │
+    │ 1    ┆ [0.2, 0.2] │
+    │ 2    ┆ [0.3, 0.3] │
+    └──────┴────────────┘
+
     """
 
     valid_pixel_position_columns = [
