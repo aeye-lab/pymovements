@@ -783,6 +783,36 @@ from pymovements.synthetic import step_function
             id='fill_10ms_fixation_at_start_and_end_one_fill_per_trial',
         ),
 
+        pytest.param(
+            'fill',
+            {},
+            pm.gaze.from_numpy(
+                trial=np.array([1] * 50 + [2] * 50),
+                time=np.concatenate((np.arange(0, 50), np.arange(0, 50))),
+                events=pm.EventDataFrame(
+                    pl.DataFrame(
+                        data={
+                            'trial': [1, 2],
+                            'name': ['fixation', 'fixation'],
+                            'onsets': [0, 40],
+                            'offsets': [10, 50],
+                        },
+                    ),
+                ),
+            ),
+            pm.EventDataFrame(
+                pl.DataFrame(
+                    data={
+                        'trial': [1, 1, 2, 2],
+                        'name': ['fixation', 'unclassified', 'unclassified', 'fixation'],
+                        'onsets': [0, 10, 0, 40],
+                        'offsets': [10, 49, 39, 50],
+                    },
+                ),
+            ),
+            id='fill_10ms_fixation_at_start_and_end_one_fill_per_trial_restarting_timesteps',
+        ),
+
     ],
 )
 def test_gaze_detect(method, kwargs, gaze, expected):
