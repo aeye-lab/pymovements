@@ -135,6 +135,37 @@ class GazeDataFrame:
     │ 1002 ┆ [0.3, 0.3] │
     └──────┴────────────┘
 
+    In case your data has no time column available, you can pass an :py:class:``Experiment`` to
+    create a time column with the correct sampling rate during initialization. The time column will
+    be represented in millisecond units.
+
+    >>> df_no_time = df.select(pl.exclude('t'))
+    >>> df_no_time
+    shape: (3, 2)
+    ┌─────┬─────┐
+    │ x   ┆ y   │
+    │ --- ┆ --- │
+    │ f64 ┆ f64 │
+    ╞═════╪═════╡
+    │ 0.1 ┆ 0.1 │
+    │ 0.2 ┆ 0.2 │
+    │ 0.3 ┆ 0.3 │
+    └─────┴─────┘
+
+    >>> experiment = Experiment(1024, 768, 38, 30, 60, 'center', sampling_rate=100)
+    >>> gaze = GazeDataFrame(data=df_no_time, experiment=experiment, pixel_columns=['x', 'y'])
+    >>> gaze.frame
+    shape: (3, 2)
+    ┌──────┬────────────┐
+    │ time ┆ pixel      │
+    │ ---  ┆ ---        │
+    │ f64  ┆ list[f64]  │
+    ╞══════╪════════════╡
+    │ 0.0  ┆ [0.1, 0.1] │
+    │ 10.0 ┆ [0.2, 0.2] │
+    │ 20.0 ┆ [0.3, 0.3] │
+    └──────┴────────────┘
+
     """
 
     valid_pixel_position_columns = [
