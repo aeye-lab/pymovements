@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -341,23 +341,23 @@ class GazeDataFrame:
                             f'pix2deg() before {transform_method.__name__}(). If you want '
                             'to run transformations in pixel units, you can do so by using '
                             f"{transform_method.__name__}(position_column='pixel'). "
-                            f'Available dataframe columns are {self.frame.columns}',
+                            f'Available dataframe columns are: {self.frame.columns}',
                         )
                     raise pl.exceptions.ColumnNotFoundError(
                         "Neither is 'position' in the dataframe columns, "
                         'nor is a position column explicitly specified. '
                         'You can specify the position column via: '
                         f'{transform_method.__name__}(position_column="your_position_column"). '
-                        f'Available dataframe columns are {self.frame.columns}',
+                        f'Available dataframe columns are: {self.frame.columns}',
                     )
             if transform_method.__name__ in {'pix2deg'}:
                 if 'pixel' not in self.frame.columns and 'pixel_column' not in kwargs:
                     raise pl.exceptions.ColumnNotFoundError(
                         "Neither is 'pixel' in the dataframe columns, "
-                        ' nor is a pixel column explicitly specified. '
+                        'nor is a pixel column explicitly specified. '
                         'You can specify the pixel column via: '
                         f'{transform_method.__name__}(pixel_column="name_of_your_pixel_column"). '
-                        f'Available dataframe columns are {self.frame.columns}',
+                        f'Available dataframe columns are: {self.frame.columns}',
                     )
 
             if self.trial_columns is None:
@@ -614,9 +614,11 @@ class GazeDataFrame:
 
         # no support for custom output columns if more than one input column will be unnested
         if output_columns is not None and not len(input_columns) == 1:
-            raise ValueError("You cannot specify output columns if you want to unnest more than "
-                             "one input column. Please specify output suffixes or use a single "
-                             "input column instead.")
+            raise ValueError(
+                'You cannot specify output columns if you want to unnest more than '
+                'one input column. Please specify output suffixes or use a single '
+                'input column instead.',
+            )
 
         checks.check_is_mutual_exclusive(
             output_columns=output_columns,
@@ -650,7 +652,8 @@ class GazeDataFrame:
             )
 
         if len({name for name_list in col_names for name in name_list}) != len(
-                [name for name_list in col_names for name in name_list]):
+                [name for name_list in col_names for name in name_list],
+        ):
             raise ValueError('Output columns / suffixes must be unique')
 
         for input_col, column_names in zip(input_columns, col_names):
