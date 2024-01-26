@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test basic preprocessing on various datasets."""
-
 import pytest
 
 import pymovements as pm
@@ -38,6 +37,7 @@ import pymovements as pm
         'gazebase_vr',
         'gazegraph',
         'judo1000',
+        'potec',
     ],
 )
 def fixture_dataset_init_kwargs(request):
@@ -97,6 +97,11 @@ def fixture_dataset_init_kwargs(request):
             filename_format='judo1000_example.csv',
             filename_format_dtypes={},
             trial_columns=['trial_id'],
+        ),
+        'potec': pm.datasets.PoTeC(
+            filename_format='potec_example.tsv',
+            filename_format_dtypes={},
+            trial_columns=None,
         ),
 
     }

@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module holds all dataset definitions.
+"""Provides dataset definitions.
 
 .. rubric:: Dataset Definitions
 
@@ -31,6 +31,7 @@
     pymovements.datasets.GazeOnFaces
     pymovements.datasets.HBN
     pymovements.datasets.JuDo1000
+    pymovements.datasets.PoTeC
     pymovements.datasets.SBSAT
 
 
@@ -43,12 +44,13 @@
     pymovements.datasets.ToyDataset
     pymovements.datasets.ToyDatasetEyeLink
 """
+from pymovements.datasets.gaze_graph import GazeGraph
 from pymovements.datasets.gaze_on_faces import GazeOnFaces
 from pymovements.datasets.gazebase import GazeBase
 from pymovements.datasets.gazebasevr import GazeBaseVR
-from pymovements.datasets.gaze_graph import GazeGraph
 from pymovements.datasets.hbn import HBN
 from pymovements.datasets.judo1000 import JuDo1000
+from pymovements.datasets.potec import PoTeC
 from pymovements.datasets.sb_sat import SBSAT
 from pymovements.datasets.toy_dataset import ToyDataset
 from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
@@ -61,6 +63,7 @@ __all__ = [
     'GazeOnFaces',
     'HBN',
     'JuDo1000',
+    'PoTeC',
     'SBSAT',
     'ToyDataset',
     'ToyDatasetEyeLink',

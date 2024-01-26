@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -86,7 +86,7 @@ PATTERNS = [
 
 EXPECTED_DF = pl.from_dict(
     {
-        'time': [10000000, 10000002, 10000004, 10000005, 10000008, 10000011, 10000014, 10000017],
+        'time': [10000000, 10000002, 10000004, 10000006, 10000008, 10000011, 10000014, 10000017],
         'x_pix': [850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7],
         'y_pix': [717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5],
         'pupil': [714.0, 714.0, 714.0, 714.0, 714.0, 714.0, 714.0, np.nan],

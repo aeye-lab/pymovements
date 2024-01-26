@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,7 @@ import pymovements as pm
         pytest.param(pm.datasets.GazeOnFaces, 'GazeOnFaces', id='GazeOnFaces'),
         pytest.param(pm.datasets.HBN, 'HBN', id='HBN'),
         pytest.param(pm.datasets.JuDo1000, 'JuDo1000', id='JuDo1000'),
+        pytest.param(pm.datasets.PoTeC, 'PoTeC', id='PoTeC'),
         pytest.param(pm.datasets.SBSAT, 'SBSAT', id='SBSAT'),
     ],
 )
@@ -52,6 +53,7 @@ def test_public_dataset_registered(definition_class, dataset_name):
         pytest.param(pm.datasets.GazeOnFaces, id='GazeOnFaces'),
         pytest.param(pm.datasets.HBN, id='HBN'),
         pytest.param(pm.datasets.JuDo1000, id='JuDo1000'),
+        pytest.param(pm.datasets.PoTeC, id='PoTeC'),
         pytest.param(pm.datasets.SBSAT, id='SBSAT'),
     ],
 )

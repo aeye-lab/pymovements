@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test all functionality in pymovements.dataset.judo1000."""
+"""Test all functionality in pymovements.dataset.potec."""
 from pathlib import Path
 
 import pytest
@@ -33,15 +33,15 @@ import pymovements as pm
             {
                 'root': Path('/data/set/path/'),
                 'dataset': Path('/data/set/path/'),
-                'download': Path('/data/set/path//downloads'),
+                'download': Path('/data/set/path/downloads'),
             },
         ),
         pytest.param(
             pm.DatasetPaths(root='/data/set/path'),
             {
                 'root': Path('/data/set/path/'),
-                'dataset': Path('/data/set/path/ToyDataset'),
-                'download': Path('/data/set/path/ToyDataset/downloads'),
+                'dataset': Path('/data/set/path/PoTeC'),
+                'download': Path('/data/set/path/PoTeC/downloads'),
             },
         ),
         pytest.param(
@@ -64,14 +64,14 @@ import pymovements as pm
             pm.DatasetPaths(root='/data/set/path', downloads='custom_downloads'),
             {
                 'root': Path('/data/set/path/'),
-                'dataset': Path('/data/set/path/ToyDataset'),
-                'download': Path('/data/set/path/ToyDataset/custom_downloads'),
+                'dataset': Path('/data/set/path/PoTeC'),
+                'download': Path('/data/set/path/PoTeC/custom_downloads'),
             },
         ),
     ],
 )
 def test_paths(init_path, expected_paths):
-    dataset = pm.Dataset(pm.datasets.ToyDataset, path=init_path)
+    dataset = pm.Dataset(pm.datasets.PoTeC, path=init_path)
 
     assert dataset.paths.root == expected_paths['root']
     assert dataset.path == expected_paths['dataset']

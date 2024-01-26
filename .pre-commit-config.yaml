@@ -7,8 +7,6 @@ ci:
     autoupdate_commit_msg: 'ci: pre-commit autoupdate'
     skip: [pylint]
 
-default_stages: [push]
-
 repos:
 -   repo: https://github.com/asottile/add-trailing-comma
     rev: v3.1.0
@@ -55,7 +53,7 @@ repos:
         args: [--use-current-year]
         types: [python]
 -   repo: https://github.com/jsh9/pydoclint
-    rev: 0.3.8
+    rev: 0.3.9
     hooks:
     - id: pydoclint
       args: ["--config=pyproject.toml"]
@@ -70,7 +68,7 @@ repos:
     -   id: nbqa-pyupgrade
         args: ["--py39-plus"]
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.7.1
+    rev: v1.8.0
     hooks:
     -   id: mypy
         additional_dependencies: [types-all, pandas-stubs, types-tqdm]
@@ -104,7 +102,7 @@ repos:
     hooks:
     -   id: doc8
 -   repo: https://github.com/PyCQA/flake8
-    rev: 6.1.0
+    rev: 7.0.0
     hooks:
     -   id: flake8
 -   repo: https://github.com/pycqa/pydocstyle
@@ -112,14 +110,18 @@ repos:
     hooks:
     -   id: pydocstyle
         files: ^src/
+        args:
+          [
+            '--ignore=D107,D203,D213,D413',
+          ]
     -   id: pydocstyle
         files: ^tests/
         args:
           [
-            '--ignore=D103,D213',
+            '--ignore=D103,D107,D213',
           ]
 -   repo: https://github.com/PyCQA/pylint
-    rev: v3.0.1
+    rev: v3.0.3
     hooks:
       - id: pylint
         name: pylint

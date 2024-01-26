@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the GazeGraph dataset."""
+"""Provides a definition for the PoTeC dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -33,20 +33,23 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 @register_dataset
-class GazeGraph(DatasetDefinition):
-    """GazeGraph dataset :cite:p:`GazeGraph`.
+class PoTeC(DatasetDefinition):
+    """PoTeC dataset :cite:p:`potec`.
 
-    The dataset is collected from eight subjects (four female and four male,
-    aged between 24 and 35) using the Pupil Core eye tracker. During data collection,
-    the subjects wear the eye tracker and sit in front of the computer screen
-    (a 34-inch display) at a distance of approximately 50cm. We conduct the
-    manufacturer's default on-screen five-points calibration for each of
-    the subjects.
-    Note that we have done only one calibration per subject, and the subjects
-    can move their heads and upper bodies freely during the experiment.
-    The gaze is recorded at a 30Hz sampling rate.
+    The Potsdam Textbook Corpus (PoTeC) is a corpus of eye-tracking-while-reading data where
+    participants (N=75) read a series of German short texts taken from college level textbooks
+    of physics and biology. The experiments were conducted within a 2x2 fully-crossed factorial
+    design with the reader’s expertise (advanced vs beginner) and major (physics vs biology) as
+    factors. Reading comprehension was assessed using text comprehension questions. Moreover,
+    background questions that required additional knowledge beyond the presented text tested the
+    general domain knowledge.
+    The repository contains the eye-movement data (1000 Hz, right eye monocular) as well as the
+    stimulus text data     with extensive linguistic feature annotations at the sub-lexical,
+    lexical und supra-lexical     level. Therefore, the PoTeC is ideal for studying cognitive
+    processes related to sentence     comprehension at all linguistic levels (e.g. lexical,
+    syntactic, discourse) as well as higher-level text comprehension.
 
-    Check the respective paper for details :cite:p:`GazeGraph`.
+    Check the respective `repository <https://osf.io/dn5hp/>`_ for details.
 
     Attributes
     ----------
@@ -82,11 +85,11 @@ class GazeGraph(DatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.GazeGraph` definition:
+    :py:class:`~pymovements.PoTeC` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("GazeGraph", path='data/GazeGraph')
+    >>> dataset = pm.Dataset("PoTeC", path='data/PoTeC')
 
     Download the dataset resources resources:
 
@@ -100,53 +103,58 @@ class GazeGraph(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'GazeGraph'
+    name: str = 'PoTeC'
 
     mirrors: tuple[str, ...] = (
-        'https://codeload.github.com/GazeGraphResource/GazeGraph/zip/refs/heads/',
+        'https://osf.io/download/',
     )
 
     resources: tuple[dict[str, str], ...] = (
         {
-            'resource': 'master',
-            'filename': 'gaze_graph_data.zip',
-            'md5': '181f4b79477cee6e0267482d989610b0',
+            'resource': 'tgd9q/',
+            'filename': 'PoTeC.zip',
+            'md5': '7780904bf7b18ba7d30a811174750db3',
         },
     )
 
-    # no information about the resolution and screen size given. only 34-inch monitor
     experiment: Experiment = Experiment(
-        screen_width_px=3440,
-        screen_height_px=1440,
-        screen_width_cm=79.375,
-        screen_height_cm=34.0106,
-        distance_cm=50,
-        origin='center',
-        sampling_rate=30,
+        screen_width_px=1680,
+        screen_height_px=1050,
+        screen_width_cm=47.5,
+        screen_height_cm=30,
+        distance_cm=65,
+        origin='lower left',
+        sampling_rate=1000,
     )
 
-    filename_format: str = r'P{subject_id}_{task}.csv'
+    filename_format: str = r'reader{subject_id:d}_{text_id}_raw_data.tsv'
 
     filename_format_dtypes: dict[str, type] = field(
         default_factory=lambda: {
             'subject_id': int,
-            'task': str,
+            'text_id': str,
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: ['task'])
+    trial_columns: list[str] = field(
+        default_factory=lambda: ['subject_id', 'text_id'],
+    )
 
-    time_column: Any = None
-
-    pixel_columns: list[str] = field(default_factory=lambda: ['x', 'y'])
-
-    column_map: dict[str, str] = field(default_factory=lambda: {})
+    time_column: str = 'time'
+    pixel_columns: list[str] = field(
+        default_factory=lambda: [
+            'x', 'y',
+        ],
+    )
 
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
-            'separator': ',',
-            'has_header': False,
-            'new_columns': ['x', 'y'],
-            'dtypes': [pl.Float32, pl.Float32],
+            'dtypes': {
+                'time': pl.Int64,
+                'x': pl.Float32,
+                'y': pl.Float32,
+                'pupil_diameter': pl.Float32,
+            },
+            'separator': '\t',
         },
     )

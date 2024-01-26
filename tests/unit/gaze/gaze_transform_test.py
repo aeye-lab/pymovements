@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -662,7 +662,7 @@ def test_gaze_transform_expected_frame(
         'transform_method',
         'transform_kwargs',
         'expected_result',
-        'expected_warning'
+        'expected_warning',
     ),
     [
         pytest.param(
@@ -706,7 +706,7 @@ def test_gaze_transform_expected_frame(
             UserWarning,
             id='pix2deg_distance_experiment_and_distance_column_defaults_to_column',
         ),
-    ]
+    ],
 )
 def test_gaze_transfrom_expected_frame_warning(
         gaze_init_kwargs, transform_method, transform_kwargs, expected_result, expected_warning,
@@ -716,7 +716,6 @@ def test_gaze_transfrom_expected_frame_warning(
         gaze.transform(transform_method, **transform_kwargs)
 
         assert_frame_equal(gaze.frame, expected_result.frame)
-
 
 
 @pytest.mark.parametrize(
