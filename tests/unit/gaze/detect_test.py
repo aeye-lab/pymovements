@@ -757,13 +757,13 @@ from pymovements.synthetic import step_function
             pm.gaze.from_numpy(
                 time=np.arange(100, 200),
                 events=pm.EventDataFrame(
-                    name=['fixation', 'fixation'], onsets=[0, 120], offsets=[40, 220],
+                    name=['fixation', 'fixation'], onsets=[0, 120], offsets=[110, 220],
                 ),
             ),
             pm.EventDataFrame(
                 name=['fixation', 'fixation', 'unclassified'],
-                onsets=[0, 120, 100],
-                offsets=[40, 220, 119],
+                onsets=[0, 120, 110],
+                offsets=[110, 220, 119],
             ),
             id='fill_fixation_events_exceed_time_boundaries',
         ),
