@@ -731,7 +731,24 @@ from pymovements.synthetic import step_function
                 onsets=[0, 50, 100],
                 offsets=[40, 100, 199],
             ),
-            id='fill_fixation_events_not_in_timesteps',
+            id='fill_fixation_events_before_timesteps',
+        ),
+
+        pytest.param(
+            'fill',
+            {},
+            pm.gaze.from_numpy(
+                time=np.arange(0, 200),
+                events=pm.EventDataFrame(
+                    name=['fixation', 'saccade'], onsets=[210, 250], offsets=[240, 300],
+                ),
+            ),
+            pm.EventDataFrame(
+                name=['fixation', 'saccade', 'unclassified'],
+                onsets=[210, 250, 0],
+                offsets=[240, 300, 199],
+            ),
+            id='fill_fixation_events_after_timesteps',
         ),
 
         pytest.param(
