@@ -193,7 +193,7 @@ class GazeDataFrame:
             data = data.clone()
         self.frame = data
 
-        self.trial_columns = trial_columns
+        self.trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
 
         # In case the 'time' column is already present we don't need to do anything.
         # Otherwise, create a new time column starting with zero.

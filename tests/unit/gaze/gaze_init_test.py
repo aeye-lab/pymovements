@@ -726,6 +726,52 @@ def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, exp
 
 
 @pytest.mark.parametrize(
+    ('init_kwargs', 'expected_trial_columns'),
+    [
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    data={'trial': [1]},
+                    schema={'trial': pl.Int64},
+                ),
+                'trial_columns': 'trial',
+            },
+            ['trial'],
+            id='df_single_trial_column_str',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    data={'trial': [1]},
+                    schema={'trial': pl.Int64},
+                ),
+                'trial_columns': ['trial'],
+            },
+            ['trial'],
+            id='df_single_trial_column_list',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {'group': [2], 'trial': [1]},
+                    schema={'group': pl.Int64, 'trial': pl.Int64},
+                ),
+                'trial_columns': ['group', 'trial'],
+            },
+            ['group', 'trial'],
+            id='df_two_trial_columns',
+        ),
+
+    ],
+)
+def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_trial_columns):
+    gaze = pm.GazeDataFrame(**init_kwargs)
+    assert gaze.trial_columns == expected_trial_columns
+
+
+@pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'exception_msg'),
     [
         pytest.param(
