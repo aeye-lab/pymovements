@@ -569,8 +569,6 @@ class GazeDataFrame:
                 how='diagonal',
             )
 
-
-
     @property
     def schema(self) -> pl.type_aliases.SchemaDict:
         """Schema of event dataframe."""
