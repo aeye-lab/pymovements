@@ -181,6 +181,27 @@ def test_event_dataframe_init_expected(args, kwargs, expected_df_data, expected_
     assert_frame_equal(event_df.frame, expected_df)
 
 
+@pytest.mark.parametrize(
+    ('args', 'kwargs', 'expected_trial_column_list'),
+    [
+        pytest.param(
+            [pl.DataFrame()], {},
+            None,
+            id='dataframe_arg_no_kwargs',
+        ),
+        pytest.param(
+            [], {'onsets': [0], 'offsets': [1]},
+            None,
+            id='no_arg_dict_with_single_event_kwarg',
+        ),
+    ],
+)
+def test_event_dataframe_init_expected_trial_column_list(args, kwargs, expected_trial_column_list):
+    events = pm.EventDataFrame(*args, **kwargs)
+
+    assert events.trial_columns == expected_trial_column_list
+
+
 def test_event_dataframe_columns_same_as_frame():
     init_kwargs = {'onsets': [0], 'offsets': [1]}
     event_df = pm.EventDataFrame(**init_kwargs)
