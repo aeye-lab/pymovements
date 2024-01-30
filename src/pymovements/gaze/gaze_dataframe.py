@@ -193,10 +193,7 @@ class GazeDataFrame:
             data = data.clone()
         self.frame = data
 
-        if isinstance(trial_columns, str):
-            self.trial_columns = [trial_columns]
-        else:
-            self.trial_columns = trial_columns
+        self.trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
 
         if time_column is not None:
             self.frame = self.frame.rename({time_column: 'time'})

@@ -738,7 +738,8 @@ def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, exp
 
         pytest.param(
             {
-                'data': pl.from_dict({'group': [2], 'trial': [1]},
+                'data': pl.from_dict(
+                    {'group': [2], 'trial': [1]},
                     schema={'group': pl.Int64, 'trial': pl.Int64},
                 ),
                 'trial_columns': ['group', 'trial'],
