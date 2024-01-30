@@ -531,7 +531,7 @@ class GazeDataFrame:
             eye_components = None
 
         if self.trial_columns is None:
-            method_kwargs = _fill_event_detection_kwargs(
+            method_kwargs = self._fill_event_detection_kwargs(
                 method,
                 gaze=self.frame,
                 events=self.events,
@@ -553,10 +553,10 @@ class GazeDataFrame:
             new_events_grouped: list[pl.DataFrame] = []
 
             for group_identifier, group_gaze in grouped_frames.items():
-                method_kwargs = _fill_event_detection_kwargs(
+                method_kwargs = self._fill_event_detection_kwargs(
                     method,
                     gaze=group_gaze,
-                    events=self.events,  # FIXME
+                    events=self.events,  # FIXME: use group events
                     eye_components=eye_components,
                     **kwargs,
                 )
@@ -878,63 +878,79 @@ class GazeDataFrame:
 
         return eye_components
 
+    def _fill_event_detection_kwargs(
+            self,
+            method: Callable[..., pm.EventDataFrame],
+            gaze: pl.DataFrame,
+            events: pm.EventDataFrame,
+            eye_components: tuple[int, int] | None,
+            **kwargs: Any,
+    ) -> dict[str, Any]:
+        """Fill event detection method kwargs with gaze attributes.
 
-def _fill_event_detection_kwargs(
-        method: Callable[..., pm.EventDataFrame],
-        gaze: pl.DataFrame,
-        events: pm.EventDataFrame,
-        eye_components: tuple[int, int] | None,
-        **kwargs: Any,
-) -> dict[str, Any]:
-    """Fill event detection method kwargs with gaze attributes.
+        Parameters
+        ----------
+        method: Callable[..., pm.EventDataFrame]
+            The method for which the keyword argument dictionary will be filled.
+        gaze: pl.DataFrame
+            The gaze dataframe to be used for filling event detection keyword arguments.
+        events: pm.EventDataFrame
+            The event dataframe to be used for filling event detection keyword arguments.
+        eye_components: tuple[int, int] | None
+            The eye components to be used for filling event detection keyword arguments.
+        **kwargs: Any
+            The source keyword arguments passed to the `GazeDataFrame.detect()` method.
 
-    Parameters
-    ----------
-    method: Callable[..., pm.EventDataFrame]
-        The method for which the keyword argument dictionary will be filled.
-    eye: str
-        The string specifier for the eye to choose.
-    **kwargs: Any
-        The source keyword arguments passed to the `GazeDataFrame.detect()` method.
+        Returns
+        -------
+        dict[str, Any]
+            The filled keyword argument dictionary.
+        """
+        # Automatically infer eye to use for event detection.
+        method_args = inspect.getfullargspec(method).args
 
-    Returns
-    -------
-    dict[str, Any]
-        The filled keyword argument dictionary.
-    """
-    # Automatically infer eye to use for event detection.
-    method_args = inspect.getfullargspec(method).args
+        if 'positions' in method_args:
+            if 'position' not in gaze.columns:
+                raise pl.exceptions.ColumnNotFoundError(
+                    f'Column \'position\' not found.'
+                    f' Available columns are: {gaze.columns}',
+                )
 
-    if 'positions' in method_args:
-        if 'position' not in gaze.columns:
-            raise pl.exceptions.ColumnNotFoundError(
-                f'Column \'position\' not found.'
-                f' Available columns are: {gaze.columns}',
-            )
-        kwargs['positions'] = np.vstack(
-            [
-                gaze.get_column('position').list.get(eye_component)
-                for eye_component in eye_components
-            ],
-        ).transpose()
+            if eye_components is None:
+                raise ValueError(
+                    'eye_components must not be None if passing position to event detection',
+                )
 
-    if 'velocities' in method_args:
-        if 'velocity' not in gaze.columns:
-            raise pl.exceptions.ColumnNotFoundError(
-                f'Column \'velocity\' not found.'
-                f' Available columns are: {gaze.columns}',
-            )
-        kwargs['velocities'] = np.vstack(
-            [
-                gaze.get_column('velocity').list.get(eye_component)
-                for eye_component in eye_components
-            ],
-        ).transpose()
+            kwargs['positions'] = np.vstack(
+                [
+                    gaze.get_column('position').list.get(eye_component)
+                    for eye_component in eye_components
+                ],
+            ).transpose()
 
-    if 'events' in method_args:
-        kwargs['events'] = events
+        if 'velocities' in method_args:
+            if 'velocity' not in gaze.columns:
+                raise pl.exceptions.ColumnNotFoundError(
+                    f'Column \'velocity\' not found.'
+                    f' Available columns are: {gaze.columns}',
+                )
 
-    if 'timesteps' in method_args and 'time' in gaze.columns:
-        kwargs['timesteps'] = gaze.get_column('time').to_numpy()
+            if eye_components is None:
+                raise ValueError(
+                    'eye_components must not be None if passing velocity to event detection',
+                )
 
-    return kwargs
+            kwargs['velocities'] = np.vstack(
+                [
+                    gaze.get_column('velocity').list.get(eye_component)
+                    for eye_component in eye_components
+                ],
+            ).transpose()
+
+        if 'events' in method_args:
+            kwargs['events'] = events
+
+        if 'timesteps' in method_args and 'time' in gaze.columns:
+            kwargs['timesteps'] = gaze.get_column('time').to_numpy()
+
+        return kwargs

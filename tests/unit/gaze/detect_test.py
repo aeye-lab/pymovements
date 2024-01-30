@@ -794,8 +794,8 @@ from pymovements.synthetic import step_function
                         data={
                             'trial': [1, 2],
                             'name': ['fixation', 'fixation'],
-                            'onsets': [0, 40],
-                            'offsets': [10, 50],
+                            'onset': [0, 40],
+                            'offset': [10, 50],
                         },
                     ),
                 ),
@@ -805,8 +805,8 @@ from pymovements.synthetic import step_function
                     data={
                         'trial': [1, 1, 2, 2],
                         'name': ['fixation', 'unclassified', 'unclassified', 'fixation'],
-                        'onsets': [0, 10, 0, 40],
-                        'offsets': [10, 49, 39, 50],
+                        'onset': [0, 10, 0, 40],
+                        'offset': [10, 49, 39, 50],
                     },
                 ),
             ),
