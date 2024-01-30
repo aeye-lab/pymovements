@@ -72,6 +72,8 @@ class EventDataFrame:
             data = self._add_minimal_schema_columns(data)
             data_dict = data.to_dict()
 
+            self.trial_columns = None
+
             self._additional_columns = [
                 column_name for column_name in data_dict.keys()
                 if column_name not in self._minimal_schema
@@ -111,6 +113,8 @@ class EventDataFrame:
                     'onset': pl.Series([], dtype=pl.Int64),
                     'offset': pl.Series([], dtype=pl.Int64),
                 }
+
+            self.trial_columns = None
 
         self.frame = pl.DataFrame(data=data_dict, schema_overrides=self._minimal_schema)
         if 'duration' not in self.frame.columns:
