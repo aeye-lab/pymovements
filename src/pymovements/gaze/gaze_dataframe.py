@@ -562,6 +562,22 @@ class GazeDataFrame:
                 )
 
                 new_events = method(**method_kwargs)
+                # group identifiers as columns
+                new_events = new_events.select(
+                    [
+                        pl.lit(value).alias(column)
+                        for column, value in fileinfo.items()
+                        if column != 'filepath' and column not in df.columns
+                    ] + [pl.all()],
+                )
+
+                # Cast columns from fileinfo according to specification.
+                df = df.with_columns([
+                    pl.col(fileinfo_key).cast(fileinfo_dtype)
+                    for fileinfo_key, fileinfo_dtype in definition.filename_format_dtypes.items()
+                ])
+                return df
+
                 new_events_grouped.append(new_events.frame)
 
             self.events.frame = pl.concat(
