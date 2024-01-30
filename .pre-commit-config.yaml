@@ -7,8 +7,6 @@ ci:
     autoupdate_commit_msg: 'ci: pre-commit autoupdate'
     skip: [pylint]
 
-default_stages: [push]
-
 repos:
 -   repo: https://github.com/asottile/add-trailing-comma
     rev: v3.1.0
@@ -55,7 +53,7 @@ repos:
         args: [--use-current-year]
         types: [python]
 -   repo: https://github.com/jsh9/pydoclint
-    rev: 0.3.8
+    rev: 0.3.9
     hooks:
     - id: pydoclint
       args: ["--config=pyproject.toml"]

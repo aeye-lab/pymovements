@@ -705,7 +705,7 @@ class GazeDataFrame:
                 ],
             ).drop(input_col)
 
-    def copy(self) -> GazeDataFrame:
+    def clone(self) -> GazeDataFrame:
         """Return a copy of the GazeDataFrame.
 
         Returns
