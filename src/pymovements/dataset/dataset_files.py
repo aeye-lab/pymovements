@@ -238,7 +238,7 @@ def load_gaze_files(
             time_column = None
             distance_column = None
 
-            # Time column is always available after initlaizing GazeDataFrame.
+            # Time column is always available in every initialized GazeDataFrame.
             time_column = 'time'
 
             if 'distance' in gaze_data.columns:
