@@ -169,7 +169,7 @@ def test_from_numpy_with_trial_id():
 
     assert_frame_equal(gaze.frame, expected)
     assert gaze.n_components == 2
-    assert gaze.trial_columns == 'trial_id'
+    assert gaze.trial_columns == ['trial_id']
 
 
 def test_from_numpy_explicit_columns():
@@ -249,7 +249,7 @@ def test_from_numpy_explicit_columns_with_trial():
 
     assert_frame_equal(gaze.frame, expected)
     assert gaze.n_components == 2
-    assert gaze.trial_columns == 'trial'
+    assert gaze.trial_columns == ['trial']
 
 
 def test_from_numpy_all_none():
