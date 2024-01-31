@@ -121,7 +121,11 @@ class EventDataFrame:
                 }
 
                 if trials is not None:
+                    # Ensure that trial column is at the beginning of the dictionary.
                     data_dict['trial'] = pl.Series('trial', trials)
+                    self.trial_columns = ['trial']
+                else:
+                    self.trial_columns = None
 
             else:
                 data_dict = {
@@ -129,10 +133,14 @@ class EventDataFrame:
                     'onset': pl.Series([], dtype=pl.Int64),
                     'offset': pl.Series([], dtype=pl.Int64),
                 }
-
-            self.trial_columns = None if trials is None else ['trial']
+                self.trial_columns = None
 
         self.frame = pl.DataFrame(data=data_dict, schema_overrides=self._minimal_schema)
+
+        # Ensure column order: trial columns, name, onset, offset.
+        if self.trial_columns is not None:
+            self.frame = self.frame.select([*self.trial_columns, *self._minimal_schema.keys()])
+
         if 'duration' not in self.frame.columns:
             self._add_duration_property()
 
