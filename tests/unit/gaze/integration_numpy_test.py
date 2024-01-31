@@ -54,8 +54,8 @@ def test_from_numpy():
         experiment=experiment,
     )
 
-    assert gaze.frame.shape == (4, 4)
-    assert gaze.columns == schema
+    assert gaze.frame.shape == (4, 5)
+    assert gaze.columns == schema + ['time']  # expected schema includes additional time column
 
 
 def test_from_numpy_with_schema():
@@ -269,7 +269,7 @@ def test_from_numpy_all_none():
         acceleration_columns=None,
     )
 
-    expected = pl.DataFrame()
+    expected = pl.DataFrame(schema={'time': pl.Int64})
 
     assert_frame_equal(gaze.frame, expected)
     assert gaze.n_components is None

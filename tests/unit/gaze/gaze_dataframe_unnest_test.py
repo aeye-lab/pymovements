@@ -73,35 +73,37 @@ import pymovements as pm
         pytest.param(
             pl.DataFrame({'pixel': [[1.23, 4.56]]}),
             {'input_columns': 'pixel', 'output_columns': ['x', 'y']},
-            pl.DataFrame({'x': [1.23], 'y': [4.56]}),
+            pl.DataFrame({'time': [0], 'x': [1.23], 'y': [4.56]}),
             id='df_single_row_two_pixel_columns',
         ),
 
         pytest.param(
             pl.DataFrame({'abc': [1], 'pixel': [[1.23, 4.56]]}),
             {'input_columns': 'pixel', 'output_columns': ['x', 'y']},
-            pl.DataFrame({'abc': [1], 'x': [1.23], 'y': [4.56]}),
+            pl.DataFrame({'abc': [1], 'time': [0], 'x': [1.23], 'y': [4.56]}),
             id='df_single_row_three_columns_two_pixel_columns',
         ),
 
         pytest.param(
             pl.DataFrame({'pixel': [[1.2, 3.4, 5.6, 7.8]]}),
             {'input_columns': 'pixel', 'output_columns': ['xl', 'yl', 'xr', 'yr']},
-            pl.DataFrame({'xl': [1.2], 'yl': [3.4], 'xr': [5.6], 'yr': [7.8]}),
+            pl.DataFrame({'time': [0], 'xl': [1.2], 'yl': [3.4], 'xr': [5.6], 'yr': [7.8]}),
             id='df_single_row_four_pixel_columns',
         ),
 
         pytest.param(
             pl.DataFrame({'pixel': [[0.1, 0.2, 0.3, 0.4, 0.5, 0.6]]}),
             {'input_columns': 'pixel', 'output_columns': ['xl', 'yl', 'xr', 'yr', 'xa', 'ya']},
-            pl.DataFrame({'xl': [.1], 'yl': [.2], 'xr': [.3], 'yr': [.4], 'xa': [.5], 'ya': [.6]}),
+            pl.DataFrame({
+                'time': [0], 'xl': [.1], 'yl': [.2], 'xr': [.3], 'yr': [.4], 'xa': [.5], 'ya': [.6],
+            }),
             id='df_single_row_six_pixel_columns',
         ),
 
         pytest.param(
             pl.DataFrame(schema={'pixel': pl.List(pl.Float64)}),
             {'input_columns': 'pixel', 'output_suffixes': ['_x', '_y'], 'output_columns': None},
-            pl.DataFrame(schema={'pixel_x': pl.Float64, 'pixel_y': pl.Float64}),
+            pl.DataFrame(schema={'time': pl.Int64, 'pixel_x': pl.Float64, 'pixel_y': pl.Float64}),
             id='empty_df_with_schema_two_pixel_suffixes_columns_none',
             marks=pytest.mark.xfail(reason='#522'),
         ),
@@ -109,7 +111,11 @@ import pymovements as pm
         pytest.param(
             pl.DataFrame(schema={'abc': pl.Int64, 'pixel': pl.List(pl.Float64)}),
             {'input_columns': 'pixel', 'output_suffixes': ['_x', '_y'], 'output_columns': None},
-            pl.DataFrame(schema={'abc': pl.Int64, 'pixel_x': pl.Float64, 'pixel_y': pl.Float64}),
+            pl.DataFrame(
+                schema={
+                    'abc': pl.Int64, 'time': pl.Int64, 'pixel_x': pl.Float64, 'pixel_y': pl.Float64,
+                },
+            ),
             id='empty_df_with_three_column_schema_two_pixel_suffixes_columns_none',
             marks=pytest.mark.xfail(reason='#522'),
         ),
@@ -151,14 +157,14 @@ import pymovements as pm
         pytest.param(
             pl.DataFrame({'pixel': [[1.23, 4.56]]}),
             {'input_columns': 'pixel', 'output_suffixes': ['_x', '_y']},
-            pl.DataFrame({'pixel_x': [1.23], 'pixel_y': [4.56]}),
+            pl.DataFrame({'time': [0], 'pixel_x': [1.23], 'pixel_y': [4.56]}),
             id='df_single_row_two_pixel_suffixes',
         ),
 
         pytest.param(
             pl.DataFrame({'abc': [1], 'pixel': [[1.23, 4.56]]}),
             {'input_columns': 'pixel', 'output_suffixes': ['_x', '_y']},
-            pl.DataFrame({'abc': [1], 'pixel_x': [1.23], 'pixel_y': [4.56]}),
+            pl.DataFrame({'abc': [1], 'time': [0], 'pixel_x': [1.23], 'pixel_y': [4.56]}),
             id='df_single_row_three_columns_two_pixel_suffixes',
         ),
 
@@ -166,6 +172,7 @@ import pymovements as pm
             pl.DataFrame({'pixel': [[1.2, 3.4, 5.6, 7.8]]}),
             {'input_columns': 'pixel', 'output_suffixes': ['_xl', '_yl', '_xr', '_yr']},
             pl.DataFrame({
+                'time': [0],
                 'pixel_xl': [1.2], 'pixel_yl': [3.4],
                 'pixel_xr': [5.6], 'pixel_yr': [7.8],
             }),
@@ -179,6 +186,7 @@ import pymovements as pm
                 'output_suffixes': ['_xl', '_yl', '_xr', '_yr', '_xa', '_ya'],
             },
             pl.DataFrame({
+                'time': [0],
                 'pixel_xl': [.1], 'pixel_yl': [.2],
                 'pixel_xr': [.3], 'pixel_yr': [.4],
                 'pixel_xa': [.5], 'pixel_ya': [.6],
@@ -189,14 +197,14 @@ import pymovements as pm
         pytest.param(
             pl.DataFrame({'pixel': [[1.23, 4.56]]}),
             {'input_columns': 'pixel'},
-            pl.DataFrame({'pixel_x': [1.23], 'pixel_y': [4.56]}),
+            pl.DataFrame({'time': [0], 'pixel_x': [1.23], 'pixel_y': [4.56]}),
             id='df_single_row_two_pixel_suffixes_default_values',
         ),
 
         pytest.param(
             pl.DataFrame({'abc': [1], 'pixel': [[1.23, 4.56]]}),
             {'input_columns': 'pixel'},
-            pl.DataFrame({'abc': [1], 'pixel_x': [1.23], 'pixel_y': [4.56]}),
+            pl.DataFrame({'abc': [1], 'time': [0], 'pixel_x': [1.23], 'pixel_y': [4.56]}),
             id='df_single_row_three_columns_two_pixel_suffixes_default_values',
         ),
 
@@ -204,6 +212,7 @@ import pymovements as pm
             pl.DataFrame({'pixel': [[1.2, 3.4, 5.6, 7.8]]}),
             {'input_columns': 'pixel'},
             pl.DataFrame({
+                'time': [0],
                 'pixel_xl': [1.2], 'pixel_yl': [3.4],
                 'pixel_xr': [5.6], 'pixel_yr': [7.8],
             }),
@@ -214,6 +223,7 @@ import pymovements as pm
             pl.DataFrame({'pixel': [[0.1, 0.2, 0.3, 0.4, 0.5, 0.6]]}),
             {'input_columns': 'pixel'},
             pl.DataFrame({
+                'time': [0],
                 'pixel_xl': [.1], 'pixel_yl': [.2],
                 'pixel_xr': [.3], 'pixel_yr': [.4],
                 'pixel_xa': [.5], 'pixel_ya': [.6],
@@ -244,6 +254,7 @@ def test_gaze_dataframe_unnest_has_expected_frame(init_data, unnest_kwargs, expe
                 'position': [[1.23, 4.56]],
                 'velocity': [[1.23, 4.56]],
                 'acceleration': [[1.23, 4.56]],
+                'time': [0],
                 'x': [1.23],
                 'y': [4.56],
             }),
@@ -258,6 +269,7 @@ def test_gaze_dataframe_unnest_has_expected_frame(init_data, unnest_kwargs, expe
             }),
             {},
             pl.DataFrame({
+                'time': [0],
                 'pixel_x': [1.23], 'pixel_y': [4.56],
                 'position_x': [1.23], 'position_y': [4.56],
                 'velocity_x': [1.23], 'velocity_y': [4.56],
@@ -274,6 +286,7 @@ def test_gaze_dataframe_unnest_has_expected_frame(init_data, unnest_kwargs, expe
             }),
             {},
             pl.DataFrame({
+                'time': [0],
                 'pixel_xl': [1.23], 'pixel_yl': [4.56],
                 'pixel_xr': [7.89], 'pixel_yr': [10.11],
                 'position_xl': [1.23], 'position_yl': [4.56],
@@ -294,6 +307,7 @@ def test_gaze_dataframe_unnest_has_expected_frame(init_data, unnest_kwargs, expe
             }),
             {},
             pl.DataFrame({
+                'time': [0],
                 'pixel_xl': [1.23], 'pixel_yl': [4.56],
                 'pixel_xr': [7.89], 'pixel_yr': [10.11],
                 'pixel_xa': [12.13], 'pixel_ya': [14.15],
@@ -322,6 +336,7 @@ def test_gaze_dataframe_unnest_has_expected_frame(init_data, unnest_kwargs, expe
                 'pixel': [[1.23, 4.56]],
                 'velocity': [[1.23, 4.56]],
                 'acceleration': [[1.23, 4.56]],
+                'time': [0],
                 'position_x': [1.23], 'position_y': [4.56],
             }),
             id='df_single_row_two_components_unnest_one_multiple_columns_suffix_specified',
@@ -338,6 +353,7 @@ def test_gaze_dataframe_unnest_has_expected_frame(init_data, unnest_kwargs, expe
             pl.DataFrame({
                 'pixel': [[1.23, 4.56]],
                 'velocity': [[1.23, 4.56]],
+                'time': [0],
                 'position_x': [1.23], 'position_y': [4.56],
                 'acceleration_x': [1.23], 'acceleration_y': [4.56],
             }),
