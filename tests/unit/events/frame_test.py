@@ -191,7 +191,11 @@ def test_event_dataframe_init_expected(args, kwargs, expected_df_data, expected_
         ),
         pytest.param(
             [pl.DataFrame()], {},
-            pl.DataFrame({}),
+            pl.DataFrame(
+                {}, schema={
+                    'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64, 'duration': pl.Int64,
+                },
+            ),
             id='dataframe_arg_no_kwargs',
         ),
         pytest.param(
@@ -219,6 +223,34 @@ def test_event_dataframe_init_expected(args, kwargs, expected_df_data, expected_
                 {'trial': [1], 'name': ['foo'], 'onset': [0], 'offset': [1], 'duration': [1]},
             ),
             id='lists_one_event_trial_column_at_start',
+        ),
+        pytest.param(
+            [], {
+                'data': pl.DataFrame(
+                    data={
+                        'trial': [1], 'name': ['foo'], 'onset': [0], 'offset': [1],
+                    },
+                ),
+                'trial_columns': 'trial',
+            },
+            pl.DataFrame(
+                {'trial': [1], 'name': ['foo'], 'onset': [0], 'offset': [1], 'duration': [1]},
+            ),
+            id='data_one_event_trial_column_at_start',
+        ),
+        pytest.param(
+            [], {
+                'data': pl.DataFrame(
+                    data={
+                        'name': ['foo'], 'onset': [0], 'offset': [1], 'trial': [1],
+                    },
+                ),
+                'trial_columns': 'trial',
+            },
+            pl.DataFrame(
+                {'trial': [1], 'name': ['foo'], 'onset': [0], 'offset': [1], 'duration': [1]},
+            ),
+            id='data_one_event_trial_column_enforce_start',
         ),
     ],
 )
