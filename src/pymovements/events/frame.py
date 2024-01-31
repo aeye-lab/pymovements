@@ -191,17 +191,25 @@ class EventDataFrame:
         Parameters
         ----------
         column: str | list[str]
-            This will be the name of the created trial column.
-        data: int | float | str | list[int | float | str] | None,
-            The values to be used for filling the trial column.
+            The name(s) of the new trial column(s).
+        data: int | float | str | list[int | float | str] | None
+            The values to be used for filling the trial column(s). In case multiple columns are
+            provided, data must be a list of values matching the provided column order.
         """
         # Create trial column dictionary to iterate over in select().
         if isinstance(column, str):
             trial_columns = {column: data}
+        # In case a list of a single column is passed as an explicit value.
+        elif len(column) == 1 and (isinstance(data, (int, float, str) or data is None)):
+            trial_columns = {column[0]: data}
         else:
-            trial_columns = {
-                column_name: column_data for column_name, column_data in zip(column, data)
-            }
+            if not isinstance(data, Sequence):
+                raise TypeError(
+                    'data must be passed as a list of values in case of multiple provided columns',
+                )
+            checks.check_is_length_matching(column=column, data=data)
+
+            trial_columns = dict(zip(column, data))
 
         self.frame = self.frame.select(
             [

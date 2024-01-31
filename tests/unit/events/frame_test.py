@@ -415,37 +415,56 @@ def test_event_dataframe_copy():
         pytest.param(
             pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
             {'column': 'trial', 'data': 1},
-            pm.EventDataFrame(pl.DataFrame(
-                {'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
-                schema_overrides={'trial': pl.Int32},
-            )),
+            pm.EventDataFrame(
+                pl.DataFrame(
+                    {'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
+                    schema_overrides={'trial': pl.Int32},
+                ),
+            ),
             id='single_row_trial_str',
         ),
         pytest.param(
             pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
+            {'column': ['trial'], 'data': 1},
+            pm.EventDataFrame(
+                pl.DataFrame(
+                    {'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
+                    schema_overrides={'trial': pl.Int32},
+                ),
+            ),
+            id='single_row_trial_list_data_int',
+        ),
+        pytest.param(
+            pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
             {'column': ['trial'], 'data': [1]},
-            pm.EventDataFrame(pl.DataFrame(
-                {'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
-                schema_overrides={'trial': pl.Int32},
-            )),
+            pm.EventDataFrame(
+                pl.DataFrame(
+                    {'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
+                    schema_overrides={'trial': pl.Int32},
+                ),
+            ),
             id='single_row_trial_list_single_identifier',
         ),
         pytest.param(
             pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
             {'column': ['group', 'trial'], 'data': ['A', 1]},
-            pm.EventDataFrame(pl.DataFrame(
-                {'group': 'A', 'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
-                schema_overrides={'trial': pl.Int32},
-            )),
+            pm.EventDataFrame(
+                pl.DataFrame(
+                    {'group': 'A', 'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
+                    schema_overrides={'trial': pl.Int32},
+                ),
+            ),
             id='single_row_trial_list_single_identifier',
         ),
         pytest.param(
             pm.EventDataFrame(name='a', onsets=[0, 8], offsets=[1, 9]),
             {'column': ['trial'], 'data': [1]},
-            pm.EventDataFrame(pl.DataFrame(
-                {'trial': [1, 1], 'name': ['a', 'a'], 'onset': [0, 8], 'offset': [1, 9]},
-                schema_overrides={'trial': pl.Int32},
-            )),
+            pm.EventDataFrame(
+                pl.DataFrame(
+                    {'trial': [1, 1], 'name': ['a', 'a'], 'onset': [0, 8], 'offset': [1, 9]},
+                    schema_overrides={'trial': pl.Int32},
+                ),
+            ),
             id='two_rows_trial_list_single_identifier',
         ),
     ],
