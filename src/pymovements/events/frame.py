@@ -46,6 +46,10 @@ class EventDataFrame:
         List of onsets. (default: None)
     offsets: list[int] | np.ndarray | None
         List of offsets. (default: None)
+    trials: list[int | float | str] | np.ndarray | None
+        List of trial identifiers. (default: None)
+    trial_columns: list[str] | str | None
+        List of trial columns in passed dataframe.
 
     Raises
     ------
@@ -62,17 +66,23 @@ class EventDataFrame:
             name: str | list[str] | None = None,
             onsets: list[int] | np.ndarray | None = None,
             offsets: list[int] | np.ndarray | None = None,
+            trials: list[int | float | str] | np.ndarray | None = None,
+            trial_columns: list[str] | str | None = None,
     ):
         if data is not None:
             checks.check_is_mutual_exclusive(data=data, onsets=onsets)
             checks.check_is_mutual_exclusive(data=data, offsets=offsets)
             checks.check_is_mutual_exclusive(data=data, name=name)
+            checks.check_is_mutual_exclusive(data=data, name=trials)
 
             data = data.clone()
             data = self._add_minimal_schema_columns(data)
             data_dict = data.to_dict()
 
-            self.trial_columns = None
+            if isinstance(trial_columns, str):
+                self.trial_columns = [trial_columns]
+            else:
+                self.trial_columns = trial_columns
 
             self._additional_columns = [
                 column_name for column_name in data_dict.keys()
@@ -114,7 +124,7 @@ class EventDataFrame:
                     'offset': pl.Series([], dtype=pl.Int64),
                 }
 
-            self.trial_columns = None
+            self.trial_columns = None if trials is None else ['trial']
 
         self.frame = pl.DataFrame(data=data_dict, schema_overrides=self._minimal_schema)
         if 'duration' not in self.frame.columns:

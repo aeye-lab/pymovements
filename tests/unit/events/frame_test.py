@@ -182,22 +182,53 @@ def test_event_dataframe_init_expected(args, kwargs, expected_df_data, expected_
 
 
 @pytest.mark.parametrize(
-    ('args', 'kwargs', 'expected_trial_column_list'),
+    ('kwargs', 'expected_trial_column_list'),
     [
         pytest.param(
-            [pl.DataFrame()], {},
+            {'data': pl.DataFrame()},
             None,
-            id='dataframe_arg_no_kwargs',
+            id='empty_df_no_trial_columns',
         ),
         pytest.param(
-            [], {'onsets': [0], 'offsets': [1]},
+            {'onsets': [0], 'offsets': [1]},
             None,
-            id='no_arg_dict_with_single_event_kwarg',
+            id='single_row_no_trial_columns',
+        ),
+        pytest.param(
+            {'onsets': [0], 'offsets': [1], 'trials': None},
+            None,
+            id='single_row_trials_list',
+        ),
+        pytest.param(
+            {'onsets': [0], 'offsets': [1], 'trials': ['A']},
+            ['trial'],
+            id='single_row_trials_list',
+        ),
+        pytest.param(
+            {'data': pl.DataFrame({'onset': [0], 'offset': [1], 'trial': ['A']})},
+            None,
+            id='single_row_trial_column_not_specified',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame({'onset': [0], 'offset': [1], 'trial': ['A']}),
+                'trial_columns': ['trial'],
+            },
+            ['trial'],
+            id='single_row_trial_column_specified',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame({'onset': [0], 'offset': [1], 'trial': ['A']}),
+                'trial_columns': 'trial',
+            },
+            ['trial'],
+            id='single_row_trial_column_str',
         ),
     ],
 )
-def test_event_dataframe_init_expected_trial_column_list(args, kwargs, expected_trial_column_list):
-    events = pm.EventDataFrame(*args, **kwargs)
+def test_event_dataframe_init_expected_trial_column_list(kwargs, expected_trial_column_list):
+    events = pm.EventDataFrame(**kwargs)
 
     assert events.trial_columns == expected_trial_column_list
 
