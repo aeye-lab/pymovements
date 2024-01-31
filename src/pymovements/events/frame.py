@@ -119,6 +119,10 @@ class EventDataFrame:
                     'onset': pl.Series(onsets, dtype=pl.Int64),
                     'offset': pl.Series(offsets, dtype=pl.Int64),
                 }
+
+                if trials is not None:
+                    data_dict['trial'] = pl.Series('trial', trials)
+
             else:
                 data_dict = {
                     'name': pl.Series([], dtype=pl.Utf8),

@@ -219,6 +219,14 @@ def test_event_dataframe_init_expected(args, kwargs, expected_df_data, expected_
         ),
         pytest.param(
             {
+                'data': pl.DataFrame({'onset': [0], 'offset': [1], 'group': [1], 'trial': ['C']}),
+                'trial_columns': ['group', 'trial'],
+            },
+            ['group', 'trial'],
+            id='single_row_two_trial_columns',
+        ),
+        pytest.param(
+            {
                 'data': pl.DataFrame({'onset': [0], 'offset': [1], 'trial': ['A']}),
                 'trial_columns': 'trial',
             },
@@ -231,6 +239,48 @@ def test_event_dataframe_init_expected_trial_column_list(kwargs, expected_trial_
     events = pm.EventDataFrame(**kwargs)
 
     assert events.trial_columns == expected_trial_column_list
+
+
+@pytest.mark.parametrize(
+    ('kwargs', 'expected_trial_column_data'),
+    [
+        pytest.param(
+            {'onsets': [0], 'offsets': [1], 'trials': ['A']},
+            pl.Series('trial', ['A']),
+            id='single_row_trials_list',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame({'onset': [0], 'offset': [1], 'trial': ['C']}),
+                'trial_columns': 'trial',
+            },
+            pl.Series('trial', ['C']),
+            id='single_row_trial_column_str',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame({'onset': [0], 'offset': [1], 'trial': ['B']}),
+                'trial_columns': ['trial'],
+            },
+            pl.Series('trial', ['B']),
+            id='single_row_trial_column_list_single',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame({'onset': [0], 'offset': [1], 'group': [1], 'trial': ['C']}),
+                'trial_columns': ['group', 'trial'],
+            },
+            pl.DataFrame({'group': [1], 'trial': ['C']}),
+            id='single_row_two_trial_columns',
+        ),
+    ],
+)
+def test_event_dataframe_init_expected_trial_column_data(kwargs, expected_trial_column_data):
+    events = pm.EventDataFrame(**kwargs)
+
+    if isinstance(expected_trial_column_data, pl.Series):
+        expected_trial_column_data = pl.DataFrame(expected_trial_column_data)
+    assert_frame_equal(events.frame[events.trial_columns], expected_trial_column_data)
 
 
 def test_event_dataframe_columns_same_as_frame():
