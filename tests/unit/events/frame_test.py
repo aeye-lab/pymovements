@@ -273,6 +273,36 @@ def test_event_dataframe_init_expected_trial_column_list(kwargs, expected_trial_
             pl.DataFrame({'group': [1], 'trial': ['C']}),
             id='single_row_two_trial_columns',
         ),
+        pytest.param(
+            {
+                'data': pl.DataFrame(
+                    {'onset': [0, 2], 'offset': [1, 3], 'trial': [1, 1]},
+                ),
+                'trial_columns': 'trial',
+            },
+            pl.DataFrame({'trial': [1, 1]}),
+            id='two_rows_one_trial',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame(
+                    {'onset': [0, 2], 'offset': [1, 3], 'trial': [1, 2]},
+                ),
+                'trial_columns': 'trial',
+            },
+            pl.DataFrame({'trial': [1, 2]}),
+            id='two_rows_one_trial',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame(
+                    {'onset': [0, 2], 'offset': [1, 3], 'trial': 1},
+                ),
+                'trial_columns': 'trial',
+            },
+            pl.DataFrame({'trial': [1, 1]}),
+            id='two_rows_plain_trial',
+        ),
     ],
 )
 def test_event_dataframe_init_expected_trial_column_data(kwargs, expected_trial_column_data):
