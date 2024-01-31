@@ -410,17 +410,16 @@ def test_event_dataframe_copy():
 
 
 @pytest.mark.parametrize(
-    ('events', 'trial_data', 'trial_columns', 'expected_df'),
+    ('events', 'kwargs', 'expected'),
     [
         pytest.param(
             pm.EventDataFrame(onsets=[0], offsets=[1]),
-            1, 'trial',
-            {'name': [''], 'onset': [0], 'offset': [1], 'duration': [1], 'trial': [1]},
+            {'trial_column': 'trial', 'trial_data': 1},
+            pm.EventDataFrame(onsets=[0], offsets=[1], trials=['1']),
             id='single_row_int_trial',
         ),
     ],
 )
-def test_event_dataframe_add_trial_columns(events, trial_data, trial_columns, expected_df):
-    events.add_trial_column(trial_data, trial_columns)
-
-    assert_frame_equal(events.frame, expected_df)
+def test_event_dataframe_add_trial_columns(events, kwargs, expected):
+    events.add_trial_column(**kwargs)
+    assert_frame_equal(events.frame, expected.frame)
