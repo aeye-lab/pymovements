@@ -183,40 +183,32 @@ class EventDataFrame:
 
     def add_trial_column(
             self,
-            column: str,
-            data: int | float | str | None,
+            column: str | list[str],
+            data: int | float | str | list[int | float | str] | None,
     ) -> None:
         """Add new trial columns with constant values.
 
         Parameters
         ----------
-        column: str
+        column: str | list[str]
             This will be the name of the created trial column.
-        data: int | float | str
+        data: int | float | str | list[int | float | str] | None,
             The values to be used for filling the trial column.
         """
+        # Create trial column dictionary to iterate over in select().
+        if isinstance(column, str):
+            trial_columns = {column: data}
+        else:
+            trial_columns = {
+                column_name: column_data for column_name, column_data in zip(column, data)
+            }
+
         self.frame = self.frame.select(
             [
-                pl.lit(data).alias(column),
+                pl.lit(column_data).alias(column_name)
+                for column_name, column_data in trial_columns.items()
             ] + [pl.all()],
         )
-
-    def achhhgbnsahj(self):
-        # add group identifiers as new columns
-        if len(self.trial_columns) == 1:
-            new_events.frame = new_events.frame.select(
-                [
-                    pl.lit(group_identifier).alias(self.trial_columns[0]),
-                ] + [pl.all()],
-            )
-        else:
-            new_events.frame = new_events.frame.select(
-                [
-                    pl.lit(group_identifier[idx]).alias(group_identifier_name)
-                    for idx, group_identifier_name in enumerate(self.trial_columns)
-                ] + [pl.all()],
-            )
-
 
     @property
     def event_property_columns(self) -> list[str]:
