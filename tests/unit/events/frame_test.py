@@ -413,9 +413,12 @@ def test_event_dataframe_copy():
     ('events', 'kwargs', 'expected_df'),
     [
         pytest.param(
-            pm.EventDataFrame(onsets=[0], offsets=[1]),
+            pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
             {'column': 'trial', 'data': 1},
-            pm.EventDataFrame(pl.DataFrame({'onset': [0], 'offset': [1], 'trial': [1]})),
+            pm.EventDataFrame(pl.DataFrame(
+                {'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
+                schema_overrides={'trial': pl.Int32},
+            )),
             id='single_row_int_trial',
         ),
     ],
