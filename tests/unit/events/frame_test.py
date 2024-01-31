@@ -407,3 +407,20 @@ def test_event_dataframe_copy():
     assert events is not events_copy
     assert events.frame is not events_copy.frame
     assert_frame_equal(events.frame, events_copy.frame)
+
+
+@pytest.mark.parametrize(
+    ('events', 'trial_data', 'trial_columns', 'expected_df'),
+    [
+        pytest.param(
+            pm.EventDataFrame(onsets=[0], offsets=[1]),
+            1, 'trial',
+            {'name': [''], 'onset': [0], 'offset': [1], 'duration': [1], 'trial': [1]},
+            id='single_row_int_trial',
+        ),
+    ],
+)
+def test_event_dataframe_add_trial_columns(events, trial_data, trial_columns, expected_df):
+    events.add_trial_column(trial_data, trial_columns)
+
+    assert_frame_equal(events.frame, expected_df)
