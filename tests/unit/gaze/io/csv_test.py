@@ -81,7 +81,7 @@ import pymovements as pm
                 'pixel_columns': pm.datasets.GazeOnFaces().pixel_columns,
                 **pm.datasets.GazeOnFaces().custom_read_kwargs,
             },
-            (10, 1),
+            (10, 2),
             id='gaze_on_faces_dataset_example',
         ),
         pytest.param(
