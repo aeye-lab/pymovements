@@ -107,7 +107,7 @@ def test_from_pandas_with_trial_columnms():
     })
 
     assert_frame_equal(gaze.frame, expected)
-    assert gaze.trial_columns == 'trial_id'
+    assert gaze.trial_columns == ['trial_id']
 
 
 @pytest.mark.parametrize(
