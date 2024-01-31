@@ -37,6 +37,7 @@ def from_numpy(
         experiment: Experiment | None = None,
         events: EventDataFrame | None = None,
         *,
+        trial: np.ndarray | None = None,
         time: np.ndarray | None = None,
         pixel: np.ndarray | None = None,
         position: np.ndarray | None = None,
@@ -45,6 +46,7 @@ def from_numpy(
         distance: np.ndarray | None = None,
         schema: list[str] | None = None,
         orient: Literal['col', 'row'] = 'col',
+        trial_columns: str | list[str] | None = None,
         time_column: str | None = None,
         pixel_columns: list[str] | None = None,
         position_columns: list[str] | None = None,
@@ -72,6 +74,8 @@ def from_numpy(
         The experiment definition. (default: None)
     events: EventDataFrame | None
         A dataframe of events in the gaze signal. (default: None)
+    trial: np.ndarray | None
+        Array of trial identifiers for each timestep. (default: None)
     time: np.ndarray | None
         Array of timestamps. (default: None)
     pixel: np.ndarray | None
@@ -88,6 +92,11 @@ def from_numpy(
         A list of column names. (default: None)
     orient: Literal['col', 'row']
         Whether to interpret the two-dimensional data as columns or as rows. (default: 'col')
+    trial_columns: str | list[str] | None
+        The name of the trial columns in the input data frame. If the list is empty or None,
+        the input data frame is assumed to contain only one trial. If the list is not empty,
+        the input data frame is assumed to contain multiple trials and the transformation
+        methods will be applied to each trial separately. (default: None)
     time_column: str | None
         The name of the timestamp column in the input data frame. (default: None)
     pixel_columns: list[str] | None
@@ -216,6 +225,7 @@ def from_numpy(
             data=df,
             experiment=experiment,
             events=events,
+            trial_columns=trial_columns,
             time_column=time_column,
             pixel_columns=pixel_columns,
             position_columns=position_columns,
@@ -226,6 +236,12 @@ def from_numpy(
 
     # Initialize with an empty DataFrame, as every column specifier could be None.
     dfs: list[pl.DataFrame] = [pl.DataFrame()]
+
+    trial_columns = None
+    if trial is not None:
+        df = pl.from_numpy(data=trial, schema=['trial'], orient=orient)
+        dfs.append(df)
+        trial_columns = 'trial'
 
     time_column = None
     if time is not None:
@@ -270,6 +286,7 @@ def from_numpy(
         experiment=experiment,
         events=events,
         time_column=time_column,
+        trial_columns=trial_columns,
         pixel_columns=pixel_columns,
         position_columns=position_columns,
         velocity_columns=velocity_columns,
@@ -283,6 +300,7 @@ def from_pandas(
         experiment: Experiment | None = None,
         events: EventDataFrame | None = None,
         *,
+        trial_columns: str | list[str] | None = None,
         time_column: str | None = None,
         pixel_columns: list[str] | None = None,
         position_columns: list[str] | None = None,
@@ -300,6 +318,11 @@ def from_pandas(
         The experiment definition. (default: None)
     events: EventDataFrame | None
         A dataframe of events in the gaze signal. (default: None)
+    trial_columns: str | list[str] | None
+        The name of the trial columns in the input data frame. If the list is empty or None,
+        the input data frame is assumed to contain only one trial. If the list is not empty,
+        the input data frame is assumed to contain multiple trials and the transformation
+        methods will be applied to each trial separately. (default: None)
     time_column: str | None
         The name of the timestamp column in the input data frame. (default: None)
     pixel_columns: list[str] | None
@@ -326,6 +349,7 @@ def from_pandas(
         data=df,
         experiment=experiment,
         events=events,
+        trial_columns=trial_columns,
         time_column=time_column,
         pixel_columns=pixel_columns,
         position_columns=position_columns,
