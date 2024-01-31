@@ -26,7 +26,7 @@ from polars.testing import assert_frame_equal
 import pymovements as pm
 
 
-def test_from_pandas():
+def test_from_pandas_additional_time_column():
     pandas_df = pd.DataFrame(
         {
             'x_pix': [0, 1, 2, 3],
@@ -43,8 +43,8 @@ def test_from_pandas():
         experiment=experiment,
     )
 
-    assert gaze.frame.shape == (4, 4)
-    assert all(gaze.columns == pandas_df.columns)
+    assert gaze.frame.shape == (4, 5)
+    assert gaze.columns == list(pandas_df.columns) + ['time']
 
 
 def test_from_pandas_explicit_columns():

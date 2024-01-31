@@ -119,20 +119,65 @@ class GazeDataFrame:
     │ 1002 ┆ 0.3 ┆ 0.3 │
     └──────┴─────┴─────┘
 
-    We can now initialize our ``GazeDataFrame`` by specyfing the names of the pixel position
-    columns.
+    We can now initialize our ``GazeDataFrame`` by specyfing the names of the time and pixel
+    position columns.
 
-    >>> gaze = GazeDataFrame(data=df, pixel_columns=['x', 'y'])
+    >>> gaze = GazeDataFrame(data=df, time_column='t', pixel_columns=['x', 'y'])
     >>> gaze.frame
     shape: (3, 2)
     ┌──────┬────────────┐
-    │ t    ┆ pixel      │
+    │ time ┆ pixel      │
     │ ---  ┆ ---        │
     │ i64  ┆ list[f64]  │
     ╞══════╪════════════╡
     │ 1000 ┆ [0.1, 0.1] │
     │ 1001 ┆ [0.2, 0.2] │
     │ 1002 ┆ [0.3, 0.3] │
+    └──────┴────────────┘
+
+    In case your data has no time column available, you can pass an :py:class:``Experiment`` to
+    create a time column with the correct sampling rate during initialization. The time column will
+    be represented in millisecond units.
+
+    >>> df_no_time = df.select(pl.exclude('t'))
+    >>> df_no_time
+    shape: (3, 2)
+    ┌─────┬─────┐
+    │ x   ┆ y   │
+    │ --- ┆ --- │
+    │ f64 ┆ f64 │
+    ╞═════╪═════╡
+    │ 0.1 ┆ 0.1 │
+    │ 0.2 ┆ 0.2 │
+    │ 0.3 ┆ 0.3 │
+    └─────┴─────┘
+
+    >>> experiment = Experiment(1024, 768, 38, 30, 60, 'center', sampling_rate=100)
+    >>> gaze = GazeDataFrame(data=df_no_time, experiment=experiment, pixel_columns=['x', 'y'])
+    >>> gaze.frame
+    shape: (3, 2)
+    ┌──────┬────────────┐
+    │ time ┆ pixel      │
+    │ ---  ┆ ---        │
+    │ f64  ┆ list[f64]  │
+    ╞══════╪════════════╡
+    │ 0.0  ┆ [0.1, 0.1] │
+    │ 10.0 ┆ [0.2, 0.2] │
+    │ 20.0 ┆ [0.3, 0.3] │
+    └──────┴────────────┘
+
+    Leaving out the experiment definition will create a continuous integer column in step units.
+    >>> gaze = GazeDataFrame(data=df_no_time, pixel_columns=['x', 'y'])
+    >>> gaze.frame
+    shape: (3, 2)
+    ┌──────┬────────────┐
+    │ time ┆ pixel      │
+    │ ---  ┆ ---        │
+    │ i64  ┆ list[f64]  │
+    ╞══════╪════════════╡
+    │ 0    ┆ [0.1, 0.1] │
+    │ 1    ┆ [0.2, 0.2] │
+    │ 2    ┆ [0.3, 0.3] │
     └──────┴────────────┘
 
     """
@@ -195,6 +240,18 @@ class GazeDataFrame:
 
         self.trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
 
+        # In case the 'time' column is already present we don't need to do anything.
+        # Otherwise, create a new time column starting with zero.
+        if time_column is None and 'time' not in self.frame.columns:
+            timesteps = pl.arange(0, len(self.frame))
+
+            # In case we have an experiment with sampling rate given, we convert to milliseconds.
+            if experiment is not None and experiment.sampling_rate is not None:
+                timesteps = timesteps * (1000 / experiment.sampling_rate)
+
+            self.frame = self.frame.with_columns(time=timesteps)
+
+        # This if clause is mutually exclusive with the previous one.
         if time_column is not None:
             self.frame = self.frame.rename({time_column: 'time'})
 
