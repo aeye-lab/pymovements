@@ -69,6 +69,8 @@ class EventDataFrame:
             trials: list[int | float | str] | np.ndarray | None = None,
             trial_columns: list[str] | str | None = None,
     ):
+        self.trial_columns: list[str] | None  # otherwise mypy gets confused.
+
         if data is not None:
             checks.check_is_mutual_exclusive(data=data, onsets=onsets)
             checks.check_is_mutual_exclusive(data=data, offsets=offsets)
