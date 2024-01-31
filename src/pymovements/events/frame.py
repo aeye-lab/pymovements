@@ -181,6 +181,43 @@ class EventDataFrame:
         """
         self.frame = self.frame.join(event_properties, on=join_on, how='left')
 
+    def add_trial_column(
+            self,
+            column: str,
+            data: int | float | str | None,
+    ) -> None:
+        """Add new trial columns with constant values.
+
+        Parameters
+        ----------
+        column: str
+            This will be the name of the created trial column.
+        data: int | float | str
+            The values to be used for filling the trial column.
+        """
+        self.frame = self.frame.select(
+            [
+                pl.lit(data).alias(column),
+            ] + [pl.all()],
+        )
+
+    def achhhgbnsahj(self):
+        # add group identifiers as new columns
+        if len(self.trial_columns) == 1:
+            new_events.frame = new_events.frame.select(
+                [
+                    pl.lit(group_identifier).alias(self.trial_columns[0]),
+                ] + [pl.all()],
+            )
+        else:
+            new_events.frame = new_events.frame.select(
+                [
+                    pl.lit(group_identifier[idx]).alias(group_identifier_name)
+                    for idx, group_identifier_name in enumerate(self.trial_columns)
+                ] + [pl.all()],
+            )
+
+
     @property
     def event_property_columns(self) -> list[str]:
         """Event property columns for this dataframe.
