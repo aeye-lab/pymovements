@@ -182,6 +182,53 @@ def test_event_dataframe_init_expected(args, kwargs, expected_df_data, expected_
 
 
 @pytest.mark.parametrize(
+    ('args', 'kwargs', 'expected_df'),
+    [
+        pytest.param(
+            [], {'onsets': [0], 'offsets': [1]},
+            pl.DataFrame({'name': [''], 'onset': [0], 'offset': [1], 'duration': [1]}),
+            id='no_arg_lists_with_single_event_kwarg',
+        ),
+        pytest.param(
+            [pl.DataFrame()], {},
+            pl.DataFrame({}),
+            id='dataframe_arg_no_kwargs',
+        ),
+        pytest.param(
+            [], {'name': 'bar', 'onsets': [0], 'offsets': [1]},
+            pl.DataFrame({'name': ['bar'], 'onset': [0], 'offset': [1], 'duration': [1]}),
+            id='lists_with_single_named_event',
+        ),
+        pytest.param(
+            [], {'name': 'bar', 'onsets': [0, 2], 'offsets': [1, 3]},
+            pl.DataFrame(
+                {'name': ['bar', 'bar'], 'onset': [0, 2], 'offset': [1, 3], 'duration': [1, 1]},
+            ),
+            id='lists_with_two_events_same_name',
+        ),
+        pytest.param(
+            [], {'name': ['foo', 'bar'], 'onsets': [0, 2], 'offsets': [1, 4]},
+            pl.DataFrame(
+                {'name': ['foo', 'bar'], 'onset': [0, 2], 'offset': [1, 4], 'duration': [1, 2]},
+            ),
+            id='lists_with_two_differently_named_events',
+        ),
+        pytest.param(
+            [], {'name': ['foo'], 'onsets': [0], 'offsets': [1], 'trials': [1]},
+            pl.DataFrame(
+                {'trial': [1], 'name': ['foo'], 'onset': [0], 'offset': [1], 'duration': [1]},
+            ),
+            id='lists_one_event_trial_column_at_start',
+        ),
+    ],
+)
+def test_event_dataframe_init_expected_df(args, kwargs, expected_df):
+    event_df = pm.EventDataFrame(*args, **kwargs)
+
+    assert_frame_equal(event_df.frame, expected_df)
+
+
+@pytest.mark.parametrize(
     ('kwargs', 'expected_trial_column_list'),
     [
         pytest.param(
