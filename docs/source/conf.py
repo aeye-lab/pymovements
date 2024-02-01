@@ -27,13 +27,13 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import importlib.resources
 import inspect
 import os
 import sys
 from subprocess import CalledProcessError
 from subprocess import run
 
-import importlib.resources
 from pybtex.plugin import register_plugin
 from pybtex.style.formatting.plain import Style as PlainStyle
 from pybtex.style.labels import BaseLabelStyle
