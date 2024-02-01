@@ -501,9 +501,9 @@ from pymovements.synthetic import step_function
             pm.gaze.from_numpy(
                 trial=np.array([1] * 50 + [2] * 50),
                 velocity=np.zeros((2, 100)),
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
-            pm.EventDataFrame(name='fixation', onsets=[0, 50], offsets=[49, 99]),
+            pm.EventDataFrame(name='fixation', onsets=[0, 50], offsets=[49, 99], trials=[1, 2]),
             id='ivt_constant_position_single_fixation_per_trial',
         ),
 
@@ -684,13 +684,9 @@ from pymovements.synthetic import step_function
                 trial=np.array([1] * 50 + [2] * 50),
                 velocity=step_function(length=100, steps=[40, 60], values=[(9, 9), (0, 0)]),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
-            pm.EventDataFrame(
-                name='saccade',
-                onsets=[40, 50],
-                offsets=[49, 59],
-            ),
+            pm.EventDataFrame(name='saccade', onsets=[40, 50], offsets=[49, 59], trials=[1, 2]),
             id='microsaccades_two_steps_one_saccade_per_trial',
         ),
 
@@ -773,12 +769,15 @@ from pymovements.synthetic import step_function
             pm.gaze.from_numpy(
                 trial=np.array([1] * 50 + [2] * 50),
                 time=np.arange(0, 100),
-                events=pm.EventDataFrame(name='fixation', onsets=[0, 90], offsets=[10, 100]),
+                events=pm.EventDataFrame(
+                    name='fixation', onsets=[0, 90], offsets=[10, 100], trials=[1, 2],
+                ),
             ),
             pm.EventDataFrame(
                 name=['fixation', 'unclassified', 'unclassified', 'fixation'],
                 onsets=[0, 10, 50, 90],
                 offsets=[10, 49, 89, 100],
+                trials=[1, 1, 2, 2],
             ),
             id='fill_10ms_fixation_at_start_and_end_one_fill_per_trial',
         ),
@@ -790,14 +789,7 @@ from pymovements.synthetic import step_function
                 trial=np.array([1] * 50 + [2] * 50),
                 time=np.concatenate((np.arange(0, 50), np.arange(0, 50))),
                 events=pm.EventDataFrame(
-                    pl.DataFrame(
-                        data={
-                            'trial': [1, 2],
-                            'name': ['fixation', 'fixation'],
-                            'onset': [0, 40],
-                            'offset': [10, 50],
-                        },
-                    ),
+                    name='fixation', onsets=[0, 40], offsets=[10, 50], trials=[1, 2],
                 ),
             ),
             pm.EventDataFrame(
