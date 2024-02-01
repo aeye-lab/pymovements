@@ -795,10 +795,11 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
             },
             pl.exceptions.ColumnNotFoundError,
             (
-                "Neither 'position' is in the columns of the dataframe: ['time', 'acceleration'] "
-                'nor is the pixel column specified. You can specify the pixel column via: '
-                'pix2deg(pixel_column="name_of_your_pixel_column"). Available dataframe '
-                "columns are ['time', 'acceleration']"
+                "Neither is 'pixel' in the dataframe columns, "
+                'nor is a pixel column explicitly specified. '
+                'You can specify the pixel column via: '
+                'pix2deg(pixel_column="name_of_your_pixel_column"). '
+                "Available dataframe columns are: ['time', 'acceleration']"
             ),
             id='no_pixel_column',
         ),
@@ -930,13 +931,14 @@ def test_gaze_dataframe_pos2acc_creates_acceleration_column(data, experiment, po
             },
             pl.exceptions.ColumnNotFoundError,
             (
-                "Neither 'position' is in the columns of the dataframe: ['time', 'pixel'] "
-                "nor is the position column specified. Since the dataframe has a 'pixel' column, "
-                'consider running pix2deg() before pos2acc(). If you want to calculate pixel '
-                "transformations, you can do so by using pos2acc(position_column='pixel'). "
-                "Available dataframe columns are ['time', 'pixel']"
+                "Neither is 'position' in the dataframe columns, "
+                'nor is a position column explicitly specified. '
+                "Since the dataframe has a 'pixel' column, "
+                'consider running pix2deg() before pos2acc(). If you want to run transformations '
+                "in pixel units, you can do so by using pos2acc(position_column='pixel'). "
+                "Available dataframe columns are: ['time', 'pixel']"
             ),
-            id='no_position_column',
+            id='no_position_column_but_has_pixel_column',
         ),
         pytest.param(
             {
@@ -946,9 +948,11 @@ def test_gaze_dataframe_pos2acc_creates_acceleration_column(data, experiment, po
             },
             pl.exceptions.ColumnNotFoundError,
             (
-                "Neither 'position' is in the columns of the dataframe: ['time', 'acceleration'] "
-                'nor is the position column specified. Available dataframe columns are '
-                "['time', 'acceleration']"
+                "Neither is 'position' in the dataframe columns, "
+                'nor is a position column explicitly specified. '
+                'You can specify the position column via: '
+                'pos2acc(position_column="your_position_column"). '
+                "Available dataframe columns are: ['time', 'acceleration']"
             ),
             id='no_position_column',
         ),
@@ -1028,13 +1032,14 @@ def test_gaze_dataframe_pos2vel_creates_velocity_column(data, experiment, positi
             },
             pl.exceptions.ColumnNotFoundError,
             (
-                "Neither 'position' is in the columns of the dataframe: ['time', 'pixel'] "
-                "nor is the position column specified. Since the dataframe has a 'pixel' column, "
-                'consider running pix2deg() before pos2vel(). If you want to calculate pixel '
-                "transformations, you can do so by using pos2vel(position_column='pixel'). "
-                "Available dataframe columns are ['time', 'pixel']"
+                "Neither is 'position' in the dataframe columns, "
+                'nor is a position column explicitly specified. '
+                "Since the dataframe has a 'pixel' column, "
+                'consider running pix2deg() before pos2vel(). If you want to run transformations '
+                "in pixel units, you can do so by using pos2vel(position_column='pixel'). "
+                "Available dataframe columns are: ['time', 'pixel']"
             ),
-            id='no_position_column',
+            id='no_position_column_but_has_pixel_column',
         ),
         pytest.param(
             {
@@ -1044,9 +1049,11 @@ def test_gaze_dataframe_pos2vel_creates_velocity_column(data, experiment, positi
             },
             pl.exceptions.ColumnNotFoundError,
             (
-                "Neither 'position' is in the columns of the dataframe: ['time', 'acceleration'] "
-                'nor is the position column specified. Available dataframe columns are '
-                "['time', 'acceleration']"
+                "Neither is 'position' in the dataframe columns, "
+                'nor is a position column explicitly specified. '
+                'You can specify the position column via: '
+                'pos2vel(position_column="your_position_column"). '
+                "Available dataframe columns are: ['time', 'acceleration']"
             ),
             id='no_position_column',
         ),
