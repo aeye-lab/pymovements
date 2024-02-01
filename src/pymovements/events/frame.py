@@ -214,7 +214,7 @@ class EventDataFrame:
         self.frame = self.frame.select(
             [
                 pl.lit(column_data).alias(column_name)
-                if not isinstance(column_data, int)  # Otherwise we create Int64 columns.
+                if not isinstance(column_data, int)  # Enforce Int64 columns for integers.
                 else pl.lit(column_data).alias(column_name).cast(pl.Int64)
                 for column_name, column_data in trial_columns.items()
             ] + [pl.all()],
