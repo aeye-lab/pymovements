@@ -112,12 +112,6 @@ def idt(
         timesteps = np.arange(len(positions), dtype=np.int64)
     timesteps = np.array(timesteps).flatten()
 
-    # Check that timesteps are integers or are floats without a fractional part.
-    timesteps_int = timesteps.astype(int)
-    if np.any((timesteps - timesteps_int) != 0):
-        raise TypeError('timesteps must be of type int')
-    timesteps = timesteps_int
-
     checks.check_is_length_matching(positions=positions, timesteps=timesteps)
 
     if dispersion_threshold <= 0:
