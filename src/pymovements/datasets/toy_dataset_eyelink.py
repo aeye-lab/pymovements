@@ -118,7 +118,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
         origin='lower left',
         eyetracker=EyeTracker(
             sampling_rate=1000.0,
-            left=True,
+            left=False,
             right=True,
             model='EyeLink Portable Duo',
             vendor='EyeLink',
