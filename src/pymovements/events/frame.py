@@ -46,6 +46,10 @@ class EventDataFrame:
         List of onsets. (default: None)
     offsets: list[int] | np.ndarray | None
         List of offsets. (default: None)
+    trials: list[int | float | str] | np.ndarray | None
+        List of trial identifiers. (default: None)
+    trial_columns: list[str] | str | None
+        List of trial columns in passed dataframe.
 
     Raises
     ------
@@ -62,15 +66,25 @@ class EventDataFrame:
             name: str | list[str] | None = None,
             onsets: list[int] | np.ndarray | None = None,
             offsets: list[int] | np.ndarray | None = None,
+            trials: list[int | float | str] | np.ndarray | None = None,
+            trial_columns: list[str] | str | None = None,
     ):
+        self.trial_columns: list[str] | None  # otherwise mypy gets confused.
+
         if data is not None:
             checks.check_is_mutual_exclusive(data=data, onsets=onsets)
             checks.check_is_mutual_exclusive(data=data, offsets=offsets)
             checks.check_is_mutual_exclusive(data=data, name=name)
+            checks.check_is_mutual_exclusive(data=data, name=trials)
 
             data = data.clone()
             data = self._add_minimal_schema_columns(data)
             data_dict = data.to_dict()
+
+            if isinstance(trial_columns, str):
+                self.trial_columns = [trial_columns]
+            else:
+                self.trial_columns = trial_columns
 
             self._additional_columns = [
                 column_name for column_name in data_dict.keys()
@@ -105,14 +119,27 @@ class EventDataFrame:
                     'onset': pl.Series(onsets, dtype=pl.Int64),
                     'offset': pl.Series(offsets, dtype=pl.Int64),
                 }
+
+                if trials is not None:
+                    data_dict['trial'] = pl.Series('trial', trials)
+                    self.trial_columns = ['trial']
+                else:
+                    self.trial_columns = None
+
             else:
                 data_dict = {
                     'name': pl.Series([], dtype=pl.Utf8),
                     'onset': pl.Series([], dtype=pl.Int64),
                     'offset': pl.Series([], dtype=pl.Int64),
                 }
+                self.trial_columns = None
 
         self.frame = pl.DataFrame(data=data_dict, schema_overrides=self._minimal_schema)
+
+        # Ensure column order: trial columns, name, onset, offset.
+        if self.trial_columns is not None:
+            self.frame = self.frame.select([*self.trial_columns, *self._minimal_schema.keys()])
+
         if 'duration' not in self.frame.columns:
             self._add_duration_property()
 
