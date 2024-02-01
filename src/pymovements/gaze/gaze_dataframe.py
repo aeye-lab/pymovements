@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -119,20 +119,65 @@ class GazeDataFrame:
     │ 1002 ┆ 0.3 ┆ 0.3 │
     └──────┴─────┴─────┘
 
-    We can now initialize our ``GazeDataFrame`` by specyfing the names of the pixel position
-    columns.
+    We can now initialize our ``GazeDataFrame`` by specyfing the names of the time and pixel
+    position columns.
 
-    >>> gaze = GazeDataFrame(data=df, pixel_columns=['x', 'y'])
+    >>> gaze = GazeDataFrame(data=df, time_column='t', pixel_columns=['x', 'y'])
     >>> gaze.frame
     shape: (3, 2)
     ┌──────┬────────────┐
-    │ t    ┆ pixel      │
+    │ time ┆ pixel      │
     │ ---  ┆ ---        │
     │ i64  ┆ list[f64]  │
     ╞══════╪════════════╡
     │ 1000 ┆ [0.1, 0.1] │
     │ 1001 ┆ [0.2, 0.2] │
     │ 1002 ┆ [0.3, 0.3] │
+    └──────┴────────────┘
+
+    In case your data has no time column available, you can pass an :py:class:``Experiment`` to
+    create a time column with the correct sampling rate during initialization. The time column will
+    be represented in millisecond units.
+
+    >>> df_no_time = df.select(pl.exclude('t'))
+    >>> df_no_time
+    shape: (3, 2)
+    ┌─────┬─────┐
+    │ x   ┆ y   │
+    │ --- ┆ --- │
+    │ f64 ┆ f64 │
+    ╞═════╪═════╡
+    │ 0.1 ┆ 0.1 │
+    │ 0.2 ┆ 0.2 │
+    │ 0.3 ┆ 0.3 │
+    └─────┴─────┘
+
+    >>> experiment = Experiment(1024, 768, 38, 30, 60, 'center', sampling_rate=100)
+    >>> gaze = GazeDataFrame(data=df_no_time, experiment=experiment, pixel_columns=['x', 'y'])
+    >>> gaze.frame
+    shape: (3, 2)
+    ┌──────┬────────────┐
+    │ time ┆ pixel      │
+    │ ---  ┆ ---        │
+    │ f64  ┆ list[f64]  │
+    ╞══════╪════════════╡
+    │ 0.0  ┆ [0.1, 0.1] │
+    │ 10.0 ┆ [0.2, 0.2] │
+    │ 20.0 ┆ [0.3, 0.3] │
+    └──────┴────────────┘
+
+    Leaving out the experiment definition will create a continuous integer column in step units.
+    >>> gaze = GazeDataFrame(data=df_no_time, pixel_columns=['x', 'y'])
+    >>> gaze.frame
+    shape: (3, 2)
+    ┌──────┬────────────┐
+    │ time ┆ pixel      │
+    │ ---  ┆ ---        │
+    │ i64  ┆ list[f64]  │
+    ╞══════╪════════════╡
+    │ 0    ┆ [0.1, 0.1] │
+    │ 1    ┆ [0.2, 0.2] │
+    │ 2    ┆ [0.3, 0.3] │
     └──────┴────────────┘
 
     """
@@ -193,8 +238,20 @@ class GazeDataFrame:
             data = data.clone()
         self.frame = data
 
-        self.trial_columns = trial_columns
+        self.trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
 
+        # In case the 'time' column is already present we don't need to do anything.
+        # Otherwise, create a new time column starting with zero.
+        if time_column is None and 'time' not in self.frame.columns:
+            timesteps = pl.arange(0, len(self.frame))
+
+            # In case we have an experiment with sampling rate given, we convert to milliseconds.
+            if experiment is not None and experiment.sampling_rate is not None:
+                timesteps = timesteps * (1000 / experiment.sampling_rate)
+
+            self.frame = self.frame.with_columns(time=timesteps)
+
+        # This if clause is mutually exclusive with the previous one.
         if time_column is not None:
             self.frame = self.frame.rename({time_column: 'time'})
 
@@ -335,27 +392,29 @@ class GazeDataFrame:
                 if 'position' not in self.frame.columns and 'position_column' not in kwargs:
                     if 'pixel' in self.frame.columns:
                         raise pl.exceptions.ColumnNotFoundError(
-                            "Neither 'position' is in the columns of the dataframe: "
-                            f'{self.frame.columns} nor is the position column specified. '
+                            "Neither is 'position' in the dataframe columns, "
+                            'nor is a position column explicitly specified. '
                             "Since the dataframe has a 'pixel' column, consider running "
                             f'pix2deg() before {transform_method.__name__}(). If you want '
-                            'to calculate pixel transformations, you can do so by using '
+                            'to run transformations in pixel units, you can do so by using '
                             f"{transform_method.__name__}(position_column='pixel'). "
-                            f'Available dataframe columns are {self.frame.columns}',
+                            f'Available dataframe columns are: {self.frame.columns}',
                         )
                     raise pl.exceptions.ColumnNotFoundError(
-                        "Neither 'position' is in the columns of the dataframe: "
-                        f'{self.frame.columns} nor is the position column specified. '
-                        f'Available dataframe columns are {self.frame.columns}',
+                        "Neither is 'position' in the dataframe columns, "
+                        'nor is a position column explicitly specified. '
+                        'You can specify the position column via: '
+                        f'{transform_method.__name__}(position_column="your_position_column"). '
+                        f'Available dataframe columns are: {self.frame.columns}',
                     )
             if transform_method.__name__ in {'pix2deg'}:
                 if 'pixel' not in self.frame.columns and 'pixel_column' not in kwargs:
                     raise pl.exceptions.ColumnNotFoundError(
-                        "Neither 'position' is in the columns of the dataframe: "
-                        f'{self.frame.columns} nor is the pixel column specified. '
+                        "Neither is 'pixel' in the dataframe columns, "
+                        'nor is a pixel column explicitly specified. '
                         'You can specify the pixel column via: '
                         f'{transform_method.__name__}(pixel_column="name_of_your_pixel_column"). '
-                        f'Available dataframe columns are {self.frame.columns}',
+                        f'Available dataframe columns are: {self.frame.columns}',
                     )
 
             if self.trial_columns is None:
@@ -596,7 +655,6 @@ class GazeDataFrame:
         Warning
             If no columns to unnest exist and none are specified.
         """
-
         if input_columns is None:
             cols = ['pixel', 'position', 'velocity', 'acceleration']
             input_columns = [col for col in cols if col in self.frame.columns]
@@ -612,9 +670,11 @@ class GazeDataFrame:
 
         # no support for custom output columns if more than one input column will be unnested
         if output_columns is not None and not len(input_columns) == 1:
-            raise ValueError("You cannot specify output columns if you want to unnest more than "
-                             "one input column. Please specify output suffixes or use a single "
-                             "input column instead.")
+            raise ValueError(
+                'You cannot specify output columns if you want to unnest more than '
+                'one input column. Please specify output suffixes or use a single '
+                'input column instead.',
+            )
 
         checks.check_is_mutual_exclusive(
             output_columns=output_columns,
@@ -622,6 +682,7 @@ class GazeDataFrame:
         )
 
         self._check_n_components()
+        assert self.n_components in {2, 4, 6}
 
         col_names = [output_columns] if output_columns is not None else []
 
@@ -648,7 +709,8 @@ class GazeDataFrame:
             )
 
         if len({name for name_list in col_names for name in name_list}) != len(
-                [name for name_list in col_names for name in name_list]):
+                [name for name_list in col_names for name in name_list],
+        ):
             raise ValueError('Output columns / suffixes must be unique')
 
         for input_col, column_names in zip(input_columns, col_names):
@@ -659,7 +721,7 @@ class GazeDataFrame:
                 ],
             ).drop(input_col)
 
-    def copy(self) -> GazeDataFrame:
+    def clone(self) -> GazeDataFrame:
         """Return a copy of the GazeDataFrame.
 
         Returns

@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +54,7 @@ from pymovements.synthetic import step_function
             pm.gaze.from_numpy(
                 position=step_function(length=100, steps=[0], values=[(0, 0)]),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.EventDataFrame(name='fixation', onsets=[0], offsets=[99]),
             id='idt_constant_position_single_fixation',
@@ -70,7 +70,7 @@ from pymovements.synthetic import step_function
             pm.gaze.from_numpy(
                 position=step_function(length=100, steps=[0], values=[(0, 0)]),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.EventDataFrame(name='custom_fixation', onsets=[0], offsets=[99]),
             id='idt_constant_position_single_fixation_custom_name',
@@ -87,7 +87,7 @@ from pymovements.synthetic import step_function
                     length=100, steps=[49, 50], values=[(9, 9), (1, 1)], start_value=(0, 0),
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.events.EventDataFrame(name='fixation', onsets=[0, 50], offsets=[49, 99]),
             id='idt_three_steps_two_fixations',
@@ -105,7 +105,7 @@ from pymovements.synthetic import step_function
                     values=[(np.nan, np.nan), (0, 0), (np.nan, np.nan)],
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.events.EventDataFrame(name='fixation', onsets=[0, 20], offsets=[9, 89]),
             id='idt_two_fixations_interrupted_by_nan',
@@ -124,7 +124,7 @@ from pymovements.synthetic import step_function
                     values=[(np.nan, np.nan), (0, 0), (np.nan, np.nan)],
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.events.EventDataFrame(name='fixation', onsets=[0], offsets=[89]),
             id='idt_one_fixation_including_nan',
@@ -140,7 +140,7 @@ from pymovements.synthetic import step_function
                 time=np.arange(1000, 1100, dtype=int),
                 position=step_function(length=100, steps=[0], values=[(0, 0)]),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.events.EventDataFrame(
                 name='fixation',
@@ -160,7 +160,7 @@ from pymovements.synthetic import step_function
                 time=np.arange(1000, 1010, 0.1, dtype=float),
                 position=step_function(length=100, steps=[0], values=[(0, 0)]),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.events.EventDataFrame(
                 name='fixation',
@@ -181,7 +181,7 @@ from pymovements.synthetic import step_function
                 time=np.reshape(np.arange(1000, 1100, dtype=int), (100, 1)),
                 position=step_function(length=100, steps=[0], values=[(0, 0)]),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.events.EventDataFrame(
                 name='fixation',
@@ -200,7 +200,7 @@ from pymovements.synthetic import step_function
             pm.gaze.from_numpy(
                 time=np.arange(0, 100, 1),
                 velocity=np.ones((2, 100)) * 20,
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.events.EventDataFrame(),
             id='ivt_constant_velocity_no_fixation',
@@ -214,7 +214,7 @@ from pymovements.synthetic import step_function
             },
             pm.gaze.from_numpy(
                 velocity=np.zeros((2, 100)),
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.EventDataFrame(name='fixation', onsets=[0], offsets=[99]),
             id='ivt_constant_position_single_fixation',
@@ -229,7 +229,7 @@ from pymovements.synthetic import step_function
             },
             pm.gaze.from_numpy(
                 velocity=np.zeros((2, 100)),
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.EventDataFrame(name='custom_fixation', onsets=[0], offsets=[99]),
             id='ivt_constant_position_single_fixation_custom_name',
@@ -246,7 +246,7 @@ from pymovements.synthetic import step_function
                     length=100, steps=[49, 51], values=[(90, 90), (0, 0)], start_value=(0, 0),
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.events.EventDataFrame(name='fixation', onsets=[0, 51], offsets=[48, 99]),
             id='ivt_three_steps_two_fixations',
@@ -264,7 +264,7 @@ from pymovements.synthetic import step_function
                     values=[(np.nan, np.nan), (0, 0), (np.nan, np.nan)],
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.events.EventDataFrame(name='fixation', onsets=[0, 20], offsets=[9, 89]),
             id='ivt_two_fixations_interrupted_by_nan',
@@ -283,7 +283,7 @@ from pymovements.synthetic import step_function
                     values=[(np.nan, np.nan), (0, 0), (np.nan, np.nan)],
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.events.EventDataFrame(name='fixation', onsets=[0], offsets=[89]),
             id='ivt_one_fixation_including_nan',
@@ -299,7 +299,7 @@ from pymovements.synthetic import step_function
                 time=np.arange(1000, 1100, dtype=int),
                 velocity=step_function(length=100, steps=[0], values=[(0, 0)]),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.events.EventDataFrame(
                 name='fixation',
@@ -319,7 +319,7 @@ from pymovements.synthetic import step_function
                 time=np.arange(1000, 1010, 0.1, dtype=float),
                 velocity=step_function(length=100, steps=[0], values=[(0, 0)]),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.events.EventDataFrame(
                 name='fixation',
@@ -340,7 +340,7 @@ from pymovements.synthetic import step_function
                 time=np.reshape(np.arange(1000, 1100, dtype=int), (100, 1)),
                 velocity=step_function(length=100, steps=[0], values=[(0, 0)]),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.events.EventDataFrame(
                 name='fixation',
@@ -360,7 +360,7 @@ from pymovements.synthetic import step_function
             pm.gaze.from_numpy(
                 velocity=step_function(length=100, steps=[0], values=[(0, 0)]),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.events.EventDataFrame(
                 name='fixation',
@@ -380,7 +380,7 @@ from pymovements.synthetic import step_function
             pm.gaze.from_numpy(
                 velocity=step_function(length=100, steps=[0], values=[(0, 0, 0, 0)]),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.events.EventDataFrame(
                 name='fixation',
@@ -400,7 +400,7 @@ from pymovements.synthetic import step_function
             pm.gaze.from_numpy(
                 velocity=step_function(length=100, steps=[0], values=[(0, 0, 0, 0, 0, 0)]),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.events.EventDataFrame(
                 name='fixation',
@@ -422,7 +422,7 @@ from pymovements.synthetic import step_function
                     length=100, steps=[0, 10], values=[(0, 0, 1, 1, 1, 1), (0, 0, 0, 0, 0, 0)],
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.events.EventDataFrame(
                 name='fixation',
@@ -444,7 +444,7 @@ from pymovements.synthetic import step_function
                     length=100, steps=[0, 10], values=[(1, 1, 0, 0, 1, 1), (0, 0, 0, 0, 0, 0)],
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.events.EventDataFrame(
                 name='fixation',
@@ -466,7 +466,7 @@ from pymovements.synthetic import step_function
                     length=100, steps=[0, 10], values=[(1, 1, 1, 1, 0, 0), (0, 0, 0, 0, 0, 0)],
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.events.EventDataFrame(
                 name='fixation',
@@ -485,7 +485,7 @@ from pymovements.synthetic import step_function
                 time=np.reshape(np.arange(1000, 1100, dtype=int), (100, 1)),
                 velocity=step_function(length=100, steps=[40, 50], values=[(9, 9), (0, 0)]),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.EventDataFrame(),
             id='microsaccades_two_steps_one_saccade_high_threshold_no_events',
@@ -499,7 +499,7 @@ from pymovements.synthetic import step_function
             pm.gaze.from_numpy(
                 velocity=step_function(length=100, steps=[40, 50], values=[(9, 9), (0, 0)]),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.EventDataFrame(
                 name='saccade',
@@ -518,7 +518,7 @@ from pymovements.synthetic import step_function
             pm.gaze.from_numpy(
                 velocity=step_function(length=100, steps=[40, 50], values=[(9, 9), (0, 0)]),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.EventDataFrame(
                 name='custom_saccade',
@@ -541,7 +541,7 @@ from pymovements.synthetic import step_function
                     start_value=(0, 0),
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.EventDataFrame(
                 name='saccade',
@@ -565,7 +565,7 @@ from pymovements.synthetic import step_function
                     start_value=(0, 0),
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.EventDataFrame(
                 name='saccade',
@@ -589,7 +589,7 @@ from pymovements.synthetic import step_function
                     start_value=(0, 0),
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.EventDataFrame(
                 name='saccade',
@@ -614,7 +614,7 @@ from pymovements.synthetic import step_function
                     start_value=(0, 0),
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.EventDataFrame(
                 name='saccade',
@@ -638,7 +638,7 @@ from pymovements.synthetic import step_function
                     start_value=(0, 0),
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.EventDataFrame(),
             id='microsaccades_two_steps_one_saccade_timesteps',
@@ -716,10 +716,73 @@ from pymovements.synthetic import step_function
             ),
             id='fill_fixation_10_ms_break_then_saccade_until_end_single_fill',
         ),
+
+        pytest.param(
+            'fill',
+            {},
+            pm.gaze.from_numpy(
+                time=np.arange(100, 200),
+                events=pm.EventDataFrame(
+                    name=['fixation', 'saccade'], onsets=[0, 50], offsets=[40, 100],
+                ),
+            ),
+            pm.EventDataFrame(
+                name=['fixation', 'saccade', 'unclassified'],
+                onsets=[0, 50, 100],
+                offsets=[40, 100, 199],
+            ),
+            id='fill_fixation_events_before_timesteps',
+        ),
+
+        pytest.param(
+            'fill',
+            {},
+            pm.gaze.from_numpy(
+                time=np.arange(0, 200),
+                events=pm.EventDataFrame(
+                    name=['fixation', 'saccade'], onsets=[210, 250], offsets=[240, 300],
+                ),
+            ),
+            pm.EventDataFrame(
+                name=['fixation', 'saccade', 'unclassified'],
+                onsets=[210, 250, 0],
+                offsets=[240, 300, 199],
+            ),
+            id='fill_fixation_events_after_timesteps',
+        ),
+
+        pytest.param(
+            'fill',
+            {},
+            pm.gaze.from_numpy(
+                time=np.arange(100, 200),
+                events=pm.EventDataFrame(
+                    name=['fixation', 'fixation'], onsets=[0, 120], offsets=[110, 220],
+                ),
+            ),
+            pm.EventDataFrame(
+                name=['fixation', 'fixation', 'unclassified'],
+                onsets=[0, 120, 110],
+                offsets=[110, 220, 119],
+            ),
+            id='fill_fixation_events_exceed_time_boundaries',
+        ),
     ],
 )
 def test_gaze_detect(method, kwargs, gaze, expected):
     gaze.detect(method, **kwargs)
+    assert_frame_equal(gaze.events.frame, expected.frame)
+
+
+def test_gaze_detect_custom_method_no_arguments():
+    def custom_method():
+        return pm.EventDataFrame()
+
+    gaze = pm.gaze.from_numpy()
+
+    expected = pm.EventDataFrame()
+
+    gaze.detect(custom_method)
     assert_frame_equal(gaze.events.frame, expected.frame)
 
 
@@ -735,7 +798,7 @@ def test_gaze_detect(method, kwargs, gaze, expected):
             },
             pm.gaze.GazeDataFrame(None, pm.Experiment(1024, 768, 38, 30, 60, 'center', 10)),
             pl.exceptions.ColumnNotFoundError,
-            "Column 'velocity' not found. Available columns are: []",
+            "Column 'velocity' not found. Available columns are: ['time']",
             id='ivt_no_velocity_raises_column_not_found_error',
         ),
 
