@@ -243,18 +243,15 @@ class GazeDataFrame:
         # In case the 'time' column is already present we don't need to do anything.
         # Otherwise, create a new time column starting with zero.
         if time_column is None and 'time' not in self.frame.columns:
-            self.frame = self.frame.with_columns(time=pl.arange(0, len(self.frame)))
-
-        # In case the 'time' column is already present we don't need to do anything.
-        # Otherwise, create a new time column starting with zero.
-        if time_column is None and 'time' not in self.frame.columns:
-            timesteps = pl.arange(0, len(self.frame))
-
             # In case we have an experiment with sampling rate given, we convert to milliseconds.
             if experiment is not None and experiment.sampling_rate is not None:
-                timesteps = timesteps * (1000 / experiment.sampling_rate)
+                sampling_rate_factor = 1000 / experiment.sampling_rate
+            else:
+                sampling_rate_factor = 1
 
-            self.frame = self.frame.with_columns(time=timesteps)
+            self.frame = self.frame.with_columns(
+                time=pl.arange(0, len(self.frame)) * sampling_rate_factor
+            )
 
         # This if clause is mutually exclusive with the previous one.
         if time_column is not None:
