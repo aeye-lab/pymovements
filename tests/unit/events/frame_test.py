@@ -418,7 +418,6 @@ def test_event_dataframe_copy():
             pm.EventDataFrame(
                 pl.DataFrame(
                     {'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
-                    schema_overrides={'trial': pl.Int32},
                 ),
             ),
             id='single_row_trial_str',
@@ -429,7 +428,6 @@ def test_event_dataframe_copy():
             pm.EventDataFrame(
                 pl.DataFrame(
                     {'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
-                    schema_overrides={'trial': pl.Int32},
                 ),
             ),
             id='single_row_trial_list_data_int',
@@ -440,7 +438,6 @@ def test_event_dataframe_copy():
             pm.EventDataFrame(
                 pl.DataFrame(
                     {'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
-                    schema_overrides={'trial': pl.Int32},
                 ),
             ),
             id='single_row_trial_list_single_identifier',
@@ -451,7 +448,6 @@ def test_event_dataframe_copy():
             pm.EventDataFrame(
                 pl.DataFrame(
                     {'group': 'A', 'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
-                    schema_overrides={'trial': pl.Int32},
                 ),
             ),
             id='single_row_trial_list_single_identifier',
@@ -462,7 +458,6 @@ def test_event_dataframe_copy():
             pm.EventDataFrame(
                 pl.DataFrame(
                     {'trial': [1, 1], 'name': ['a', 'a'], 'onset': [0, 8], 'offset': [1, 9]},
-                    schema_overrides={'trial': pl.Int32},
                 ),
             ),
             id='two_rows_trial_list_single_identifier',
