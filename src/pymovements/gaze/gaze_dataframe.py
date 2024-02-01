@@ -250,7 +250,7 @@ class GazeDataFrame:
                 sampling_rate_factor = 1
 
             self.frame = self.frame.with_columns(
-                time=pl.arange(0, len(self.frame)) * sampling_rate_factor
+                time=pl.arange(0, len(self.frame)) * sampling_rate_factor,
             )
 
         # This if clause is mutually exclusive with the previous one.
@@ -294,7 +294,7 @@ class GazeDataFrame:
                 self.events = pm.EventDataFrame(
                     data=pl.DataFrame(
                         schema={column: self.frame.schema[column] for column in self.trial_columns},
-                    )
+                    ),
                 )
         else:
             self.events = events.copy()
@@ -589,7 +589,7 @@ class GazeDataFrame:
                 self.events = pm.EventDataFrame(
                     data=pl.DataFrame(
                         schema={column: self.frame.schema[column] for column in self.trial_columns},
-                    )
+                    ),
                 )
 
         if isinstance(method, str):
@@ -630,7 +630,7 @@ class GazeDataFrame:
                 if missing_trial_columns:
                     raise RuntimeError(
                         f'trial columns {missing_trial_columns} missing from events, '
-                        f'available columns: {self.events.frame.columns}'
+                        f'available columns: {self.events.frame.columns}',
                     )
 
                 # Create filter expression for selecting respective group rows.
@@ -670,7 +670,7 @@ class GazeDataFrame:
                         column for column in self.events.frame.columns
                         if column not in self.trial_columns
                     ],
-                ]
+                ],
             )
 
     @property
