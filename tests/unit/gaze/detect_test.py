@@ -856,6 +856,39 @@ from pymovements.synthetic import step_function
             ),
             id='fill_fixation_events_exceed_time_boundaries',
         ),
+
+        pytest.param(
+            'fill',
+            {'clear': True},
+            pm.gaze.from_numpy(
+                position=step_function(
+                    length=100, steps=[10, 20, 90],
+                    values=[(np.nan, np.nan), (0, 0), (np.nan, np.nan)],
+                ),
+                orient='row',
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+                events=pm.events.EventDataFrame(name='fixation', onsets=[0, 20], offsets=[9, 89]),
+            ),
+            pm.events.EventDataFrame(name='unclassified', onsets=[0], offsets=[99]),
+            id='fill_clear_events_no_trials',
+        ),
+
+        pytest.param(
+            'fill',
+            {'clear': True},
+            pm.gaze.from_numpy(
+                trial=np.ones(100, dtype=int),
+                position=step_function(
+                    length=100, steps=[10, 20, 90],
+                    values=[(np.nan, np.nan), (0, 0), (np.nan, np.nan)],
+                ),
+                orient='row',
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+                events=pm.events.EventDataFrame(name='fixation', onsets=[0, 20], offsets=[9, 89]),
+            ),
+            pm.events.EventDataFrame(name='unclassified', onsets=[0], offsets=[99], trials=[1]),
+            id='fill_clear_events_with_trials',
+        ),
     ],
 )
 def test_gaze_detect(method, kwargs, gaze, expected):
