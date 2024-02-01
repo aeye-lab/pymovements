@@ -205,7 +205,7 @@ class EventDataFrame:
         else:
             if not isinstance(data, Sequence):
                 raise TypeError(
-                    'data must be passed as a list of values in case of multiple provided columns',
+                    'data must be passed as a list of values in case of providing multiple columns',
                 )
             checks.check_is_length_matching(column=column, data=data)
 

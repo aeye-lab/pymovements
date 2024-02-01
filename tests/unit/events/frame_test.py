@@ -472,3 +472,22 @@ def test_event_dataframe_copy():
 def test_event_dataframe_add_trial_column(events, kwargs, expected_df):
     events.add_trial_column(**kwargs)
     assert_frame_equal(events.frame, expected_df.frame)
+
+
+@pytest.mark.parametrize(
+    ('events', 'kwargs', 'exception', 'message'),
+    [
+        pytest.param(
+            pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
+            {'column': ['group', 'trial'], 'data': 1},
+            TypeError,
+            'data must be passed as a list of values in case of providing multiple columns',
+            id='multiple_columns_data_not_list',
+        ),
+    ],
+)
+def test_event_dataframe_add_trial_column_raises_exception(events, kwargs, exception, message):
+    with pytest.raises(exception) as excinfo:
+        events.add_trial_column(**kwargs)
+
+    assert message == excinfo.value.args[0]
