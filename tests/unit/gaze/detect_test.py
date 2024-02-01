@@ -958,6 +958,7 @@ def test_gaze_detect_custom_method_no_arguments():
             "unknown eye 'foobar'. Supported values are: ['auto', 'left', 'right', 'cyclops']",
             id='ivt_cyclops_eye_four_components_raises_attribute_error',
         ),
+
     ],
 )
 def test_gaze_detect_raises_exception(method, kwargs, gaze, exception, exception_msg):
@@ -966,3 +967,54 @@ def test_gaze_detect_raises_exception(method, kwargs, gaze, exception, exception
 
     msg, = exc_info.value.args
     assert msg == exception_msg
+
+
+def test_gaze_detect_missing_trial_column_events_raises_exception():
+    gaze = pm.gaze.from_numpy(
+        trial=np.ones(100),
+        velocity=step_function(length=100, steps=[0], values=[(0, 0, 0, 0)]),
+        orient='row',
+        experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+    )
+    assert gaze.trial_columns
+
+    # manipulaute event dataframe to not have trial columns
+    gaze.events.frame = gaze.events.frame.drop(gaze.trial_columns)
+    assert gaze.trial_columns[0] not in gaze.events.frame.columns
+
+    with pytest.raises(pl.ColumnNotFoundError) as exc_info:
+        gaze.detect('fill')
+
+    msg, = exc_info.value.args
+    assert msg == (
+        "trial columns ['trial'] missing from events, "
+        "available columns: ['name', 'onset', 'offset', 'duration']"
+    )
+
+
+@pytest.mark.parametrize(
+    ('method', 'column'),
+    [
+        ('ivt', 'velocity'),
+        ('idt', 'position'),
+    ],
+)
+def test_gaze_detect_missing_missing_eye_components_raises_exception(method, column):
+    gaze = pm.gaze.from_numpy(
+        trial=np.ones(100),
+        position=step_function(length=100, steps=[0], values=[(0, 0, 0, 0)]),
+        velocity=step_function(length=100, steps=[0], values=[(0, 0, 0, 0)]),
+        orient='row',
+        experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+    )
+    assert gaze.n_components is not None
+
+    # Manipulate n_components attribute.
+    gaze.n_components = None
+    assert gaze.n_components is None
+
+    with pytest.raises(ValueError) as exc_info:
+        gaze.detect(method)
+
+    msg, = exc_info.value.args
+    assert msg == f"eye_components must not be None if passing {column} to event detection"
