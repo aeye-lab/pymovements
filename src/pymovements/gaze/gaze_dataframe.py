@@ -295,6 +295,7 @@ class GazeDataFrame:
                     data=pl.DataFrame(
                         schema={column: self.frame.schema[column] for column in self.trial_columns},
                     ),
+                    trial_columns=self.trial_columns,
                 )
         else:
             self.events = events.copy()
@@ -590,6 +591,7 @@ class GazeDataFrame:
                     data=pl.DataFrame(
                         schema={column: self.frame.schema[column] for column in self.trial_columns},
                     ),
+                    trial_columns=self.trial_columns,
                 )
 
         if isinstance(method, str):
