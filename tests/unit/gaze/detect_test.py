@@ -201,7 +201,7 @@ from pymovements.synthetic import step_function
                 trial=np.array([1] * 50 + [2] * 50),
                 position=step_function(length=100, steps=[0], values=[(0, 0)]),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.EventDataFrame(name='fixation', onsets=[0, 50], offsets=[49, 99], trials=[1, 2]),
             id='idt_constant_position_single_fixation_per_trial',
