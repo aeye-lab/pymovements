@@ -664,16 +664,6 @@ class GazeDataFrame:
                 [self.events.frame, *new_events_grouped],
                 how='diagonal',
             )
-            # ensure trial columns are at the start
-            self.events.frame = self.events.frame.select(
-                [
-                    *self.trial_columns,
-                    *[
-                        column for column in self.events.frame.columns
-                        if column not in self.trial_columns
-                    ],
-                ],
-            )
 
     @property
     def schema(self) -> pl.type_aliases.SchemaDict:
