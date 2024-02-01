@@ -716,6 +716,57 @@ from pymovements.synthetic import step_function
             ),
             id='fill_fixation_10_ms_break_then_saccade_until_end_single_fill',
         ),
+
+        pytest.param(
+            'fill',
+            {},
+            pm.gaze.from_numpy(
+                time=np.arange(100, 200),
+                events=pm.EventDataFrame(
+                    name=['fixation', 'saccade'], onsets=[0, 50], offsets=[40, 100],
+                ),
+            ),
+            pm.EventDataFrame(
+                name=['fixation', 'saccade', 'unclassified'],
+                onsets=[0, 50, 100],
+                offsets=[40, 100, 199],
+            ),
+            id='fill_fixation_events_before_timesteps',
+        ),
+
+        pytest.param(
+            'fill',
+            {},
+            pm.gaze.from_numpy(
+                time=np.arange(0, 200),
+                events=pm.EventDataFrame(
+                    name=['fixation', 'saccade'], onsets=[210, 250], offsets=[240, 300],
+                ),
+            ),
+            pm.EventDataFrame(
+                name=['fixation', 'saccade', 'unclassified'],
+                onsets=[210, 250, 0],
+                offsets=[240, 300, 199],
+            ),
+            id='fill_fixation_events_after_timesteps',
+        ),
+
+        pytest.param(
+            'fill',
+            {},
+            pm.gaze.from_numpy(
+                time=np.arange(100, 200),
+                events=pm.EventDataFrame(
+                    name=['fixation', 'fixation'], onsets=[0, 120], offsets=[110, 220],
+                ),
+            ),
+            pm.EventDataFrame(
+                name=['fixation', 'fixation', 'unclassified'],
+                onsets=[0, 120, 110],
+                offsets=[110, 220, 119],
+            ),
+            id='fill_fixation_events_exceed_time_boundaries',
+        ),
     ],
 )
 def test_gaze_detect(method, kwargs, gaze, expected):
