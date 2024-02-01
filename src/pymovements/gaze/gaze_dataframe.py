@@ -288,7 +288,14 @@ class GazeDataFrame:
         self.experiment = experiment
 
         if events is None:
-            self.events = pm.EventDataFrame()
+            if self.trial_columns is None:
+                self.events = pm.EventDataFrame()
+            else:  # Ensure that trial columns with correct dtype are present in event dataframe.
+                self.events = pm.EventDataFrame(
+                    data=pl.DataFrame(
+                        schema={column: self.frame.schema[column] for column in self.trial_columns},
+                    )
+                )
         else:
             self.events = events.copy()
 
@@ -576,7 +583,14 @@ class GazeDataFrame:
             Additional keyword arguments to be passed to the event detection method.
         """
         if not self.events or clear:
-            self.events = pm.EventDataFrame()
+            if self.trial_columns is None:
+                self.events = pm.EventDataFrame()
+            else:  # Ensure that trial columns with correct dtype are present in event dataframe.
+                self.events = pm.EventDataFrame(
+                    data=pl.DataFrame(
+                        schema={column: self.frame.schema[column] for column in self.trial_columns},
+                    )
+                )
 
         if isinstance(method, str):
             method = pm.events.EventDetectionLibrary.get(method)
@@ -609,6 +623,16 @@ class GazeDataFrame:
             new_events_grouped: list[pl.DataFrame] = []
 
             for group_identifier, group_gaze in grouped_frames.items():
+                missing_trial_columns = [
+                    trial_column for trial_column in self.trial_columns
+                    if trial_column not in self.events.frame.columns
+                ]
+                if missing_trial_columns:
+                    raise RuntimeError(
+                        f'trial columns {missing_trial_columns} missing from events, '
+                        f'available columns: {self.events.frame.columns}'
+                    )
+
                 method_kwargs = self._fill_event_detection_kwargs(
                     method,
                     gaze=group_gaze,
