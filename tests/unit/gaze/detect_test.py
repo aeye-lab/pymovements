@@ -1017,4 +1017,4 @@ def test_gaze_detect_missing_missing_eye_components_raises_exception(method, col
         gaze.detect(method)
 
     msg, = exc_info.value.args
-    assert msg == f"eye_components must not be None if passing {column} to event detection"
+    assert msg == f'eye_components must not be None if passing {column} to event detection'

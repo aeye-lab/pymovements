@@ -583,7 +583,7 @@ class GazeDataFrame:
         **kwargs: Any
             Additional keyword arguments to be passed to the event detection method.
         """
-        if not self.events or clear:
+        if self.events is None or clear:
             if self.trial_columns is None:
                 self.events = pm.EventDataFrame()
             else:  # Ensure that trial columns with correct dtype are present in event dataframe.
@@ -622,19 +622,19 @@ class GazeDataFrame:
                 self.trial_columns, maintain_order=True, include_key=True, as_dict=True,
             )
 
+            missing_trial_columns = [
+                trial_column for trial_column in self.trial_columns
+                if trial_column not in self.events.frame.columns
+            ]
+            if missing_trial_columns:
+                raise pl.ColumnNotFoundError(
+                    f'trial columns {missing_trial_columns} missing from events, '
+                    f'available columns: {self.events.frame.columns}',
+                )
+
             new_events_grouped: list[pl.DataFrame] = []
 
             for group_identifier, group_gaze in grouped_frames.items():
-                missing_trial_columns = [
-                    trial_column for trial_column in self.trial_columns
-                    if trial_column not in self.events.frame.columns
-                ]
-                if missing_trial_columns:
-                    raise RuntimeError(
-                        f'trial columns {missing_trial_columns} missing from events, '
-                        f'available columns: {self.events.frame.columns}',
-                    )
-
                 # Create filter expression for selecting respective group rows.
                 if len(self.trial_columns) == 1:
                     group_filter_expression = pl.col(self.trial_columns[0]) == group_identifier
