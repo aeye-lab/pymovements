@@ -195,6 +195,7 @@ from pymovements.synthetic import step_function
                         'y_vel': [None, 100.0, 100.0, None, 100.0, 100.0],
                     },
                 ),
+                trial_columns='trial_id',
                 position_columns=['x_dva', 'y_dva'],
                 velocity_columns=['x_vel', 'y_vel'],
             ),
