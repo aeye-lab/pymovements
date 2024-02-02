@@ -407,3 +407,82 @@ def test_event_dataframe_copy():
     assert events is not events_copy
     assert events.frame is not events_copy.frame
     assert_frame_equal(events.frame, events_copy.frame)
+
+
+@pytest.mark.parametrize(
+    ('events', 'kwargs', 'expected_df'),
+    [
+        pytest.param(
+            pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
+            {'column': 'trial', 'data': 1},
+            pm.EventDataFrame(
+                pl.DataFrame(
+                    {'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
+                ),
+            ),
+            id='single_row_trial_str',
+        ),
+        pytest.param(
+            pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
+            {'column': ['trial'], 'data': 1},
+            pm.EventDataFrame(
+                pl.DataFrame(
+                    {'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
+                ),
+            ),
+            id='single_row_trial_list_data_int',
+        ),
+        pytest.param(
+            pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
+            {'column': ['trial'], 'data': [1]},
+            pm.EventDataFrame(
+                pl.DataFrame(
+                    {'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
+                ),
+            ),
+            id='single_row_trial_list_single_identifier',
+        ),
+        pytest.param(
+            pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
+            {'column': ['group', 'trial'], 'data': ['A', 1]},
+            pm.EventDataFrame(
+                pl.DataFrame(
+                    {'group': 'A', 'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
+                ),
+            ),
+            id='single_row_trial_list_single_identifier',
+        ),
+        pytest.param(
+            pm.EventDataFrame(name='a', onsets=[0, 8], offsets=[1, 9]),
+            {'column': ['trial'], 'data': [1]},
+            pm.EventDataFrame(
+                pl.DataFrame(
+                    {'trial': [1, 1], 'name': ['a', 'a'], 'onset': [0, 8], 'offset': [1, 9]},
+                ),
+            ),
+            id='two_rows_trial_list_single_identifier',
+        ),
+    ],
+)
+def test_event_dataframe_add_trial_column(events, kwargs, expected_df):
+    events.add_trial_column(**kwargs)
+    assert_frame_equal(events.frame, expected_df.frame)
+
+
+@pytest.mark.parametrize(
+    ('events', 'kwargs', 'exception', 'message'),
+    [
+        pytest.param(
+            pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
+            {'column': ['group', 'trial'], 'data': 1},
+            TypeError,
+            'data must be passed as a list of values in case of providing multiple columns',
+            id='multiple_columns_data_not_list',
+        ),
+    ],
+)
+def test_event_dataframe_add_trial_column_raises_exception(events, kwargs, exception, message):
+    with pytest.raises(exception) as excinfo:
+        events.add_trial_column(**kwargs)
+
+    assert message == excinfo.value.args[0]

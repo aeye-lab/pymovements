@@ -181,6 +181,45 @@ class EventDataFrame:
         """
         self.frame = self.frame.join(event_properties, on=join_on, how='left')
 
+    def add_trial_column(
+            self,
+            column: str | list[str],
+            data: int | float | str | list[int | float | str] | None,
+    ) -> None:
+        """Add new trial columns with constant values.
+
+        Parameters
+        ----------
+        column: str | list[str]
+            The name(s) of the new trial column(s).
+        data: int | float | str | list[int | float | str] | None
+            The values to be used for filling the trial column(s). In case multiple columns are
+            provided, data must be a list of values matching the provided column order.
+        """
+        # Create trial column dictionary to iterate over in select().
+        if isinstance(column, str):
+            trial_columns = {column: data}
+        # In case a list of a single column is passed as an explicit value.
+        elif len(column) == 1 and (isinstance(data, (int, float, str) or data is None)):
+            trial_columns = {column[0]: data}
+        else:
+            if not isinstance(data, Sequence):
+                raise TypeError(
+                    'data must be passed as a list of values in case of providing multiple columns',
+                )
+            checks.check_is_length_matching(column=column, data=data)
+
+            trial_columns = dict(zip(column, data))
+
+        self.frame = self.frame.select(
+            [
+                pl.lit(column_data).alias(column_name) if not isinstance(column_data, int)
+                # Enforce Int64 columns for integers.
+                else pl.lit(column_data).alias(column_name).cast(pl.Int64)
+                for column_name, column_data in trial_columns.items()
+            ] + [pl.all()],
+        )
+
     @property
     def event_property_columns(self) -> list[str]:
         """Event property columns for this dataframe.
