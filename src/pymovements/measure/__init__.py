@@ -17,6 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Provides eye movement measures."""
 from pymovements.measure.library import MeasureLibrary
 from pymovements.measure.library import register_measure
 from pymovements.measure.measures import null_ratio

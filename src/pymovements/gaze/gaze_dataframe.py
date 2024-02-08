@@ -666,6 +666,23 @@ class GazeDataFrame:
             )
 
     def get_measure(self, method: str, **kwargs: Any) -> pl.DataFrame:
+        """Calculate eye movement measure.
+
+        If :py:class:``GazeDataFrame`` has :py:attr:``trial_columns``, measures will be grouped by
+        trials.
+
+        Parameters
+        ----------
+        method: str
+            Measure to be calculated.
+        **kwargs: Any
+            Keyword arguments to be passed to the respective measure function.
+
+        Returns
+        -------
+        pl.DataFrame
+            Measure results.
+        """
         if method == 'null_ratio':
             kwargs['column_dtype'] = self.frame[kwargs['column']].dtype
 

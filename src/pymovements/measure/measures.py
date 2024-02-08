@@ -17,6 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Provides eye movement measure implementations."""
 from __future__ import annotations
 
 import polars as pl
@@ -26,11 +27,27 @@ from pymovements.measure.library import register_measure
 
 @register_measure
 def null_ratio(column: str, column_dtype: pl.DataType) -> pl.Expr:
-    if column_dtype == pl.List:
+    """Ratio of null values to overall values.
+
+    In case of list columns, a null element in the list will count as overall null for the
+    respective cell.
+
+    Parameters
+    ----------
+    column: str
+        Name of measured column.
+    column_dtype: pl.DataType
+        Data type of measured column.
+
+    Returns
+    -------
+    pl.Expr
+        Null ratio expression.
+    """
+    if column_dtype in {pl.Float64, pl.Int64, pl.Utf8}:
+        value = 1 - pl.col(column).count() / pl.col(column).len()
+    elif column_dtype == pl.List:
         non_null_lengths = pl.col(column).list.drop_nulls().list.len()
         value = 1 - (non_null_lengths == pl.col(column).list.len()).sum() / pl.col(column).len()
-
-    elif column_dtype in {pl.Float64, pl.Int64, pl.Utf8}:
-        value = 1 - pl.col(column).count() / pl.col(column).len()
 
     return value.alias('null_ratio')
