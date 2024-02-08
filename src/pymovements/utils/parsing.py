@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import re
+from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -36,6 +37,15 @@ EYE_TRACKING_SAMPLE = re.compile(
     r'(?P<dots>[A-Za-z.]{3,5})?\s*',
 )
 
+EYELINK_META_REGEXES = [
+    r'\*\*\s+VERSION:\s+(?P<version_1>.*)\s+',
+    r'\*\*\s+DATE:\s+(?P<weekday>[A-Z,a-z]+)\s+(?P<month>[A-Z,a-z]+)'
+    r'\s+(?P<day>\d\d?)\s+(?P<time>\d\d:\d\d:\d\d)\s+(?P<year>\d{4})\s+',
+    r'\*\*\s+(?P<version_2>EYELINK.*)',
+    r'SAMPLES\s+GAZE\s+(?P<tracked_eye>LEFT|RIGHT)\s+RATE\s+'
+    r'(?P<sampling_rate>[-]?\d*[.]\d*)\s+TRACKING\s+(?P<tracking>\S+)'
+    r'\s+FILTER\s+(?P<filter>\d+)\s+INPUT',
+]
 
 def check_nan(sample_location: str) -> float:
     """Return position as float or np.nan depending on validity of sample.
@@ -121,7 +131,7 @@ def parse_eyelink(
         filepath: Path | str,
         patterns: list[dict[str, Any]] | None = None,
         schema: dict[str, Any] | None = None,
-) -> pl.DataFrame:
+) -> tuple[pl.DataFrame, dict[str, Any]]:
     """Process EyeLink asc file.
 
     Parameters
@@ -135,10 +145,15 @@ def parse_eyelink(
 
     Returns
     -------
-    pl.DataFrame
-        Returns parsed eyelink polars dataframe.
+    tuple[pl.DataFrame, dict[str, Any]]
+        A tuple containing the parsed sample data and the metadata in a dictionary.
 
+    Raises
+    ------
+    Warning
+        If no metadata is found in the file.
     """
+
     if patterns is None:
         patterns = []
     compiled_patterns = compile_patterns(patterns)
@@ -161,6 +176,11 @@ def parse_eyelink(
 
     with open(filepath, encoding='ascii') as asc_file:
         lines = asc_file.readlines()
+
+    metadata = defaultdict(str)
+    compiled_metadata_patterns = [
+        re.compile(metadata_pattern) for metadata_pattern in EYELINK_META_REGEXES
+    ]
 
     for line in lines:
         for pattern_dict in compiled_patterns:
@@ -194,6 +214,23 @@ def parse_eyelink(
             for additional_column in additional_columns:
                 samples[additional_column].append(current_additional[additional_column])
 
+        if compiled_metadata_patterns:
+            for pattern in compiled_metadata_patterns:
+                if match := pattern.match(line):
+                    for column, value in match.groupdict().items():
+                        metadata[column] = value
+
+                    # each metadata pattern should only match once
+                    compiled_metadata_patterns.remove(pattern)
+
+    # note sure not if this is the best way...
+    if not metadata:
+        raise Warning('No metadata found. Please check the file for errors.')
+
+    metadata['version_number'], metadata['model'] = _parse_full_version(
+        metadata['version_1'], metadata['version_2']
+    )
+
     schema_overrides = {
         'time': pl.Int64,
         'x_pix': pl.Float64,
@@ -209,4 +246,44 @@ def parse_eyelink(
         schema_overrides=schema_overrides,
     )
 
-    return df
+    return df, metadata
+
+
+def _parse_full_version(version_str_1: str, version_str_2: str) -> (str, str):
+    """
+    Parse the two version strings into a version number and model.
+
+    Parameters
+    ----------
+    version_str_1: str
+        First version string.
+    version_str_2: str
+        Second version string.
+
+    Returns
+    -------
+    str, str
+        Version number and model as strings.
+    """
+
+    if version_str_1 == 'EYELINK II 1':
+        version_pattern = re.compile(r'.*v([0-9]\.[0-9]+).*')
+        version_number = version_pattern.match(version_str_2).group(1)
+        if float(version_number) < 3:
+            model = 'EyeLink II'
+        elif float(version_number) < 5:
+            model = 'EyeLink 1000'
+        elif float(version_number) < 6:
+            model = 'EyeLink 1000 Plus'
+        else:
+            model = 'EyeLink Portable Duo'
+
+    else:
+        # taken from R package eyelinker/eyelink_parser.R
+        version_pattern = re.compile(r'.*\s+([0-9]\.[0-9]+).*')
+        model = 'EyeLink I'
+        version_number = version_pattern.match(version_str_1).group(1)
+
+    version = version_number
+
+    return version, model

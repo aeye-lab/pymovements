@@ -22,15 +22,35 @@ import numpy as np
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
+from unittest import TestCase
 
 import pymovements as pm
 
 
 ASC_TEXT = r"""
+** CONVERTED FROM D:\pymovements\results\sub_1\sub_1.edf using edfapi 4.2.1 Win32  EyeLink Dataviewer Sub ComponentApr 12 2021 on Fri Mar 10 18:07:57 2023
+** DATE: Wed Mar  8 09:25:20 2023
+** TYPE: EDF_FILE BINARY EVENT SAMPLE TAGGED
+** VERSION: EYELINK II 1
+** SOURCE: EYELINK CL
+** EYELINK II CL v6.12 Feb  1 2018 (EyeLink Portable Duo)
+** CAMERA: EyeLink USBCAM Version 1.01
+** SERIAL NUMBER: CLU-DAB50
+** CAMERA_CONFIG: DAB50200.SCD
+** RECORDED BY pymovements
+** SREB2.2.299 WIN32 LID:20A87A96 Mod:2023.03.08 11:03 MEZ
+**
+
 some
 lines
 to
 ignore
+MSG	2095865 DISPLAY_COORDS 0 0 1279 1023
+PRESCALER	1
+VPRESCALER	1
+PUPIL	AREA
+EVENTS	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2
+SAMPLES	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2	INPUT
 the next line has all additional trial columns set to None
 10000000	  850.7	  717.5	  714.0	    0.0	...
 MSG 10000001 START_A
@@ -95,17 +115,35 @@ EXPECTED_DF = pl.from_dict(
     },
 )
 
+EXPECTED_METADATA = {
+    'weekday': 'Wed',
+    'month': 'Mar',
+    'day': '8',
+    'time': '09:25:20',
+    'year': '2023',
+    'version_1': 'EYELINK II 1',
+    'version_2': 'EYELINK II CL v6.12 Feb  1 2018 (EyeLink Portable Duo)',
+    'model': 'EyeLink Portable Duo',
+    'version_number': '6.12',
+    'sampling_rate': '1000.00',
+    'filter': '2',
+    'tracking': 'CR',
+    'tracked_eye': 'LEFT',
+
+}
+
 
 def test_parse_eyelink(tmp_path):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(ASC_TEXT)
 
-    df = pm.utils.parsing.parse_eyelink(
+    df, metadata = pm.utils.parsing.parse_eyelink(
         filepath,
         patterns=PATTERNS,
     )
 
     assert_frame_equal(df, EXPECTED_DF, check_column_order=False)
+    assert metadata == EXPECTED_METADATA
 
 
 @pytest.mark.parametrize(
@@ -130,3 +168,85 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
     expected_substrings = ['invalid pattern', '1']
     for substring in expected_substrings:
         assert substring in msg
+
+
+@pytest.mark.parametrize(
+    'metadata, expected_version, expected_model',
+    [
+        pytest.param(
+            '** VERSION: EYELINK II 1\n'
+            '** EYELINK II CL v6.12 Feb  1 2018 (EyeLink Portable Duo)',
+            '6.12',
+            'EyeLink Portable Duo',
+            id='eye_link_portable_duo',
+        ),
+        pytest.param(
+            '** VERSION: EYELINK II 1\n'
+            '** EYELINK II CL v5.12 Feb  1 2018',
+            '5.12',
+            'EyeLink 1000 Plus',
+            id='eye_link_1000_plus',
+        ),
+        pytest.param(
+            '** VERSION: EYELINK II 1\n'
+            '** EYELINK II CL v4.12 Feb  1 2018',
+            '4.12',
+            'EyeLink 1000',
+            id='eye_link_1000_1',
+        ),
+        pytest.param(
+            '** VERSION: EYELINK II 1\n'
+            '** EYELINK II CL v3.12 Feb  1 2018',
+            '3.12',
+            'EyeLink 1000',
+            id='eye_link_1000_2',
+        ),
+        pytest.param(
+            '** VERSION: EYELINK II 1\n'
+            '** EYELINK II CL v2.12 Feb  1 2018',
+            '2.12',
+            'EyeLink II',
+            id='eye_link_II',
+        ),
+        pytest.param(
+            '** VERSION: EYELINK REVISION 2.00 (Aug 12 1997)',
+            '2.00',
+            'EyeLink I',
+            id='eye_link_I',
+        ),
+    ],
+)
+def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_model):
+    filepath = tmp_path / 'sub.asc'
+    filepath.write_text(metadata)
+
+    _, metadata = pm.utils.parsing.parse_eyelink(
+        filepath,
+    )
+
+    assert metadata['version_number'] == expected_version
+    assert metadata['model'] == expected_model
+
+@pytest.mark.parametrize(
+    'metadata, expected_msg',
+    [
+        pytest.param(
+            '',
+            f'No metadata found. Please check the file for errors.',
+            id='eye_link_no_metadata',
+        ),
+    ],
+)
+def test_no_metadata_warning(tmp_path, metadata, expected_msg):
+    filepath = tmp_path / 'sub.asc'
+    filepath.write_text(metadata)
+
+    with pytest.raises(Warning) as info:
+        _, metadata = pm.utils.parsing.parse_eyelink(
+            filepath,
+        )
+
+    msg = info.value.args[0]
+
+    assert msg == expected_msg
+
