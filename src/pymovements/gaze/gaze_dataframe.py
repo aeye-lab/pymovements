@@ -665,13 +665,10 @@ class GazeDataFrame:
                 how='diagonal',
             )
 
-    def get_measure(self, method: str):
-        non_null_lengths = self.frame['pixel'].list.drop_nulls().list.len()
-        value = 1 - (non_null_lengths ==  self.frame['pixel'].list.len()).sum() / len(self.frame)
-        # will work only for plain non-nested columns
-        #value = (len(self.frame) - self.frame['pixel'].count()) / len(self.frame)
-
-        return pl.DataFrame(data={method: [value]})
+    def get_measure(self, method: str, column: str):
+        column_dtype = self.frame[column].dtype
+        method = pm.measure.MeasureLibrary.get(method)
+        return self.frame.select(method(column=column, column_dtype=column_dtype))
 
     @property
     def schema(self) -> pl.type_aliases.SchemaDict:
