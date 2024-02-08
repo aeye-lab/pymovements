@@ -99,4 +99,3 @@ def register_measure(method: MeasureMethod) -> MeasureMethod:
     """
     MeasureLibrary.add(method)
     return method
-

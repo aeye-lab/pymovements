@@ -200,7 +200,8 @@ import pymovements as pm
             pm.GazeDataFrame(
                 data=pl.from_dict(
                     data={'A': [1000, 1001, 1002, 1003], 'trial': [1, 1, 1, 1]},
-                    schema={'A': pl.Int64, 'trial': pl.Int64}),
+                    schema={'A': pl.Int64, 'trial': pl.Int64},
+                ),
                 trial_columns='trial',
             ),
             'null_ratio',
@@ -213,7 +214,8 @@ import pymovements as pm
             pm.GazeDataFrame(
                 data=pl.from_dict(
                     data={'A': [1000, 1001, None, None], 'trial': [1, 1, 2, 2]},
-                    schema={'A': pl.Int64, 'trial': pl.Int64}),
+                    schema={'A': pl.Int64, 'trial': pl.Int64},
+                ),
                 trial_columns='trial',
             ),
             'null_ratio',
@@ -222,7 +224,7 @@ import pymovements as pm
             id='null_ratio_int_column_no_nulls_two_trials',
         ),
 
-    ]
+    ],
 )
 def test_get_measure(gaze, method, kwargs, expected):
     df = gaze.get_measure(method, **kwargs)

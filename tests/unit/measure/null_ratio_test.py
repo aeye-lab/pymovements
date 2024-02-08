@@ -92,33 +92,33 @@ import pymovements as pm
         ),
 
         pytest.param(
-            pl.from_dict(data={'A': [[0.1, 0.2], [0.3, 0.4]],}),
+            pl.from_dict(data={'A': [[0.1, 0.2], [0.3, 0.4]]}),
             {'column': 'A', 'column_dtype': pl.List(pl.Float64)},
             pl.from_dict(data={'null_ratio': [0.0]}),
             id='list_dtype_2_elem_2_rows_no_nulls',
         ),
 
         pytest.param(
-            pl.from_dict(data={'A': [[None, None], [None, None]],}),
+            pl.from_dict(data={'A': [[None, None], [None, None]]}),
             {'column': 'A', 'column_dtype': pl.List(pl.Float64)},
             pl.from_dict(data={'null_ratio': [1.0]}),
             id='list_dtype_2_elem_2_rows_all_nulls',
         ),
 
         pytest.param(
-            pl.from_dict(data={'A': [[0.1, 0.2], [None, None]],}),
+            pl.from_dict(data={'A': [[0.1, 0.2], [None, None]]}),
             {'column': 'A', 'column_dtype': pl.List(pl.Float64)},
             pl.from_dict(data={'null_ratio': [0.5]}),
             id='list_dtype_2_elem_2_rows_half_nulls',
         ),
 
         pytest.param(
-            pl.from_dict(data={'A': [[0.1, None], [0.2, None]], }),
+            pl.from_dict(data={'A': [[0.1, None], [0.2, None]]}),
             {'column': 'A', 'column_dtype': pl.List(pl.Float64)},
             pl.from_dict(data={'null_ratio': [1.0]}),
             id='list_dtype_2_elem_2_rows_half_nulls_each_row',
         ),
-    ]
+    ],
 )
 def test_get_measure(df, kwargs, expected):
     result = df.select(pm.measure.null_ratio(**kwargs))
