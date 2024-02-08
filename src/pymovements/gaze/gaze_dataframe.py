@@ -665,6 +665,14 @@ class GazeDataFrame:
                 how='diagonal',
             )
 
+    def get_measure(self, method: str):
+        non_null_lengths = self.frame['pixel'].list.drop_nulls().list.len()
+        value = 1 - (non_null_lengths ==  self.frame['pixel'].list.len()).sum() / len(self.frame)
+        # will work only for plain non-nested columns
+        #value = (len(self.frame) - self.frame['pixel'].count()) / len(self.frame)
+
+        return pl.DataFrame(data={method: [value]})
+
     @property
     def schema(self) -> pl.type_aliases.SchemaDict:
         """Schema of event dataframe."""

@@ -23,6 +23,7 @@ from pymovements import datasets
 from pymovements import events
 from pymovements import exceptions
 from pymovements import gaze
+from pymovements import measure
 from pymovements import plotting
 from pymovements import synthetic
 from pymovements import utils
@@ -37,6 +38,8 @@ from pymovements.events import EventProcessor
 from pymovements.gaze import Experiment
 from pymovements.gaze import GazeDataFrame
 from pymovements.gaze import Screen
+from pymovements.measure import MeasureLibrary
+from pymovements.measure import register_measure
 
 
 __all__ = [
@@ -58,6 +61,11 @@ __all__ = [
     'GazeDataFrame',
 
     'exceptions',
+
+    'measure',
+    'MeasureLibrary',
+    'register_measure',
+
     'plotting',
     'synthetic',
     'utils',
