@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test event detection library."""
+"""Test measure library."""
 from __future__ import annotations
 
 import pytest
@@ -31,7 +31,7 @@ import pymovements as pm
         pytest.param(pm.measure.null_ratio, 'null_ratio', id='null_ratio'),
     ],
 )
-def test_transform_registered(method, name):
+def test_measure_registered(method, name):
     assert name in pm.measure.MeasureLibrary
     assert pm.measure.MeasureLibrary.get(name) == method
     assert pm.measure.MeasureLibrary.get(name).__name__ == name
