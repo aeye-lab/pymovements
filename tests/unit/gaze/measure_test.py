@@ -195,6 +195,33 @@ import pymovements as pm
             pl.DataFrame(data={'null_ratio': [0.5]}),
             id='null_ratio_velocity_half_nulls',
         ),
+
+        pytest.param(
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    data={'A': [1000, 1001, 1002, 1003], 'trial': [1, 1, 1, 1]},
+                    schema={'A': pl.Int64, 'trial': pl.Int64}),
+                trial_columns='trial',
+            ),
+            'null_ratio',
+            {'column': 'A'},
+            pl.DataFrame(data={'trial': [1], 'null_ratio': [0.0]}),
+            id='null_ratio_int_column_no_nulls_single_trial',
+        ),
+
+        pytest.param(
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    data={'A': [1000, 1001, None, None], 'trial': [1, 1, 2, 2]},
+                    schema={'A': pl.Int64, 'trial': pl.Int64}),
+                trial_columns='trial',
+            ),
+            'null_ratio',
+            {'column': 'A'},
+            pl.DataFrame(data={'trial': [1, 2], 'null_ratio': [0.0, 1.0]}),
+            id='null_ratio_int_column_no_nulls_two_trials',
+        ),
+
     ]
 )
 def test_get_measure(gaze, method, kwargs, expected):

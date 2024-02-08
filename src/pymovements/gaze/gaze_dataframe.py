@@ -665,10 +665,27 @@ class GazeDataFrame:
                 how='diagonal',
             )
 
-    def get_measure(self, method: str, column: str):
-        column_dtype = self.frame[column].dtype
+    def get_measure(self, method: str, **kwargs) -> pl.DataFrame:
+        if method == 'null_ratio':
+            kwargs['column_dtype'] = self.frame[kwargs['column']].dtype
+
         method = pm.measure.MeasureLibrary.get(method)
-        return self.frame.select(method(column=column, column_dtype=column_dtype))
+
+        if self.trial_columns is None:
+            return self.frame.select(method(**kwargs))
+        else:
+            return pl.concat(
+                [
+                    df.select(
+                        [  # add trial columns first, then add column for measure.
+                            pl.lit(value).cast(self.frame.schema[name]).alias(name)
+                            for name, value in zip(self.trial_columns, trial_values)
+                        ] + [method(**kwargs)],
+                    )
+                    for trial_values, df in
+                    self.frame.group_by(self.trial_columns, maintain_order=True)
+                ],
+            )
 
     @property
     def schema(self) -> pl.type_aliases.SchemaDict:
