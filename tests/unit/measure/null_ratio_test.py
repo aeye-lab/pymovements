@@ -118,7 +118,6 @@ import pymovements as pm
             pl.from_dict(data={'null_ratio': [1.0]}),
             id='list_dtype_2_elem_2_rows_half_nulls_each_row',
         ),
-
     ]
 )
 def test_get_measure(df, kwargs, expected):

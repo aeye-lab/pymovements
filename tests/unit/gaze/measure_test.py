@@ -30,6 +30,96 @@ import pymovements as pm
     [
         pytest.param(
             pm.GazeDataFrame(
+                data=pl.from_dict(data={'A': [1000, 1001, 1002, 1003]}, schema={'A': pl.Int64}),
+            ),
+            'null_ratio',
+            {'column': 'A'},
+            pl.DataFrame(data={'null_ratio': [0.0]}),
+            id='null_ratio_int_column_no_nulls',
+        ),
+
+        pytest.param(
+            pm.GazeDataFrame(
+                data=pl.from_dict(data={'A': [1000, None, None, 1003]}, schema={'A': pl.Int64}),
+            ),
+            'null_ratio',
+            {'column': 'A'},
+            pl.DataFrame(data={'null_ratio': [0.5]}),
+            id='null_ratio_int_column_half_nulls',
+        ),
+
+        pytest.param(
+            pm.GazeDataFrame(
+                data=pl.from_dict(data={'A': [None, None, None, None]}, schema={'A': pl.Int64}),
+            ),
+            'null_ratio',
+            {'column': 'A'},
+            pl.DataFrame(data={'null_ratio': [1.0]}),
+            id='null_ratio_int_column_all_nulls',
+        ),
+
+        pytest.param(
+            pm.GazeDataFrame(
+                data=pl.from_dict(data={'A': [0.0, 0.1, 0.2, 0.3]}, schema={'A': pl.Float64}),
+            ),
+            'null_ratio',
+            {'column': 'A'},
+            pl.DataFrame(data={'null_ratio': [0.0]}),
+            id='null_ratio_float_column_no_nulls',
+        ),
+
+        pytest.param(
+            pm.GazeDataFrame(
+                data=pl.from_dict(data={'A': [0.0, None, None, 0.3]}, schema={'A': pl.Float64}),
+            ),
+            'null_ratio',
+            {'column': 'A'},
+            pl.DataFrame(data={'null_ratio': [0.5]}),
+            id='null_ratio_float_column_half_nulls',
+        ),
+
+        pytest.param(
+            pm.GazeDataFrame(
+                data=pl.from_dict(data={'A': [None, None, None, None]}, schema={'A': pl.Float64}),
+            ),
+            'null_ratio',
+            {'column': 'A'},
+            pl.DataFrame(data={'null_ratio': [1.0]}),
+            id='null_ratio_float_column_all_nulls',
+        ),
+
+        pytest.param(
+            pm.GazeDataFrame(
+                data=pl.from_dict(data={'A': ['a', 'b', 'c', 'd']}, schema={'A': pl.Utf8}),
+            ),
+            'null_ratio',
+            {'column': 'A'},
+            pl.DataFrame(data={'null_ratio': [0.0]}),
+            id='null_ratio_str_column_no_nulls',
+        ),
+
+        pytest.param(
+            pm.GazeDataFrame(
+                data=pl.from_dict(data={'A': ['a', None, None, 'd']}, schema={'A': pl.Utf8}),
+            ),
+            'null_ratio',
+            {'column': 'A'},
+            pl.DataFrame(data={'null_ratio': [0.5]}),
+            id='null_ratio_str_column_half_nulls',
+        ),
+
+        pytest.param(
+            pm.GazeDataFrame(
+                data=pl.from_dict(data={'A': [None, None, None, None]}, schema={'A': pl.Utf8}),
+            ),
+            'null_ratio',
+            {'column': 'A'},
+            pl.DataFrame(data={'null_ratio': [1.0]}),
+            id='null_ratio_str_column_all_nulls',
+        ),
+
+        pytest.param(
+            pm.GazeDataFrame(
                 data=pl.from_dict(
                     data={'t': [1000, 1001, 1002], 'x': [0.1, 0.2, 0.3], 'y': [0.1, 0.2, 0.3]},
                 ),
