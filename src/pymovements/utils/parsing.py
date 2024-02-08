@@ -47,6 +47,7 @@ EYELINK_META_REGEXES = [
     r'\s+FILTER\s+(?P<filter>\d+)\s+INPUT',
 ]
 
+
 def check_nan(sample_location: str) -> float:
     """Return position as float or np.nan depending on validity of sample.
 
@@ -153,7 +154,6 @@ def parse_eyelink(
     Warning
         If no metadata is found in the file.
     """
-
     if patterns is None:
         patterns = []
     compiled_patterns = compile_patterns(patterns)
@@ -224,12 +224,13 @@ def parse_eyelink(
                     compiled_metadata_patterns.remove(pattern)
 
     # note sure not if this is the best way...
-    if not metadata:
-        raise Warning('No metadata found. Please check the file for errors.')
+    if metadata:
+        metadata['version_number'], metadata['model'] = _parse_full_version(
+            metadata['version_1'], metadata['version_2'],
+        )
 
-    metadata['version_number'], metadata['model'] = _parse_full_version(
-        metadata['version_1'], metadata['version_2']
-    )
+    else:
+        raise Warning('No metadata found. Please check the file for errors.')
 
     schema_overrides = {
         'time': pl.Int64,
@@ -249,9 +250,8 @@ def parse_eyelink(
     return df, metadata
 
 
-def _parse_full_version(version_str_1: str, version_str_2: str) -> (str, str):
-    """
-    Parse the two version strings into a version number and model.
+def _parse_full_version(version_str_1: str, version_str_2: str) -> tuple[str, str]:
+    """Parse the two version strings into a version number and model.
 
     Parameters
     ----------
@@ -262,28 +262,35 @@ def _parse_full_version(version_str_1: str, version_str_2: str) -> (str, str):
 
     Returns
     -------
-    str, str
+    tuple[str, str]
         Version number and model as strings.
     """
+    if version_str_1 == 'EYELINK II 1' and version_str_2:
+        version_pattern = re.compile(r'.*v(?P<version_number>[0-9]\.[0-9]+).*')
+        if match := version_pattern.match(version_str_2):
+            version_number = match.groupdict()['version_number']
+            if float(version_number) < 3:
+                model = 'EyeLink II'
+            elif float(version_number) < 5:
+                model = 'EyeLink 1000'
+            elif float(version_number) < 6:
+                model = 'EyeLink 1000 Plus'
+            else:
+                model = 'EyeLink Portable Duo'
 
-    if version_str_1 == 'EYELINK II 1':
-        version_pattern = re.compile(r'.*v([0-9]\.[0-9]+).*')
-        version_number = version_pattern.match(version_str_2).group(1)
-        if float(version_number) < 3:
-            model = 'EyeLink II'
-        elif float(version_number) < 5:
-            model = 'EyeLink 1000'
-        elif float(version_number) < 6:
-            model = 'EyeLink 1000 Plus'
         else:
-            model = 'EyeLink Portable Duo'
+            version_number = 'unknown'
+            model = 'unknown'
 
     else:
         # taken from R package eyelinker/eyelink_parser.R
-        version_pattern = re.compile(r'.*\s+([0-9]\.[0-9]+).*')
+        version_pattern = re.compile(r'.*\s+(?P<version_number>[0-9]\.[0-9]+).*')
         model = 'EyeLink I'
-        version_number = version_pattern.match(version_str_1).group(1)
+        if match := version_pattern.match(version_str_1):
+            version_number = match.groupdict()['version_number']
 
-    version = version_number
+        else:
+            model = 'unknown'
+            version_number = 'unknown'
 
-    return version, model
+    return version_number, model

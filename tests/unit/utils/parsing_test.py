@@ -22,13 +22,11 @@ import numpy as np
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
-from unittest import TestCase
 
 import pymovements as pm
 
 
 ASC_TEXT = r"""
-** CONVERTED FROM D:\pymovements\results\sub_1\sub_1.edf using edfapi 4.2.1 Win32  EyeLink Dataviewer Sub ComponentApr 12 2021 on Fri Mar 10 18:07:57 2023
 ** DATE: Wed Mar  8 09:25:20 2023
 ** TYPE: EDF_FILE BINARY EVENT SAMPLE TAGGED
 ** VERSION: EYELINK II 1
@@ -214,6 +212,19 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
             'EyeLink I',
             id='eye_link_I',
         ),
+        pytest.param(
+            '** VERSION: nothing\n',
+            'unknown',
+            'unknown',
+            id='unknown_version_1',
+        ),
+        pytest.param(
+            '** VERSION: EYELINK II 1\n'
+            '** EYELINK II CL Feb  1 2018 (EyeLink Portable Duo)',
+            'unknown',
+            'unknown',
+            id='unknown_version_2',
+        ),
     ],
 )
 def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_model):
@@ -227,12 +238,13 @@ def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_mo
     assert metadata['version_number'] == expected_version
     assert metadata['model'] == expected_model
 
+
 @pytest.mark.parametrize(
     'metadata, expected_msg',
     [
         pytest.param(
             '',
-            f'No metadata found. Please check the file for errors.',
+            'No metadata found. Please check the file for errors.',
             id='eye_link_no_metadata',
         ),
     ],
@@ -249,4 +261,3 @@ def test_no_metadata_warning(tmp_path, metadata, expected_msg):
     msg = info.value.args[0]
 
     assert msg == expected_msg
-
