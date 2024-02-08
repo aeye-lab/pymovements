@@ -327,7 +327,7 @@ def load_gaze_file(
     elif filepath.suffix == '.feather':
         gaze_df = pl.read_ipc(filepath)
     elif filepath.suffix == '.asc':
-        gaze_df = parse_eyelink(filepath, **custom_read_kwargs)
+        gaze_df, _ = parse_eyelink(filepath, **custom_read_kwargs)
     else:
         valid_extensions = ['csv', 'tsv', 'txt', 'feather', 'asc']
         raise ValueError(

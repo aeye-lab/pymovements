@@ -223,7 +223,7 @@ def parse_eyelink(
                     # each metadata pattern should only match once
                     compiled_metadata_patterns.remove(pattern)
 
-    # note sure not if this is the best way...
+    # note sure if this is the best way...
     if metadata:
         metadata['version_number'], metadata['model'] = _parse_full_version(
             metadata['version_1'], metadata['version_2'],
@@ -263,7 +263,7 @@ def _parse_full_version(version_str_1: str, version_str_2: str) -> tuple[str, st
     Returns
     -------
     tuple[str, str]
-        Version number and model as strings.
+        Version number and model as strings or unknown if it cannot be parsed.
     """
     if version_str_1 == 'EYELINK II 1' and version_str_2:
         version_pattern = re.compile(r'.*v(?P<version_number>[0-9]\.[0-9]+).*')
