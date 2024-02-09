@@ -1,0 +1,1 @@
+from pymovements.stimuli.stimulus import StimulusDataFrame
