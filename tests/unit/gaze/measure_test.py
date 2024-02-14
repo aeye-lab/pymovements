@@ -25,6 +25,10 @@ from polars.testing import assert_frame_equal
 import pymovements as pm
 
 
+def my_test_measure(column: str) -> pl.Expr:
+    return pl.col(column).len().cast(pl.Int64).alias('my_measure')
+
+
 @pytest.mark.parametrize(
     ('gaze', 'method', 'kwargs', 'expected'),
     [
@@ -224,6 +228,15 @@ import pymovements as pm
             id='null_ratio_int_column_no_nulls_two_trials',
         ),
 
+        pytest.param(
+            pm.GazeDataFrame(
+                data=pl.from_dict(data={'A': [1000, 1001, 1002, 1003]}, schema={'A': pl.Int64}),
+            ),
+            my_test_measure,
+            {'column': 'A'},
+            pl.DataFrame(data={'my_measure': [4]}),
+            id='null_ratio_int_column_no_nulls',
+        ),
     ],
 )
 def test_get_measure(gaze, method, kwargs, expected):

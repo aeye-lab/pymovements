@@ -665,7 +665,11 @@ class GazeDataFrame:
                 how='diagonal',
             )
 
-    def get_measure(self, method: str, **kwargs: Any) -> pl.DataFrame:
+    def get_measure(
+            self,
+            method: str | Callable[..., pl.Expr],
+            **kwargs: Any,
+    ) -> pl.DataFrame:
         """Calculate eye movement measure.
 
         If :py:class:``GazeDataFrame`` has :py:attr:``trial_columns``, measures will be grouped by
@@ -673,7 +677,7 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        method: str
+        method: str | Callable[..., pl.Expr]
             Measure to be calculated.
         **kwargs: Any
             Keyword arguments to be passed to the respective measure function.
@@ -683,10 +687,12 @@ class GazeDataFrame:
         pl.DataFrame
             Measure results.
         """
-        if method == 'null_ratio':
-            kwargs['column_dtype'] = self.frame[kwargs['column']].dtype
+        if isinstance(method, str):
+            method = pm.measure.MeasureLibrary.get(method)
 
-        method = pm.measure.MeasureLibrary.get(method)
+        method_args = inspect.getfullargspec(method).args
+        if 'column_dtype' in method_args:
+            kwargs['column_dtype'] = self.frame[kwargs['column']].dtype
 
         if self.trial_columns is None:
             return self.frame.select(method(**kwargs))

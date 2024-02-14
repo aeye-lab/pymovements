@@ -125,17 +125,6 @@ def test_null_ratio_expected(df, kwargs, expected):
     assert_frame_equal(result, expected)
 
 
-df = pl.DataFrame(
-    {
-        "int": [1, 2],
-        "str": ["a", "b"],
-        "bool": [True, None],
-        "list": [[1, 2], [3]],
-    }
-)
-df.select(pl.struct(pl.all()).alias("my_struct"))
-
-
 @pytest.mark.parametrize(
     ('df', 'kwargs', 'exception', 'message'),
     [
