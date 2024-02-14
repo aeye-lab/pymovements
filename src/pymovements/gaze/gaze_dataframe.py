@@ -238,6 +238,8 @@ class GazeDataFrame:
             data = data.clone()
         self.frame = data
 
+        self.frame = self.frame.fill_nan(None)
+
         self.trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
 
         # In case the 'time' column is already present we don't need to do anything.
@@ -686,6 +688,24 @@ class GazeDataFrame:
         -------
         pl.DataFrame
             Measure results.
+
+        Examples
+        --------
+        Let's initialize an example GazeDataFrame first:
+        >>> gaze = pm.gaze.from_numpy(
+        ...     distance=np.concatenate([np.zeros(40), np.full(10, np.nan), np.ones(50)]),
+        ... )
+
+        You can calculate measures, for example the null ratio like this:
+        >>> gaze.get_measure('null_ratio', column='distance')
+        shape: (1, 1)
+        ┌────────────┐
+        │ null_ratio │
+        │ ---        │
+        │ f64        │
+        ╞════════════╡
+        │ 0.1        │
+        └────────────┘
         """
         if isinstance(method, str):
             method = pm.measure.MeasureLibrary.get(method)

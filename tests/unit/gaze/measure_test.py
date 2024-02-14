@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test GazeDataFrame get_measure method."""
+import numpy as np
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
@@ -50,6 +51,16 @@ def my_test_measure(column: str) -> pl.Expr:
             {'column': 'A'},
             pl.DataFrame(data={'null_ratio': [0.5]}),
             id='null_ratio_int_column_half_nulls',
+        ),
+
+        pytest.param(
+            pm.GazeDataFrame(
+                data=pl.from_dict(data={'A': [1.0, np.nan, np.nan, 1.3]}, schema={'A': pl.Float64}),
+            ),
+            'null_ratio',
+            {'column': 'A'},
+            pl.DataFrame(data={'null_ratio': [0.5]}),
+            id='null_ratio_int_column_half_nans',
         ),
 
         pytest.param(
@@ -166,6 +177,22 @@ def my_test_measure(column: str) -> pl.Expr:
             {'column': 'pixel'},
             pl.DataFrame(data={'null_ratio': [0.5]}),
             id='null_ratio_pixel_half_nulls',
+        ),
+
+        pytest.param(
+            pm.GazeDataFrame(
+                data=pl.DataFrame(
+                    data={
+                        't': [1000, 1001], 'x': [0.1, np.nan], 'y': [0.2, np.nan],
+                    },
+                ),
+                time_column='t',
+                pixel_columns=['x', 'y'],
+            ),
+            'null_ratio',
+            {'column': 'pixel'},
+            pl.DataFrame(data={'null_ratio': [0.5]}),
+            id='null_ratio_pixel_half_nans',
         ),
 
         pytest.param(
