@@ -120,6 +120,37 @@ import pymovements as pm
         ),
     ],
 )
-def test_get_measure(df, kwargs, expected):
+def test_null_ratio_expected(df, kwargs, expected):
     result = df.select(pm.measure.null_ratio(**kwargs))
     assert_frame_equal(result, expected)
+
+
+df = pl.DataFrame(
+    {
+        "int": [1, 2],
+        "str": ["a", "b"],
+        "bool": [True, None],
+        "list": [[1, 2], [3]],
+    }
+)
+df.select(pl.struct(pl.all()).alias("my_struct"))
+
+
+@pytest.mark.parametrize(
+    ('df', 'kwargs', 'exception', 'message'),
+    [
+        pytest.param(
+            pl.DataFrame({'A': [1, 2], 'B': [True, False]}).select(pl.struct(pl.all()).alias('C')),
+            {'column': 'C', 'column_dtype': pl.Struct},
+            TypeError,
+            'column_dtype must be of type {Float64, Int64, Utf8, List} but is of type Struct',
+            id='struct_column',
+        ),
+    ],
+)
+def test_null_ratio_raises(df, kwargs, exception, message):
+    with pytest.raises(exception) as excinfo:
+        df.select(pm.measure.null_ratio(**kwargs))
+
+    exception_message, = excinfo.value.args
+    assert exception_message == message

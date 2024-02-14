@@ -49,5 +49,10 @@ def null_ratio(column: str, column_dtype: pl.DataType) -> pl.Expr:
     elif column_dtype == pl.List:
         non_null_lengths = pl.col(column).list.drop_nulls().list.len()
         value = 1 - (non_null_lengths == pl.col(column).list.len()).sum() / pl.col(column).len()
+    else:
+        raise TypeError(
+            'column_dtype must be of type {Float64, Int64, Utf8, List}'
+            f' but is of type {column_dtype}',
+        )
 
     return value.alias('null_ratio')
