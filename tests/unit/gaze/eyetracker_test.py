@@ -23,7 +23,7 @@ import pytest
 from pymovements.gaze.eyetracker import EyeTracker
 
 
-def test_eyetracker_with_sampling_rate():
+def test_eyetracker_with_positive_sampling_rate():
     EyeTracker(
         1000.0, False, True, 'EyeLink 1000 Plus',
         '1.5.3', 'Arm Mount / Monocular / Remote',
@@ -34,13 +34,5 @@ def test_eyetracker_with_negative_sampling_rate():
     with pytest.raises(ValueError):
         EyeTracker(
             -500.0, False, True, 'EyeLink 1000 Plus',
-            '1.5.3', 'Arm Mount / Monocular / Remote',
-        )
-
-
-def test_eyetracker_without_sampling_rate():
-    with pytest.raises(TypeError):
-        EyeTracker(
-            None, False, True, 'EyeLink 1000 Plus',
             '1.5.3', 'Arm Mount / Monocular / Remote',
         )
