@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module holds the EyeTracker class."""
+"""Holds the EyeTracker class."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -32,22 +32,22 @@ class EyeTracker:
     Attributes
     ----------
     sampling_rate : float | None
-        Sample rate of recording (in Hz)
+        Sample rate of recording (in Hz). (default: None)
     left : bool | None
-        Whether the left eye is tracked
+        Whether the left eye is tracked. (default: None)
     right : bool | None
-        Whether the right eye is tracked
+        Whether the right eye is tracked. (default: None)
     model : str | None
-        Eye tracker model (e.g. 'EyeLink II', 'Tobii Pro Spectrum')
-    version : str | None
+        Eye tracker model (e.g. 'EyeLink II', 'Tobii Pro Spectrum'). (default: None)
+    version : str | None. (default: None)
         Eye tracker software version number
-    vendor : str | None
+    vendor : str | None. (default: None)
         Eye tracker vendor (e.g. 'EyeLink', 'Tobii')
-    mount : str | None
+    mount : str | None. (default: None)
         The mounting setup of the eye tracker (e.g. 'Desktop / Monocular / Remote')
 
     Examples
-        --------
+    --------
         >>> eyetracker = EyeTracker(
         ...     sampling_rate = 1000.0,
         ...     left = False,
@@ -72,8 +72,5 @@ class EyeTracker:
 
     def __post_init__(self) -> None:
         """Check that the sampling rate is a positive number."""
-        checks.check_is_not_none(sampling_rate=self.sampling_rate)
-        assert self.sampling_rate is not None
-
         if self.sampling_rate is not None:
             checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)

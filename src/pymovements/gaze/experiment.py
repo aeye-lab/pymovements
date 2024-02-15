@@ -52,6 +52,8 @@ class Experiment:
         (default: 'lower left')
     sampling_rate: float | None
         Sampling rate in Hz. (default: None)
+    eyetracker : EyeTracker | None
+        EyeTracker object for experiment. (default: None)
 
     Examples
     --------
@@ -66,7 +68,7 @@ class Experiment:
     ... )
     >>> print(experiment)
     Experiment(sampling_rate=1000.00, screen=Screen(width_px=1280, height_px=1024, width_cm=38,
-    height_cm=30, distance_cm=68, origin=lower left), eyetracker=None, _sampling_rate=1000.00)
+    height_cm=30, distance_cm=68, origin=lower left), eyetracker=None)
 
     We can also access the screen boundaries in degrees of visual angle via the
     :py:attr:`~pymovements.gaze.Screen` object. This only works if the
@@ -101,63 +103,6 @@ class Experiment:
             sampling_rate: float | None = None,
             eyetracker: EyeTracker | None = None,
     ):
-        """Initialize Experiment.
-
-        Parameters
-        ----------
-        screen_width_px : int
-            Screen width in pixels
-        screen_height_px : int
-            Screen height in pixels
-        screen_width_cm : float
-            Screen width in centimeters
-        screen_height_cm : float
-            Screen height in centimeters
-        distance_cm : float | None
-            Eye-to-screen distance in centimeters. If None, a `distance_column` must be provided
-            in the `DatasetDefinition` or `GazeDataFrame`, which contains the eye-to-screen
-            distance for each sample in millimeters.
-        origin : str
-            Specifies the screen location of the origin of the pixel coordinate system.
-        sampling_rate : float | None
-            Sampling rate in Hz
-        eyetracker : EyeTracker | None
-            EyeTracker object for experiment
-
-        Examples
-        --------
-        >>> experiment = Experiment(
-        ...     screen_width_px=1280,
-        ...     screen_height_px=1024,
-        ...     screen_width_cm=38,
-        ...     screen_height_cm=30,
-        ...     distance_cm=68,
-        ...     origin='lower left',
-        ...     sampling_rate=None,
-        ...     eyetracker=EyeTracker(1000.0, False, True, 'EyeLink 1000 Plus', '1.5.3',
-        ...                           'EyeLink', 'Arm Mount / Monocular / Remote',),
-        ... )
-        >>> print(experiment)
-        Experiment(sampling_rate=1000.00, screen=Screen(width_px=1280, height_px=1024, width_cm=38,
-        height_cm=30, distance_cm=68, origin=lower left),
-        eyetracker=EyeTracker(sampling_rate=1000.0, left=False, right=True,
-        model='EyeLink 1000 Plus', version='1.5.3', vendor='EyeLink',
-        mount='Arm Mount / Monocular / Remote'), _sampling_rate=None)
-
-        We can also access the screen boundaries in degrees of visual angle via the
-        :py:attr:`~pymovements.gaze.Screen` object. This only works if the
-        `distance_cm` attribute is specified.
-
-        >>> experiment.screen.x_min_dva# doctest:+ELLIPSIS
-        -15.59...
-        >>> experiment.screen.x_max_dva# doctest:+ELLIPSIS
-        15.59...
-        >>> experiment.screen.y_min_dva# doctest:+ELLIPSIS
-        -12.42...
-        >>> experiment.screen.y_max_dva# doctest:+ELLIPSIS
-        12.42...
-
-        """
         self.screen = Screen(
             width_px=screen_width_px,
             height_px=screen_height_px,
@@ -184,12 +129,15 @@ class Experiment:
         if self._sampling_rate is not None:
             return self._sampling_rate
 
+        if self.eyetracker is None:
+            return None
+
         return self.eyetracker.sampling_rate
 
     @sampling_rate.setter
-    def sampling_rate(self, _sampling_rate: float | None = None) -> None:
+    def sampling_rate(self, sampling_rate: float | None = None) -> None:
         """Set sampling rate of experiment."""
-        self._sampling_rate = _sampling_rate
+        self._sampling_rate = sampling_rate
 
     def pos2vel(
             self,
@@ -232,7 +180,6 @@ class Experiment:
         ...     distance_cm=68,
         ...     origin='lower left',
         ...     sampling_rate=1000.0,
-        ...     eyetracker=None,
         ... )
         >>> arr = [[0., 0.], [1., 1.], [2., 2.], [3., 3.], [4., 4.], [5., 5.]]
         >>> experiment.pos2vel(
@@ -258,5 +205,9 @@ class Experiment:
                 value = f'{value:.2f}'
             return value
 
-        attributes = ', '.join(f'{key}={shorten(value)}' for key, value in vars(self).items())
-        return f'{type(self).__name__}(sampling_rate={shorten(self.sampling_rate)}, {attributes})'
+        attributes = ''
+        for key, value in vars(self).items():
+            if not key.startswith('_'):
+                attributes += ', ' + f'{key}={shorten(value)}'
+
+        return f'{type(self).__name__}(sampling_rate={shorten(self.sampling_rate)}{attributes})'
