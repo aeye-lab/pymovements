@@ -18,7 +18,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test for Experiment class."""
+import pytest
+
 from pymovements.gaze.experiment import Experiment
+from pymovements.gaze.eyetracker import EyeTracker
 
 
 def test_sampling_rate_setter():
@@ -27,3 +30,9 @@ def test_sampling_rate_setter():
 
     experiment.sampling_rate = 100.0
     assert experiment.sampling_rate == 100.0
+
+
+def test_sampling_rate_setter_invalid():
+    with pytest.raises(TypeError):
+        eyetracker = EyeTracker()
+        Experiment(1280, 1024, 38, 30, eyetracker=eyetracker)

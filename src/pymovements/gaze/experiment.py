@@ -129,8 +129,7 @@ class Experiment:
         if self._sampling_rate is not None:
             return self._sampling_rate
 
-        if self.eyetracker is None:
-            return None
+        assert self.eyetracker is not None
 
         return self.eyetracker.sampling_rate
 
@@ -193,6 +192,7 @@ class Experiment:
                [1000., 1000.],
                [ 500.,  500.]])
         """
+        assert self.sampling_rate is not None
         return transforms_numpy.pos2vel(
             arr=arr, sampling_rate=self.sampling_rate, method=method, **kwargs,
         )

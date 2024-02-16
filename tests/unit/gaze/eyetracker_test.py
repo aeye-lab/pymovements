@@ -36,3 +36,10 @@ def test_eyetracker_with_negative_sampling_rate():
             -500.0, False, True, 'EyeLink 1000 Plus',
             '1.5.3', 'Arm Mount / Monocular / Remote',
         )
+
+
+def test_eyetracker_without_sampling_rate():
+    EyeTracker(
+        None, False, True, 'EyeLink 1000 Plus',
+        '1.5.3', 'Arm Mount / Monocular / Remote',
+    )
