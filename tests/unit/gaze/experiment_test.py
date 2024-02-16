@@ -32,7 +32,7 @@ def test_sampling_rate_setter():
     assert experiment.sampling_rate == 100.0
 
 
-def test_sampling_rate_setter_invalid():
+def test_sampling_rate_invalid():
     with pytest.raises(TypeError):
         eyetracker = EyeTracker()
         Experiment(1280, 1024, 38, 30, eyetracker=eyetracker)
