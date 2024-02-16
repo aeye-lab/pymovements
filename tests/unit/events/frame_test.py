@@ -181,6 +181,217 @@ def test_event_dataframe_init_expected(args, kwargs, expected_df_data, expected_
     assert_frame_equal(event_df.frame, expected_df)
 
 
+@pytest.mark.parametrize(
+    ('args', 'kwargs', 'expected_df'),
+    [
+        pytest.param(
+            [], {'onsets': [0], 'offsets': [1]},
+            pl.DataFrame({'name': [''], 'onset': [0], 'offset': [1], 'duration': [1]}),
+            id='no_arg_lists_with_single_event_kwarg',
+        ),
+        pytest.param(
+            [pl.DataFrame()], {},
+            pl.DataFrame(
+                {}, schema={
+                    'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64, 'duration': pl.Int64,
+                },
+            ),
+            id='dataframe_arg_no_kwargs',
+        ),
+        pytest.param(
+            [], {'name': 'bar', 'onsets': [0], 'offsets': [1]},
+            pl.DataFrame({'name': ['bar'], 'onset': [0], 'offset': [1], 'duration': [1]}),
+            id='lists_with_single_named_event',
+        ),
+        pytest.param(
+            [], {'name': 'bar', 'onsets': [0, 2], 'offsets': [1, 3]},
+            pl.DataFrame(
+                {'name': ['bar', 'bar'], 'onset': [0, 2], 'offset': [1, 3], 'duration': [1, 1]},
+            ),
+            id='lists_with_two_events_same_name',
+        ),
+        pytest.param(
+            [], {'name': ['foo', 'bar'], 'onsets': [0, 2], 'offsets': [1, 4]},
+            pl.DataFrame(
+                {'name': ['foo', 'bar'], 'onset': [0, 2], 'offset': [1, 4], 'duration': [1, 2]},
+            ),
+            id='lists_with_two_differently_named_events',
+        ),
+        pytest.param(
+            [], {'name': ['foo'], 'onsets': [0], 'offsets': [1], 'trials': [1]},
+            pl.DataFrame(
+                {'trial': [1], 'name': ['foo'], 'onset': [0], 'offset': [1], 'duration': [1]},
+            ),
+            id='lists_one_event_trial_column_at_start',
+        ),
+        pytest.param(
+            [], {
+                'data': pl.DataFrame(
+                    data={
+                        'trial': [1], 'name': ['foo'], 'onset': [0], 'offset': [1],
+                    },
+                ),
+                'trial_columns': 'trial',
+            },
+            pl.DataFrame(
+                {'trial': [1], 'name': ['foo'], 'onset': [0], 'offset': [1], 'duration': [1]},
+            ),
+            id='data_one_event_trial_column_at_start',
+        ),
+        pytest.param(
+            [], {
+                'data': pl.DataFrame(
+                    data={
+                        'name': ['foo'], 'onset': [0], 'offset': [1], 'trial': [1],
+                    },
+                ),
+                'trial_columns': 'trial',
+            },
+            pl.DataFrame(
+                {'trial': [1], 'name': ['foo'], 'onset': [0], 'offset': [1], 'duration': [1]},
+            ),
+            id='data_one_event_trial_column_enforce_start',
+        ),
+    ],
+)
+def test_event_dataframe_init_expected_df(args, kwargs, expected_df):
+    event_df = pm.EventDataFrame(*args, **kwargs)
+
+    assert_frame_equal(event_df.frame, expected_df)
+
+
+@pytest.mark.parametrize(
+    ('kwargs', 'expected_trial_column_list'),
+    [
+        pytest.param(
+            {'data': pl.DataFrame()},
+            None,
+            id='empty_df_no_trial_columns',
+        ),
+        pytest.param(
+            {'onsets': [0], 'offsets': [1]},
+            None,
+            id='single_row_no_trial_columns',
+        ),
+        pytest.param(
+            {'onsets': [0], 'offsets': [1], 'trials': None},
+            None,
+            id='single_row_trials_list',
+        ),
+        pytest.param(
+            {'onsets': [0], 'offsets': [1], 'trials': ['A']},
+            ['trial'],
+            id='single_row_trials_list',
+        ),
+        pytest.param(
+            {'data': pl.DataFrame({'onset': [0], 'offset': [1], 'trial': ['A']})},
+            None,
+            id='single_row_trial_column_not_specified',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame({'onset': [0], 'offset': [1], 'trial': ['A']}),
+                'trial_columns': ['trial'],
+            },
+            ['trial'],
+            id='single_row_trial_column_specified',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame({'onset': [0], 'offset': [1], 'group': [1], 'trial': ['C']}),
+                'trial_columns': ['group', 'trial'],
+            },
+            ['group', 'trial'],
+            id='single_row_two_trial_columns',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame({'onset': [0], 'offset': [1], 'trial': ['A']}),
+                'trial_columns': 'trial',
+            },
+            ['trial'],
+            id='single_row_trial_column_str',
+        ),
+    ],
+)
+def test_event_dataframe_init_expected_trial_column_list(kwargs, expected_trial_column_list):
+    events = pm.EventDataFrame(**kwargs)
+
+    assert events.trial_columns == expected_trial_column_list
+
+
+@pytest.mark.parametrize(
+    ('kwargs', 'expected_trial_column_data'),
+    [
+        pytest.param(
+            {'onsets': [0], 'offsets': [1], 'trials': ['A']},
+            pl.Series('trial', ['A']),
+            id='single_row_trials_list',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame({'onset': [0], 'offset': [1], 'trial': ['C']}),
+                'trial_columns': 'trial',
+            },
+            pl.Series('trial', ['C']),
+            id='single_row_trial_column_str',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame({'onset': [0], 'offset': [1], 'trial': ['B']}),
+                'trial_columns': ['trial'],
+            },
+            pl.Series('trial', ['B']),
+            id='single_row_trial_column_list_single',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame({'onset': [0], 'offset': [1], 'group': [1], 'trial': ['C']}),
+                'trial_columns': ['group', 'trial'],
+            },
+            pl.DataFrame({'group': [1], 'trial': ['C']}),
+            id='single_row_two_trial_columns',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame(
+                    {'onset': [0, 2], 'offset': [1, 3], 'trial': [1, 1]},
+                ),
+                'trial_columns': 'trial',
+            },
+            pl.DataFrame({'trial': [1, 1]}),
+            id='two_rows_one_trial',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame(
+                    {'onset': [0, 2], 'offset': [1, 3], 'trial': [1, 2]},
+                ),
+                'trial_columns': 'trial',
+            },
+            pl.DataFrame({'trial': [1, 2]}),
+            id='two_rows_one_trial',
+        ),
+        pytest.param(
+            {
+                'data': pl.DataFrame(
+                    {'onset': [0, 2], 'offset': [1, 3], 'trial': 1},
+                ),
+                'trial_columns': 'trial',
+            },
+            pl.DataFrame({'trial': [1, 1]}),
+            id='two_rows_plain_trial',
+        ),
+    ],
+)
+def test_event_dataframe_init_expected_trial_column_data(kwargs, expected_trial_column_data):
+    events = pm.EventDataFrame(**kwargs)
+
+    if isinstance(expected_trial_column_data, pl.Series):
+        expected_trial_column_data = pl.DataFrame(expected_trial_column_data)
+    assert_frame_equal(events.frame[events.trial_columns], expected_trial_column_data)
+
+
 def test_event_dataframe_columns_same_as_frame():
     init_kwargs = {'onsets': [0], 'offsets': [1]}
     event_df = pm.EventDataFrame(**init_kwargs)
@@ -196,3 +407,82 @@ def test_event_dataframe_copy():
     assert events is not events_copy
     assert events.frame is not events_copy.frame
     assert_frame_equal(events.frame, events_copy.frame)
+
+
+@pytest.mark.parametrize(
+    ('events', 'kwargs', 'expected_df'),
+    [
+        pytest.param(
+            pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
+            {'column': 'trial', 'data': 1},
+            pm.EventDataFrame(
+                pl.DataFrame(
+                    {'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
+                ),
+            ),
+            id='single_row_trial_str',
+        ),
+        pytest.param(
+            pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
+            {'column': ['trial'], 'data': 1},
+            pm.EventDataFrame(
+                pl.DataFrame(
+                    {'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
+                ),
+            ),
+            id='single_row_trial_list_data_int',
+        ),
+        pytest.param(
+            pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
+            {'column': ['trial'], 'data': [1]},
+            pm.EventDataFrame(
+                pl.DataFrame(
+                    {'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
+                ),
+            ),
+            id='single_row_trial_list_single_identifier',
+        ),
+        pytest.param(
+            pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
+            {'column': ['group', 'trial'], 'data': ['A', 1]},
+            pm.EventDataFrame(
+                pl.DataFrame(
+                    {'group': 'A', 'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
+                ),
+            ),
+            id='single_row_trial_list_single_identifier',
+        ),
+        pytest.param(
+            pm.EventDataFrame(name='a', onsets=[0, 8], offsets=[1, 9]),
+            {'column': ['trial'], 'data': [1]},
+            pm.EventDataFrame(
+                pl.DataFrame(
+                    {'trial': [1, 1], 'name': ['a', 'a'], 'onset': [0, 8], 'offset': [1, 9]},
+                ),
+            ),
+            id='two_rows_trial_list_single_identifier',
+        ),
+    ],
+)
+def test_event_dataframe_add_trial_column(events, kwargs, expected_df):
+    events.add_trial_column(**kwargs)
+    assert_frame_equal(events.frame, expected_df.frame)
+
+
+@pytest.mark.parametrize(
+    ('events', 'kwargs', 'exception', 'message'),
+    [
+        pytest.param(
+            pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
+            {'column': ['group', 'trial'], 'data': 1},
+            TypeError,
+            'data must be passed as a list of values in case of providing multiple columns',
+            id='multiple_columns_data_not_list',
+        ),
+    ],
+)
+def test_event_dataframe_add_trial_column_raises_exception(events, kwargs, exception, message):
+    with pytest.raises(exception) as excinfo:
+        events.add_trial_column(**kwargs)
+
+    assert message == excinfo.value.args[0]

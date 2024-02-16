@@ -119,20 +119,65 @@ class GazeDataFrame:
     │ 1002 ┆ 0.3 ┆ 0.3 │
     └──────┴─────┴─────┘
 
-    We can now initialize our ``GazeDataFrame`` by specyfing the names of the pixel position
-    columns.
+    We can now initialize our ``GazeDataFrame`` by specyfing the names of the time and pixel
+    position columns.
 
-    >>> gaze = GazeDataFrame(data=df, pixel_columns=['x', 'y'])
+    >>> gaze = GazeDataFrame(data=df, time_column='t', pixel_columns=['x', 'y'])
     >>> gaze.frame
     shape: (3, 2)
     ┌──────┬────────────┐
-    │ t    ┆ pixel      │
+    │ time ┆ pixel      │
     │ ---  ┆ ---        │
     │ i64  ┆ list[f64]  │
     ╞══════╪════════════╡
     │ 1000 ┆ [0.1, 0.1] │
     │ 1001 ┆ [0.2, 0.2] │
     │ 1002 ┆ [0.3, 0.3] │
+    └──────┴────────────┘
+
+    In case your data has no time column available, you can pass an :py:class:``Experiment`` to
+    create a time column with the correct sampling rate during initialization. The time column will
+    be represented in millisecond units.
+
+    >>> df_no_time = df.select(pl.exclude('t'))
+    >>> df_no_time
+    shape: (3, 2)
+    ┌─────┬─────┐
+    │ x   ┆ y   │
+    │ --- ┆ --- │
+    │ f64 ┆ f64 │
+    ╞═════╪═════╡
+    │ 0.1 ┆ 0.1 │
+    │ 0.2 ┆ 0.2 │
+    │ 0.3 ┆ 0.3 │
+    └─────┴─────┘
+
+    >>> experiment = Experiment(1024, 768, 38, 30, 60, 'center', sampling_rate=100)
+    >>> gaze = GazeDataFrame(data=df_no_time, experiment=experiment, pixel_columns=['x', 'y'])
+    >>> gaze.frame
+    shape: (3, 2)
+    ┌──────┬────────────┐
+    │ time ┆ pixel      │
+    │ ---  ┆ ---        │
+    │ f64  ┆ list[f64]  │
+    ╞══════╪════════════╡
+    │ 0.0  ┆ [0.1, 0.1] │
+    │ 10.0 ┆ [0.2, 0.2] │
+    │ 20.0 ┆ [0.3, 0.3] │
+    └──────┴────────────┘
+
+    Leaving out the experiment definition will create a continuous integer column in step units.
+    >>> gaze = GazeDataFrame(data=df_no_time, pixel_columns=['x', 'y'])
+    >>> gaze.frame
+    shape: (3, 2)
+    ┌──────┬────────────┐
+    │ time ┆ pixel      │
+    │ ---  ┆ ---        │
+    │ i64  ┆ list[f64]  │
+    ╞══════╪════════════╡
+    │ 0    ┆ [0.1, 0.1] │
+    │ 1    ┆ [0.2, 0.2] │
+    │ 2    ┆ [0.3, 0.3] │
     └──────┴────────────┘
 
     """
@@ -193,8 +238,22 @@ class GazeDataFrame:
             data = data.clone()
         self.frame = data
 
-        self.trial_columns = trial_columns
+        self.trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
 
+        # In case the 'time' column is already present we don't need to do anything.
+        # Otherwise, create a new time column starting with zero.
+        if time_column is None and 'time' not in self.frame.columns:
+            # In case we have an experiment with sampling rate given, we convert to milliseconds.
+            if experiment is not None and experiment.sampling_rate is not None:
+                sampling_rate_factor = 1000 / experiment.sampling_rate
+            else:
+                sampling_rate_factor = 1
+
+            self.frame = self.frame.with_columns(
+                time=pl.arange(0, len(self.frame)) * sampling_rate_factor,
+            )
+
+        # This if clause is mutually exclusive with the previous one.
         if time_column is not None:
             self.frame = self.frame.rename({time_column: 'time'})
 
@@ -229,7 +288,15 @@ class GazeDataFrame:
         self.experiment = experiment
 
         if events is None:
-            self.events = pm.EventDataFrame()
+            if self.trial_columns is None:
+                self.events = pm.EventDataFrame()
+            else:  # Ensure that trial columns with correct dtype are present in event dataframe.
+                self.events = pm.EventDataFrame(
+                    data=pl.DataFrame(
+                        schema={column: self.frame.schema[column] for column in self.trial_columns},
+                    ),
+                    trial_columns=self.trial_columns,
+                )
         else:
             self.events = events.copy()
 
@@ -335,27 +402,29 @@ class GazeDataFrame:
                 if 'position' not in self.frame.columns and 'position_column' not in kwargs:
                     if 'pixel' in self.frame.columns:
                         raise pl.exceptions.ColumnNotFoundError(
-                            "Neither 'position' is in the columns of the dataframe: "
-                            f'{self.frame.columns} nor is the position column specified. '
+                            "Neither is 'position' in the dataframe columns, "
+                            'nor is a position column explicitly specified. '
                             "Since the dataframe has a 'pixel' column, consider running "
                             f'pix2deg() before {transform_method.__name__}(). If you want '
-                            'to calculate pixel transformations, you can do so by using '
+                            'to run transformations in pixel units, you can do so by using '
                             f"{transform_method.__name__}(position_column='pixel'). "
-                            f'Available dataframe columns are {self.frame.columns}',
+                            f'Available dataframe columns are: {self.frame.columns}',
                         )
                     raise pl.exceptions.ColumnNotFoundError(
-                        "Neither 'position' is in the columns of the dataframe: "
-                        f'{self.frame.columns} nor is the position column specified. '
-                        f'Available dataframe columns are {self.frame.columns}',
+                        "Neither is 'position' in the dataframe columns, "
+                        'nor is a position column explicitly specified. '
+                        'You can specify the position column via: '
+                        f'{transform_method.__name__}(position_column="your_position_column"). '
+                        f'Available dataframe columns are: {self.frame.columns}',
                     )
             if transform_method.__name__ in {'pix2deg'}:
                 if 'pixel' not in self.frame.columns and 'pixel_column' not in kwargs:
                     raise pl.exceptions.ColumnNotFoundError(
-                        "Neither 'position' is in the columns of the dataframe: "
-                        f'{self.frame.columns} nor is the pixel column specified. '
+                        "Neither is 'pixel' in the dataframe columns, "
+                        'nor is a pixel column explicitly specified. '
                         'You can specify the pixel column via: '
                         f'{transform_method.__name__}(pixel_column="name_of_your_pixel_column"). '
-                        f'Available dataframe columns are {self.frame.columns}',
+                        f'Available dataframe columns are: {self.frame.columns}',
                     )
 
             if self.trial_columns is None:
@@ -514,19 +583,87 @@ class GazeDataFrame:
         **kwargs: Any
             Additional keyword arguments to be passed to the event detection method.
         """
-        if not self.events or clear:
-            self.events = pm.EventDataFrame()
+        if self.events is None or clear:
+            if self.trial_columns is None:
+                self.events = pm.EventDataFrame()
+            else:  # Ensure that trial columns with correct dtype are present in event dataframe.
+                self.events = pm.EventDataFrame(
+                    data=pl.DataFrame(
+                        schema={column: self.frame.schema[column] for column in self.trial_columns},
+                    ),
+                    trial_columns=self.trial_columns,
+                )
 
         if isinstance(method, str):
             method = pm.events.EventDetectionLibrary.get(method)
 
-        method_kwargs = self._fill_event_detection_kwargs(method, eye, **kwargs)
-        new_events = method(**method_kwargs)
+        if self.n_components is not None:
+            eye_components = self._infer_eye_components(eye)
+        else:
+            eye_components = None
 
-        self.events.frame = pl.concat(
-            [self.events.frame, new_events.frame],
-            how='diagonal',
-        )
+        if self.trial_columns is None:
+            method_kwargs = self._fill_event_detection_kwargs(
+                method,
+                gaze=self.frame,
+                events=self.events,
+                eye_components=eye_components,
+                **kwargs,
+            )
+
+            new_events = method(**method_kwargs)
+
+            self.events.frame = pl.concat(
+                [self.events.frame, new_events.frame],
+                how='diagonal',
+            )
+        else:
+            grouped_frames = self.frame.partition_by(
+                self.trial_columns, maintain_order=True, include_key=True, as_dict=True,
+            )
+
+            missing_trial_columns = [
+                trial_column for trial_column in self.trial_columns
+                if trial_column not in self.events.frame.columns
+            ]
+            if missing_trial_columns:
+                raise pl.ColumnNotFoundError(
+                    f'trial columns {missing_trial_columns} missing from events, '
+                    f'available columns: {self.events.frame.columns}',
+                )
+
+            new_events_grouped: list[pl.DataFrame] = []
+
+            for group_identifier, group_gaze in grouped_frames.items():
+                # Create filter expression for selecting respective group rows.
+                if len(self.trial_columns) == 1:
+                    group_filter_expression = pl.col(self.trial_columns[0]) == group_identifier
+                else:
+                    group_filter_expression = pl.col(self.trial_columns[0]) == group_identifier[0]
+                    for name, value in zip(self.trial_columns[1:], group_identifier[1:]):
+                        group_filter_expression = group_filter_expression & pl.col(name) == value
+
+                # Select group events
+                group_events = pm.EventDataFrame(self.events.frame.filter(group_filter_expression))
+
+                method_kwargs = self._fill_event_detection_kwargs(
+                    method,
+                    gaze=group_gaze,
+                    events=group_events,
+                    eye_components=eye_components,
+                    **kwargs,
+                )
+
+                new_events = method(**method_kwargs)
+                # add group identifiers as new columns
+                new_events.add_trial_column(self.trial_columns, group_identifier)
+
+                new_events_grouped.append(new_events.frame)
+
+            self.events.frame = pl.concat(
+                [self.events.frame, *new_events_grouped],
+                how='diagonal',
+            )
 
     @property
     def schema(self) -> pl.type_aliases.SchemaDict:
@@ -840,17 +977,23 @@ class GazeDataFrame:
     def _fill_event_detection_kwargs(
             self,
             method: Callable[..., pm.EventDataFrame],
-            eye: str,
+            gaze: pl.DataFrame,
+            events: pm.EventDataFrame,
+            eye_components: tuple[int, int] | None,
             **kwargs: Any,
     ) -> dict[str, Any]:
-        """Fill event detection kwargs with gaze attributes.
+        """Fill event detection method kwargs with gaze attributes.
 
         Parameters
         ----------
         method: Callable[..., pm.EventDataFrame]
             The method for which the keyword argument dictionary will be filled.
-        eye: str
-            The string specifier for the eye to choose.
+        gaze: pl.DataFrame
+            The gaze dataframe to be used for filling event detection keyword arguments.
+        events: pm.EventDataFrame
+            The event dataframe to be used for filling event detection keyword arguments.
+        eye_components: tuple[int, int] | None
+            The eye components to be used for filling event detection keyword arguments.
         **kwargs: Any
             The source keyword arguments passed to the `GazeDataFrame.detect()` method.
 
@@ -863,38 +1006,47 @@ class GazeDataFrame:
         method_args = inspect.getfullargspec(method).args
 
         if 'positions' in method_args:
-            if 'position' not in self.frame.columns:
+            if 'position' not in gaze.columns:
                 raise pl.exceptions.ColumnNotFoundError(
                     f'Column \'position\' not found.'
-                    f' Available columns are: {self.frame.columns}',
+                    f' Available columns are: {gaze.columns}',
                 )
-            eye_components = self._infer_eye_components(eye)
+
+            if eye_components is None:
+                raise ValueError(
+                    'eye_components must not be None if passing position to event detection',
+                )
+
             kwargs['positions'] = np.vstack(
                 [
-                    self.frame.get_column('position').list.get(eye_component)
+                    gaze.get_column('position').list.get(eye_component)
                     for eye_component in eye_components
                 ],
             ).transpose()
 
         if 'velocities' in method_args:
-            if 'velocity' not in self.frame.columns:
+            if 'velocity' not in gaze.columns:
                 raise pl.exceptions.ColumnNotFoundError(
                     f'Column \'velocity\' not found.'
-                    f' Available columns are: {self.frame.columns}',
+                    f' Available columns are: {gaze.columns}',
                 )
 
-            eye_components = self._infer_eye_components(eye)
+            if eye_components is None:
+                raise ValueError(
+                    'eye_components must not be None if passing velocity to event detection',
+                )
+
             kwargs['velocities'] = np.vstack(
                 [
-                    self.frame.get_column('velocity').list.get(eye_component)
+                    gaze.get_column('velocity').list.get(eye_component)
                     for eye_component in eye_components
                 ],
             ).transpose()
 
         if 'events' in method_args:
-            kwargs['events'] = self.events
+            kwargs['events'] = events
 
-        if 'timesteps' in method_args and 'time' in self.frame.columns:
-            kwargs['timesteps'] = self.frame.get_column('time').to_numpy()
+        if 'timesteps' in method_args and 'time' in gaze.columns:
+            kwargs['timesteps'] = gaze.get_column('time').to_numpy()
 
         return kwargs
