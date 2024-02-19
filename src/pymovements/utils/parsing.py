@@ -38,13 +38,17 @@ EYE_TRACKING_SAMPLE = re.compile(
 )
 
 EYELINK_META_REGEXES = [
-    r'\*\*\s+VERSION:\s+(?P<version_1>.*)\s+',
-    r'\*\*\s+DATE:\s+(?P<weekday>[A-Z,a-z]+)\s+(?P<month>[A-Z,a-z]+)'
-    r'\s+(?P<day>\d\d?)\s+(?P<time>\d\d:\d\d:\d\d)\s+(?P<year>\d{4})\s+',
-    r'\*\*\s+(?P<version_2>EYELINK.*)',
-    r'SAMPLES\s+GAZE\s+(?P<tracked_eye>LEFT|RIGHT)\s+RATE\s+'
-    r'(?P<sampling_rate>[-]?\d*[.]\d*)\s+TRACKING\s+(?P<tracking>\S+)'
-    r'\s+FILTER\s+(?P<filter>\d+)\s+INPUT',
+    {'pattern': r'\*\*\s+VERSION:\s+(?P<version_1>.*)\s+'},
+    {
+        'pattern': r'\*\*\s+DATE:\s+(?P<weekday>[A-Z,a-z]+)\s+(?P<month>[A-Z,a-z]+)'
+        r'\s+(?P<day>\d\d?)\s+(?P<time>\d\d:\d\d:\d\d)\s+(?P<year>\d{4})\s+',
+    },
+    {'pattern': r'\*\*\s+(?P<version_2>EYELINK.*)'},
+    {
+        'pattern': r'SAMPLES\s+GAZE\s+(?P<tracked_eye>LEFT|RIGHT)\s+RATE\s+'
+        r'(?P<sampling_rate>[-]?\d*[.]\d*)\s+TRACKING\s+(?P<tracking>\S+)'
+        r'\s+FILTER\s+(?P<filter>\d+)\s+INPUT',
+    },
 ]
 
 
@@ -177,10 +181,12 @@ def parse_eyelink(
     with open(filepath, encoding='ascii') as asc_file:
         lines = asc_file.readlines()
 
+    # will return an empty string if the key does not exist
     metadata = defaultdict(str)
-    compiled_metadata_patterns = [
-        re.compile(metadata_pattern) for metadata_pattern in EYELINK_META_REGEXES
-    ]
+
+    compiled_metadata_patterns = []
+    for metadata_pattern in EYELINK_META_REGEXES:
+        compiled_metadata_patterns.append({'pattern': re.compile(metadata_pattern['pattern'])})
 
     for line in lines:
         for pattern_dict in compiled_patterns:
@@ -214,18 +220,18 @@ def parse_eyelink(
             for additional_column in additional_columns:
                 samples[additional_column].append(current_additional[additional_column])
 
-        if compiled_metadata_patterns:
-            for pattern in compiled_metadata_patterns:
-                if match := pattern.match(line):
+        elif compiled_metadata_patterns:
+            for pattern_dict in compiled_metadata_patterns.copy():
+                if match := pattern_dict['pattern'].match(line):
                     for column, value in match.groupdict().items():
                         metadata[column] = value
 
                     # each metadata pattern should only match once
-                    compiled_metadata_patterns.remove(pattern)
+                    compiled_metadata_patterns.remove(pattern_dict)
 
-    # note sure if this is the best way...
     if metadata:
-        metadata['version_number'], metadata['model'] = _parse_full_version(
+        # in case the version strings have not been found, they will be empty strings (defaultdict)
+        metadata['version_number'], metadata['model'] = _parse_full_eyelink_version(
             metadata['version_1'], metadata['version_2'],
         )
 
@@ -247,11 +253,13 @@ def parse_eyelink(
         schema_overrides=schema_overrides,
     )
 
-    return df, metadata
+    return_meatadata = dict(metadata)
+
+    return df, return_meatadata
 
 
-def _parse_full_version(version_str_1: str, version_str_2: str) -> tuple[str, str]:
-    """Parse the two version strings into a version number and model.
+def _parse_full_eyelink_version(version_str_1: str, version_str_2: str) -> tuple[str, str]:
+    """Parse the two version strings into an eyelink version number and model.
 
     Parameters
     ----------

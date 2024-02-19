@@ -127,7 +127,6 @@ EXPECTED_METADATA = {
     'filter': '2',
     'tracking': 'CR',
     'tracked_eye': 'LEFT',
-
 }
 
 
@@ -169,65 +168,89 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
 
 
 @pytest.mark.parametrize(
-    'metadata, expected_version, expected_model',
+    'metadata, expected_version, expected_model, time',
     [
         pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL v6.12 Feb  1 2018 (EyeLink Portable Duo)',
             '6.12',
             'EyeLink Portable Duo',
+            '09:25:20',
             id='eye_link_portable_duo',
         ),
         pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL v5.12 Feb  1 2018',
             '5.12',
             'EyeLink 1000 Plus',
+            '09:25:20',
             id='eye_link_1000_plus',
         ),
         pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL v4.12 Feb  1 2018',
             '4.12',
             'EyeLink 1000',
+            '09:25:20',
             id='eye_link_1000_1',
         ),
         pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL v3.12 Feb  1 2018',
             '3.12',
             'EyeLink 1000',
+            '09:25:20',
             id='eye_link_1000_2',
         ),
         pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL v2.12 Feb  1 2018',
             '2.12',
             'EyeLink II',
+            '09:25:20',
             id='eye_link_II',
         ),
         pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK REVISION 2.00 (Aug 12 1997)',
             '2.00',
             'EyeLink I',
+            '09:25:20',
             id='eye_link_I',
         ),
         pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: nothing\n',
             'unknown',
             'unknown',
+            '09:25:20',
             id='unknown_version_1',
         ),
         pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL Feb  1 2018 (EyeLink Portable Duo)',
             'unknown',
             'unknown',
+            '09:25:20',
             id='unknown_version_2',
+        ),
+        pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
+            '** TYPE: EDF_FILE BINARY EVENT SAMPLE TAGGED',
+            'unknown',
+            'unknown',
+            '09:25:20',
+            id='unknown_version_3',
         ),
     ],
 )
-def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_model):
+def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_model, time):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
@@ -237,6 +260,7 @@ def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_mo
 
     assert metadata['version_number'] == expected_version
     assert metadata['model'] == expected_model
+    assert metadata['time'] == time
 
 
 @pytest.mark.parametrize(
