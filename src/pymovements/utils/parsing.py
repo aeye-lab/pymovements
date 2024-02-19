@@ -253,9 +253,10 @@ def parse_eyelink(
         schema_overrides=schema_overrides,
     )
 
-    return_meatadata = dict(metadata)
+    # convert the defaultdict to a regular dict
+    return_metadata = dict(metadata)
 
-    return df, return_meatadata
+    return df, return_metadata
 
 
 def _parse_full_eyelink_version(version_str_1: str, version_str_2: str) -> tuple[str, str]:
