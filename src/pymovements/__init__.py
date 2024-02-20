@@ -37,6 +37,7 @@ from pymovements.events import EventProcessor
 from pymovements.gaze import Experiment
 from pymovements.gaze import GazeDataFrame
 from pymovements.gaze import Screen
+from pymovements.stimulus import text
 
 
 __all__ = [
