@@ -38,7 +38,8 @@ dependencies = [
   "pyarrow>=11.0.0,<16",
   "pyopenssl>=16.0.0,<25.0.0",
   "scipy>=1.8.0,<2",
-  "tqdm>=4.27.0,<5"
+  "tqdm>=4.27.0,<5",
+  "typing_extensions",
 ]
 dynamic = ["version"]
 
@@ -56,14 +57,14 @@ docs = [
   "sphinx_design>=0.3.0",
   "sphinx_mdinclude>=0.5.0",
   "sphinxcontrib.datatemplates>=0.9.0",
-  "sphinxcontrib.bibtex>=2.4.1"
+  "sphinxcontrib.bibtex>=2.4.1",
 ]
 test = [
   "pybtex",
   "pytest>=6.0.0",
   "pytest-cov>=4.0.0",
   "types-tqdm",
-  "typing_extensions"
+  "typing_extensions",
 ]
 
 [project.urls]
@@ -88,7 +89,7 @@ aggressive = 1
 source = [
   '{toxworkdir}/src/pymovements',
   '*/.tox/*/lib/python*/site-packages/pymovements',
-  '*/src/pymovements'
+  '*/src/pymovements',
 ]
 
 [tool.coverage.report]
@@ -101,7 +102,7 @@ branch = true
 omit = [
   'docs/*',
   'src/pymovements/_version.py',
-  'tests/*'
+  'tests/*',
 ]
 
 [tool.doc8]
@@ -138,7 +139,7 @@ filterwarnings = [
   "ignore:pkg_resources is deprecated.*:DeprecationWarning",
   "ignore:Deprecated call to `pkg_resources.declare_namespace.*:DeprecationWarning",
   "ignore:distutils Version classes are deprecated. Use packaging.version instead.:DeprecationWarning",
-  "ignore:FigureCanvasAgg is non-interactive, and thus cannot be shown:UserWarning"
+  "ignore:FigureCanvasAgg is non-interactive, and thus cannot be shown:UserWarning",
 ]
 testpaths = ['tests', 'src']
 
