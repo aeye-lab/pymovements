@@ -39,20 +39,14 @@ class TextStimulus(Stimulus):
             height_column,
             page_column,
     ):
-        if aois is None:
-            aois = pl.DataFrame()
-        else:
-            aois = aois.clone()
-        self.frame = aois
-        self.frame = self.frame.rename(
-            {
-                character_column: 'character',
-                pixel_x_column: 'top_left_x',
-                pixel_y_column: 'top_left_y',
-                width_column: 'aoi_width',
-                height_column: 'aoi_height',
-                page_column: 'page',
-            },
+
+        self.frame = aois.select(
+            pl.col(character_column),
+            pl.col(pixel_x_column),
+            pl.col(pixel_y_column),
+            pl.col(width_column),
+            pl.col(height_column),
+            pl.col(page_column),
         )
 
 
@@ -81,7 +75,7 @@ def from_file(
     else:
         raise ValueError(
             f'unsupported file format "{aoi_path.suffix}".'
-            f'Supported formats are: {valid_extensions}',
+            f'Supported formats are: {sorted(valid_extensions)}',
         )
 
 
