@@ -62,6 +62,8 @@ __all__ = [
     'plotting',
     'synthetic',
     'utils',
+
+    'text',
 ]
 
 __version__ = _version.get_versions()['version']

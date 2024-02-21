@@ -21,24 +21,27 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import polars as pl
 
-import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.stimulus.stimulus import Stimulus
 
 
 class TextStimulus(Stimulus):
+    """TextStimulus class
+    """
+
     def __init__(
             self,
             aois: pl.DataFrame,
-            character_column,
-            pixel_x_column,
-            pixel_y_column,
-            width_column,
-            height_column,
-            page_column,
-    ):
+            character_column: str,
+            pixel_x_column: str,
+            pixel_y_column: str,
+            width_column: str,
+            height_column: str,
+            page_column: str,
+    ) -> None:
 
         self.frame = aois.select(
             pl.col(character_column),
@@ -61,6 +64,7 @@ def from_file(
         page_column: str,
         custom_read_kwargs: dict[str, Any] | None = None,
 ) -> TextStimulus:
+    """ Load text stimulus from file"""
     if isinstance(aoi_path, str):
         aoi_path = Path(aoi_path)
     if custom_read_kwargs is None:

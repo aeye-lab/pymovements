@@ -21,8 +21,6 @@
 from __future__ import annotations
 
 
-
-
 class Stimulus:
     """Stimulus base class.
 
@@ -35,5 +33,5 @@ class Stimulus:
 
     def __init__(
             self,
-    ):
+    ) -> None:
         self.stimulus: list[Stimulus] = []

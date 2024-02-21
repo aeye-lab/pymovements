@@ -17,7 +17,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
 from pathlib import Path
 
 import pytest
@@ -159,4 +158,6 @@ def test_text_stimulus_unsupported_format():
             page_column='page',
         )
     msg, = excinfo.value.args
-    assert msg == 'unsupported file format ".pickle".Supported formats are: [\'.csv\', \'.tsv\', \'.txt\']'
+    expected = 'unsupported file format ".pickle".Supported formats are: '\
+        '[\'.csv\', \'.tsv\', \'.txt\']'
+    assert msg == expected

@@ -17,6 +17,16 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Provides access to stimulus classes.
 
-from pymovements.stimulus.stimulus import Stimulus
-from pymovements.stimulus.text import TextStimulus
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :template: class.rst
+
+    pymovements.stimulus.Stimulus
+    pymovements.stimulus.TextStimulus
+"""
+from pymovements.stimulus.stimulus import Stimulus  # noqa: F401
+from pymovements.stimulus.text import TextStimulus  # noqa: F401
