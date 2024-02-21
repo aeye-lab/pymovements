@@ -78,7 +78,6 @@ def from_file(
             f'Supported formats are: {sorted(valid_extensions)}',
         )
 
-
     text_stimulus = TextStimulus(
         stimulus_df,
         character_column,

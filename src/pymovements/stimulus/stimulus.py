@@ -20,11 +20,7 @@
 """Provides the StimulusDataFrame class."""
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Any
 
-import polars as pl
-from tqdm.auto import tqdm
 
 
 class Stimulus:
