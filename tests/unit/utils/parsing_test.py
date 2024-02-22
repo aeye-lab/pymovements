@@ -273,7 +273,7 @@ def test_parse_eyelink_time(tmp_path, metadata, expected_time):
         filepath,
     )
 
-    assert metadata['time'] == time
+    assert metadata['time'] == expected_time
 
 
 @pytest.mark.parametrize(
