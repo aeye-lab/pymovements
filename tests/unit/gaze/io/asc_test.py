@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ import pymovements as pm
             pl.from_dict(
                 data={
                     'time': [
-                        2154556, 2154557, 2154560, 2154564, 2154597, 2154598, 2154599, 2154695,
+                        2154556, 2154557, 2154560, 2154564, 2154596, 2154598, 2154599, 2154695,
                         2154696, 2339227, 2339245, 2339246, 2339271, 2339272, 2339290, 2339291,
                     ],
                     'pupil': [
@@ -67,7 +67,7 @@ import pymovements as pm
             pl.DataFrame(
                 data={
                     'time': [
-                        2154556, 2154557, 2154560, 2154564, 2154597, 2154598, 2154599, 2154695,
+                        2154556, 2154557, 2154560, 2154564, 2154596, 2154598, 2154599, 2154695,
                         2154696, 2339227, 2339245, 2339246, 2339271, 2339272, 2339290, 2339291,
                     ],
                     'pupil': [

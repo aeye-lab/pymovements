@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 The pymovements Project Authors
+# Copyright (c) 2022-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module holds the EventDataFrame class."""
+"""Provides the EventDataFrame class."""
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -46,6 +46,10 @@ class EventDataFrame:
         List of onsets. (default: None)
     offsets: list[int] | np.ndarray | None
         List of offsets. (default: None)
+    trials: list[int | float | str] | np.ndarray | None
+        List of trial identifiers. (default: None)
+    trial_columns: list[str] | str | None
+        List of trial columns in passed dataframe.
 
     Raises
     ------
@@ -62,15 +66,25 @@ class EventDataFrame:
             name: str | list[str] | None = None,
             onsets: list[int] | np.ndarray | None = None,
             offsets: list[int] | np.ndarray | None = None,
+            trials: list[int | float | str] | np.ndarray | None = None,
+            trial_columns: list[str] | str | None = None,
     ):
+        self.trial_columns: list[str] | None  # otherwise mypy gets confused.
+
         if data is not None:
             checks.check_is_mutual_exclusive(data=data, onsets=onsets)
             checks.check_is_mutual_exclusive(data=data, offsets=offsets)
             checks.check_is_mutual_exclusive(data=data, name=name)
+            checks.check_is_mutual_exclusive(data=data, name=trials)
 
             data = data.clone()
             data = self._add_minimal_schema_columns(data)
             data_dict = data.to_dict()
+
+            if isinstance(trial_columns, str):
+                self.trial_columns = [trial_columns]
+            else:
+                self.trial_columns = trial_columns
 
             self._additional_columns = [
                 column_name for column_name in data_dict.keys()
@@ -105,14 +119,27 @@ class EventDataFrame:
                     'onset': pl.Series(onsets, dtype=pl.Int64),
                     'offset': pl.Series(offsets, dtype=pl.Int64),
                 }
+
+                if trials is not None:
+                    data_dict['trial'] = pl.Series('trial', trials)
+                    self.trial_columns = ['trial']
+                else:
+                    self.trial_columns = None
+
             else:
                 data_dict = {
                     'name': pl.Series([], dtype=pl.Utf8),
                     'onset': pl.Series([], dtype=pl.Int64),
                     'offset': pl.Series([], dtype=pl.Int64),
                 }
+                self.trial_columns = None
 
         self.frame = pl.DataFrame(data=data_dict, schema_overrides=self._minimal_schema)
+
+        # Ensure column order: trial columns, name, onset, offset.
+        if self.trial_columns is not None:
+            self.frame = self.frame.select([*self.trial_columns, *self._minimal_schema.keys()])
+
         if 'duration' not in self.frame.columns:
             self._add_duration_property()
 
@@ -153,6 +180,45 @@ class EventDataFrame:
             Columns to join event properties on.
         """
         self.frame = self.frame.join(event_properties, on=join_on, how='left')
+
+    def add_trial_column(
+            self,
+            column: str | list[str],
+            data: int | float | str | list[int | float | str] | None,
+    ) -> None:
+        """Add new trial columns with constant values.
+
+        Parameters
+        ----------
+        column: str | list[str]
+            The name(s) of the new trial column(s).
+        data: int | float | str | list[int | float | str] | None
+            The values to be used for filling the trial column(s). In case multiple columns are
+            provided, data must be a list of values matching the provided column order.
+        """
+        # Create trial column dictionary to iterate over in select().
+        if isinstance(column, str):
+            trial_columns = {column: data}
+        # In case a list of a single column is passed as an explicit value.
+        elif len(column) == 1 and (isinstance(data, (int, float, str) or data is None)):
+            trial_columns = {column[0]: data}
+        else:
+            if not isinstance(data, Sequence):
+                raise TypeError(
+                    'data must be passed as a list of values in case of providing multiple columns',
+                )
+            checks.check_is_length_matching(column=column, data=data)
+
+            trial_columns = dict(zip(column, data))
+
+        self.frame = self.frame.select(
+            [
+                pl.lit(column_data).alias(column_name) if not isinstance(column_data, int)
+                # Enforce Int64 columns for integers.
+                else pl.lit(column_data).alias(column_name).cast(pl.Int64)
+                for column_name, column_data in trial_columns.items()
+            ] + [pl.all()],
+        )
 
     @property
     def event_property_columns(self) -> list[str]:
