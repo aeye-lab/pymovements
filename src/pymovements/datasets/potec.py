@@ -113,7 +113,7 @@ class PoTeC(DatasetDefinition):
         {
             'resource': 'tgd9q/',
             'filename': 'PoTeC.zip',
-            'md5': '7780904bf7b18ba7d30a811174750db3',
+            'md5': 'cffd45039757c3777e2fd130e5d8a2ad',
         },
     )
 
