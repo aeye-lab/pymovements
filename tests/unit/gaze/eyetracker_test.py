@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,35 +17,29 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides utility functions.
+"""Test for EyeTracker class."""
+import pytest
 
-.. rubric:: Modules
-
-.. autosummary::
-   :toctree:
-   :template: module.rst
-
-    pymovements.utils.archives
-    pymovements.utils.checks
-    pymovements.utils.decorators
-    pymovements.utils.downloads
-    pymovements.utils.filters
-    pymovements.utils.parsing
-    pymovements.utils.paths
-"""
-from pymovements.utils import archives
-from pymovements.utils import checks
-from pymovements.utils import decorators
-from pymovements.utils import downloads
-from pymovements.utils import parsing
-from pymovements.utils import paths
+from pymovements.gaze.eyetracker import EyeTracker
 
 
-__all__ = [
-    'archives',
-    'checks',
-    'decorators',
-    'downloads',
-    'parsing',
-    'paths',
-]
+def test_eyetracker_with_positive_sampling_rate():
+    EyeTracker(
+        1000.0, False, True, 'EyeLink 1000 Plus',
+        '1.5.3', 'Arm Mount / Monocular / Remote',
+    )
+
+
+def test_eyetracker_with_negative_sampling_rate():
+    with pytest.raises(ValueError):
+        EyeTracker(
+            -500.0, False, True, 'EyeLink 1000 Plus',
+            '1.5.3', 'Arm Mount / Monocular / Remote',
+        )
+
+
+def test_eyetracker_without_sampling_rate():
+    EyeTracker(
+        None, False, True, 'EyeLink 1000 Plus',
+        '1.5.3', 'Arm Mount / Monocular / Remote',
+    )

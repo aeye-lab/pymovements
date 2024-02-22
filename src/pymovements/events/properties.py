@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module holds all supported event properties."""
+"""Provides functions for calculating event properties."""
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -97,8 +97,7 @@ def dispersion(
         position_column: str = 'position',
         n_components: int = 2,
 ) -> pl.Expr:
-    r"""
-    Dispersion of an event.
+    r"""Dispersion of an event.
 
     The dispersion is calculated as:
 

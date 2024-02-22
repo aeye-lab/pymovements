@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module provides an interface to the pymovements example eyelink toy dataset."""
+"""Provides a definition for the pymovements example eyelink toy dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -29,6 +29,7 @@ import polars as pl
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import register_dataset
 from pymovements.gaze.experiment import Experiment
+from pymovements.gaze.eyetracker import EyeTracker
 
 
 @dataclass
@@ -115,7 +116,13 @@ class ToyDatasetEyeLink(DatasetDefinition):
         screen_height_cm=30.2,
         distance_cm=68,
         origin='lower left',
-        sampling_rate=1000,
+        eyetracker=EyeTracker(
+            sampling_rate=1000.0,
+            left=False,
+            right=True,
+            model='EyeLink Portable Duo',
+            vendor='EyeLink',
+        ),
     )
 
     filename_format: str = r'subject_{subject_id:d}_session_{session_id:d}.asc'

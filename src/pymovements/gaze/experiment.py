@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 The pymovements Project Authors
+# Copyright (c) 2022-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,18 +17,19 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""This module holds the Experiment class."""
+"""Provides the Experiment class."""
 from __future__ import annotations
+
+from typing import Any
 
 import numpy as np
 
 from pymovements.gaze import transforms_numpy
+from pymovements.gaze.eyetracker import EyeTracker
 from pymovements.gaze.screen import Screen
 from pymovements.utils import checks
-from pymovements.utils import decorators
 
 
-@decorators.auto_str
 class Experiment:
     """Experiment class for holding experiment properties.
 
@@ -51,6 +52,8 @@ class Experiment:
         (default: 'lower left')
     sampling_rate: float | None
         Sampling rate in Hz. (default: None)
+    eyetracker : EyeTracker | None
+        EyeTracker object for experiment. (default: None)
 
     Examples
     --------
@@ -64,8 +67,8 @@ class Experiment:
     ...     sampling_rate=1000.0,
     ... )
     >>> print(experiment)
-    Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38,
-    height_cm=30, distance_cm=68, origin=lower left), sampling_rate=1000.00)
+    Experiment(sampling_rate=1000.00, screen=Screen(width_px=1280, height_px=1024, width_cm=38,
+    height_cm=30, distance_cm=68, origin=lower left), eyetracker=None)
 
     We can also access the screen boundaries in degrees of visual angle via the
     :py:attr:`~pymovements.gaze.Screen` object. This only works if the
@@ -85,9 +88,10 @@ class Experiment:
     ----------
     screen: Screen
         Screen object for experiment
-    sampling_rate: float
-        Sampling rate in Hz
+    eyetracker : EyeTracker | None
+        Eye tracker for experiment
     """
+
     def __init__(
             self,
             screen_width_px: int,
@@ -97,6 +101,7 @@ class Experiment:
             distance_cm: float | None = None,
             origin: str = 'lower left',
             sampling_rate: float | None = None,
+            eyetracker: EyeTracker | None = None,
     ):
         self.screen = Screen(
             width_px=screen_width_px,
@@ -107,12 +112,31 @@ class Experiment:
             origin=origin,
         )
 
-        checks.check_is_not_none(sampling_rate=sampling_rate)
-        assert sampling_rate is not None
+        checks.check_is_mutual_exclusive(sampling_rate=sampling_rate, eyetracker=eyetracker)
 
-        checks.check_is_greater_than_zero(sampling_rate=sampling_rate)
+        self.eyetracker = eyetracker
 
-        self.sampling_rate = sampling_rate
+        self._sampling_rate = sampling_rate
+
+        checks.check_is_not_none(sampling_rate=self.sampling_rate)
+        assert self.sampling_rate is not None
+
+        checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
+
+    @property
+    def sampling_rate(self) -> float | None:
+        """Get sampling rate of experiment."""
+        if self._sampling_rate is not None:
+            return self._sampling_rate
+
+        assert self.eyetracker is not None
+
+        return self.eyetracker.sampling_rate
+
+    @sampling_rate.setter
+    def sampling_rate(self, sampling_rate: float | None = None) -> None:
+        """Set sampling rate of experiment."""
+        self._sampling_rate = sampling_rate
 
     def pos2vel(
             self,
@@ -168,6 +192,22 @@ class Experiment:
                [1000., 1000.],
                [ 500.,  500.]])
         """
+        assert self.sampling_rate is not None
         return transforms_numpy.pos2vel(
             arr=arr, sampling_rate=self.sampling_rate, method=method, **kwargs,
         )
+
+    def __str__(self: Any) -> str:
+        """Print experiment."""
+
+        def shorten(value: Any) -> str:
+            if isinstance(value, float):
+                value = f'{value:.2f}'
+            return value
+
+        attributes = ''
+        for key, value in vars(self).items():
+            if not key.startswith('_'):
+                attributes += ', ' + f'{key}={shorten(value)}'
+
+        return f'{type(self).__name__}(sampling_rate={shorten(self.sampling_rate)}{attributes})'

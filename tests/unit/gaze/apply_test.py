@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -42,14 +42,14 @@ from pymovements.synthetic import step_function
                     length=100, steps=[0, 10], values=[(1, 1, 1, 1, 0, 0), (0, 0, 0, 0, 0, 0)],
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.gaze.from_numpy(
                 velocity=step_function(
                     length=100, steps=[0, 10], values=[(1, 1, 1, 1, 0, 0), (0, 0, 0, 0, 0, 0)],
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
                 events=pm.events.EventDataFrame(
                     name='fixation',
                     onsets=[0],
@@ -72,7 +72,7 @@ from pymovements.synthetic import step_function
                     start_value=(0, 0),
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.gaze.from_numpy(
                 velocity=step_function(
@@ -82,7 +82,7 @@ from pymovements.synthetic import step_function
                     start_value=(0, 0),
                 ),
                 orient='row',
-                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
                 events=pm.EventDataFrame(
                     name='saccade',
                     onsets=[20, 70],
@@ -195,6 +195,7 @@ from pymovements.synthetic import step_function
                         'y_vel': [None, 100.0, 100.0, None, 100.0, 100.0],
                     },
                 ),
+                trial_columns='trial_id',
                 position_columns=['x_dva', 'y_dva'],
                 velocity_columns=['x_vel', 'y_vel'],
             ),

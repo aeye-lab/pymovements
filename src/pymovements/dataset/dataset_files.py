@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -102,7 +102,7 @@ def load_event_files(
         One-time usage of an alternative directory name to save data relative to dataset path.
         This argument is used only for this single call and does not alter
         :py:meth:`pymovements.Dataset.events_rootpath`.
-    extension:
+    extension: str
         Specifies the file format for loading data. Valid options are: `csv`, `feather`,
         `tsv`, `txt`.
         (default: 'feather')
@@ -180,7 +180,7 @@ def load_gaze_files(
         :py:meth:`pymovements.Dataset.path`.
         This argument is used only for this single call and does not alter
         :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
-    extension:
+    extension: str
         Specifies the file format for loading data. Valid options are: `csv`, `feather`,
         `txt`, `tsv`.
         (default: 'feather')
@@ -238,8 +238,8 @@ def load_gaze_files(
             time_column = None
             distance_column = None
 
-            if 'time' in gaze_data.columns:
-                time_column = 'time'
+            # Time column is always available in every initialized GazeDataFrame.
+            time_column = 'time'
 
             if 'distance' in gaze_data.columns:
                 distance_column = 'distance'
@@ -482,7 +482,7 @@ def save_preprocessed(
     disable_progressbar = not verbose
 
     for file_id, gaze_df in enumerate(tqdm(gaze, disable=disable_progressbar)):
-        gaze_df = gaze_df.copy()
+        gaze_df = gaze_df.clone()
 
         raw_filepath = paths.raw / Path(fileinfo[file_id, 'filepath'])
         preprocessed_filepath = paths.get_preprocessed_filepath(

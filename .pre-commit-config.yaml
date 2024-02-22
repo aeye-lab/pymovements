@@ -7,15 +7,13 @@ ci:
     autoupdate_commit_msg: 'ci: pre-commit autoupdate'
     skip: [pylint]
 
-default_stages: [push]
-
 repos:
 -   repo: https://github.com/asottile/add-trailing-comma
     rev: v3.1.0
     hooks:
     -   id: add-trailing-comma
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.0
+    rev: v3.15.1
     hooks:
     -   id: pyupgrade
         args: [--py39-plus]
@@ -45,17 +43,17 @@ repos:
     hooks:
     -   id: rm-unneeded-f-str
 -   repo: https://github.com/kynan/nbstripout
-    rev: 0.6.1
+    rev: 0.7.1
     hooks:
     -   id: nbstripout
 -   repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.5.4
+    rev: v1.5.5
     hooks:
     -   id: insert-license
         args: [--use-current-year]
         types: [python]
 -   repo: https://github.com/jsh9/pydoclint
-    rev: 0.3.8
+    rev: 0.4.1
     hooks:
     - id: pydoclint
       args: ["--config=pyproject.toml"]
@@ -70,7 +68,7 @@ repos:
     -   id: nbqa-pyupgrade
         args: ["--py39-plus"]
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.7.1
+    rev: v1.8.0
     hooks:
     -   id: mypy
         additional_dependencies: [types-all, pandas-stubs, types-tqdm]
@@ -96,7 +94,7 @@ repos:
     hooks:
     -   id: autopep8
 -   repo: https://github.com/PyCQA/autoflake
-    rev: v2.2.1
+    rev: v2.3.0
     hooks:
     -   id: autoflake
 -   repo: https://github.com/PyCQA/doc8
@@ -104,7 +102,7 @@ repos:
     hooks:
     -   id: doc8
 -   repo: https://github.com/PyCQA/flake8
-    rev: 6.1.0
+    rev: 7.0.0
     hooks:
     -   id: flake8
 -   repo: https://github.com/pycqa/pydocstyle
@@ -112,14 +110,18 @@ repos:
     hooks:
     -   id: pydocstyle
         files: ^src/
+        args:
+          [
+            '--ignore=D107,D203,D213,D413',
+          ]
     -   id: pydocstyle
         files: ^tests/
         args:
           [
-            '--ignore=D103,D213',
+            '--ignore=D103,D107,D213',
           ]
 -   repo: https://github.com/PyCQA/pylint
-    rev: v3.0.1
+    rev: v3.0.3
     hooks:
       - id: pylint
         name: pylint
