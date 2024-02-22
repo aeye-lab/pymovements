@@ -47,17 +47,17 @@
 .. autosummary::
     :toctree:
 
-    pymovements.gaze.io.from_asc
-    pymovements.gaze.io.from_csv
-    pymovements.gaze.io.from_ipc
+    pymovements.gaze.from_asc
+    pymovements.gaze.from_csv
+    pymovements.gaze.from_ipc
 
 .. rubric:: Integration
 
 .. autosummary::
     :toctree:
 
-    pymovements.gaze.integration.from_numpy
-    pymovements.gaze.integration.from_pandas
+    pymovements.gaze.from_numpy
+    pymovements.gaze.from_pandas
 
 .. rubric:: Numpy Transformations
 
