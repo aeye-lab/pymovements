@@ -39,7 +39,7 @@ dependencies = [
   "pyopenssl>=16.0.0,<25.0.0",
   "scipy>=1.8.0,<2",
   "tqdm>=4.27.0,<5",
-  "typing_extensions"
+  "typing_extensions>=4.0.0,<5"
 ]
 dynamic = ["version"]
 
