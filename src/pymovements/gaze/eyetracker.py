@@ -39,12 +39,13 @@ class EyeTracker:
         Whether the right eye is tracked. (default: None)
     model : str | None
         Eye tracker model (e.g. 'EyeLink II', 'Tobii Pro Spectrum'). (default: None)
-    version : str | None. (default: None)
-        Eye tracker software version number
-    vendor : str | None. (default: None)
-        Eye tracker vendor (e.g. 'EyeLink', 'Tobii')
-    mount : str | None. (default: None)
-        The mounting setup of the eye tracker (e.g. 'Desktop / Monocular / Remote')
+    version : str | None
+        Eye tracker software version number. (default: None)
+    vendor : str | None
+        Eye tracker vendor (e.g. 'EyeLink', 'Tobii'). (default: None)
+    mount : str | None
+        The mounting setup of the eye tracker (e.g. 'Desktop / Monocular / Remote').
+        (default: None)
 
     Examples
     --------
