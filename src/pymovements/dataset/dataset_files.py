@@ -30,12 +30,11 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events import EventDataFrame
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
-from pymovements.utils.parsing import parse_eyelink
-from pymovements.utils.paths import match_filepaths
-from pymovements.utils.strings import curly_to_regex
 from pymovements.gaze.io import from_asc
 from pymovements.gaze.io import from_csv
 from pymovements.gaze.io import from_ipc
+from pymovements.utils.paths import match_filepaths
+from pymovements.utils.strings import curly_to_regex
 
 
 def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataFrame:
@@ -212,8 +211,7 @@ def load_gaze_files(
                 filepath, preprocessed_dirname=preprocessed_dirname,
                 extension=extension,
             )
-        
-        
+
         if preprocessed and extension == 'feather':
             # Preprocessed data already has tuple columns.
             gaze_df = load_gaze_file(
@@ -221,8 +219,8 @@ def load_gaze_files(
                 preprocessed=preprocessed,
                 definition=definition,
                 custom_read_kwargs=definition.custom_read_kwargs,
-            )          
-        
+            )
+
         else:
             # Create GazeDataFrame
             gaze_df = load_gaze_file(
@@ -235,7 +233,7 @@ def load_gaze_files(
             definition=definition,
             df=gaze_df,
             fileinfo=fileinfo_row,
-        )        
+        )
         gaze_dfs.append(gaze_df)
     return gaze_dfs
 
@@ -278,15 +276,12 @@ def load_gaze_file(
     if filepath.suffix in {'.csv', '.txt', '.tsv'}:
         if preprocessed:
             gaze_df = from_csv(filepath)
-            time_column = None
-            distance_column = None
 
             # Time column is always available in every initialized GazeDataFrame.
-            time_column = 'time'
 
             if 'distance' in gaze_df.frame.columns:
-                distance_column = 'distance'
-            
+                pass
+
             pixel_columns: list[str] = list(
                 set(GazeDataFrame.valid_pixel_position_columns) & set(gaze_df.frame.columns),
             )
@@ -325,7 +320,7 @@ def load_gaze_file(
             if definition is None:
                 gaze_df = from_csv(
                     filepath,
-                    **custom_read_kwargs
+                    **custom_read_kwargs,
                 )
             else:
                 gaze_df = from_csv(
