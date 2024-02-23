@@ -33,6 +33,9 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
 from pymovements.utils.parsing import parse_eyelink
 from pymovements.utils.paths import match_filepaths
 from pymovements.utils.strings import curly_to_regex
+from pymovements.gaze.io import from_asc
+from pymovements.gaze.io import from_csv
+from pymovements.gaze.io import from_ipc
 
 
 def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataFrame:
@@ -209,87 +212,38 @@ def load_gaze_files(
                 filepath, preprocessed_dirname=preprocessed_dirname,
                 extension=extension,
             )
-
-        gaze_data = load_gaze_file(
-            filepath=filepath,
-            preprocessed=preprocessed,
-            custom_read_kwargs=definition.custom_read_kwargs,
-        )
-
-        if not preprocessed:
-            gaze_data = gaze_data.rename(definition.column_map)
-
-        # Add fileinfo columns to dataframe.
-        gaze_data = add_fileinfo(
-            definition=definition,
-            df=gaze_data,
-            fileinfo=fileinfo_row,
-        )
-
+        
+        
         if preprocessed and extension == 'feather':
             # Preprocessed data already has tuple columns.
-            gaze_df = GazeDataFrame(
-                gaze_data,
-                experiment=definition.experiment,
-                trial_columns=definition.trial_columns,
-            )
-
-        elif preprocessed and extension in {'csv', 'txt', 'tsv'}:
-            time_column = None
-            distance_column = None
-
-            # Time column is always available in every initialized GazeDataFrame.
-            time_column = 'time'
-
-            if 'distance' in gaze_data.columns:
-                distance_column = 'distance'
-
-            pixel_columns: list[str] = list(
-                set(GazeDataFrame.valid_pixel_position_columns) & set(gaze_data.columns),
-            )
-            position_columns: list[str] = list(
-                set(GazeDataFrame.valid_position_columns) & set(gaze_data.columns),
-            )
-            velocity_columns: list[str] = list(
-                set(GazeDataFrame.valid_velocity_columns) & set(gaze_data.columns),
-            )
-            acceleration_columns: list[str] = list(
-                set(GazeDataFrame.valid_acceleration_columns) & set(gaze_data.columns),
-            )
-
-            gaze_df = GazeDataFrame(
-                gaze_data,
-                experiment=definition.experiment,
-                trial_columns=definition.trial_columns,
-                time_column=time_column,
-                distance_column=distance_column,
-                pixel_columns=pixel_columns,
-                position_columns=position_columns,
-                velocity_columns=velocity_columns,
-                acceleration_columns=acceleration_columns,
-            )
+            gaze_df = load_gaze_file(
+                filepath=filepath,
+                preprocessed=preprocessed,
+                definition=definition,
+                custom_read_kwargs=definition.custom_read_kwargs,
+            )          
+        
         else:
             # Create GazeDataFrame
-            gaze_df = GazeDataFrame(
-                gaze_data,
-                experiment=definition.experiment,
-                trial_columns=definition.trial_columns,
-                time_column=definition.time_column,
-                distance_column=definition.distance_column,
-                pixel_columns=definition.pixel_columns,
-                position_columns=definition.position_columns,
-                velocity_columns=definition.velocity_columns,
-                acceleration_columns=definition.acceleration_columns,
+            gaze_df = load_gaze_file(
+                filepath=filepath,
+                preprocessed=preprocessed,
+                definition=definition,
+                custom_read_kwargs=definition.custom_read_kwargs,
             )
-
+        gaze_df = add_fileinfo(
+            definition=definition,
+            df=gaze_df,
+            fileinfo=fileinfo_row,
+        )        
         gaze_dfs.append(gaze_df)
-
     return gaze_dfs
 
 
 def load_gaze_file(
         filepath: Path,
         preprocessed: bool = False,
+        definition: DatasetDefinition = None,
         custom_read_kwargs: dict[str, Any] | None = None,
 ) -> GazeDataFrame:
     """Load a gaze data file as a polars DataFrame.
@@ -301,6 +255,8 @@ def load_gaze_file(
     preprocessed: bool
         If ``True``, saved preprocessed data will be loaded, otherwise raw data will be loaded.
         (default: False)
+    definition: DatasetDefinition
+        The dataset definition.
     custom_read_kwargs: dict[str, Any] | None
         Dictionary of keyword arguments for reading gaze file. (default: None)
 
@@ -322,10 +278,75 @@ def load_gaze_file(
     if filepath.suffix in {'.csv', '.txt', '.tsv'}:
         if preprocessed:
             gaze_df = from_csv(filepath)
+            time_column = None
+            distance_column = None
+
+            # Time column is always available in every initialized GazeDataFrame.
+            time_column = 'time'
+
+            if 'distance' in gaze_df.frame.columns:
+                distance_column = 'distance'
+            
+            pixel_columns: list[str] = list(
+                set(GazeDataFrame.valid_pixel_position_columns) & set(gaze_df.frame.columns),
+            )
+            position_columns: list[str] = list(
+                set(GazeDataFrame.valid_position_columns) & set(gaze_df.frame.columns),
+            )
+            velocity_columns: list[str] = list(
+                set(GazeDataFrame.valid_velocity_columns) & set(gaze_df.frame.columns),
+            )
+            acceleration_columns: list[str] = list(
+                set(GazeDataFrame.valid_acceleration_columns) & set(gaze_df.frame.columns),
+            )
+
+            column_specifiers: list[list[str]] = []
+            if len(pixel_columns) > 0:
+                gaze_df._check_component_columns(pixel_columns=pixel_columns)
+                gaze_df.nest(pixel_columns, output_column='pixel')
+                column_specifiers.append(pixel_columns)
+
+            if len(position_columns) > 0:
+                gaze_df._check_component_columns(position_columns=position_columns)
+                gaze_df.nest(position_columns, output_column='position')
+                column_specifiers.append(position_columns)
+
+            if len(velocity_columns) > 0:
+                gaze_df._check_component_columns(velocity_columns=velocity_columns)
+                gaze_df.nest(velocity_columns, output_column='velocity')
+                column_specifiers.append(velocity_columns)
+
+            if len(acceleration_columns) > 0:
+                gaze_df._check_component_columns(acceleration_columns=acceleration_columns)
+                gaze_df.nest(acceleration_columns, output_column='acceleration')
+                column_specifiers.append(acceleration_columns)
+            gaze_df.n_components = gaze_df._infer_n_components(column_specifiers)
         else:
-            gaze_df = from_csv(filepath, **custom_read_kwargs)
+            if definition is None:
+                gaze_df = from_csv(
+                    filepath,
+                    **custom_read_kwargs
+                )
+            else:
+                gaze_df = from_csv(
+                    filepath,
+                    experiment=definition.experiment,
+                    time_column=definition.time_column,
+                    distance_column=definition.distance_column,
+                    pixel_columns=definition.pixel_columns,
+                    position_columns=definition.position_columns,
+                    velocity_columns=definition.velocity_columns,
+                    acceleration_columns=definition.acceleration_columns,
+                    **custom_read_kwargs,
+                )
     elif filepath.suffix == '.feather':
-        gaze_df = from_ipc(filepath)
+        if definition is None:
+            gaze_df = from_ipc(filepath)
+        else:
+            gaze_df = from_ipc(
+                filepath,
+                experiment=definition.experiment,
+            )
     elif filepath.suffix == '.asc':
         gaze_df = from_asc(filepath, **custom_read_kwargs)
     else:
@@ -340,10 +361,10 @@ def load_gaze_file(
 
 def add_fileinfo(
         definition: DatasetDefinition,
-        df: pl.DataFrame,
+        df: GazeDataFrame,
         fileinfo: dict[str, Any],
-) -> pl.DataFrame:
-    """Add columns from fileinfo to dataframe.
+) -> GazeDataFrame:
+    """Add columns from fileinfo to GazeDataFrame.
 
     Parameters
     ----------
@@ -356,10 +377,10 @@ def add_fileinfo(
 
     Returns
     -------
-    pl.DataFrame
-        Dataframe with added columns from fileinfo dictionary keys.
+    GazeDataFrame
+        GazeDataFrame with added columns from fileinfo dictionary keys.
     """
-    df = df.select(
+    df.frame = df.frame.select(
         [
             pl.lit(value).alias(column)
             for column, value in fileinfo.items()
@@ -368,7 +389,7 @@ def add_fileinfo(
     )
 
     # Cast columns from fileinfo according to specification.
-    df = df.with_columns([
+    df.frame = df.frame.with_columns([
         pl.col(fileinfo_key).cast(fileinfo_dtype)
         for fileinfo_key, fileinfo_dtype in definition.filename_format_dtypes.items()
     ])
