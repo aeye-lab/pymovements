@@ -30,11 +30,11 @@ jobs:
           - tox_env: py311
             python: "3.11"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Setup python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
       - name: Install tox
@@ -45,7 +45,7 @@ jobs:
         run: tox --skip-pkg-install -e ${{ matrix.tox_env }}
       - name: Upload coverage reports to Codecov
         if: success() || failure()
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -53,11 +53,11 @@ jobs:
     name: pylint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Install base python for tox
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.9"
       - name: Install tox
@@ -72,11 +72,11 @@ jobs:
     name: minimum requirements
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Setup python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.9"
       - name: Install tox
@@ -94,11 +94,10 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macos-latest
           - ubuntu-latest
           - windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Install pandoc
@@ -106,7 +105,7 @@ jobs:
         with:
           pandoc-version: '2.19.2'
       - name: Install base python for tox
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.9"
       - name: Install tox
