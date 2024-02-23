@@ -42,6 +42,23 @@
    pymovements.gaze.transforms.pos2vel
    pymovements.gaze.transforms.savitzky_golay
 
+.. rubric:: Input / Output
+
+.. autosummary::
+    :toctree:
+
+    pymovements.gaze.from_asc
+    pymovements.gaze.from_csv
+    pymovements.gaze.from_ipc
+
+.. rubric:: Integration
+
+.. autosummary::
+    :toctree:
+
+    pymovements.gaze.from_numpy
+    pymovements.gaze.from_pandas
+
 .. rubric:: Numpy Transformations
 
 .. autosummary::
