@@ -291,7 +291,7 @@ def load_gaze_file(
         filepath: Path,
         preprocessed: bool = False,
         custom_read_kwargs: dict[str, Any] | None = None,
-) -> pl.DataFrame:
+) -> GazeDataFrame:
     """Load a gaze data file as a polars DataFrame.
 
     Parameters
@@ -306,8 +306,8 @@ def load_gaze_file(
 
     Returns
     -------
-    pl.DataFrame
-        The resulting polars.DataFrame
+   GazeDataFrame
+        The resulting GazeDataFrame
 
     Raises
     ------
@@ -321,13 +321,13 @@ def load_gaze_file(
 
     if filepath.suffix in {'.csv', '.txt', '.tsv'}:
         if preprocessed:
-            gaze_df = pl.read_csv(filepath)
+            gaze_df = from_csv(filepath)
         else:
-            gaze_df = pl.read_csv(filepath, **custom_read_kwargs)
+            gaze_df = from_csv(filepath, **custom_read_kwargs)
     elif filepath.suffix == '.feather':
-        gaze_df = pl.read_ipc(filepath)
+        gaze_df = from_ipc(filepath)
     elif filepath.suffix == '.asc':
-        gaze_df = parse_eyelink(filepath, **custom_read_kwargs)
+        gaze_df = from_asc(filepath, **custom_read_kwargs)
     else:
         valid_extensions = ['csv', 'tsv', 'txt', 'feather', 'asc']
         raise ValueError(
