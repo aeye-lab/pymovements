@@ -28,5 +28,9 @@
     pymovements.stimulus.Stimulus
     pymovements.stimulus.TextStimulus
 """
-from pymovements.stimulus.stimulus import Stimulus  # noqa: F401
-from pymovements.stimulus.text import TextStimulus  # noqa: F401
+from pymovements.stimulus.text import TextStimulus
+
+
+__all__ = [
+    'TextStimulus',
+]

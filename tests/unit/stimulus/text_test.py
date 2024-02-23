@@ -19,138 +19,109 @@
 # SOFTWARE.
 from pathlib import Path
 
+import polars
 import pytest
+from polars.testing import assert_frame_equal
 
 import pymovements as pm
 
 
+EXPECTED_DF = polars.DataFrame(
+    {
+        'char': [
+            'W',
+            'h',
+            'a',
+            't',
+            polars.Null,
+            'i',
+            's',
+            polars.Null,
+            'p',
+            'y',
+            'm',
+            'o',
+        ],
+        'top_left_x': [
+            400.0,
+            414.95,
+            429.9,
+            444.85,
+            459.8,
+            474.75,
+            489.7,
+            504.65,
+            519.6,
+            534.55,
+            549.5,
+            564.45,
+        ],
+        'top_left_y': [122.0 for _ in range(12)],
+        'width': [14.95 for _ in range(12)],
+        'height': [23 for _ in range(12)],
+        'char_idx_in_line': list(range(12)),
+        'line_idx': [0 for _ in range(12)],
+        'page': ['question_1' for _ in range(12)],
+        'word': [
+            'What',
+            'What',
+            'What',
+            'What',
+            polars.Null,
+            'is',
+            'is',
+            polars.Null,
+            'pymovements?',
+            'pymovements?',
+            'pymovements?',
+            'pymovements?',
+        ],
+    },
+)
+
+
 @pytest.mark.parametrize(
-    ('aoi_file'),
+    ('aoi_file', 'custom_read_kwargs', 'expected'),
     [
         pytest.param(
             'tests/files/toy_text_1_1_aoi.csv',
+            None,
+            EXPECTED_DF,
             id='toy_text_1_1_aoi',
         ),
-        pytest.param(
-            'tests/files/toy_text_2_2_aoi.csv',
-            id='toy_text_2_2_aoi',
-        ),
-        pytest.param(
-            'tests/files/toy_text_3_3_aoi.csv',
-            id='toy_text_3_3_aoi',
-        ),
-    ],
-)
-def test_str_aoi_path(aoi_file):
-    pm.stimulus.text.from_file(
-        aoi_file,
-        character_column='char',
-        pixel_x_column='top_left_x',
-        pixel_y_column='top_left_y',
-        width_column='width',
-        height_column='height',
-        page_column='page',
-    )
-
-
-@pytest.mark.parametrize(
-    ('aoi_file'),
-    [
-        pytest.param(
-            'tests/files/toy_text_1_1_aoi.csv',
-            id='toy_text_1_1_aoi',
-        ),
-        pytest.param(
-            'tests/files/toy_text_2_2_aoi.csv',
-            id='toy_text_2_2_aoi',
-        ),
-        pytest.param(
-            'tests/files/toy_text_3_3_aoi.csv',
-            id='toy_text_3_3_aoi',
-        ),
-    ],
-)
-def test_str_aoi_path_kwargs(aoi_file):
-    pm.stimulus.text.from_file(
-        aoi_file,
-        character_column='char',
-        pixel_x_column='top_left_x',
-        pixel_y_column='top_left_y',
-        width_column='width',
-        height_column='height',
-        page_column='page',
-        custom_read_kwargs={
-            'separator': ',',
-        },
-    )
-
-
-@pytest.mark.parametrize(
-    ('aoi_file'),
-    [
         pytest.param(
             Path('tests/files/toy_text_1_1_aoi.csv'),
+            {'separator': ','},
+            EXPECTED_DF,
             id='toy_text_1_1_aoi',
-        ),
-        pytest.param(
-            Path('tests/files/toy_text_2_2_aoi.csv'),
-            id='toy_text_2_2_aoi',
-        ),
-        pytest.param(
-            Path('tests/files/toy_text_3_3_aoi.csv'),
-            id='toy_text_3_3_aoi',
         ),
     ],
 )
-def test_Path_aoi_path(aoi_file):
-    pm.stimulus.text.from_file(
+def test_text_stimulus(aoi_file, custom_read_kwargs, expected):
+    aois = pm.stimulus.text.from_file(
         aoi_file,
-        character_column='char',
+        aoi_column='char',
         pixel_x_column='top_left_x',
         pixel_y_column='top_left_y',
         width_column='width',
         height_column='height',
         page_column='page',
+        custom_read_kwargs=custom_read_kwargs,
     )
+    head = aois.aois.head(12)
 
-
-@pytest.mark.parametrize(
-    ('aoi_file'),
-    [
-        pytest.param(
-            Path('tests/files/toy_text_1_1_aoi.csv'),
-            id='toy_text_1_1_aoi',
-        ),
-        pytest.param(
-            Path('tests/files/toy_text_2_2_aoi.csv'),
-            id='toy_text_2_2_aoi',
-        ),
-        pytest.param(
-            Path('tests/files/toy_text_3_3_aoi.csv'),
-            id='toy_text_3_3_aoi',
-        ),
-    ],
-)
-def test_Path_aoi_path_kwargs(aoi_file):
-    pm.stimulus.text.from_file(
-        aoi_file,
-        character_column='char',
-        pixel_x_column='top_left_x',
-        pixel_y_column='top_left_y',
-        width_column='width',
-        height_column='height',
-        page_column='page',
-        custom_read_kwargs={
-            'separator': ',',
-        },
+    assert_frame_equal(
+        head,
+        expected,
     )
+    assert len(aois.aois.columns) == len(expected.columns)
 
 
 def test_text_stimulus_unsupported_format():
     with pytest.raises(ValueError) as excinfo:
         pm.stimulus.text.from_file(
             'tests/files/toy_text_1_1_aoi.pickle',
-            character_column='char',
+            aoi_column='char',
             pixel_x_column='top_left_x',
             pixel_y_column='top_left_y',
             width_column='width',

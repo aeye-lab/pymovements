@@ -25,17 +25,15 @@ from typing import Any
 
 import polars as pl
 
-from pymovements.stimulus.stimulus import Stimulus
 
-
-class TextStimulus(Stimulus):
-    """TextStimulus class
-    """
+class TextStimulus:
+    """TextStimulus class"""
 
     def __init__(
             self,
+            *,
             aois: pl.DataFrame,
-            character_column: str,
+            aoi_column: str,
             pixel_x_column: str,
             pixel_y_column: str,
             width_column: str,
@@ -43,20 +41,19 @@ class TextStimulus(Stimulus):
             page_column: str,
     ) -> None:
 
-        self.frame = aois.select(
-            pl.col(character_column),
-            pl.col(pixel_x_column),
-            pl.col(pixel_y_column),
-            pl.col(width_column),
-            pl.col(height_column),
-            pl.col(page_column),
-        )
+        self.aois = aois
+        self.aoi_column = aoi_column
+        self.pixel_x_column = pixel_x_column
+        self.pixel_y_column = pixel_y_column
+        self.width_column = width_column
+        self.height_column = height_column
+        self.page_column = page_column
 
 
 def from_file(
         aoi_path: str | Path,
         *,
-        character_column: str,
+        aoi_column: str,
         pixel_x_column: str,
         pixel_y_column: str,
         width_column: str,
@@ -82,13 +79,12 @@ def from_file(
             f'Supported formats are: {sorted(valid_extensions)}',
         )
 
-    text_stimulus = TextStimulus(
-        stimulus_df,
-        character_column,
-        pixel_x_column,
-        pixel_y_column,
-        width_column,
-        height_column,
-        page_column,
+    return TextStimulus(
+        aois=stimulus_df,
+        aoi_column=aoi_column,
+        pixel_x_column=pixel_x_column,
+        pixel_y_column=pixel_y_column,
+        width_column=width_column,
+        height_column=height_column,
+        page_column=page_column,
     )
-    return text_stimulus
