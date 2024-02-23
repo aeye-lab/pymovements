@@ -27,7 +27,7 @@ import polars as pl
 
 
 class TextStimulus:
-    """TextStimulus class"""
+    """TextStimulus class."""
 
     def __init__(
             self,
@@ -61,7 +61,7 @@ def from_file(
         page_column: str,
         custom_read_kwargs: dict[str, Any] | None = None,
 ) -> TextStimulus:
-    """ Load text stimulus from file"""
+    """Load text stimulus from file."""
     if isinstance(aoi_path, str):
         aoi_path = Path(aoi_path)
     if custom_read_kwargs is None:
