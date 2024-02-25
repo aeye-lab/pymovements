@@ -320,7 +320,7 @@ class Dataset:
             if experiment is None.
         """
         return self.apply('pix2deg', verbose=verbose)
-    
+
     def deg2pix(self, verbose: bool = True) -> Dataset:
         """Compute gaze positions in pixel coordinates from degrees of visual angle.
 
