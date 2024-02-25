@@ -282,7 +282,7 @@ def test_deg2pix_init_raises_error(kwargs, exception, msg_substrings):
             },
             pl.Series('ccc', [0], pl.Float64),
             pl.exceptions.ColumnNotFoundError,
-            ('aaa',),
+            ('bbb',),
             id='df_missing_column_raises_column_not_found_error',
         ),
     ],
@@ -370,7 +370,7 @@ def test_deg2pix_raises_error(kwargs, series, exception, msg_substrings):
                 'n_components': 2,
             },
             pl.Series('position', [[-44.7120, 45]], pl.List(pl.Float64)),
-            pl.Series('pixel', [[0, 100 - 0.5]], pl.List(pl.Float64)),
+            pl.Series('pixel', [[0.000145, 100 - 0.5]], pl.List(pl.Float64)),
             id='isosceles_triangle_origin_lowerleft_returns_45',
         ),
         pytest.param(
@@ -384,7 +384,7 @@ def test_deg2pix_raises_error(kwargs, series, exception, msg_substrings):
                 'n_components': 2,
             },
             pl.Series('position', [[-44.7120, -45]], pl.List(pl.Float64)),
-            pl.Series('pixel', [[0, -0.5]], pl.List(pl.Float64)),
+            pl.Series('pixel', [[0.000145, -0.5]], pl.List(pl.Float64)),
             id='isosceles_triangle_left_origin_lowerleft_returns_neg45',
         ),
         pytest.param(
