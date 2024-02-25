@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test pymovements.gaze.transforms.deg2pix. Based on tests for pix2deg"""
+"""Test pymovements.gaze.transforms.deg2pix. Based on tests for pix2deg."""
 import numpy as np
 import polars as pl
 import pytest
@@ -369,8 +369,8 @@ def test_deg2pix_raises_error(kwargs, series, exception, msg_substrings):
                 'position_column': 'position',
                 'n_components': 2,
             },
-            pl.Series('position', [[-44.7120, 45]], pl.List(pl.Float64)),
-            pl.Series('pixel', [[0.000145, 100 - 0.5]], pl.List(pl.Float64)),
+            pl.Series('position', [[-44.712084, 45]], pl.List(pl.Float64)),
+            pl.Series('pixel', [[0, 100 - 0.5]], pl.List(pl.Float64)),
             id='isosceles_triangle_origin_lowerleft_returns_45',
         ),
         pytest.param(
@@ -383,8 +383,8 @@ def test_deg2pix_raises_error(kwargs, series, exception, msg_substrings):
                 'position_column': 'position',
                 'n_components': 2,
             },
-            pl.Series('position', [[-44.7120, -45]], pl.List(pl.Float64)),
-            pl.Series('pixel', [[0.000145, -0.5]], pl.List(pl.Float64)),
+            pl.Series('position', [[-44.712084, -45]], pl.List(pl.Float64)),
+            pl.Series('pixel', [[0, -0.5]], pl.List(pl.Float64)),
             id='isosceles_triangle_left_origin_lowerleft_returns_neg45',
         ),
         pytest.param(
@@ -595,7 +595,7 @@ def test_deg2pix_returns(kwargs, series, expected_df, distance_as_column):
                 'distance': [1000., 100., 10.],
             },
             pl.Series('pixel', [[49.5, 49.5], [49.5, 49.5], [49.5, 49.5]], pl.List(pl.Float64)),
-            id='origin_lower_left_constant_centered_position_changing_distance_returns_constant_pixel',
+            id='origin_lower_left_constant_centered_pos_changing_distance_returns_constant_pixel',
         ),
         pytest.param(
             {
@@ -644,4 +644,4 @@ def test_deg2pix_distance_as_colum_returns(kwargs, data, expected_df):
         pm.gaze.transforms.deg2pix(**kwargs, distance='distance'),
     )
 
-    assert_frame_equal(result_df, expected_df.to_frame(), atol=1e-4)
+    assert_frame_equal(result_df, expected_df.to_frame())
