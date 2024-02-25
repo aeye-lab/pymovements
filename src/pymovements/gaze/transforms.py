@@ -284,6 +284,89 @@ def pix2deg(
 
     return pl.concat_list(list(degree_components)).alias(position_column)
 
+@register_transform
+def deg2pix(
+        *,
+        screen_resolution: tuple[int, int],
+        screen_size: tuple[float, float],
+        distance: float | str,
+        origin: str,
+        n_components: int,
+        position_column: str = 'position',
+        pixel_column: str = 'pixel',
+) -> pl.Expr:
+    """Convert degrees of visual angle to pixel screen coordinates.
+
+    Parameters
+    ----------
+    screen_resolution: tuple[int, int]
+        Pixel screen resolution as tuple (width, height).
+    screen_size: tuple[float, float]
+        Screen size in centimeters as tuple (width, height).
+    distance: float | str
+        Must be either a scalar or a string. If a scalar is passed, it is interpreted as the
+        Eye-to-screen distance in centimeters. If a string is passed, it is interpreted as the name
+        of a column containing the Eye-to-screen distance in millimiters for each sample.
+    origin: str
+        The location of the pixel origin. Supported values: ``center``, ``lower left``. See also
+        py:func:`~pymovements.gaze.transform.center_origin` for more information.
+    n_components: int
+        Number of components in input column.
+    position_column: str
+        The input position column name. (default: 'position')
+    pixel_column: str
+        The output pixel column name. (default: 'pixel')
+
+    Returns
+    -------
+    pl.Expr
+        The respective polars expression.
+    """
+    _check_screen_resolution(screen_resolution)
+    _check_screen_size(screen_size)
+
+    if isinstance(distance, (float, int)):
+        _check_distance(distance)
+        distance_series = pl.lit(distance)
+    elif isinstance(distance, str):
+        # True division by 10 is needed to convert distance from mm to cm
+        distance_series = pl.col(distance).truediv(10)
+    else:
+        raise TypeError(
+            f'`distance` must be of type `float`, `int` or `str`, but is of type'
+            f'`{type(distance).__name__}`',
+        )
+    
+    distance_pixels = pl.concat_list([
+        distance_series.mul(screen_resolution[component % 2] / screen_size[component % 2])
+        for component in range(n_components)
+    ])
+        
+    pixel_components = [
+            pl.col(position_column).list.get(component).radians().tan()*
+        distance_pixels.list.get(component)
+        for component in range(n_components)
+    ]
+
+    if origin == 'center':
+        origin_offset = (0.0, 0.0)
+    elif origin == 'lower left':
+        origin_offset = ((screen_resolution[0] - 1) / 2, (screen_resolution[1] - 1) / 2)
+    else:
+        supported_origins = ['center', 'lower left']
+        raise ValueError(
+            f'value `{origin}` for argument `origin` is invalid. '
+            f' Valid values are: {supported_origins}',
+        )
+
+    centered_pixels = pl.concat_list(
+        [
+            pixel_components[component] + origin_offset[component % 2]
+            for component in range(n_components)
+        ],
+    )
+    return centered_pixels.alias(pixel_column)
+
 
 def _check_distance(distance: float) -> None:
     """Check if all screen values are scalars and are greather than zero.
