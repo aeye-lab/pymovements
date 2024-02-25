@@ -167,6 +167,36 @@ from pymovements.synthetic import step_function
             ),
             id='pix2deg_origin_center',
         ),
+        
+        pytest.param(
+            'deg2pix',
+            {},
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'time': [1000, 1000],
+                        'x_dva': [26.335410003881346, 26.335410003881346],
+                        'y_dva': [0.0, 0.0],
+                    },
+                ),
+                experiment=pm.Experiment(100, 100, 100, 100, 100, 'center', 1000),
+                position_columns=['x_dva', 'y_dva'],
+            ),
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'time': [1000, 1000],
+                        'x_pix': [49.5, 49.5],
+                        'y_pix': [0.0, 0.0],
+                        'x_dva': [26.335410003881346, 26.335410003881346],
+                        'y_dva': [0.0, 0.0],
+                    },
+                ),
+                pixel_columns=['x_pix', 'y_pix'],
+                position_columns=['x_dva', 'y_dva'],
+            ),
+            id='deg2pix_origin_center',
+        ),
 
         pytest.param(
             'pos2vel',

@@ -66,7 +66,6 @@
    :toctree:
 
    pymovements.gaze.transforms_numpy.pix2deg
-   pymovements.gaze.transforms_numpy.deg2pix
    pymovements.gaze.transforms_numpy.pos2acc
    pymovements.gaze.transforms_numpy.pos2vel
    pymovements.gaze.transforms_numpy.norm
