@@ -284,6 +284,7 @@ def pix2deg(
 
     return pl.concat_list(list(degree_components)).alias(position_column)
 
+
 @register_transform
 def deg2pix(
         *,
@@ -336,14 +337,14 @@ def deg2pix(
             f'`distance` must be of type `float`, `int` or `str`, but is of type'
             f'`{type(distance).__name__}`',
         )
-    
+
     distance_pixels = pl.concat_list([
         distance_series.mul(screen_resolution[component % 2] / screen_size[component % 2])
         for component in range(n_components)
     ])
-        
+
     pixel_components = [
-            pl.col(position_column).list.get(component).radians().tan()*
+        pl.col(position_column).list.get(component).radians().tan() *
         distance_pixels.list.get(component)
         for component in range(n_components)
     ]

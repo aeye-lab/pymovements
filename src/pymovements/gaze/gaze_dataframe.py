@@ -462,7 +462,7 @@ class GazeDataFrame:
             if experiment is None.
         """
         self.transform('pix2deg')
-        
+
     def deg2pix(self) -> None:
         """Compute gaze positions in pixel position coordinates from degrees of visual angle.
 
