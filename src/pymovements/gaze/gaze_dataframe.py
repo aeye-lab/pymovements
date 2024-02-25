@@ -432,7 +432,8 @@ class GazeDataFrame:
                         "Neither is 'position' in the dataframe columns, "
                         'nor is a position column explicitly specified. '
                         'You can specify the position column via: '
-                        f'{transform_method.__name__}(position_column="name_of_your_position_column"). '
+                        f'{transform_method.__name__}'
+                        f'(position_column="name_of_your_position_column"). '
                         f'Available dataframe columns are: {self.frame.columns}',
                     )
 
