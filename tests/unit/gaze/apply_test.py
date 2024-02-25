@@ -167,7 +167,7 @@ from pymovements.synthetic import step_function
             ),
             id='pix2deg_origin_center',
         ),
-        
+
         pytest.param(
             'deg2pix',
             {},
