@@ -52,7 +52,7 @@ class PoTeC(DatasetDefinition):
 
     The corpus and all the accompanying data at all
     stages of the preprocessing pipeline and all code used to preprocess the data are
-    made available via GitHub: https://github.com/DiLi-Lab/PoTeC.
+    made available via `GitHub. <https://github.com/DiLi-Lab/PoTeC>`_
 
     Attributes
     ----------
