@@ -82,7 +82,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
     >>>
     >>> dataset = pm.Dataset("ToyDatasetEyeLink", path='data/ToyDatasetEyeLink')
 
-    Download the dataset resources resources:
+    Download the dataset resources:
 
     >>> dataset.download()# doctest: +SKIP
 
