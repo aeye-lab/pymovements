@@ -104,6 +104,8 @@ def heatmap(
             'GazeDataFrame must be associated with an experiment.',
         )
 
+    assert gaze.experiment.sampling_rate is not None
+
     # Get experiment screen properties
     screen = gaze.experiment.screen
 
