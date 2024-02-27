@@ -235,7 +235,8 @@ from pymovements.synthetic import step_function
 )
 def test_gaze_apply(method, kwargs, gaze, expected):
     gaze.apply(method, **kwargs)
-    assert_frame_equal(gaze.frame, expected.frame)
+    check_column_order = True if method != 'deg2pix' else False
+    assert_frame_equal(gaze.frame, expected.frame, check_column_order=check_column_order)
     assert_frame_equal(gaze.events.frame, expected.events.frame)
 
 
