@@ -276,9 +276,9 @@ def pix2deg(
     ])
 
     degree_components = [
-        pl.arctan2(
+        pl.arctan2d(
             centered_pixels.list.get(component), distance_pixels.list.get(component),
-        ) * (180 / np.pi)
+        )
         for component in range(n_components)
     ]
 
