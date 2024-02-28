@@ -216,8 +216,8 @@ def load_gaze_files(
             # Preprocessed data already has tuple columns.
             gaze_df = load_gaze_file(
                 filepath=filepath,
-                preprocessed=preprocessed,
                 definition=definition,
+                preprocessed=preprocessed,                
                 custom_read_kwargs=definition.custom_read_kwargs,
             )
 
@@ -225,8 +225,8 @@ def load_gaze_files(
             # Create GazeDataFrame
             gaze_df = load_gaze_file(
                 filepath=filepath,
-                preprocessed=preprocessed,
                 definition=definition,
+                preprocessed=preprocessed,                
                 custom_read_kwargs=definition.custom_read_kwargs,
             )
         gaze_df.frame = add_fileinfo(
@@ -240,21 +240,21 @@ def load_gaze_files(
 
 def load_gaze_file(
         filepath: Path,
-        preprocessed: bool = False,
         definition: DatasetDefinition | None = None,
+        preprocessed: bool = False,
         custom_read_kwargs: dict[str, Any] | None = None,
 ) -> GazeDataFrame:
-    """Load a gaze data file as a polars DataFrame.
-
+    """Load a gaze data file as GazeDataFrame.
+    
     Parameters
     ----------
     filepath: Path
         Path of gaze file.
-    preprocessed: bool
-        If ``True``, saved preprocessed data will be loaded, otherwise raw data will be loaded.
-        (default: False)
     definition: DatasetDefinition | None
         The dataset definition.
+    preprocessed: bool
+        If ``True``, saved preprocessed data will be loaded, otherwise raw data will be loaded.
+        (default: False)    
     custom_read_kwargs: dict[str, Any] | None
         Dictionary of keyword arguments for reading gaze file. (default: None)
 
@@ -306,11 +306,6 @@ def load_gaze_file(
             if len(acceleration_columns) > 0:
                 gaze_df.nest(acceleration_columns, output_column='acceleration')
                 column_specifiers.append(acceleration_columns)
-        elif definition is None:
-            gaze_df = from_csv(
-                filepath,
-                **custom_read_kwargs,
-            )
         else:
             gaze_df = from_csv(
                 filepath,
@@ -324,13 +319,10 @@ def load_gaze_file(
                 **custom_read_kwargs,
             )
     elif filepath.suffix == '.feather':
-        if definition is None:
-            gaze_df = from_ipc(filepath)
-        else:
-            gaze_df = from_ipc(
-                filepath,
-                experiment=definition.experiment,
-            )
+        gaze_df = from_ipc(
+            filepath,
+            experiment=definition.experiment,
+        )
     elif filepath.suffix == '.asc':
         gaze_df = from_asc(filepath, **custom_read_kwargs)
     else:
