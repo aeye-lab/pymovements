@@ -197,7 +197,8 @@ def test_load_eyelink_file(tmp_path, read_kwargs):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(ASC_TEXT)
 
-    df = pm.dataset.dataset_files.load_gaze_file(filepath, DatasetDefinition(),custom_read_kwargs=read_kwargs)
+    df = pm.dataset.dataset_files.load_gaze_file(
+        filepath, DatasetDefinition(), custom_read_kwargs=read_kwargs)
 
     if read_kwargs is not None:
         expected_df = EXPECTED_DF_PATTERNS
