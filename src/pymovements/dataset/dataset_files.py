@@ -231,9 +231,9 @@ def load_gaze_files(
                 definition=definition,
                 custom_read_kwargs=definition.custom_read_kwargs,
             )
-        gaze_df = add_fileinfo(
+        gaze_df.frame = add_fileinfo(
             definition=definition,
-            df=gaze_df,
+            df=gaze_df.frame,
             fileinfo=fileinfo_row,
         )        
         gaze_dfs.append(gaze_df)
@@ -361,10 +361,10 @@ def load_gaze_file(
 
 def add_fileinfo(
         definition: DatasetDefinition,
-        df: GazeDataFrame,
+        df: pl.DataFrame,
         fileinfo: dict[str, Any],
-) -> GazeDataFrame:
-    """Add columns from fileinfo to GazeDataFrame.
+) -> pl.DataFrame:
+    """Add columns from fileinfo to dataframe.
 
     Parameters
     ----------
@@ -377,10 +377,10 @@ def add_fileinfo(
 
     Returns
     -------
-    GazeDataFrame
-        GazeDataFrame with added columns from fileinfo dictionary keys.
+    pl.DataFrame
+        Dataframe with added columns from fileinfo dictionary keys.
     """
-    df.frame = df.frame.select(
+    df = df.select(
         [
             pl.lit(value).alias(column)
             for column, value in fileinfo.items()
@@ -389,7 +389,7 @@ def add_fileinfo(
     )
 
     # Cast columns from fileinfo according to specification.
-    df.frame = df.frame.with_columns([
+    df = df.with_columns([
         pl.col(fileinfo_key).cast(fileinfo_dtype)
         for fileinfo_key, fileinfo_dtype in definition.filename_format_dtypes.items()
     ])

@@ -153,47 +153,16 @@ MSG	2154570 0 READING_SCREEN_1.STOP
 
 EXPECTED_DF_NO_PATTERNS = pl.from_dict(
     {
-        'time': [
-            2154557,
-            2154558,
-            2154560,
-            2154561,
-            2154565,
-            2154567,
-            2154568,
-        ], 'x_pix': [
-            139.6,
-            139.5,
-            np.nan,
-            850.7,
-            139.5,
-            np.nan,
-            850.7,
-        ], 'y_pix': [
-            132.1,
-            131.9,
-            np.nan,
-            717.5,
-            131.9,
-            np.nan,
-            717.5,
-        ], 'pupil': [
-            784.0,
-            784.0,
-            0.0,
-            714.0,
-            784.0,
-            0.0,
-            714.0,
-        ],
+        'time': [2154557, 2154558, 2154560, 2154561, 2154565, 2154567, 2154568],
+        'pixel':[(139.6, 132.1), (139.5, 131.9), (np.nan, np.nan), (850.7, 717.5), (139.5, 131.9), (np.nan, np.nan), (850.7, 717.5)],
+        'pupil': [784.0, 784.0, 0.0, 714.0, 784.0, 0.0, 714.0],
     },
 )
 
 EXPECTED_DF_PATTERNS = pl.from_dict(
     {
         'time': [2154557, 2154558, 2154560, 2154561, 2154565, 2154567, 2154568],
-        'x_pix': [139.6, 139.5, np.nan, 850.7, 139.5, np.nan, 850.7],
-        'y_pix': [132.1, 131.9, np.nan, 717.5, 131.9, np.nan, 717.5],
+        'pixel':[(139.6, 132.1), (139.5, 131.9), (np.nan, np.nan), (850.7, 717.5), (139.5, 131.9), (np.nan, np.nan), (850.7, 717.5)],
         'pupil': [784.0, 784.0, 0.0, 714.0, 784.0, 0.0, 714.0],
         'task': ['reading', 'reading', 'reading', 'reading', 'reading', 'reading', 'reading'],
         'trial_id': [0, 0, 0, 0, 1, 1, 1],
@@ -234,4 +203,4 @@ def test_load_eyelink_file(tmp_path, read_kwargs):
     else:
         expected_df = EXPECTED_DF_NO_PATTERNS
 
-    assert_frame_equal(df, expected_df, check_column_order=False)
+    assert_frame_equal(df.frame, expected_df, check_column_order=False)
