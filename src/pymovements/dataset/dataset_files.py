@@ -30,11 +30,11 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events import EventDataFrame
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
-from pymovements.utils.paths import match_filepaths
-from pymovements.utils.strings import curly_to_regex
 from pymovements.gaze.io import from_asc
 from pymovements.gaze.io import from_csv
 from pymovements.gaze.io import from_ipc
+from pymovements.utils.paths import match_filepaths
+from pymovements.utils.strings import curly_to_regex
 
 
 def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataFrame:
@@ -212,7 +212,6 @@ def load_gaze_files(
                 extension=extension,
             )
 
-
         if preprocessed and extension == 'feather':
             # Preprocessed data already has tuple columns.
             gaze_df = load_gaze_file(
@@ -310,7 +309,7 @@ def load_gaze_file(
         elif definition is None:
             gaze_df = from_csv(
                 filepath,
-                **custom_read_kwargs
+                **custom_read_kwargs,
             )
         else:
             gaze_df = from_csv(
