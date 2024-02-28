@@ -240,7 +240,7 @@ def load_gaze_files(
 
 def load_gaze_file(
         filepath: Path,
-        definition: DatasetDefinition | None = None,
+        definition: DatasetDefinition,
         preprocessed: bool = False,
         custom_read_kwargs: dict[str, Any] | None = None,
 ) -> GazeDataFrame:
@@ -250,7 +250,7 @@ def load_gaze_file(
     ----------
     filepath: Path
         Path of gaze file.
-    definition: DatasetDefinition | None
+    definition: DatasetDefinition
         The dataset definition.
     preprocessed: bool
         If ``True``, saved preprocessed data will be loaded, otherwise raw data will be loaded.
