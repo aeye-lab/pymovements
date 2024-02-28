@@ -207,7 +207,7 @@ class GazeDataFrame:
         'velocity_x', 'velocity_y',
         'x_left_vel', 'y_left_vel',
         'x_right_vel', 'y_right_vel',
-        '__x_vel__', '__y_vel__',   
+        '__x_vel__', '__y_vel__',
         '__x_left_vel__', '__y_left_vel__',
         '__x_right_vel__', '__y_right_vel__',
     ]
