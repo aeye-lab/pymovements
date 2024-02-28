@@ -217,7 +217,7 @@ def load_gaze_files(
             gaze_df = load_gaze_file(
                 filepath=filepath,
                 definition=definition,
-                preprocessed=preprocessed,                
+                preprocessed=preprocessed,
                 custom_read_kwargs=definition.custom_read_kwargs,
             )
 
@@ -226,7 +226,7 @@ def load_gaze_files(
             gaze_df = load_gaze_file(
                 filepath=filepath,
                 definition=definition,
-                preprocessed=preprocessed,                
+                preprocessed=preprocessed,
                 custom_read_kwargs=definition.custom_read_kwargs,
             )
         gaze_df.frame = add_fileinfo(
@@ -245,7 +245,7 @@ def load_gaze_file(
         custom_read_kwargs: dict[str, Any] | None = None,
 ) -> GazeDataFrame:
     """Load a gaze data file as GazeDataFrame.
-    
+
     Parameters
     ----------
     filepath: Path
@@ -254,7 +254,7 @@ def load_gaze_file(
         The dataset definition.
     preprocessed: bool
         If ``True``, saved preprocessed data will be loaded, otherwise raw data will be loaded.
-        (default: False)    
+        (default: False)
     custom_read_kwargs: dict[str, Any] | None
         Dictionary of keyword arguments for reading gaze file. (default: None)
 
