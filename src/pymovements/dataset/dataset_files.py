@@ -30,11 +30,11 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events import EventDataFrame
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
+from pymovements.utils.paths import match_filepaths
+from pymovements.utils.strings import curly_to_regex
 from pymovements.gaze.io import from_asc
 from pymovements.gaze.io import from_csv
 from pymovements.gaze.io import from_ipc
-from pymovements.utils.paths import match_filepaths
-from pymovements.utils.strings import curly_to_regex
 
 
 def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataFrame:
@@ -212,6 +212,7 @@ def load_gaze_files(
                 extension=extension,
             )
 
+
         if preprocessed and extension == 'feather':
             # Preprocessed data already has tuple columns.
             gaze_df = load_gaze_file(
@@ -277,11 +278,6 @@ def load_gaze_file(
         if preprocessed:
             gaze_df = from_csv(filepath)
 
-            # Time column is always available in every initialized GazeDataFrame.
-
-            if 'distance' in gaze_df.frame.columns:
-                pass
-
             pixel_columns: list[str] = list(
                 set(GazeDataFrame.valid_pixel_position_columns) & set(gaze_df.frame.columns),
             )
@@ -297,43 +293,37 @@ def load_gaze_file(
 
             column_specifiers: list[list[str]] = []
             if len(pixel_columns) > 0:
-                gaze_df._check_component_columns(pixel_columns=pixel_columns)
                 gaze_df.nest(pixel_columns, output_column='pixel')
                 column_specifiers.append(pixel_columns)
 
             if len(position_columns) > 0:
-                gaze_df._check_component_columns(position_columns=position_columns)
                 gaze_df.nest(position_columns, output_column='position')
                 column_specifiers.append(position_columns)
 
             if len(velocity_columns) > 0:
-                gaze_df._check_component_columns(velocity_columns=velocity_columns)
                 gaze_df.nest(velocity_columns, output_column='velocity')
                 column_specifiers.append(velocity_columns)
 
             if len(acceleration_columns) > 0:
-                gaze_df._check_component_columns(acceleration_columns=acceleration_columns)
                 gaze_df.nest(acceleration_columns, output_column='acceleration')
                 column_specifiers.append(acceleration_columns)
-            gaze_df.n_components = gaze_df._infer_n_components(column_specifiers)
+        elif definition is None:
+            gaze_df = from_csv(
+                filepath,
+                **custom_read_kwargs
+            )
         else:
-            if definition is None:
-                gaze_df = from_csv(
-                    filepath,
-                    **custom_read_kwargs,
-                )
-            else:
-                gaze_df = from_csv(
-                    filepath,
-                    experiment=definition.experiment,
-                    time_column=definition.time_column,
-                    distance_column=definition.distance_column,
-                    pixel_columns=definition.pixel_columns,
-                    position_columns=definition.position_columns,
-                    velocity_columns=definition.velocity_columns,
-                    acceleration_columns=definition.acceleration_columns,
-                    **custom_read_kwargs,
-                )
+            gaze_df = from_csv(
+                filepath,
+                experiment=definition.experiment,
+                time_column=definition.time_column,
+                distance_column=definition.distance_column,
+                pixel_columns=definition.pixel_columns,
+                position_columns=definition.position_columns,
+                velocity_columns=definition.velocity_columns,
+                acceleration_columns=definition.acceleration_columns,
+                **custom_read_kwargs,
+            )
     elif filepath.suffix == '.feather':
         if definition is None:
             gaze_df = from_ipc(filepath)
