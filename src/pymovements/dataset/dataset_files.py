@@ -241,7 +241,7 @@ def load_gaze_files(
 def load_gaze_file(
         filepath: Path,
         preprocessed: bool = False,
-        definition: DatasetDefinition = None,
+        definition: DatasetDefinition | None = None,
         custom_read_kwargs: dict[str, Any] | None = None,
 ) -> GazeDataFrame:
     """Load a gaze data file as a polars DataFrame.
@@ -253,14 +253,14 @@ def load_gaze_file(
     preprocessed: bool
         If ``True``, saved preprocessed data will be loaded, otherwise raw data will be loaded.
         (default: False)
-    definition: DatasetDefinition
+    definition: DatasetDefinition | None
         The dataset definition.
     custom_read_kwargs: dict[str, Any] | None
         Dictionary of keyword arguments for reading gaze file. (default: None)
 
     Returns
     -------
-   GazeDataFrame
+    GazeDataFrame
         The resulting GazeDataFrame
 
     Raises
