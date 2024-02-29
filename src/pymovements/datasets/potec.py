@@ -36,20 +36,23 @@ from pymovements.gaze.experiment import Experiment
 class PoTeC(DatasetDefinition):
     """PoTeC dataset :cite:p:`potec`.
 
-    The Potsdam Textbook Corpus (PoTeC) is a corpus of eye-tracking-while-reading data where
-    participants (N=75) read a series of German short texts taken from college level textbooks
-    of physics and biology. The experiments were conducted within a 2x2 fully-crossed factorial
-    design with the reader’s expertise (advanced vs beginner) and major (physics vs biology) as
-    factors. Reading comprehension was assessed using text comprehension questions. Moreover,
-    background questions that required additional knowledge beyond the presented text tested the
-    general domain knowledge.
-    The repository contains the eye-movement data (1000 Hz, right eye monocular) as well as the
-    stimulus text data     with extensive linguistic feature annotations at the sub-lexical,
-    lexical und supra-lexical     level. Therefore, the PoTeC is ideal for studying cognitive
-    processes related to sentence     comprehension at all linguistic levels (e.g. lexical,
-    syntactic, discourse) as well as higher-level text comprehension.
+    The Potsdam Textbook Corpus (PoTeC) is a naturalistic eye-tracking-while-reading
+    corpus containing data from 75 participants reading 12 scientific texts.
+    PoTeC is the first naturalistic eye-tracking-while-reading corpus that contains
+    eye-movements from domain-experts as well as novices in a within-participant
+    manipulation: It is based on a 2×2×2 fully-crossed factorial design which includes
+    the participants' level of study and the participants' discipline of study as
+    between-subject factors and the text domain as a within-subject factor. The
+    participants' reading comprehension was assessed by a series of text comprehension
+    questions and their domain knowledge was tested by text-independent
+    background questions for each of the texts. The materials are annotated for a
+    variety of linguistic features at different levels. We envision PoTeC to be used
+    for a wide range of studies including but not limited to analyses of expert and
+    non-expert reading strategies.
 
-    Check the respective `repository <https://osf.io/dn5hp/>`_ for details.
+    The corpus and all the accompanying data at all
+    stages of the preprocessing pipeline and all code used to preprocess the data are
+    made available via `GitHub. <https://github.com/DiLi-Lab/PoTeC>`_
 
     Attributes
     ----------
@@ -91,7 +94,7 @@ class PoTeC(DatasetDefinition):
     >>>
     >>> dataset = pm.Dataset("PoTeC", path='data/PoTeC')
 
-    Download the dataset resources resources:
+    Download the dataset resources:
 
     >>> dataset.download()# doctest: +SKIP
 
@@ -113,7 +116,7 @@ class PoTeC(DatasetDefinition):
         {
             'resource': 'tgd9q/',
             'filename': 'PoTeC.zip',
-            'md5': '7780904bf7b18ba7d30a811174750db3',
+            'md5': 'cffd45039757c3777e2fd130e5d8a2ad',
         },
     )
 
