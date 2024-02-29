@@ -343,7 +343,7 @@ def deg2pix(
         for component in range(n_components)
     ])
 
-    pixel_components = [
+    centered_pixels = [
         pl.col(position_column).list.get(component).radians().tan() *
         distance_pixels.list.get(component)
         for component in range(n_components)
@@ -360,13 +360,13 @@ def deg2pix(
             f' Valid values are: {supported_origins}',
         )
 
-    centered_pixels = pl.concat_list(
+    pixel_series = pl.concat_list(
         [
-            pixel_components[component] + origin_offset[component % 2]
+            centered_pixels[component] + origin_offset[component % 2]
             for component in range(n_components)
         ],
     )
-    return centered_pixels.alias(pixel_column)
+    return pixel_series.alias(pixel_column)
 
 
 def _check_distance(distance: float) -> None:
