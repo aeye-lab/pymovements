@@ -216,6 +216,7 @@ def load_gaze_files(
             # Preprocessed data already has tuple columns.
             gaze_df = load_gaze_file(
                 filepath=filepath,
+                fileinfo_row=fileinfo_row,
                 definition=definition,
                 preprocessed=preprocessed,
                 custom_read_kwargs=definition.custom_read_kwargs,
@@ -225,22 +226,19 @@ def load_gaze_files(
             # Create GazeDataFrame
             gaze_df = load_gaze_file(
                 filepath=filepath,
+                fileinfo_row=fileinfo_row,
                 definition=definition,
                 preprocessed=preprocessed,
                 custom_read_kwargs=definition.custom_read_kwargs,
             )
-        gaze_df.frame = add_fileinfo(
-            definition=definition,
-            df=gaze_df.frame,
-            fileinfo=fileinfo_row,
-        )
         gaze_dfs.append(gaze_df)
     return gaze_dfs
 
 
 def load_gaze_file(
         filepath: Path,
-        definition: DatasetDefinition,
+        fileinfo_row: dict[str, Any],
+        definition: DatasetDefinition | None = None,
         preprocessed: bool = False,
         custom_read_kwargs: dict[str, Any] | None = None,
 ) -> GazeDataFrame:
@@ -250,8 +248,11 @@ def load_gaze_file(
     ----------
     filepath: Path
         Path of gaze file.
+    fileinfo_row
+        A dictionary holding file information.
     definition: DatasetDefinition
         The dataset definition.
+        (default: False)
     preprocessed: bool
         If ``True``, saved preprocessed data will be loaded, otherwise raw data will be loaded.
         (default: False)
@@ -272,10 +273,19 @@ def load_gaze_file(
     """
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
+    add_columns = {
+        key:fileinfo_row[key] for key in
+        [key for key in fileinfo_row.keys() if key != 'filepath']
+    }
 
     if filepath.suffix in {'.csv', '.txt', '.tsv'}:
         if preprocessed:
-            gaze_df = from_csv(filepath)
+            gaze_df = from_csv(
+                filepath,
+                trial_columns=definition.trial_columns,
+                add_columns=add_columns,
+                column_dtypes=definition.filename_format_dtypes,
+            )
 
             pixel_columns: list[str] = list(
                 set(GazeDataFrame.valid_pixel_position_columns) & set(gaze_df.frame.columns),
@@ -316,12 +326,19 @@ def load_gaze_file(
                 position_columns=definition.position_columns,
                 velocity_columns=definition.velocity_columns,
                 acceleration_columns=definition.acceleration_columns,
+                trial_columns=definition.trial_columns,
+                column_map=definition.column_map,
+                add_columns=add_columns,
+                column_dtypes=definition.filename_format_dtypes,
                 **custom_read_kwargs,
             )
     elif filepath.suffix == '.feather':
         gaze_df = from_ipc(
             filepath,
             experiment=definition.experiment,
+            column_map=definition.column_map,
+            add_columns=add_columns,
+            column_dtypes=definition.filename_format_dtypes,
         )
     elif filepath.suffix == '.asc':
         gaze_df = from_asc(filepath, **custom_read_kwargs)
@@ -356,8 +373,7 @@ def add_fileinfo(
     pl.DataFrame
         Dataframe with added columns from fileinfo dictionary keys.
     """
-    df = df.select(
-        [
+    df = df.select([
             pl.lit(value).alias(column)
             for column, value in fileinfo.items()
             if column != 'filepath' and column not in df.columns

@@ -41,6 +41,9 @@ def from_csv(
         velocity_columns: list[str] | None = None,
         acceleration_columns: list[str] | None = None,
         distance_column: str | None = None,
+        column_map: dict[str, str] | None = None,
+        add_columns: dict[str, str] | None = None,
+        column_dtypes:  dict[str, str] | None = None,
         **read_csv_kwargs: Any,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
@@ -78,6 +81,15 @@ def from_csv(
         The name of the eye-to-screen distance column in the input data frame. If specified,
         the column will be used for pixel to dva transformations. If not specified, the
         constant eye-to-screen distance will be taken from the experiment definition.
+        (default: None)
+    column_map: dict[str, str] | None
+        The keys are the columns to read, the values are the names to which they should be renamed.
+        (default: None)
+    add_columns: dict[str, str] | None
+        Dictionary containing columns to add to loaded data frame.
+        (default: None)
+    column_dtypes:  dict[str, str] | None
+        Dictionary containing types for columns.
         (default: None)
     **read_csv_kwargs: Any
         Additional keyword arguments to be passed to :py:func:`polars.read_csv` to read in the csv.
@@ -192,6 +204,26 @@ def from_csv(
     """
     # Read data.
     gaze_data = pl.read_csv(file, **read_csv_kwargs)
+    if column_map is not None:
+        gaze_data = gaze_data.rename({
+            key:column_map[key] for key in
+            [key for key in column_map.keys()
+                if key in gaze_data.columns
+            ]
+        })
+
+    if add_columns is not None:
+        gaze_data = gaze_data.with_columns([
+            pl.lit(value).alias(column)
+            for column, value in add_columns.items()
+            if column not in gaze_data.columns
+        ])
+
+    if column_dtypes is not None:
+        gaze_data = gaze_data.with_columns([
+            pl.col(fileinfo_key).cast(fileinfo_dtype)
+            for fileinfo_key, fileinfo_dtype in column_dtypes.items()
+        ])
 
     # Create gaze data frame.
     gaze_df = GazeDataFrame(
@@ -283,6 +315,9 @@ def from_asc(
 def from_ipc(
         file: str | Path,
         experiment: Experiment | None = None,
+        column_map: dict[str, str] | None = None,
+        add_columns: dict[str, str] | None = None,
+        column_dtypes:  dict[str, str] | None = None,
         **read_ipc_kwargs: Any,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
@@ -292,7 +327,17 @@ def from_ipc(
     file: str | Path
         Path of IPC/feather file.
     experiment : Experiment | None
-        The experiment definition. (default: None)
+        The experiment definition. 
+        (default: None)
+    column_map: dict[str, str] | None
+        The keys are the columns to read, the values are the names to which they should be renamed.
+        (default: None)
+    add_columns: dict[str, str] | None
+        Dictionary containing columns to add to loaded data frame.
+        (default: None)
+    column_dtypes:  dict[str, str] | None
+        Dictionary containing types for columns.
+        (default: None)
     **read_ipc_kwargs: Any
             Additional keyword arguments to be passed to polars to read in the ipc file.
 
@@ -329,6 +374,27 @@ def from_ipc(
     """
     # Read data.
     gaze_data = pl.read_ipc(file, **read_ipc_kwargs)
+
+    if column_map is not None:
+        gaze_data = gaze_data.rename({
+            key:column_map[key] for key in
+            [key for key in column_map.keys()
+                if key in gaze_data.columns
+            ]
+        })
+
+    if add_columns is not None:
+        gaze_data = gaze_data.with_columns([
+            pl.lit(value).alias(column)
+            for column, value in add_columns.items()
+            if column not in gaze_data.columns
+        ])
+
+    if column_dtypes is not None:
+        gaze_data = gaze_data.with_columns([
+            pl.col(fileinfo_key).cast(fileinfo_dtype)
+            for fileinfo_key, fileinfo_dtype in column_dtypes.items()
+        ])
 
     # Create gaze data frame.
     gaze_df = GazeDataFrame(
