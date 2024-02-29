@@ -645,6 +645,34 @@ def fixture_experiment():
             id='smooth_method_pass',
         ),
 
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1000, 1001, 1002, 1003],
+                        'x_pix': [-50, 5, 50, None],
+                        'y_pix': [4, 5, 6, 7],
+                    },
+                ),
+                'pixel_columns': ['x_pix', 'y_pix'],
+            },
+            'clip', {
+                'input_column': 'pixel', 'output_column': 'pixel', 'n_components': 2,
+                'lower_bound': 1, 'upper_bound': 10,
+            },
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'time': [1000, 1001, 1002, 1003],
+                        'x_pix': [1, 5, 10, None],
+                        'y_pix': [4, 5, 6, 7],
+                    },
+                ),
+                pixel_columns=['x_pix', 'y_pix'],
+            ),
+            id='clip',
+        ),
+
     ],
 )
 def test_gaze_transform_expected_frame(
