@@ -201,7 +201,7 @@ def test_load_eyelink_file(tmp_path, read_kwargs):
         filepath,
         fileinfo_row={},
         definition=DatasetDefinition(),
-        custom_read_kwargs=read_kwargs
+        custom_read_kwargs=read_kwargs,
     )
 
     if read_kwargs is not None:

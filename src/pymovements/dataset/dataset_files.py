@@ -274,7 +274,7 @@ def load_gaze_file(
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
     add_columns = {
-        key:fileinfo_row[key] for key in
+        key: fileinfo_row[key] for key in
         [key for key in fileinfo_row.keys() if key != 'filepath']
     }
 
@@ -373,7 +373,8 @@ def add_fileinfo(
     pl.DataFrame
         Dataframe with added columns from fileinfo dictionary keys.
     """
-    df = df.select([
+    df = df.select(
+        [
             pl.lit(value).alias(column)
             for column, value in fileinfo.items()
             if column != 'filepath' and column not in df.columns

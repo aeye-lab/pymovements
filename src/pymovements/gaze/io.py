@@ -43,7 +43,7 @@ def from_csv(
         distance_column: str | None = None,
         column_map: dict[str, str] | None = None,
         add_columns: dict[str, str] | None = None,
-        column_dtypes:  dict[str, str] | None = None,
+        column_dtypes: dict[str, str] | None = None,
         **read_csv_kwargs: Any,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
@@ -206,8 +206,9 @@ def from_csv(
     gaze_data = pl.read_csv(file, **read_csv_kwargs)
     if column_map is not None:
         gaze_data = gaze_data.rename({
-            key:column_map[key] for key in
-            [key for key in column_map.keys()
+            key: column_map[key] for key in
+            [
+                key for key in column_map.keys()
                 if key in gaze_data.columns
             ]
         })
@@ -317,7 +318,7 @@ def from_ipc(
         experiment: Experiment | None = None,
         column_map: dict[str, str] | None = None,
         add_columns: dict[str, str] | None = None,
-        column_dtypes:  dict[str, str] | None = None,
+        column_dtypes: dict[str, str] | None = None,
         **read_ipc_kwargs: Any,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
@@ -327,7 +328,7 @@ def from_ipc(
     file: str | Path
         Path of IPC/feather file.
     experiment : Experiment | None
-        The experiment definition. 
+        The experiment definition.
         (default: None)
     column_map: dict[str, str] | None
         The keys are the columns to read, the values are the names to which they should be renamed.
@@ -377,8 +378,9 @@ def from_ipc(
 
     if column_map is not None:
         gaze_data = gaze_data.rename({
-            key:column_map[key] for key in
-            [key for key in column_map.keys()
+            key: column_map[key] for key in
+            [
+                key for key in column_map.keys()
                 if key in gaze_data.columns
             ]
         })
