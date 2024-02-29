@@ -438,6 +438,21 @@ class GazeDataFrame:
                     ],
                 )
 
+    def clip(self) -> None:
+        """Clip gaze signal values.
+
+        This method requires a properly initialized :py:attr:`~.GazeDataFrame.experiment` attribute.
+
+        After success, the gaze dataframe is clipped.
+
+        Raises
+        ------
+        AttributeError
+            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
+            if experiment is None.
+        """
+        self.transform('clip')
+
     def pix2deg(self) -> None:
         """Compute gaze positions in degrees of visual angle from pixel position coordinates.
 

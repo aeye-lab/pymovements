@@ -296,6 +296,31 @@ class Dataset:
 
         return self
 
+    def clip(self, verbose: bool = True) -> Dataset:
+        """Clip gaze signal values.
+
+        This method requires a properly initialized :py:attr:`~.Dataset.experiment` attribute.
+
+        After success, the gaze dataframe is clipped.
+
+        Parameters
+        ----------
+        verbose : bool
+            If True, show progress of computation. (default: True)
+
+        Returns
+        -------
+        Dataset
+            Returns self, useful for method cascading.
+
+        Raises
+        ------
+        AttributeError
+            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
+            if experiment is None.
+        """
+        return self.apply('clip', verbose=verbose)
+
     def pix2deg(self, verbose: bool = True) -> Dataset:
         """Compute gaze positions in degrees of visual angle from pixel coordinates.
 
