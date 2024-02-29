@@ -43,7 +43,7 @@ def from_csv(
         distance_column: str | None = None,
         column_map: dict[str, str] | None = None,
         add_columns: dict[str, str] | None = None,
-        column_dtypes: dict[str, str] | None = None,
+        column_dtypes: dict[str, Any] | None = None,
         **read_csv_kwargs: Any,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
@@ -88,7 +88,7 @@ def from_csv(
     add_columns: dict[str, str] | None
         Dictionary containing columns to add to loaded data frame.
         (default: None)
-    column_dtypes:  dict[str, str] | None
+    column_dtypes:  dict[str, Any] | None
         Dictionary containing types for columns.
         (default: None)
     **read_csv_kwargs: Any
@@ -318,7 +318,7 @@ def from_ipc(
         experiment: Experiment | None = None,
         column_map: dict[str, str] | None = None,
         add_columns: dict[str, str] | None = None,
-        column_dtypes: dict[str, str] | None = None,
+        column_dtypes: dict[str, Any] | None = None,
         **read_ipc_kwargs: Any,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
@@ -336,7 +336,7 @@ def from_ipc(
     add_columns: dict[str, str] | None
         Dictionary containing columns to add to loaded data frame.
         (default: None)
-    column_dtypes:  dict[str, str] | None
+    column_dtypes:  dict[str, Any] | None
         Dictionary containing types for columns.
         (default: None)
     **read_ipc_kwargs: Any
