@@ -49,7 +49,29 @@ EYELINK_META_REGEXES = [
         r'(?P<sampling_rate>[-]?\d*[.]\d*)\s+TRACKING\s+(?P<tracking>\S+)'
         r'\s+FILTER\s+(?P<filter>\d+)\s+INPUT',
     },
+    {
+        'pattern': r'MSG\s+\d+\s+DISPLAY_COORDS\s+(?P<resolution>.*)',
+    },
 ]
+
+VALIDATION_REGEX = (
+    r'MSG\s+(?P<timestamp>\d+)\s+!CAL\s+VALIDATION\s+HV'
+    r'(?P<num_points>\d\d?).*'
+    r'(?P<eye_tracked>LEFT|RIGHT)\s+'
+    r'(?P<error>\D*)\s+'
+    r'(?P<validation_score_avg>\d.\d\d)\s+avg\.\s+'
+    r'(?P<validation_score_max>\d.\d\d)\s+max'
+)
+
+
+CALIBRATION_TIMESTAMP_REGEX = r'MSG\s+(?P<timestamp>\d+)\s+!CAL\n'
+
+
+CALIBRATION_REGEX = (
+    r'>+\s+CALIBRATION\s+\(HV(?P<num_points>\d\d?),'
+    r'(?P<type>.*)\).*'
+    r'(?P<tracked_eye>RIGHT|LEFT):\s+<{9}'
+)
 
 
 def check_nan(sample_location: str) -> float:
@@ -182,13 +204,31 @@ def parse_eyelink(
         lines = asc_file.readlines()
 
     # will return an empty string if the key does not exist
-    metadata = defaultdict(str)
+    metadata: defaultdict = defaultdict(str)
 
     compiled_metadata_patterns = []
     for metadata_pattern in EYELINK_META_REGEXES:
         compiled_metadata_patterns.append({'pattern': re.compile(metadata_pattern['pattern'])})
 
+    compiled_validation_pattern = re.compile(VALIDATION_REGEX)
+    compiled_calibration_pattern = re.compile(CALIBRATION_REGEX)
+    compiled_calibration_timestamp = re.compile(CALIBRATION_TIMESTAMP_REGEX)
+    cal_timestamp = ''
+
+    validations = []
+    calibrations = []
+
     for line in lines:
+
+        if cal_timestamp:
+            if match := compiled_calibration_pattern.match(line):
+                calibrations.append({
+                    **match.groupdict(),
+                    'timestamp': cal_timestamp,
+                })
+                cal_timestamp = ''
+                continue
+
         for pattern_dict in compiled_patterns:
 
             if match := pattern_dict['pattern'].match(line):
@@ -220,6 +260,12 @@ def parse_eyelink(
             for additional_column in additional_columns:
                 samples[additional_column].append(current_additional[additional_column])
 
+        elif match := compiled_calibration_timestamp.match(line):
+            cal_timestamp = match.groupdict()['timestamp']
+
+        elif match := compiled_validation_pattern.match(line):
+            validations.append(match.groupdict())
+
         elif compiled_metadata_patterns:
             for pattern_dict in compiled_metadata_patterns.copy():
                 if match := pattern_dict['pattern'].match(line):
@@ -230,10 +276,9 @@ def parse_eyelink(
                     compiled_metadata_patterns.remove(pattern_dict)
 
     if metadata:
-        # in case the version strings have not been found, they will be empty strings (defaultdict)
-        metadata['version_number'], metadata['model'] = _parse_full_eyelink_version(
-            metadata['version_1'], metadata['version_2'],
-        )
+        pre_processed_metadata: dict[str, Any] = _pre_process_metadata(metadata)
+        pre_processed_metadata['calibrations'] = calibrations
+        pre_processed_metadata['validations'] = validations
 
     else:
         raise Warning('No metadata found. Please check the file for errors.')
@@ -253,10 +298,47 @@ def parse_eyelink(
         schema_overrides=schema_overrides,
     )
 
-    # convert the defaultdict to a regular dict
-    return_metadata = dict(metadata)
+    return df, pre_processed_metadata
 
-    return df, return_metadata
+
+def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:
+    """Pre-process metadata to suitable types and formats.
+
+    Parameters
+    ----------
+    metadata: defaultdict[str, Any]
+        Metadata to pre-process.
+
+    Returns
+    -------
+    dict[str, Any]
+        Pre-processed metadata.
+    """
+    # in case the version strings have not been found, they will be empty strings (defaultdict)
+    metadata['version_number'], metadata['model'] = _parse_full_eyelink_version(
+        metadata['version_1'], metadata['version_2'],
+    )
+
+    if 'resolution' in metadata:
+        resolution = metadata['resolution'].split()
+        metadata['resolution'] = tuple(int(res) for res in resolution)
+
+    if 'sampling_rate' in metadata:
+        metadata['sampling_rate'] = float(metadata['sampling_rate'])
+
+    if 'day' in metadata:
+        metadata['day'] = int(metadata['day'])
+
+    if 'year' in metadata:
+        metadata['year'] = int(metadata['year'])
+
+    if 'version_number' in metadata:
+        if metadata['version_number'] != 'unknown':
+            metadata['version_number'] = float(metadata['version_number'])
+
+    return_metadata: dict[str, Any] = dict(metadata)
+
+    return return_metadata
 
 
 def _parse_full_eyelink_version(version_str_1: str, version_str_2: str) -> tuple[str, str]:

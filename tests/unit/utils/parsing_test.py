@@ -18,13 +18,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Tests pymovements asc to csv processing."""
+from pathlib import Path
+
 import numpy as np
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
 import pymovements as pm
-
 
 ASC_TEXT = r"""
 ** DATE: Wed Mar  8 09:25:20 2023
@@ -43,7 +44,8 @@ some
 lines
 to
 ignore
-MSG	2095865 DISPLAY_COORDS 0 0 1279 1023
+MSG	421491 DISPLAY_COORDS 0 0 1679 1049
+MSG	421491 RETRACE_INTERVAL  16.5783460286
 PRESCALER	1
 VPRESCALER	1
 PUPIL	AREA
@@ -116,17 +118,20 @@ EXPECTED_DF = pl.from_dict(
 EXPECTED_METADATA = {
     'weekday': 'Wed',
     'month': 'Mar',
-    'day': '8',
+    'day': 8,
     'time': '09:25:20',
-    'year': '2023',
+    'year': 2023,
     'version_1': 'EYELINK II 1',
     'version_2': 'EYELINK II CL v6.12 Feb  1 2018 (EyeLink Portable Duo)',
     'model': 'EyeLink Portable Duo',
-    'version_number': '6.12',
-    'sampling_rate': '1000.00',
+    'version_number': 6.12,
+    'sampling_rate': 1000.00,
     'filter': '2',
     'tracking': 'CR',
     'tracked_eye': 'LEFT',
+    'calibrations': [],
+    'validations': [],
+    'resolution': (0, 0, 1679, 1049),
 }
 
 
@@ -174,7 +179,7 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
             '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL v6.12 Feb  1 2018 (EyeLink Portable Duo)',
-            '6.12',
+            6.12,
             'EyeLink Portable Duo',
             '09:25:20',
             id='eye_link_portable_duo',
@@ -183,7 +188,7 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
             '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL v5.12 Feb  1 2018',
-            '5.12',
+            5.12,
             'EyeLink 1000 Plus',
             '09:25:20',
             id='eye_link_1000_plus',
@@ -192,7 +197,7 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
             '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL v4.12 Feb  1 2018',
-            '4.12',
+            4.12,
             'EyeLink 1000',
             '09:25:20',
             id='eye_link_1000_1',
@@ -201,7 +206,7 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
             '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL v3.12 Feb  1 2018',
-            '3.12',
+            3.12,
             'EyeLink 1000',
             '09:25:20',
             id='eye_link_1000_2',
@@ -210,7 +215,7 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
             '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL v2.12 Feb  1 2018',
-            '2.12',
+            2.12,
             'EyeLink II',
             '09:25:20',
             id='eye_link_II',
@@ -218,7 +223,7 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
         pytest.param(
             '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK REVISION 2.00 (Aug 12 1997)',
-            '2.00',
+            2.00,
             'EyeLink I',
             '09:25:20',
             id='eye_link_I',
@@ -285,3 +290,25 @@ def test_no_metadata_warning(tmp_path, metadata, expected_msg):
     msg = info.value.args[0]
 
     assert msg == expected_msg
+
+
+def test_parse_vali_cal_eyelink():
+    example_asc_monocular_path = Path(__file__).parent.parent.parent / \
+        'files/eyelink_monocular_example.asc'
+
+    _, metadata = pm.utils.parsing.parse_eyelink(example_asc_monocular_path)
+
+    expected_validation = [{
+        'error': 'GOOD ERROR',
+        'eye_tracked': 'LEFT',
+        'num_points': '9',
+        'timestamp': '2148587',
+        'validation_score_avg': '0.27',
+        'validation_score_max': '0.83',
+    }]
+    expected_calibration = [{
+        'num_points': '9', 'type': 'P-CR', 'tracked_eye': 'LEFT', 'timestamp': '2135819',
+    }]
+
+    assert metadata['calibrations'] == expected_calibration
+    assert metadata['validations'] == expected_validation
