@@ -292,7 +292,58 @@ def test_no_metadata_warning(tmp_path, metadata, expected_msg):
     assert msg == expected_msg
 
 
-def test_parse_vali_cal_eyelink():
+@pytest.mark.parametrize(
+    ('metadata', 'expected_validation', 'expected_calibration'),
+    [
+        pytest.param(
+            '** DATE: Wed Feb  1 04:38:54 2017\n'
+            'MSG	7045618 !CAL \n'
+            '>>>>>>> CALIBRATION (HV9,P-CR) FOR LEFT: <<<<<<<<<\n'
+            'MSG	7045618 !CAL Calibration points:  \n'
+            'MSG	1076158 !CAL VALIDATION HV9 R RIGHT POOR ERROR 2.40 avg. 6.03 max  '
+            'OFFSET 0.19 deg. 4.2,6.3 pix.\n',
+            [{
+                'error': 'POOR ERROR',
+                'eye_tracked': 'RIGHT',
+                'num_points': '9',
+                'timestamp': '1076158',
+                'validation_score_avg': '2.40',
+                'validation_score_max': '6.03',
+            }],
+            [{
+                'num_points': '9',
+                'timestamp': '7045618',
+                'tracked_eye': 'LEFT',
+                'type': 'P-CR',
+            }],
+            id='cal_timestamp_with_space',
+        ),
+        pytest.param(
+            '** DATE: Wed Feb  1 04:38:54 2017\n'
+            'MSG	7045618 !CAL\n'
+            '>>>>>>> CALIBRATION (HV9,P-CR) FOR LEFT: <<<<<<<<<\n',
+            [],
+            [{
+                'num_points': '9',
+                'timestamp': '7045618',
+                'tracked_eye': 'LEFT',
+                'type': 'P-CR',
+            }],
+            id='cal_timestamp_no_space_no_val',
+        ),
+    ],
+)
+def test_val_cal_eyelink(tmp_path, metadata, expected_validation, expected_calibration):
+    filepath = tmp_path / 'sub.asc'
+    filepath.write_text(metadata)
+
+    _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
+
+    assert parsed_metadata['calibrations'] == expected_calibration
+    assert parsed_metadata['validations'] == expected_validation
+
+
+def test_parse_val_cal_eyelink_monocular_file():
     example_asc_monocular_path = Path(__file__).parent.parent.parent / \
         'files/eyelink_monocular_example.asc'
 

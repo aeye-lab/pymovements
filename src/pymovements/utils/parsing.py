@@ -64,7 +64,7 @@ VALIDATION_REGEX = (
 )
 
 
-CALIBRATION_TIMESTAMP_REGEX = r'MSG\s+(?P<timestamp>\d+)\s+!CAL\n'
+CALIBRATION_TIMESTAMP_REGEX = r'MSG\s+(?P<timestamp>\d+)\s+!CAL\s*\n'
 
 
 CALIBRATION_REGEX = (
