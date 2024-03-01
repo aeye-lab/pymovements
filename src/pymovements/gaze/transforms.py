@@ -291,7 +291,7 @@ def deg2pix(
         screen_resolution: tuple[int, int],
         screen_size: tuple[float, float],
         distance: float | str,
-        origin: str,
+        pixel_origin: str,
         n_components: int,
         position_column: str = 'position',
         pixel_column: str = 'pixel',
@@ -308,9 +308,8 @@ def deg2pix(
         Must be either a scalar or a string. If a scalar is passed, it is interpreted as the
         Eye-to-screen distance in centimeters. If a string is passed, it is interpreted as the name
         of a column containing the Eye-to-screen distance in millimiters for each sample.
-    origin: str
-        The location of the pixel origin. Supported values: ``center``, ``lower left``. See also
-        py:func:`~pymovements.gaze.transform.center_origin` for more information.
+    pixel_origin: str
+        The desired location of the pixel origin. Supported values: ``center``, ``lower left``.
     n_components: int
         Number of components in input column.
     position_column: str
@@ -349,14 +348,14 @@ def deg2pix(
         for component in range(n_components)
     ]
 
-    if origin == 'center':
+    if pixel_origin == 'center':
         origin_offset = (0.0, 0.0)
-    elif origin == 'lower left':
+    elif pixel_origin == 'lower left':
         origin_offset = ((screen_resolution[0] - 1) / 2, (screen_resolution[1] - 1) / 2)
     else:
         supported_origins = ['center', 'lower left']
         raise ValueError(
-            f'value `{origin}` for argument `origin` is invalid. '
+            f'value `{pixel_origin}` for argument `pixel_origin` is invalid. '
             f' Valid values are: {supported_origins}',
         )
 
