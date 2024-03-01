@@ -221,13 +221,13 @@ def parse_eyelink(
     for line in lines:
 
         if cal_timestamp:
+            # if a calibration timestamp has been found, the next line will be a
+            # calibration pattern, if not, there will only be the timestamp
+            cal = {'timestamp': cal_timestamp}
             if match := compiled_calibration_pattern.match(line):
-                calibrations.append({
-                    **match.groupdict(),
-                    'timestamp': cal_timestamp,
-                })
-                cal_timestamp = ''
-                continue
+                cal.update(match.groupdict())
+            calibrations.append(cal)
+            cal_timestamp = ''
 
         for pattern_dict in compiled_patterns:
 
@@ -332,9 +332,8 @@ def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:
     if 'year' in metadata:
         metadata['year'] = int(metadata['year'])
 
-    if 'version_number' in metadata:
-        if metadata['version_number'] != 'unknown':
-            metadata['version_number'] = float(metadata['version_number'])
+    if metadata['version_number'] != 'unknown':
+        metadata['version_number'] = float(metadata['version_number'])
 
     return_metadata: dict[str, Any] = dict(metadata)
 

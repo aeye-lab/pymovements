@@ -186,7 +186,7 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
         pytest.param(
             '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
-            '** EYELINK II CL v5.12 Feb  1 2018',
+            '** EYELINK II CL v5.12 Feb  1 2018\n',
             5.12,
             'EyeLink 1000 Plus',
             '09:25:20',
@@ -295,7 +295,7 @@ def test_no_metadata_warning(tmp_path, metadata, expected_msg):
     ('metadata', 'expected_validation', 'expected_calibration'),
     [
         pytest.param(
-            '** DATE: Wed Feb  1 04:38:54 2017\n'
+            'MSG	2095865 DISPLAY_COORDS 0 0 1279 1023\n'
             'MSG	7045618 !CAL \n'
             '>>>>>>> CALIBRATION (HV9,P-CR) FOR LEFT: <<<<<<<<<\n'
             'MSG	7045618 !CAL Calibration points:  \n'
@@ -329,6 +329,14 @@ def test_no_metadata_warning(tmp_path, metadata, expected_msg):
                 'type': 'P-CR',
             }],
             id='cal_timestamp_no_space_no_val',
+        ),
+        pytest.param(
+            '** DATE: Wed Feb  1 04:38:54 2017\n'
+            'MSG	7045618 !CAL\n'
+            'MSG	7045618 !CAL\n',
+            [],
+            [{'timestamp': '7045618'}],
+            id='cal_timestamp_no_cal_no_val',
         ),
     ],
 )
