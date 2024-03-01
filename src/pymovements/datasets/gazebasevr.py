@@ -91,7 +91,7 @@ class GazeBaseVR(DatasetDefinition):
     >>>
     >>> dataset = pm.Dataset("GazeBaseVR", path='data/GazeBaseVR')
 
-    Download the dataset resources resources:
+    Download the dataset resources:
 
     >>> dataset.download()# doctest: +SKIP
 
