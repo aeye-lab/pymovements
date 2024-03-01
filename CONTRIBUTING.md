@@ -93,7 +93,7 @@ cd pymovements
 pip install -e .
 ```
 
-If you have a problem e.g. `command not found: pip`, check whether you have activated a virtual enviroment.
+If you have a problem e.g. `command not found: pip`, check whether you have activated a virtual environment.
 
 
 ### Creating a Branch
