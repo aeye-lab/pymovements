@@ -172,7 +172,7 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
 
 
 @pytest.mark.parametrize(
-    'metadata, expected_version, expected_model, time',
+    ('metadata', 'expected_version', 'expected_model', 'time'),
     [
         pytest.param(
             '** DATE: Wed Mar  8 09:25:20 2023\n'
@@ -268,7 +268,7 @@ def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_mo
 
 
 @pytest.mark.parametrize(
-    'metadata, expected_msg',
+    ('metadata', 'expected_msg'),
     [
         pytest.param(
             '',
