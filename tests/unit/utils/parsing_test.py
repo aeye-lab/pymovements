@@ -130,7 +130,7 @@ EXPECTED_METADATA = {
     'tracked_eye': 'LEFT',
     'calibrations': [],
     'validations': [],
-    'resolution': (0, 0, 1679, 1049),
+    'resolution': (0, 0, 1279, 1023),
 }
 
 
