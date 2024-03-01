@@ -31,8 +31,8 @@ class TextStimulus:
 
     def __init__(
             self,
-            *,
             aois: pl.DataFrame,
+            *,
             aoi_column: str,
             pixel_x_column: str,
             pixel_y_column: str,
@@ -41,7 +41,7 @@ class TextStimulus:
             page_column: str,
     ) -> None:
 
-        self.aois = aois
+        self.aois = aois.clone()
         self.aoi_column = aoi_column
         self.pixel_x_column = pixel_x_column
         self.pixel_y_column = pixel_y_column
