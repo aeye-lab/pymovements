@@ -25,8 +25,8 @@ import gzip
 import lzma
 import os
 import shutil
-import tarfile
 import sys
+import tarfile
 import zipfile
 from collections.abc import Callable
 from pathlib import Path
