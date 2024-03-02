@@ -26,6 +26,7 @@ import lzma
 import os
 import shutil
 import tarfile
+import sys
 import zipfile
 from collections.abc import Callable
 from pathlib import Path
