@@ -150,7 +150,7 @@ def _extract_tar(
         Compression filename suffix.
     """
     with tarfile.open(source_path, f'r:{compression[1:]}' if compression else 'r') as archive:
-        archive.extractall(destination_path)
+        archive.extractall(destination_path, filter='tar')
 
 
 def _extract_zip(
