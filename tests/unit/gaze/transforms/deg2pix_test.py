@@ -64,16 +64,6 @@ import pymovements as pm
         ),
         pytest.param(
             {
-                'screen_resolution': (100, 100), 'screen_size': (100, 100), 'distance': 100,
-                'pixel_column': 'pixel', 'position_column': 'position',
-                'n_components': 2,
-            },
-            TypeError,
-            ('pixel_origin', 'missing'),
-            id='no_origin_raises_type_error',
-        ),
-        pytest.param(
-            {
                 'screen_resolution': None,
                 'screen_size': (100, 100),
                 'distance': 100,

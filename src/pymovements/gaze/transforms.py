@@ -291,7 +291,7 @@ def deg2pix(
         screen_resolution: tuple[int, int],
         screen_size: tuple[float, float],
         distance: float | str,
-        pixel_origin: str,
+        pixel_origin: str = 'lower left',
         n_components: int,
         position_column: str = 'position',
         pixel_column: str = 'pixel',
@@ -309,7 +309,8 @@ def deg2pix(
         Eye-to-screen distance in centimeters. If a string is passed, it is interpreted as the name
         of a column containing the Eye-to-screen distance in millimiters for each sample.
     pixel_origin: str
-        The desired location of the pixel origin. Supported values: ``center``, ``lower left``.
+        The desired location of the pixel origin. (default: 'lower left')
+        Supported values: ``center``, ``lower left``.
     n_components: int
         Number of components in input column.
     position_column: str

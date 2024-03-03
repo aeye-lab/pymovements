@@ -170,7 +170,7 @@ from pymovements.synthetic import step_function
 
         pytest.param(
             'deg2pix',
-            {},
+            {'pixel_origin': 'center'},
             pm.GazeDataFrame(
                 data=pl.from_dict(
                     {
