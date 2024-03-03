@@ -436,6 +436,18 @@ class GazeDataFrame:
                         f'(position_column="name_of_your_position_column"). '
                         f'Available dataframe columns are: {self.frame.columns}',
                     )
+                if (
+                    'position_column' in kwargs and
+                    kwargs.get('position_column') not in self.frame.columns
+                ):
+                    raise pl.exceptions.ColumnNotFoundError(
+                        f"The specified 'position_column' ({kwargs.get('position_column')}) "
+                        'is not found in the dataframe columns. '
+                        'You can specify the position column via: '
+                        f'{transform_method.__name__}'
+                        f'(position_column="name_of_your_position_column"). '
+                        f'Available dataframe columns are: {self.frame.columns}',
+                    )
 
             if self.trial_columns is None:
                 self.frame = self.frame.with_columns(transform_method(**kwargs))
