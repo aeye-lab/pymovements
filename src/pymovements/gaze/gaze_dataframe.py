@@ -427,15 +427,6 @@ class GazeDataFrame:
                         f'Available dataframe columns are: {self.frame.columns}',
                     )
             if transform_method.__name__ in {'deg2pix'}:
-                if 'position' not in self.frame.columns and 'position_column' not in kwargs:
-                    raise pl.exceptions.ColumnNotFoundError(
-                        "Neither is 'position' in the dataframe columns, "
-                        'nor is a position column explicitly specified. '
-                        'You can specify the position column via: '
-                        f'{transform_method.__name__}'
-                        f'(position_column="name_of_your_position_column"). '
-                        f'Available dataframe columns are: {self.frame.columns}',
-                    )
                 if (
                     'position_column' in kwargs and
                     kwargs.get('position_column') not in self.frame.columns
