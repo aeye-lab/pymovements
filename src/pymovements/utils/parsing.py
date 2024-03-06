@@ -29,7 +29,7 @@ import numpy as np
 import polars as pl
 
 EYE_TRACKING_SAMPLE = re.compile(
-    r'(?P<time>(\d{7,10}))\s+'
+    r'(?P<time>(\d{6,10}))\s+'
     r'(?P<x_pix>[-]?\d*[.]\d*)\s+'
     r'(?P<y_pix>[-]?\d*[.]\d*)\s+'
     r'(?P<pupil>\d*[.]\d*)\s+'
