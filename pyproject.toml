@@ -66,7 +66,7 @@ test = [
   "pytest>=6.0.0",
   "pytest-cov>=4.0.0",
   "setuptools>=61.0.0",
-  "types-tqdm>=4.27.0,<5",
+  "types-tqdm>=4.28.0,<5",
   "typing_extensions>=4.0.0,<5"
 ]
 
