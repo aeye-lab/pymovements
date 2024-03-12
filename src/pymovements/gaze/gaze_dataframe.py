@@ -417,6 +417,7 @@ class GazeDataFrame:
                         f'{transform_method.__name__}(position_column="your_position_column"). '
                         f'Available dataframe columns are: {self.frame.columns}',
                     )
+
             if transform_method.__name__ in {'pix2deg'}:
                 if 'pixel' not in self.frame.columns and 'pixel_column' not in kwargs:
                     raise pl.exceptions.ColumnNotFoundError(
@@ -426,6 +427,7 @@ class GazeDataFrame:
                         f'{transform_method.__name__}(pixel_column="name_of_your_pixel_column"). '
                         f'Available dataframe columns are: {self.frame.columns}',
                     )
+
             if transform_method.__name__ in {'deg2pix'}:
                 if (
                     'position_column' in kwargs and
