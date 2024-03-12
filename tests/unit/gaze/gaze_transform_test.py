@@ -766,7 +766,7 @@ def test_gaze_transform_expected_frame(
 ):
     gaze = pm.GazeDataFrame(**gaze_init_kwargs)
     gaze.transform(transform_method, **transform_kwargs)
-    
+
     # the deg2pix test cases result in a column order different to the default ordering
     check_column_order = not transform_method == 'deg2pix'
 
