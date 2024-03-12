@@ -52,7 +52,7 @@ docs = [
   "pandoc",
   "pybtex",
   "pydata-sphinx-theme>=0.12",
-  "setuptools",
+  "setuptools>=42.0.0",
   "sphinx>=5.3.0",
   "sphinx-copybutton>=0.4.0",
   "sphinx-favicon>=1.0.1",
@@ -65,9 +65,9 @@ test = [
   "pybtex",
   "pytest>=6.0.0",
   "pytest-cov>=4.0.0",
-  "setuptools",
-  "types-tqdm",
-  "typing_extensions"
+  "setuptools>=42.0.0",
+  "types-tqdm>=4.27.0,<5",
+  "typing_extensions>=4.0.0,<5"
 ]
 
 [project.urls]
