@@ -61,7 +61,7 @@ class GazeDataFrame:
         The unit of the timestamps in the timestamp column in the input data frame. Supported
         units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
         'step' the experiment definition must be specified. All timestamps will be converted to
-        milliseconds. (default: None)
+        milliseconds. (default: 'ms')
     pixel_columns:list[str] | None
         The name of the pixel position columns in the input data frame. These columns will be
         nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
@@ -231,7 +231,7 @@ class GazeDataFrame:
             *,
             trial_columns: str | list[str] | None = None,
             time_column: str | None = None,
-            time_unit: str | None = None,
+            time_unit: str | None = 'ms',
             pixel_columns: list[str] | None = None,
             position_columns: list[str] | None = None,
             velocity_columns: list[str] | None = None,
@@ -247,23 +247,24 @@ class GazeDataFrame:
         self.trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
         self.experiment = experiment
 
-        ## OLD
+
         # In case the 'time' column is already present we don't need to do anything.
-        # Otherwise, create a new time column starting with zero.
+        # Otherwise, create a new time column starting with zero and set time unit to steps
         if time_column is None and 'time' not in self.frame.columns:
-            # In case we have an experiment with sampling rate given, we convert to milliseconds.
+            # In case we have an experiment with sampling rate given, we create a time
             if experiment is not None and experiment.sampling_rate is not None:
-                sampling_rate_factor = 1000 / experiment.sampling_rate
+                self.frame = self.frame.with_columns(
+                    time=pl.arange(0, len(self.frame)),
+                )
+
+                time_column = 'time'
+                time_unit = 'step'
             else:
-                sampling_rate_factor = 1
+                warnings.warn(
+                    'No timestamp column specified and no experiment with sampling rate given. '
+                    'Some functionality may not be available.',
+                )
 
-
-            self.frame = self.frame.with_columns(
-                time=pl.arange(0, len(self.frame)) * sampling_rate_factor,
-            )
-        ##
-
-        # This if clause is mutually exclusive with the previous one.
         if time_column is not None:
             self.frame = self.frame.rename({time_column: 'time'})
             self._convert_time_units(time_unit)
@@ -1063,12 +1064,6 @@ class GazeDataFrame:
 
     def _convert_time_units(self, time_unit: str):
         """Converts the time column to milliseconds based on the specified time unit."""
-        if time_unit is None:
-            raise ValueError(
-                "time_unit must be specified if time_column is specified. "
-                "Supported units are 's' for seconds, 'ms' for milliseconds and "
-                "'step' for steps.",
-            )
 
         if time_unit == 's':
             self.frame = self.frame.with_columns(pl.col('time').mul(1000))
