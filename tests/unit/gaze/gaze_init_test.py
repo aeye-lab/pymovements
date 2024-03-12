@@ -1458,6 +1458,29 @@ def test_gaze_dataframe_init_exceptions(init_kwargs, exception, exception_msg):
     assert msg == exception_msg
 
 
+@pytest.mark.parametrize(
+    ('init_kwargs', 'warning', 'warning_msg'),
+    [
+        pytest.param(
+            {
+                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'pixel_columns': ['x', 'y'],
+            },
+            UserWarning,
+            'No timestamp column specified and no experiment with sampling rate given. '
+            'Some functionality may not be available.',
+            id='no_time_column_no_experiment',
+        )
+    ]
+)
+def test_gaze_dataframe_init_warnings(init_kwargs, warning, warning_msg):
+    with pytest.warns(warning) as record:
+        pm.GazeDataFrame(**init_kwargs)
+
+    assert len(record) == 1
+    assert record[0].message.args[0] == warning_msg
+
+
 def test_gaze_copy_init_has_same_n_components():
     """Tests if gaze initialization with frame with nested columns has correct n_components.
 
