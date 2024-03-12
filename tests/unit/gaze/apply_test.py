@@ -235,7 +235,10 @@ from pymovements.synthetic import step_function
 )
 def test_gaze_apply(method, kwargs, gaze, expected):
     gaze.apply(method, **kwargs)
+
+    # the deg2pix test case results in a column order different to the default
     check_column_order = not method == 'deg2pix'
+    
     assert_frame_equal(gaze.frame, expected.frame, check_column_order=check_column_order)
     assert_frame_equal(gaze.events.frame, expected.events.frame)
 
