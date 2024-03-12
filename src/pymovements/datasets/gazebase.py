@@ -90,7 +90,7 @@ class GazeBase(DatasetDefinition):
     >>>
     >>> dataset = pm.Dataset("GazeBase", path='data/GazeBase')
 
-    Download the dataset resources resources:
+    Download the dataset resources:
 
     >>> dataset.download()# doctest: +SKIP
 

@@ -85,7 +85,7 @@ class HBN(DatasetDefinition):
     >>>
     >>> dataset = pm.Dataset("HBN", path='data/HBN')
 
-    Download the dataset resources resources:
+    Download the dataset resources:
 
     >>> dataset.download()# doctest: +SKIP
 

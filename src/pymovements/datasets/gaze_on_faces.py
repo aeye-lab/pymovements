@@ -86,7 +86,7 @@ class GazeOnFaces(DatasetDefinition):
     >>>
     >>> dataset = pm.Dataset("GazeOnFaces", path='data/GazeOnFaces')
 
-    Download the dataset resources resources:
+    Download the dataset resources:
 
     >>> dataset.download()# doctest: +SKIP
 

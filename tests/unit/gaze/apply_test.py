@@ -175,6 +175,36 @@ from pymovements.synthetic import step_function
         ),
 
         pytest.param(
+            'deg2pix',
+            {'pixel_origin': 'center'},
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'time': [1000, 1000],
+                        'x_dva': [26.335410003881346, 26.335410003881346],
+                        'y_dva': [0.0, 0.0],
+                    },
+                ),
+                experiment=pm.Experiment(100, 100, 100, 100, 100, 'center', 1000),
+                position_columns=['x_dva', 'y_dva'],
+            ),
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'time': [1000, 1000],
+                        'x_pix': [49.5, 49.5],
+                        'y_pix': [0.0, 0.0],
+                        'x_dva': [26.335410003881346, 26.335410003881346],
+                        'y_dva': [0.0, 0.0],
+                    },
+                ),
+                pixel_columns=['x_pix', 'y_pix'],
+                position_columns=['x_dva', 'y_dva'],
+            ),
+            id='deg2pix_origin_center',
+        ),
+
+        pytest.param(
             'pos2vel',
             {'method': 'preceding'},
             pm.GazeDataFrame(
@@ -213,7 +243,11 @@ from pymovements.synthetic import step_function
 )
 def test_gaze_apply(method, kwargs, gaze, expected):
     gaze.apply(method, **kwargs)
-    assert_frame_equal(gaze.frame, expected.frame)
+
+    # the deg2pix test case results in a column order different to the default
+    check_column_order = not method == 'deg2pix'
+
+    assert_frame_equal(gaze.frame, expected.frame, check_column_order=check_column_order)
     assert_frame_equal(gaze.events.frame, expected.events.frame)
 
 

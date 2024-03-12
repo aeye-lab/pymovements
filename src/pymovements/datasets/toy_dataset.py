@@ -82,7 +82,7 @@ class ToyDataset(DatasetDefinition):
     >>>
     >>> dataset = pm.Dataset("ToyDataset", path='data/ToyDataset')
 
-    Download the dataset resources resources:
+    Download the dataset resources:
 
     >>> dataset.download()# doctest: +SKIP
 

@@ -84,7 +84,7 @@ class JuDo1000(DatasetDefinition):
     >>>
     >>> dataset = pm.Dataset("JuDo1000", path='data/JuDo1000')
 
-    Download the dataset resources resources:
+    Download the dataset resources:
 
     >>> dataset.download()# doctest: +SKIP
 

@@ -277,7 +277,7 @@ def from_asc(
             raise ValueError(f"unknown pattern key '{patterns}'. Supported keys are: eyelink")
 
     # Read data.
-    gaze_data = parse_eyelink(file, patterns=patterns, schema=schema)
+    gaze_data, _ = parse_eyelink(file, patterns=patterns, schema=schema)
 
     # Create gaze data frame.
     gaze_df = GazeDataFrame(

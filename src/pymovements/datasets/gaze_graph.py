@@ -88,7 +88,7 @@ class GazeGraph(DatasetDefinition):
     >>>
     >>> dataset = pm.Dataset("GazeGraph", path='data/GazeGraph')
 
-    Download the dataset resources resources:
+    Download the dataset resources:
 
     >>> dataset.download()# doctest: +SKIP
 
