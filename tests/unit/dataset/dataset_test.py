@@ -543,8 +543,6 @@ def test_pix2deg(dataset_configuration):
 
     expected_schema = {**original_schema, 'position': pl.List(pl.Float64)}
     for result_gaze_df in dataset.gaze:
-        print(result_gaze_df.schema)
-        print(expected_schema)
         assert result_gaze_df.schema == expected_schema
 
 
@@ -562,8 +560,6 @@ def test_deg2pix(dataset_configuration):
         'new_pixel': pl.List(pl.Float64),
     }
     for result_gaze_df in dataset.gaze:
-        print(result_gaze_df.schema)
-        print(expected_schema)
         assert result_gaze_df.schema == expected_schema
 
 
