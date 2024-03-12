@@ -832,8 +832,8 @@ import pymovements as pm
                     screen_width_cm=1,
                     screen_height_px=1,
                     screen_height_cm=1,
-                    sampling_rate=200
-                )
+                    sampling_rate=200,
+                ),
             },
             pl.from_dict(
                 {
@@ -1442,7 +1442,7 @@ def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_tr
                 'time_unit': 'invalid',
             },
             ValueError,
-            f"unsupported time unit 'invalid'. "
+            "unsupported time unit 'invalid'. "
             "Supported units are 's' for seconds, 'ms' for milliseconds and "
             "'step' for steps.",
             id='time_unit_unsupported',
