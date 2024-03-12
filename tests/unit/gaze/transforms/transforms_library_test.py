@@ -29,10 +29,10 @@ import pymovements as pm
     ('transform_function', 'transform_name'),
     [
         pytest.param(pm.gaze.transforms.center_origin, 'center_origin', id='center_origin'),
+        pytest.param(pm.gaze.transforms.deg2pix, 'deg2pix', id='deg2pix'),
         pytest.param(pm.gaze.transforms.downsample, 'downsample', id='downsample'),
         pytest.param(pm.gaze.transforms.norm, 'norm', id='norm'),
         pytest.param(pm.gaze.transforms.pix2deg, 'pix2deg', id='pix2deg'),
-        pytest.param(pm.gaze.transforms.deg2pix, 'deg2pix', id='deg2pix'),
         pytest.param(pm.gaze.transforms.pos2acc, 'pos2acc', id='pos2acc'),
         pytest.param(pm.gaze.transforms.pos2vel, 'pos2vel', id='pos2vel'),
         pytest.param(pm.gaze.transforms.savitzky_golay, 'savitzky_golay', id='savitzky_golay'),
