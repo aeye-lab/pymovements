@@ -247,7 +247,6 @@ class GazeDataFrame:
         self.trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
         self.experiment = experiment
 
-
         # In case the 'time' column is already present we don't need to do anything.
         # Otherwise, create a new time column starting with zero and set time unit to steps
         if time_column is None and 'time' not in self.frame.columns:
@@ -1086,7 +1085,7 @@ class GazeDataFrame:
         # Convert to int if possible.
         if self.frame.schema['time'] == pl.Float64:
             all_decimals = self.frame.select(
-                pl.col('time').round().eq(pl.col('time')).all()
+                pl.col('time').round().eq(pl.col('time')).all(),
             ).item()
 
             if all_decimals:
