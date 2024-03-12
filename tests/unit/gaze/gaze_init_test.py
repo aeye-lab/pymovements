@@ -1470,8 +1470,8 @@ def test_gaze_dataframe_init_exceptions(init_kwargs, exception, exception_msg):
             'No timestamp column specified and no experiment with sampling rate given. '
             'Some functionality may not be available.',
             id='no_time_column_no_experiment',
-        )
-    ]
+        ),
+    ],
 )
 def test_gaze_dataframe_init_warnings(init_kwargs, warning, warning_msg):
     with pytest.warns(warning) as record:
