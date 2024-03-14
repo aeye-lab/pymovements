@@ -258,7 +258,7 @@ def test_from_numpy_explicit_columns_with_trial():
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 def test_from_numpy_all_none():
     gaze = pm.gaze.from_numpy(
@@ -287,7 +287,7 @@ def test_from_numpy_all_none():
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 @pytest.mark.parametrize(
     'events',

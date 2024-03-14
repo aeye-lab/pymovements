@@ -29,7 +29,7 @@ import pymovements as pm
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 @pytest.mark.parametrize(
     'init_arg',
@@ -53,7 +53,7 @@ def test_gaze_dataframe_init(init_arg):
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 @pytest.mark.parametrize(
     ('init_df', 'velocity_columns'),
@@ -100,7 +100,7 @@ def test_gaze_dataframe_velocity_columns(init_df, velocity_columns):
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 @pytest.mark.parametrize(
     ('init_df', 'pixel_columns'),
@@ -147,7 +147,7 @@ def test_gaze_dataframe_pixel_position_columns(init_df, pixel_columns):
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 @pytest.mark.parametrize(
     ('init_df', 'position_columns'),
@@ -218,7 +218,7 @@ def test_gaze_dataframe_copy_with_experiment():
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 def test_gaze_dataframe_copy_no_experiment():
     gaze = pm.GazeDataFrame(

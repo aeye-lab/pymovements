@@ -27,7 +27,7 @@ import pymovements as pm
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 @pytest.mark.parametrize(
     ('kwargs', 'shape'),

@@ -30,7 +30,7 @@ import pymovements as pm
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 @pytest.mark.parametrize(
     ('init_kwargs', 'expected_frame', 'expected_n_components'),
@@ -914,7 +914,7 @@ def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, exp
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 @pytest.mark.parametrize(
     ('init_kwargs', 'expected_trial_columns'),
@@ -966,7 +966,7 @@ def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_tr
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'exception_msg'),
@@ -1517,7 +1517,7 @@ def test_gaze_copy_init_has_same_n_components():
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 @pytest.mark.parametrize(
     ('events', 'init_kwargs'),

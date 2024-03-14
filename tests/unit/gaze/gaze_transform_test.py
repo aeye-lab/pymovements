@@ -843,7 +843,7 @@ def test_gaze_transfrom_expected_frame_warning(
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'exception_msg'),
@@ -906,7 +906,7 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'expected_msg'),
@@ -1013,7 +1013,7 @@ def test_gaze_dataframe_pix2deg_warnings(init_kwargs, warning, expected_msg):
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'expected_msg'),
@@ -1125,7 +1125,7 @@ def test_gaze_dataframe_pos2acc_creates_acceleration_column(data, experiment, po
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'expected_msg'),
@@ -1232,7 +1232,7 @@ def test_gaze_dataframe_pos2vel_creates_velocity_column(data, experiment, positi
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'expected_msg'),

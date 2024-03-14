@@ -916,7 +916,7 @@ def test_gaze_detect(method, kwargs, gaze, expected):
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 def test_gaze_detect_custom_method_no_arguments():
     def custom_method():

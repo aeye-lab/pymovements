@@ -24,11 +24,12 @@ from polars.testing import assert_frame_equal
 
 import pymovements as pm
 
+
 @pytest.mark.filterwarnings(
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 @pytest.mark.parametrize(
     ('init_data', 'unnest_kwargs', 'expected'),
@@ -244,7 +245,7 @@ def test_gaze_dataframe_unnest_has_expected_frame(init_data, unnest_kwargs, expe
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 @pytest.mark.parametrize(
     ('init_data', 'unnest_kwargs', 'expected'),
@@ -374,7 +375,7 @@ def test_gaze_dataframe_unnest_has_expected_frame_multiple_unnest(
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 @pytest.mark.parametrize(
     ('init_data', 'unnest_kwargs', 'exception', 'exception_msg'),
@@ -473,7 +474,7 @@ def test_gaze_dataframe_unnest_errors(init_data, unnest_kwargs, exception, excep
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 @pytest.mark.parametrize(
     ('init_data', 'unnest_kwargs', 'n_components', 'exception', 'exception_msg'),

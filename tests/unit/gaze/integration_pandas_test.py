@@ -114,7 +114,7 @@ def test_from_pandas_with_trial_columnms():
     'ignore:'
     'No timestamp column specified and no experiment with sampling rate given. '
     'Some functionality may not be available.'
-    ':UserWarning'
+    ':UserWarning',
 )
 @pytest.mark.parametrize(
     ('df', 'events'),
