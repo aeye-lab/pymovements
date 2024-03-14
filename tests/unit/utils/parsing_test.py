@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Tests pymovements asc to csv processing."""
+import datetime
 from pathlib import Path
 
 import numpy as np
@@ -51,31 +52,52 @@ PUPIL	AREA
 EVENTS	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2
 SAMPLES	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2	INPUT
 the next line has all additional trial columns set to None
+START	10000000 	RIGHT	SAMPLES	EVENTS
 10000000	  850.7	  717.5	  714.0	    0.0	...
+END	10000001 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000001 START_A
+START	10000002 	RIGHT	SAMPLES	EVENTS
 the next line now should have the task column set to A
 10000002	  850.7	  717.5	  714.0	    0.0	...
+END	10000002 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000003 STOP_A
 the task should be set to None again
+START	10000004 	RIGHT	SAMPLES	EVENTS
 10000004	  850.7	  717.5	  714.0	    0.0	...
+END	10000005 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000005 START_B
 the next line now should have the task column set to B
+START	10000006 	RIGHT	SAMPLES	EVENTS
 10000006	  850.7	  717.5	  714.0	    0.0	...
+END	10000007 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000007 START_TRIAL_1
 the next line now should have the trial column set to 1
+START	10000008 	RIGHT	SAMPLES	EVENTS
 10000008	  850.7	  717.5	  714.0	    0.0	...
+END	10000009 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000009 STOP_TRIAL_1
 MSG 10000010 START_TRIAL_2
 the next line now should have the trial column set to 2
+START	10000011 	RIGHT	SAMPLES	EVENTS
 10000011	  850.7	  717.5	  714.0	    0.0	...
+END	10000012 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000012 STOP_TRIAL_2
 MSG 10000013 START_TRIAL_3
 the next line now should have the trial column set to 3
+START	10000014 	RIGHT	SAMPLES	EVENTS
 10000014	  850.7	  717.5	  714.0	    0.0	...
+END	10000015 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000015 STOP_TRIAL_3
 MSG 10000016 STOP_B
 task and trial should be set to None again
+START	10000017 	RIGHT	SAMPLES	EVENTS
 10000017	  850.7	  717.5	  .	    0.0	...
+SBLINK R 10000018
+10000019	   .	   .	    0.0	    0.0	...
+10000020	   .	   .	    0.0	    0.0	...
+EBLINK R 10000018	10000020	2
+10000021	   .	   .	    0.0	    0.0	...
+END	10000022 	SAMPLES	EVENTS	RES	  38.54	  31.12
 """
 
 PATTERNS = [
@@ -105,12 +127,15 @@ PATTERNS = [
 
 EXPECTED_DF = pl.from_dict(
     {
-        'time': [10000000, 10000002, 10000004, 10000006, 10000008, 10000011, 10000014, 10000017],
-        'x_pix': [850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7],
-        'y_pix': [717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5],
-        'pupil': [714.0, 714.0, 714.0, 714.0, 714.0, 714.0, 714.0, np.nan],
-        'task': [None, 'A', None, 'B', 'B', 'B', 'B', None],
-        'trial_id': [None, None, None, None, '1', '2', '3', None],
+        'time': [
+            10000000, 10000002, 10000004, 10000006, 10000008, 10000011, 10000014,
+            10000017, 10000019, 10000020, 10000021,
+        ],
+        'x_pix': [850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, np.nan, np.nan, np.nan],
+        'y_pix': [717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, np.nan, np.nan, np.nan],
+        'pupil': [714.0, 714.0, 714.0, 714.0, 714.0, 714.0, 714.0, np.nan, 0.0, 0.0, 0.0],
+        'task': [None, 'A', None, 'B', 'B', 'B', 'B', None, None, None, None],
+        'trial_id': [None, None, None, None, '1', '2', '3', None, None, None, None],
     },
 )
 
@@ -123,14 +148,24 @@ EXPECTED_METADATA = {
     'version_1': 'EYELINK II 1',
     'version_2': 'EYELINK II CL v6.12 Feb  1 2018 (EyeLink Portable Duo)',
     'model': 'EyeLink Portable Duo',
-    'version_number': 6.12,
+    'version_number': '6.12',
     'sampling_rate': 1000.00,
     'filter': '2',
     'tracking': 'CR',
     'tracked_eye': 'LEFT',
     'calibrations': [],
     'validations': [],
-    'resolution': (0, 0, 1279, 1023),
+    'resolution': (1280, 1024),
+    'data_loss_ratio_blinks': 0.18181818181818182,
+    'data_loss_ratio': 0.2727272727272727,
+    'total_recording_duration_ms': 11,
+    'datetime': datetime.datetime(2023, 3, 8, 9, 25, 20),
+    'blinks': [{
+        'duration_ms': '2',
+        'num_samples': 2,
+        'start_timestamp': '10000018',
+        'stop_timestamp': '10000020',
+    }],
 }
 
 
@@ -172,59 +207,53 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
 
 
 @pytest.mark.parametrize(
-    ('metadata', 'expected_version', 'expected_model', 'time'),
+    ('metadata', 'expected_version', 'expected_model'),
     [
         pytest.param(
             '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL v6.12 Feb  1 2018 (EyeLink Portable Duo)',
-            6.12,
+            '6.12',
             'EyeLink Portable Duo',
-            '09:25:20',
             id='eye_link_portable_duo',
         ),
         pytest.param(
             '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL v5.12 Feb  1 2018\n',
-            5.12,
+            '5.12',
             'EyeLink 1000 Plus',
-            '09:25:20',
             id='eye_link_1000_plus',
         ),
         pytest.param(
             '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL v4.12 Feb  1 2018',
-            4.12,
+            '4.12',
             'EyeLink 1000',
-            '09:25:20',
             id='eye_link_1000_1',
         ),
         pytest.param(
             '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL v3.12 Feb  1 2018',
-            3.12,
+            '3.12',
             'EyeLink 1000',
-            '09:25:20',
             id='eye_link_1000_2',
         ),
         pytest.param(
             '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL v2.12 Feb  1 2018',
-            2.12,
+            '2.12',
             'EyeLink II',
-            '09:25:20',
             id='eye_link_II',
         ),
         pytest.param(
             '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK REVISION 2.00 (Aug 12 1997)',
-            2.00,
+            '2.00',
             'EyeLink I',
-            '09:25:20',
             id='eye_link_I',
         ),
         pytest.param(
@@ -232,7 +261,6 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
             '** VERSION: nothing\n',
             'unknown',
             'unknown',
-            '09:25:20',
             id='unknown_version_1',
         ),
         pytest.param(
@@ -241,7 +269,6 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
             '** EYELINK II CL Feb  1 2018 (EyeLink Portable Duo)',
             'unknown',
             'unknown',
-            '09:25:20',
             id='unknown_version_2',
         ),
         pytest.param(
@@ -249,12 +276,11 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
             '** TYPE: EDF_FILE BINARY EVENT SAMPLE TAGGED',
             'unknown',
             'unknown',
-            '09:25:20',
             id='unknown_version_3',
         ),
     ],
 )
-def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_model, time):
+def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_model):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
@@ -264,7 +290,6 @@ def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_mo
 
     assert metadata['version_number'] == expected_version
     assert metadata['model'] == expected_model
-    assert metadata['time'] == time
 
 
 @pytest.mark.parametrize(
