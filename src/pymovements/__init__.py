@@ -24,6 +24,7 @@ from pymovements import events
 from pymovements import exceptions
 from pymovements import gaze
 from pymovements import plotting
+from pymovements import stimulus
 from pymovements import synthetic
 from pymovements import utils
 from pymovements.dataset import Dataset
@@ -60,6 +61,7 @@ __all__ = [
 
     'exceptions',
     'plotting',
+    'stimulus',
     'synthetic',
     'utils',
 

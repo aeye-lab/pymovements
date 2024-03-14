@@ -27,7 +27,28 @@ import polars as pl
 
 
 class TextStimulus:
-    """TextStimulus class."""
+    """A DataFrame for gaze time series data.
+
+    Each row is a sample at a specific timestep.
+    Each column is a channel in the gaze time series.
+
+    Parameters
+    ----------
+    aois: pl.DataFrame
+        A stimulus dataframe.
+    aoi_column: str
+        Name of the column that contains the content of the aois.
+    pixel_x_column: str
+        Name of the column which contains the x coordinate of the areas of interest.
+    pixel_y_column: str
+        Name of the column which contains the y coordinate of the areas of interest.
+    width_column: str
+        Name of the column which contains the width of the area of interest.
+    height_column: str
+        Name of the column which contains the height of the area of interest.
+    page_column: str
+        Name of the column which contains the page information of the area of interest.
+    """
 
     def __init__(
             self,
@@ -61,7 +82,32 @@ def from_file(
         page_column: str,
         custom_read_kwargs: dict[str, Any] | None = None,
 ) -> TextStimulus:
-    """Load text stimulus from file."""
+    """Load text stimulus from file.
+
+    Parameters
+    ----------
+    aoi_path:  str | Path
+        Path to file to be read.
+    aoi_column: str
+        Name of the column that contains the content of the aois.
+    pixel_x_column: str
+        Name of the column which contains the x coordinate of the areas of interest.
+    pixel_y_column: str
+        Name of the column which contains the y coordinate of the areas of interest.
+    width_column: str
+        Name of the column which contains the width of the area of interest.
+    height_column: str
+        Name of the column which contains the height of the area of interest.
+    page_column: str
+        Name of the column which contains the page information of the area of interest.
+    custom_read_kwargs: dict[str, Any] | None
+        Custom read keyword arguments for polars. (default: None)
+
+    Returns
+    -------
+    TextStimulus
+        Returns the text stimulus file.
+    """
     if isinstance(aoi_path, str):
         aoi_path = Path(aoi_path)
     if custom_read_kwargs is None:
