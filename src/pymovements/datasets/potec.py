@@ -104,7 +104,6 @@ class PoTeC(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # pylint: disable=too-many-instance-attributes
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'PoTeC'
