@@ -22,6 +22,7 @@ jobs:
           - py39
           - py310
           - py311
+          - py312
         include:
           - tox_env: py39
             python: "3.9"
@@ -29,6 +30,8 @@ jobs:
             python: "3.10"
           - tox_env: py311
             python: "3.11"
+          - tox_env: py312
+            python: "3.12"
     steps:
       - uses: actions/checkout@v4
         with:
