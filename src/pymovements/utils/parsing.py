@@ -450,12 +450,13 @@ def _calculate_data_loss(
     tuple[float | str, float | str]
         Data loss ratio and blink loss ratio.
     """
-    if not sampling_rate:
+    if not sampling_rate or not total_rec_duration:
         return 'unknown', 'unknown'
 
     dl_ratio_blinks = 0.0
 
     num_expected_samples = total_rec_duration * float(sampling_rate) / 1000
+
     total_lost_samples = num_expected_samples - actual_num_samples
 
     if blinks:
