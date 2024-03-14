@@ -163,7 +163,7 @@ def test_from_numpy_with_trial_id():
         },
         schema={
             'trial_id': pl.Float64,
-            'time': pl.Float64,
+            'time': pl.Int64,
             'pixel': pl.List(pl.Float64),
         },
     )
@@ -254,6 +254,12 @@ def test_from_numpy_explicit_columns_with_trial():
     assert gaze.trial_columns == ['trial']
 
 
+@pytest.mark.filterwarnings(
+    'ignore:'
+    'No timestamp column specified and no experiment with sampling rate given. '
+    'Some functionality may not be available.'
+    ':UserWarning'
+)
 def test_from_numpy_all_none():
     gaze = pm.gaze.from_numpy(
         data=None,
@@ -271,12 +277,18 @@ def test_from_numpy_all_none():
         acceleration_columns=None,
     )
 
-    expected = pl.DataFrame(schema={'time': pl.Int64})
+    expected = pl.DataFrame()
 
     assert_frame_equal(gaze.frame, expected)
     assert gaze.n_components is None
 
 
+@pytest.mark.filterwarnings(
+    'ignore:'
+    'No timestamp column specified and no experiment with sampling rate given. '
+    'Some functionality may not be available.'
+    ':UserWarning'
+)
 @pytest.mark.parametrize(
     'events',
     [

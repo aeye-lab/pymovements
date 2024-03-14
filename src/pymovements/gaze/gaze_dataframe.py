@@ -266,6 +266,8 @@ class GazeDataFrame:
 
         if time_column is not None:
             self.frame = self.frame.rename({time_column: 'time'})
+
+        if 'time' in self.frame.columns:
             self._convert_time_units(time_unit)
 
         if distance_column is not None:

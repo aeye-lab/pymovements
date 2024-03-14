@@ -26,6 +26,12 @@ from polars.testing import assert_frame_equal
 import pymovements as pm
 
 
+@pytest.mark.filterwarnings(
+    'ignore:'
+    'No timestamp column specified and no experiment with sampling rate given. '
+    'Some functionality may not be available.'
+    ':UserWarning'
+)
 @pytest.mark.parametrize(
     ('init_kwargs', 'expected_frame', 'expected_n_components'),
     [
@@ -904,6 +910,12 @@ def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, exp
     assert gaze.n_components == expected_n_components
 
 
+@pytest.mark.filterwarnings(
+    'ignore:'
+    'No timestamp column specified and no experiment with sampling rate given. '
+    'Some functionality may not be available.'
+    ':UserWarning'
+)
 @pytest.mark.parametrize(
     ('init_kwargs', 'expected_trial_columns'),
     [
@@ -950,6 +962,12 @@ def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_tr
     assert gaze.trial_columns == expected_trial_columns
 
 
+@pytest.mark.filterwarnings(
+    'ignore:'
+    'No timestamp column specified and no experiment with sampling rate given. '
+    'Some functionality may not be available.'
+    ':UserWarning'
+)
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'exception_msg'),
     [
@@ -1486,8 +1504,8 @@ def test_gaze_copy_init_has_same_n_components():
 
     Refers to issue #514.
     """
-    df_orig = pl.from_numpy(np.zeros((2, 1000)), orient='col', schema=['x', 'y'])
-    gaze = pm.GazeDataFrame(df_orig, position_columns=['x', 'y'])
+    df_orig = pl.from_numpy(np.zeros((3, 1000)), orient='col', schema=['t', 'x', 'y'])
+    gaze = pm.GazeDataFrame(df_orig, position_columns=['x', 'y'], time_column='t')
 
     df_copy = gaze.frame.clone()
     gaze_copy = pm.GazeDataFrame(df_copy)
@@ -1495,6 +1513,12 @@ def test_gaze_copy_init_has_same_n_components():
     assert gaze.n_components == gaze_copy.n_components
 
 
+@pytest.mark.filterwarnings(
+    'ignore:'
+    'No timestamp column specified and no experiment with sampling rate given. '
+    'Some functionality may not be available.'
+    ':UserWarning'
+)
 @pytest.mark.parametrize(
     ('events', 'init_kwargs'),
     [

@@ -110,6 +110,12 @@ def test_from_pandas_with_trial_columnms():
     assert gaze.trial_columns == ['trial_id']
 
 
+@pytest.mark.filterwarnings(
+    'ignore:'
+    'No timestamp column specified and no experiment with sampling rate given. '
+    'Some functionality may not be available.'
+    ':UserWarning'
+)
 @pytest.mark.parametrize(
     ('df', 'events'),
     [

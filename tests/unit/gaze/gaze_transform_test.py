@@ -718,6 +718,7 @@ def fixture_experiment():
             {
                 'data': pl.from_dict(
                     {
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                         'y_dva': [2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
                     },
@@ -728,6 +729,7 @@ def fixture_experiment():
             pm.GazeDataFrame(
                 data=pl.from_dict(
                     {
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                         'y_dva': [2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
                     },
@@ -740,6 +742,7 @@ def fixture_experiment():
             {
                 'data': pl.from_dict(
                     {
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                         'y_dva': [2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
                     },
@@ -750,6 +753,7 @@ def fixture_experiment():
             pm.GazeDataFrame(
                 data=pl.from_dict(
                     {
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                         'y_dva': [2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
                     },
@@ -835,6 +839,12 @@ def test_gaze_transfrom_expected_frame_warning(
         assert_frame_equal(gaze.frame, expected_result.frame)
 
 
+@pytest.mark.filterwarnings(
+    'ignore:'
+    'No timestamp column specified and no experiment with sampling rate given. '
+    'Some functionality may not be available.'
+    ':UserWarning'
+)
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'exception_msg'),
     [
@@ -892,6 +902,12 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
     assert 'position' in gaze.columns
 
 
+@pytest.mark.filterwarnings(
+    'ignore:'
+    'No timestamp column specified and no experiment with sampling rate given. '
+    'Some functionality may not be available.'
+    ':UserWarning'
+)
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'expected_msg'),
     [
@@ -993,6 +1009,12 @@ def test_gaze_dataframe_pix2deg_warnings(init_kwargs, warning, expected_msg):
     assert msg == expected_msg
 
 
+@pytest.mark.filterwarnings(
+    'ignore:'
+    'No timestamp column specified and no experiment with sampling rate given. '
+    'Some functionality may not be available.'
+    ':UserWarning'
+)
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'expected_msg'),
     [
@@ -1099,6 +1121,12 @@ def test_gaze_dataframe_pos2acc_creates_acceleration_column(data, experiment, po
     assert 'acceleration' in gaze.columns
 
 
+@pytest.mark.filterwarnings(
+    'ignore:'
+    'No timestamp column specified and no experiment with sampling rate given. '
+    'Some functionality may not be available.'
+    ':UserWarning'
+)
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'expected_msg'),
     [
@@ -1200,6 +1228,12 @@ def test_gaze_dataframe_pos2vel_creates_velocity_column(data, experiment, positi
     assert 'velocity' in gaze.columns
 
 
+@pytest.mark.filterwarnings(
+    'ignore:'
+    'No timestamp column specified and no experiment with sampling rate given. '
+    'Some functionality may not be available.'
+    ':UserWarning'
+)
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'expected_msg'),
     [
@@ -1273,6 +1307,7 @@ def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg)
             {
                 'data': pl.from_dict(
                     {
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
                         'y_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
                         'x_dva': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
@@ -1286,7 +1321,7 @@ def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg)
             pm.GazeDataFrame(
                 data=pl.from_dict(
                     {
-
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_pix': [1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3],
                         'y_pix': [1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3],
                         'x_dva': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
@@ -1302,6 +1337,7 @@ def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg)
             {
                 'data': pl.from_dict(
                     {
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
                         'y_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
                         'x_dva': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
@@ -1315,7 +1351,7 @@ def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg)
             pm.GazeDataFrame(
                 data=pl.from_dict(
                     {
-
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
                         'y_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
                         'x_dva': [1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3],

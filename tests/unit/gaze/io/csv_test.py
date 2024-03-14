@@ -23,6 +23,12 @@ import pytest
 import pymovements as pm
 
 
+@pytest.mark.filterwarnings(
+    'ignore:'
+    'No timestamp column specified and no experiment with sampling rate given. '
+    'Some functionality may not be available.'
+    ':UserWarning'
+)
 @pytest.mark.parametrize(
     ('kwargs', 'shape'),
     [
@@ -88,7 +94,7 @@ import pymovements as pm
                 'pixel_columns': pm.datasets.GazeOnFaces().pixel_columns,
                 **pm.datasets.GazeOnFaces().custom_read_kwargs,
             },
-            (10, 2),
+            (10, 1),
             id='gaze_on_faces_dataset_example',
         ),
         pytest.param(
