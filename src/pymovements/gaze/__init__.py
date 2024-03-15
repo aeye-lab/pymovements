@@ -38,6 +38,7 @@
    pymovements.gaze.transforms.downsample
    pymovements.gaze.transforms.norm
    pymovements.gaze.transforms.pix2deg
+   pymovements.gaze.transforms.deg2pix
    pymovements.gaze.transforms.pos2acc
    pymovements.gaze.transforms.pos2vel
    pymovements.gaze.transforms.savitzky_golay

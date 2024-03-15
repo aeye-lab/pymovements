@@ -321,6 +321,50 @@ class Dataset:
         """
         return self.apply('pix2deg', verbose=verbose)
 
+    def deg2pix(
+        self,
+        pixel_origin: str = 'lower left',
+        position_column: str = 'position',
+        pixel_column: str = 'pixel',
+        verbose: bool = True,
+    ) -> Dataset:
+        """Compute gaze positions in pixel coordinates from degrees of visual angle.
+
+        This method requires a properly initialized :py:attr:`~.Dataset.experiment` attribute.
+
+        After success, the gaze dataframe is extended by the resulting dva columns.
+
+        Parameters
+        ----------
+        pixel_origin: str
+            The desired location of the pixel origin. (default: 'lower left')
+            Supported values: ``center``, ``lower left``.
+        position_column: str
+            The input position column name. (default: 'position')
+        pixel_column: str
+            The output pixel column name. (default: 'pixel')
+        verbose : bool
+            If True, show progress of computation. (default: True)
+
+        Returns
+        -------
+        Dataset
+            Returns self, useful for method cascading.
+
+        Raises
+        ------
+        AttributeError
+            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
+            if experiment is None.
+        """
+        return self.apply(
+            'deg2pix',
+            pixel_origin=pixel_origin,
+            position_column=position_column,
+            pixel_column=pixel_column,
+            verbose=verbose,
+        )
+
     def pos2acc(
             self,
             *,

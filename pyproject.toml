@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-  "setuptools>=42",
+  "setuptools>=61.0.0",
   "setuptools-git-versioning<2",
   "versioneer[toml]>=0.29,<1.0",
   "wheel"
@@ -27,13 +27,14 @@ classifiers = [
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
   "Topic :: Scientific/Engineering",
   "Typing :: Typed"
 ]
 dependencies = [
-  "matplotlib>=3.5.0,<3.9",
-  "numpy>=1.20.0,<2",
-  "pandas>=1.2.0,<3",
+  "matplotlib>=3.8.0,<3.9",
+  "numpy>=1.22.4,<2",
+  "pandas>=2.1.4,<3",
   "polars>=0.20.1,<0.20.3",
   "pyarrow>=11.0.0,<16",
   "pyopenssl>=16.0.0,<25.0.0",
@@ -51,6 +52,7 @@ docs = [
   "pandoc",
   "pybtex",
   "pydata-sphinx-theme>=0.12",
+  "setuptools>=61.0.0",
   "sphinx>=5.3.0",
   "sphinx-copybutton>=0.4.0",
   "sphinx-favicon>=1.0.1",
@@ -63,8 +65,9 @@ test = [
   "pybtex",
   "pytest>=6.0.0",
   "pytest-cov>=4.0.0",
-  "types-tqdm",
-  "typing_extensions"
+  "setuptools>=61.0.0",
+  "types-tqdm>=4.64.0,<5",
+  "typing_extensions>=4.0.0,<5"
 ]
 
 [project.urls]
@@ -139,7 +142,8 @@ filterwarnings = [
   "ignore:pkg_resources is deprecated.*:DeprecationWarning",
   "ignore:Deprecated call to `pkg_resources.declare_namespace.*:DeprecationWarning",
   "ignore:distutils Version classes are deprecated. Use packaging.version instead.:DeprecationWarning",
-  "ignore:FigureCanvasAgg is non-interactive, and thus cannot be shown:UserWarning"
+  "ignore:FigureCanvasAgg is non-interactive, and thus cannot be shown:UserWarning",
+  "ignore:datetime.datetime.utcfromtimestamp() is deprecated.*:DeprecationWarning"
 ]
 testpaths = ['tests', 'src']
 
