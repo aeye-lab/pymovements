@@ -236,12 +236,8 @@ def load_gaze_files(
 
         elif preprocessed and extension in {'csv', 'txt', 'tsv'}:
             time_column = None
-            time_unit = None
+            time_unit = 'ms'
             distance_column = None
-
-            if 'time' in gaze_data.columns:
-                time_column = 'time'
-                time_unit = 'ms'
 
             if 'distance' in gaze_data.columns:
                 distance_column = 'distance'
