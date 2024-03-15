@@ -235,7 +235,7 @@ def load_gaze_files(
             )
 
         elif preprocessed and extension in {'csv', 'txt', 'tsv'}:
-            time_column = None
+            # Time unit is always milliseconds for preprocessed data if a time column is present.
             time_unit = 'ms'
             distance_column = None
 
@@ -259,7 +259,6 @@ def load_gaze_files(
                 gaze_data,
                 experiment=definition.experiment,
                 trial_columns=definition.trial_columns,
-                time_column=time_column,
                 time_unit=time_unit,
                 distance_column=distance_column,
                 pixel_columns=pixel_columns,
