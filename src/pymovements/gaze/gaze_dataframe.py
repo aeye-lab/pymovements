@@ -417,6 +417,7 @@ class GazeDataFrame:
                         f'{transform_method.__name__}(position_column="your_position_column"). '
                         f'Available dataframe columns are: {self.frame.columns}',
                     )
+
             if transform_method.__name__ in {'pix2deg'}:
                 if 'pixel' not in self.frame.columns and 'pixel_column' not in kwargs:
                     raise pl.exceptions.ColumnNotFoundError(
@@ -424,6 +425,20 @@ class GazeDataFrame:
                         'nor is a pixel column explicitly specified. '
                         'You can specify the pixel column via: '
                         f'{transform_method.__name__}(pixel_column="name_of_your_pixel_column"). '
+                        f'Available dataframe columns are: {self.frame.columns}',
+                    )
+
+            if transform_method.__name__ in {'deg2pix'}:
+                if (
+                    'position_column' in kwargs and
+                    kwargs.get('position_column') not in self.frame.columns
+                ):
+                    raise pl.exceptions.ColumnNotFoundError(
+                        f"The specified 'position_column' ({kwargs.get('position_column')}) "
+                        'is not found in the dataframe columns. '
+                        'You can specify the position column via: '
+                        f'{transform_method.__name__}'
+                        f'(position_column="name_of_your_position_column"). '
                         f'Available dataframe columns are: {self.frame.columns}',
                     )
 
@@ -499,6 +514,41 @@ class GazeDataFrame:
             if experiment is None.
         """
         self.transform('pix2deg')
+
+    def deg2pix(
+        self,
+        pixel_origin: str = 'lower left',
+        position_column: str = 'position',
+        pixel_column: str = 'pixel',
+    ) -> None:
+        """Compute gaze positions in pixel position coordinates from degrees of visual angle.
+
+        This method requires a properly initialized :py:attr:`~.GazeDataFrame.experiment` attribute.
+
+        After success, the gaze dataframe is extended by the resulting dva position columns.
+
+        Parameters
+        ----------
+        pixel_origin: str
+            The desired location of the pixel origin. (default: 'lower left')
+            Supported values: ``center``, ``lower left``.
+        position_column: str
+            The input position column name. (default: 'position')
+        pixel_column: str
+            The output pixel column name. (default: 'pixel')
+
+        Raises
+        ------
+        AttributeError
+            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
+            if experiment is None.
+        """
+        self.transform(
+            'deg2pix',
+            pixel_origin=pixel_origin,
+            position_column=position_column,
+            pixel_column=pixel_column,
+        )
 
     def pos2acc(
             self,

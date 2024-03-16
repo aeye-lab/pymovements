@@ -24,6 +24,7 @@ from pymovements import events
 from pymovements import exceptions
 from pymovements import gaze
 from pymovements import plotting
+from pymovements import stimulus
 from pymovements import synthetic
 from pymovements import utils
 from pymovements.dataset import Dataset
@@ -37,6 +38,7 @@ from pymovements.events import EventProcessor
 from pymovements.gaze import Experiment
 from pymovements.gaze import GazeDataFrame
 from pymovements.gaze import Screen
+from pymovements.stimulus import text
 
 
 __all__ = [
@@ -59,8 +61,11 @@ __all__ = [
 
     'exceptions',
     'plotting',
+    'stimulus',
     'synthetic',
     'utils',
+
+    'text',
 ]
 
 __version__ = _version.get_versions()['version']
