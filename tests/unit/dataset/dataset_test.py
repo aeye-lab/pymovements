@@ -84,7 +84,7 @@ def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
     fileinfo = fileinfo.sort(by='filepath')
 
     gaze_dfs = []
-    for fileinfo_row in fileinfo.to_dicts():
+    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
         if eyes == 'both':
             gaze_df = pl.from_dict(
                 {
@@ -206,7 +206,7 @@ def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
     ]
 
     preprocessed_gaze_dfs = []
-    for fileinfo_row in fileinfo.to_dicts():
+    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
         position_columns = [pixel_column.replace('pix', 'pos') for pixel_column in pixel_columns]
         velocity_columns = [pixel_column.replace('pix', 'vel') for pixel_column in pixel_columns]
         acceleration_columns = [
@@ -242,7 +242,7 @@ def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
     )
 
     event_dfs = []
-    for fileinfo_row in fileinfo.to_dicts():
+    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
         event_df = pl.from_dict(
             {
                 'subject_id': fileinfo_row['subject_id'],
