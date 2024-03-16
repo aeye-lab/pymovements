@@ -296,7 +296,17 @@ class Dataset:
 
         return self
 
-    def clip(self, verbose: bool = True) -> Dataset:
+    def clip(
+            self,
+            *,
+            input_column: str,
+            output_column: str,
+            n_components: int,
+            lower_bound: int | float | None = None,
+            upper_bound: int | float | None = None,
+            verbose: bool = True,
+            **kwargs: Any,
+    ) -> Dataset:
         """Clip gaze signal values.
 
         This method requires a properly initialized :py:attr:`~.Dataset.experiment` attribute.
@@ -305,8 +315,20 @@ class Dataset:
 
         Parameters
         ----------
+        input_column : str
+            Name of the input column.
+        output_column : str
+            Name of the output column.
+        n_components : int
+            Number of components in input colum.
+        lower_bound : int | float | None
+            Lower bound of the clipped column. (default: None)
+        upper_bound : int | float | None
+            Upper bound of the clipped column. (default: None)
         verbose : bool
             If True, show progress of computation. (default: True)
+        **kwargs: Any
+            Additional keyword arguments to be passed to the :func:`~transforms.clip()` method.
 
         Returns
         -------
@@ -319,7 +341,16 @@ class Dataset:
             If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
             if experiment is None.
         """
-        return self.apply('clip', verbose=verbose)
+        return self.apply(
+            'clip',
+            input_column=input_column,
+            output_column=output_column,
+            n_components=n_components,
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            verbose=verbose,
+            **kwargs,
+        )
 
     def pix2deg(self, verbose: bool = True) -> Dataset:
         """Compute gaze positions in degrees of visual angle from pixel coordinates.

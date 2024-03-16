@@ -785,6 +785,7 @@ def smooth(
 
 @register_transform
 def clip(
+        *,
         input_column: str,
         output_column: str,
         n_components: int,

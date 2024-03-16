@@ -576,6 +576,20 @@ def test_pos2vel(dataset_configuration):
         assert result_gaze_df.schema == expected_schema
 
 
+def test_clip(dataset_configuration):
+    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+
+    original_schema = dataset.gaze[0].schema
+
+    dataset.clip(input_column='pixel', output_column='pixel_clipped', n_components=4)
+
+    expected_schema = {**original_schema, 'pixel_clipped': pl.List(pl.Float64)}
+    for result_gaze_df in dataset.gaze:
+        assert result_gaze_df.schema == expected_schema
+
+
 @pytest.mark.parametrize(
     'detect_event_kwargs',
     [
