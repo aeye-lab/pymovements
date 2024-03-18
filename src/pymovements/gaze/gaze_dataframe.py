@@ -1100,9 +1100,8 @@ class GazeDataFrame:
 
         return kwargs
 
-    def _convert_time_units(self, time_unit: str):
-        """Converts the time column to milliseconds based on the specified time unit."""
-
+    def _convert_time_units(self, time_unit: str | None) -> None:
+        """Convert the time column to milliseconds based on the specified time unit."""
         if time_unit == 's':
             self.frame = self.frame.with_columns(pl.col('time').mul(1000))
 
