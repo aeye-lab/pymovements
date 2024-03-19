@@ -912,12 +912,6 @@ def test_gaze_detect(method, kwargs, gaze, expected):
     assert_frame_equal(gaze.events.frame, expected.frame, check_row_order=False)
 
 
-@pytest.mark.filterwarnings(
-    'ignore:'
-    'No timestamp column specified and no experiment with sampling rate given. '
-    'Some functionality may not be available.'
-    ':UserWarning',
-)
 def test_gaze_detect_custom_method_no_arguments():
     def custom_method():
         return pm.EventDataFrame()

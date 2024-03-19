@@ -245,11 +245,6 @@ class GazeDataFrame:
 
                 time_column = 'time'
                 time_unit = 'step'
-            else:
-                warnings.warn(
-                    'No timestamp column specified and no experiment with sampling rate given. '
-                    'Some functionality may not be available.',
-                )
 
         if time_column is not None:
             self.frame = self.frame.rename({time_column: 'time'})

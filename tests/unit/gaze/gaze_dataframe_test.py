@@ -25,12 +25,6 @@ from polars.testing import assert_frame_equal
 import pymovements as pm
 
 
-@pytest.mark.filterwarnings(
-    'ignore:'
-    'No timestamp column specified and no experiment with sampling rate given. '
-    'Some functionality may not be available.'
-    ':UserWarning',
-)
 @pytest.mark.parametrize(
     'init_arg',
     [
@@ -49,12 +43,6 @@ def test_gaze_dataframe_init(init_arg):
     assert isinstance(gaze_df.frame, pl.DataFrame)
 
 
-@pytest.mark.filterwarnings(
-    'ignore:'
-    'No timestamp column specified and no experiment with sampling rate given. '
-    'Some functionality may not be available.'
-    ':UserWarning',
-)
 @pytest.mark.parametrize(
     ('init_df', 'velocity_columns'),
     [
@@ -96,12 +84,6 @@ def test_gaze_dataframe_velocity_columns(init_df, velocity_columns):
     assert 'velocity' in gaze_df.columns
 
 
-@pytest.mark.filterwarnings(
-    'ignore:'
-    'No timestamp column specified and no experiment with sampling rate given. '
-    'Some functionality may not be available.'
-    ':UserWarning',
-)
 @pytest.mark.parametrize(
     ('init_df', 'pixel_columns'),
     [
@@ -143,12 +125,6 @@ def test_gaze_dataframe_pixel_position_columns(init_df, pixel_columns):
     assert 'pixel' in gaze_df.columns
 
 
-@pytest.mark.filterwarnings(
-    'ignore:'
-    'No timestamp column specified and no experiment with sampling rate given. '
-    'Some functionality may not be available.'
-    ':UserWarning',
-)
 @pytest.mark.parametrize(
     ('init_df', 'position_columns'),
     [
@@ -214,12 +190,6 @@ def test_gaze_dataframe_copy_with_experiment():
     assert gaze.experiment.sampling_rate == gaze_copy.experiment.sampling_rate
 
 
-@pytest.mark.filterwarnings(
-    'ignore:'
-    'No timestamp column specified and no experiment with sampling rate given. '
-    'Some functionality may not be available.'
-    ':UserWarning',
-)
 def test_gaze_dataframe_copy_no_experiment():
     gaze = pm.GazeDataFrame(
         pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),

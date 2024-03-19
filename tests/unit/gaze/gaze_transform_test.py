@@ -839,12 +839,6 @@ def test_gaze_transfrom_expected_frame_warning(
         assert_frame_equal(gaze.frame, expected_result.frame)
 
 
-@pytest.mark.filterwarnings(
-    'ignore:'
-    'No timestamp column specified and no experiment with sampling rate given. '
-    'Some functionality may not be available.'
-    ':UserWarning',
-)
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'exception_msg'),
     [
@@ -902,12 +896,6 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
     assert 'position' in gaze.columns
 
 
-@pytest.mark.filterwarnings(
-    'ignore:'
-    'No timestamp column specified and no experiment with sampling rate given. '
-    'Some functionality may not be available.'
-    ':UserWarning',
-)
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'expected_msg'),
     [
@@ -1009,12 +997,6 @@ def test_gaze_dataframe_pix2deg_warnings(init_kwargs, warning, expected_msg):
     assert msg == expected_msg
 
 
-@pytest.mark.filterwarnings(
-    'ignore:'
-    'No timestamp column specified and no experiment with sampling rate given. '
-    'Some functionality may not be available.'
-    ':UserWarning',
-)
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'expected_msg'),
     [
@@ -1121,12 +1103,6 @@ def test_gaze_dataframe_pos2acc_creates_acceleration_column(data, experiment, po
     assert 'acceleration' in gaze.columns
 
 
-@pytest.mark.filterwarnings(
-    'ignore:'
-    'No timestamp column specified and no experiment with sampling rate given. '
-    'Some functionality may not be available.'
-    ':UserWarning',
-)
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'expected_msg'),
     [
@@ -1228,12 +1204,6 @@ def test_gaze_dataframe_pos2vel_creates_velocity_column(data, experiment, positi
     assert 'velocity' in gaze.columns
 
 
-@pytest.mark.filterwarnings(
-    'ignore:'
-    'No timestamp column specified and no experiment with sampling rate given. '
-    'Some functionality may not be available.'
-    ':UserWarning',
-)
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'expected_msg'),
     [

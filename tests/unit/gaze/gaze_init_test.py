@@ -26,12 +26,6 @@ from polars.testing import assert_frame_equal
 import pymovements as pm
 
 
-@pytest.mark.filterwarnings(
-    'ignore:'
-    'No timestamp column specified and no experiment with sampling rate given. '
-    'Some functionality may not be available.'
-    ':UserWarning',
-)
 @pytest.mark.parametrize(
     ('init_kwargs', 'expected_frame', 'expected_n_components'),
     [
@@ -910,12 +904,6 @@ def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, exp
     assert gaze.n_components == expected_n_components
 
 
-@pytest.mark.filterwarnings(
-    'ignore:'
-    'No timestamp column specified and no experiment with sampling rate given. '
-    'Some functionality may not be available.'
-    ':UserWarning',
-)
 @pytest.mark.parametrize(
     ('init_kwargs', 'expected_trial_columns'),
     [
@@ -962,12 +950,6 @@ def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_tr
     assert gaze.trial_columns == expected_trial_columns
 
 
-@pytest.mark.filterwarnings(
-    'ignore:'
-    'No timestamp column specified and no experiment with sampling rate given. '
-    'Some functionality may not be available.'
-    ':UserWarning',
-)
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'exception_msg'),
     [
@@ -1476,29 +1458,6 @@ def test_gaze_dataframe_init_exceptions(init_kwargs, exception, exception_msg):
     assert msg == exception_msg
 
 
-@pytest.mark.parametrize(
-    ('init_kwargs', 'warning', 'warning_msg'),
-    [
-        pytest.param(
-            {
-                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
-                'pixel_columns': ['x', 'y'],
-            },
-            UserWarning,
-            'No timestamp column specified and no experiment with sampling rate given. '
-            'Some functionality may not be available.',
-            id='no_time_column_no_experiment',
-        ),
-    ],
-)
-def test_gaze_dataframe_init_warnings(init_kwargs, warning, warning_msg):
-    with pytest.warns(warning) as record:
-        pm.GazeDataFrame(**init_kwargs)
-
-    assert len(record) == 1
-    assert record[0].message.args[0] == warning_msg
-
-
 def test_gaze_copy_init_has_same_n_components():
     """Tests if gaze initialization with frame with nested columns has correct n_components.
 
@@ -1513,12 +1472,6 @@ def test_gaze_copy_init_has_same_n_components():
     assert gaze.n_components == gaze_copy.n_components
 
 
-@pytest.mark.filterwarnings(
-    'ignore:'
-    'No timestamp column specified and no experiment with sampling rate given. '
-    'Some functionality may not be available.'
-    ':UserWarning',
-)
 @pytest.mark.parametrize(
     ('events', 'init_kwargs'),
     [

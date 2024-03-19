@@ -191,12 +191,6 @@ def test_heatmap_invalid_position_columns(args):
         heatmap(gaze=args[0], position_column=position_column, show=False)
 
 
-@pytest.mark.filterwarnings(
-    'ignore:'
-    'No timestamp column specified and no experiment with sampling rate given. '
-    'Some functionality may not be available.'
-    ':UserWarning',
-)
 def test_heatmap_no_experiment_property():
     df = pl.DataFrame(
         {
