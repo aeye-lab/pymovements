@@ -1443,7 +1443,7 @@ def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_tr
                 'time_unit': 'step',
             },
             ValueError,
-            "experiment must be specified if time_unit is 'step'",
+            "experiment with sampling rate must be specified if time_unit is 'step'",
             id='time_unit_step_no_experiment',
         ),
 
