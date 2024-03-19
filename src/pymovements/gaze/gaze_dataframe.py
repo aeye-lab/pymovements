@@ -1111,7 +1111,8 @@ class GazeDataFrame:
                     pl.col('time').mul(1000).truediv(self.experiment.sampling_rate),
                 )
             else:
-                raise ValueError("experiment with sampling rate must be specified if time_unit is 'step'")
+                raise ValueError(
+                    "experiment with sampling rate must be specified if time_unit is 'step'")
 
         elif time_unit != 'ms':
             raise ValueError(
