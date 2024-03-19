@@ -1112,7 +1112,8 @@ class GazeDataFrame:
                 )
             else:
                 raise ValueError(
-                    "experiment with sampling rate must be specified if time_unit is 'step'")
+                    "experiment with sampling rate must be specified if time_unit is 'step'",
+                )
 
         elif time_unit != 'ms':
             raise ValueError(
