@@ -1106,7 +1106,7 @@ class GazeDataFrame:
             self.frame = self.frame.with_columns(pl.col('time').mul(1000))
 
         elif time_unit == 'step':
-            if self.experiment is not None and self.experiment.sampling_rate is not None:
+            if self.experiment is None or self.experiment.sampling_rate is None:
                 self.frame = self.frame.with_columns(
                     pl.col('time').mul(1000).truediv(self.experiment.sampling_rate),
                 )
