@@ -212,25 +212,13 @@ def load_gaze_files(
                 extension=extension,
             )
 
-        if preprocessed and extension == 'feather':
-            # Preprocessed data already has tuple columns.
-            gaze_df = load_gaze_file(
-                filepath=filepath,
-                fileinfo_row=fileinfo_row,
-                definition=definition,
-                preprocessed=preprocessed,
-                custom_read_kwargs=definition.custom_read_kwargs,
-            )
-
-        else:
-            # Create GazeDataFrame
-            gaze_df = load_gaze_file(
-                filepath=filepath,
-                fileinfo_row=fileinfo_row,
-                definition=definition,
-                preprocessed=preprocessed,
-                custom_read_kwargs=definition.custom_read_kwargs,
-            )
+        gaze_df = load_gaze_file(
+            filepath=filepath,
+            fileinfo_row=fileinfo_row,
+            definition=definition,
+            preprocessed=preprocessed,
+            custom_read_kwargs=definition.custom_read_kwargs,
+        )
         gaze_dfs.append(gaze_df)
     return gaze_dfs
 
@@ -286,18 +274,20 @@ def load_gaze_file(
                 column_dtypes=definition.filename_format_dtypes,
             )
 
-            pixel_columns: list[str] = list(
-                set(GazeDataFrame.valid_pixel_position_columns) & set(gaze_df.frame.columns),
-            )
-            position_columns: list[str] = list(
-                set(GazeDataFrame.valid_position_columns) & set(gaze_df.frame.columns),
-            )
-            velocity_columns: list[str] = list(
-                set(GazeDataFrame.valid_velocity_columns) & set(gaze_df.frame.columns),
-            )
-            acceleration_columns: list[str] = list(
-                set(GazeDataFrame.valid_acceleration_columns) & set(gaze_df.frame.columns),
-            )
+            # suffixes as ordered after using GazeDataFrame.unnest()
+            component_suffixes = ['x', 'y', 'xl', 'yl', 'xr', 'yr', 'xa', 'ya']
+
+            pixel_columns = ['pixel_' + suffix for suffix in component_suffixes]
+            pixel_columns = [c for c in pixel_columns if c in gaze_df.frame.columns]
+
+            position_columns = ['position_' + suffix for suffix in component_suffixes]
+            position_columns = [c for c in position_columns if c in gaze_df.frame.columns]
+
+            velocity_columns = ['velocity_' + suffix for suffix in component_suffixes]
+            velocity_columns = [c for c in velocity_columns if c in gaze_df.frame.columns]
+
+            acceleration_columns = ['acceleration_' + suffix for suffix in component_suffixes]
+            acceleration_columns = [c for c in acceleration_columns if c in gaze_df.frame.columns]
 
             column_specifiers: list[list[str]] = []
             if len(pixel_columns) > 0:
@@ -335,12 +325,14 @@ def load_gaze_file(
         gaze_df = from_ipc(
             filepath,
             experiment=definition.experiment,
-            column_map=definition.column_map,
             add_columns=add_columns,
             column_dtypes=definition.filename_format_dtypes,
         )
     elif filepath.suffix == '.asc':
-        gaze_df = from_asc(filepath, **custom_read_kwargs)
+        gaze_df = from_asc(filepath,
+            add_columns=add_columns,
+            column_dtypes=definition.filename_format_dtypes,
+            **custom_read_kwargs)
     else:
         valid_extensions = ['csv', 'tsv', 'txt', 'feather', 'asc']
         raise ValueError(

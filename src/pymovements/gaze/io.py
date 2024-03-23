@@ -247,13 +247,15 @@ def from_asc(
         patterns: str | list | None = 'eyelink',
         schema: dict[str, Any] | None = None,
         experiment: Experiment | None = None,
+        add_columns: dict[str, str] | None = None,
+        column_dtypes: dict[str, Any] | None = None,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
 
     Parameters
     ----------
     file: str | Path
-        Path of IPC/feather file.
+        Path of IPC/feather file.    
     patterns: str | list | None
         list of patterns to match for additional columns or a key identifier of eye tracker specific
         default patterns. Supported values are: eyelink. (default: 'eyelink')
@@ -261,6 +263,12 @@ def from_asc(
         Dictionary to optionally specify types of columns parsed by patterns. (default: None)
     experiment: Experiment | None
         The experiment definition. (default: None)
+    add_columns: dict[str, str] | None
+        Dictionary containing columns to add to loaded data frame.
+        (default: None)
+    column_dtypes:  dict[str, Any] | None
+        Dictionary containing types for columns.
+        (default: None)
 
     Returns
     -------
@@ -302,6 +310,19 @@ def from_asc(
 
     # Read data.
     gaze_data, _ = parse_eyelink(file, patterns=patterns, schema=schema)
+
+    if add_columns is not None:
+        gaze_data = gaze_data.with_columns([
+            pl.lit(value).alias(column)
+            for column, value in add_columns.items()
+            if column not in gaze_data.columns
+        ])
+
+    if column_dtypes is not None:
+        gaze_data = gaze_data.with_columns([
+            pl.col(fileinfo_key).cast(fileinfo_dtype)
+            for fileinfo_key, fileinfo_dtype in column_dtypes.items()
+        ])
 
     # Create gaze data frame.
     gaze_df = GazeDataFrame(
