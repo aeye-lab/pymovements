@@ -329,10 +329,12 @@ def load_gaze_file(
             column_dtypes=definition.filename_format_dtypes,
         )
     elif filepath.suffix == '.asc':
-        gaze_df = from_asc(filepath,
+        gaze_df = from_asc(
+            filepath,
             add_columns=add_columns,
             column_dtypes=definition.filename_format_dtypes,
-            **custom_read_kwargs)
+            **custom_read_kwargs,
+        )
     else:
         valid_extensions = ['csv', 'tsv', 'txt', 'feather', 'asc']
         raise ValueError(

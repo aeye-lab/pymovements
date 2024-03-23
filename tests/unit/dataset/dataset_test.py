@@ -334,9 +334,10 @@ def test_load_correct_raw_gaze_dfs(dataset_configuration):
 
     expected_gaze_dfs = dataset_configuration['raw_gaze_dfs']
     for result_gaze_df, expected_gaze_df in zip(dataset.gaze, expected_gaze_dfs):
-        assert_frame_equal(result_gaze_df.frame,
-                        expected_gaze_df.frame,
-                        check_column_order=False,
+        assert_frame_equal(
+            result_gaze_df.frame,
+            expected_gaze_df.frame,
+            check_column_order=False,
         )
 
 
@@ -354,9 +355,10 @@ def test_load_correct_preprocessed_gaze_dfs(dataset_configuration):
 
     expected_gaze_dfs = dataset_configuration['preprocessed_gaze_dfs']
     for result_gaze_df, expected_gaze_df in zip(dataset.gaze, expected_gaze_dfs):
-        assert_frame_equal(result_gaze_df.frame,
-                        expected_gaze_df.frame,
-                        check_column_order=False,
+        assert_frame_equal(
+            result_gaze_df.frame,
+            expected_gaze_df.frame,
+            check_column_order=False,
         )
 
 
