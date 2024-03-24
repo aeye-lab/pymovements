@@ -255,7 +255,7 @@ def from_asc(
     Parameters
     ----------
     file: str | Path
-        Path of IPC/feather file.    
+        Path of IPC/feather file.
     patterns: str | list | None
         list of patterns to match for additional columns or a key identifier of eye tracker specific
         default patterns. Supported values are: eyelink. (default: 'eyelink')
