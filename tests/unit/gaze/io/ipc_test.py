@@ -43,7 +43,7 @@ import pymovements as pm
         pytest.param(
             {
                 'file': 'tests/files/monocular_example.feather',
-                'column_map': {'pixel':'pixel_coordinates'},
+                'column_map': {'pixel': 'pixel_coordinates'},
             },
             (10, 2),
             id='feather_bino_shape',
