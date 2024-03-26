@@ -18,13 +18,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Tests pymovements asc to csv processing."""
+import datetime
+from pathlib import Path
+
 import numpy as np
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
 import pymovements as pm
-
 
 ASC_TEXT = r"""
 ** DATE: Wed Mar  8 09:25:20 2023
@@ -50,31 +52,52 @@ PUPIL	AREA
 EVENTS	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2
 SAMPLES	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2	INPUT
 the next line has all additional trial columns set to None
+START	10000000 	RIGHT	SAMPLES	EVENTS
 10000000	  850.7	  717.5	  714.0	    0.0	...
+END	10000001 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000001 START_A
+START	10000002 	RIGHT	SAMPLES	EVENTS
 the next line now should have the task column set to A
 10000002	  850.7	  717.5	  714.0	    0.0	...
+END	10000002 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000003 STOP_A
 the task should be set to None again
+START	10000004 	RIGHT	SAMPLES	EVENTS
 10000004	  850.7	  717.5	  714.0	    0.0	...
+END	10000005 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000005 START_B
 the next line now should have the task column set to B
+START	10000006 	RIGHT	SAMPLES	EVENTS
 10000006	  850.7	  717.5	  714.0	    0.0	...
+END	10000007 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000007 START_TRIAL_1
 the next line now should have the trial column set to 1
+START	10000008 	RIGHT	SAMPLES	EVENTS
 10000008	  850.7	  717.5	  714.0	    0.0	...
+END	10000009 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000009 STOP_TRIAL_1
 MSG 10000010 START_TRIAL_2
 the next line now should have the trial column set to 2
+START	10000011 	RIGHT	SAMPLES	EVENTS
 10000011	  850.7	  717.5	  714.0	    0.0	...
+END	10000012 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000012 STOP_TRIAL_2
 MSG 10000013 START_TRIAL_3
 the next line now should have the trial column set to 3
+START	10000014 	RIGHT	SAMPLES	EVENTS
 10000014	  850.7	  717.5	  714.0	    0.0	...
+END	10000015 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000015 STOP_TRIAL_3
 MSG 10000016 STOP_B
 task and trial should be set to None again
+START	10000017 	RIGHT	SAMPLES	EVENTS
 10000017	  850.7	  717.5	  .	    0.0	...
+SBLINK R 10000018
+10000019	   .	   .	    0.0	    0.0	...
+10000020	   .	   .	    0.0	    0.0	...
+EBLINK R 10000018	10000020	2
+10000021	   .	   .	    0.0	    0.0	...
+END	10000022 	SAMPLES	EVENTS	RES	  38.54	  31.12
 """
 
 PATTERNS = [
@@ -104,29 +127,45 @@ PATTERNS = [
 
 EXPECTED_DF = pl.from_dict(
     {
-        'time': [10000000, 10000002, 10000004, 10000006, 10000008, 10000011, 10000014, 10000017],
-        'x_pix': [850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7],
-        'y_pix': [717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5],
-        'pupil': [714.0, 714.0, 714.0, 714.0, 714.0, 714.0, 714.0, np.nan],
-        'task': [None, 'A', None, 'B', 'B', 'B', 'B', None],
-        'trial_id': [None, None, None, None, '1', '2', '3', None],
+        'time': [
+            10000000, 10000002, 10000004, 10000006, 10000008, 10000011, 10000014,
+            10000017, 10000019, 10000020, 10000021,
+        ],
+        'x_pix': [850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, np.nan, np.nan, np.nan],
+        'y_pix': [717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, np.nan, np.nan, np.nan],
+        'pupil': [714.0, 714.0, 714.0, 714.0, 714.0, 714.0, 714.0, np.nan, 0.0, 0.0, 0.0],
+        'task': [None, 'A', None, 'B', 'B', 'B', 'B', None, None, None, None],
+        'trial_id': [None, None, None, None, '1', '2', '3', None, None, None, None],
     },
 )
 
 EXPECTED_METADATA = {
     'weekday': 'Wed',
     'month': 'Mar',
-    'day': '8',
+    'day': 8,
     'time': '09:25:20',
-    'year': '2023',
+    'year': 2023,
     'version_1': 'EYELINK II 1',
     'version_2': 'EYELINK II CL v6.12 Feb  1 2018 (EyeLink Portable Duo)',
     'model': 'EyeLink Portable Duo',
     'version_number': '6.12',
-    'sampling_rate': '1000.00',
+    'sampling_rate': 1000.00,
     'filter': '2',
     'tracking': 'CR',
     'tracked_eye': 'LEFT',
+    'calibrations': [],
+    'validations': [],
+    'resolution': (1280, 1024),
+    'data_loss_ratio_blinks': 0.18181818181818182,
+    'data_loss_ratio': 0.2727272727272727,
+    'total_recording_duration_ms': 11,
+    'datetime': datetime.datetime(2023, 3, 8, 9, 25, 20),
+    'blinks': [{
+        'duration_ms': '2',
+        'num_samples': 2,
+        'start_timestamp': '10000018',
+        'stop_timestamp': '10000020',
+    }],
 }
 
 
@@ -181,7 +220,7 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
         pytest.param(
             '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
-            '** EYELINK II CL v5.12 Feb  1 2018',
+            '** EYELINK II CL v5.12 Feb  1 2018\n',
             '5.12',
             'EyeLink 1000 Plus',
             id='eye_link_1000_plus',
@@ -254,30 +293,7 @@ def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_mo
 
 
 @pytest.mark.parametrize(
-    ('metadata', 'expected_time'),
-    [
-        pytest.param(
-            '** DATE: Wed Mar  8 09:25:20 2023\n'
-            '** VERSION: EYELINK II 1\n'
-            '** EYELINK II CL v6.12 Feb  1 2018 (EyeLink Portable Duo)',
-            '09:25:20',
-            id='092520',
-        ),
-    ],
-)
-def test_parse_eyelink_time(tmp_path, metadata, expected_time):
-    filepath = tmp_path / 'sub.asc'
-    filepath.write_text(metadata)
-
-    _, metadata = pm.utils.parsing.parse_eyelink(
-        filepath,
-    )
-
-    assert metadata['time'] == expected_time
-
-
-@pytest.mark.parametrize(
-    'metadata, expected_msg',
+    ('metadata', 'expected_msg'),
     [
         pytest.param(
             '',
@@ -298,3 +314,84 @@ def test_no_metadata_warning(tmp_path, metadata, expected_msg):
     msg = info.value.args[0]
 
     assert msg == expected_msg
+
+
+@pytest.mark.parametrize(
+    ('metadata', 'expected_validation', 'expected_calibration'),
+    [
+        pytest.param(
+            'MSG	2095865 DISPLAY_COORDS 0 0 1279 1023\n'
+            'MSG	7045618 !CAL \n'
+            '>>>>>>> CALIBRATION (HV9,P-CR) FOR LEFT: <<<<<<<<<\n'
+            'MSG	7045618 !CAL Calibration points:  \n'
+            'MSG	1076158 !CAL VALIDATION HV9 R RIGHT POOR ERROR 2.40 avg. 6.03 max  '
+            'OFFSET 0.19 deg. 4.2,6.3 pix.\n',
+            [{
+                'error': 'POOR ERROR',
+                'eye_tracked': 'RIGHT',
+                'num_points': '9',
+                'timestamp': '1076158',
+                'validation_score_avg': '2.40',
+                'validation_score_max': '6.03',
+            }],
+            [{
+                'num_points': '9',
+                'timestamp': '7045618',
+                'tracked_eye': 'LEFT',
+                'type': 'P-CR',
+            }],
+            id='cal_timestamp_with_space',
+        ),
+        pytest.param(
+            '** DATE: Wed Feb  1 04:38:54 2017\n'
+            'MSG	7045618 !CAL\n'
+            '>>>>>>> CALIBRATION (HV9,P-CR) FOR LEFT: <<<<<<<<<\n',
+            [],
+            [{
+                'num_points': '9',
+                'timestamp': '7045618',
+                'tracked_eye': 'LEFT',
+                'type': 'P-CR',
+            }],
+            id='cal_timestamp_no_space_no_val',
+        ),
+        pytest.param(
+            '** DATE: Wed Feb  1 04:38:54 2017\n'
+            'MSG	7045618 !CAL\n'
+            'MSG	7045618 !CAL\n',
+            [],
+            [{'timestamp': '7045618'}],
+            id='cal_timestamp_no_cal_no_val',
+        ),
+    ],
+)
+def test_val_cal_eyelink(tmp_path, metadata, expected_validation, expected_calibration):
+    filepath = tmp_path / 'sub.asc'
+    filepath.write_text(metadata)
+
+    _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
+
+    assert parsed_metadata['calibrations'] == expected_calibration
+    assert parsed_metadata['validations'] == expected_validation
+
+
+def test_parse_val_cal_eyelink_monocular_file():
+    example_asc_monocular_path = Path(__file__).parent.parent.parent / \
+        'files/eyelink_monocular_example.asc'
+
+    _, metadata = pm.utils.parsing.parse_eyelink(example_asc_monocular_path)
+
+    expected_validation = [{
+        'error': 'GOOD ERROR',
+        'eye_tracked': 'LEFT',
+        'num_points': '9',
+        'timestamp': '2148587',
+        'validation_score_avg': '0.27',
+        'validation_score_max': '0.83',
+    }]
+    expected_calibration = [{
+        'num_points': '9', 'type': 'P-CR', 'tracked_eye': 'LEFT', 'timestamp': '2135819',
+    }]
+
+    assert metadata['calibrations'] == expected_calibration
+    assert metadata['validations'] == expected_validation
