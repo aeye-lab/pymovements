@@ -880,16 +880,16 @@ def clip(
 
     Parameters
     ----------
+    lower_bound : int | float | None
+        Lower bound of the clipped column.
+    upper_bound : int | float | None
+        Upper bound of the clipped column.
     input_column : str
         Name of the input column.
     output_column : str
         Name of the output column.
     n_components : int
         Number of components in input column.
-    lower_bound : int | float | None
-        Lower bound of the clipped column.
-    upper_bound : int | float | None
-        Upper bound of the clipped column.
 
     Returns
     -------
