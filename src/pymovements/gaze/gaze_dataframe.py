@@ -675,12 +675,12 @@ class GazeDataFrame:
                 how='diagonal',
             )
 
-    def get_measure(
+    def measure_samples(
             self,
             method: str | Callable[..., pl.Expr],
             **kwargs: Any,
     ) -> pl.DataFrame:
-        """Calculate eye movement measure.
+        """Calculate eye movement measure for gaze data samples.
 
         If :py:class:``GazeDataFrame`` has :py:attr:``trial_columns``, measures will be grouped by
         trials.
@@ -705,7 +705,7 @@ class GazeDataFrame:
         ... )
 
         You can calculate measures, for example the null ratio like this:
-        >>> gaze.get_measure('null_ratio', column='distance')
+        >>> gaze.measure_samples('null_ratio', column='distance')
         shape: (1, 1)
         ┌────────────┐
         │ null_ratio │

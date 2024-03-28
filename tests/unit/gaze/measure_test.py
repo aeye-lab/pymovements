@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test GazeDataFrame get_measure method."""
+"""Test GazeDataFrame measure_samples method."""
 import numpy as np
 import polars as pl
 import pytest
@@ -266,6 +266,6 @@ def my_test_measure(column: str) -> pl.Expr:
         ),
     ],
 )
-def test_get_measure(gaze, method, kwargs, expected):
-    df = gaze.get_measure(method, **kwargs)
+def test_measure_samples(gaze, method, kwargs, expected):
+    df = gaze.measure_samples(method, **kwargs)
     assert_frame_equal(df, expected)
