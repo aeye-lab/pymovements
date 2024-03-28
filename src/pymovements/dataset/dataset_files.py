@@ -260,7 +260,7 @@ def load_gaze_file(
     """
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
-        
+
     add_columns = {
         key: fileinfo_row[key] for key in
         [key for key in fileinfo_row.keys() if key != 'filepath']
