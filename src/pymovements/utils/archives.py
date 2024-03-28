@@ -25,6 +25,7 @@ import gzip
 import lzma
 import os
 import shutil
+import sys
 import tarfile
 import zipfile
 from collections.abc import Callable
@@ -150,7 +151,10 @@ def _extract_tar(
         Compression filename suffix.
     """
     with tarfile.open(source_path, f'r:{compression[1:]}' if compression else 'r') as archive:
-        archive.extractall(destination_path)
+        if sys.version_info < (3, 12):  # pragma: <3.12 cover
+            archive.extractall(destination_path)
+        else:  # pragma: >=3.12 cover
+            archive.extractall(destination_path, filter='tar')
 
 
 def _extract_zip(

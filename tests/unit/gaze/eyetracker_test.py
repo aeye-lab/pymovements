@@ -17,40 +17,29 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test read from IPC/feather."""
+"""Test for EyeTracker class."""
 import pytest
 
-import pymovements as pm
+from pymovements.gaze.eyetracker import EyeTracker
 
 
-@pytest.mark.parametrize(
-    ('kwargs', 'shape'),
-    [
-        pytest.param(
-            {
-                'file': 'tests/files/monocular_example.feather',
-            },
-            (10, 2),
-            id='feather_mono_shape',
-        ),
-        pytest.param(
-            {
-                'file': 'tests/files/binocular_example.feather',
-            },
-            (10, 3),
-            id='feather_bino_shape',
-        ),
-        pytest.param(
-            {
-                'file': 'tests/files/monocular_example.feather',
-                'column_map': {'pixel': 'pixel_coordinates'},
-            },
-            (10, 2),
-            id='feather_bino_shape',
-        ),
-    ],
-)
-def test_shapes(kwargs, shape):
-    gaze_dataframe = pm.gaze.from_ipc(**kwargs)
+def test_eyetracker_with_positive_sampling_rate():
+    EyeTracker(
+        1000.0, False, True, 'EyeLink 1000 Plus',
+        '1.5.3', 'Arm Mount / Monocular / Remote',
+    )
 
-    assert gaze_dataframe.frame.shape == shape
+
+def test_eyetracker_with_negative_sampling_rate():
+    with pytest.raises(ValueError):
+        EyeTracker(
+            -500.0, False, True, 'EyeLink 1000 Plus',
+            '1.5.3', 'Arm Mount / Monocular / Remote',
+        )
+
+
+def test_eyetracker_without_sampling_rate():
+    EyeTracker(
+        None, False, True, 'EyeLink 1000 Plus',
+        '1.5.3', 'Arm Mount / Monocular / Remote',
+    )

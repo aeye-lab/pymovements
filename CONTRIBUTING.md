@@ -93,7 +93,7 @@ cd pymovements
 pip install -e .
 ```
 
-If you have a problem e.g. `command not found: pip`, check whether you have activated a virtual enviroment.
+If you have a problem e.g. `command not found: pip`, check whether you have activated a virtual environment.
 
 
 ### Creating a Branch
@@ -204,7 +204,7 @@ functionality. We try to keep our code coverage close to 100%.
 It is possible to limit the scope of testing to specific environments and files. For example, to
 only test event related functionality using the Python 3.9 environment use:
 ```bash
-tox -e py39 tests/events
+tox -e py39 -- tests/unit/events
 ```
 
 

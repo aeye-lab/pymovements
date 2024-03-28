@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 The pymovements Project Authors
+# Copyright (c) 2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,40 +17,22 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test read from IPC/feather."""
+"""Test for Experiment class."""
 import pytest
 
-import pymovements as pm
+from pymovements.gaze.experiment import Experiment
+from pymovements.gaze.eyetracker import EyeTracker
 
 
-@pytest.mark.parametrize(
-    ('kwargs', 'shape'),
-    [
-        pytest.param(
-            {
-                'file': 'tests/files/monocular_example.feather',
-            },
-            (10, 2),
-            id='feather_mono_shape',
-        ),
-        pytest.param(
-            {
-                'file': 'tests/files/binocular_example.feather',
-            },
-            (10, 3),
-            id='feather_bino_shape',
-        ),
-        pytest.param(
-            {
-                'file': 'tests/files/monocular_example.feather',
-                'column_map': {'pixel': 'pixel_coordinates'},
-            },
-            (10, 2),
-            id='feather_bino_shape',
-        ),
-    ],
-)
-def test_shapes(kwargs, shape):
-    gaze_dataframe = pm.gaze.from_ipc(**kwargs)
+def test_sampling_rate_setter():
+    experiment = Experiment(1280, 1024, 38, 30, sampling_rate=1000.0)
+    assert experiment.sampling_rate == 1000.0
 
-    assert gaze_dataframe.frame.shape == shape
+    experiment.sampling_rate = 100.0
+    assert experiment.sampling_rate == 100.0
+
+
+def test_sampling_rate_invalid():
+    with pytest.raises(TypeError):
+        eyetracker = EyeTracker()
+        Experiment(1280, 1024, 38, 30, eyetracker=eyetracker)

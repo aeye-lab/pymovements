@@ -84,7 +84,7 @@ class SBSAT(DatasetDefinition):
     >>>
     >>> dataset = pm.Dataset("SBSAT", path='data/SBSAT')
 
-    Download the dataset resources resources:
+    Download the dataset resources:
 
     >>> dataset.download()# doctest: +SKIP
 

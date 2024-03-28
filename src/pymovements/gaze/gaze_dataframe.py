@@ -182,42 +182,6 @@ class GazeDataFrame:
 
     """
 
-    valid_pixel_position_columns = [
-        'x_pix', 'y_pix',
-        'x_left_pix', 'y_left_pix',
-        'x_right_pix', 'y_right_pix',
-        '__x_pix__', '__y_pix__',
-        '__x_left_pix__', '__y_left_pix__',
-        '__x_right_pix__', '__y_right_pix__',
-    ]
-
-    valid_position_columns = [
-        'x_pos', 'y_pos',
-        'x_left_pos', 'y_left_pos',
-        'x_right_pos', 'y_right_pos',
-        '__x_pos__', '__y_pos__',
-        '__x_left_pos__', '__y_left_pos__',
-        '__x_right_pos__', '__y_right_pos__',
-    ]
-
-    valid_velocity_columns = [
-        'x_vel', 'y_vel',
-        'x_left_vel', 'y_left_vel',
-        'x_right_vel', 'y_right_vel',
-        '__x_vel__', '__y_vel__',
-        '__x_left_vel__', '__y_left_vel__',
-        '__x_right_vel__', '__y_right_vel__',
-    ]
-
-    valid_acceleration_columns = [
-        'x_acc', 'y_acc',
-        'x_left_acc', 'y_left_acc',
-        'x_right_acc', 'y_right_acc',
-        '__x_acc__', '__y_acc__',
-        '__x_left_acc__', '__y_left_acc__',
-        '__x_right_acc__', '__y_right_acc__',
-    ]
-
     def __init__(
             self,
             data: pl.DataFrame | None = None,
@@ -419,6 +383,7 @@ class GazeDataFrame:
                         f'{transform_method.__name__}(position_column="your_position_column"). '
                         f'Available dataframe columns are: {self.frame.columns}',
                     )
+
             if transform_method.__name__ in {'pix2deg'}:
                 if 'pixel' not in self.frame.columns and 'pixel_column' not in kwargs:
                     raise pl.exceptions.ColumnNotFoundError(
@@ -426,6 +391,20 @@ class GazeDataFrame:
                         'nor is a pixel column explicitly specified. '
                         'You can specify the pixel column via: '
                         f'{transform_method.__name__}(pixel_column="name_of_your_pixel_column"). '
+                        f'Available dataframe columns are: {self.frame.columns}',
+                    )
+
+            if transform_method.__name__ in {'deg2pix'}:
+                if (
+                    'position_column' in kwargs and
+                    kwargs.get('position_column') not in self.frame.columns
+                ):
+                    raise pl.exceptions.ColumnNotFoundError(
+                        f"The specified 'position_column' ({kwargs.get('position_column')}) "
+                        'is not found in the dataframe columns. '
+                        'You can specify the position column via: '
+                        f'{transform_method.__name__}'
+                        f'(position_column="name_of_your_position_column"). '
                         f'Available dataframe columns are: {self.frame.columns}',
                     )
 
@@ -454,6 +433,41 @@ class GazeDataFrame:
             if experiment is None.
         """
         self.transform('pix2deg')
+
+    def deg2pix(
+        self,
+        pixel_origin: str = 'lower left',
+        position_column: str = 'position',
+        pixel_column: str = 'pixel',
+    ) -> None:
+        """Compute gaze positions in pixel position coordinates from degrees of visual angle.
+
+        This method requires a properly initialized :py:attr:`~.GazeDataFrame.experiment` attribute.
+
+        After success, the gaze dataframe is extended by the resulting dva position columns.
+
+        Parameters
+        ----------
+        pixel_origin: str
+            The desired location of the pixel origin. (default: 'lower left')
+            Supported values: ``center``, ``lower left``.
+        position_column: str
+            The input position column name. (default: 'position')
+        pixel_column: str
+            The output pixel column name. (default: 'pixel')
+
+        Raises
+        ------
+        AttributeError
+            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
+            if experiment is None.
+        """
+        self.transform(
+            'deg2pix',
+            pixel_origin=pixel_origin,
+            position_column=position_column,
+            pixel_column=pixel_column,
+        )
 
     def pos2acc(
             self,

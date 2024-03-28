@@ -334,7 +334,11 @@ def test_load_correct_raw_gaze_dfs(dataset_configuration):
 
     expected_gaze_dfs = dataset_configuration['raw_gaze_dfs']
     for result_gaze_df, expected_gaze_df in zip(dataset.gaze, expected_gaze_dfs):
-        assert_frame_equal(result_gaze_df.frame, expected_gaze_df.frame)
+        assert_frame_equal(
+            result_gaze_df.frame,
+            expected_gaze_df.frame,
+            check_column_order=False,
+        )
 
 
 def test_load_gaze_has_position_columns(dataset_configuration):
@@ -351,7 +355,11 @@ def test_load_correct_preprocessed_gaze_dfs(dataset_configuration):
 
     expected_gaze_dfs = dataset_configuration['preprocessed_gaze_dfs']
     for result_gaze_df, expected_gaze_df in zip(dataset.gaze, expected_gaze_dfs):
-        assert_frame_equal(result_gaze_df.frame, expected_gaze_df.frame)
+        assert_frame_equal(
+            result_gaze_df.frame,
+            expected_gaze_df.frame,
+            check_column_order=False,
+        )
 
 
 def test_load_correct_event_dfs(dataset_configuration):
@@ -543,8 +551,23 @@ def test_pix2deg(dataset_configuration):
 
     expected_schema = {**original_schema, 'position': pl.List(pl.Float64)}
     for result_gaze_df in dataset.gaze:
-        print(result_gaze_df.schema)
-        print(expected_schema)
+        assert result_gaze_df.schema == expected_schema
+
+
+def test_deg2pix(dataset_configuration):
+    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+
+    original_schema = dataset.gaze[0].schema
+
+    dataset.pix2deg()
+    dataset.deg2pix(pixel_column='new_pixel')
+
+    expected_schema = {
+        **original_schema, 'position': pl.List(pl.Float64),
+        'new_pixel': pl.List(pl.Float64),
+    }
+    for result_gaze_df in dataset.gaze:
         assert result_gaze_df.schema == expected_schema
 
 
@@ -820,7 +843,7 @@ def test_detect_events_attribute_error(dataset_configuration):
             },
             (
                 "Column 'position' not found. Available columns are: "
-                "['subject_id', 'time', 'pixel', 'custom_position', 'velocity']"
+                "['time', 'subject_id', 'pixel', 'custom_position', 'velocity']"
             ),
             id='no_position',
         ),
@@ -832,7 +855,7 @@ def test_detect_events_attribute_error(dataset_configuration):
             },
             (
                 "Column 'velocity' not found. Available columns are: "
-                "['subject_id', 'time', 'pixel', 'position', 'custom_velocity']"
+                "['time', 'subject_id', 'pixel', 'position', 'custom_velocity']"
             ),
             id='no_velocity',
         ),
