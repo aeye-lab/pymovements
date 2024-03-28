@@ -40,6 +40,14 @@ import pymovements as pm
             (10, 3),
             id='feather_bino_shape',
         ),
+        pytest.param(
+            {
+                'file': 'tests/files/monocular_example.feather',
+                'column_map': {'pixel': 'pixel_coordinates'},
+            },
+            (10, 2),
+            id='feather_bino_shape',
+        ),
     ],
 )
 def test_shapes(kwargs, shape):
