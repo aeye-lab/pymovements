@@ -39,8 +39,8 @@ from pymovements.events import EventProcessor
 from pymovements.gaze import Experiment
 from pymovements.gaze import GazeDataFrame
 from pymovements.gaze import Screen
-from pymovements.measure import MeasureLibrary
-from pymovements.measure import register_measure
+from pymovements.measure import register_sample_measure
+from pymovements.measure import SampleMeasureLibrary
 from pymovements.stimulus import text
 
 
@@ -65,8 +65,8 @@ __all__ = [
     'exceptions',
 
     'measure',
-    'MeasureLibrary',
-    'register_measure',
+    'SampleMeasureLibrary',
+    'register_sample_measure',
 
     'plotting',
     'stimulus',

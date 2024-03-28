@@ -26,8 +26,8 @@ from typing import TypeVar
 import polars as pl
 
 
-class MeasureLibrary:
-    """Provides access by name to measure methods.
+class SampleMeasureLibrary:
+    """Provides access by name to sample measure methods.
 
     Attributes
     ----------
@@ -81,21 +81,21 @@ class MeasureLibrary:
         return name in cls.methods
 
 
-MeasureMethod = TypeVar('MeasureMethod', bound=Callable[..., pl.Expr])
+SampleMeasureMethod = TypeVar('SampleMeasureMethod', bound=Callable[..., pl.Expr])
 
 
-def register_measure(method: MeasureMethod) -> MeasureMethod:
-    """Register a measure method.
+def register_sample_measure(method: SampleMeasureMethod) -> SampleMeasureMethod:
+    """Register a sample measure method.
 
     Parameters
     ----------
-    method: MeasureMethod
+    method: SampleMeasureMethod
         The measure method to register.
 
     Returns
     -------
-    MeasureMethod
-        The registered measure method.
+    SampleMeasureMethod
+        The registered sample measure method.
     """
-    MeasureLibrary.add(method)
+    SampleMeasureLibrary.add(method)
     return method

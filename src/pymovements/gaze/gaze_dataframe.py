@@ -760,7 +760,7 @@ class GazeDataFrame:
         └────────────┘
         """
         if isinstance(method, str):
-            method = pm.measure.MeasureLibrary.get(method)
+            method = pm.measure.SampleMeasureLibrary.get(method)
 
         if 'column_dtype' in inspect.getfullargspec(method).args:
             kwargs['column_dtype'] = self.frame[kwargs['column']].dtype

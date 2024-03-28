@@ -22,10 +22,10 @@ from __future__ import annotations
 
 import polars as pl
 
-from pymovements.measure.library import register_measure
+from pymovements.measure.library import register_sample_measure
 
 
-@register_measure
+@register_sample_measure
 def null_ratio(column: str, column_dtype: pl.DataType) -> pl.Expr:
     """Ratio of null values to overall values.
 

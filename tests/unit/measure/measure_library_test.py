@@ -32,6 +32,6 @@ import pymovements as pm
     ],
 )
 def test_measure_registered(method, name):
-    assert name in pm.measure.MeasureLibrary()
-    assert pm.measure.MeasureLibrary.get(name) == method
-    assert pm.measure.MeasureLibrary.get(name).__name__ == name
+    assert name in pm.measure.SampleMeasureLibrary()
+    assert pm.measure.SampleMeasureLibrary.get(name) == method
+    assert pm.measure.SampleMeasureLibrary.get(name).__name__ == name

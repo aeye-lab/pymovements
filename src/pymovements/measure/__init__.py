@@ -18,13 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Provides eye movement measures."""
-from pymovements.measure.library import MeasureLibrary
-from pymovements.measure.library import register_measure
+from pymovements.measure.library import register_sample_measure
+from pymovements.measure.library import SampleMeasureLibrary
 from pymovements.measure.measures import null_ratio
 
 __all__ = [
-    'MeasureLibrary',
-    'register_measure',
+    'SampleMeasureLibrary',
+    'register_sample_measure',
 
     'null_ratio',
 ]
