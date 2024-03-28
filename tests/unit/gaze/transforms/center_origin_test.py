@@ -46,6 +46,15 @@ import pymovements as pm
                 'n_components': 2,
             },
             ValueError,
+            ('origin string lower left was corrected to upper left. please update your definition'),
+            id='lower_left_origin_raises_value_error',
+        ),
+        pytest.param(
+            {
+                'screen_resolution': (100, 100), 'origin': 'foobar', 'pixel_column': 'pixel',
+                'n_components': 2,
+            },
+            ValueError,
             ('origin', 'invalid', 'foobar', 'valid', 'center', 'upper left'),
             id='invalid_origin_raises_value_error',
         ),

@@ -144,6 +144,10 @@ def center_origin(
         origin_offset = (0.0, 0.0)
     elif origin == 'upper left':
         origin_offset = ((screen_resolution[0] - 1) / 2, (screen_resolution[1] - 1) / 2)
+    elif origin == 'lower left':
+        raise ValueError(
+            'origin string lower left was corrected to upper left. please update your definition',
+        )
     else:
         supported_origins = ['center', 'upper left']
         raise ValueError(
