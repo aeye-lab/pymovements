@@ -195,6 +195,9 @@ class GazeDataFrame:
             data = data.clone()
         self.frame = data
 
+        # Set nan values to null.
+        self.frame = self.frame.fill_nan(None)
+
         self.trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
         self.experiment = experiment
 
@@ -715,6 +718,69 @@ class GazeDataFrame:
                 [self.events.frame, *new_events_grouped],
                 how='diagonal',
             )
+
+    def measure_samples(
+            self,
+            method: str | Callable[..., pl.Expr],
+            **kwargs: Any,
+    ) -> pl.DataFrame:
+        """Calculate eye movement measure for gaze data samples.
+
+        If :py:class:``GazeDataFrame`` has :py:attr:``trial_columns``, measures will be grouped by
+        trials.
+
+        Parameters
+        ----------
+        method: str | Callable[..., pl.Expr]
+            Measure to be calculated.
+        **kwargs: Any
+            Keyword arguments to be passed to the respective measure function.
+
+        Returns
+        -------
+        pl.DataFrame
+            Measure results.
+
+        Examples
+        --------
+        Let's initialize an example GazeDataFrame first:
+        >>> gaze = pm.gaze.from_numpy(
+        ...     distance=np.concatenate([np.zeros(40), np.full(10, np.nan), np.ones(50)]),
+        ... )
+
+        You can calculate measures, for example the null ratio like this:
+        >>> gaze.measure_samples('null_ratio', column='distance')
+        shape: (1, 1)
+        ┌────────────┐
+        │ null_ratio │
+        │ ---        │
+        │ f64        │
+        ╞════════════╡
+        │ 0.1        │
+        └────────────┘
+        """
+        if isinstance(method, str):
+            method = pm.measure.SampleMeasureLibrary.get(method)
+
+        if 'column_dtype' in inspect.getfullargspec(method).args:
+            kwargs['column_dtype'] = self.frame[kwargs['column']].dtype
+
+        if self.trial_columns is None:
+            return self.frame.select(method(**kwargs))
+
+        # Group measure values by trial columns.
+        return pl.concat(
+            [
+                df.select(
+                    [  # add trial columns first, then add column for measure.
+                        pl.lit(value).cast(self.frame.schema[name]).alias(name)
+                        for name, value in zip(self.trial_columns, trial_values)
+                    ] + [method(**kwargs)],
+                )
+                for trial_values, df in
+                self.frame.group_by(self.trial_columns, maintain_order=True)
+            ],
+        )
 
     @property
     def schema(self) -> pl.type_aliases.SchemaDict:

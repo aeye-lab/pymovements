@@ -20,7 +20,6 @@
 """Tests pymovements asc to csv processing."""
 # flake8: noqa: E101, W191, E501
 # pylint: disable=duplicate-code
-import numpy as np
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
@@ -155,7 +154,7 @@ MSG	2154570 0 READING_SCREEN_1.STOP
 EXPECTED_DF_NO_PATTERNS = pl.from_dict(
     {
         'time': [2154557, 2154558, 2154560, 2154561, 2154565, 2154567, 2154568],
-        'pixel': [(139.6, 132.1), (139.5, 131.9), (np.nan, np.nan), (850.7, 717.5), (139.5, 131.9), (np.nan, np.nan), (850.7, 717.5)],
+        'pixel': [(139.6, 132.1), (139.5, 131.9), (None, None), (850.7, 717.5), (139.5, 131.9), (None, None), (850.7, 717.5)],
         'pupil': [784.0, 784.0, 0.0, 714.0, 784.0, 0.0, 714.0],
     },
 )
@@ -163,7 +162,7 @@ EXPECTED_DF_NO_PATTERNS = pl.from_dict(
 EXPECTED_DF_PATTERNS = pl.from_dict(
     {
         'time': [2154557, 2154558, 2154560, 2154561, 2154565, 2154567, 2154568],
-        'pixel': [(139.6, 132.1), (139.5, 131.9), (np.nan, np.nan), (850.7, 717.5), (139.5, 131.9), (np.nan, np.nan), (850.7, 717.5)],
+        'pixel': [(139.6, 132.1), (139.5, 131.9), (None, None), (850.7, 717.5), (139.5, 131.9), (None, None), (850.7, 717.5)],
         'pupil': [784.0, 784.0, 0.0, 714.0, 784.0, 0.0, 714.0],
         'task': ['reading', 'reading', 'reading', 'reading', 'reading', 'reading', 'reading'],
         'trial_id': [0, 0, 0, 0, 1, 1, 1],
