@@ -598,7 +598,7 @@ def test_clip(dataset_configuration):
 
     original_schema = dataset.gaze[0].schema
 
-    dataset.clip(input_column='pixel', output_column='pixel_clipped', n_components=4)
+    dataset.clip(-1000, 1000, input_column='pixel', output_column='pixel_clipped', n_components=4)
 
     expected_schema = {**original_schema, 'pixel_clipped': pl.List(pl.Float64)}
     for result_gaze_df in dataset.gaze:
