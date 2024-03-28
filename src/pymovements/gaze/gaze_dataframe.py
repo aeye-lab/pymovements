@@ -182,42 +182,6 @@ class GazeDataFrame:
 
     """
 
-    valid_pixel_position_columns = [
-        'x_pix', 'y_pix',
-        'x_left_pix', 'y_left_pix',
-        'x_right_pix', 'y_right_pix',
-        '__x_pix__', '__y_pix__',
-        '__x_left_pix__', '__y_left_pix__',
-        '__x_right_pix__', '__y_right_pix__',
-    ]
-
-    valid_position_columns = [
-        'x_pos', 'y_pos',
-        'x_left_pos', 'y_left_pos',
-        'x_right_pos', 'y_right_pos',
-        '__x_pos__', '__y_pos__',
-        '__x_left_pos__', '__y_left_pos__',
-        '__x_right_pos__', '__y_right_pos__',
-    ]
-
-    valid_velocity_columns = [
-        'x_vel', 'y_vel',
-        'x_left_vel', 'y_left_vel',
-        'x_right_vel', 'y_right_vel',
-        '__x_vel__', '__y_vel__',
-        '__x_left_vel__', '__y_left_vel__',
-        '__x_right_vel__', '__y_right_vel__',
-    ]
-
-    valid_acceleration_columns = [
-        'x_acc', 'y_acc',
-        'x_left_acc', 'y_left_acc',
-        'x_right_acc', 'y_right_acc',
-        '__x_acc__', '__y_acc__',
-        '__x_left_acc__', '__y_left_acc__',
-        '__x_right_acc__', '__y_right_acc__',
-    ]
-
     def __init__(
             self,
             data: pl.DataFrame | None = None,
