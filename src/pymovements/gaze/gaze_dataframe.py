@@ -455,12 +455,11 @@ class GazeDataFrame:
 
     def clip(
             self,
+            lower_bound: int | float | None,
+            upper_bound: int | float | None,
             *,
             input_column: str,
             output_column: str,
-            n_components: int,
-            lower_bound: int | float | None = None,
-            upper_bound: int | float | None = None,
             **kwargs: Any,
     ) -> None:
         """Clip gaze signal values.
@@ -471,16 +470,14 @@ class GazeDataFrame:
 
         Parameters
         ----------
+        lower_bound : int | float | None
+            Lower bound of the clipped column.
+        upper_bound : int | float | None
+            Upper bound of the clipped column.
         input_column : str
             Name of the input column.
         output_column : str
             Name of the output column.
-        n_components : int
-            Number of components in input colum.
-        lower_bound : int | float | None
-            Lower bound of the clipped column. (default: None)
-        upper_bound : int | float | None
-            Upper bound of the clipped column. (default: None)
         **kwargs: Any
             Additional keyword arguments to be passed to the :func:`~transforms.clip()` method.
 
@@ -492,11 +489,10 @@ class GazeDataFrame:
         """
         self.transform(
             'clip',
-            input_column=input_column,
-            output_column=output_column,
-            n_components=n_components,
             lower_bound=lower_bound,
             upper_bound=upper_bound,
+            input_column=input_column,
+            output_column=output_column,
             **kwargs,
         )
 
