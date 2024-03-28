@@ -40,7 +40,7 @@ def gaze_fixture():
         screen_width_cm=38,
         screen_height_cm=30,
         distance_cm=68,
-        origin='lower left',
+        origin='upper left',
         sampling_rate=1000.0,
     )
 

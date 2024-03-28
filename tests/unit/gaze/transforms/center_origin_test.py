@@ -46,7 +46,7 @@ import pymovements as pm
                 'n_components': 2,
             },
             ValueError,
-            ('origin', 'invalid', 'foobar', 'valid', 'center', 'lower left'),
+            ('origin', 'invalid', 'foobar', 'valid', 'center', 'upper left'),
             id='invalid_origin_raises_value_error',
         ),
     ],
@@ -93,7 +93,7 @@ def test_center_origin_init_raises_error(kwargs, exception, msg_substrings):
         ),
         pytest.param(
             {
-                'screen_resolution': (100, 100), 'origin': 'lower left', 'pixel_column': 'pixel',
+                'screen_resolution': (100, 100), 'origin': 'upper left', 'pixel_column': 'pixel',
                 'n_components': 2,
             },
             pl.Series('pixel', [[0, (100 - 1) / 2]], pl.List(pl.Float64)),
