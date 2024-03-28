@@ -42,7 +42,7 @@ import pymovements as pm
         ),
         pytest.param(
             {
-                'screen_resolution': (100, 100), 'origin': 'foobar', 'pixel_column': 'pixel',
+                'screen_resolution': (100, 100), 'origin': 'lower left', 'pixel_column': 'pixel',
                 'n_components': 2,
             },
             ValueError,
