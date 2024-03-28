@@ -48,6 +48,7 @@ def from_numpy(
         orient: Literal['col', 'row'] = 'col',
         trial_columns: str | list[str] | None = None,
         time_column: str | None = None,
+        time_unit: str | None = 'ms',
         pixel_columns: list[str] | None = None,
         position_columns: list[str] | None = None,
         velocity_columns: list[str] | None = None,
@@ -99,6 +100,10 @@ def from_numpy(
         methods will be applied to each trial separately. (default: None)
     time_column: str | None
         The name of the timestamp column in the input data frame. (default: None)
+    time_unit: str | None
+        The unit of the timestamps. Supported units are 's' for seconds, 'ms' for milliseconds and
+        'step' for steps. If the unit is 'step' the experiment definition must be specified. All
+        timestamps will be converted to milliseconds. (default: None)
     pixel_columns: list[str] | None
         The name of the pixel position columns in the input data frame. (default: None)
     position_columns: list[str] | None
@@ -137,6 +142,7 @@ def from_numpy(
     ...     arr,
     ...     schema=schema,
     ...     time_column='t',
+    ...     time_unit='ms',
     ...     position_columns=['x', 'y'],
     ...     orient='col',
     ... )
@@ -145,17 +151,17 @@ def from_numpy(
     ┌──────┬────────────┐
     │ time ┆ position   │
     │ ---  ┆ ---        │
-    │ f64  ┆ list[f64]  │
+    │ i64  ┆ list[f64]  │
     ╞══════╪════════════╡
-    │ 0.0  ┆ [0.0, 0.0] │
-    │ 0.0  ┆ [0.0, 0.0] │
-    │ 0.0  ┆ [0.0, 0.0] │
-    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
     │ …    ┆ …          │
-    │ 0.0  ┆ [0.0, 0.0] │
-    │ 0.0  ┆ [0.0, 0.0] │
-    │ 0.0  ┆ [0.0, 0.0] │
-    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
     └──────┴────────────┘
 
     Use the ``orient`` keyword argument to specify the layout of your array.
@@ -166,6 +172,7 @@ def from_numpy(
     ...     arr.T,
     ...     schema=schema,
     ...     time_column='t',
+    ...     time_unit='ms',
     ...     position_columns=['x', 'y'],
     ...     orient='row',
     ... )
@@ -174,22 +181,23 @@ def from_numpy(
     ┌──────┬────────────┐
     │ time ┆ position   │
     │ ---  ┆ ---        │
-    │ f64  ┆ list[f64]  │
+    │ i64  ┆ list[f64]  │
     ╞══════╪════════════╡
-    │ 0.0  ┆ [0.0, 0.0] │
-    │ 0.0  ┆ [0.0, 0.0] │
-    │ 0.0  ┆ [0.0, 0.0] │
-    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
     │ …    ┆ …          │
-    │ 0.0  ┆ [0.0, 0.0] │
-    │ 0.0  ┆ [0.0, 0.0] │
-    │ 0.0  ┆ [0.0, 0.0] │
-    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
     └──────┴────────────┘
 
     Pass the data explicitly via the specific keyword arguments, without having to specify a schema.
     >>> gaze = pm.gaze.from_numpy(
     ...     time=arr[0],
+    ...     time_unit='ms',
     ...     position=arr[[1, 2]],
     ...     orient='col',
     ... )
@@ -198,17 +206,17 @@ def from_numpy(
     ┌──────┬────────────┐
     │ time ┆ position   │
     │ ---  ┆ ---        │
-    │ f64  ┆ list[f64]  │
+    │ i64  ┆ list[f64]  │
     ╞══════╪════════════╡
-    │ 0.0  ┆ [0.0, 0.0] │
-    │ 0.0  ┆ [0.0, 0.0] │
-    │ 0.0  ┆ [0.0, 0.0] │
-    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
     │ …    ┆ …          │
-    │ 0.0  ┆ [0.0, 0.0] │
-    │ 0.0  ┆ [0.0, 0.0] │
-    │ 0.0  ┆ [0.0, 0.0] │
-    │ 0.0  ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
+    │ 0    ┆ [0.0, 0.0] │
     └──────┴────────────┘
     """
     # Either data or {time, pixel, position, velocity, acceleration} must be None.
@@ -227,6 +235,7 @@ def from_numpy(
             events=events,
             trial_columns=trial_columns,
             time_column=time_column,
+            time_unit=time_unit,
             pixel_columns=pixel_columns,
             position_columns=position_columns,
             velocity_columns=velocity_columns,
@@ -286,6 +295,7 @@ def from_numpy(
         experiment=experiment,
         events=events,
         time_column=time_column,
+        time_unit=time_unit,
         trial_columns=trial_columns,
         pixel_columns=pixel_columns,
         position_columns=position_columns,
@@ -302,6 +312,7 @@ def from_pandas(
         *,
         trial_columns: str | list[str] | None = None,
         time_column: str | None = None,
+        time_unit: str | None = 'ms',
         pixel_columns: list[str] | None = None,
         position_columns: list[str] | None = None,
         velocity_columns: list[str] | None = None,
@@ -325,6 +336,11 @@ def from_pandas(
         methods will be applied to each trial separately. (default: None)
     time_column: str | None
         The name of the timestamp column in the input data frame. (default: None)
+    time_unit: str | None
+        The unit of the timestamps in the input data frame. Supported units are 's' for seconds,
+        'ms' for milliseconds and 'step' for steps. If the unit is 'step' the experiment
+        definition must be specified. All timestamps will be converted to milliseconds.
+        (default: 'ms')
     pixel_columns: list[str] | None
         The name of the pixel position columns in the input data frame. (default: None)
     position_columns: list[str] | None
@@ -351,6 +367,7 @@ def from_pandas(
         events=events,
         trial_columns=trial_columns,
         time_column=time_column,
+        time_unit=time_unit,
         pixel_columns=pixel_columns,
         position_columns=position_columns,
         velocity_columns=velocity_columns,

@@ -718,6 +718,7 @@ def fixture_experiment():
             {
                 'data': pl.from_dict(
                     {
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                         'y_dva': [2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
                     },
@@ -728,6 +729,7 @@ def fixture_experiment():
             pm.GazeDataFrame(
                 data=pl.from_dict(
                     {
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                         'y_dva': [2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
                     },
@@ -740,6 +742,7 @@ def fixture_experiment():
             {
                 'data': pl.from_dict(
                     {
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                         'y_dva': [2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
                     },
@@ -750,6 +753,7 @@ def fixture_experiment():
             pm.GazeDataFrame(
                 data=pl.from_dict(
                     {
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                         'y_dva': [2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
                     },
@@ -1323,6 +1327,7 @@ def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg)
             {
                 'data': pl.from_dict(
                     {
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
                         'y_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
                         'x_dva': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
@@ -1336,7 +1341,7 @@ def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg)
             pm.GazeDataFrame(
                 data=pl.from_dict(
                     {
-
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_pix': [1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3],
                         'y_pix': [1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3],
                         'x_dva': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
@@ -1352,6 +1357,7 @@ def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg)
             {
                 'data': pl.from_dict(
                     {
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
                         'y_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
                         'x_dva': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
@@ -1365,7 +1371,7 @@ def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg)
             pm.GazeDataFrame(
                 data=pl.from_dict(
                     {
-
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
                         'y_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
                         'x_dva': [1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3],

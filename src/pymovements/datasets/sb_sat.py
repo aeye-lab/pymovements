@@ -132,6 +132,8 @@ class SBSAT(DatasetDefinition):
 
     time_column: str = 'time'
 
+    time_unit: str = 'ms'
+
     pixel_columns: list[str] = field(default_factory=lambda: ['x_left', 'y_left'])
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
