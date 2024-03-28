@@ -338,6 +338,7 @@ def load_gaze_file(
     elif filepath.suffix == '.asc':
         gaze_df = from_asc(
             filepath,
+            experiment=definition.experiment,
             add_columns=add_columns,
             column_dtypes=definition.filename_format_dtypes,
             **custom_read_kwargs,
