@@ -20,7 +20,6 @@
 """Tests pymovements asc to csv processing."""
 # flake8: noqa: E101, W191, E501
 # pylint: disable=duplicate-code
-import numpy as np
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
