@@ -867,6 +867,43 @@ def smooth(
     )
 
 
+@register_transform
+def clip(
+        lower_bound: int | float | None,
+        upper_bound: int | float | None,
+        *,
+        input_column: str,
+        output_column: str,
+        n_components: int,
+) -> pl.Expr:
+    """Clip gaze signal to a lower and upper bound.
+
+    Parameters
+    ----------
+    lower_bound : int | float | None
+        Lower bound of the clipped column.
+    upper_bound : int | float | None
+        Upper bound of the clipped column.
+    input_column : str
+        Name of the input column.
+    output_column : str
+        Name of the output column.
+    n_components : int
+        Number of components in input column.
+
+    Returns
+    -------
+    pl.Expr
+        The respective polars expression.
+    """
+    return pl.concat_list(
+        [
+            pl.col(input_column).list.get(component).clip(lower_bound, upper_bound)
+            for component in range(n_components)
+        ],
+    ).alias(output_column)
+
+
 def _identity(x: Any) -> Any:
     """Identity function as placeholder for None as padding.
 

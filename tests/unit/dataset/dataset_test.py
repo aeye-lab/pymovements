@@ -84,7 +84,7 @@ def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
     fileinfo = fileinfo.sort(by='filepath')
 
     gaze_dfs = []
-    for fileinfo_row in fileinfo.to_dicts():
+    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
         if eyes == 'both':
             gaze_df = pl.from_dict(
                 {
@@ -206,7 +206,7 @@ def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
     ]
 
     preprocessed_gaze_dfs = []
-    for fileinfo_row in fileinfo.to_dicts():
+    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
         position_columns = [pixel_column.replace('pix', 'pos') for pixel_column in pixel_columns]
         velocity_columns = [pixel_column.replace('pix', 'vel') for pixel_column in pixel_columns]
         acceleration_columns = [
@@ -242,7 +242,7 @@ def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
     )
 
     event_dfs = []
-    for fileinfo_row in fileinfo.to_dicts():
+    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
         event_df = pl.from_dict(
             {
                 'subject_id': fileinfo_row['subject_id'],
@@ -596,6 +596,20 @@ def test_pos2vel(dataset_configuration):
     dataset.pos2vel()
 
     expected_schema = {**original_schema, 'velocity': pl.List(pl.Float64)}
+    for result_gaze_df in dataset.gaze:
+        assert result_gaze_df.schema == expected_schema
+
+
+def test_clip(dataset_configuration):
+    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+
+    original_schema = dataset.gaze[0].schema
+
+    dataset.clip(-1000, 1000, input_column='pixel', output_column='pixel_clipped', n_components=4)
+
+    expected_schema = {**original_schema, 'pixel_clipped': pl.List(pl.Float64)}
     for result_gaze_df in dataset.gaze:
         assert result_gaze_df.schema == expected_schema
 
