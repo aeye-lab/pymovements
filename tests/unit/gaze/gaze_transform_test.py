@@ -763,6 +763,34 @@ def fixture_experiment():
             id='smooth_method_pass',
         ),
 
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1000, 1001, 1002, 1003],
+                        'x_pix': [-50, 5, 50, None],
+                        'y_pix': [4, 5, 6, 7],
+                    },
+                ),
+                'pixel_columns': ['x_pix', 'y_pix'],
+            },
+            'clip', {
+                'input_column': 'pixel', 'output_column': 'pixel', 'n_components': 2,
+                'lower_bound': 1, 'upper_bound': 10,
+            },
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'time': [1000, 1001, 1002, 1003],
+                        'x_pix': [1, 5, 10, None],
+                        'y_pix': [4, 5, 6, 7],
+                    },
+                ),
+                pixel_columns=['x_pix', 'y_pix'],
+            ),
+            id='clip',
+        ),
+
     ],
 )
 def test_gaze_transform_expected_frame(
@@ -1202,6 +1230,28 @@ def test_gaze_dataframe_pos2vel_creates_velocity_column(data, experiment, positi
     )
     gaze.pos2vel(method='savitzky_golay', window_length=7, degree=2)
     assert 'velocity' in gaze.columns
+
+
+def test_gaze_dataframe_clip_creates_new_column(experiment):
+    gaze = pm.GazeDataFrame(
+        data=pl.from_dict(
+            {
+                'time': [1000, 1001, 1002, 1003],
+                'x_pix': [1, 5, 10, None],
+                'y_pix': [4, 5, 6, 7],
+            },
+        ),
+        experiment=experiment,
+        pixel_columns=['x_pix', 'y_pix'],
+    )
+    gaze.clip(
+        input_column='pixel',
+        output_column='pixel_new',
+        n_components=2,
+        lower_bound=1,
+        upper_bound=10,
+    )
+    assert 'pixel_new' in gaze.columns
 
 
 @pytest.mark.parametrize(

@@ -413,6 +413,49 @@ class GazeDataFrame:
                     ],
                 )
 
+    def clip(
+            self,
+            lower_bound: int | float | None,
+            upper_bound: int | float | None,
+            *,
+            input_column: str,
+            output_column: str,
+            **kwargs: Any,
+    ) -> None:
+        """Clip gaze signal values.
+
+        This method requires a properly initialized :py:attr:`~.GazeDataFrame.experiment` attribute.
+
+        After success, the gaze dataframe is clipped.
+
+        Parameters
+        ----------
+        lower_bound : int | float | None
+            Lower bound of the clipped column.
+        upper_bound : int | float | None
+            Upper bound of the clipped column.
+        input_column : str
+            Name of the input column.
+        output_column : str
+            Name of the output column.
+        **kwargs: Any
+            Additional keyword arguments to be passed to the :func:`~transforms.clip()` method.
+
+        Raises
+        ------
+        AttributeError
+            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
+            if experiment is None.
+        """
+        self.transform(
+            'clip',
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            input_column=input_column,
+            output_column=output_column,
+            **kwargs,
+        )
+
     def pix2deg(self) -> None:
         """Compute gaze positions in degrees of visual angle from pixel position coordinates.
 
