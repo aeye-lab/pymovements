@@ -220,6 +220,7 @@ def load_gaze_files(
             custom_read_kwargs=definition.custom_read_kwargs,
         )
         gaze_dfs.append(gaze_df)
+
     return gaze_dfs
 
 
@@ -268,9 +269,13 @@ def load_gaze_file(
 
     if filepath.suffix in {'.csv', '.txt', '.tsv'}:
         if preprocessed:
+            # Time unit is always milliseconds for preprocessed data if a time column is present.
+            time_unit = 'ms'
+
             gaze_df = from_csv(
                 filepath,
                 trial_columns=definition.trial_columns,
+                time_unit=time_unit,
                 add_columns=add_columns,
                 column_dtypes=definition.filename_format_dtypes,
             )
@@ -311,6 +316,7 @@ def load_gaze_file(
                 filepath,
                 experiment=definition.experiment,
                 time_column=definition.time_column,
+                time_unit=definition.time_unit,
                 distance_column=definition.distance_column,
                 pixel_columns=definition.pixel_columns,
                 position_columns=definition.position_columns,

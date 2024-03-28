@@ -57,7 +57,12 @@ class GazeDataFrame:
     time_column: str | None
         The name of the timestamp column in the input data frame. This column will be renamed to
         ``time``. (default: None)
-    pixel_columns: list[str] | None
+    time_unit: str | None
+        The unit of the timestamps in the timestamp column in the input data frame. Supported
+        units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
+        'step' the experiment definition must be specified. All timestamps will be converted to
+        milliseconds. (default: 'ms')
+    pixel_columns:list[str] | None
         The name of the pixel position columns in the input data frame. These columns will be
         nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
         column will not be created. (default: None)
@@ -119,10 +124,10 @@ class GazeDataFrame:
     │ 1002 ┆ 0.3 ┆ 0.3 │
     └──────┴─────┴─────┘
 
-    We can now initialize our ``GazeDataFrame`` by specyfing the names of the time and pixel
-    position columns.
+    We can now initialize our ``GazeDataFrame`` by specyfing the names of the pixel position
+    columns, the timestamp column and the unit of the timestamps.
 
-    >>> gaze = GazeDataFrame(data=df, time_column='t', pixel_columns=['x', 'y'])
+    >>> gaze = GazeDataFrame(data=df, pixel_columns=['x', 'y'], time_column='t', time_unit='ms')
     >>> gaze.frame
     shape: (3, 2)
     ┌──────┬────────────┐
@@ -159,26 +164,13 @@ class GazeDataFrame:
     ┌──────┬────────────┐
     │ time ┆ pixel      │
     │ ---  ┆ ---        │
-    │ f64  ┆ list[f64]  │
-    ╞══════╪════════════╡
-    │ 0.0  ┆ [0.1, 0.1] │
-    │ 10.0 ┆ [0.2, 0.2] │
-    │ 20.0 ┆ [0.3, 0.3] │
-    └──────┴────────────┘
-
-    Leaving out the experiment definition will create a continuous integer column in step units.
-    >>> gaze = GazeDataFrame(data=df_no_time, pixel_columns=['x', 'y'])
-    >>> gaze.frame
-    shape: (3, 2)
-    ┌──────┬────────────┐
-    │ time ┆ pixel      │
-    │ ---  ┆ ---        │
     │ i64  ┆ list[f64]  │
     ╞══════╪════════════╡
     │ 0    ┆ [0.1, 0.1] │
-    │ 1    ┆ [0.2, 0.2] │
-    │ 2    ┆ [0.3, 0.3] │
+    │ 10   ┆ [0.2, 0.2] │
+    │ 20   ┆ [0.3, 0.3] │
     └──────┴────────────┘
+
 
     """
 
@@ -190,6 +182,7 @@ class GazeDataFrame:
             *,
             trial_columns: str | list[str] | None = None,
             time_column: str | None = None,
+            time_unit: str | None = 'ms',
             pixel_columns: list[str] | None = None,
             position_columns: list[str] | None = None,
             velocity_columns: list[str] | None = None,
@@ -205,23 +198,25 @@ class GazeDataFrame:
         self.frame = self.frame.fill_nan(None)
 
         self.trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
+        self.experiment = experiment
 
         # In case the 'time' column is already present we don't need to do anything.
-        # Otherwise, create a new time column starting with zero.
+        # Otherwise, create a new time column starting with zero and set time unit to steps
         if time_column is None and 'time' not in self.frame.columns:
-            # In case we have an experiment with sampling rate given, we convert to milliseconds.
+            # In case we have an experiment with sampling rate given, we create a time
             if experiment is not None and experiment.sampling_rate is not None:
-                sampling_rate_factor = 1000 / experiment.sampling_rate
-            else:
-                sampling_rate_factor = 1
+                self.frame = self.frame.with_columns(
+                    time=pl.arange(0, len(self.frame)),
+                )
 
-            self.frame = self.frame.with_columns(
-                time=pl.arange(0, len(self.frame)) * sampling_rate_factor,
-            )
+                time_column = 'time'
+                time_unit = 'step'
 
-        # This if clause is mutually exclusive with the previous one.
         if time_column is not None:
             self.frame = self.frame.rename({time_column: 'time'})
+
+        if 'time' in self.frame.columns:
+            self._convert_time_units(time_unit)
 
         if distance_column is not None:
             self.frame = self.frame.rename({distance_column: 'distance'})
@@ -251,7 +246,6 @@ class GazeDataFrame:
             column_specifiers.append(acceleration_columns)
 
         self.n_components = self._infer_n_components(column_specifiers)
-        self.experiment = experiment
 
         if events is None:
             if self.trial_columns is None:
@@ -1130,3 +1124,36 @@ class GazeDataFrame:
             kwargs['timesteps'] = gaze.get_column('time').to_numpy()
 
         return kwargs
+
+    def _convert_time_units(self, time_unit: str | None) -> None:
+        """Convert the time column to milliseconds based on the specified time unit."""
+        if time_unit == 's':
+            self.frame = self.frame.with_columns(pl.col('time').mul(1000))
+
+        elif time_unit == 'step':
+            if self.experiment is not None:
+                self.frame = self.frame.with_columns(
+                    pl.col('time').mul(1000).truediv(self.experiment.sampling_rate),
+                )
+            else:
+                raise ValueError(
+                    "experiment with sampling rate must be specified if time_unit is 'step'",
+                )
+
+        elif time_unit != 'ms':
+            raise ValueError(
+                f"unsupported time unit '{time_unit}'. "
+                "Supported units are 's' for seconds, 'ms' for milliseconds and "
+                "'step' for steps.",
+            )
+
+        # Convert to int if possible.
+        if self.frame.schema['time'] == pl.Float64:
+            all_decimals = self.frame.select(
+                pl.col('time').round().eq(pl.col('time')).all(),
+            ).item()
+
+            if all_decimals:
+                self.frame = self.frame.with_columns(
+                    pl.col('time').cast(pl.Int64),
+                )
