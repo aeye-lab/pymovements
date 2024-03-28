@@ -298,12 +298,11 @@ class Dataset:
 
     def clip(
             self,
+            lower_bound: int | float | None,
+            upper_bound: int | float | None,
             *,
             input_column: str,
             output_column: str,
-            n_components: int,
-            lower_bound: int | float | None = None,
-            upper_bound: int | float | None = None,
             verbose: bool = True,
             **kwargs: Any,
     ) -> Dataset:
@@ -315,16 +314,14 @@ class Dataset:
 
         Parameters
         ----------
+        lower_bound : int | float | None
+            Lower bound of the clipped column.
+        upper_bound : int | float | None
+            Upper bound of the clipped column.
         input_column : str
             Name of the input column.
         output_column : str
             Name of the output column.
-        n_components : int
-            Number of components in input colum.
-        lower_bound : int | float | None
-            Lower bound of the clipped column. (default: None)
-        upper_bound : int | float | None
-            Upper bound of the clipped column. (default: None)
         verbose : bool
             If True, show progress of computation. (default: True)
         **kwargs: Any
@@ -343,11 +340,10 @@ class Dataset:
         """
         return self.apply(
             'clip',
-            input_column=input_column,
-            output_column=output_column,
-            n_components=n_components,
             lower_bound=lower_bound,
             upper_bound=upper_bound,
+            input_column=input_column,
+            output_column=output_column,
             verbose=verbose,
             **kwargs,
         )
