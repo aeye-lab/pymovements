@@ -270,7 +270,7 @@ def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
             screen_width_cm=38,
             screen_height_cm=30.2,
             distance_cm=distance_cm,
-            origin='lower left',
+            origin='upper left',
             sampling_rate=1000,
         ),
         filename_format=r'{subject_id:d}.' + raw_fileformat,

@@ -44,7 +44,7 @@ def test_from_numpy():
         screen_width_cm=38,
         screen_height_cm=30,
         distance_cm=68,
-        origin='lower left',
+        origin='upper left',
         sampling_rate=1000.0,
     )
 
@@ -83,7 +83,7 @@ def test_from_numpy_with_schema():
         screen_width_cm=38,
         screen_height_cm=30,
         distance_cm=None,
-        origin='lower left',
+        origin='upper left',
         sampling_rate=1000.0,
     )
 
@@ -142,7 +142,7 @@ def test_from_numpy_with_trial_id():
         screen_width_cm=38,
         screen_height_cm=30,
         distance_cm=None,
-        origin='lower left',
+        origin='upper left',
         sampling_rate=1000.0,
     )
 
@@ -187,7 +187,7 @@ def test_from_numpy_explicit_columns():
         screen_width_cm=38,
         screen_height_cm=30,
         distance_cm=None,
-        origin='lower left',
+        origin='upper left',
         sampling_rate=1000.0,
     )
 

@@ -49,7 +49,7 @@ class Experiment:
         distance for each sample in millimeters. (default: None)
     origin: str
         Specifies the screen location of the origin of the pixel coordinate system.
-        (default: 'lower left')
+        (default: 'upper left')
     sampling_rate: float | None
         Sampling rate in Hz. (default: None)
     eyetracker : EyeTracker | None
@@ -63,12 +63,12 @@ class Experiment:
     ...     screen_width_cm=38,
     ...     screen_height_cm=30,
     ...     distance_cm=68,
-    ...     origin='lower left',
+    ...     origin='upper left',
     ...     sampling_rate=1000.0,
     ... )
     >>> print(experiment)
     Experiment(sampling_rate=1000.00, screen=Screen(width_px=1280, height_px=1024, width_cm=38,
-    height_cm=30, distance_cm=68, origin=lower left), eyetracker=None)
+    height_cm=30, distance_cm=68, origin=upper left), eyetracker=None)
 
     We can also access the screen boundaries in degrees of visual angle via the
     :py:attr:`~pymovements.gaze.Screen` object. This only works if the
@@ -99,7 +99,7 @@ class Experiment:
             screen_width_cm: float,
             screen_height_cm: float,
             distance_cm: float | None = None,
-            origin: str = 'lower left',
+            origin: str = 'upper left',
             sampling_rate: float | None = None,
             eyetracker: EyeTracker | None = None,
     ):
@@ -177,7 +177,7 @@ class Experiment:
         ...     screen_width_cm=38,
         ...     screen_height_cm=30,
         ...     distance_cm=68,
-        ...     origin='lower left',
+        ...     origin='upper left',
         ...     sampling_rate=1000.0,
         ... )
         >>> arr = [[0., 0.], [1., 1.], [2., 2.], [3., 3.], [4., 4.], [5., 5.]]

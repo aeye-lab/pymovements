@@ -375,7 +375,7 @@ class Dataset:
 
     def deg2pix(
         self,
-        pixel_origin: str = 'lower left',
+        pixel_origin: str = 'upper left',
         position_column: str = 'position',
         pixel_column: str = 'pixel',
         verbose: bool = True,
@@ -389,8 +389,8 @@ class Dataset:
         Parameters
         ----------
         pixel_origin: str
-            The desired location of the pixel origin. (default: 'lower left')
-            Supported values: ``center``, ``lower left``.
+            The desired location of the pixel origin. (default: 'upper left')
+            Supported values: ``center``, ``upper left``.
         position_column: str
             The input position column name. (default: 'position')
         pixel_column: str

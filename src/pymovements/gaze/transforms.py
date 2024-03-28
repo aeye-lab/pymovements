@@ -124,7 +124,7 @@ def center_origin(
     screen_resolution: tuple[int, int]
         Pixel screen resolution as tuple (width, height).
     origin: str
-        The location of the pixel origin. Supported values: ``center``, ``lower left``
+        The location of the pixel origin. Supported values: ``center``, ``upper left``
     n_components: int
         Number of components in input column.
     pixel_column: str
@@ -142,10 +142,14 @@ def center_origin(
 
     if origin == 'center':
         origin_offset = (0.0, 0.0)
-    elif origin == 'lower left':
+    elif origin == 'upper left':
         origin_offset = ((screen_resolution[0] - 1) / 2, (screen_resolution[1] - 1) / 2)
+    elif origin == 'lower left':
+        raise ValueError(
+            'origin string lower left was corrected to upper left. please update your definition',
+        )
     else:
-        supported_origins = ['center', 'lower left']
+        supported_origins = ['center', 'upper left']
         raise ValueError(
             f'value `{origin}` for argument `origin` is invalid. '
             f' Valid values are: {supported_origins}',
@@ -234,7 +238,7 @@ def pix2deg(
         Eye-to-screen distance in centimeters. If a string is passed, it is interpreted as the name
         of a column containing the Eye-to-screen distance in millimiters for each sample.
     origin: str
-        The location of the pixel origin. Supported values: ``center``, ``lower left``. See also
+        The location of the pixel origin. Supported values: ``center``, ``upper left``. See also
         py:func:`~pymovements.gaze.transform.center_origin` for more information.
     n_components: int
         Number of components in input column.
@@ -291,7 +295,7 @@ def deg2pix(
         screen_resolution: tuple[int, int],
         screen_size: tuple[float, float],
         distance: float | str,
-        pixel_origin: str = 'lower left',
+        pixel_origin: str = 'upper left',
         n_components: int,
         position_column: str = 'position',
         pixel_column: str = 'pixel',
@@ -309,8 +313,8 @@ def deg2pix(
         Eye-to-screen distance in centimeters. If a string is passed, it is interpreted as the name
         of a column containing the Eye-to-screen distance in millimiters for each sample.
     pixel_origin: str
-        The desired location of the pixel origin. (default: 'lower left')
-        Supported values: ``center``, ``lower left``.
+        The desired location of the pixel origin. (default: 'upper left')
+        Supported values: ``center``, ``upper left``.
     n_components: int
         Number of components in input column.
     position_column: str
@@ -351,10 +355,10 @@ def deg2pix(
 
     if pixel_origin == 'center':
         origin_offset = (0.0, 0.0)
-    elif pixel_origin == 'lower left':
+    elif pixel_origin == 'upper left':
         origin_offset = ((screen_resolution[0] - 1) / 2, (screen_resolution[1] - 1) / 2)
     else:
-        supported_origins = ['center', 'lower left']
+        supported_origins = ['center', 'upper left']
         raise ValueError(
             f'value `{pixel_origin}` for argument `pixel_origin` is invalid. '
             f' Valid values are: {supported_origins}',

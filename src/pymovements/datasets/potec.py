@@ -126,7 +126,7 @@ class PoTeC(DatasetDefinition):
         screen_width_cm=47.5,
         screen_height_cm=30,
         distance_cm=65,
-        origin='lower left',
+        origin='upper left',
         sampling_rate=1000,
     )
 
