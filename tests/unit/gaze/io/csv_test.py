@@ -30,6 +30,7 @@ import pymovements as pm
             {
                 'file': 'tests/files/monocular_example.csv',
                 'time_column': 'time',
+                'time_unit': 'ms',
                 'pixel_columns': ['x_left_pix', 'y_left_pix'],
             },
             (10, 2),
@@ -39,6 +40,7 @@ import pymovements as pm
             {
                 'file': 'tests/files/binocular_example.csv',
                 'time_column': 'time',
+                'time_unit': 'ms',
                 'pixel_columns': ['x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix'],
                 'position_columns': ['x_left_pos', 'y_left_pos', 'x_right_pos', 'y_right_pos'],
             },
@@ -49,6 +51,8 @@ import pymovements as pm
             {
                 'file': 'tests/files/hbn_example.csv',
                 'time_column': pm.datasets.HBN().time_column,
+                'time_unit': pm.datasets.HBN().time_unit,
+                'experiment': pm.datasets.HBN().experiment,
                 'pixel_columns': pm.datasets.HBN().pixel_columns,
             },
             (10, 2),
@@ -58,6 +62,7 @@ import pymovements as pm
             {
                 'file': 'tests/files/sbsat_example.csv',
                 'time_column': pm.datasets.SBSAT().time_column,
+                'time_unit': pm.datasets.SBSAT().time_unit,
                 'pixel_columns': pm.datasets.SBSAT().pixel_columns,
                 **pm.datasets.SBSAT().custom_read_kwargs,
             },
@@ -68,6 +73,7 @@ import pymovements as pm
             {
                 'file': 'tests/files/gazebase_example.csv',
                 'time_column': pm.datasets.GazeBase().time_column,
+                'time_unit': pm.datasets.GazeBase().time_unit,
                 'position_columns': pm.datasets.GazeBase().position_columns,
                 **pm.datasets.GazeBase().custom_read_kwargs,
             },
@@ -78,16 +84,18 @@ import pymovements as pm
             {
                 'file': 'tests/files/gaze_on_faces_example.csv',
                 'time_column': pm.datasets.GazeOnFaces().time_column,
+                'time_unit': pm.datasets.GazeOnFaces().time_unit,
                 'pixel_columns': pm.datasets.GazeOnFaces().pixel_columns,
                 **pm.datasets.GazeOnFaces().custom_read_kwargs,
             },
-            (10, 2),
+            (10, 1),
             id='gaze_on_faces_dataset_example',
         ),
         pytest.param(
             {
                 'file': 'tests/files/gazebase_vr_example.csv',
                 'time_column': pm.datasets.GazeBaseVR().time_column,
+                'time_unit': pm.datasets.GazeBaseVR().time_unit,
                 'position_columns': pm.datasets.GazeBaseVR().position_columns,
             },
             (10, 11),
@@ -97,6 +105,7 @@ import pymovements as pm
             {
                 'file': 'tests/files/judo1000_example.csv',
                 'time_column': pm.datasets.JuDo1000().time_column,
+                'time_unit': pm.datasets.JuDo1000().time_unit,
                 'pixel_columns': pm.datasets.JuDo1000().pixel_columns,
                 **pm.datasets.JuDo1000().custom_read_kwargs,
             },

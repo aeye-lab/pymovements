@@ -92,6 +92,7 @@ def test_from_numpy_with_schema():
         schema=schema,
         experiment=experiment,
         time_column='t',
+        time_unit='ms',
         distance_column='d',
         pixel_columns=['x_pix', 'y_pix'],
         position_columns=['x_pos', 'y_pos'],
@@ -109,7 +110,7 @@ def test_from_numpy_with_schema():
             'acceleration': [[2, 6], [3, 7], [4, 8], [5, 9]],
         },
         schema={
-            'time': pl.Float64,
+            'time': pl.Int64,
             'distance': pl.Float64,
             'pixel': pl.List(pl.Float64),
             'position': pl.List(pl.Float64),
@@ -162,7 +163,7 @@ def test_from_numpy_with_trial_id():
         },
         schema={
             'trial_id': pl.Float64,
-            'time': pl.Float64,
+            'time': pl.Int64,
             'pixel': pl.List(pl.Float64),
         },
     )
@@ -192,6 +193,7 @@ def test_from_numpy_explicit_columns():
 
     gaze = pm.gaze.from_numpy(
         time=time,
+        time_unit='ms',
         distance=distance,
         pixel=pixel,
         position=position,
@@ -269,7 +271,7 @@ def test_from_numpy_all_none():
         acceleration_columns=None,
     )
 
-    expected = pl.DataFrame(schema={'time': pl.Int64})
+    expected = pl.DataFrame()
 
     assert_frame_equal(gaze.frame, expected)
     assert gaze.n_components is None
