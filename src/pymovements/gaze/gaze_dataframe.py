@@ -195,6 +195,7 @@ class GazeDataFrame:
             data = data.clone()
         self.frame = data
 
+        # Set nan values to null.
         self.frame = self.frame.fill_nan(None)
 
         self.trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
