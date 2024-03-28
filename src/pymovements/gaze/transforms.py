@@ -869,12 +869,12 @@ def smooth(
 
 @register_transform
 def clip(
+        lower_bound: int | float | None,
+        upper_bound: int | float | None,
         *,
         input_column: str,
         output_column: str,
         n_components: int,
-        lower_bound: int | float | None = None,
-        upper_bound: int | float | None = None,
 ) -> pl.Expr:
     """Clip gaze signal to a lower and upper bound.
 
@@ -887,9 +887,9 @@ def clip(
     n_components : int
         Number of components in input column.
     lower_bound : int | float | None
-        Lower bound of the clipped column. (default: None)
+        Lower bound of the clipped column.
     upper_bound : int | float | None
-        Upper bound of the clipped column. (default: None)
+        Upper bound of the clipped column.
 
     Returns
     -------
