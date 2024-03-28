@@ -154,7 +154,10 @@ MSG	2154570 0 READING_SCREEN_1.STOP
 EXPECTED_DF_NO_PATTERNS = pl.from_dict(
     {
         'time': [2154557, 2154558, 2154560, 2154561, 2154565, 2154567, 2154568],
-        'pixel': [(139.6, 132.1), (139.5, 131.9), (None, None), (850.7, 717.5), (139.5, 131.9), (None, None), (850.7, 717.5)],
+        'pixel': [
+            (139.6, 132.1), (139.5, 131.9), (None, None), (850.7, 717.5),
+            (139.5, 131.9), (None, None), (850.7, 717.5),
+        ],
         'pupil': [784.0, 784.0, 0.0, 714.0, 784.0, 0.0, 714.0],
     },
 )
@@ -162,7 +165,10 @@ EXPECTED_DF_NO_PATTERNS = pl.from_dict(
 EXPECTED_DF_PATTERNS = pl.from_dict(
     {
         'time': [2154557, 2154558, 2154560, 2154561, 2154565, 2154567, 2154568],
-        'pixel': [(139.6, 132.1), (139.5, 131.9), (None, None), (850.7, 717.5), (139.5, 131.9), (None, None), (850.7, 717.5)],
+        'pixel': [
+            (139.6, 132.1), (139.5, 131.9), (None, None), (850.7, 717.5),
+            (139.5, 131.9), (None, None), (850.7, 717.5),
+        ],
         'pupil': [784.0, 784.0, 0.0, 714.0, 784.0, 0.0, 714.0],
         'task': ['reading', 'reading', 'reading', 'reading', 'reading', 'reading', 'reading'],
         'trial_id': [0, 0, 0, 0, 1, 1, 1],
@@ -196,10 +202,12 @@ def test_load_eyelink_file(tmp_path, read_kwargs):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(ASC_TEXT)
 
-    df = pm.dataset.dataset_files.load_gaze_file(
+    gaze = pm.dataset.dataset_files.load_gaze_file(
         filepath,
         fileinfo_row={},
-        definition=DatasetDefinition(),
+        definition=DatasetDefinition(
+            experiment=pm.Experiment(1024, 768, 38, 30, None, 'center', 100),
+        ),
         custom_read_kwargs=read_kwargs,
     )
 
@@ -208,4 +216,5 @@ def test_load_eyelink_file(tmp_path, read_kwargs):
     else:
         expected_df = EXPECTED_DF_NO_PATTERNS
 
-    assert_frame_equal(df.frame, expected_df, check_column_order=False)
+    assert_frame_equal(gaze.frame, expected_df, check_column_order=False)
+    assert gaze.experiment is not None
