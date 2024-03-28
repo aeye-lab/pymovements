@@ -271,7 +271,7 @@ def load_gaze_file(
         if preprocessed:
             # Time unit is always milliseconds for preprocessed data if a time column is present.
             time_unit = 'ms'
-            
+
             gaze_df = from_csv(
                 filepath,
                 trial_columns=definition.trial_columns,
