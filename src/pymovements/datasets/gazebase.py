@@ -122,7 +122,7 @@ class GazeBase(DatasetDefinition):
         screen_width_cm=47.4,
         screen_height_cm=29.7,
         distance_cm=55,
-        origin='lower left',
+        origin='upper left',
         sampling_rate=1000,
     )
 

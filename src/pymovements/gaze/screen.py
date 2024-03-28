@@ -49,7 +49,7 @@ class Screen:
         distance for each sample in millimeters. (default: None)
     origin: str
         Specifies the screen location of the origin of the pixel
-        coordinate system. (default: 'lower left')
+        coordinate system. (default: 'upper left')
 
     Attributes
     ----------
@@ -82,11 +82,11 @@ class Screen:
     ...     width_cm=38.0,
     ...     height_cm=30.0,
     ...     distance_cm=68.0,
-    ...     origin='lower left',
+    ...     origin='upper left',
     ... )
     >>> print(screen)
     Screen(width_px=1280, height_px=1024, width_cm=38.00,
-    height_cm=30.00, distance_cm=68.00, origin=lower left)
+    height_cm=30.00, distance_cm=68.00, origin=upper left)
 
     We can also access the screen boundaries in degrees of visual angle. This only works if the
     `distance_cm` attribute is specified.
@@ -109,7 +109,7 @@ class Screen:
             width_cm: float,
             height_cm: float,
             distance_cm: float | None = None,
-            origin: str = 'lower left',
+            origin: str = 'upper left',
     ):
         checks.check_no_zeros(width_px, 'width_px')
         checks.check_no_zeros(height_px, 'height_px')
@@ -220,7 +220,7 @@ class Screen:
         ...     width_cm=38.0,
         ...     height_cm=30.0,
         ...     distance_cm=68.0,
-        ...     origin='lower left',
+        ...     origin='upper left',
         ... )
         >>> screen.pix2deg(arr=arr)
         array([[-12.70732231, 8.65963972]])

@@ -49,7 +49,7 @@ def pix2deg(
         Eye-to-screen distance in centimeters
     origin : str
         Specifies the screen location of the origin of the pixel coordinate system. Valid values
-        are: center, lower left.
+        are: center, upper left.
 
     Returns
     -------
@@ -73,7 +73,7 @@ def pix2deg(
     ...    screen_px=(1280, 1024),
     ...    screen_cm=(38.0, 30.0),
     ...    distance_cm=68.0,
-    ...    origin='lower left',
+    ...    origin='upper left',
     ... )
     array([[-12.70732231, 8.65963972]])
 
@@ -160,7 +160,7 @@ def pix2deg(
     distance_px = distance_cm * (screen_px / screen_cm)
 
     # If pixel coordinate system is not centered, shift pixel coordinate to the center.
-    if origin == 'lower left':
+    if origin == 'upper left':
         arr = arr - (screen_px - 1) / 2
     elif origin != 'center':
         raise ValueError(f'origin {origin} is not supported.')
