@@ -49,7 +49,7 @@ class GazeDataFrame:
         The experiment definition. (default: None)
     events: pm.EventDataFrame | None
         A dataframe of events in the gaze signal. (default: None)
-    auto_column_detect: bool = False
+    auto_column_detect: bool
         Flag indicating if the column names should be inferred automatically. (default: False)
     trial_columns: str | list[str] | None
         The name of the trial columns in the input data frame. If the list is empty or None,
