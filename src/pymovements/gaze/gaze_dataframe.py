@@ -232,7 +232,7 @@ class GazeDataFrame:
         component_suffixes = ['x', 'y', 'xl', 'yl', 'xr', 'yr', 'xa', 'ya']
 
         if auto_column_detect and pixel_columns is None:
-            column_canditates = ['pixel_' + suffix for suffix in component_suffixes] 
+            column_canditates = ['pixel_' + suffix for suffix in component_suffixes]
             pixel_columns = [c for c in column_canditates if c in self.frame.columns]
 
         if pixel_columns:
@@ -241,7 +241,7 @@ class GazeDataFrame:
             column_specifiers.append(pixel_columns)
 
         if auto_column_detect and position_columns is None:
-            column_canditates = ['position_' + suffix for suffix in component_suffixes] 
+            column_canditates = ['position_' + suffix for suffix in component_suffixes]
             position_columns = [c for c in column_canditates if c in self.frame.columns]
 
         if position_columns:
@@ -250,7 +250,7 @@ class GazeDataFrame:
             column_specifiers.append(position_columns)
 
         if auto_column_detect and velocity_columns is None:
-            column_canditates = ['velocity_' + suffix for suffix in component_suffixes] 
+            column_canditates = ['velocity_' + suffix for suffix in component_suffixes]
             velocity_columns = [c for c in column_canditates if c in self.frame.columns]
 
         if velocity_columns:
@@ -259,7 +259,7 @@ class GazeDataFrame:
             column_specifiers.append(velocity_columns)
 
         if auto_column_detect and acceleration_columns is None:
-            column_canditates = ['acceleration_' + suffix for suffix in component_suffixes] 
+            column_canditates = ['acceleration_' + suffix for suffix in component_suffixes]
             acceleration_columns = [c for c in column_canditates if c in self.frame.columns]
 
         if acceleration_columns:
