@@ -977,7 +977,8 @@ import pymovements as pm
                     schema={
                         'time': pl.Int64,
                         'acceleration_x': pl.Float64,
-                        'acceleration_y': pl.Float64},
+                        'acceleration_y': pl.Float64,
+                    },
                 ),
                 'auto_column_detect': True,
             },
