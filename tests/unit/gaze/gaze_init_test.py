@@ -896,6 +896,98 @@ import pymovements as pm
             2,
             id='df_three_rows_two_position_columns_no_time_1000_hz',
         ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1, 2, 3],
+                        'pixel_x': [0., 1., 2.],
+                        'pixel_y': [3., 4., 5.],
+                    },
+                    schema={'time': pl.Int64, 'pixel_x': pl.Float64, 'pixel_y': pl.Float64},
+                ),
+                'auto_column_detect': True,
+            },
+            pl.from_dict(
+                {
+                    'time': [1, 2, 3],
+                    'pixel': [[0., 3.], [1., 4.], [2., 5.]],
+                },
+                schema={'time': pl.Int64, 'pixel': pl.List(pl.Float64)},
+            ),
+            2,
+            id='df_auto_columns_pixel',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1, 2, 3],
+                        'position_x': [0., 1., 2.],
+                        'position_y': [3., 4., 5.],
+                    },
+                    schema={'time': pl.Int64, 'position_x': pl.Float64, 'position_y': pl.Float64},
+                ),
+                'auto_column_detect': True,
+            },
+            pl.from_dict(
+                {
+                    'time': [1, 2, 3],
+                    'position': [[0., 3.], [1., 4.], [2., 5.]],
+                },
+                schema={'time': pl.Int64, 'position': pl.List(pl.Float64)},
+            ),
+            2,
+            id='df_auto_columns_position',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1, 2, 3],
+                        'velocity_x': [0., 1., 2.],
+                        'velocity_y': [3., 4., 5.],
+                    },
+                    schema={'time': pl.Int64, 'velocity_x': pl.Float64, 'velocity_y': pl.Float64},
+                ),
+                'auto_column_detect': True,
+            },
+            pl.from_dict(
+                {
+                    'time': [1, 2, 3],
+                    'velocity': [[0., 3.], [1., 4.], [2., 5.]],
+                },
+                schema={'time': pl.Int64, 'velocity': pl.List(pl.Float64)},
+            ),
+            2,
+            id='df_auto_columns_velocity',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1, 2, 3],
+                        'acceleration_x': [0., 1., 2.],
+                        'acceleration_y': [3., 4., 5.],
+                    },
+                    schema={'time': pl.Int64, 'acceleration_x': pl.Float64, 'acceleration_y': pl.Float64},
+                ),
+                'auto_column_detect': True,
+            },
+            pl.from_dict(
+                {
+                    'time': [1, 2, 3],
+                    'acceleration': [[0., 3.], [1., 4.], [2., 5.]],
+                },
+                schema={'time': pl.Int64, 'acceleration': pl.List(pl.Float64)},
+            ),
+            2,
+            id='df_auto_columns_acceleration',
+        ),
     ],
 )
 def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, expected_n_components):
