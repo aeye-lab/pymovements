@@ -1412,7 +1412,7 @@ def test_gaze_dataframe_smooth_expected_column(
                 'distance_column': 'd',
             },
             {
-                'resampling_rate': 2000
+                'resampling_rate': 2000,
             },
             pm.GazeDataFrame(
                 data=pl.from_dict(
@@ -1444,7 +1444,7 @@ def test_gaze_dataframe_smooth_expected_column(
                 'distance_column': 'd',
             },
             {
-                'resampling_rate': 2000
+                'resampling_rate': 2000,
             },
             pm.GazeDataFrame(
                 data=pl.from_dict(
@@ -1483,7 +1483,7 @@ def test_gaze_dataframe_smooth_expected_column(
             },
             {
                 'resampling_rate': 2000,
-                'columns': 'pixel'
+                'columns': 'pixel',
             },
             pm.GazeDataFrame(
                 data=pl.from_dict(
@@ -1521,7 +1521,7 @@ def test_gaze_dataframe_smooth_expected_column(
             },
             {
                 'resampling_rate': 2000,
-                'columns': ['pixel']
+                'columns': ['pixel'],
             },
             pm.GazeDataFrame(
                 data=pl.from_dict(
@@ -1551,6 +1551,7 @@ def test_gaze_dataframe_resample_expected(
     gaze.resample(**kwargs)
 
     assert_frame_equal(gaze.frame, expected.frame)
+
 
 def test_gaze_dataframe_resample_changes_experiemnt_sampling_rate(experiment):
     gaze = pm.GazeDataFrame(

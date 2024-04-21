@@ -1,29 +1,50 @@
+# Copyright (c) 2024 The pymovements Project Authors
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
 import pymovements as pm
 
+
 @pytest.mark.parametrize(
     ('kwargs', 'df', 'expected_df'),
     [
-        #-----------------No Interpolation, just concerned with time-----------------
+        # -----------------No Interpolation, just concerned with time-----------------
         pytest.param(
             {
                 'resampling_rate': 1000,
-                'columns' : None
+                'columns': None,
             },
             pl.DataFrame(
                 {
                     'time': [0, 1, 2, 3, 4, 5],
                     'pixel': [1, 2, 3, 4, 5, 6],
-                }
+                },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 1, 2, 3, 4, 5],
                     'pixel': [1, 2, 3, 4, 5, 6],
-                }
+                },
             ),
             id='resample_same_sampling_rate',
         ),
@@ -31,19 +52,19 @@ import pymovements as pm
         pytest.param(
             {
                 'resampling_rate': 2000,
-                'columns': None
+                'columns': None,
             },
             pl.DataFrame(
                 {
                     'time': [0, 1, 2, 3, 4, 5],
                     'pixel': [1, 2, 3, 4, 5, 6],
-                }
+                },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5],
                     'pixel': [1, None, 2, None, 3, None, 4, None, 5, None, 6],
-                }
+                },
             ),
             id='upsample_1000_to_2000_no_interpolation',
         ),
@@ -51,19 +72,19 @@ import pymovements as pm
         pytest.param(
             {
                 'resampling_rate': 500,
-                'columns': None
+                'columns': None,
             },
             pl.DataFrame(
                 {
                     'time': [0, 1, 2, 3, 4, 5],
                     'pixel': [1, 2, 3, 4, 5, 6],
-                }
+                },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 2, 4],
                     'pixel': [1, 3, 5],
-                }
+                },
             ),
             id='downsample_1000_to_500_no_interpolation',
         ),
@@ -71,19 +92,19 @@ import pymovements as pm
         pytest.param(
             {
                 'resampling_rate': 500,
-                'columns': None
+                'columns': None,
             },
             pl.DataFrame(
                 {
                     'time': [0, 1, 4, 6, 8, 10],
                     'pixel': [1, 2, 4, 5, 6, 7],
-                }
+                },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 2, 4, 6, 8, 10],
                     'pixel': [1, None, 4, 5, 6, 7],
-                }
+                },
             ),
             id='resample_inconsistent_sampling_rate_no_interpolation',
         ),
@@ -97,13 +118,13 @@ import pymovements as pm
                 {
                     'time': [0, 1, 4, 6, 8, 10],
                     'pixel': [1, 2, 4, 5, 6, 7],
-                }
+                },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                     'pixel': [1, 2, None, None, 4, None, 5, None, 6, None, 7],
-                }
+                },
             ),
             id='upsample_inconsistent_sampling_rate_no_interpolation',
         ),
@@ -117,17 +138,17 @@ import pymovements as pm
                 {
                     'time': [0, 0.5, 1, 1.5, 2, 2.5],
                     'pixel': [1, 2, 3, 4, 5, 6],
-                }
+                },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5],
                     'pixel': [1, None, 2, None, 3, None, 4, None, 5, None, 6],
-                }
+                },
             ),
             id='upsample_2000_to_4000_no_interpolation',
         ),
-        #-----------------With Interpolation-----------------
+        # -----------------With Interpolation-----------------
         pytest.param(
             {
                 'resampling_rate': 1000,
@@ -135,15 +156,15 @@ import pymovements as pm
             },
             pl.DataFrame(
                 {
-                    'time': [0, 2, 4,],
-                    'pixel': [1, 2, 4,],
-                }
+                    'time': [0, 2, 4],
+                    'pixel': [1, 2, 4],
+                },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 1, 2, 3, 4],
                     'pixel': [1, 1.5, 2, 3, 4],
-                }
+                },
             ),
             id='upsample_500_to_1000_interpolate_linear_one_component',
         ),
@@ -156,13 +177,13 @@ import pymovements as pm
                 {
                     'time': [0, 2, 4],
                     'pixel': [1, 2, 4],
-                }
+                },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 1, 2, 3, 4],
                     'pixel': [1., 2., 2., 4., 4.],
-                }
+                },
             ),
             id='upsample_500_to_1000_interpolate_nearest_one_component',
         ),
@@ -175,13 +196,13 @@ import pymovements as pm
                 {
                     'time': [0, 2, 4],
                     'pixel': [1, 2, 4],
-                }
+                },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4],
                     'pixel': [1., 1., 2., 2., 2., 2., 4., 4., 4.],
-                }
+                },
             ),
             id='upsample_500_to_2000_interpolate_nearest_one_component',
         ),
@@ -192,15 +213,15 @@ import pymovements as pm
             },
             pl.DataFrame(
                 {
-                    'time': [0, 2, 4, ],
-                    'pixel': [1, 2, 4, ],
-                }
+                    'time': [0, 2, 4],
+                    'pixel': [1, 2, 4],
+                },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 1, 2, 3, 4],
                     'pixel': [1., 1., 2., 2., 4.],
-                }
+                },
             ),
             id='upsample_500_to_1000_fill_forward_one_component',
         ),
@@ -211,19 +232,19 @@ import pymovements as pm
             },
             pl.DataFrame(
                 {
-                    'time': [0, 2, 4, ],
-                    'pixel': [1, 2, 4, ],
-                }
+                    'time': [0, 2, 4],
+                    'pixel': [1, 2, 4],
+                },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 1, 2, 3, 4],
                     'pixel': [1., 2., 2., 4., 4.],
-                }
+                },
             ),
             id='upsample_500_to_1000_fill_backward_one_component',
         ),
-    #-----------------Interpolation multiple components-----------------
+        # -----------------Interpolation multiple components-----------------
         pytest.param(
             {
                 'resampling_rate': 1000,
@@ -232,15 +253,15 @@ import pymovements as pm
             },
             pl.DataFrame(
                 {
-                    'time': [0, 2, 4, ],
+                    'time': [0, 2, 4],
                     'pixel': [[1, 2], [2, 3], [3, 4]],
-                }
+                },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 1, 2, 3, 4],
                     'pixel': [[1., 2.], [1.5, 2.5], [2., 3.], [2.5, 3.5], [3., 4.]],
-                }
+                },
             ),
             id='upsample_500_to_1000_interpolate_linear_two_components',
         ),
@@ -254,13 +275,13 @@ import pymovements as pm
                 {
                     'time': [0, 2, 4],
                     'pixel': [[1, 2], [2, 3], [3, 4]],
-                }
+                },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 1, 2, 3, 4],
                     'pixel': [[1., 2.], [2., 3.], [2., 3.], [3., 4.], [3., 4.]],
-                }
+                },
             ),
             id='upsample_500_to_1000_interpolate_nearest_two_components',
         ),
@@ -274,16 +295,16 @@ import pymovements as pm
                 {
                     'time': [0, 2, 4],
                     'pixel': [[1, 2], [2, 3], [3, 4]],
-                }
+                },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4],
                     'pixel': [
                         [1., 2.], [1., 2.], [2., 3.], [2., 3.], [2., 3.],
-                        [2., 3.], [3., 4.], [3., 4.], [3., 4.]
+                        [2., 3.], [3., 4.], [3., 4.], [3., 4.],
                     ],
-                }
+                },
             ),
             id='upsample_500_to_2000_interpolate_nearest_two_components',
         ),
@@ -295,15 +316,15 @@ import pymovements as pm
             },
             pl.DataFrame(
                 {
-                    'time': [0, 2, 4, ],
+                    'time': [0, 2, 4],
                     'pixel': [[1, 2], [2, 3], [3, 4]],
-                }
+                },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 1, 2, 3, 4],
                     'pixel': [[1., 2.], [1., 2.], [2., 3.], [2., 3.], [3., 4.]],
-                }
+                },
             ),
             id='upsample_500_to_1000_fill_forward_two_components',
         ),
@@ -315,15 +336,15 @@ import pymovements as pm
             },
             pl.DataFrame(
                 {
-                    'time': [0, 2, 4, ],
+                    'time': [0, 2, 4],
                     'pixel': [[1, 2], [2, 3], [3, 4]],
-                }
+                },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 1, 2, 3, 4],
                     'pixel': [[1., 2.], [2., 3.], [2., 3.], [3., 4.], [3., 4.]],
-                }
+                },
             ),
             id='upsample_500_to_1000_fill_backward_two_components',
         ),
@@ -337,11 +358,11 @@ import pymovements as pm
             },
             pl.DataFrame(
                 {
-                    'time': [0, 2, 4, ],
+                    'time': [0, 2, 4],
                     'pixel': [[1, 2], [2, 3], [3, 4]],
                     'distance': [1, 2, 4],
                     'other': [1, 2, 4],
-                }
+                },
             ),
             pl.DataFrame(
                 {
@@ -349,7 +370,7 @@ import pymovements as pm
                     'pixel': [[1., 2.], [1.5, 2.5], [2., 3.], [2.5, 3.5], [3., 4.]],
                     'distance': [1, 1.5, 2, 3, 4],
                     'other': [1, None, 2, None, 4],
-                }
+                },
             ),
             id='upsample_500_to_1000_interpolate_linear_one_component_specific_columns_list',
         ),
@@ -362,11 +383,11 @@ import pymovements as pm
             },
             pl.DataFrame(
                 {
-                    'time': [0, 2, 4, ],
+                    'time': [0, 2, 4],
                     'pixel': [[1, 2], [2, 3], [3, 4]],
                     'distance': [1, 2, 4],
                     'other': [1, 2, 4],
-                }
+                },
             ),
             pl.DataFrame(
                 {
@@ -374,7 +395,7 @@ import pymovements as pm
                     'pixel': [[1., 2.], [1.5, 2.5], [2., 3.], [2.5, 3.5], [3., 4.]],
                     'distance': [1, None, 2, None, 4],
                     'other': [1, None, 2, None, 4],
-                }
+                },
             ),
             id='upsample_500_to_1000_interpolate_linear_one_component_specific_columnn_string',
         ),
@@ -386,15 +407,15 @@ import pymovements as pm
             },
             pl.DataFrame(
                 {
-                    'time': [0, 2, 4, ],
+                    'time': [0, 2, 4],
                     'pixel': [None, 2, 4],
-                }
+                },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 1, 2, 3, 4],
                     'pixel': [None, None, 2., 3., 4.],
-                }
+                },
             ),
             id='upsample_500_to_1000_interpolate_linear_one_component_with_none_values',
         ),
@@ -406,15 +427,15 @@ import pymovements as pm
             },
             pl.DataFrame(
                 {
-                    'time': [0, 2, 4, ],
+                    'time': [0, 2, 4],
                     'pixel': [None, 2, 4],
-                }
+                },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 1, 2, 3, 4],
                     'pixel': [None, None, 2., 4., 4.],
-                }
+                },
             ),
             id='upsample_500_to_1000_interpolate_nearest_one_component_with_none_values',
         ),
@@ -426,15 +447,15 @@ import pymovements as pm
             },
             pl.DataFrame(
                 {
-                    'time': [0, 2, 4, ],
+                    'time': [0, 2, 4],
                     'pixel': [None, 2, 4],
-                }
+                },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 1, 2, 3, 4],
                     'pixel': [None, None, 2., 2., 4.],
-                }
+                },
             ),
             id='upsample_500_to_1000_fill_forward_one_component_with_none_values',
         ),
@@ -446,15 +467,15 @@ import pymovements as pm
             },
             pl.DataFrame(
                 {
-                    'time': [0, 2, 4, ],
+                    'time': [0, 2, 4],
                     'pixel': [None, 2, 4],
-                }
+                },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 1, 2, 3, 4],
                     'pixel': [None, 2., 2., 4., 4.],
-                }
+                },
             ),
             id='upsample_500_to_1000_fill_backward_one_component_with_none_values',
         ),
@@ -468,7 +489,7 @@ import pymovements as pm
                 {
                     'time': [1713398400010, 1713398400011, 1713398400012],
                     'pixel': [1, 2, 4],
-                }
+                },
             ),
             pl.DataFrame(
                 {
@@ -477,10 +498,10 @@ import pymovements as pm
                         1713398400010.5,
                         1713398400011.0,
                         1713398400011.5,
-                        1713398400012.0
+                        1713398400012.0,
                     ],
                     'pixel': [1.0, None, 2.0, None, 4.0],
-                }
+                },
             ),
             id='upsample_unix_timestamps_int',
         ),
@@ -493,7 +514,7 @@ import pymovements as pm
                 {
                     'time': [1713398400010., 1713398400011., 1713398400012.],
                     'pixel': [1, 2, 4],
-                }
+                },
             ),
             pl.DataFrame(
                 {
@@ -502,10 +523,10 @@ import pymovements as pm
                         1713398400010.5,
                         1713398400011.0,
                         1713398400011.5,
-                        1713398400012.0
+                        1713398400012.0,
                     ],
                     'pixel': [1.0, None, 2.0, None, 4.0],
-                }
+                },
             ),
             id='upsample_unix_timestamps_float',
         ),
@@ -519,7 +540,7 @@ import pymovements as pm
             pl.DataFrame(schema={'time': pl.Int32, 'pixel': pl.Float32}),
             id='resample_empty_df',
         ),
-    ]
+    ],
 )
 def test_resample_returns(kwargs, df, expected_df):
     """Test if resample returns expected DataFrame."""
@@ -578,12 +599,12 @@ def test_resample_returns(kwargs, df, expected_df):
             ['unsupported resampling rate'],
             id='unsupported_resampling_rate',
         ),
-    ]
+    ],
 )
 def test_resample_raises_error(kwargs, exception, msg_substrings):
     df = pl.DataFrame({
         'time': [0, 1, 2, 3, 4, 5],
-        'pixel': [[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7]]
+        'pixel': [[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7]],
     })
 
     with pytest.raises(exception) as excinfo:

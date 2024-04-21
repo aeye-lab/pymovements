@@ -769,14 +769,14 @@ def resample(
     if 1000000 % resample_step_us != 0:
         raise ValueError(
             f'Unsupported resampling rate: {resampling_rate}.'
-            f' Resample rate must be a divisor of 1000000.'
+            f' Resample rate must be a divisor of 1000000.',
         )
 
     resample_step_us = int(resample_step_us)
 
     # Create microsecond precision datetime column from millisecond time column
     frame = frame.with_columns(
-        pl.col('time').cast(pl.Float64).mul(1000).cast(pl.Datetime('us')).alias('datetime')
+        pl.col('time').cast(pl.Float64).mul(1000).cast(pl.Datetime('us')).alias('datetime'),
     )
 
     # Sort columns by datetime
@@ -796,7 +796,7 @@ def resample(
         time_column='datetime',
         every=f'{resample_step_us}us',
     ).with_columns(
-        pl.col('datetime').cast(pl.Float64).truediv(1000).alias('time')
+        pl.col('datetime').cast(pl.Float64).truediv(1000).alias('time'),
     ).drop('datetime')
 
     # Convert time column to integer if all values are integers
@@ -806,14 +806,14 @@ def resample(
 
     if all_decimals:
         frame = frame.with_columns(
-            pl.col('time').cast(pl.Int64)
+            pl.col('time').cast(pl.Int64),
         )
 
     # Fill null values with specified strategy
     if columns is not None and fill_null_strategy is not None:
         if fill_null_strategy in {'forward', 'backward'}:
             frame = frame.with_columns(
-                pl.col(columns).fill_null(strategy=fill_null_strategy)
+                pl.col(columns).fill_null(strategy=fill_null_strategy),
             )
         elif fill_null_strategy in {'interpolate_linear', 'interpolate_nearest'}:
             _, interpolate_method = fill_null_strategy.split('_')
@@ -1066,7 +1066,7 @@ def _apply_on_columns(
             # Raise an error if n_components is not specified for nested columns
             if n_components is None:
                 raise ValueError(
-                    f'n_components must be specified when processing nested column {column}'
+                    f'n_components must be specified when processing nested column {column}',
                 )
 
             # Apply the function on the nested components separately
@@ -1075,12 +1075,12 @@ def _apply_on_columns(
                     [
                         pl.col(column).list.get(component).map_batches(transformation)
                         for component in range(n_components)
-                    ]
-                ).alias(column)
+                    ],
+                ).alias(column),
             )
         else:
             frame = frame.with_columns(
-                pl.col(column).map_batches(transformation).alias(column)
+                pl.col(column).map_batches(transformation).alias(column),
             )
 
     return frame

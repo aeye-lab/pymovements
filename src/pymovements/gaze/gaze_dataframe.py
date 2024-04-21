@@ -328,7 +328,8 @@ class GazeDataFrame:
                     resample_columns = [resample_columns]
 
                 if resample_columns is not None:
-                    resample_columns = [col for col in resample_columns if col not in self.trial_columns]
+                    resample_columns = [
+                        col for col in resample_columns if col not in self.trial_columns]
 
                 self.frame = pl.concat(
                     [
@@ -346,7 +347,7 @@ class GazeDataFrame:
 
                 # forward fill trial columns
                 self.frame = self.frame.with_columns(
-                    pl.col(self.trial_columns).fill_null(strategy='forward')
+                    pl.col(self.trial_columns).fill_null(strategy='forward'),
                 )
 
             # set new sampling rate in experiment
@@ -700,7 +701,6 @@ class GazeDataFrame:
             columns=columns,
             fill_null_strategy=fill_null_strategy,
         )
-
 
     def smooth(
             self,
