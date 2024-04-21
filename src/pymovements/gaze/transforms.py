@@ -718,6 +718,132 @@ def savitzky_golay(
 
 
 @register_transform
+def resample(
+        frame: pl.DataFrame,
+        resampling_rate: float,
+        fill_null_strategy: str = 'interpolate_linear',
+        columns: str | list[str] = 'all',
+        n_components: int = None,
+) -> pl.DataFrame:
+    """
+    Resample a DataFrame to a new sampling rate by timestamps in time column. The DataFrame is resampled by
+    upsampling or downsampling the data to the new sampling rate. Can also be used to achieve a
+    constant sampling rate for inconsistent data.
+
+    Parameters
+    ----------
+    frame: pl.DataFrame
+        The DataFrame to resample.
+    resampling_rate: float
+        The new sampling rate.
+    columns: str | list[str]
+        The columns to apply the fill null strategy. Specify a single column name or a list of column names.
+        If 'all' is specified, the fill null strategy is applied to all columns. (default: 'all')
+    fill_null_strategy: str
+        The strategy to fill null values of the resampled DataFrame. Supported strategies are: 'forward', 'backward',
+        'interpolate_linear', 'interpolate_nearest'. (default: 'interpolate_linear')
+    n_components: int
+        Number of components of nested columns in columns. (default: None)
+
+
+    Returns
+    -------
+    pl.DataFrame
+        The resampled DataFrame.
+    """
+    if columns == 'all':
+        columns = [column for column in frame.columns if column != 'time']
+    elif isinstance(columns, str):
+        columns = [columns]
+
+    checks.check_is_greater_than_zero(resampling_rate=resampling_rate)
+
+    # Return frame if empty
+    if frame.is_empty():
+        return frame
+
+    # Calculate resampling time steps in microseconds
+    resample_step_us = 1000000 / resampling_rate
+
+    # Check if resample rate is supported when using microsecond precision
+    if 1000000 % resample_step_us != 0:
+        raise ValueError(
+            f'Unsupported resampling rate: {resampling_rate}.'
+            f' Resample rate must be a divisor of 1000000.'
+        )
+
+    resample_step_us = int(resample_step_us)
+
+    # Create microsecond precision datetime column from millisecond time column
+    frame = frame.with_columns(
+        pl.col('time').cast(pl.Float64).mul(1000).cast(pl.Datetime('us')).alias('datetime')
+    )
+
+    # Sort columns by datetime
+    frame = frame.sort('datetime')
+
+    # Replace pre-existing null values with NaN as they should not be interpolated
+    if columns is not None:
+        frame = _apply_on_columns(
+            frame,
+            columns=columns,
+            transformation=lambda series: series.fill_null(np.nan),
+            n_components=n_components,
+        )
+
+    # Resample data by datetime column, create milliseconds time column and drop datetime column
+    frame = frame.upsample(
+        time_column='datetime',
+        every=f'{resample_step_us}us',
+    ).with_columns(
+        pl.col('datetime').cast(pl.Float64).truediv(1000).alias('time')
+    ).drop('datetime')
+
+    # Convert time column to integer if all values are integers
+    all_decimals = frame.select(
+        pl.col('time').round().eq(pl.col('time')).all(),
+    ).item()
+
+    if all_decimals:
+        frame = frame.with_columns(
+            pl.col('time').cast(pl.Int64)
+        )
+
+    # Fill null values with specified strategy
+    if columns is not None and fill_null_strategy is not None:
+        if fill_null_strategy in {'forward', 'backward'}:
+            frame = frame.with_columns(
+                pl.col(columns).fill_null(strategy=fill_null_strategy)
+            )
+        elif fill_null_strategy in {'interpolate_linear', 'interpolate_nearest'}:
+            _, interpolate_method = fill_null_strategy.split('_')
+
+            frame = _apply_on_columns(
+                frame=frame,
+                columns=columns,
+                transformation=lambda series: series.interpolate(
+                    method=interpolate_method,
+                ),
+                n_components=n_components,
+            )
+        else:
+            raise ValueError(
+                f'Unknown fill_null_strategy: {fill_null_strategy}.'
+                ' Supported strategies are: forward, backward, interpolate_linear, interpolate_nearest',
+            )
+
+        # Replace the pre-existing NaN values with Null
+        frame = _apply_on_columns(
+            frame,
+            columns=columns,
+            transformation=lambda series: series.fill_nan(None),
+            n_components=n_components,
+        )
+
+    return frame
+
+
+@register_transform
 def smooth(
         *,
         method: str,
@@ -906,6 +1032,58 @@ def clip(
             for component in range(n_components)
         ],
     ).alias(output_column)
+
+
+def _apply_on_columns(
+    frame: pl.DataFrame,
+    columns: list[str],
+    transformation: Callable,
+    n_components: int = None,
+) -> pl.DataFrame:
+    """
+    Apply a function on nested and normal columns of a DataFrame.
+
+    Parameters
+    ----------
+    frame: pl.DataFrame
+        The DataFrame to apply the function on.
+    columns: list[str]
+        The columns to apply the function on.
+    transformation: Callable
+        The function to apply on the specified columns.
+    n_components: int
+        Number of components of nested columns in columns. (default: None)
+
+    Returns
+    -------
+    pl.DataFrame
+        The DataFrame with the function applied on the specified columns.
+    """
+    for column in columns:
+        # Determine if the column is nested based on its data type
+        if frame.schema[column] == pl.List:
+
+            # Raise an error if n_components is not specified for nested columns
+            if n_components is None:
+                raise ValueError(
+                    f'n_components must be specified when processing nested column {column}'
+                )
+
+            # Apply the function on the nested components separately
+            frame = frame.with_columns(
+                pl.concat_list(
+                    [
+                        pl.col(column).list.get(component).map_batches(transformation)
+                        for component in range(n_components)
+                    ]
+                ).alias(column)
+            )
+        else:
+            frame = frame.with_columns(
+                pl.col(column).map_batches(transformation).alias(column)
+            )
+
+    return frame
 
 
 def _identity(x: Any) -> Any:

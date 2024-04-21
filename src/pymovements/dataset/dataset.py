@@ -287,6 +287,11 @@ class Dataset:
 
         >>> dataset.apply('microsaccades', minimum_duration=8)# doctest:+ELLIPSIS
         <pymovements.dataset.dataset.Dataset object at ...>
+
+        Use apply for upsampling, downsampling or making the sampling rate constant
+        using resample:
+        >>> dataset.apply('resample', resampling_rate=2000)# doctest:+ELLIPSIS
+        <pymovements.dataset.dataset.Dataset object at ...>
         """
         self._check_gaze_dataframe()
 
@@ -346,6 +351,39 @@ class Dataset:
             output_column=output_column,
             verbose=verbose,
             **kwargs,
+        )
+
+    def resample(
+            self,
+            resampling_rate: float,
+            fill_null_strategy: str = 'interpolate_linear',
+            columns: str | list[str] = 'all',
+            verbose: bool = True,
+    ) -> Dataset:
+        """
+        Resample a DataFrame to a new sampling rate by timestamps in time column. The DataFrame is resampled by
+        upsampling or downsampling the data to the new sampling rate. Can also be used to achieve a
+        constant sampling rate for inconsistent data.
+
+        Parameters
+        ----------
+        resampling_rate: float
+            The new sampling rate.
+        columns: str | list[str]
+            The columns to apply the fill null strategy. Specify a single column name or a list of column names.
+            If 'all' is specified, the fill null strategy is applied to all columns. (default: 'all')
+        fill_null_strategy: str
+            The strategy to fill null values of the resampled DataFrame. Supported strategies are: 'forward', 'backward',
+            'interpolate_linear', 'interpolate_nearest'. (default: 'interpolate_linear')
+        verbose: bool
+            If True, show progress of computation. (default: True)
+        """
+        return self.apply(
+            'resample',
+            resampling_rate=resampling_rate,
+            fill_null_strategy=fill_null_strategy,
+            columns=columns,
+            verbose=verbose,
         )
 
     def pix2deg(self, verbose: bool = True) -> Dataset:

@@ -147,6 +147,7 @@ def test_gaze_file_processing(gaze_from_kwargs):
         gaze.pix2deg()
     gaze.pos2vel()
     gaze.pos2acc()
+    gaze.resample(resampling_rate=2000)
 
     assert 'position' in gaze.columns
     assert 'velocity' in gaze.columns
