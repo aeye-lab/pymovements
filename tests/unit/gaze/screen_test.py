@@ -46,3 +46,55 @@ def test_screen_pix2deg_with_no_distance_cm():
 def test_screen_pix2deg_with_distance_cm():
     screen = pm.Screen(1920, 1080, 30, 20, 60, 'upper left')
     screen.pix2deg([[0, 0]])
+
+
+@pytest.mark.parametrize(
+    ('missing_attribute', 'exception', 'exception_msg'),
+    [
+        pytest.param(
+            'width_px',
+            ValueError,
+            'width_px must not be None when using this method',
+            id='width_px',
+        ),
+        pytest.param(
+            'height_px',
+            ValueError,
+            'height_px must not be None when using this method',
+            id='height_px',
+        ),
+        pytest.param(
+            'width_cm',
+            ValueError,
+            'width_cm must not be None when using this method',
+            id='width_cm',
+        ),
+        pytest.param(
+            'height_cm',
+            ValueError,
+            'height_cm must not be None when using this method',
+            id='height_cm',
+        ),
+        pytest.param(
+            'distance_cm',
+            ValueError,
+            'distance_cm must not be None when using this method',
+            id='distance_cm',
+        ),
+        pytest.param(
+            'origin',
+            ValueError,
+            'origin must not be None when using this method',
+            id='origin',
+        ),
+    ],
+)
+def test_pix2deg_without_attributes(missing_attribute, exception, exception_msg):
+    screen = pm.Screen(1920, 1080, 30, 20, 68.0, 'upper left')
+    setattr(screen, missing_attribute, None)
+
+    with pytest.raises(exception) as excinfo:
+        screen.pix2deg([[0, 0]])
+
+    msg, = excinfo.value.args
+    assert msg == exception_msg
