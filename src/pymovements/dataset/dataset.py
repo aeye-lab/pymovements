@@ -356,27 +356,35 @@ class Dataset:
     def resample(
             self,
             resampling_rate: float,
-            fill_null_strategy: str = 'interpolate_linear',
             columns: str | list[str] = 'all',
+            fill_null_strategy: str = 'interpolate_linear',
             verbose: bool = True,
     ) -> Dataset:
         """
-        Resample a DataFrame to a new sampling rate by timestamps in time column. The DataFrame is resampled by
-        upsampling or downsampling the data to the new sampling rate. Can also be used to achieve a
-        constant sampling rate for inconsistent data.
+        Resample a DataFrame to a new sampling rate by timestamps in time column. The DataFrame is
+        resampled by upsampling or downsampling the data to the new sampling rate. Can also be used
+        to achieve a constant sampling rate for inconsistent data.
 
         Parameters
         ----------
         resampling_rate: float
             The new sampling rate.
+        resampling_rate: float
+            The new sampling rate.
         columns: str | list[str]
-            The columns to apply the fill null strategy. Specify a single column name or a list of column names.
-            If 'all' is specified, the fill null strategy is applied to all columns. (default: 'all')
+            The columns to apply the fill null strategy. Specify a single column name or a list of
+            column names. If 'all' is specified, the fill null strategy is applied to all columns.
+            (default: 'all')
         fill_null_strategy: str
-            The strategy to fill null values of the resampled DataFrame. Supported strategies are: 'forward', 'backward',
-            'interpolate_linear', 'interpolate_nearest'. (default: 'interpolate_linear')
+            The strategy to fill null values of the resampled DataFrame. Supported strategies
+            are: 'forward', 'backward', 'interpolate_linear', 'interpolate_nearest'.
+            (default: 'interpolate_linear')
         verbose: bool
             If True, show progress of computation. (default: True)
+
+        Returns
+        -------
+        Dataset
         """
         return self.apply(
             'resample',

@@ -618,20 +618,24 @@ class GazeDataFrame:
             columns: str | list[str] = 'all',
     ) -> None:
         """
-        Resample a DataFrame to a new sampling rate by timestamps in time column. The DataFrame is resampled by
-        upsampling or downsampling the data to the new sampling rate. Can also be used to achieve a
-        constant sampling rate for inconsistent data.
+        Resample a DataFrame to a new sampling rate by timestamps in time column. The DataFrame is
+        resampled by upsampling or downsampling the data to the new sampling rate. Can also be used
+        to achieve a constant sampling rate for inconsistent data.
 
         Parameters
         ----------
         resampling_rate: float
             The new sampling rate.
+        resampling_rate: float
+            The new sampling rate.
         columns: str | list[str]
-            The columns to apply the fill null strategy. Specify a single column name or a list of column names.
-            If 'all' is specified, the fill null strategy is applied to all columns. (default: 'all')
+            The columns to apply the fill null strategy. Specify a single column name or a list of
+            column names. If 'all' is specified, the fill null strategy is applied to all columns.
+            (default: 'all')
         fill_null_strategy: str
-            The strategy to fill null values of the resampled DataFrame. Supported strategies are: 'forward', 'backward',
-            'interpolate_linear', 'interpolate_nearest'. (default: 'interpolate_linear')
+            The strategy to fill null values of the resampled DataFrame. Supported strategies
+            are: 'forward', 'backward', 'interpolate_linear', 'interpolate_nearest'.
+            (default: 'interpolate_linear')
 
         Examples
         --------
@@ -657,7 +661,8 @@ class GazeDataFrame:
         │ 4    ┆ [5, 5]    │
         └──────┴───────────┘
 
-        We can now upsample the GazeDataFrame to 2000Hz with interpolating the values in the pixel column.
+        We can now upsample the GazeDataFrame to 2000Hz with interpolating the values in
+        the pixel column.
         >>> gaze.resample(
         ...     resampling_rate=2000,
         ...     fill_null_strategy='interpolate_linear',

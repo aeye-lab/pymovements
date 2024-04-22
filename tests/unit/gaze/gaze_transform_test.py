@@ -1395,9 +1395,8 @@ def test_gaze_dataframe_smooth_expected_column(
 
 
 @pytest.mark.parametrize(
-    ('gaze_init_kwargs', 'kwargs', 'expected'),
+    ('gaze_init_kwargs', 'kwargs', 'expected_frame'),
     [
-        # Test with no trial columns
         pytest.param(
             {
                 'data': pl.from_dict(
@@ -1414,17 +1413,12 @@ def test_gaze_dataframe_smooth_expected_column(
             {
                 'resampling_rate': 2000,
             },
-            pm.GazeDataFrame(
-                data=pl.from_dict(
-                    {
-                        'time': [1000.0, 1000.5, 1001.0],
-                        'x_pix': [0.0, 0.5, 1.0],
-                        'y_pix': [0.0, 0.5, 1.0],
-                        'd': [1, 0.5, 0],
-                    },
-                ),
-                pixel_columns=['x_pix', 'y_pix'],
-                distance_column='d',
+            pl.from_dict(
+                {
+                    'time': [1000.0, 1000.5, 1001.0],
+                    'distance': [1, 0.5, 0],
+                    'pixel': [[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]],
+                },
             ),
             id='resample_all_columns_no_trials',
         ),
@@ -1446,23 +1440,21 @@ def test_gaze_dataframe_smooth_expected_column(
             {
                 'resampling_rate': 2000,
             },
-            pm.GazeDataFrame(
-                data=pl.from_dict(
-                    {
-                        'time': [
-                            1000.0, 1000.5, 1001.0,
-                            2000.0, 2000.5, 2001.0,
-                            3000.0, 3000.5, 3001.0,
-                        ],
-                        'x_pix': [0.0, 0.5, 1.0, 0.0, 0.5, 1.0, 0.0, 0.5, 1.0],
-                        'y_pix': [0.0, 0.5, 1.0, 0.0, 0.5, 1.0, 0.0, 0.5, 1.0],
-                        'd': [1, 0.5, 0, 1, 0.5, 0, 1, 0.5, 0],
-                        'trial_id': [1, 1, 1, 2, 2, 2, 3, 3, 3],
-                    },
-                ),
-                pixel_columns=['x_pix', 'y_pix'],
-                distance_column='d',
-                trial_columns='trial_id',
+            pl.from_dict(
+                {
+                    'time': [
+                        1000.0, 1000.5, 1001.0,
+                        2000.0, 2000.5, 2001.0,
+                        3000.0, 3000.5, 3001.0,
+                    ],
+                    'distance': [1, 0.5, 0, 1, 0.5, 0, 1, 0.5, 0],
+                    'trial_id': [1, 1, 1, 2, 2, 2, 3, 3, 3],
+                    'pixel': [
+                        [0.0, 0.0], [0.5, 0.5], [1.0, 1.0],
+                        [0.0, 0.0], [0.5, 0.5], [1.0, 1.0],
+                        [0.0, 0.0], [0.5, 0.5], [1.0, 1.0],
+                    ],
+                },
             ),
             id='resample_all_columns_multiple_trials',
         ),
@@ -1483,24 +1475,61 @@ def test_gaze_dataframe_smooth_expected_column(
             },
             {
                 'resampling_rate': 2000,
-                'columns': 'pixel',
+                'columns': None
             },
-            pm.GazeDataFrame(
-                data=pl.from_dict(
+            pl.from_dict(
+                {
+                    'time': [
+                        1000.0, 1000.5, 1001.0,
+                        2000.0, 2000.5, 2001.0,
+                        3000.0, 3000.5, 3001.0,
+                    ],
+                    'distance': [1, None, 0, 1, None, 0, 1, None, 0],
+                    'trial_id': [1, 1, 1, 2, 2, 2, 3, 3, 3],
+                    'pixel': [
+                        [0.0, 0.0], None, [1.0, 1.0],
+                        [0.0, 0.0], None, [1.0, 1.0],
+                        [0.0, 0.0], None, [1.0, 1.0],
+                    ],
+
+                },
+            ),
+            id='resample_no_columns_multiple_trials',
+        ),
+        pytest.param(
+            {
+                'data': pl.from_dict(
                     {
-                        'time': [
-                            1000.0, 1000.5, 1001.0,
-                            2000.0, 2000.5, 2001.0,
-                            3000.0, 3000.5, 3001.0,
-                        ],
-                        'x_pix': [0.0, 0.5, 1.0, 0.0, 0.5, 1.0, 0.0, 0.5, 1.0],
-                        'y_pix': [0.0, 0.5, 1.0, 0.0, 0.5, 1.0, 0.0, 0.5, 1.0],
-                        'd': [1, None, 0, 1, None, 0, 1, None, 0],
-                        'trial_id': [1, 1, 1, 2, 2, 2, 3, 3, 3],
+                        'time': [1000, 1001, 2000, 2001, 3000, 3001],
+                        'x_pix': [0.0, 1.0, 0.0, 1.0, 0.0, 1.0],
+                        'y_pix': [0.0, 1.0, 0.0, 1.0, 0.0, 1.0],
+                        'd': [1, 0, 1, 0, 1, 0],
+                        'trial_id': [1, 1, 2, 2, 3, 3],
                     },
                 ),
-                pixel_columns=['x_pix', 'y_pix'],
-                distance_column='d',
+                'pixel_columns': ['x_pix', 'y_pix'],
+                'trial_columns': 'trial_id',
+                'distance_column': 'd',
+            },
+            {
+                'resampling_rate': 2000,
+                'columns': 'pixel',
+            },
+            pl.from_dict(
+                {
+                    'time': [
+                        1000.0, 1000.5, 1001.0,
+                        2000.0, 2000.5, 2001.0,
+                        3000.0, 3000.5, 3001.0,
+                    ],
+                    'distance': [1, None, 0, 1, None, 0, 1, None, 0],
+                    'trial_id': [1, 1, 1, 2, 2, 2, 3, 3, 3],
+                    'pixel': [
+                        [0.0, 0.0], [0.5, 0.5], [1.0, 1.0],
+                        [0.0, 0.0], [0.5, 0.5], [1.0, 1.0],
+                        [0.0, 0.0], [0.5, 0.5], [1.0, 1.0],
+                    ],
+                },
             ),
             id='resample_single_column_string_multiple_trials',
         ),
@@ -1523,34 +1552,33 @@ def test_gaze_dataframe_smooth_expected_column(
                 'resampling_rate': 2000,
                 'columns': ['pixel'],
             },
-            pm.GazeDataFrame(
-                data=pl.from_dict(
-                    {
-                        'time': [
-                            1000.0, 1000.5, 1001.0,
-                            2000.0, 2000.5, 2001.0,
-                            3000.0, 3000.5, 3001.0,
-                        ],
-                        'x_pix': [0.0, 0.5, 1.0, 0.0, 0.5, 1.0, 0.0, 0.5, 1.0],
-                        'y_pix': [0.0, 0.5, 1.0, 0.0, 0.5, 1.0, 0.0, 0.5, 1.0],
-                        'd': [1, None, 0, 1, None, 0, 1, None, 0],
-                        'trial_id': [1, 1, 1, 2, 2, 2, 3, 3, 3],
-                    },
-                ),
-                pixel_columns=['x_pix', 'y_pix'],
-                distance_column='d',
+            pl.from_dict(
+                {
+                    'time': [
+                        1000.0, 1000.5, 1001.0,
+                        2000.0, 2000.5, 2001.0,
+                        3000.0, 3000.5, 3001.0,
+                    ],
+                    'distance': [1, None, 0, 1, None, 0, 1, None, 0],
+                    'trial_id': [1, 1, 1, 2, 2, 2, 3, 3, 3],
+                    'pixel': [
+                        [0.0, 0.0], [0.5, 0.5], [1.0, 1.0],
+                        [0.0, 0.0], [0.5, 0.5], [1.0, 1.0],
+                        [0.0, 0.0], [0.5, 0.5], [1.0, 1.0],
+                    ],
+                },
             ),
             id='resample_single_column_list_multiple_trials',
         ),
     ],
 )
 def test_gaze_dataframe_resample_expected(
-        gaze_init_kwargs, kwargs, expected,
+        gaze_init_kwargs, kwargs, expected_frame,
 ):
     gaze = pm.GazeDataFrame(**gaze_init_kwargs)
     gaze.resample(**kwargs)
 
-    assert_frame_equal(gaze.frame, expected.frame)
+    assert_frame_equal(gaze.frame, expected_frame)
 
 
 def test_gaze_dataframe_resample_changes_experiemnt_sampling_rate(experiment):

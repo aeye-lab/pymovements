@@ -723,12 +723,12 @@ def resample(
         resampling_rate: float,
         fill_null_strategy: str = 'interpolate_linear',
         columns: str | list[str] = 'all',
-        n_components: int = None,
+        n_components: int | None = None,
 ) -> pl.DataFrame:
     """
-    Resample a DataFrame to a new sampling rate by timestamps in time column. The DataFrame is resampled by
-    upsampling or downsampling the data to the new sampling rate. Can also be used to achieve a
-    constant sampling rate for inconsistent data.
+    Resample a DataFrame to a new sampling rate by timestamps in time column. The DataFrame is
+    resampled by upsampling or downsampling the data to the new sampling rate. Can also be used
+    to achieve a constant sampling rate for inconsistent data.
 
     Parameters
     ----------
@@ -737,19 +737,35 @@ def resample(
     resampling_rate: float
         The new sampling rate.
     columns: str | list[str]
-        The columns to apply the fill null strategy. Specify a single column name or a list of column names.
-        If 'all' is specified, the fill null strategy is applied to all columns. (default: 'all')
+        The columns to apply the fill null strategy. Specify a single column name or a list of
+        column names. If 'all' is specified, the fill null strategy is applied to all columns.
+        (default: 'all')
     fill_null_strategy: str
-        The strategy to fill null values of the resampled DataFrame. Supported strategies are: 'forward', 'backward',
-        'interpolate_linear', 'interpolate_nearest'. (default: 'interpolate_linear')
+        The strategy to fill null values of the resampled DataFrame. Supported strategies
+        are: 'forward', 'backward', 'interpolate_linear', 'interpolate_nearest'.
+        (default: 'interpolate_linear')
     n_components: int
         Number of components of nested columns in columns. (default: None)
-
 
     Returns
     -------
     pl.DataFrame
         The resampled DataFrame.
+
+    Raises
+    ------
+    ValueError
+        If the resampling rate is not a divisor of 1000000.
+
+    Notes
+    -----
+    The following fill null strategies are available:
+
+    * ``forward``: Fill null values with the previous non-null value.
+    * ``backward``: Fill null values with the next non-null value.
+    * ``interpolate_linear``: Fill null values by linear interpolation.
+    * ``interpolate_nearest``: Fill null values by nearest interpolation.
+
     """
     if columns == 'all':
         columns = [column for column in frame.columns if column != 'time']
@@ -829,7 +845,8 @@ def resample(
         else:
             raise ValueError(
                 f'Unknown fill_null_strategy: {fill_null_strategy}.'
-                ' Supported strategies are: forward, backward, interpolate_linear, interpolate_nearest',
+                ' Supported strategies are: '
+                'forward, backward, interpolate_linear, interpolate_nearest',
             )
 
         # Replace the pre-existing NaN values with Null
@@ -1038,7 +1055,7 @@ def _apply_on_columns(
     frame: pl.DataFrame,
     columns: list[str],
     transformation: Callable,
-    n_components: int = None,
+    n_components: int | None = None,
 ) -> pl.DataFrame:
     """
     Apply a function on nested and normal columns of a DataFrame.
@@ -1058,6 +1075,11 @@ def _apply_on_columns(
     -------
     pl.DataFrame
         The DataFrame with the function applied on the specified columns.
+
+    Raises
+    ------
+    ValueError
+        If n_components is not specified when nested columns are present.
     """
     for column in columns:
         # Determine if the column is nested based on its data type
