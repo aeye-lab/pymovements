@@ -329,7 +329,8 @@ class GazeDataFrame:
 
                 if resample_columns is not None:
                     resample_columns = [
-                        col for col in resample_columns if col not in self.trial_columns]
+                        col for col in resample_columns if col not in self.trial_columns
+                    ]
 
                 self.frame = pl.concat(
                     [
@@ -617,15 +618,13 @@ class GazeDataFrame:
             fill_null_strategy: str = 'interpolate_linear',
             columns: str | list[str] = 'all',
     ) -> None:
-        """
-        Resample a DataFrame to a new sampling rate by timestamps in time column. The DataFrame is
-        resampled by upsampling or downsampling the data to the new sampling rate. Can also be used
-        to achieve a constant sampling rate for inconsistent data.
+        """Resample a DataFrame to a new sampling rate by timestamps in time column.
+
+        The DataFrame is resampled by upsampling or downsampling the data to the new sampling rate.
+        Can also be used to achieve a constant sampling rate for inconsistent data.
 
         Parameters
         ----------
-        resampling_rate: float
-            The new sampling rate.
         resampling_rate: float
             The new sampling rate.
         columns: str | list[str]

@@ -1475,7 +1475,7 @@ def test_gaze_dataframe_smooth_expected_column(
             },
             {
                 'resampling_rate': 2000,
-                'columns': None
+                'columns': None,
             },
             pl.from_dict(
                 {

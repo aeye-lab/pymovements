@@ -721,14 +721,14 @@ def savitzky_golay(
 def resample(
         frame: pl.DataFrame,
         resampling_rate: float,
-        fill_null_strategy: str = 'interpolate_linear',
         columns: str | list[str] = 'all',
+        fill_null_strategy: str = 'interpolate_linear',
         n_components: int | None = None,
 ) -> pl.DataFrame:
-    """
-    Resample a DataFrame to a new sampling rate by timestamps in time column. The DataFrame is
-    resampled by upsampling or downsampling the data to the new sampling rate. Can also be used
-    to achieve a constant sampling rate for inconsistent data.
+    """Resample a DataFrame to a new sampling rate by timestamps in time column.
+
+    The DataFrame is resampled by upsampling or downsampling the data to the new sampling rate.
+    Can also be used to achieve a constant sampling rate for inconsistent data.
 
     Parameters
     ----------
@@ -744,7 +744,7 @@ def resample(
         The strategy to fill null values of the resampled DataFrame. Supported strategies
         are: 'forward', 'backward', 'interpolate_linear', 'interpolate_nearest'.
         (default: 'interpolate_linear')
-    n_components: int
+    n_components: int | None
         Number of components of nested columns in columns. (default: None)
 
     Returns
@@ -1057,8 +1057,7 @@ def _apply_on_columns(
     transformation: Callable,
     n_components: int | None = None,
 ) -> pl.DataFrame:
-    """
-    Apply a function on nested and normal columns of a DataFrame.
+    """Apply a function on nested and normal columns of a DataFrame.
 
     Parameters
     ----------
@@ -1068,7 +1067,7 @@ def _apply_on_columns(
         The columns to apply the function on.
     transformation: Callable
         The function to apply on the specified columns.
-    n_components: int
+    n_components: int | None
         Number of components of nested columns in columns. (default: None)
 
     Returns

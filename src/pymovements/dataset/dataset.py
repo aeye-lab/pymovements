@@ -360,15 +360,13 @@ class Dataset:
             fill_null_strategy: str = 'interpolate_linear',
             verbose: bool = True,
     ) -> Dataset:
-        """
-        Resample a DataFrame to a new sampling rate by timestamps in time column. The DataFrame is
-        resampled by upsampling or downsampling the data to the new sampling rate. Can also be used
-        to achieve a constant sampling rate for inconsistent data.
+        """Resample a DataFrame to a new sampling rate by timestamps in time column.
+
+        The DataFrame is resampled by upsampling or downsampling the data to the new sampling rate.
+        Can also be used to achieve a constant sampling rate for inconsistent data.
 
         Parameters
         ----------
-        resampling_rate: float
-            The new sampling rate.
         resampling_rate: float
             The new sampling rate.
         columns: str | list[str]
