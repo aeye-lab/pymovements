@@ -35,21 +35,21 @@ class Screen:
 
     Parameters
     ----------
-    width_px: int
-        Screen width in pixels
-    height_px: int
-        Screen height in pixels
-    width_cm: float
-        Screen width in centimeters
-    height_cm: float
-        Screen height in centimeters
+    width_px: int | None
+        Screen width in pixels. (default: None)
+    height_px: int | None
+        Screen height in pixels. (default: None)
+    width_cm: float | None
+        Screen width in centimeters. (default: None)
+    height_cm: float | None
+        Screen height in centimeters. (default: None)
     distance_cm: float | None
         Eye-to-screen distance in centimeters. If None, a `distance_column` must be provided
         in the `DatasetDefinition` or `GazeDataFrame`, which contains the eye-to-screen
         distance for each sample in millimeters. (default: None)
-    origin: str
+    origin: str | None
         Specifies the screen location of the origin of the pixel
-        coordinate system. (default: 'upper left')
+        coordinate system. (default: None)
 
     Attributes
     ----------
@@ -104,20 +104,27 @@ class Screen:
 
     def __init__(
             self,
-            width_px: int,
-            height_px: int,
-            width_cm: float,
-            height_cm: float,
+            width_px: int | None = None,
+            height_px: int | None = None,
+            width_cm: float | None = None,
+            height_cm: float | None = None,
             distance_cm: float | None = None,
-            origin: str = 'upper left',
+            origin: str | None = None,
     ):
-        checks.check_no_zeros(width_px, 'width_px')
-        checks.check_no_zeros(height_px, 'height_px')
-        checks.check_no_zeros(width_cm, 'width_cm')
-        checks.check_no_zeros(height_cm, 'height_cm')
+        if width_px is not None:
+            checks.check_is_greater_than_zero(width_px=width_px)
+
+        if height_px is not None:
+            checks.check_is_greater_than_zero(height_px=height_px)
+
+        if width_cm is not None:
+            checks.check_is_greater_than_zero(width_cm=width_cm)
+
+        if height_cm is not None:
+            checks.check_is_greater_than_zero(height_cm=height_cm)
 
         if distance_cm is not None:
-            checks.check_no_zeros(distance_cm, 'distance_cm')
+            checks.check_is_greater_than_zero(distance_cm=distance_cm)
 
         self.width_px = width_px
         self.height_px = height_px
@@ -129,8 +136,17 @@ class Screen:
     @property
     def x_max_dva(self) -> float:
         """Maximum screen x-coordinate in degrees of visual angle."""
+        self._check_width_px()
+        assert self.width_px is not None
+
+        self._check_width_cm()
+        assert self.width_cm is not None
+
         self._check_distance_cm()
         assert self.distance_cm is not None
+
+        self._check_origin()
+        assert self.origin is not None
 
         return float(
             transforms_numpy.pix2deg(
@@ -145,8 +161,17 @@ class Screen:
     @property
     def y_max_dva(self) -> float:
         """Maximum screen y-coordinate in degrees of visual angle."""
+        self._check_height_px()
+        assert self.height_px is not None
+
+        self._check_height_cm()
+        assert self.height_cm is not None
+
         self._check_distance_cm()
         assert self.distance_cm is not None
+
+        self._check_origin()
+        assert self.origin is not None
 
         return float(
             transforms_numpy.pix2deg(
@@ -161,8 +186,17 @@ class Screen:
     @property
     def x_min_dva(self) -> float:
         """Minimum screen x-coordinate in degrees of visual angle."""
+        self._check_width_px()
+        assert self.width_px is not None
+
+        self._check_width_cm()
+        assert self.width_cm is not None
+
         self._check_distance_cm()
         assert self.distance_cm is not None
+
+        self._check_origin()
+        assert self.origin is not None
 
         return float(
             transforms_numpy.pix2deg(
@@ -177,8 +211,17 @@ class Screen:
     @property
     def y_min_dva(self) -> float:
         """Minimum screen y-coordinate in degrees of visual angle."""
+        self._check_height_px()
+        assert self.height_px is not None
+
+        self._check_height_cm()
+        assert self.height_cm is not None
+
         self._check_distance_cm()
         assert self.distance_cm is not None
+
+        self._check_origin()
+        assert self.origin is not None
 
         return float(
             transforms_numpy.pix2deg(
@@ -236,8 +279,23 @@ class Screen:
         >>> screen.pix2deg(arr=arr)
         array([[ 3.07379946, 20.43909054]])
         """
+        self._check_width_px()
+        assert self.width_px is not None
+
+        self._check_height_px()
+        assert self.height_px is not None
+
+        self._check_width_cm()
+        assert self.width_cm is not None
+
+        self._check_height_cm()
+        assert self.height_cm is not None
+
         self._check_distance_cm()
         assert self.distance_cm is not None
+
+        self._check_origin()
+        assert self.origin is not None
 
         return transforms_numpy.pix2deg(
             arr=arr,
@@ -247,9 +305,44 @@ class Screen:
             origin=self.origin,
         )
 
+    def _check_width_px(self) -> None:
+        """Check if width_px is not None."""
+        if self.width_px is None:
+            raise ValueError(
+                'width_px must not be None when using this method',
+            )
+
+    def _check_height_px(self) -> None:
+        """Check if height_px is not None."""
+        if self.height_px is None:
+            raise ValueError(
+                'height_px must not be None when using this method',
+            )
+
+    def _check_width_cm(self) -> None:
+        """Check if width_cm is not None."""
+        if self.width_cm is None:
+            raise ValueError(
+                'width_cm must not be None when using this method',
+            )
+
+    def _check_height_cm(self) -> None:
+        """Check if height_cm is not None."""
+        if self.height_cm is None:
+            raise ValueError(
+                'height_cm must not be None when using this method',
+            )
+
     def _check_distance_cm(self) -> None:
         """Check if distance_cm is not None."""
         if self.distance_cm is None:
             raise ValueError(
                 'distance_cm must not be None when using this method',
+            )
+
+    def _check_origin(self) -> None:
+        """Check if origin is not None."""
+        if self.origin is None:
+            raise ValueError(
+                'origin must not be None when using this method',
             )
