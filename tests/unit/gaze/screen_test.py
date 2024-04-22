@@ -98,3 +98,8 @@ def test_pix2deg_without_attributes(missing_attribute, exception, exception_msg)
 
     msg, = excinfo.value.args
     assert msg == exception_msg
+
+
+def test_screen_init_without_attributes():
+    screen = pm.Screen()
+    assert isinstance(screen, pm.Screen)
