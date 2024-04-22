@@ -615,8 +615,8 @@ class GazeDataFrame:
     def resample(
             self,
             resampling_rate: float,
-            fill_null_strategy: str = 'interpolate_linear',
             columns: str | list[str] = 'all',
+            fill_null_strategy: str = 'interpolate_linear',
     ) -> None:
         """Resample a DataFrame to a new sampling rate by timestamps in time column.
 
