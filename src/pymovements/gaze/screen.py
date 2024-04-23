@@ -113,24 +113,24 @@ class Screen:
     ):
         if width_px is not None:
             checks.check_is_greater_than_zero(width_px=width_px)
+        self.width_px = width_px
 
         if height_px is not None:
             checks.check_is_greater_than_zero(height_px=height_px)
+        self.height_px = height_px
 
         if width_cm is not None:
             checks.check_is_greater_than_zero(width_cm=width_cm)
+        self.width_cm = width_cm
 
         if height_cm is not None:
             checks.check_is_greater_than_zero(height_cm=height_cm)
+        self.height_cm = height_cm
 
         if distance_cm is not None:
             checks.check_is_greater_than_zero(distance_cm=distance_cm)
-
-        self.width_px = width_px
-        self.height_px = height_px
-        self.width_cm = width_cm
-        self.height_cm = height_cm
         self.distance_cm = distance_cm
+
         self.origin = origin
 
     @property
