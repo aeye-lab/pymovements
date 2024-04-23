@@ -49,7 +49,7 @@ class Screen:
         distance for each sample in millimeters. (default: None)
     origin: str | None
         Specifies the screen location of the origin of the pixel
-        coordinate system. (default: None)
+        coordinate system. (default: 'upper left')
 
     Attributes
     ----------
@@ -109,7 +109,7 @@ class Screen:
             width_cm: float | None = None,
             height_cm: float | None = None,
             distance_cm: float | None = None,
-            origin: str | None = None,
+            origin: str | None = 'upper left',
     ):
         if width_px is not None:
             checks.check_is_greater_than_zero(width_px=width_px)
