@@ -17,6 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Test the resample transformation function."""
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
@@ -601,6 +602,7 @@ def test_resample_returns(kwargs, df, expected_df):
     ],
 )
 def test_resample_raises_error(kwargs, exception, msg_substrings):
+    """Test if resample raises expected error."""
     df = pl.DataFrame({
         'time': [0, 1, 2, 3, 4, 5],
         'pixel': [[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7]],
