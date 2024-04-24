@@ -320,7 +320,7 @@ class GazeDataFrame:
                 )
             else:
                 # Manipulate columns to exclude trial columns
-                resample_columns = kwargs.pop('columns')
+                resample_columns = kwargs.pop('columns', 'all')
 
                 if resample_columns == 'all':
                     resample_columns = self.frame.columns
