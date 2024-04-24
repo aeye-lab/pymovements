@@ -26,7 +26,7 @@ import pymovements as pm
 @pytest.mark.parametrize('property_name', ['x_max_dva', 'y_max_dva', 'x_min_dva', 'y_min_dva'])
 def test_dva_properties_with_no_distance_cm(property_name):
     screen = pm.Screen(1920, 1080, 30, 20, None, 'upper left')
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         getattr(screen, property_name)
 
 
@@ -39,7 +39,7 @@ def test_dva_properties_with_distance_cm(property_name):
 
 def test_screen_pix2deg_with_no_distance_cm():
     screen = pm.Screen(1920, 1080, 30, 20, None, 'upper left')
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         screen.pix2deg([[0, 0]])
 
 
@@ -53,38 +53,38 @@ def test_screen_pix2deg_with_distance_cm():
     [
         pytest.param(
             'width_px',
-            ValueError,
-            'width_px must not be None when using this method',
+            TypeError,
+            "'width_px' must not be None",
             id='width_px',
         ),
         pytest.param(
             'height_px',
-            ValueError,
-            'height_px must not be None when using this method',
+            TypeError,
+            "'height_px' must not be None",
             id='height_px',
         ),
         pytest.param(
             'width_cm',
-            ValueError,
-            'width_cm must not be None when using this method',
+            TypeError,
+            "'width_cm' must not be None",
             id='width_cm',
         ),
         pytest.param(
             'height_cm',
-            ValueError,
-            'height_cm must not be None when using this method',
+            TypeError,
+            "'height_cm' must not be None",
             id='height_cm',
         ),
         pytest.param(
             'distance_cm',
-            ValueError,
-            'distance_cm must not be None when using this method',
+            TypeError,
+            "'distance_cm' must not be None",
             id='distance_cm',
         ),
         pytest.param(
             'origin',
-            ValueError,
-            'origin must not be None when using this method',
+            TypeError,
+            "'origin' must not be None",
             id='origin',
         ),
     ],
