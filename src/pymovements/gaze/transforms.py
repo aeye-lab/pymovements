@@ -742,7 +742,8 @@ def resample(
         (default: 'all')
     fill_null_strategy: str
         The strategy to fill null values of the resampled DataFrame. Supported strategies
-        are: 'forward', 'backward', 'interpolate_linear', 'interpolate_nearest'.
+        are: 'forward', 'backward', 'interpolate_linear', 'interpolate_nearest'. Columns
+        must be numeric when using interpolation.
         (default: 'interpolate_linear')
     n_components: int | None
         Number of components of nested columns in columns. (default: None)
@@ -1064,7 +1065,7 @@ def _apply_on_columns(
     frame: pl.DataFrame
         The DataFrame to apply the function on.
     columns: list[str]
-        The columns to apply the function on.
+        The columns to apply the function on. Must be numeric columns.
     transformation: Callable
         The function to apply on the specified columns.
     n_components: int | None
