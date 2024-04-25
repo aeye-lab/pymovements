@@ -28,7 +28,7 @@ import pymovements as pm
 @pytest.mark.parametrize(
     ('kwargs', 'df', 'expected_df'),
     [
-        # -----------------No Interpolation, just concerned with time-----------------
+        # Without filling nulls after resampling
         pytest.param(
             {
                 'resampling_rate': 1000,
@@ -48,7 +48,6 @@ import pymovements as pm
             ),
             id='resample_same_sampling_rate',
         ),
-        # Upsampling from 1000 Hz to 2000 Hz
         pytest.param(
             {
                 'resampling_rate': 2000,
@@ -68,7 +67,6 @@ import pymovements as pm
             ),
             id='upsample_1000_to_2000_no_interpolation',
         ),
-        # Downsampling from 1000 Hz to 500 Hz
         pytest.param(
             {
                 'resampling_rate': 500,
@@ -88,7 +86,6 @@ import pymovements as pm
             ),
             id='downsample_1000_to_500_no_interpolation',
         ),
-        # Resample inconsistent 500 Hz to constant 500 Hz
         pytest.param(
             {
                 'resampling_rate': 500,
@@ -108,7 +105,6 @@ import pymovements as pm
             ),
             id='resample_inconsistent_sampling_rate_no_interpolation',
         ),
-        # Upsample inconsistent 500 Hz to constant 1000 Hz
         pytest.param(
             {
                 'resampling_rate': 1000,
@@ -128,7 +124,6 @@ import pymovements as pm
             ),
             id='upsample_inconsistent_sampling_rate_no_interpolation',
         ),
-        # Upsampling from 2000 Hz to 4000 Hz
         pytest.param(
             {
                 'resampling_rate': 4000,
@@ -148,7 +143,7 @@ import pymovements as pm
             ),
             id='upsample_2000_to_4000_no_interpolation',
         ),
-        # -----------------With Interpolation-----------------
+        # With filling nulls, single component
         pytest.param(
             {
                 'resampling_rate': 1000,
@@ -244,7 +239,7 @@ import pymovements as pm
             ),
             id='upsample_500_to_1000_fill_backward_one_component',
         ),
-        # -----------------Interpolation multiple components-----------------
+        # With fill nulls, multiple components
         pytest.param(
             {
                 'resampling_rate': 1000,
@@ -348,7 +343,7 @@ import pymovements as pm
             ),
             id='upsample_500_to_1000_fill_backward_two_components',
         ),
-        # -----------------Interpolation only specific columns-----------------
+        # With filling null on specific columns
         pytest.param(
             {
                 'resampling_rate': 1000,
@@ -399,7 +394,7 @@ import pymovements as pm
             ),
             id='upsample_500_to_1000_interpolate_linear_one_component_specific_columnn_string',
         ),
-        # --- test if original None values are preserved ---
+        # Test for handling pre-existing null values
         pytest.param(
             {
                 'resampling_rate': 1000,
@@ -419,7 +414,6 @@ import pymovements as pm
             ),
             id='upsample_500_to_1000_interpolate_linear_one_component_with_none_values',
         ),
-        # same with nearest
         pytest.param(
             {
                 'resampling_rate': 1000,
@@ -439,7 +433,6 @@ import pymovements as pm
             ),
             id='upsample_500_to_1000_interpolate_nearest_one_component_with_none_values',
         ),
-        # Same test with fill forward
         pytest.param(
             {
                 'resampling_rate': 1000,
@@ -459,7 +452,6 @@ import pymovements as pm
             ),
             id='upsample_500_to_1000_fill_forward_one_component_with_none_values',
         ),
-        # Same test with fill backward
         pytest.param(
             {
                 'resampling_rate': 1000,
@@ -530,7 +522,7 @@ import pymovements as pm
             ),
             id='upsample_unix_timestamps_float',
         ),
-        # test for resampling empty DataFrame
+        # Handling empty DataFrame
         pytest.param(
             {
                 'resampling_rate': 1000,
