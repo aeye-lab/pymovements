@@ -35,19 +35,19 @@ class Experiment:
 
     Parameters
     ----------
-    screen_width_px: int
-        Screen width in pixels
-    screen_height_px: int
-        Screen height in pixels
-    screen_width_cm: float
-        Screen width in centimeters
-    screen_height_cm: float
-        Screen height in centimeters
+    screen_width_px: int | None
+        Screen width in pixels. (default: None)
+    screen_height_px: int | None
+        Screen height in pixels. (default: None)
+    screen_width_cm: float | None
+        Screen width in centimeters. (default: None)
+    screen_height_cm: float | None
+        Screen height in centimeters. (default: None)
     distance_cm: float | None
         Eye-to-screen distance in centimeters. If None, a `distance_column` must be provided
         in the `DatasetDefinition` or `GazeDataFrame`, which contains the eye-to-screen
         distance for each sample in millimeters. (default: None)
-    origin: str
+    origin: str | None
         Specifies the screen location of the origin of the pixel coordinate system.
         (default: 'upper left')
     sampling_rate: float | None
@@ -94,12 +94,12 @@ class Experiment:
 
     def __init__(
             self,
-            screen_width_px: int,
-            screen_height_px: int,
-            screen_width_cm: float,
-            screen_height_cm: float,
+            screen_width_px: int | None = None,
+            screen_height_px: int | None = None,
+            screen_width_cm: float | None = None,
+            screen_height_cm: float | None = None,
             distance_cm: float | None = None,
-            origin: str = 'upper left',
+            origin: str | None = 'upper left',
             sampling_rate: float | None = None,
             eyetracker: EyeTracker | None = None,
     ):
