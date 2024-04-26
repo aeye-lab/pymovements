@@ -590,8 +590,6 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
             1,
             id='missing_timestamps_lost_samples',
         ),
-
-
     ],
 )
 def test_parse_eyelink_data_loss_ratio(
@@ -613,7 +611,7 @@ def test_parse_eyelink_datetime(tmp_path):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, parsed_metadata = pm.utils = pm.utils.parsing.parse_eyelink(filepath)
+    _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
 
     assert parsed_metadata['datetime'] == expected_datetime
 
