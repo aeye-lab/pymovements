@@ -637,8 +637,9 @@ def _parse_eyelink_mount_config(mount_config: str) -> dict[str, str]:
         return possible_mounts[mount_config]
 
     return {
-        'mount_type': 'unkonwn',
+        'mount_type': 'unknown',
         'head_stabilization': 'unknown',
         'eyes_recorded': 'unknown',
         'camera_position': 'unknown',
+        'short_name': mount_config,
     }

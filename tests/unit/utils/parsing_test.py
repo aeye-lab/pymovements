@@ -775,6 +775,18 @@ def test_parse_eyelink_datetime(tmp_path):
             },
             id='long_range_angled_binocular',
         ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'MSG	2154555 ELCLCFG XXXXX\n',
+            {
+                'mount_type': 'unknown',
+                'head_stabilization': 'unknown',
+                'eyes_recorded': 'unknown',
+                'camera_position': 'unknown',
+                'short_name': 'XXXXX',
+            },
+            id='unknown_mount_config',
+        ),
     ],
 )
 def test_parse_eyelink_mount_config(tmp_path, metadata, expected_mount_config):
