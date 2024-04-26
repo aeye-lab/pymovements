@@ -36,11 +36,15 @@ def from_csv(
         *,
         trial_columns: list[str] | None = None,
         time_column: str | None = None,
+        time_unit: str | None = 'ms',
         pixel_columns: list[str] | None = None,
         position_columns: list[str] | None = None,
         velocity_columns: list[str] | None = None,
         acceleration_columns: list[str] | None = None,
         distance_column: str | None = None,
+        column_map: dict[str, str] | None = None,
+        add_columns: dict[str, str] | None = None,
+        column_dtypes: dict[str, Any] | None = None,
         **read_csv_kwargs: Any,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
@@ -58,6 +62,11 @@ def from_csv(
         methods will be applied to each trial separately. (default: None)
     time_column: str | None
         The name of the timestamp column in the input data frame. (default: None)
+    time_unit: str | None
+        The unit of the timestamps in the timespamp column in the input data frame. Supported
+        units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
+        'step' the experiment definition must be specified. All timestamps will be converted to
+        milliseconds. (default: 'ms')
     pixel_columns: list[str] | None
         The name of the pixel position columns in the input data frame. These columns will be
         nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
@@ -78,6 +87,15 @@ def from_csv(
         The name of the eye-to-screen distance column in the input data frame. If specified,
         the column will be used for pixel to dva transformations. If not specified, the
         constant eye-to-screen distance will be taken from the experiment definition.
+        (default: None)
+    column_map: dict[str, str] | None
+        The keys are the columns to read, the values are the names to which they should be renamed.
+        (default: None)
+    add_columns: dict[str, str] | None
+        Dictionary containing columns to add to loaded data frame.
+        (default: None)
+    column_dtypes:  dict[str, Any] | None
+        Dictionary containing types for columns.
         (default: None)
     **read_csv_kwargs: Any
         Additional keyword arguments to be passed to :py:func:`polars.read_csv` to read in the csv.
@@ -138,6 +156,7 @@ def from_csv(
     >>> gaze = from_csv(
     ...     file='tests/files/monocular_example.csv',
     ...     time_column = 'time',
+    ...     time_unit='ms',
     ...     pixel_columns = ['x_left_pix','y_left_pix'],
     ...     separator = ',',
     ... )
@@ -168,6 +187,7 @@ def from_csv(
     >>> gaze = from_csv(
     ...     file='tests/files/monocular_example.csv',
     ...     time_column = 'time',
+    ...     time_unit='ms',
     ...     pixel_columns = ['x_left_pix','y_left_pix'],
     ...     dtypes = {'time': pl.Int64, 'x_left_pix': pl.Int64, 'y_left_pix': pl.Int64},
     ... )
@@ -192,6 +212,27 @@ def from_csv(
     """
     # Read data.
     gaze_data = pl.read_csv(file, **read_csv_kwargs)
+    if column_map is not None:
+        gaze_data = gaze_data.rename({
+            key: column_map[key] for key in
+            [
+                key for key in column_map.keys()
+                if key in gaze_data.columns
+            ]
+        })
+
+    if add_columns is not None:
+        gaze_data = gaze_data.with_columns([
+            pl.lit(value).alias(column)
+            for column, value in add_columns.items()
+            if column not in gaze_data.columns
+        ])
+
+    if column_dtypes is not None:
+        gaze_data = gaze_data.with_columns([
+            pl.col(fileinfo_key).cast(fileinfo_dtype)
+            for fileinfo_key, fileinfo_dtype in column_dtypes.items()
+        ])
 
     # Create gaze data frame.
     gaze_df = GazeDataFrame(
@@ -199,6 +240,7 @@ def from_csv(
         experiment=experiment,
         trial_columns=trial_columns,
         time_column=time_column,
+        time_unit=time_unit,
         pixel_columns=pixel_columns,
         position_columns=position_columns,
         velocity_columns=velocity_columns,
@@ -214,6 +256,8 @@ def from_asc(
         patterns: str | list | None = 'eyelink',
         schema: dict[str, Any] | None = None,
         experiment: Experiment | None = None,
+        add_columns: dict[str, str] | None = None,
+        column_dtypes: dict[str, Any] | None = None,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
 
@@ -228,6 +272,12 @@ def from_asc(
         Dictionary to optionally specify types of columns parsed by patterns. (default: None)
     experiment: Experiment | None
         The experiment definition. (default: None)
+    add_columns: dict[str, str] | None
+        Dictionary containing columns to add to loaded data frame.
+        (default: None)
+    column_dtypes:  dict[str, Any] | None
+        Dictionary containing types for columns.
+        (default: None)
 
     Returns
     -------
@@ -270,11 +320,25 @@ def from_asc(
     # Read data.
     gaze_data, _ = parse_eyelink(file, patterns=patterns, schema=schema)
 
+    if add_columns is not None:
+        gaze_data = gaze_data.with_columns([
+            pl.lit(value).alias(column)
+            for column, value in add_columns.items()
+            if column not in gaze_data.columns
+        ])
+
+    if column_dtypes is not None:
+        gaze_data = gaze_data.with_columns([
+            pl.col(fileinfo_key).cast(fileinfo_dtype)
+            for fileinfo_key, fileinfo_dtype in column_dtypes.items()
+        ])
+
     # Create gaze data frame.
     gaze_df = GazeDataFrame(
         gaze_data,
         experiment=experiment,
         time_column='time',
+        time_unit='ms',
         pixel_columns=['x_pix', 'y_pix'],
     )
     return gaze_df
@@ -283,6 +347,9 @@ def from_asc(
 def from_ipc(
         file: str | Path,
         experiment: Experiment | None = None,
+        column_map: dict[str, str] | None = None,
+        add_columns: dict[str, str] | None = None,
+        column_dtypes: dict[str, Any] | None = None,
         **read_ipc_kwargs: Any,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
@@ -292,7 +359,17 @@ def from_ipc(
     file: str | Path
         Path of IPC/feather file.
     experiment : Experiment | None
-        The experiment definition. (default: None)
+        The experiment definition.
+        (default: None)
+    column_map: dict[str, str] | None
+        The keys are the columns to read, the values are the names to which they should be renamed.
+        (default: None)
+    add_columns: dict[str, str] | None
+        Dictionary containing columns to add to loaded data frame.
+        (default: None)
+    column_dtypes:  dict[str, Any] | None
+        Dictionary containing types for columns.
+        (default: None)
     **read_ipc_kwargs: Any
             Additional keyword arguments to be passed to polars to read in the ipc file.
 
@@ -329,6 +406,28 @@ def from_ipc(
     """
     # Read data.
     gaze_data = pl.read_ipc(file, **read_ipc_kwargs)
+
+    if column_map is not None:
+        gaze_data = gaze_data.rename({
+            key: column_map[key] for key in
+            [
+                key for key in column_map.keys()
+                if key in gaze_data.columns
+            ]
+        })
+
+    if add_columns is not None:
+        gaze_data = gaze_data.with_columns([
+            pl.lit(value).alias(column)
+            for column, value in add_columns.items()
+            if column not in gaze_data.columns
+        ])
+
+    if column_dtypes is not None:
+        gaze_data = gaze_data.with_columns([
+            pl.col(fileinfo_key).cast(fileinfo_dtype)
+            for fileinfo_key, fileinfo_dtype in column_dtypes.items()
+        ])
 
     # Create gaze data frame.
     gaze_df = GazeDataFrame(

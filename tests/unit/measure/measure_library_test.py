@@ -17,40 +17,21 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test read from IPC/feather."""
+"""Test measure library."""
+from __future__ import annotations
+
 import pytest
 
 import pymovements as pm
 
 
 @pytest.mark.parametrize(
-    ('kwargs', 'shape'),
+    ('method', 'name'),
     [
-        pytest.param(
-            {
-                'file': 'tests/files/monocular_example.feather',
-            },
-            (10, 2),
-            id='feather_mono_shape',
-        ),
-        pytest.param(
-            {
-                'file': 'tests/files/binocular_example.feather',
-            },
-            (10, 3),
-            id='feather_bino_shape',
-        ),
-        pytest.param(
-            {
-                'file': 'tests/files/monocular_example.feather',
-                'column_map': {'pixel': 'pixel_coordinates'},
-            },
-            (10, 2),
-            id='feather_bino_shape',
-        ),
+        pytest.param(pm.measure.null_ratio, 'null_ratio', id='null_ratio'),
     ],
 )
-def test_shapes(kwargs, shape):
-    gaze_dataframe = pm.gaze.from_ipc(**kwargs)
-
-    assert gaze_dataframe.frame.shape == shape
+def test_measure_registered(method, name):
+    assert name in pm.measure.SampleMeasureLibrary()
+    assert pm.measure.SampleMeasureLibrary.get(name) == method
+    assert pm.measure.SampleMeasureLibrary.get(name).__name__ == name

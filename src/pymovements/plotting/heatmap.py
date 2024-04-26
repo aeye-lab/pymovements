@@ -120,6 +120,11 @@ def heatmap(
         xmin, xmax = int(x.min()), int(x.max())
         ymin, ymax = int(y.min()), int(y.max())
 
+    assert xmin is not None
+    assert xmax is not None
+    assert ymin is not None
+    assert ymax is not None
+
     # Define the grid and bin the gaze data
     x_bins = np.linspace(xmin, xmax, num=gridsize[0]).astype(int)
     y_bins = np.linspace(ymin, ymax, num=gridsize[1]).astype(int)

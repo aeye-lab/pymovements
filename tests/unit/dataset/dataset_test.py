@@ -84,7 +84,7 @@ def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
     fileinfo = fileinfo.sort(by='filepath')
 
     gaze_dfs = []
-    for fileinfo_row in fileinfo.to_dicts():
+    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
         if eyes == 'both':
             gaze_df = pl.from_dict(
                 {
@@ -206,7 +206,7 @@ def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
     ]
 
     preprocessed_gaze_dfs = []
-    for fileinfo_row in fileinfo.to_dicts():
+    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
         position_columns = [pixel_column.replace('pix', 'pos') for pixel_column in pixel_columns]
         velocity_columns = [pixel_column.replace('pix', 'vel') for pixel_column in pixel_columns]
         acceleration_columns = [
@@ -242,7 +242,7 @@ def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
     )
 
     event_dfs = []
-    for fileinfo_row in fileinfo.to_dicts():
+    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
         event_df = pl.from_dict(
             {
                 'subject_id': fileinfo_row['subject_id'],
@@ -270,12 +270,13 @@ def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
             screen_width_cm=38,
             screen_height_cm=30.2,
             distance_cm=distance_cm,
-            origin='lower left',
+            origin='upper left',
             sampling_rate=1000,
         ),
         filename_format=r'{subject_id:d}.' + raw_fileformat,
         filename_format_dtypes={'subject_id': pl.Int64},
         time_column='time',
+        time_unit='ms',
         distance_column=distance_column,
         pixel_columns=pixel_columns,
     )
@@ -334,7 +335,11 @@ def test_load_correct_raw_gaze_dfs(dataset_configuration):
 
     expected_gaze_dfs = dataset_configuration['raw_gaze_dfs']
     for result_gaze_df, expected_gaze_df in zip(dataset.gaze, expected_gaze_dfs):
-        assert_frame_equal(result_gaze_df.frame, expected_gaze_df.frame)
+        assert_frame_equal(
+            result_gaze_df.frame,
+            expected_gaze_df.frame,
+            check_column_order=False,
+        )
 
 
 def test_load_gaze_has_position_columns(dataset_configuration):
@@ -351,7 +356,11 @@ def test_load_correct_preprocessed_gaze_dfs(dataset_configuration):
 
     expected_gaze_dfs = dataset_configuration['preprocessed_gaze_dfs']
     for result_gaze_df, expected_gaze_df in zip(dataset.gaze, expected_gaze_dfs):
-        assert_frame_equal(result_gaze_df.frame, expected_gaze_df.frame)
+        assert_frame_equal(
+            result_gaze_df.frame,
+            expected_gaze_df.frame,
+            check_column_order=False,
+        )
 
 
 def test_load_correct_event_dfs(dataset_configuration):
@@ -587,6 +596,20 @@ def test_pos2vel(dataset_configuration):
     dataset.pos2vel()
 
     expected_schema = {**original_schema, 'velocity': pl.List(pl.Float64)}
+    for result_gaze_df in dataset.gaze:
+        assert result_gaze_df.schema == expected_schema
+
+
+def test_clip(dataset_configuration):
+    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+
+    original_schema = dataset.gaze[0].schema
+
+    dataset.clip(-1000, 1000, input_column='pixel', output_column='pixel_clipped', n_components=4)
+
+    expected_schema = {**original_schema, 'pixel_clipped': pl.List(pl.Float64)}
     for result_gaze_df in dataset.gaze:
         assert result_gaze_df.schema == expected_schema
 
@@ -835,7 +858,7 @@ def test_detect_events_attribute_error(dataset_configuration):
             },
             (
                 "Column 'position' not found. Available columns are: "
-                "['subject_id', 'time', 'pixel', 'custom_position', 'velocity']"
+                "['time', 'subject_id', 'pixel', 'custom_position', 'velocity']"
             ),
             id='no_position',
         ),
@@ -847,7 +870,7 @@ def test_detect_events_attribute_error(dataset_configuration):
             },
             (
                 "Column 'velocity' not found. Available columns are: "
-                "['subject_id', 'time', 'pixel', 'position', 'custom_velocity']"
+                "['time', 'subject_id', 'pixel', 'position', 'custom_velocity']"
             ),
             id='no_velocity',
         ),

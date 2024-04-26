@@ -115,7 +115,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
         screen_width_cm=38,
         screen_height_cm=30.2,
         distance_cm=68,
-        origin='lower left',
+        origin='upper left',
         eyetracker=EyeTracker(
             sampling_rate=1000.0,
             left=False,
@@ -139,6 +139,8 @@ class ToyDatasetEyeLink(DatasetDefinition):
     trial_columns: list[str] = field(default_factory=lambda: ['subject_id', 'session_id'])
 
     time_column: str = 'time'
+
+    time_unit: str = 'ms'
 
     pixel_columns: list[str] = field(default_factory=lambda: ['x_pix', 'y_pix'])
 

@@ -116,7 +116,7 @@ class JuDo1000(DatasetDefinition):
         screen_width_cm=38,
         screen_height_cm=30.2,
         distance_cm=68,
-        origin='lower left',
+        origin='upper left',
         sampling_rate=1000,
     )
 
@@ -134,6 +134,9 @@ class JuDo1000(DatasetDefinition):
     )
 
     time_column: str = 'time'
+
+    time_unit: str = 'ms'
+
     pixel_columns: list[str] = field(
         default_factory=lambda: [
             'x_left', 'y_left', 'x_right', 'y_right',

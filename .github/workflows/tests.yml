@@ -15,6 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
+          - macos-13
           - macos-latest
           - ubuntu-latest
           - windows-latest
@@ -22,6 +23,16 @@ jobs:
           - py39
           - py310
           - py311
+          - py312
+        exclude:
+            - os: macos-latest
+              tox_env: py39
+            - os: macos-13
+              tox_env: py310
+            - os: macos-13
+              tox_env: py311
+            - os: macos-13
+              tox_env: py312
         include:
           - tox_env: py39
             python: "3.9"
@@ -29,6 +40,8 @@ jobs:
             python: "3.10"
           - tox_env: py311
             python: "3.11"
+          - tox_env: py312
+            python: "3.12"
     steps:
       - uses: actions/checkout@v4
         with:

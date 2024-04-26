@@ -126,7 +126,7 @@ class PoTeC(DatasetDefinition):
         screen_width_cm=47.5,
         screen_height_cm=30,
         distance_cm=65,
-        origin='lower left',
+        origin='upper left',
         sampling_rate=1000,
     )
 
@@ -144,6 +144,9 @@ class PoTeC(DatasetDefinition):
     )
 
     time_column: str = 'time'
+
+    time_unit: str = 'ms'
+
     pixel_columns: list[str] = field(
         default_factory=lambda: [
             'x', 'y',

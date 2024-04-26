@@ -158,7 +158,7 @@ def fixture_experiment():
                     screen_width_cm=100,
                     screen_height_cm=100,
                     distance_cm=100,
-                    origin='lower left',
+                    origin='upper left',
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
@@ -266,7 +266,7 @@ def fixture_experiment():
                     screen_width_cm=100,
                     screen_height_cm=100,
                     distance_cm=100,
-                    origin='lower left',
+                    origin='upper left',
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
@@ -424,7 +424,7 @@ def fixture_experiment():
                     screen_width_cm=100,
                     screen_height_cm=100,
                     distance_cm=None,
-                    origin='lower left',
+                    origin='upper left',
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
                 'distance_column': 'distance',
@@ -501,7 +501,7 @@ def fixture_experiment():
                     screen_width_cm=100,
                     screen_height_cm=100,
                     distance_cm=100,
-                    origin='lower left',
+                    origin='upper left',
                 ),
                 'position_columns': ['x_dva', 'y_dva'],
             },
@@ -579,7 +579,7 @@ def fixture_experiment():
                     screen_width_cm=100,
                     screen_height_cm=100,
                     distance_cm=100,
-                    origin='lower left',
+                    origin='upper left',
                 ),
                 'position_columns': ['x_dva', 'y_dva'],
             },
@@ -617,7 +617,7 @@ def fixture_experiment():
                     screen_width_cm=100,
                     screen_height_cm=100,
                     distance_cm=100,
-                    origin='lower left',
+                    origin='upper left',
                 ),
                 'position_columns': ['x_dva', 'y_dva'],
             },
@@ -654,7 +654,7 @@ def fixture_experiment():
                     screen_width_cm=100,
                     screen_height_cm=100,
                     distance_cm=100,
-                    origin='lower left',
+                    origin='upper left',
                 ),
                 'position_columns': ['x_dva', 'y_dva'],
             },
@@ -692,7 +692,7 @@ def fixture_experiment():
                     screen_width_cm=100,
                     screen_height_cm=100,
                     distance_cm=100,
-                    origin='lower left',
+                    origin='upper left',
                 ),
                 'position_columns': ['x_dva', 'y_dva'],
                 'trial_columns': 'trial_id',
@@ -718,6 +718,7 @@ def fixture_experiment():
             {
                 'data': pl.from_dict(
                     {
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                         'y_dva': [2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
                     },
@@ -728,6 +729,7 @@ def fixture_experiment():
             pm.GazeDataFrame(
                 data=pl.from_dict(
                     {
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                         'y_dva': [2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
                     },
@@ -740,6 +742,7 @@ def fixture_experiment():
             {
                 'data': pl.from_dict(
                     {
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                         'y_dva': [2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
                     },
@@ -750,6 +753,7 @@ def fixture_experiment():
             pm.GazeDataFrame(
                 data=pl.from_dict(
                     {
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                         'y_dva': [2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
                     },
@@ -757,6 +761,34 @@ def fixture_experiment():
                 position_columns=['x_dva', 'y_dva'],
             ),
             id='smooth_method_pass',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1000, 1001, 1002, 1003],
+                        'x_pix': [-50, 5, 50, None],
+                        'y_pix': [4, 5, 6, 7],
+                    },
+                ),
+                'pixel_columns': ['x_pix', 'y_pix'],
+            },
+            'clip', {
+                'input_column': 'pixel', 'output_column': 'pixel', 'n_components': 2,
+                'lower_bound': 1, 'upper_bound': 10,
+            },
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'time': [1000, 1001, 1002, 1003],
+                        'x_pix': [1, 5, 10, None],
+                        'y_pix': [4, 5, 6, 7],
+                    },
+                ),
+                pixel_columns=['x_pix', 'y_pix'],
+            ),
+            id='clip',
         ),
 
     ],
@@ -799,7 +831,7 @@ def test_gaze_transform_expected_frame(
                     screen_width_cm=100,
                     screen_height_cm=100,
                     distance_cm=1,
-                    origin='lower left',
+                    origin='upper left',
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
                 'distance_column': 'distance',
@@ -1200,6 +1232,28 @@ def test_gaze_dataframe_pos2vel_creates_velocity_column(data, experiment, positi
     assert 'velocity' in gaze.columns
 
 
+def test_gaze_dataframe_clip_creates_new_column(experiment):
+    gaze = pm.GazeDataFrame(
+        data=pl.from_dict(
+            {
+                'time': [1000, 1001, 1002, 1003],
+                'x_pix': [1, 5, 10, None],
+                'y_pix': [4, 5, 6, 7],
+            },
+        ),
+        experiment=experiment,
+        pixel_columns=['x_pix', 'y_pix'],
+    )
+    gaze.clip(
+        input_column='pixel',
+        output_column='pixel_new',
+        n_components=2,
+        lower_bound=1,
+        upper_bound=10,
+    )
+    assert 'pixel_new' in gaze.columns
+
+
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'expected_msg'),
     [
@@ -1273,6 +1327,7 @@ def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg)
             {
                 'data': pl.from_dict(
                     {
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
                         'y_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
                         'x_dva': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
@@ -1286,7 +1341,7 @@ def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg)
             pm.GazeDataFrame(
                 data=pl.from_dict(
                     {
-
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_pix': [1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3],
                         'y_pix': [1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3],
                         'x_dva': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
@@ -1302,6 +1357,7 @@ def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg)
             {
                 'data': pl.from_dict(
                     {
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
                         'y_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
                         'x_dva': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
@@ -1315,7 +1371,7 @@ def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg)
             pm.GazeDataFrame(
                 data=pl.from_dict(
                     {
-
+                        'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
                         'y_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
                         'x_dva': [1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3],

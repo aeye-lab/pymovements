@@ -134,6 +134,8 @@ class HBN(DatasetDefinition):
 
     time_column: str = 'time'
 
+    time_unit: str = 'step'
+
     pixel_columns: list[str] = field(default_factory=lambda: ['x_pix', 'y_pix'])
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
