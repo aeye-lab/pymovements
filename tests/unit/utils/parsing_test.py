@@ -43,8 +43,8 @@ ASC_TEXT = r"""
 
 some
 lines
-to
-ignore
+MSG	2154555 RECCFG CR 1000 2 1 L
+MSG	2154555 ELCLCFG BTABLER
 MSG	2095865 DISPLAY_COORDS 0 0 1279 1023
 PRESCALER	1
 VPRESCALER	1
@@ -150,9 +150,11 @@ EXPECTED_METADATA = {
     'model': 'EyeLink Portable Duo',
     'version_number': '6.12',
     'sampling_rate': 1000.00,
-    'filter': '2',
-    'tracking': 'CR',
-    'tracked_eye': 'LEFT',
+    'file_sample_filter': '2',
+    'link_sample_filter': '1',
+    'pupil_data_type': 'AREA',
+    'tracking_mode': 'CR',
+    'tracked_eye': 'L',
     'calibrations': [],
     'validations': [],
     'resolution': (1280, 1024),
@@ -166,6 +168,12 @@ EXPECTED_METADATA = {
         'start_timestamp': '10000018',
         'stop_timestamp': '10000020',
     }],
+    'mount_configuration': {
+        'mount_type': 'Desktop',
+        'head_stabilization': 'stabilized',
+        'eyes_recorded': 'binocular / monocular',
+        'short_name': 'BTABLER',
+    },
 }
 
 
@@ -328,7 +336,7 @@ def test_no_metadata_warning(tmp_path, metadata, expected_msg):
             'OFFSET 0.19 deg. 4.2,6.3 pix.\n',
             [{
                 'error': 'POOR ERROR',
-                'eye_tracked': 'RIGHT',
+                'tracked_eye': 'RIGHT',
                 'num_points': '9',
                 'timestamp': '1076158',
                 'validation_score_avg': '2.40',
@@ -383,7 +391,7 @@ def test_parse_val_cal_eyelink_monocular_file():
 
     expected_validation = [{
         'error': 'GOOD ERROR',
-        'eye_tracked': 'LEFT',
+        'tracked_eye': 'LEFT',
         'num_points': '9',
         'timestamp': '2148587',
         'validation_score_avg': '0.27',
@@ -395,3 +403,386 @@ def test_parse_val_cal_eyelink_monocular_file():
 
     assert metadata['calibrations'] == expected_calibration
     assert metadata['validations'] == expected_validation
+
+
+@pytest.mark.parametrize(
+    ('metadata', 'expected_blinks'),
+    [
+        pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
+            'EVENTS	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2\n'
+            'SBLINK R 10000018\n'
+            '10000019	   .	   .	    0.0	    0.0	...\n'
+            '10000020	   .	   .	    0.0	    0.0	...\n'
+            'EBLINK R 10000018	10000020	2\n',
+            [{
+                'duration_ms': '2',
+                'num_samples': 2,
+                'start_timestamp': '10000018',
+                'stop_timestamp': '10000020',
+            }],
+            id='blink',
+        ),
+        pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
+            'EVENTS	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2\n'
+            'SBLINK R 10000018\n'
+            '10000019	   .	   .	    0.0	    0.0	...\n'
+            '10000020	   .	   .	    0.0	    0.0	...\n'
+            'EBLINK R 10000018	10000020	2\n'
+            'SBLINK R 10000021\n'
+            '10000021	   .	   .	    0.0	    0.0	...\n'
+            '10000022	   .	   .	    0.0	    0.0	...\n'
+            '10000023	   .	   .	    0.0	    0.0	...\n'
+            '10000024	   .	   .	    0.0	    0.0	...\n'
+            'EBLINK R 10000021	10000024	4\n',
+            [
+                {
+                    'duration_ms': '2',
+                    'num_samples': 2,
+                    'start_timestamp': '10000018',
+                    'stop_timestamp': '10000020',
+                },
+                {
+                    'duration_ms': '4',
+                    'num_samples': 4,
+                    'start_timestamp': '10000021',
+                    'stop_timestamp': '10000024',
+                },
+            ],
+            id='multiple_blinks',
+        ),
+        pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
+            'SBLINK R 10000018\n'
+            '10000019	   .	   .	    0.0	    0.0	...\n'
+            '10000020	   .	   .	    0.0	    0.0	...\n'
+            'EBLINK R 10000018	10000020	2\n',
+            [{
+                'duration_ms': '2',
+                'num_samples': 2,
+                'start_timestamp': '10000018',
+                'stop_timestamp': '10000020',
+            }],
+            id='blinks_no_sampling_rate',
+        ),
+    ],
+)
+def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
+    filepath = tmp_path / 'sub.asc'
+    filepath.write_text(metadata)
+
+    _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
+
+    assert parsed_metadata['blinks'] == expected_blinks
+
+
+@pytest.mark.parametrize(
+    ('metadata', 'expected_blink_ratio', 'expected_overall_ratio'),
+    [
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
+            'SBLINK R 10000018\n'
+            '10000019	   .	   .	    0.0	    0.0	...\n'
+            '10000020	   .	   .	    0.0	    0.0	...\n'
+            'EBLINK R 10000018	10000020	2\n'
+            'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            1,
+            1,
+            id='only_blinks',
+        ),
+        pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
+            'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
+            'SBLINK R 10000018\n'
+            '10000019	   .	   .	    0.0	    0.0	...\n'
+            '10000020	   .	   .	    0.0	    0.0	...\n'
+            'EBLINK R 10000018	10000020	2\n'
+            'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            'unknown',
+            'unknown',
+            id='unknown_sampling_rate_only_blinks',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
+            '10000019	   .	   .	    0.0	    0.0	...\n'
+            'END	10000019 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            0,
+            1,
+            id='lost_samples_no_blinks',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
+            'SBLINK R 10000018\n'
+            '10000019	   .	   .	    0.0	    0.0	...\n'
+            'EBLINK R 10000018	10000019	1\n'
+            '10000020	   .	   .	    0.0	    0.0	...\n'
+            'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            0.5,
+            1.0,
+            id='blinks_and_lost_samples',
+        ),
+        pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
+            'START	10000021 	RIGHT	SAMPLES	EVENTS\n'
+            '10000021	   .	   .	    0.0	    0.0	...\n'
+            '10000022	   .	   .	    0.0	    0.0	...\n'
+            'END	10000022 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            'unknown',
+            'unknown',
+            id='lost_samples_no_sampling_rate',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
+            '10000019	   850.7	  717.5	  714.0	    0.0	...\n'
+            '10000020	   850.7	  717.5	  714.0	    0.0	...\n'
+            '10000022	   850.7	  717.5	  714.0	    0.0	...\n'
+            'END	10000022 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            0,
+            0.25,
+            id='missing_timestamps',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
+            '10000019	   850.7	  717.5	  714.0	    0.0	...\n'
+            '10000020	   850.7	  717.5	  714.0	    0.0	...\n'
+            '10000022	   .	   .	    0.0	    0.0	...\n'
+            'END	10000022 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            0,
+            0.5,
+            id='missing_timestamps_lost_samples',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'START	10000020 	RIGHT	SAMPLES	EVENTS\n'
+            '10000020	   850.7	  717.5	  714.0	    0.0	...\n'
+            '10000022	   .	   .	    0.0	    0.0	...\n'
+            'SBLINK R 10000023\n'
+            '10000024	   .	   .	    0.0	    0.0	...\n'
+            'EBLINK R 10000023	10000024	1\n'
+            'END	10000024 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            0.25,
+            0.75,
+            id='missing_timestamps_lost_samples',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'SBLINK R 10000018\n'
+            '10000019	   .	   .	    0.0	    0.0	...\n'
+            '10000020	   .	   .	    0.0	    0.0	...\n'
+            'EBLINK R 10000018	10000020	2\n'
+            '10000021	   .	   .	    0.0	    0.0	...\n'
+            '10000022	   .	   .	    0.0	    0.0	...\n',
+            'unknown',
+            'unknown',
+            id='blinks_and_lost_samples_no_start_end',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'START	10000020 	RIGHT	SAMPLES	EVENTS\n'
+            'END	10000021 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            0,
+            1,
+            id='missing_timestamps_lost_samples',
+        ),
+
+
+    ],
+)
+def test_parse_eyelink_data_loss_ratio(
+        tmp_path, metadata, expected_blink_ratio, expected_overall_ratio,
+):
+    filepath = tmp_path / 'sub.asc'
+    filepath.write_text(metadata)
+
+    _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
+
+    assert parsed_metadata['data_loss_ratio_blinks'] == expected_blink_ratio
+    assert parsed_metadata['data_loss_ratio'] == expected_overall_ratio
+
+
+def test_parse_eyelink_datetime(tmp_path):
+    metadata = '** DATE: Wed Mar  8 09:25:20 2023\n'
+    expected_datetime = datetime.datetime(2023, 3, 8, 9, 25, 20)
+
+    filepath = tmp_path / 'sub.asc'
+    filepath.write_text(metadata)
+
+    _, parsed_metadata = pm.utils = pm.utils.parsing.parse_eyelink(filepath)
+
+    assert parsed_metadata['datetime'] == expected_datetime
+
+
+@pytest.mark.parametrize(
+    ('metadata', 'expected_mount_config'),
+    [
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'MSG	2154555 ELCLCFG BTABLER\n',
+            {
+                'mount_type': 'Desktop',
+                'head_stabilization': 'stabilized',
+                'eyes_recorded': 'binocular / monocular',
+                'short_name': 'BTABLER',
+            },
+            id='desktop_stabilized_binocular',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'MSG	2154555 ELCLCFG MTABLER\n',
+            {
+                'mount_type': 'Desktop',
+                'head_stabilization': 'stabilized',
+                'eyes_recorded': 'monocular',
+                'short_name': 'MTABLER',
+            },
+            id='desktop_stabilized_monocular',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'MSG	2154555 ELCLCFG RTABLER\n',
+            {
+                'mount_type': 'Desktop',
+                'head_stabilization': 'remote mode (target sticker)',
+                'eyes_recorded': 'monocular',
+                'short_name': 'RTABLER',
+            },
+            id='desktop_remote_monocular',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'MSG	2154555 ELCLCFG RBTABLER\n',
+            {
+                'mount_type': 'Desktop',
+                'head_stabilization': 'remote mode (target sticker)',
+                'eyes_recorded': 'binocular / monocular',
+                'short_name': 'RBTABLER',
+            },
+            id='desktop_remote_binocular',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'MSG	2154555 ELCLCFG AMTABLER\n',
+            {
+                'mount_type': 'Arm Mount',
+                'head_stabilization': 'stabilized',
+                'eyes_recorded': 'monocular',
+                'short_name': 'AMTABLER',
+            },
+            id='arm_stabilized_monocular',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'MSG	2154555 ELCLCFG ABTABLER\n',
+            {
+                'mount_type': 'Arm Mount',
+                'head_stabilization': 'stabilized',
+                'eyes_recorded': 'binocular / monocular',
+                'short_name': 'ABTABLER',
+            },
+            id='arm_stabilized_binocular',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'MSG	2154555 ELCLCFG ARTABLER\n',
+            {
+                'mount_type': 'Arm Mount',
+                'head_stabilization': 'remote mode (target sticker)',
+                'eyes_recorded': 'monocular',
+                'short_name': 'ARTABLER',
+            },
+            id='arm_remote_monocular',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'MSG	2154555 ELCLCFG ABRTABLE\n',
+            {
+                'mount_type': 'Arm Mount',
+                'head_stabilization': 'remote mode (target sticker)',
+                'eyes_recorded': 'binocular / monocular',
+                'short_name': 'ABRTABLE',
+            },
+            id='arm_remote_binocular',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'MSG	2154555 ELCLCFG BTOWER\n',
+            {
+                'mount_type': 'Binocular Tower Mount',
+                'head_stabilization': 'stabilized',
+                'eyes_recorded': 'binocular / monocular',
+                'short_name': 'BTOWER',
+            },
+            id='binocular_tower_stabilized_binocular',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'MSG	2154555 ELCLCFG TOWER\n',
+            {
+                'mount_type': 'Tower Mount',
+                'head_stabilization': 'stabilized',
+                'eyes_recorded': 'monocular',
+                'short_name': 'TOWER',
+            },
+            id='tower_stabilized_monocular',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'MSG	2154555 ELCLCFG MPRIM\n',
+            {
+                'mount_type': 'Primate Mount',
+                'head_stabilization': 'stabilized',
+                'eyes_recorded': 'monocular',
+                'short_name': 'MPRIM',
+            },
+            id='primate_stabilized_binocular',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'MSG	2154555 ELCLCFG BPRIM\n',
+            {
+                'mount_type': 'Primate Mount',
+                'head_stabilization': 'stabilized',
+                'eyes_recorded': 'binocular / monocular',
+                'short_name': 'BPRIM',
+            },
+            id='primate_stabilized_monocular',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'MSG	2154555 ELCLCFG MLRR\n',
+            {
+                'mount_type': 'Long-Range Mount',
+                'head_stabilization': 'stabilized',
+                'eyes_recorded': 'monocular',
+                'camera_position': 'level',
+                'short_name': 'MLRR',
+            },
+            id='long_range_level_monocular',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'MSG	2154555 ELCLCFG BLRR\n',
+            {
+                'mount_type': 'Long-Range Mount',
+                'head_stabilization': 'stabilized',
+                'eyes_recorded': 'binocular / monocular',
+                'camera_position': 'angled',
+                'short_name': 'BLRR',
+            },
+            id='long_range_angled_binocular',
+        ),
+    ],
+)
+def test_parse_eyelink_mount_config(tmp_path, metadata, expected_mount_config):
+    filepath = tmp_path / 'sub.asc'
+    filepath.write_text(metadata)
+
+    _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
+
+    assert parsed_metadata['mount_configuration'] == expected_mount_config
