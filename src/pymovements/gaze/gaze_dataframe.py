@@ -128,7 +128,7 @@ class GazeDataFrame:
     columns, the timestamp column and the unit of the timestamps.
 
     >>> gaze = GazeDataFrame(data=df, pixel_columns=['x', 'y'], time_column='t', time_unit='ms')
-    >>> gaze.frame
+    >>> print(gaze)
     shape: (3, 2)
     ┌──────┬────────────┐
     │ time ┆ pixel      │
@@ -159,7 +159,9 @@ class GazeDataFrame:
 
     >>> experiment = Experiment(1024, 768, 38, 30, 60, 'center', sampling_rate=100)
     >>> gaze = GazeDataFrame(data=df_no_time, experiment=experiment, pixel_columns=['x', 'y'])
-    >>> gaze.frame
+    >>> print(gaze)
+    Experiment(sampling_rate=100, screen=Screen(width_px=1024, height_px=768, width_cm=38,
+    height_cm=30, distance_cm=60, origin=center), eyetracker=None)
     shape: (3, 2)
     ┌──────┬────────────┐
     │ time ┆ pixel      │
@@ -170,8 +172,6 @@ class GazeDataFrame:
     │ 10   ┆ [0.2, 0.2] │
     │ 20   ┆ [0.3, 0.3] │
     └──────┴────────────┘
-
-
     """
 
     def __init__(
@@ -1200,3 +1200,10 @@ class GazeDataFrame:
                 self.frame = self.frame.with_columns(
                     pl.col('time').cast(pl.Int64),
                 )
+
+    def __str__(self: Any) -> str:
+        """Print gaze dataframe."""
+        if self.experiment is None:
+            return pl.DataFrame.__str__(self.frame)
+
+        return pm.Experiment.__str__(self.experiment) + '\n' + pl.DataFrame.__str__(self.frame)

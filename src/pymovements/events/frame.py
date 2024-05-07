@@ -56,6 +56,29 @@ class EventDataFrame:
     ValueError
         If list of onsets is passed but not a list of offsets, or vice versa, or if length of
         onsets does not match length of offsets.
+
+    Examples
+    --------
+    We define an event dataframe with given names of events and lists of onsets and offsets.
+    Durations are computed automatically.
+
+    >>> event = EventDataFrame(
+    ...    name=['fixation', 'fixation', 'fixation', 'fixation', ],
+    ...    onsets=[1988147, 1988351, 1988592, 1988788],
+    ...    offsets=[1988322, 1988546, 1988736, 1989013]
+    ... )
+    >>> print(event)
+    shape: (4, 4)
+    ┌──────────┬─────────┬─────────┬──────────┐
+    │ name     ┆ onset   ┆ offset  ┆ duration │
+    │ ---      ┆ ---     ┆ ---     ┆ ---      │
+    │ str      ┆ i64     ┆ i64     ┆ i64      │
+    ╞══════════╪═════════╪═════════╪══════════╡
+    │ fixation ┆ 1988147 ┆ 1988322 ┆ 175      │
+    │ fixation ┆ 1988351 ┆ 1988546 ┆ 195      │
+    │ fixation ┆ 1988592 ┆ 1988736 ┆ 144      │
+    │ fixation ┆ 1988788 ┆ 1989013 ┆ 225      │
+    └──────────┴─────────┴─────────┴──────────┘
     """
 
     _minimal_schema = {'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64}
@@ -268,3 +291,7 @@ class EventDataFrame:
             ] + [pl.all()],
         )
         return df
+
+    def __str__(self: Any) -> str:
+        """Print event dataframe."""
+        return pl.DataFrame.__str__(self.frame)
