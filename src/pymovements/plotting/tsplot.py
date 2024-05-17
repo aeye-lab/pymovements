@@ -137,7 +137,7 @@ def tsplot(
 
     # set ylims to have zero centered y-axis (for all axes)
     # will be overwritten if share_y is False
-    if zero_centered_yaxis: 
+    if zero_centered_yaxis:
         ylim_abs = np.nanmax(np.abs(arr))
         ylims = -ylim_abs * y_pad_factor, ylim_abs * y_pad_factor
     else:
