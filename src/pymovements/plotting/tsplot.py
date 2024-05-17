@@ -143,7 +143,7 @@ def tsplot(
         ylim_max = np.nanmax(arr)
         ylim_min = np.nanmin(arr)
         ylims = ylim_min * y_pad_factor, ylim_max * y_pad_factor
-        
+
     for channel_id in range(n_channels):
         ax = axs[channel_id]
 
