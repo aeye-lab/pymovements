@@ -289,9 +289,9 @@ def parse_eyelink(
             blink = False
             parsed_blink = match.groupdict()
             blink_info = {
-                'start_timestamp': parsed_blink['timestamp_start'],
-                'stop_timestamp': parsed_blink['timestamp_end'],
-                'duration_ms': parsed_blink['duration_ms'],
+                'start_timestamp': int(parsed_blink['timestamp_start']),
+                'stop_timestamp': int(parsed_blink['timestamp_end']),
+                'duration_ms': int(parsed_blink['duration_ms']),
                 'num_samples': num_blink_samples,
             }
             num_blink_samples = 0
