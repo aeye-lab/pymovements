@@ -133,7 +133,7 @@ def test_gaze_file_processing(gaze_from_kwargs):
     # Load in gaze file.
     file_extension = os.path.splitext(gaze_from_kwargs['file'])[1]
     gaze = None
-    if file_extension in {'.txt', '.csv', '.tsv', '.txt'}:
+    if file_extension in {'.txt', '.csv', '.tsv'}:
         gaze = pm.gaze.from_csv(**gaze_from_kwargs)
     elif file_extension in {'.feather', '.ipc'}:
         gaze = pm.gaze.from_ipc(**gaze_from_kwargs)
