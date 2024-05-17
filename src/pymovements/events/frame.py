@@ -67,7 +67,7 @@ class EventDataFrame:
     ...    onsets=[1988147, 1988351, 1988592, 1988788],
     ...    offsets=[1988322, 1988546, 1988736, 1989013]
     ... )
-    >>> print(event)
+    >>> event
     shape: (4, 4)
     ┌──────────┬─────────┬─────────┬──────────┐
     │ name     ┆ onset   ┆ offset  ┆ duration │
@@ -294,4 +294,8 @@ class EventDataFrame:
 
     def __str__(self: Any) -> str:
         """Print event dataframe."""
-        return pl.DataFrame.__str__(self.frame)
+        return self.frame.__str__()
+
+    def __repr__(self) -> str:
+        """Return string representation of event dataframe."""
+        return self.__str__()
