@@ -559,13 +559,13 @@ def _parse_eyelink_mount_config(mount_config: str) -> dict[str, str]:
         },
         'RTABLER': {
             'mount_type': 'Desktop',
-            'head_stabilization': 'remote mode (target sticker)',
+            'head_stabilization': 'remote',
             'eyes_recorded': 'monocular',
             'short_name': 'RTABLER',
         },
         'RBTABLER': {
             'mount_type': 'Desktop',
-            'head_stabilization': 'remote mode (target sticker)',
+            'head_stabilization': 'remote',
             'eyes_recorded': 'binocular / monocular',
             'short_name': 'RBTABLER',
         },
@@ -583,13 +583,13 @@ def _parse_eyelink_mount_config(mount_config: str) -> dict[str, str]:
         },
         'ARTABLER': {
             'mount_type': 'Arm Mount',
-            'head_stabilization': 'remote mode (target sticker)',
+            'head_stabilization': 'remote',
             'eyes_recorded': 'monocular',
             'short_name': 'ARTABLER',
         },
         'ABRTABLE': {
             'mount_type': 'Arm Mount',
-            'head_stabilization': 'remote mode (target sticker)',
+            'head_stabilization': 'remote',
             'eyes_recorded': 'binocular / monocular',
             'short_name': 'ABRTABLE',
         },
