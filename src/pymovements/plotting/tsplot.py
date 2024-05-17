@@ -133,22 +133,30 @@ def tsplot(
     t = np.arange(n_samples)
     xlims = t.min(), t.max()
 
+    y_pad_factor = 1.1
+
     # set ylims to have zero centered y-axis (for all axes)
     if share_y and zero_centered_yaxis:
-        y_pad_factor = 1.1
         ylim_abs = np.nanmax(np.abs(arr))
         ylims = -ylim_abs * y_pad_factor, ylim_abs * y_pad_factor
-
+    elif share_y and not zero_centered_yaxis:
+        ylim_max = np.nanmax(arr)
+        ylim_min = np.nanmin(arr)
+        ylims = ylim_min * y_pad_factor, ylim_max * y_pad_factor
+        
     for channel_id in range(n_channels):
         ax = axs[channel_id]
 
         x_channel = arr[channel_id, :]
         ax.plot(t, x_channel, color=line_color, linewidth=line_width)
 
-        if not share_y:
-            y_pad_factor = 1.1
+        if not share_y and zero_centered_yaxis:
             ylim_abs = np.nanmax(np.abs(arr[channel_id]))
             ylims = -ylim_abs * y_pad_factor, ylim_abs * y_pad_factor
+        elif not share_y and not zero_centered_yaxis:
+            ylim_max = np.nanmax(arr)
+            ylim_min = np.nanmin(arr)
+            ylims = ylim_min * y_pad_factor, ylim_max * y_pad_factor
 
         ax.set_xlim(xlims)
         ax.set_ylim(ylims)
