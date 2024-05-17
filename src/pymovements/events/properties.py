@@ -236,7 +236,7 @@ def location(
     ValueError
         If method is not one of the supported methods.
     """
-    if method not in ['mean', 'median']:
+    if method not in {'mean', 'median'}:
         raise ValueError(
             f"Method '{method}' not supported. "
             f"Please choose one of the following: ['mean', 'median'].",
@@ -252,8 +252,7 @@ def location(
 
         if method == 'mean':
             expression_component = position_component.mean()
-
-        if method == 'median':
+        else:  # must be median
             expression_component = position_component.median()
 
         component_expressions.append(expression_component)
