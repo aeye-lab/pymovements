@@ -646,7 +646,7 @@ def test_parse_eyelink_datetime(tmp_path):
             'MSG	2154555 ELCLCFG RTABLER\n',
             {
                 'mount_type': 'Desktop',
-                'head_stabilization': 'remote mode (target sticker)',
+                'head_stabilization': 'remote',
                 'eyes_recorded': 'monocular',
                 'short_name': 'RTABLER',
             },
@@ -657,7 +657,7 @@ def test_parse_eyelink_datetime(tmp_path):
             'MSG	2154555 ELCLCFG RBTABLER\n',
             {
                 'mount_type': 'Desktop',
-                'head_stabilization': 'remote mode (target sticker)',
+                'head_stabilization': 'remote',
                 'eyes_recorded': 'binocular / monocular',
                 'short_name': 'RBTABLER',
             },
@@ -690,7 +690,7 @@ def test_parse_eyelink_datetime(tmp_path):
             'MSG	2154555 ELCLCFG ARTABLER\n',
             {
                 'mount_type': 'Arm Mount',
-                'head_stabilization': 'remote mode (target sticker)',
+                'head_stabilization': 'remote',
                 'eyes_recorded': 'monocular',
                 'short_name': 'ARTABLER',
             },
@@ -701,7 +701,7 @@ def test_parse_eyelink_datetime(tmp_path):
             'MSG	2154555 ELCLCFG ABRTABLE\n',
             {
                 'mount_type': 'Arm Mount',
-                'head_stabilization': 'remote mode (target sticker)',
+                'head_stabilization': 'remote',
                 'eyes_recorded': 'binocular / monocular',
                 'short_name': 'ABRTABLE',
             },
