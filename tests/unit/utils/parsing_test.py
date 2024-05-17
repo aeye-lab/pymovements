@@ -163,10 +163,10 @@ EXPECTED_METADATA = {
     'total_recording_duration_ms': 11,
     'datetime': datetime.datetime(2023, 3, 8, 9, 25, 20),
     'blinks': [{
-        'duration_ms': '2',
+        'duration_ms': 2,
         'num_samples': 2,
-        'start_timestamp': '10000018',
-        'stop_timestamp': '10000020',
+        'start_timestamp': 10000018,
+        'stop_timestamp': 10000020,
     }],
     'mount_configuration': {
         'mount_type': 'Desktop',
@@ -459,7 +459,7 @@ def test_parse_val_cal_eyelink_monocular_file():
             '10000020	   .	   .	    0.0	    0.0	...\n'
             'EBLINK R 10000018	10000020	2\n',
             [{
-                'duration_ms': '2',
+                'duration_ms': 2,
                 'num_samples': 2,
                 'start_timestamp': 10000018,
                 'stop_timestamp': 10000020,
