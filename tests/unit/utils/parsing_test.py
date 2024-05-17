@@ -416,10 +416,10 @@ def test_parse_val_cal_eyelink_monocular_file():
             '10000020	   .	   .	    0.0	    0.0	...\n'
             'EBLINK R 10000018	10000020	2\n',
             [{
-                'duration_ms': '2',
+                'duration_ms': 2,
                 'num_samples': 2,
-                'start_timestamp': '10000018',
-                'stop_timestamp': '10000020',
+                'start_timestamp': 10000018,
+                'stop_timestamp': 10000020,
             }],
             id='blink',
         ),
@@ -438,16 +438,16 @@ def test_parse_val_cal_eyelink_monocular_file():
             'EBLINK R 10000021	10000024	4\n',
             [
                 {
-                    'duration_ms': '2',
+                    'duration_ms': 2,
                     'num_samples': 2,
-                    'start_timestamp': '10000018',
-                    'stop_timestamp': '10000020',
+                    'start_timestamp': 10000018,
+                    'stop_timestamp': 10000020,
                 },
                 {
-                    'duration_ms': '4',
+                    'duration_ms': 4,
                     'num_samples': 4,
-                    'start_timestamp': '10000021',
-                    'stop_timestamp': '10000024',
+                    'start_timestamp': 10000021,
+                    'stop_timestamp': 10000024,
                 },
             ],
             id='multiple_blinks',
@@ -461,8 +461,8 @@ def test_parse_val_cal_eyelink_monocular_file():
             [{
                 'duration_ms': '2',
                 'num_samples': 2,
-                'start_timestamp': '10000018',
-                'stop_timestamp': '10000020',
+                'start_timestamp': 10000018,
+                'stop_timestamp': 10000020,
             }],
             id='blinks_no_sampling_rate',
         ),
