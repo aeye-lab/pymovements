@@ -68,7 +68,7 @@ repos:
     -   id: nbqa-pyupgrade
         args: ["--py39-plus"]
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.9.0
+    rev: v1.10.0
     hooks:
     -   id: mypy
         additional_dependencies: [types-all, pandas-stubs, types-tqdm]
