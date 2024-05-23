@@ -143,6 +143,44 @@ import pymovements as pm
             ),
             id='upsample_2000_to_4000_no_interpolation',
         ),
+        pytest.param(
+            {
+                'resampling_rate': 333,
+                'columns': None,
+            },
+            pl.DataFrame(
+                {
+                    'time': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                    'pixel': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                },
+            ),
+            pl.DataFrame(
+                {
+                    'time': [0, 3.003, 6.006],
+                    'pixel': [1, None, None]
+                },
+            ),
+            id='downsample_1000_to_333_no_interpolation',
+        ),
+        pytest.param(
+            {
+                'resampling_rate': 333,
+                'columns': None,
+            },
+            pl.DataFrame(
+                {
+                    'time': [0, 10, 20],
+                    'pixel': [1, 2, 3]
+                },
+            ),
+            pl.DataFrame(
+                {
+                    'time': [0, 3.003, 6.006, 9.009, 12.012, 15.015, 18.018],
+                    'pixel': [1, None, None, None, None, None, None]
+                },
+            ),
+            id='upsample_100_to_333_no_interpolation',
+        ),
         # With filling nulls, single component
         pytest.param(
             {
@@ -585,7 +623,8 @@ def test_resample_returns(kwargs, df, expected_df):
         # Unsuporrted sample rate
         pytest.param(
             {
-                'resampling_rate': 123,
+                'resampling_rate': 7,
+                'n_components': 2,
             },
             ValueError,
             ['unsupported resampling rate'],

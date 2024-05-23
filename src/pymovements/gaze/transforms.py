@@ -783,10 +783,12 @@ def resample(
     resample_step_us = 1000000 / resampling_rate
 
     # Check if resample rate is supported when using microsecond precision
-    if 1000000 % resample_step_us != 0:
+    # Allow for rounding error less than 1 microsecond
+    if 1000000 % resample_step_us >= 1000:
         raise ValueError(
             f'Unsupported resampling rate: {resampling_rate}.'
-            f' Resample rate must be a divisor of 1000000.',
+            ' Sampling rate must result in rounding error less than 1 microsecond'
+            ' for resampling time steps'
         )
 
     resample_step_us = int(resample_step_us)
