@@ -1202,7 +1202,7 @@ class GazeDataFrame:
                 )
 
     def __str__(self: Any) -> str:
-        """Print gaze dataframe."""
+        """Return string representation of GazeDataFrame."""
         if self.experiment is None:
             return self.frame.__str__()
 
