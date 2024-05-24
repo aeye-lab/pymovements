@@ -293,7 +293,7 @@ class EventDataFrame:
         return df
 
     def __str__(self: Any) -> str:
-        """Print event dataframe."""
+        """Return string representation of event dataframe."""
         return self.frame.__str__()
 
     def __repr__(self) -> str:
