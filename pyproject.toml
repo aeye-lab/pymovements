@@ -32,7 +32,7 @@ classifiers = [
   "Typing :: Typed"
 ]
 dependencies = [
-  "matplotlib>=3.8.0,<3.9",
+  "matplotlib>=3.8.0,<3.10",
   "numpy>=1.22.4,<2",
   "pandas>=2.1.4,<3",
   "polars>=0.20.1,<0.20.3",
@@ -48,7 +48,7 @@ dynamic = ["version"]
 docs = [
   "ipykernel>=6.13.0",
   "nbconvert>=7.0.0,<7.14",
-  "nbsphinx>=0.8.8,<0.9.4",
+  "nbsphinx>=0.8.8,<0.9.5",
   "pandoc",
   "pybtex",
   "pydata-sphinx-theme>=0.12",

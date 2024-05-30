@@ -43,23 +43,31 @@ EYELINK_META_REGEXES = [
     {'pattern': r'\*\*\s+VERSION:\s+(?P<version_1>.*)\s+'},
     {
         'pattern': r'\*\*\s+DATE:\s+(?P<weekday>[A-Z,a-z]+)\s+(?P<month>[A-Z,a-z]+)'
-                   r'\s+(?P<day>\d\d?)\s+(?P<time>\d\d:\d\d:\d\d)\s+(?P<year>\d{4})\s+',
+                   r'\s+(?P<day>\d\d?)\s+(?P<time>\d\d:\d\d:\d\d)\s+(?P<year>\d{4})\s*',
     },
     {'pattern': r'\*\*\s+(?P<version_2>EYELINK.*)'},
     {
-        'pattern': r'SAMPLES\s+GAZE\s+(?P<tracked_eye>LEFT|RIGHT)\s+RATE\s+'
-                   r'(?P<sampling_rate>[-]?\d*[.]\d*)\s+TRACKING\s+(?P<tracking>\S+)'
-                   r'\s+FILTER\s+(?P<filter>\d+)\s+INPUT',
+        'pattern': r'MSG\s+\d+\s+DISPLAY_COORDS\s+(?P<resolution>.*)',
     },
     {
-        'pattern': r'MSG\s+\d+\s+DISPLAY_COORDS\s+(?P<resolution>.*)',
+        'pattern': r'MSG\s+\d+\s+RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+'
+                   r'(?P<sampling_rate>\d+)\s+'
+                   r'(?P<file_sample_filter>(0|1|2))\s+'
+                   r'(?P<link_sample_filter>(0|1|2))\s+'
+                   r'(?P<tracked_eye>(L|R|LR))\s*',
+    },
+    {
+        'pattern': r'PUPIL\s+(?P<pupil_data_type>(AREA|DIAMETER))\s*',
+    },
+    {
+        'pattern': r'MSG\s+\d+\s+ELCLCFG\s+(?P<mount_configuration>.*)',
     },
 ]
 
 VALIDATION_REGEX = (
     r'MSG\s+(?P<timestamp>\d+)\s+!CAL\s+VALIDATION\s+HV'
     r'(?P<num_points>\d\d?).*'
-    r'(?P<eye_tracked>LEFT|RIGHT)\s+'
+    r'(?P<tracked_eye>LEFT|RIGHT)\s+'
     r'(?P<error>\D*)\s+'
     r'(?P<validation_score_avg>\d.\d\d)\s+avg\.\s+'
     r'(?P<validation_score_max>\d.\d\d)\s+max'
@@ -281,9 +289,9 @@ def parse_eyelink(
             blink = False
             parsed_blink = match.groupdict()
             blink_info = {
-                'start_timestamp': parsed_blink['timestamp_start'],
-                'stop_timestamp': parsed_blink['timestamp_end'],
-                'duration_ms': parsed_blink['duration_ms'],
+                'start_timestamp': int(parsed_blink['timestamp_start']),
+                'stop_timestamp': int(parsed_blink['timestamp_end']),
+                'duration_ms': int(parsed_blink['duration_ms']),
                 'num_samples': num_blink_samples,
             }
             num_blink_samples = 0
@@ -409,7 +417,7 @@ def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:
     else:
         metadata['sampling_rate'] = 'unknown'
 
-    # if the data has been parsed fully, convert the date to a datetime object
+    # if the date has been parsed fully, convert the date to a datetime object
     if 'day' in metadata and 'year' in metadata and 'month' in metadata and 'time' in metadata:
         metadata['day'] = int(metadata['day'])
         metadata['year'] = int(metadata['year'])
@@ -417,6 +425,11 @@ def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:
         date_time = datetime.datetime(day=metadata['day'], month=month_num, year=metadata['year'])
         time = datetime.datetime.strptime(metadata['time'], '%H:%M:%S')
         metadata['datetime'] = datetime.datetime.combine(date_time, time.time())
+
+    if 'mount_configuration' in metadata:
+        metadata['mount_configuration'] = _parse_eyelink_mount_config(
+            metadata['mount_configuration'],
+        )
 
     return_metadata: dict[str, Any] = dict(metadata)
 
@@ -515,3 +528,118 @@ def _parse_full_eyelink_version(version_str_1: str, version_str_2: str) -> tuple
             version_number = 'unknown'
 
     return version_number, model
+
+
+def _parse_eyelink_mount_config(mount_config: str) -> dict[str, str]:
+    """Return a dictionary with the mount configuration based on the config short name.
+
+    Parameters
+    ----------
+    mount_config: str
+        Short name of the mount configuration.
+
+    Returns
+    -------
+    dict[str, str]
+        Dictionary with the mount configuration spelled out.
+
+    """
+    possible_mounts = {
+        'MTABLER': {
+            'mount_type': 'Desktop',
+            'head_stabilization': 'stabilized',
+            'eyes_recorded': 'monocular',
+            'short_name': 'MTABLER',
+        },
+        'BTABLER': {
+            'mount_type': 'Desktop',
+            'head_stabilization': 'stabilized',
+            'eyes_recorded': 'binocular / monocular',
+            'short_name': 'BTABLER',
+        },
+        'RTABLER': {
+            'mount_type': 'Desktop',
+            'head_stabilization': 'remote',
+            'eyes_recorded': 'monocular',
+            'short_name': 'RTABLER',
+        },
+        'RBTABLER': {
+            'mount_type': 'Desktop',
+            'head_stabilization': 'remote',
+            'eyes_recorded': 'binocular / monocular',
+            'short_name': 'RBTABLER',
+        },
+        'AMTABLER': {
+            'mount_type': 'Arm Mount',
+            'head_stabilization': 'stabilized',
+            'eyes_recorded': 'monocular',
+            'short_name': 'AMTABLER',
+        },
+        'ABTABLER': {
+            'mount_type': 'Arm Mount',
+            'head_stabilization': 'stabilized',
+            'eyes_recorded': 'binocular / monocular',
+            'short_name': 'ABTABLER',
+        },
+        'ARTABLER': {
+            'mount_type': 'Arm Mount',
+            'head_stabilization': 'remote',
+            'eyes_recorded': 'monocular',
+            'short_name': 'ARTABLER',
+        },
+        'ABRTABLE': {
+            'mount_type': 'Arm Mount',
+            'head_stabilization': 'remote',
+            'eyes_recorded': 'binocular / monocular',
+            'short_name': 'ABRTABLE',
+        },
+        'BTOWER': {
+            'mount_type': 'Binocular Tower Mount',
+            'head_stabilization': 'stabilized',
+            'eyes_recorded': 'binocular / monocular',
+            'short_name': 'BTOWER',
+        },
+        'TOWER': {
+            'mount_type': 'Tower Mount',
+            'head_stabilization': 'stabilized',
+            'eyes_recorded': 'monocular',
+            'short_name': 'TOWER',
+        },
+        'MPRIM': {
+            'mount_type': 'Primate Mount',
+            'head_stabilization': 'stabilized',
+            'eyes_recorded': 'monocular',
+            'short_name': 'MPRIM',
+        },
+        'BPRIM': {
+            'mount_type': 'Primate Mount',
+            'head_stabilization': 'stabilized',
+            'eyes_recorded': 'binocular / monocular',
+            'short_name': 'BPRIM',
+        },
+        'MLRR': {
+            'mount_type': 'Long-Range Mount',
+            'head_stabilization': 'stabilized',
+            'eyes_recorded': 'monocular',
+            'camera_position': 'level',
+            'short_name': 'MLRR',
+        },
+        'BLRR': {
+            'mount_type': 'Long-Range Mount',
+            'head_stabilization': 'stabilized',
+            'eyes_recorded': 'binocular / monocular',
+            'camera_position': 'angled',
+            'short_name': 'BLRR',
+        },
+    }
+
+    if mount_config in possible_mounts:
+        return possible_mounts[mount_config]
+
+    return {
+        'mount_type': 'unknown',
+        'head_stabilization': 'unknown',
+        'eyes_recorded': 'unknown',
+        'camera_position': 'unknown',
+        'short_name': mount_config,
+    }
