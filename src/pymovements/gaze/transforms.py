@@ -788,7 +788,7 @@ def resample(
         raise ValueError(
             f'Unsupported resampling rate: {resampling_rate}.'
             ' Sampling rate must result in rounding error less than 1 microsecond'
-            ' for resampling time steps'
+            ' for resampling time steps',
         )
 
     resample_step_us = int(resample_step_us)

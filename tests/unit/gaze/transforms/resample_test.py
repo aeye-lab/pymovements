@@ -157,7 +157,7 @@ import pymovements as pm
             pl.DataFrame(
                 {
                     'time': [0, 3.003, 6.006],
-                    'pixel': [1, None, None]
+                    'pixel': [1, None, None],
                 },
             ),
             id='downsample_1000_to_333_no_interpolation',
@@ -170,13 +170,13 @@ import pymovements as pm
             pl.DataFrame(
                 {
                     'time': [0, 10, 20],
-                    'pixel': [1, 2, 3]
+                    'pixel': [1, 2, 3],
                 },
             ),
             pl.DataFrame(
                 {
                     'time': [0, 3.003, 6.006, 9.009, 12.012, 15.015, 18.018],
-                    'pixel': [1, None, None, None, None, None, None]
+                    'pixel': [1, None, None, None, None, None, None],
                 },
             ),
             id='upsample_100_to_333_no_interpolation',
