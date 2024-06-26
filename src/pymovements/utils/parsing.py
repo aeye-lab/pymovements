@@ -47,10 +47,10 @@ EYELINK_META_REGEXES = [
     },
     {'pattern': r'\*\*\s+(?P<version_2>EYELINK.*)'},
     {
-        'pattern': r'MSG\s+\d+\s+DISPLAY_COORDS\s+(?P<resolution>.*)',
+        'pattern': r'MSG\s+\d+[.]?\d*\s+DISPLAY_COORDS\s+(?P<resolution>.*)',
     },
     {
-        'pattern': r'MSG\s+\d+\s+RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+'
+        'pattern': r'MSG\s+\d+[.]?\d*\s+RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+'
                    r'(?P<sampling_rate>\d+)\s+'
                    r'(?P<file_sample_filter>(0|1|2))\s+'
                    r'(?P<link_sample_filter>(0|1|2))\s+'
@@ -60,7 +60,7 @@ EYELINK_META_REGEXES = [
         'pattern': r'PUPIL\s+(?P<pupil_data_type>(AREA|DIAMETER))\s*',
     },
     {
-        'pattern': r'MSG\s+\d+\s+ELCLCFG\s+(?P<mount_configuration>.*)',
+        'pattern': r'MSG\s+\d+[.]?\d*\s+ELCLCFG\s+(?P<mount_configuration>.*)',
     },
 ]
 
@@ -128,7 +128,7 @@ def compile_patterns(patterns: list[dict[str, Any]]) -> list[dict[str, Any]]:
     list[dict[str, Any]]
         Returns from string compiled regex patterns.
     """
-    msg_prefix = r'MSG\s+\d+\s+'
+    msg_prefix = r'MSG\s+\d+[.]?\d*\s+'
 
     compiled_patterns = []
 
