@@ -26,11 +26,11 @@ import numpy as np
 
 
 def step_function(
-        length: int,
-        steps: list[int],
-        values: list[float | tuple[float, ...]],
-        start_value: float | tuple[float, ...] = 0,
-        noise: float = 0,
+    length: int,
+    steps: list[int],
+    values: list[float | tuple[float, ...]],
+    start_value: float | tuple[float, ...] = 0,
+    noise: float = 0,
 ) -> np.ndarray:
     """Create a synthetic eye gaze by using a simple step function.
 
@@ -90,8 +90,7 @@ def step_function(
     # Check that steps and values have equal length.
     if len(steps) != len(values):
         raise ValueError(
-            'length of steps not equal to length of values'
-            f' ({len(steps)} != {len(values)})',
+            'length of steps not equal to length of values' f" ({len(steps)} != {len(values)})",
         )
 
     # Check that steps are sorted in ascending order.
@@ -116,7 +115,6 @@ def step_function(
 
     # Make sure start value corresponds to number of channels.
     if n_channels > 1:
-
         # If start value is a scalar, create tuple with length of number of channels.
         if isinstance(start_value, (int, float)):
             start_value = tuple(start_value for _ in range(n_channels))

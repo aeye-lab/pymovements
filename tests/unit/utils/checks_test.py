@@ -57,7 +57,7 @@ def test_check_no_zeros_raises_error(variable, expected_error, expected_err_msg)
     else:
         with pytest.raises(expected_error) as excinfo:
             checks.check_no_zeros(variable)
-        msg, = excinfo.value.args
+        (msg,) = excinfo.value.args
         assert msg == expected_err_msg
 
 
@@ -106,7 +106,7 @@ def test_check_nan_both_channels_raises_error(arr, expected_error, expected_err_
     else:
         with pytest.raises(expected_error) as excinfo:
             checks.check_nan_both_channels(arr)
-        msg, = excinfo.value.args
+        (msg,) = excinfo.value.args
         assert msg == expected_err_msg
 
 
@@ -174,9 +174,7 @@ def test_check_nan_both_channels_raises_error(arr, expected_error, expected_err_
                 'velocities': np.array([[1, 2], [3, 4], [5, 6]]),
             },
             ValueError,
-            'positions, velocities'
-            ' must have the same shape, but shapes are '
-            '(2, 2), (3, 2)',
+            'positions, velocities' ' must have the same shape, but shapes are ' '(2, 2), (3, 2)',
             id='positions_and_velocities_N_2_but_different_lengths_raises_value_error',
         ),
     ],
@@ -192,7 +190,7 @@ def test_check_shapes_raises_error(kwargs, expected_error, expected_err_msg):
     else:
         with pytest.raises(expected_error) as excinfo:
             checks.check_shapes(**kwargs)
-        msg, = excinfo.value.args
+        (msg,) = excinfo.value.args
         assert msg == expected_err_msg
 
 

@@ -162,21 +162,18 @@ class ToyDatasetEyeLink(DatasetDefinition):
                     'column': 'task',
                     'value': None,
                 },
-
                 r'TRIALID (?P<trial_id>\d+)',
                 {
                     'pattern': 'TRIAL_RESULT',
                     'column': 'trial_id',
                     'value': None,
                 },
-
                 r'SYNCTIME_READING_SCREEN_(?P<screen_id>\d+)',
                 {
                     'pattern': 'READING[.]STOP',
                     'column': 'screen_id',
                     'value': None,
                 },
-
                 r'SYNCTIME.P(?P<point_id>\d+)',
                 {
                     'pattern': r'P\d[.]STOP',

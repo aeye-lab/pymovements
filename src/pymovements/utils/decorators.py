@@ -28,14 +28,15 @@ ClassT = TypeVar('ClassT')
 
 def auto_str(cls: type[ClassT]) -> type[ClassT]:
     """Automatically generate __str__() to include all arguments. Can be used as a decorator."""
+
     def shorten(value: Any) -> str:
         if isinstance(value, float):
-            value = f'{value:.2f}'
+            value = f"{value:.2f}"
         return value
 
     def __str__(self: Any) -> str:
-        attributes = ', '.join(f'{key}={shorten(value)}' for key, value in vars(self).items())
-        return f'{type(self).__name__}({attributes})'
+        attributes = ', '.join(f"{key}={shorten(value)}" for key, value in vars(self).items())
+        return f"{type(self).__name__}({attributes})"
 
     # for type ignore see: https://github.com/python/mypy/issues/3951#issuecomment-329183108
     cls.__str__ = __str__  # type: ignore

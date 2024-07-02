@@ -41,7 +41,6 @@ from pymovements.events.detection._microsaccades import microsaccades
 __all__ = [
     'EventDetectionLibrary',
     'register_event_detection',
-
     'fill',
     'idt',
     'ivt',

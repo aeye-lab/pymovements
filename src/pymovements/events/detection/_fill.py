@@ -29,10 +29,10 @@ from pymovements.gaze.transforms_numpy import consecutive
 
 @register_event_detection
 def fill(
-        events: EventDataFrame,
-        timesteps: list[int] | np.ndarray,
-        minimum_duration: int = 1,
-        name: str = 'unclassified',
+    events: EventDataFrame,
+    timesteps: list[int] | np.ndarray,
+    minimum_duration: int = 1,
+    name: str = 'unclassified',
 ) -> EventDataFrame:
     """Classify all previously unclassified timesteps as events.
 
@@ -76,7 +76,7 @@ def fill(
         else:
             idx_offset = np.where(timesteps == row['offset'] - 1)[0][0]
 
-        events_mask[idx_onset:idx_offset + 1] = True
+        events_mask[idx_onset: idx_offset + 1] = True
 
     # Mask all indices where there is no event.
     candidate_mask = ~events_mask
@@ -92,7 +92,8 @@ def fill(
 
     # Filter all candidates by minimum duration.
     candidates = [
-        candidate for candidate in candidates
+        candidate
+        for candidate in candidates
         if timesteps[candidate[-1]] - timesteps[candidate[0]] >= minimum_duration
     ]
 

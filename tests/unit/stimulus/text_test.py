@@ -129,7 +129,8 @@ def test_text_stimulus_unsupported_format():
             height_column='height',
             page_column='page',
         )
-    msg, = excinfo.value.args
-    expected = 'unsupported file format ".pickle".Supported formats are: '\
-        '[\'.csv\', \'.tsv\', \'.txt\']'
+    (msg,) = excinfo.value.args
+    expected = (
+        'unsupported file format ".pickle".Supported formats are: ' "['.csv', '.tsv', '.txt']"
+    )
     assert msg == expected

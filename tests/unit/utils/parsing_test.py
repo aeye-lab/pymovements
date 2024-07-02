@@ -116,7 +116,6 @@ PATTERNS = [
         'column': 'task',
         'value': None,
     },
-
     r'START_TRIAL_(?P<trial_id>\d+)',
     {
         'pattern': r'STOP_TRIAL',
@@ -128,8 +127,17 @@ PATTERNS = [
 EXPECTED_DF = pl.from_dict(
     {
         'time': [
-            10000000, 10000002, 10000004, 10000006, 10000008, 10000011, 10000014,
-            10000017, 10000019, 10000020, 10000021,
+            10000000,
+            10000002,
+            10000004,
+            10000006,
+            10000008,
+            10000011,
+            10000014,
+            10000017,
+            10000019,
+            10000020,
+            10000021,
         ],
         'x_pix': [850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, np.nan, np.nan, np.nan],
         'y_pix': [717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, np.nan, np.nan, np.nan],
@@ -162,12 +170,14 @@ EXPECTED_METADATA = {
     'data_loss_ratio': 0.2727272727272727,
     'total_recording_duration_ms': 11,
     'datetime': datetime.datetime(2023, 3, 8, 9, 25, 20),
-    'blinks': [{
-        'duration_ms': 2,
-        'num_samples': 2,
-        'start_timestamp': 10000018,
-        'stop_timestamp': 10000020,
-    }],
+    'blinks': [
+        {
+            'duration_ms': 2,
+            'num_samples': 2,
+            'start_timestamp': 10000018,
+            'stop_timestamp': 10000020,
+        },
+    ],
     'mount_configuration': {
         'mount_type': 'Desktop',
         'head_stabilization': 'stabilized',
@@ -207,7 +217,7 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
             patterns=patterns,
         )
 
-    msg, = excinfo.value.args
+    (msg,) = excinfo.value.args
 
     expected_substrings = ['invalid pattern', '1']
     for substring in expected_substrings:
@@ -258,15 +268,13 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
             id='eye_link_II',
         ),
         pytest.param(
-            '** DATE: Wed Mar  8 09:25:20 2023\n'
-            '** VERSION: EYELINK REVISION 2.00 (Aug 12 1997)',
+            '** DATE: Wed Mar  8 09:25:20 2023\n' '** VERSION: EYELINK REVISION 2.00 (Aug 12 1997)',
             '2.00',
             'EyeLink I',
             id='eye_link_I',
         ),
         pytest.param(
-            '** DATE: Wed Mar  8 09:25:20 2023\n'
-            '** VERSION: nothing\n',
+            '** DATE: Wed Mar  8 09:25:20 2023\n' '** VERSION: nothing\n',
             'unknown',
             'unknown',
             id='unknown_version_1',
@@ -280,8 +288,7 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
             id='unknown_version_2',
         ),
         pytest.param(
-            '** DATE: Wed Mar  8 09:25:20 2023\n'
-            '** TYPE: EDF_FILE BINARY EVENT SAMPLE TAGGED',
+            '** DATE: Wed Mar  8 09:25:20 2023\n' '** TYPE: EDF_FILE BINARY EVENT SAMPLE TAGGED',
             'unknown',
             'unknown',
             id='unknown_version_3',
@@ -334,20 +341,24 @@ def test_no_metadata_warning(tmp_path, metadata, expected_msg):
             'MSG	7045618 !CAL Calibration points:  \n'
             'MSG	1076158 !CAL VALIDATION HV9 R RIGHT POOR ERROR 2.40 avg. 6.03 max  '
             'OFFSET 0.19 deg. 4.2,6.3 pix.\n',
-            [{
-                'error': 'POOR ERROR',
-                'tracked_eye': 'RIGHT',
-                'num_points': '9',
-                'timestamp': '1076158',
-                'validation_score_avg': '2.40',
-                'validation_score_max': '6.03',
-            }],
-            [{
-                'num_points': '9',
-                'timestamp': '7045618',
-                'tracked_eye': 'LEFT',
-                'type': 'P-CR',
-            }],
+            [
+                {
+                    'error': 'POOR ERROR',
+                    'tracked_eye': 'RIGHT',
+                    'num_points': '9',
+                    'timestamp': '1076158',
+                    'validation_score_avg': '2.40',
+                    'validation_score_max': '6.03',
+                },
+            ],
+            [
+                {
+                    'num_points': '9',
+                    'timestamp': '7045618',
+                    'tracked_eye': 'LEFT',
+                    'type': 'P-CR',
+                },
+            ],
             id='cal_timestamp_with_space',
         ),
         pytest.param(
@@ -355,18 +366,18 @@ def test_no_metadata_warning(tmp_path, metadata, expected_msg):
             'MSG	7045618 !CAL\n'
             '>>>>>>> CALIBRATION (HV9,P-CR) FOR LEFT: <<<<<<<<<\n',
             [],
-            [{
-                'num_points': '9',
-                'timestamp': '7045618',
-                'tracked_eye': 'LEFT',
-                'type': 'P-CR',
-            }],
+            [
+                {
+                    'num_points': '9',
+                    'timestamp': '7045618',
+                    'tracked_eye': 'LEFT',
+                    'type': 'P-CR',
+                },
+            ],
             id='cal_timestamp_no_space_no_val',
         ),
         pytest.param(
-            '** DATE: Wed Feb  1 04:38:54 2017\n'
-            'MSG	7045618 !CAL\n'
-            'MSG	7045618 !CAL\n',
+            '** DATE: Wed Feb  1 04:38:54 2017\n' 'MSG	7045618 !CAL\n' 'MSG	7045618 !CAL\n',
             [],
             [{'timestamp': '7045618'}],
             id='cal_timestamp_no_cal_no_val',
@@ -384,22 +395,30 @@ def test_val_cal_eyelink(tmp_path, metadata, expected_validation, expected_calib
 
 
 def test_parse_val_cal_eyelink_monocular_file():
-    example_asc_monocular_path = Path(__file__).parent.parent.parent / \
-        'files/eyelink_monocular_example.asc'
+    example_asc_monocular_path = (
+        Path(__file__).parent.parent.parent / 'files/eyelink_monocular_example.asc'
+    )
 
     _, metadata = pm.utils.parsing.parse_eyelink(example_asc_monocular_path)
 
-    expected_validation = [{
-        'error': 'GOOD ERROR',
-        'tracked_eye': 'LEFT',
-        'num_points': '9',
-        'timestamp': '2148587',
-        'validation_score_avg': '0.27',
-        'validation_score_max': '0.83',
-    }]
-    expected_calibration = [{
-        'num_points': '9', 'type': 'P-CR', 'tracked_eye': 'LEFT', 'timestamp': '2135819',
-    }]
+    expected_validation = [
+        {
+            'error': 'GOOD ERROR',
+            'tracked_eye': 'LEFT',
+            'num_points': '9',
+            'timestamp': '2148587',
+            'validation_score_avg': '0.27',
+            'validation_score_max': '0.83',
+        },
+    ]
+    expected_calibration = [
+        {
+            'num_points': '9',
+            'type': 'P-CR',
+            'tracked_eye': 'LEFT',
+            'timestamp': '2135819',
+        },
+    ]
 
     assert metadata['calibrations'] == expected_calibration
     assert metadata['validations'] == expected_validation
@@ -415,12 +434,14 @@ def test_parse_val_cal_eyelink_monocular_file():
             '10000019	   .	   .	    0.0	    0.0	...\n'
             '10000020	   .	   .	    0.0	    0.0	...\n'
             'EBLINK R 10000018	10000020	2\n',
-            [{
-                'duration_ms': 2,
-                'num_samples': 2,
-                'start_timestamp': 10000018,
-                'stop_timestamp': 10000020,
-            }],
+            [
+                {
+                    'duration_ms': 2,
+                    'num_samples': 2,
+                    'start_timestamp': 10000018,
+                    'stop_timestamp': 10000020,
+                },
+            ],
             id='blink',
         ),
         pytest.param(
@@ -458,12 +479,14 @@ def test_parse_val_cal_eyelink_monocular_file():
             '10000019	   .	   .	    0.0	    0.0	...\n'
             '10000020	   .	   .	    0.0	    0.0	...\n'
             'EBLINK R 10000018	10000020	2\n',
-            [{
-                'duration_ms': 2,
-                'num_samples': 2,
-                'start_timestamp': 10000018,
-                'stop_timestamp': 10000020,
-            }],
+            [
+                {
+                    'duration_ms': 2,
+                    'num_samples': 2,
+                    'start_timestamp': 10000018,
+                    'stop_timestamp': 10000020,
+                },
+            ],
             id='blinks_no_sampling_rate',
         ),
     ],
@@ -593,7 +616,10 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
     ],
 )
 def test_parse_eyelink_data_loss_ratio(
-        tmp_path, metadata, expected_blink_ratio, expected_overall_ratio,
+    tmp_path,
+    metadata,
+    expected_blink_ratio,
+    expected_overall_ratio,
 ):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
@@ -620,8 +646,7 @@ def test_parse_eyelink_datetime(tmp_path):
     ('metadata', 'expected_mount_config'),
     [
         pytest.param(
-            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
-            'MSG	2154555 ELCLCFG BTABLER\n',
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n' 'MSG	2154555 ELCLCFG BTABLER\n',
             {
                 'mount_type': 'Desktop',
                 'head_stabilization': 'stabilized',
@@ -631,8 +656,7 @@ def test_parse_eyelink_datetime(tmp_path):
             id='desktop_stabilized_binocular',
         ),
         pytest.param(
-            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
-            'MSG	2154555 ELCLCFG MTABLER\n',
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n' 'MSG	2154555 ELCLCFG MTABLER\n',
             {
                 'mount_type': 'Desktop',
                 'head_stabilization': 'stabilized',
@@ -642,8 +666,7 @@ def test_parse_eyelink_datetime(tmp_path):
             id='desktop_stabilized_monocular',
         ),
         pytest.param(
-            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
-            'MSG	2154555 ELCLCFG RTABLER\n',
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n' 'MSG	2154555 ELCLCFG RTABLER\n',
             {
                 'mount_type': 'Desktop',
                 'head_stabilization': 'remote',
@@ -653,8 +676,7 @@ def test_parse_eyelink_datetime(tmp_path):
             id='desktop_remote_monocular',
         ),
         pytest.param(
-            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
-            'MSG	2154555 ELCLCFG RBTABLER\n',
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n' 'MSG	2154555 ELCLCFG RBTABLER\n',
             {
                 'mount_type': 'Desktop',
                 'head_stabilization': 'remote',
@@ -664,8 +686,7 @@ def test_parse_eyelink_datetime(tmp_path):
             id='desktop_remote_binocular',
         ),
         pytest.param(
-            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
-            'MSG	2154555 ELCLCFG AMTABLER\n',
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n' 'MSG	2154555 ELCLCFG AMTABLER\n',
             {
                 'mount_type': 'Arm Mount',
                 'head_stabilization': 'stabilized',
@@ -675,8 +696,7 @@ def test_parse_eyelink_datetime(tmp_path):
             id='arm_stabilized_monocular',
         ),
         pytest.param(
-            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
-            'MSG	2154555 ELCLCFG ABTABLER\n',
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n' 'MSG	2154555 ELCLCFG ABTABLER\n',
             {
                 'mount_type': 'Arm Mount',
                 'head_stabilization': 'stabilized',
@@ -686,8 +706,7 @@ def test_parse_eyelink_datetime(tmp_path):
             id='arm_stabilized_binocular',
         ),
         pytest.param(
-            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
-            'MSG	2154555 ELCLCFG ARTABLER\n',
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n' 'MSG	2154555 ELCLCFG ARTABLER\n',
             {
                 'mount_type': 'Arm Mount',
                 'head_stabilization': 'remote',
@@ -697,8 +716,7 @@ def test_parse_eyelink_datetime(tmp_path):
             id='arm_remote_monocular',
         ),
         pytest.param(
-            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
-            'MSG	2154555 ELCLCFG ABRTABLE\n',
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n' 'MSG	2154555 ELCLCFG ABRTABLE\n',
             {
                 'mount_type': 'Arm Mount',
                 'head_stabilization': 'remote',
@@ -708,8 +726,7 @@ def test_parse_eyelink_datetime(tmp_path):
             id='arm_remote_binocular',
         ),
         pytest.param(
-            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
-            'MSG	2154555 ELCLCFG BTOWER\n',
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n' 'MSG	2154555 ELCLCFG BTOWER\n',
             {
                 'mount_type': 'Binocular Tower Mount',
                 'head_stabilization': 'stabilized',
@@ -719,8 +736,7 @@ def test_parse_eyelink_datetime(tmp_path):
             id='binocular_tower_stabilized_binocular',
         ),
         pytest.param(
-            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
-            'MSG	2154555 ELCLCFG TOWER\n',
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n' 'MSG	2154555 ELCLCFG TOWER\n',
             {
                 'mount_type': 'Tower Mount',
                 'head_stabilization': 'stabilized',
@@ -730,8 +746,7 @@ def test_parse_eyelink_datetime(tmp_path):
             id='tower_stabilized_monocular',
         ),
         pytest.param(
-            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
-            'MSG	2154555 ELCLCFG MPRIM\n',
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n' 'MSG	2154555 ELCLCFG MPRIM\n',
             {
                 'mount_type': 'Primate Mount',
                 'head_stabilization': 'stabilized',
@@ -741,8 +756,7 @@ def test_parse_eyelink_datetime(tmp_path):
             id='primate_stabilized_binocular',
         ),
         pytest.param(
-            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
-            'MSG	2154555 ELCLCFG BPRIM\n',
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n' 'MSG	2154555 ELCLCFG BPRIM\n',
             {
                 'mount_type': 'Primate Mount',
                 'head_stabilization': 'stabilized',
@@ -752,8 +766,7 @@ def test_parse_eyelink_datetime(tmp_path):
             id='primate_stabilized_monocular',
         ),
         pytest.param(
-            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
-            'MSG	2154555 ELCLCFG MLRR\n',
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n' 'MSG	2154555 ELCLCFG MLRR\n',
             {
                 'mount_type': 'Long-Range Mount',
                 'head_stabilization': 'stabilized',
@@ -764,8 +777,7 @@ def test_parse_eyelink_datetime(tmp_path):
             id='long_range_level_monocular',
         ),
         pytest.param(
-            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
-            'MSG	2154555 ELCLCFG BLRR\n',
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n' 'MSG	2154555 ELCLCFG BLRR\n',
             {
                 'mount_type': 'Long-Range Mount',
                 'head_stabilization': 'stabilized',
@@ -776,8 +788,7 @@ def test_parse_eyelink_datetime(tmp_path):
             id='long_range_angled_binocular',
         ),
         pytest.param(
-            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
-            'MSG	2154555 ELCLCFG XXXXX\n',
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n' 'MSG	2154555 ELCLCFG XXXXX\n',
             {
                 'mount_type': 'unknown',
                 'head_stabilization': 'unknown',

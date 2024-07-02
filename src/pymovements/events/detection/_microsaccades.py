@@ -33,14 +33,14 @@ from pymovements.utils.filters import filter_candidates_remove_nans
 
 @register_event_detection
 def microsaccades(
-        velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
-        timesteps: list[int] | np.ndarray | None = None,
-        minimum_duration: int = 6,
-        threshold: np.ndarray | tuple[float, float] | str = 'engbert2015',
-        threshold_factor: float = 6,
-        minimum_threshold: float = 1e-10,
-        include_nan: bool = False,
-        name: str = 'saccade',
+    velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
+    timesteps: list[int] | np.ndarray | None = None,
+    minimum_duration: int = 6,
+    threshold: np.ndarray | tuple[float, float] | str = 'engbert2015',
+    threshold_factor: float = 6,
+    minimum_threshold: float = 1e-10,
+    include_nan: bool = False,
+    name: str = 'saccade',
 ) -> EventDataFrame:
     """Detect micro-saccades from velocity gaze sequence.
 
@@ -107,7 +107,7 @@ def microsaccades(
     if (threshold < minimum_threshold).any():
         raise ValueError(
             'threshold does not provide enough variance as required by min_threshold'
-            f' ({threshold} < {minimum_threshold})',
+            f" ({threshold} < {minimum_threshold})",
         )
 
     # Radius of elliptic threshold.
@@ -132,7 +132,8 @@ def microsaccades(
 
     # Filter all candidates by minimum duration.
     candidates = [
-        candidate for candidate in candidates
+        candidate
+        for candidate in candidates
         if len(candidate) > 0
         and timesteps[candidate[-1]] - timesteps[candidate[0]] >= minimum_duration
     ]

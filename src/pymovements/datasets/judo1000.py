@@ -98,9 +98,7 @@ class JuDo1000(DatasetDefinition):
 
     name: str = 'JuDo1000'
 
-    mirrors: tuple[str, ...] = (
-        'https://osf.io/download/',
-    )
+    mirrors: tuple[str, ...] = ('https://osf.io/download/',)
 
     resources: tuple[dict[str, str], ...] = (
         {
@@ -139,7 +137,10 @@ class JuDo1000(DatasetDefinition):
 
     pixel_columns: list[str] = field(
         default_factory=lambda: [
-            'x_left', 'y_left', 'x_right', 'y_right',
+            'x_left',
+            'y_left',
+            'x_right',
+            'y_right',
         ],
     )
 

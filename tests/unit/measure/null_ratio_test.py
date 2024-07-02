@@ -34,84 +34,72 @@ import pymovements as pm
             pl.from_dict(data={'null_ratio': [0.0]}),
             id='float_dtype_4_rows_no_nulls',
         ),
-
         pytest.param(
             pl.from_dict(data={'A': [0.1, None, 0.3, None]}, schema={'A': pl.Float64}),
             {'column': 'A', 'column_dtype': pl.Float64},
             pl.from_dict(data={'null_ratio': [0.5]}),
             id='float_dtype_4_rows_half_nulls',
         ),
-
         pytest.param(
             pl.from_dict(data={'A': [None, None, None, None]}, schema={'A': pl.Float64}),
             {'column': 'A', 'column_dtype': pl.Float64},
             pl.from_dict(data={'null_ratio': [1.0]}),
             id='float_dtype_4_rows_all_nulls',
         ),
-
         pytest.param(
             pl.from_dict(data={'A': [1, 2, 3, 4]}, schema={'A': pl.Int64}),
             {'column': 'A', 'column_dtype': pl.Int64},
             pl.from_dict(data={'null_ratio': [0.0]}),
             id='int_dtype_4_rows_no_nulls',
         ),
-
         pytest.param(
             pl.from_dict(data={'A': [1, None, 3, None]}, schema={'A': pl.Int64}),
             {'column': 'A', 'column_dtype': pl.Int64},
             pl.from_dict(data={'null_ratio': [0.5]}),
             id='int_dtype_4_rows_half_nulls',
         ),
-
         pytest.param(
             pl.from_dict(data={'A': [None, None, None, None]}, schema={'A': pl.Int64}),
             {'column': 'A', 'column_dtype': pl.Int64},
             pl.from_dict(data={'null_ratio': [1.0]}),
             id='int_dtype_4_rows_all_nulls',
         ),
-
         pytest.param(
             pl.from_dict(data={'A': [None, None, None, None]}, schema={'A': pl.Utf8}),
             {'column': 'A', 'column_dtype': pl.Utf8},
             pl.from_dict(data={'null_ratio': [1.0]}),
             id='str_dtype_4_rows_all_nulls',
         ),
-
         pytest.param(
             pl.from_dict(data={'A': ['1', '2', '3', '4']}, schema={'A': pl.Utf8}),
             {'column': 'A', 'column_dtype': pl.Utf8},
             pl.from_dict(data={'null_ratio': [0.0]}),
             id='str_dtype_4_rows_no_nulls',
         ),
-
         pytest.param(
             pl.from_dict(data={'A': ['1', None, '3', None]}, schema={'A': pl.Utf8}),
             {'column': 'A', 'column_dtype': pl.Utf8},
             pl.from_dict(data={'null_ratio': [0.5]}),
             id='str_dtype_4_rows_half_nulls',
         ),
-
         pytest.param(
             pl.from_dict(data={'A': [[0.1, 0.2], [0.3, 0.4]]}),
             {'column': 'A', 'column_dtype': pl.List(pl.Float64)},
             pl.from_dict(data={'null_ratio': [0.0]}),
             id='list_dtype_2_elem_2_rows_no_nulls',
         ),
-
         pytest.param(
             pl.from_dict(data={'A': [[None, None], [None, None]]}),
             {'column': 'A', 'column_dtype': pl.List(pl.Float64)},
             pl.from_dict(data={'null_ratio': [1.0]}),
             id='list_dtype_2_elem_2_rows_all_nulls',
         ),
-
         pytest.param(
             pl.from_dict(data={'A': [[0.1, 0.2], [None, None]]}),
             {'column': 'A', 'column_dtype': pl.List(pl.Float64)},
             pl.from_dict(data={'null_ratio': [0.5]}),
             id='list_dtype_2_elem_2_rows_half_nulls',
         ),
-
         pytest.param(
             pl.from_dict(data={'A': [[0.1, None], [0.2, None]]}),
             {'column': 'A', 'column_dtype': pl.List(pl.Float64)},
@@ -141,5 +129,5 @@ def test_null_ratio_raises(df, kwargs, exception, message):
     with pytest.raises(exception) as excinfo:
         df.select(pm.measure.null_ratio(**kwargs))
 
-    exception_message, = excinfo.value.args
+    (exception_message,) = excinfo.value.args
     assert exception_message == message

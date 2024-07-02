@@ -29,11 +29,11 @@ from pymovements.utils.downloads import download_file
 
 
 def download_dataset(
-        definition: DatasetDefinition,
-        paths: DatasetPaths,
-        extract: bool = True,
-        remove_finished: bool = False,
-        verbose: bool = True,
+    definition: DatasetDefinition,
+    paths: DatasetPaths,
+    extract: bool = True,
+    remove_finished: bool = False,
+    verbose: bool = True,
 ) -> None:
     """Download dataset resources.
 
@@ -81,7 +81,6 @@ def download_dataset(
         success = False
 
         for mirror_idx, mirror in enumerate(definition.mirrors):
-
             url = f'{mirror}{resource["resource"]}'
 
             try:
@@ -98,7 +97,7 @@ def download_dataset(
             except (URLError, OSError, RuntimeError) as error:
                 # Error downloading the resource, try next mirror
                 if mirror_idx < len(definition.mirrors) - 1:
-                    print(f'Failed to download:\n{error}\nTrying next mirror.')
+                    print(f"Failed to download:\n{error}\nTrying next mirror.")
                 continue
 
             # downloading the resource was successful, we don't need to try another mirror
@@ -119,11 +118,11 @@ def download_dataset(
 
 
 def extract_dataset(
-        definition: DatasetDefinition,
-        paths: DatasetPaths,
-        remove_finished: bool = False,
-        remove_top_level: bool = True,
-        verbose: int = 1,
+    definition: DatasetDefinition,
+    paths: DatasetPaths,
+    remove_finished: bool = False,
+    remove_top_level: bool = True,
+    verbose: int = 1,
 ) -> None:
     """Extract downloaded dataset archive files.
 

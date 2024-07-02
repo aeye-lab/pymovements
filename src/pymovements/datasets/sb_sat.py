@@ -98,9 +98,7 @@ class SBSAT(DatasetDefinition):
 
     name: str = 'SBSAT'
 
-    mirrors: tuple[str, ...] = (
-        'https://osf.io/download/',
-    )
+    mirrors: tuple[str, ...] = ('https://osf.io/download/',)
 
     resources: tuple[dict[str, str], ...] = (
         {

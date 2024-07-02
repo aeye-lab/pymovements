@@ -54,7 +54,7 @@ def null_ratio(column: str, column_dtype: pl.DataType) -> pl.Expr:
     else:
         raise TypeError(
             'column_dtype must be of type {Float64, Int64, Utf8, List}'
-            f' but is of type {column_dtype}',
+            f" but is of type {column_dtype}",
         )
 
     return value.alias('null_ratio')

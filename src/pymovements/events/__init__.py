@@ -87,12 +87,9 @@ __all__ = [
     'idt',
     'ivt',
     'microsaccades',
-
     'EventDataFrame',
-
     'EventGazeProcessor',
     'EventProcessor',
-
     'EVENT_PROPERTIES',
     'register_event_property',
     'amplitude',

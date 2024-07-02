@@ -185,13 +185,13 @@ REVISION = getrev()
 
 extlinks = {
     'repo': (
-        f'https://github.com/aeye-lab/pymovements/blob/{REVISION}/%s',
+        f"https://github.com/aeye-lab/pymovements/blob/{REVISION}/%s",
         '%s',
     ),
 }
 
 LINKCODE_URL = (
-    f'https://github.com/aeye-lab/pymovements/blob/{REVISION}'
+    f"https://github.com/aeye-lab/pymovements/blob/{REVISION}"
     '/src/{filepath}#L{linestart}-L{linestop}'
 )
 

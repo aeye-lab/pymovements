@@ -25,6 +25,5 @@ from pymovements.measure.measures import null_ratio
 __all__ = [
     'SampleMeasureLibrary',
     'register_sample_measure',
-
     'null_ratio',
 ]

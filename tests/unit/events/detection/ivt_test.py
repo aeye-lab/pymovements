@@ -34,7 +34,7 @@ from pymovements.synthetic import step_function
         pytest.param(
             {
                 'velocities': None,
-                'velocity_threshold': 1.,
+                'velocity_threshold': 1.0,
                 'minimum_duration': 1,
             },
             ValueError,
@@ -43,7 +43,7 @@ from pymovements.synthetic import step_function
         pytest.param(
             {
                 'velocities': 1,
-                'velocity_threshold': 1.,
+                'velocity_threshold': 1.0,
                 'minimum_duration': 1,
             },
             ValueError,
@@ -52,7 +52,7 @@ from pymovements.synthetic import step_function
         pytest.param(
             {
                 'velocities': np.ones(100),
-                'velocity_threshold': 1.,
+                'velocity_threshold': 1.0,
                 'minimum_duration': 1,
             },
             ValueError,
@@ -61,7 +61,7 @@ from pymovements.synthetic import step_function
         pytest.param(
             {
                 'velocities': np.ones((100, 3)),
-                'velocity_threshold': 1.,
+                'velocity_threshold': 1.0,
                 'minimum_duration': 1,
             },
             ValueError,
@@ -88,7 +88,7 @@ from pymovements.synthetic import step_function
         pytest.param(
             {
                 'velocities': np.ones((100, 2)),
-                'velocity_threshold': 0.,
+                'velocity_threshold': 0.0,
                 'minimum_duration': 1,
             },
             ValueError,
@@ -162,10 +162,12 @@ def test_ivt_raise_error(kwargs, expected_error):
         pytest.param(
             {
                 'positions': step_function(
-                    length=100, steps=[10, 20, 90],
+                    length=100,
+                    steps=[10, 20, 90],
                     values=[
                         (np.nan, np.nan),
-                        (0, 0), (np.nan, np.nan),
+                        (0, 0),
+                        (np.nan, np.nan),
                     ],
                 ),
                 'velocity_threshold': 1,
@@ -181,10 +183,12 @@ def test_ivt_raise_error(kwargs, expected_error):
         pytest.param(
             {
                 'positions': step_function(
-                    length=100, steps=[10, 20, 90],
+                    length=100,
+                    steps=[10, 20, 90],
                     values=[
                         (np.nan, np.nan),
-                        (0, 0), (np.nan, np.nan),
+                        (0, 0),
+                        (np.nan, np.nan),
                     ],
                 ),
                 'velocity_threshold': 1,
@@ -216,7 +220,9 @@ def test_ivt_raise_error(kwargs, expected_error):
 )
 def test_ivt_detects_fixations(kwargs, expected):
     velocities = pm.gaze.transforms_numpy.pos2vel(
-        kwargs['positions'], sampling_rate=10, method='preceding',
+        kwargs['positions'],
+        sampling_rate=10,
+        method='preceding',
     )
 
     # Just use positions argument for velocity calculation

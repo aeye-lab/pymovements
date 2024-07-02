@@ -43,7 +43,7 @@ EYELINK_META_REGEXES = [
     {'pattern': r'\*\*\s+VERSION:\s+(?P<version_1>.*)\s+'},
     {
         'pattern': r'\*\*\s+DATE:\s+(?P<weekday>[A-Z,a-z]+)\s+(?P<month>[A-Z,a-z]+)'
-                   r'\s+(?P<day>\d\d?)\s+(?P<time>\d\d:\d\d:\d\d)\s+(?P<year>\d{4})\s*',
+        r'\s+(?P<day>\d\d?)\s+(?P<time>\d\d:\d\d:\d\d)\s+(?P<year>\d{4})\s*',
     },
     {'pattern': r'\*\*\s+(?P<version_2>EYELINK.*)'},
     {
@@ -51,10 +51,10 @@ EYELINK_META_REGEXES = [
     },
     {
         'pattern': r'MSG\s+\d+\s+RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+'
-                   r'(?P<sampling_rate>\d+)\s+'
-                   r'(?P<file_sample_filter>(0|1|2))\s+'
-                   r'(?P<link_sample_filter>(0|1|2))\s+'
-                   r'(?P<tracked_eye>(L|R|LR))\s*',
+        r'(?P<sampling_rate>\d+)\s+'
+        r'(?P<file_sample_filter>(0|1|2))\s+'
+        r'(?P<link_sample_filter>(0|1|2))\s+'
+        r'(?P<tracked_eye>(L|R|LR))\s*',
     },
     {
         'pattern': r'PUPIL\s+(?P<pupil_data_type>(AREA|DIAMETER))\s*',
@@ -140,23 +140,27 @@ def compile_patterns(patterns: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
         if isinstance(pattern, dict):
             if isinstance(pattern['pattern'], str):
-                compiled_patterns.append({
-                    **pattern,
-                    'pattern': re.compile(msg_prefix + pattern['pattern']),
-                })
+                compiled_patterns.append(
+                    {
+                        **pattern,
+                        'pattern': re.compile(msg_prefix + pattern['pattern']),
+                    },
+                )
                 continue
 
             if isinstance(pattern['pattern'], tuple):
                 for single_pattern in pattern['pattern']:
-                    compiled_patterns.append({
-                        **pattern,
-                        'pattern': re.compile(msg_prefix + single_pattern),
-                    })
+                    compiled_patterns.append(
+                        {
+                            **pattern,
+                            'pattern': re.compile(msg_prefix + single_pattern),
+                        },
+                    )
                 continue
 
-            raise ValueError(f'invalid pattern: {pattern}')
+            raise ValueError(f"invalid pattern: {pattern}")
 
-        raise ValueError(f'invalid pattern: {pattern}')
+        raise ValueError(f"invalid pattern: {pattern}")
 
     return compiled_patterns
 
@@ -176,9 +180,9 @@ def get_additional_columns(compiled_patterns: list[dict[str, Any]]) -> set[str]:
 
 
 def parse_eyelink(
-        filepath: Path | str,
-        patterns: list[dict[str, Any]] | None = None,
-        schema: dict[str, Any] | None = None,
+    filepath: Path | str,
+    patterns: list[dict[str, Any]] | None = None,
+    schema: dict[str, Any] | None = None,
 ) -> tuple[pl.DataFrame, dict[str, Any]]:
     """Process EyeLink asc file.
 
@@ -209,9 +213,7 @@ def parse_eyelink(
     additional: dict[str, list[Any]] = {
         additional_column: [] for additional_column in additional_columns
     }
-    current_additional = {
-        additional_column: None for additional_column in additional_columns
-    }
+    current_additional = {additional_column: None for additional_column in additional_columns}
 
     samples: dict[str, list[Any]] = {
         'time': [],
@@ -255,9 +257,7 @@ def parse_eyelink(
     num_blink_samples = 0
 
     for line in lines:
-
         for pattern_dict in compiled_patterns:
-
             if match := pattern_dict['pattern'].match(line):
                 if 'value' in pattern_dict:
                     current_column = pattern_dict['column']
@@ -307,7 +307,6 @@ def parse_eyelink(
             total_recording_duration += block_duration
 
         elif eye_tracking_sample_match := EYE_TRACKING_SAMPLE.match(line):
-
             timestamp_s = eye_tracking_sample_match.group('time')
             x_pix_s = eye_tracking_sample_match.group('x_pix')
             y_pix_s = eye_tracking_sample_match.group('y_pix')
@@ -404,7 +403,8 @@ def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:
     """
     # in case the version strings have not been found, they will be empty strings (defaultdict)
     metadata['version_number'], metadata['model'] = _parse_full_eyelink_version(
-        metadata['version_1'], metadata['version_2'],
+        metadata['version_1'],
+        metadata['version_2'],
     )
 
     if 'resolution' in metadata:
@@ -437,11 +437,11 @@ def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:
 
 
 def _calculate_data_loss(
-        blinks: list[dict[str, Any]],
-        invalid_samples: list[str],
-        actual_num_samples: int,
-        total_rec_duration: int,
-        sampling_rate: float,
+    blinks: list[dict[str, Any]],
+    invalid_samples: list[str],
+    actual_num_samples: int,
+    total_rec_duration: int,
+    sampling_rate: float,
 ) -> tuple[float | str, float | str]:
     """Calculate data loss and blink loss.
 

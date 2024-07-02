@@ -39,7 +39,6 @@ from pymovements.plotting.main_sequence_plot import main_sequence_plot
                         'amplitude': [1.0, 1.0, 2.0, 2.0, 3.0, 4.0],
                         'peak_velocity': [10.0, 11.0, 12.0, 11.0, 13.0, 13.0],
                         'name': ['saccade' for _ in range(6)],
-
                     },
                 ),
             ),
@@ -91,7 +90,6 @@ def test_main_sequence_plot_show_plot(input_df, show, monkeypatch, color, marker
                         'amplitude': [1.0, 1.0, 2.0, 2.0, 3.0, 4.0],
                         'peak_velocity': [10.0, 11.0, 12.0, 11.0, 13.0, 13.0],
                         'name': ['saccade' for _ in range(5)] + ['fixation'],
-
                     },
                 ),
             ),
@@ -127,7 +125,6 @@ def test_main_sequence_plot_filter_out_fixations(input_df, monkeypatch):
                         'amplitude': np.arange(100),
                         'peak_velocity': np.linspace(10, 50, num=100),
                         'name': ['saccade' for _ in range(100)],
-
                     },
                 ),
             ),
@@ -203,7 +200,6 @@ def test_main_sequence_plot_set_title(input_df, title, monkeypatch):
                     {
                         'peak_velocity': np.linspace(10, 50, num=100),
                         'name': ['saccade' for _ in range(100)],
-
                     },
                 ),
             ),
@@ -250,6 +246,6 @@ def test_main_sequence_plot_error(input_df, expected_error, error_msg):
     with pytest.raises(expected_error) as actual_error:
         main_sequence_plot(input_df)
 
-    msg, = actual_error.value.args
+    (msg,) = actual_error.value.args
 
     assert msg == error_msg

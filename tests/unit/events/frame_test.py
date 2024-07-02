@@ -36,37 +36,44 @@ def fixture_dataset():
     [
         pytest.param(
             {'onsets': None, 'offsets': []},
-            ValueError, ('onsets', 'offsets', 'both None', 'or', 'both not None'),
+            ValueError,
+            ('onsets', 'offsets', 'both None', 'or', 'both not None'),
             id='onsets_none_offsets_list',
         ),
         pytest.param(
             {'onsets': [], 'offsets': None},
-            ValueError, ('onsets', 'offsets', 'both None', 'or', 'both not None'),
+            ValueError,
+            ('onsets', 'offsets', 'both None', 'or', 'both not None'),
             id='onsets_list_offsets_none',
         ),
         pytest.param(
             {'onsets': [], 'offsets': [0]},
-            ValueError, ('onsets', 'offsets', 'length', 'equal'),
+            ValueError,
+            ('onsets', 'offsets', 'length', 'equal'),
             id='onsets_empty_list_offsets_single_int',
         ),
         pytest.param(
             {'onsets': [1], 'offsets': []},
-            ValueError, ('onsets', 'offsets', 'length', 'equal'),
+            ValueError,
+            ('onsets', 'offsets', 'length', 'equal'),
             id='onsets_single_int_offsets_empty_list',
         ),
         pytest.param(
             {'data': pl.DataFrame(), 'name': None, 'onsets': 1, 'offsets': None},
-            ValueError, ('data', 'onsets', 'mutually', 'exclusive'),
+            ValueError,
+            ('data', 'onsets', 'mutually', 'exclusive'),
             id='data_with_onsets_raises_mutually_exclusive',
         ),
         pytest.param(
             {'data': pl.DataFrame(), 'offsets': 1},
-            ValueError, ('data', 'offsets', 'mutually', 'exclusive'),
+            ValueError,
+            ('data', 'offsets', 'mutually', 'exclusive'),
             id='data_with_offsets_raises_mutually_exclusive',
         ),
         pytest.param(
             {'data': pl.DataFrame(), 'name': 1},
-            ValueError, ('data', 'name', 'mutually', 'exclusive'),
+            ValueError,
+            ('data', 'name', 'mutually', 'exclusive'),
             id='data_with_name_raises_mutually_exclusive',
         ),
     ],
@@ -75,7 +82,7 @@ def test_event_dataframe_init_exceptions(kwargs, exception, msg_substrings):
     with pytest.raises(exception) as excinfo:
         pm.EventDataFrame(**kwargs)
 
-    msg, = excinfo.value.args
+    (msg,) = excinfo.value.args
     for msg_substring in msg_substrings:
         assert msg_substring in msg
 
@@ -112,15 +119,21 @@ def test_event_dataframe_init_has_expected_length(args, kwargs, expected_length)
     ('args', 'kwargs', 'expected_name'),
     [
         pytest.param(
-            [pl.DataFrame()], {}, 'foo',
+            [pl.DataFrame()],
+            {},
+            'foo',
             id='dataframe_arg_dict_with_single_event_kwarg',
         ),
         pytest.param(
-            [], {'name': 'bar', 'onsets': [0], 'offsets': [1]}, 'bar',
+            [],
+            {'name': 'bar', 'onsets': [0], 'offsets': [1]},
+            'bar',
             id='dict_with_single_event_with_name_kwarg',
         ),
         pytest.param(
-            [], {'name': 'bar', 'onsets': [0, 1], 'offsets': [1, 2]}, 'bar',
+            [],
+            {'name': 'bar', 'onsets': [0, 1], 'offsets': [1, 2]},
+            'bar',
             id='dict_with_two_events_with_name_kwarg',
         ),
     ],
@@ -134,7 +147,9 @@ def test_event_dataframe_init_has_correct_name(args, kwargs, expected_name):
     ('args', 'kwargs', 'expected_names'),
     [
         pytest.param(
-            [], {'name': ['foo', 'bar'], 'onsets': [0, 1], 'offsets': [1, 2]}, ['foo', 'bar'],
+            [],
+            {'name': ['foo', 'bar'], 'onsets': [0, 1], 'offsets': [1, 2]},
+            ['foo', 'bar'],
             id='dict_with_two_events_with_name_kwarg',
         ),
     ],
@@ -148,27 +163,32 @@ def test_event_dataframe_init_has_correct_names(args, kwargs, expected_names):
     ('args', 'kwargs', 'expected_df_data'),
     [
         pytest.param(
-            [], {'onsets': [0], 'offsets': [1]},
+            [],
+            {'onsets': [0], 'offsets': [1]},
             {'name': [''], 'onset': [0], 'offset': [1], 'duration': [1]},
             id='no_arg_dict_with_single_event_kwarg',
         ),
         pytest.param(
-            [pl.DataFrame()], {},
+            [pl.DataFrame()],
+            {},
             {},
             id='dataframe_arg_no_kwargs',
         ),
         pytest.param(
-            [], {'name': 'bar', 'onsets': [0], 'offsets': [1]},
+            [],
+            {'name': 'bar', 'onsets': [0], 'offsets': [1]},
             {'name': ['bar'], 'onset': [0], 'offset': [1], 'duration': [1]},
             id='dict_with_single_named_event',
         ),
         pytest.param(
-            [], {'name': 'bar', 'onsets': [0, 2], 'offsets': [1, 3]},
+            [],
+            {'name': 'bar', 'onsets': [0, 2], 'offsets': [1, 3]},
             {'name': ['bar', 'bar'], 'onset': [0, 2], 'offset': [1, 3], 'duration': [1, 1]},
             id='dict_with_two_events_same_name',
         ),
         pytest.param(
-            [], {'name': ['foo', 'bar'], 'onsets': [0, 2], 'offsets': [1, 4]},
+            [],
+            {'name': ['foo', 'bar'], 'onsets': [0, 2], 'offsets': [1, 4]},
             {'name': ['foo', 'bar'], 'onset': [0, 2], 'offset': [1, 4], 'duration': [1, 2]},
             id='dict_with_two_differently_named_events',
         ),
@@ -185,50 +205,64 @@ def test_event_dataframe_init_expected(args, kwargs, expected_df_data, expected_
     ('args', 'kwargs', 'expected_df'),
     [
         pytest.param(
-            [], {'onsets': [0], 'offsets': [1]},
+            [],
+            {'onsets': [0], 'offsets': [1]},
             pl.DataFrame({'name': [''], 'onset': [0], 'offset': [1], 'duration': [1]}),
             id='no_arg_lists_with_single_event_kwarg',
         ),
         pytest.param(
-            [pl.DataFrame()], {},
+            [pl.DataFrame()],
+            {},
             pl.DataFrame(
-                {}, schema={
-                    'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64, 'duration': pl.Int64,
+                {},
+                schema={
+                    'name': pl.Utf8,
+                    'onset': pl.Int64,
+                    'offset': pl.Int64,
+                    'duration': pl.Int64,
                 },
             ),
             id='dataframe_arg_no_kwargs',
         ),
         pytest.param(
-            [], {'name': 'bar', 'onsets': [0], 'offsets': [1]},
+            [],
+            {'name': 'bar', 'onsets': [0], 'offsets': [1]},
             pl.DataFrame({'name': ['bar'], 'onset': [0], 'offset': [1], 'duration': [1]}),
             id='lists_with_single_named_event',
         ),
         pytest.param(
-            [], {'name': 'bar', 'onsets': [0, 2], 'offsets': [1, 3]},
+            [],
+            {'name': 'bar', 'onsets': [0, 2], 'offsets': [1, 3]},
             pl.DataFrame(
                 {'name': ['bar', 'bar'], 'onset': [0, 2], 'offset': [1, 3], 'duration': [1, 1]},
             ),
             id='lists_with_two_events_same_name',
         ),
         pytest.param(
-            [], {'name': ['foo', 'bar'], 'onsets': [0, 2], 'offsets': [1, 4]},
+            [],
+            {'name': ['foo', 'bar'], 'onsets': [0, 2], 'offsets': [1, 4]},
             pl.DataFrame(
                 {'name': ['foo', 'bar'], 'onset': [0, 2], 'offset': [1, 4], 'duration': [1, 2]},
             ),
             id='lists_with_two_differently_named_events',
         ),
         pytest.param(
-            [], {'name': ['foo'], 'onsets': [0], 'offsets': [1], 'trials': [1]},
+            [],
+            {'name': ['foo'], 'onsets': [0], 'offsets': [1], 'trials': [1]},
             pl.DataFrame(
                 {'trial': [1], 'name': ['foo'], 'onset': [0], 'offset': [1], 'duration': [1]},
             ),
             id='lists_one_event_trial_column_at_start',
         ),
         pytest.param(
-            [], {
+            [],
+            {
                 'data': pl.DataFrame(
                     data={
-                        'trial': [1], 'name': ['foo'], 'onset': [0], 'offset': [1],
+                        'trial': [1],
+                        'name': ['foo'],
+                        'onset': [0],
+                        'offset': [1],
                     },
                 ),
                 'trial_columns': 'trial',
@@ -239,10 +273,14 @@ def test_event_dataframe_init_expected(args, kwargs, expected_df_data, expected_
             id='data_one_event_trial_column_at_start',
         ),
         pytest.param(
-            [], {
+            [],
+            {
                 'data': pl.DataFrame(
                     data={
-                        'name': ['foo'], 'onset': [0], 'offset': [1], 'trial': [1],
+                        'name': ['foo'],
+                        'onset': [0],
+                        'offset': [1],
+                        'trial': [1],
                     },
                 ),
                 'trial_columns': 'trial',

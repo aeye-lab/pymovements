@@ -103,13 +103,13 @@ class Screen:
     """
 
     def __init__(
-            self,
-            width_px: int | None = None,
-            height_px: int | None = None,
-            width_cm: float | None = None,
-            height_cm: float | None = None,
-            distance_cm: float | None = None,
-            origin: str | None = 'upper left',
+        self,
+        width_px: int | None = None,
+        height_px: int | None = None,
+        width_cm: float | None = None,
+        height_cm: float | None = None,
+        distance_cm: float | None = None,
+        origin: str | None = 'upper left',
     ):
         if width_px is not None:
             checks.check_is_greater_than_zero(width_px=width_px)
@@ -234,8 +234,8 @@ class Screen:
         )
 
     def pix2deg(
-            self,
-            arr: float | list[float] | list[list[float]] | np.ndarray,
+        self,
+        arr: float | list[float] | list[list[float]] | np.ndarray,
     ) -> np.ndarray:
         """Convert pixel screen coordinates to degrees of visual angle.
 
