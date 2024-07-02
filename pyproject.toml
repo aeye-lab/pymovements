@@ -147,6 +147,18 @@ filterwarnings = [
 ]
 testpaths = ['tests', 'src']
 
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+  "E",
+  "F",
+  "UP",
+  "B"
+]
+fixable = ["ALL"]
+
 [tool.setuptools-git-versioning]
 enabled = true
 

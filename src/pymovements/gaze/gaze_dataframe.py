@@ -341,6 +341,7 @@ class GazeDataFrame:
                             'eye-to-screen distance are specified. '
                             'Using eye-to-screen distances from column '
                             "'distance' in the dataframe.",
+                            stacklevel=2,
                         )
                 elif self.experiment.screen.distance_cm:
                     kwargs['distance'] = self.experiment.screen.distance_cm
