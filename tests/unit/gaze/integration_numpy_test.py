@@ -284,22 +284,18 @@ def test_from_numpy_all_none():
             None,
             id='events_none',
         ),
-
         pytest.param(
             pm.EventDataFrame(),
             id='events_empty',
         ),
-
         pytest.param(
             pm.EventDataFrame(name='fixation', onsets=[123], offsets=[345]),
             id='fixation',
         ),
-
         pytest.param(
             pm.EventDataFrame(name='saccade', onsets=[34123], offsets=[67345]),
             id='saccade',
         ),
-
     ],
 )
 def test_from_numpy_events(events):

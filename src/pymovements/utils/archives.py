@@ -36,12 +36,12 @@ from pymovements.utils.paths import get_filepaths
 
 
 def extract_archive(
-        source_path: Path,
-        destination_path: Path | None = None,
-        recursive: bool = True,
-        remove_finished: bool = False,
-        remove_top_level: bool = True,
-        verbose: int = 1,
+    source_path: Path,
+    destination_path: Path | None = None,
+    recursive: bool = True,
+    remove_finished: bool = False,
+    remove_top_level: bool = True,
+    verbose: int = 1,
 ) -> Path:
     """Extract an archive.
 
@@ -87,7 +87,7 @@ def extract_archive(
         destination_path = source_path.parent
 
     if verbose:
-        print(f'Extracting {source_path.name} to {destination_path}')
+        print(f"Extracting {source_path.name} to {destination_path}")
 
     # Extract file and remove archive if desired.
     extractor(source_path, destination_path, compression_type)
@@ -135,9 +135,9 @@ def extract_archive(
 
 
 def _extract_tar(
-        source_path: Path,
-        destination_path: Path,
-        compression: str | None,
+    source_path: Path,
+    destination_path: Path,
+    compression: str | None,
 ) -> None:
     """Extract a tar archive.
 
@@ -150,7 +150,7 @@ def _extract_tar(
     compression: str | None
         Compression filename suffix.
     """
-    with tarfile.open(source_path, f'r:{compression[1:]}' if compression else 'r') as archive:
+    with tarfile.open(source_path, f"r:{compression[1:]}" if compression else 'r') as archive:
         if sys.version_info < (3, 12):  # pragma: <3.12 cover
             archive.extractall(destination_path)
         else:  # pragma: >=3.12 cover
@@ -158,9 +158,9 @@ def _extract_tar(
 
 
 def _extract_zip(
-        source_path: Path,
-        destination_path: Path,
-        compression: str | None,
+    source_path: Path,
+    destination_path: Path,
+    compression: str | None,
 ) -> None:
     """Extract a zip archive.
 
@@ -240,7 +240,6 @@ def _detect_file_type(filepath: Path) -> tuple[str | None, str | None]:
     if suffix in _COMPRESSED_FILE_OPENERS:
         # Check if there are more than one suffix.
         if len(suffixes) > 1:
-
             # Check if the second last suffix refers to an archive type.
             if (suffix2 := suffixes[-2]) not in _ARCHIVE_EXTRACTORS:
                 raise RuntimeError(
@@ -264,9 +263,9 @@ def _detect_file_type(filepath: Path) -> tuple[str | None, str | None]:
 
 
 def _decompress(
-        source_path: Path,
-        destination_path: Path | None = None,
-        remove_finished: bool = False,
+    source_path: Path,
+    destination_path: Path | None = None,
+    remove_finished: bool = False,
 ) -> Path:
     """Decompress a file.
 

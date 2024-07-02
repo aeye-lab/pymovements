@@ -120,22 +120,24 @@ def test_dataset_download_both_mirrors_fail(mock_download_file, tmp_path, datase
     with pytest.raises(RuntimeError):
         dataset.download()
 
-    mock_download_file.assert_has_calls([
-        mock.call(
-            url='https://example.com/test.gz.tar',
-            dirpath=tmp_path / 'downloads',
-            filename='test.gz.tar',
-            md5='52bbf03a7c50ee7152ccb9d357c2bb30',
-            verbose=True,
-        ),
-        mock.call(
-            url='https://another_example.com/test.gz.tar',
-            dirpath=tmp_path / 'downloads',
-            filename='test.gz.tar',
-            md5='52bbf03a7c50ee7152ccb9d357c2bb30',
-            verbose=True,
-        ),
-    ])
+    mock_download_file.assert_has_calls(
+        [
+            mock.call(
+                url='https://example.com/test.gz.tar',
+                dirpath=tmp_path / 'downloads',
+                filename='test.gz.tar',
+                md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+                verbose=True,
+            ),
+            mock.call(
+                url='https://another_example.com/test.gz.tar',
+                dirpath=tmp_path / 'downloads',
+                filename='test.gz.tar',
+                md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+                verbose=True,
+            ),
+        ],
+    )
 
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
@@ -146,22 +148,24 @@ def test_dataset_download_first_mirror_fails(mock_download_file, tmp_path, datas
     dataset = pm.Dataset(dataset_definition, path=paths)
     dataset.download(extract=False)
 
-    mock_download_file.assert_has_calls([
-        mock.call(
-            url='https://example.com/test.gz.tar',
-            dirpath=tmp_path / 'downloads',
-            filename='test.gz.tar',
-            md5='52bbf03a7c50ee7152ccb9d357c2bb30',
-            verbose=True,
-        ),
-        mock.call(
-            url='https://another_example.com/test.gz.tar',
-            dirpath=tmp_path / 'downloads',
-            filename='test.gz.tar',
-            md5='52bbf03a7c50ee7152ccb9d357c2bb30',
-            verbose=True,
-        ),
-    ])
+    mock_download_file.assert_has_calls(
+        [
+            mock.call(
+                url='https://example.com/test.gz.tar',
+                dirpath=tmp_path / 'downloads',
+                filename='test.gz.tar',
+                md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+                verbose=True,
+            ),
+            mock.call(
+                url='https://another_example.com/test.gz.tar',
+                dirpath=tmp_path / 'downloads',
+                filename='test.gz.tar',
+                md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+                verbose=True,
+            ),
+        ],
+    )
 
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
@@ -174,15 +178,17 @@ def test_dataset_download_file_not_found(mock_download_file, tmp_path, dataset_d
     with pytest.raises(RuntimeError):
         dataset.download()
 
-    mock_download_file.assert_has_calls([
-        mock.call(
-            url='https://example.com/test.gz.tar',
-            dirpath=tmp_path / 'downloads',
-            filename='test.gz.tar',
-            md5='52bbf03a7c50ee7152ccb9d357c2bb30',
-            verbose=True,
-        ),
-    ])
+    mock_download_file.assert_has_calls(
+        [
+            mock.call(
+                url='https://example.com/test.gz.tar',
+                dirpath=tmp_path / 'downloads',
+                filename='test.gz.tar',
+                md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+                verbose=True,
+            ),
+        ],
+    )
 
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
@@ -193,22 +199,24 @@ def test_dataset_download_no_extract(mock_download_file, tmp_path, dataset_defin
     dataset = pm.Dataset(dataset_definition, path=paths)
     dataset.download(extract=False)
 
-    mock_download_file.assert_has_calls([
-        mock.call(
-            url='https://example.com/test.gz.tar',
-            dirpath=tmp_path / 'downloads',
-            filename='test.gz.tar',
-            md5='52bbf03a7c50ee7152ccb9d357c2bb30',
-            verbose=True,
-        ),
-    ])
+    mock_download_file.assert_has_calls(
+        [
+            mock.call(
+                url='https://example.com/test.gz.tar',
+                dirpath=tmp_path / 'downloads',
+                filename='test.gz.tar',
+                md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+                verbose=True,
+            ),
+        ],
+    )
 
 
 @mock.patch('pymovements.dataset.dataset_download.extract_archive')
 def test_dataset_extract_remove_finished_true(
-        mock_extract_archive,
-        tmp_path,
-        dataset_definition,
+    mock_extract_archive,
+    tmp_path,
+    dataset_definition,
 ):
     mock_extract_archive.return_value = 'path'
 
@@ -216,23 +224,25 @@ def test_dataset_extract_remove_finished_true(
     dataset = pm.Dataset(dataset_definition, path=paths)
     dataset.extract(remove_finished=True, remove_top_level=False, verbose=1)
 
-    mock_extract_archive.assert_has_calls([
-        mock.call(
-            source_path=tmp_path / 'downloads' / 'test.gz.tar',
-            destination_path=tmp_path / 'raw',
-            recursive=True,
-            remove_finished=True,
-            remove_top_level=False,
-            verbose=1,
-        ),
-    ])
+    mock_extract_archive.assert_has_calls(
+        [
+            mock.call(
+                source_path=tmp_path / 'downloads' / 'test.gz.tar',
+                destination_path=tmp_path / 'raw',
+                recursive=True,
+                remove_finished=True,
+                remove_top_level=False,
+                verbose=1,
+            ),
+        ],
+    )
 
 
 @mock.patch('pymovements.dataset.dataset_download.extract_archive')
 def test_dataset_extract_remove_finished_false(
-        mock_extract_archive,
-        tmp_path,
-        dataset_definition,
+    mock_extract_archive,
+    tmp_path,
+    dataset_definition,
 ):
     mock_extract_archive.return_value = 'path'
 
@@ -240,22 +250,27 @@ def test_dataset_extract_remove_finished_false(
     dataset = pm.Dataset(dataset_definition, path=paths)
     dataset.extract()
 
-    mock_extract_archive.assert_has_calls([
-        mock.call(
-            source_path=tmp_path / 'downloads' / 'test.gz.tar',
-            destination_path=tmp_path / 'raw',
-            recursive=True,
-            remove_finished=False,
-            remove_top_level=True,
-            verbose=1,
-        ),
-    ])
+    mock_extract_archive.assert_has_calls(
+        [
+            mock.call(
+                source_path=tmp_path / 'downloads' / 'test.gz.tar',
+                destination_path=tmp_path / 'raw',
+                recursive=True,
+                remove_finished=False,
+                remove_top_level=True,
+                verbose=1,
+            ),
+        ],
+    )
 
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @mock.patch('pymovements.dataset.dataset_download.extract_archive')
 def test_dataset_download_default_extract(
-        mock_extract, mock_download, tmp_path, dataset_definition,
+    mock_extract,
+    mock_download,
+    tmp_path,
+    dataset_definition,
 ):
     mock_extract.return_value = None
     mock_download.return_value = None
@@ -284,7 +299,7 @@ def test_dataset_download_no_mirrors_raises_exception(tmp_path):
     with pytest.raises(AttributeError) as excinfo:
         pm.Dataset(NoMirrorsDefinition, path=tmp_path).download()
 
-    msg, = excinfo.value.args
+    (msg,) = excinfo.value.args
 
     expected_substrings = ['number', 'mirrors', 'zero', 'download']
     for substring in expected_substrings:
@@ -306,7 +321,7 @@ def test_dataset_download_no_resources_raises_exception(tmp_path):
     with pytest.raises(AttributeError) as excinfo:
         pm.Dataset(NoResourcesDefinition, path=tmp_path).download()
 
-    msg, = excinfo.value.args
+    (msg,) = excinfo.value.args
 
     expected_substrings = ['number', 'resources', 'zero', 'download']
     for substring in expected_substrings:

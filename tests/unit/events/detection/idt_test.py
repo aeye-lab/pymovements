@@ -178,9 +178,11 @@ def test_idt_raises_error(kwargs, expected_error):
         pytest.param(
             {
                 'positions': step_function(
-                    length=100, steps=[10, 20, 90],
+                    length=100,
+                    steps=[10, 20, 90],
                     values=[
-                        (np.nan, np.nan), (0, 0),
+                        (np.nan, np.nan),
+                        (0, 0),
                         (np.nan, np.nan),
                     ],
                 ),
@@ -197,9 +199,11 @@ def test_idt_raises_error(kwargs, expected_error):
         pytest.param(
             {
                 'positions': step_function(
-                    length=100, steps=[10, 20, 90],
+                    length=100,
+                    steps=[10, 20, 90],
                     values=[
-                        (np.nan, np.nan), (0, 0),
+                        (np.nan, np.nan),
+                        (0, 0),
                         (np.nan, np.nan),
                     ],
                 ),
@@ -286,13 +290,17 @@ def test_idt_detects_fixations(kwargs, expected):
         pytest.param(
             {
                 'positions': step_function(length=10, steps=[0], values=[(0, 0)]),
-                'timesteps': np.concatenate([
-                    np.arange(0, 5, dtype=int), np.arange(7, 12, dtype=int),
-                ]),
+                'timesteps': np.concatenate(
+                    [
+                        np.arange(0, 5, dtype=int),
+                        np.arange(7, 12, dtype=int),
+                    ],
+                ),
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
             },
-            ValueError, ('interval', 'timesteps', 'constant'),
+            ValueError,
+            ('interval', 'timesteps', 'constant'),
             id='non_constant_timesteps_interval',
         ),
         pytest.param(
@@ -302,7 +310,8 @@ def test_idt_detects_fixations(kwargs, expected):
                 'dispersion_threshold': 1,
                 'minimum_duration': 2,
             },
-            ValueError, ('interval', 'timesteps', 'divisible', 'minimum_duration'),
+            ValueError,
+            ('interval', 'timesteps', 'divisible', 'minimum_duration'),
             id='minimum_duration_not_divisible_by_timesteps_interval',
         ),
         pytest.param(
@@ -312,7 +321,8 @@ def test_idt_detects_fixations(kwargs, expected):
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
             },
-            TypeError, ('timesteps', 'int'),
+            TypeError,
+            ('timesteps', 'int'),
             id='constant_position_single_fixation_with_timesteps_float_with_fractions',
         ),
         pytest.param(
@@ -321,7 +331,8 @@ def test_idt_detects_fixations(kwargs, expected):
                 'dispersion_threshold': 1,
                 'minimum_duration': 1,
             },
-            ValueError, ('minimum_duration', '2'),
+            ValueError,
+            ('minimum_duration', '2'),
             id='minimum_duration_1_sample',
         ),
     ],
@@ -330,6 +341,6 @@ def test_idt_timesteps_exceptions(kwargs, exception, msg_substrings):
     with pytest.raises(exception) as excinfo:
         pm.events.idt(**kwargs)
 
-    msg, = excinfo.value.args
+    (msg,) = excinfo.value.args
     for msg_substring in msg_substrings:
         assert msg_substring.lower() in msg.lower()

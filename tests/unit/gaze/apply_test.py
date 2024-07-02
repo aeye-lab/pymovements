@@ -39,14 +39,18 @@ from pymovements.synthetic import step_function
             },
             pm.gaze.from_numpy(
                 velocity=step_function(
-                    length=100, steps=[0, 10], values=[(1, 1, 1, 1, 0, 0), (0, 0, 0, 0, 0, 0)],
+                    length=100,
+                    steps=[0, 10],
+                    values=[(1, 1, 1, 1, 0, 0), (0, 0, 0, 0, 0, 0)],
                 ),
                 orient='row',
                 experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.gaze.from_numpy(
                 velocity=step_function(
-                    length=100, steps=[0, 10], values=[(1, 1, 1, 1, 0, 0), (0, 0, 0, 0, 0, 0)],
+                    length=100,
+                    steps=[0, 10],
+                    values=[(1, 1, 1, 1, 0, 0), (0, 0, 0, 0, 0, 0)],
                 ),
                 orient='row',
                 experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
@@ -58,7 +62,6 @@ from pymovements.synthetic import step_function
             ),
             id='ivt_constant_position_monocular_fixation_six_components_eye_cyclops',
         ),
-
         pytest.param(
             'microsaccades',
             {
@@ -91,14 +94,15 @@ from pymovements.synthetic import step_function
             ),
             id='microsaccades_four_steps_two_saccades',
         ),
-
         pytest.param(
             'fill',
             {},
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
                 events=pm.EventDataFrame(
-                    name=['fixation', 'saccade'], onsets=[0, 50], offsets=[40, 100],
+                    name=['fixation', 'saccade'],
+                    onsets=[0, 50],
+                    offsets=[40, 100],
                 ),
             ),
             pm.gaze.from_numpy(
@@ -111,7 +115,6 @@ from pymovements.synthetic import step_function
             ),
             id='fill_fixation_10_ms_break_then_saccade_until_end_single_fill',
         ),
-
         pytest.param(
             'downsample',
             {'factor': 2},
@@ -137,7 +140,6 @@ from pymovements.synthetic import step_function
             ),
             id='downsample_factor_2',
         ),
-
         pytest.param(
             'pix2deg',
             {},
@@ -167,7 +169,6 @@ from pymovements.synthetic import step_function
             ),
             id='pix2deg_origin_center',
         ),
-
         pytest.param(
             'deg2pix',
             {'pixel_origin': 'center'},
@@ -197,7 +198,6 @@ from pymovements.synthetic import step_function
             ),
             id='deg2pix_origin_center',
         ),
-
         pytest.param(
             'pos2vel',
             {'method': 'preceding'},
@@ -251,7 +251,9 @@ def test_gaze_apply(method, kwargs, gaze, expected):
             {},
             pm.gaze.from_numpy(
                 velocity=step_function(
-                    length=100, steps=[0, 10], values=[(1, 1, 1, 1, 0, 0), (0, 0, 0, 0, 0, 0)],
+                    length=100,
+                    steps=[0, 10],
+                    values=[(1, 1, 1, 1, 0, 0), (0, 0, 0, 0, 0, 0)],
                 ),
                 orient='row',
                 experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 10),
@@ -260,12 +262,11 @@ def test_gaze_apply(method, kwargs, gaze, expected):
             "unsupported method 'foobar'",
             id='unknown_method',
         ),
-
     ],
 )
 def test_gaze_apply_raises_exception(method, kwargs, gaze, exception, exception_msg):
     with pytest.raises(exception) as exc_info:
         gaze.apply(method, **kwargs)
 
-    msg, = exc_info.value.args
+    (msg,) = exc_info.value.args
     assert msg == exception_msg

@@ -138,8 +138,7 @@ def test_traceplot_save(gaze, monkeypatch, tmp_path):
         gaze=gaze,
         show=False,
         savepath=str(
-            tmp_path /
-            'test.svg',
+            tmp_path / 'test.svg',
         ),
     )
     plt.close()

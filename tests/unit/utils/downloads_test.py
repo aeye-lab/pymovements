@@ -114,9 +114,11 @@ def test_download_file_with_invalid_md5(tmp_path):
     with pytest.raises(RuntimeError) as excinfo:
         download_file(url, tmp_path, filename, md5)
 
-    msg, = excinfo.value.args
-    assert msg == f"File {os.path.join(tmp_path, 'pymovements-0.4.0.tar.gz')} "\
+    (msg,) = excinfo.value.args
+    assert (
+        msg == f"File {os.path.join(tmp_path, 'pymovements-0.4.0.tar.gz')} "
         'not found or download corrupted.'
+    )
 
 
 def test__get_redirected_url():
@@ -143,11 +145,13 @@ def test__get_redirected_url_with_redirects_max_hops():
     with pytest.raises(RuntimeError) as excinfo:
         _get_redirected_url(url, max_hops=0)
 
-    msg, = excinfo.value.args
-    assert msg == 'Request to '\
-        'https://github.com/aeye-lab/pymovements/archive/master.zip '\
-        'exceeded 0 redirects. The last redirect points to '\
+    (msg,) = excinfo.value.args
+    assert (
+        msg == 'Request to '
+        'https://github.com/aeye-lab/pymovements/archive/master.zip '
+        'exceeded 0 redirects. The last redirect points to '
         'https://codeload.github.com/aeye-lab/pymovements/zip/main.'
+    )
 
 
 def test_download_and_extract_archive(tmp_path):
@@ -191,29 +195,43 @@ def test_download_and_extract_archive_extract_dirpath_None(tmp_path, capsys, ver
 
     # extract first time
     download_and_extract_archive(
-        url, tmp_path, download_filename, extract_dirpath, md5, verbose=verbose,
+        url,
+        tmp_path,
+        download_filename,
+        extract_dirpath,
+        md5,
+        verbose=verbose,
     )
     out, _ = capsys.readouterr()
 
     if verbose:
-        assert out == 'Downloading '\
-            'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'\
-            f" to {os.path.join(tmp_path, 'pymovements-0.4.0.tar.gz')}\n" \
-            f'Checking integrity of pymovements-0.4.0.tar.gz\n'\
+        assert (
+            out == 'Downloading '
+            'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
+            f" to {os.path.join(tmp_path, 'pymovements-0.4.0.tar.gz')}\n"
+            f'Checking integrity of pymovements-0.4.0.tar.gz\n'
             f'Extracting pymovements-0.4.0.tar.gz to {tmp_path}\n'
+        )
     else:
         assert out == ''
 
     # extract second time to test already downloaded and verified file
     download_and_extract_archive(
-        url, tmp_path, download_filename, extract_dirpath, md5, verbose=verbose,
+        url,
+        tmp_path,
+        download_filename,
+        extract_dirpath,
+        md5,
+        verbose=verbose,
     )
     out, _ = capsys.readouterr()
 
     if verbose:
-        assert out == f'Using already downloaded and verified file: '\
-            f"{os.path.join(tmp_path, 'pymovements-0.4.0.tar.gz')}"\
+        assert (
+            out == f'Using already downloaded and verified file: '
+            f"{os.path.join(tmp_path, 'pymovements-0.4.0.tar.gz')}"
             f'\nExtracting pymovements-0.4.0.tar.gz to {tmp_path}\n'
+        )
     else:
         assert out == ''
 
@@ -227,9 +245,11 @@ def test_download_and_extract_archive_invalid_md5(tmp_path):
     with pytest.raises(RuntimeError) as excinfo:
         download_and_extract_archive(url, tmp_path, download_filename, extract_dirpath, md5)
 
-    msg, = excinfo.value.args
-    assert msg == f"File {os.path.join(tmp_path, 'pymovements-0.4.0.tar.gz')} "\
+    (msg,) = excinfo.value.args
+    assert (
+        msg == f"File {os.path.join(tmp_path, 'pymovements-0.4.0.tar.gz')} "
         'not found or download corrupted.'
+    )
 
 
 def test__DownloadProgressBar_tsize_not_None():

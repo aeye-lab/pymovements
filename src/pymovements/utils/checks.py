@@ -38,7 +38,7 @@ def check_no_zeros(variable: Any, name: str = 'variable') -> None:
         Name of variable to be used in error message. (default: 'variable')
     """
     # construct error message first
-    error_message = f'{name} must not be zero'
+    error_message = f"{name} must not be zero"
 
     # ducktyping check if variable is iterable
     try:
@@ -90,7 +90,7 @@ def check_shapes(**kwargs: Any) -> None:
     """
     for key, array in kwargs.items():
         if array.ndim != 2 or array.shape[1] != 2:
-            raise ValueError(f'{key} must have shape (N, 2) but have shape {array.shape}')
+            raise ValueError(f"{key} must have shape (N, 2) but have shape {array.shape}")
 
     # Check if shapes are equal, printing the key of the first array that is not equal
     if not all(array.shape == next(iter(kwargs.values())).shape for array in kwargs.values()):

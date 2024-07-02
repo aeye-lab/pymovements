@@ -49,7 +49,7 @@ def test_property_init_exceptions(event_property, init_kwargs, exception, msg_su
     with pytest.raises(exception) as excinfo:
         event_property(**init_kwargs)
 
-    msg, = excinfo.value.args
+    (msg,) = excinfo.value.args
     for msg_substring in msg_substrings:
         assert msg_substring.lower() in msg.lower()
 
@@ -104,7 +104,7 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
     with pytest.raises(exception) as excinfo:
         input_df.select([property_expression])
 
-    msg, = excinfo.value.args
+    (msg,) = excinfo.value.args
     for msg_substring in msg_substrings:
         assert msg_substring.lower() in msg.lower()
 
@@ -119,7 +119,6 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             pl.DataFrame(schema={'duration': pl.Int64}),
             id='empty_dataframe_results_in_empty_dataframe_with_correct_schema',
         ),
-
         pytest.param(
             pm.events.duration,
             {},
@@ -127,7 +126,6 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             pl.DataFrame({'duration': 1}, schema={'duration': pl.Int64}),
             id='single_event_duration',
         ),
-
         pytest.param(
             pm.events.duration,
             {},
@@ -141,7 +139,6 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             ),
             id='two_events_different_durations',
         ),
-
         pytest.param(
             pm.events.peak_velocity,
             {},
@@ -155,7 +152,6 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             ),
             id='single_event_peak_velocity',
         ),
-
         pytest.param(
             pm.events.dispersion,
             {},
@@ -169,7 +165,6 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             ),
             id='dispersion_one_sample',
         ),
-
         pytest.param(
             pm.events.dispersion,
             {},
@@ -183,7 +178,6 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             ),
             id='dispersion_two_samples_x_move',
         ),
-
         pytest.param(
             pm.events.dispersion,
             {},
@@ -197,7 +191,6 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             ),
             id='dispersion_two_samples_y_move',
         ),
-
         pytest.param(
             pm.events.dispersion,
             {},
@@ -211,7 +204,6 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             ),
             id='dispersion_two_samples_xy_move',
         ),
-
         pytest.param(
             pm.events.disposition,
             {},
@@ -225,7 +217,6 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             ),
             id='disposition_single_sample',
         ),
-
         pytest.param(
             pm.events.disposition,
             {},
@@ -239,7 +230,6 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             ),
             id='disposition_two_samples_x_move',
         ),
-
         pytest.param(
             pm.events.disposition,
             {},
@@ -253,7 +243,6 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             ),
             id='disposition_two_samples_y_move',
         ),
-
         pytest.param(
             pm.events.disposition,
             {},
@@ -267,7 +256,6 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             ),
             id='disposition_two_samples_xy_move',
         ),
-
         pytest.param(
             pm.events.disposition,
             {},
@@ -281,7 +269,6 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             ),
             id='disposition_three_samples_overshoot',
         ),
-
         pytest.param(
             pm.events.disposition,
             {},
@@ -295,7 +282,6 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             ),
             id='disposition_three_samples_negative',
         ),
-
         pytest.param(
             pm.events.amplitude,
             {},
@@ -309,7 +295,6 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             ),
             id='amplitude_one_sample',
         ),
-
         pytest.param(
             pm.events.amplitude,
             {},
@@ -323,7 +308,6 @@ def test_property_exceptions(event_property, init_kwargs, input_df, exception, m
             ),
             id='amplitude_two_samples_x_move',
         ),
-
         pytest.param(
             pm.events.amplitude,
             {},

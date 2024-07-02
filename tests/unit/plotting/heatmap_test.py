@@ -72,28 +72,36 @@ def args_fixture(experiment_fixture, request):
     'kwargs',
     [
         pytest.param(
-            {'cmap': 'jet'}, id='str_cmap',
+            {'cmap': 'jet'},
+            id='str_cmap',
         ),
         pytest.param(
-            {'cmap': matplotlib.colors.ListedColormap(['red', 'blue', 'green'])}, id='custom_cmap',
+            {'cmap': matplotlib.colors.ListedColormap(['red', 'blue', 'green'])},
+            id='custom_cmap',
         ),
         pytest.param(
-            {'gridsize': (10, 10)}, id='default_gridsize',
+            {'gridsize': (10, 10)},
+            id='default_gridsize',
         ),
         pytest.param(
-            {'gridsize': (15, 20)}, id='custom_gridsize',
+            {'gridsize': (15, 20)},
+            id='custom_gridsize',
         ),
         pytest.param(
-            {'interpolation': 'gaussian'}, id='default_interpolation',
+            {'interpolation': 'gaussian'},
+            id='default_interpolation',
         ),
         pytest.param(
-            {'interpolation': 'bilinear'}, id='custom_interpolation',
+            {'interpolation': 'bilinear'},
+            id='custom_interpolation',
         ),
         pytest.param(
-            {'origin': 'lower'}, id='default_origin',
+            {'origin': 'lower'},
+            id='default_origin',
         ),
         pytest.param(
-            {'origin': 'upper'}, id='custom_origin',
+            {'origin': 'upper'},
+            id='custom_origin',
         ),
         pytest.param(
             {
@@ -101,7 +109,8 @@ def args_fixture(experiment_fixture, request):
                 'xlabel': None,
                 'ylabel': None,
                 'cbar_label': None,
-            }, id='default_labels',
+            },
+            id='default_labels',
         ),
         pytest.param(
             {
@@ -113,10 +122,12 @@ def args_fixture(experiment_fixture, request):
             id='custom_labels',
         ),
         pytest.param(
-            {'show_cbar': True}, id='show_cbar_true',
+            {'show_cbar': True},
+            id='show_cbar_true',
         ),
         pytest.param(
-            {'show_cbar': False}, id='show_cbar_false',
+            {'show_cbar': False},
+            id='show_cbar_false',
         ),
     ],
 )
@@ -175,7 +186,10 @@ def test_heatmap_save(args, monkeypatch, tmp_path):
         position_column = 'position'
 
     heatmap(
-        args[0], position_column=position_column, show=False, savepath=str(tmp_path / 'test.svg'),
+        args[0],
+        position_column=position_column,
+        show=False,
+        savepath=str(tmp_path / 'test.svg'),
     )
     plt.close()
     mock.assert_called_once()

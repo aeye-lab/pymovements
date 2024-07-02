@@ -108,12 +108,12 @@ def register_transform(method: TransformMethod) -> TransformMethod:
 
 @register_transform
 def center_origin(
-        *,
-        screen_resolution: tuple[int, int],
-        origin: str,
-        n_components: int,
-        pixel_column: str = 'pixel',
-        output_column: str | None = None,
+    *,
+    screen_resolution: tuple[int, int],
+    origin: str,
+    n_components: int,
+    pixel_column: str = 'pixel',
+    output_column: str | None = None,
 ) -> pl.Expr:
     """Center pixel data.
 
@@ -151,8 +151,8 @@ def center_origin(
     else:
         supported_origins = ['center', 'upper left']
         raise ValueError(
-            f'value `{origin}` for argument `origin` is invalid. '
-            f' Valid values are: {supported_origins}',
+            f"value `{origin}` for argument `origin` is invalid. "
+            f" Valid values are: {supported_origins}",
         )
 
     centered_pixels = pl.concat_list(
@@ -166,8 +166,8 @@ def center_origin(
 
 @register_transform
 def downsample(
-        *,
-        factor: int,
+    *,
+    factor: int,
 ) -> pl.Expr:
     """Downsample gaze data by an integer factor.
 
@@ -191,8 +191,8 @@ def downsample(
 
 @register_transform
 def norm(
-        *,
-        columns: tuple[str, str],
+    *,
+    columns: tuple[str, str],
 ) -> pl.Expr:
     r"""Take the norm of a 2D series.
 
@@ -216,14 +216,14 @@ def norm(
 
 @register_transform
 def pix2deg(
-        *,
-        screen_resolution: tuple[int, int],
-        screen_size: tuple[float, float],
-        distance: float | str,
-        origin: str,
-        n_components: int,
-        pixel_column: str = 'pixel',
-        position_column: str = 'position',
+    *,
+    screen_resolution: tuple[int, int],
+    screen_size: tuple[float, float],
+    distance: float | str,
+    origin: str,
+    n_components: int,
+    pixel_column: str = 'pixel',
+    position_column: str = 'position',
 ) -> pl.Expr:
     """Convert pixel screen coordinates to degrees of visual angle.
 
@@ -270,18 +270,21 @@ def pix2deg(
         distance_series = pl.col(distance).truediv(10)
     else:
         raise TypeError(
-            f'`distance` must be of type `float`, `int` or `str`, but is of type'
-            f'`{type(distance).__name__}`',
+            f"`distance` must be of type `float`, `int` or `str`, but is of type"
+            f"`{type(distance).__name__}`",
         )
 
-    distance_pixels = pl.concat_list([
-        distance_series.mul(screen_resolution[component % 2] / screen_size[component % 2])
-        for component in range(n_components)
-    ])
+    distance_pixels = pl.concat_list(
+        [
+            distance_series.mul(screen_resolution[component % 2] / screen_size[component % 2])
+            for component in range(n_components)
+        ],
+    )
 
     degree_components = [
         pl.arctan2d(
-            centered_pixels.list.get(component), distance_pixels.list.get(component),
+            centered_pixels.list.get(component),
+            distance_pixels.list.get(component),
         )
         for component in range(n_components)
     ]
@@ -291,14 +294,14 @@ def pix2deg(
 
 @register_transform
 def deg2pix(
-        *,
-        screen_resolution: tuple[int, int],
-        screen_size: tuple[float, float],
-        distance: float | str,
-        pixel_origin: str = 'upper left',
-        n_components: int,
-        position_column: str = 'position',
-        pixel_column: str = 'pixel',
+    *,
+    screen_resolution: tuple[int, int],
+    screen_size: tuple[float, float],
+    distance: float | str,
+    pixel_origin: str = 'upper left',
+    n_components: int,
+    position_column: str = 'position',
+    pixel_column: str = 'pixel',
 ) -> pl.Expr:
     """Convert degrees of visual angle to pixel screen coordinates.
 
@@ -338,18 +341,20 @@ def deg2pix(
         distance_series = pl.col(distance).truediv(10)
     else:
         raise TypeError(
-            f'`distance` must be of type `float`, `int` or `str`, but is of type'
-            f'`{type(distance).__name__}`',
+            f"`distance` must be of type `float`, `int` or `str`, but is of type"
+            f"`{type(distance).__name__}`",
         )
 
-    distance_pixels = pl.concat_list([
-        distance_series.mul(screen_resolution[component % 2] / screen_size[component % 2])
-        for component in range(n_components)
-    ])
+    distance_pixels = pl.concat_list(
+        [
+            distance_series.mul(screen_resolution[component % 2] / screen_size[component % 2])
+            for component in range(n_components)
+        ],
+    )
 
     centered_pixels = [
-        pl.col(position_column).list.get(component).radians().tan() *
-        distance_pixels.list.get(component)
+        pl.col(position_column).list.get(component).radians().tan()
+        * distance_pixels.list.get(component)
         for component in range(n_components)
     ]
 
@@ -360,8 +365,8 @@ def deg2pix(
     else:
         supported_origins = ['center', 'upper left']
         raise ValueError(
-            f'value `{pixel_origin}` for argument `pixel_origin` is invalid. '
-            f' Valid values are: {supported_origins}',
+            f"value `{pixel_origin}` for argument `pixel_origin` is invalid. "
+            f" Valid values are: {supported_origins}",
         )
 
     pixel_series = pl.concat_list(
@@ -399,12 +404,12 @@ def _check_screen_resolution(screen_resolution: tuple[int, int]) -> None:
     if not isinstance(screen_resolution, (tuple, list)):
         raise TypeError(
             'screen_resolution must be of type tuple[int, int],'
-            f' but is of type {type(screen_resolution).__name__}',
+            f" but is of type {type(screen_resolution).__name__}",
         )
 
     if len(screen_resolution) != 2:
         raise ValueError(
-            f'screen_resolution must have length of 2, but is of length {len(screen_resolution)}',
+            f"screen_resolution must have length of 2, but is of length {len(screen_resolution)}",
         )
 
     for element in screen_resolution:
@@ -426,11 +431,11 @@ def _check_screen_size(screen_size: tuple[float, float]) -> None:
     if not isinstance(screen_size, (tuple, list)):
         raise TypeError(
             'screen_size must be of type tuple[int, int],'
-            f' but is of type {type(screen_size).__name__}',
+            f" but is of type {type(screen_size).__name__}",
         )
 
     if len(screen_size) != 2:
-        raise ValueError(f'screen_size must have length of 2, but is of length {len(screen_size)}')
+        raise ValueError(f"screen_size must have length of 2, but is of length {len(screen_size)}")
 
     for element in screen_size:
         checks.check_is_scalar(screen_size=element)
@@ -439,14 +444,14 @@ def _check_screen_size(screen_size: tuple[float, float]) -> None:
 
 @register_transform
 def pos2acc(
-        *,
-        sampling_rate: float,
-        n_components: int,
-        degree: int = 2,
-        window_length: int = 7,
-        padding: str | float | int | None = 'nearest',
-        position_column: str = 'position',
-        acceleration_column: str = 'acceleration',
+    *,
+    sampling_rate: float,
+    n_components: int,
+    degree: int = 2,
+    window_length: int = 7,
+    padding: str | float | int | None = 'nearest',
+    position_column: str = 'position',
+    acceleration_column: str = 'acceleration',
 ) -> pl.Expr:
     """Compute acceleration data from positional data.
 
@@ -486,15 +491,15 @@ def pos2acc(
 
 @register_transform
 def pos2vel(
-        *,
-        sampling_rate: float,
-        method: str,
-        n_components: int,
-        degree: int | None = None,
-        window_length: int | None = None,
-        padding: str | float | int | None = 'nearest',
-        position_column: str = 'position',
-        velocity_column: str = 'velocity',
+    *,
+    sampling_rate: float,
+    method: str,
+    n_components: int,
+    degree: int | None = None,
+    window_length: int | None = None,
+    padding: str | float | int | None = 'nearest',
+    position_column: str = 'position',
+    velocity_column: str = 'velocity',
 ) -> pl.Expr:
     """Compute velocitiy data from positional data.
 
@@ -541,8 +546,8 @@ def pos2vel(
     if method == 'preceding':
         return pl.concat_list(
             [
-                pl.col(position_column).list.get(component)
-                .diff(n=1, null_behavior='ignore') * sampling_rate
+                pl.col(position_column).list.get(component).diff(n=1, null_behavior='ignore')
+                * sampling_rate
                 for component in range(n_components)
             ],
         ).alias(velocity_column)
@@ -553,7 +558,8 @@ def pos2vel(
                 (
                     pl.col(position_column).shift(n=-1).list.get(component)
                     - pl.col(position_column).shift(n=1).list.get(component)
-                ) * (sampling_rate / 2)
+                )
+                * (sampling_rate / 2)
                 for component in range(n_components)
             ],
         ).alias(velocity_column)
@@ -570,7 +576,8 @@ def pos2vel(
                     + pl.col(position_column).shift(n=-1).list.get(component)
                     - pl.col(position_column).shift(n=1).list.get(component)
                     - pl.col(position_column).shift(n=2).list.get(component)
-                ) * (sampling_rate / 6)
+                )
+                * (sampling_rate / 6)
                 for component in range(n_components)
             ],
         ).alias(velocity_column)
@@ -600,15 +607,15 @@ def pos2vel(
 
 @register_transform
 def savitzky_golay(
-        *,
-        window_length: int,
-        degree: int,
-        sampling_rate: float,
-        n_components: int,
-        input_column: str,
-        output_column: str | None = None,
-        derivative: int = 0,
-        padding: str | float | int | None = 'nearest',
+    *,
+    window_length: int,
+    degree: int,
+    sampling_rate: float,
+    n_components: int,
+    input_column: str,
+    output_column: str | None = None,
+    derivative: int = 0,
+    padding: str | float | int | None = 'nearest',
 ) -> pl.Expr:
     """Apply a 1-D Savitzky-Golay filter to a column|_|:cite:p:`SavitzkyGolay1964`.
 
@@ -719,13 +726,13 @@ def savitzky_golay(
 
 @register_transform
 def smooth(
-        *,
-        method: str,
-        window_length: int,
-        n_components: int,
-        degree: int | None = None,
-        column: str = 'position',
-        padding: str | float | int | None = 'nearest',
+    *,
+    method: str,
+    window_length: int,
+    n_components: int,
+    degree: int | None = None,
+    column: str = 'position',
+    padding: str | float | int | None = 'nearest',
 ) -> pl.Expr:
     """Smooth data in a column.
 
@@ -825,10 +832,12 @@ def smooth(
             )
 
         if method == 'moving_average':
-
             return pl.concat_list(
                 [
-                    pl.col(column).list.get(component).map_batches(pad_func).list.explode()
+                    pl.col(column)
+                    .list.get(component)
+                    .map_batches(pad_func)
+                    .list.explode()
                     .rolling_mean(window_size=window_length, center=True)
                     .shift(n=pad_kwargs['pad_width'])
                     .slice(pad_kwargs['pad_width'] * 2)
@@ -838,12 +847,16 @@ def smooth(
 
         return pl.concat_list(
             [
-                pl.col(column).list.get(component).map_batches(pad_func).list.explode()
+                pl.col(column)
+                .list.get(component)
+                .map_batches(pad_func)
+                .list.explode()
                 .ewm_mean(
                     span=window_length,
                     adjust=False,
                     min_periods=window_length,
-                ).shift(n=pad_kwargs['pad_width'])
+                )
+                .shift(n=pad_kwargs['pad_width'])
                 .slice(pad_kwargs['pad_width'] * 2)
                 for component in range(n_components)
             ],
@@ -873,12 +886,12 @@ def smooth(
 
 @register_transform
 def clip(
-        lower_bound: int | float | None,
-        upper_bound: int | float | None,
-        *,
-        input_column: str,
-        output_column: str,
-        n_components: int,
+    lower_bound: int | float | None,
+    upper_bound: int | float | None,
+    *,
+    input_column: str,
+    output_column: str,
+    n_components: int,
 ) -> pl.Expr:
     """Clip gaze signal to a lower and upper bound.
 
@@ -977,7 +990,7 @@ def _check_padding(padding: Any) -> None:
             raise ValueError(
                 f"Invalid 'padding' value '{padding}'."
                 'Choose a valid padding string, a scalar, or None.'
-                f' Valid padding strings are: {supported_padding_modes}',
+                f" Valid padding strings are: {supported_padding_modes}",
             )
 
 

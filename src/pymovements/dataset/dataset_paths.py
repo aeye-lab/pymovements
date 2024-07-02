@@ -49,14 +49,14 @@ class DatasetPaths:
     """
 
     def __init__(
-            self,
-            *,
-            root: str | Path = 'data',
-            dataset: str | None = None,
-            raw: str = 'raw',
-            events: str = 'events',
-            preprocessed: str = 'preprocessed',
-            downloads: str = 'downloads',
+        self,
+        *,
+        root: str | Path = 'data',
+        dataset: str | None = None,
+        raw: str = 'raw',
+        events: str = 'events',
+        preprocessed: str = 'preprocessed',
+        downloads: str = 'downloads',
     ):
         self._root = Path(root)
         self._dataset = dataset
@@ -66,11 +66,11 @@ class DatasetPaths:
         self._downloads = downloads
 
     def get_preprocessed_filepath(
-            self,
-            raw_filepath: Path,
-            *,
-            preprocessed_dirname: str | None = None,
-            extension: str = 'feather',
+        self,
+        raw_filepath: Path,
+        *,
+        preprocessed_dirname: str | None = None,
+        extension: str = 'feather',
     ) -> Path:
         """Get preprocessed filepath in accordance to filepath of the raw file.
 
@@ -109,11 +109,11 @@ class DatasetPaths:
         return preprocessed_file_dirpath / preprocessed_filename
 
     def raw_to_event_filepath(
-            self,
-            raw_filepath: Path,
-            *,
-            events_dirname: str | None = None,
-            extension: str = 'feather',
+        self,
+        raw_filepath: Path,
+        *,
+        events_dirname: str | None = None,
+        extension: str = 'feather',
     ) -> Path:
         """Get event filepath in accordance to filepath of the raw file.
 

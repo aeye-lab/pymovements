@@ -124,7 +124,6 @@ def fixture_gaze_init_kwargs(request):
             'experiment': pm.datasets.PoTeC().experiment,
             **pm.datasets.PoTeC().custom_read_kwargs,
         },
-
     }
     yield init_param_dict[request.param]
 

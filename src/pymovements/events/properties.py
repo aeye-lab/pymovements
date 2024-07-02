@@ -46,9 +46,9 @@ def register_event_property(function: Callable) -> Callable:
 
 @register_event_property
 def amplitude(
-        *,
-        position_column: str = 'position',
-        n_components: int = 2,
+    *,
+    position_column: str = 'position',
+    n_components: int = 2,
 ) -> pl.Expr:
     r"""Amplitude of an event.
 
@@ -86,16 +86,15 @@ def amplitude(
     y_position = pl.col(position_column).list.get(1)
 
     return (
-        (x_position.max() - x_position.min()).pow(2)
-        + (y_position.max() - y_position.min()).pow(2)
+        (x_position.max() - x_position.min()).pow(2) + (y_position.max() - y_position.min()).pow(2)
     ).sqrt()
 
 
 @register_event_property
 def dispersion(
-        *,
-        position_column: str = 'position',
-        n_components: int = 2,
+    *,
+    position_column: str = 'position',
+    n_components: int = 2,
 ) -> pl.Expr:
     r"""Dispersion of an event.
 
@@ -136,9 +135,9 @@ def dispersion(
 
 @register_event_property
 def disposition(
-        *,
-        position_column: str = 'position',
-        n_components: int = 2,
+    *,
+    position_column: str = 'position',
+    n_components: int = 2,
 ) -> pl.Expr:
     r"""Disposition of an event.
 
@@ -196,10 +195,10 @@ def duration() -> pl.Expr:
 
 @register_event_property
 def location(
-        method: str = 'mean',
-        *,
-        position_column: str = 'position',
-        n_components: int = 2,
+    method: str = 'mean',
+    *,
+    position_column: str = 'position',
+    n_components: int = 2,
 ) -> pl.Expr:
     r"""Location of an event.
 
@@ -244,11 +243,7 @@ def location(
 
     component_expressions = []
     for component in range(n_components):
-        position_component = (
-            pl.col(position_column)
-            .list.slice(0, None)
-            .list.get(component)
-        )
+        position_component = pl.col(position_column).list.slice(0, None).list.get(component)
 
         if method == 'mean':
             expression_component = position_component.mean()
@@ -263,9 +258,9 @@ def location(
 
 @register_event_property
 def peak_velocity(
-        *,
-        velocity_column: str = 'velocity',
-        n_components: int = 2,
+    *,
+    velocity_column: str = 'velocity',
+    n_components: int = 2,
 ) -> pl.Expr:
     r"""Peak velocity of an event.
 

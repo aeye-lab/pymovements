@@ -68,7 +68,8 @@ def gaze_fixture():
             {
                 'zero_centered_yaxis': False,
                 'share_y': False,
-            }, id='zero_centered_yaxis_false_share_y_false',
+            },
+            id='zero_centered_yaxis_false_share_y_false',
         ),
         pytest.param({'show_yticks': False}, id='show_yticks_false'),
         pytest.param({'channels': ['x_pix']}, id='single_channel'),
@@ -76,7 +77,9 @@ def gaze_fixture():
         pytest.param({'channels': ['x_pix', 'y_pix']}, id='two_channels'),
         pytest.param(
             {
-                'channels': ['x_pix', 'y_pix'], 'n_rows': 1, 'n_cols': 2,
+                'channels': ['x_pix', 'y_pix'],
+                'n_rows': 1,
+                'n_cols': 2,
             },
             id='two_channels_explicit_rows_cols',
         ),

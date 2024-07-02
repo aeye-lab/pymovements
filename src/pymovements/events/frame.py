@@ -84,13 +84,13 @@ class EventDataFrame:
     _minimal_schema = {'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64}
 
     def __init__(
-            self,
-            data: pl.DataFrame | None = None,
-            name: str | list[str] | None = None,
-            onsets: list[int] | np.ndarray | None = None,
-            offsets: list[int] | np.ndarray | None = None,
-            trials: list[int | float | str] | np.ndarray | None = None,
-            trial_columns: list[str] | str | None = None,
+        self,
+        data: pl.DataFrame | None = None,
+        name: str | list[str] | None = None,
+        onsets: list[int] | np.ndarray | None = None,
+        offsets: list[int] | np.ndarray | None = None,
+        trials: list[int | float | str] | np.ndarray | None = None,
+        trial_columns: list[str] | str | None = None,
     ):
         self.trial_columns: list[str] | None  # otherwise mypy gets confused.
 
@@ -110,7 +110,8 @@ class EventDataFrame:
                 self.trial_columns = trial_columns
 
             self._additional_columns = [
-                column_name for column_name in data_dict.keys()
+                column_name
+                for column_name in data_dict.keys()
                 if column_name not in self._minimal_schema
             ]
 
@@ -120,7 +121,6 @@ class EventDataFrame:
 
             # Make sure lengths of onsets and offsets are equal.
             if onsets is not None:
-
                 # mypy does not get that offsets cannot be None (l. 87)
                 assert offsets is not None
 
@@ -189,9 +189,9 @@ class EventDataFrame:
         self.frame = self.frame.select([pl.all(), duration().alias('duration')])
 
     def add_event_properties(
-            self,
-            event_properties: pl.DataFrame,
-            join_on: str | list[str],
+        self,
+        event_properties: pl.DataFrame,
+        join_on: str | list[str],
     ) -> None:
         """Add new event properties into dataframe.
 
@@ -205,9 +205,9 @@ class EventDataFrame:
         self.frame = self.frame.join(event_properties, on=join_on, how='left')
 
     def add_trial_column(
-            self,
-            column: str | list[str],
-            data: int | float | str | list[int | float | str] | None,
+        self,
+        column: str | list[str],
+        data: int | float | str | list[int | float | str] | None,
     ) -> None:
         """Add new trial columns with constant values.
 
@@ -236,11 +236,13 @@ class EventDataFrame:
 
         self.frame = self.frame.select(
             [
-                pl.lit(column_data).alias(column_name) if not isinstance(column_data, int)
+                pl.lit(column_data).alias(column_name)
+                if not isinstance(column_data, int)
                 # Enforce Int64 columns for integers.
                 else pl.lit(column_data).alias(column_name).cast(pl.Int64)
                 for column_name, column_data in trial_columns.items()
-            ] + [pl.all()],
+            ]
+            + [pl.all()],
         )
 
     @property
@@ -288,7 +290,8 @@ class EventDataFrame:
                 pl.lit(None).cast(column_type).alias(column_name)
                 for column_name, column_type in self._minimal_schema.items()
                 if column_name not in df.columns
-            ] + [pl.all()],
+            ]
+            + [pl.all()],
         )
         return df
 

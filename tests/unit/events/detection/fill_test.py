@@ -77,7 +77,9 @@ import pymovements as pm
         pytest.param(
             {
                 'events': pm.EventDataFrame(
-                    name=['fixation', 'saccade'], onsets=[0, 50], offsets=[40, 100],
+                    name=['fixation', 'saccade'],
+                    onsets=[0, 50],
+                    offsets=[40, 100],
                 ),
                 'timesteps': np.arange(0, 100),
             },

@@ -93,15 +93,15 @@ class Experiment:
     """
 
     def __init__(
-            self,
-            screen_width_px: int | None = None,
-            screen_height_px: int | None = None,
-            screen_width_cm: float | None = None,
-            screen_height_cm: float | None = None,
-            distance_cm: float | None = None,
-            origin: str | None = 'upper left',
-            sampling_rate: float | None = None,
-            eyetracker: EyeTracker | None = None,
+        self,
+        screen_width_px: int | None = None,
+        screen_height_px: int | None = None,
+        screen_width_cm: float | None = None,
+        screen_height_cm: float | None = None,
+        distance_cm: float | None = None,
+        origin: str | None = 'upper left',
+        sampling_rate: float | None = None,
+        eyetracker: EyeTracker | None = None,
     ):
         self.screen = Screen(
             width_px=screen_width_px,
@@ -139,10 +139,10 @@ class Experiment:
         self._sampling_rate = sampling_rate
 
     def pos2vel(
-            self,
-            arr: list[float] | list[list[float]] | np.ndarray,
-            method: str = 'smooth',
-            **kwargs: int | float | str,
+        self,
+        arr: list[float] | list[list[float]] | np.ndarray,
+        method: str = 'smooth',
+        **kwargs: int | float | str,
     ) -> np.ndarray:
         """Compute velocity time series from 2-dimensional position time series.
 
@@ -194,7 +194,10 @@ class Experiment:
         """
         assert self.sampling_rate is not None
         return transforms_numpy.pos2vel(
-            arr=arr, sampling_rate=self.sampling_rate, method=method, **kwargs,
+            arr=arr,
+            sampling_rate=self.sampling_rate,
+            method=method,
+            **kwargs,
         )
 
     def __str__(self: Any) -> str:
@@ -202,12 +205,12 @@ class Experiment:
 
         def shorten(value: Any) -> str:
             if isinstance(value, float):
-                value = f'{value:.2f}'
+                value = f"{value:.2f}"
             return value
 
         attributes = ''
         for key, value in vars(self).items():
             if not key.startswith('_'):
-                attributes += ', ' + f'{key}={shorten(value)}'
+                attributes += ', ' + f"{key}={shorten(value)}"
 
-        return f'{type(self).__name__}(sampling_rate={shorten(self.sampling_rate)}{attributes})'
+        return f"{type(self).__name__}(sampling_rate={shorten(self.sampling_rate)}{attributes})"

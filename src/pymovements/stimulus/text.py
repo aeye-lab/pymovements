@@ -51,17 +51,16 @@ class TextStimulus:
     """
 
     def __init__(
-            self,
-            aois: pl.DataFrame,
-            *,
-            aoi_column: str,
-            pixel_x_column: str,
-            pixel_y_column: str,
-            width_column: str,
-            height_column: str,
-            page_column: str,
+        self,
+        aois: pl.DataFrame,
+        *,
+        aoi_column: str,
+        pixel_x_column: str,
+        pixel_y_column: str,
+        width_column: str,
+        height_column: str,
+        page_column: str,
     ) -> None:
-
         self.aois = aois.clone()
         self.aoi_column = aoi_column
         self.pixel_x_column = pixel_x_column
@@ -72,15 +71,15 @@ class TextStimulus:
 
 
 def from_file(
-        aoi_path: str | Path,
-        *,
-        aoi_column: str,
-        pixel_x_column: str,
-        pixel_y_column: str,
-        width_column: str,
-        height_column: str,
-        page_column: str,
-        custom_read_kwargs: dict[str, Any] | None = None,
+    aoi_path: str | Path,
+    *,
+    aoi_column: str,
+    pixel_x_column: str,
+    pixel_y_column: str,
+    width_column: str,
+    height_column: str,
+    page_column: str,
+    custom_read_kwargs: dict[str, Any] | None = None,
 ) -> TextStimulus:
     """Load text stimulus from file.
 
@@ -122,7 +121,7 @@ def from_file(
     else:
         raise ValueError(
             f'unsupported file format "{aoi_path.suffix}".'
-            f'Supported formats are: {sorted(valid_extensions)}',
+            f"Supported formats are: {sorted(valid_extensions)}",
         )
 
     return TextStimulus(

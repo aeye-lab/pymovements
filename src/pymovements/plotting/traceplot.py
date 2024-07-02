@@ -41,7 +41,8 @@ if 'pytest' in sys.modules:  # pragma: no cover
     matplotlib.use('Agg')
 
 LinearSegmentedColormapType: TypeAlias = dict[
-    Literal['red', 'green', 'blue', 'alpha'], Sequence[tuple[float, ...]],
+    Literal['red', 'green', 'blue', 'alpha'],
+    Sequence[tuple[float, ...]],
 ]
 
 DEFAULT_SEGMENTDATA: LinearSegmentedColormapType = {
@@ -98,20 +99,20 @@ DEFAULT_SEGMENTDATA_TWOSLOPE: LinearSegmentedColormapType = {
 
 
 def traceplot(
-        gaze: GazeDataFrame,
-        position_column: str = 'pixel',
-        cval: np.ndarray | None = None,  # pragma: no cover
-        cmap: matplotlib.colors.Colormap | None = None,
-        cmap_norm: matplotlib.colors.Normalize | str | None = None,
-        cmap_segmentdata: LinearSegmentedColormapType | None = None,
-        cbar_label: str | None = None,
-        show_cbar: bool = False,
-        padding: float | None = None,
-        pad_factor: float | None = 0.05,
-        figsize: tuple[int, int] = (15, 5),
-        title: str | None = None,
-        savepath: str | None = None,
-        show: bool = True,
+    gaze: GazeDataFrame,
+    position_column: str = 'pixel',
+    cval: np.ndarray | None = None,  # pragma: no cover
+    cmap: matplotlib.colors.Colormap | None = None,
+    cmap_norm: matplotlib.colors.Normalize | str | None = None,
+    cmap_segmentdata: LinearSegmentedColormapType | None = None,
+    cbar_label: str | None = None,
+    show_cbar: bool = False,
+    padding: float | None = None,
+    pad_factor: float | None = 0.05,
+    figsize: tuple[int, int] = (15, 5),
+    title: str | None = None,
+    savepath: str | None = None,
+    show: bool = True,
 ) -> None:
     """Plot eye gaze trace from positional data.
 
@@ -184,16 +185,21 @@ def traceplot(
                 cmap_segmentdata = DEFAULT_SEGMENTDATA
 
         cmap = matplotlib.colors.LinearSegmentedColormap(
-            'line_cmap', segmentdata=cmap_segmentdata, N=512,
+            'line_cmap',
+            segmentdata=cmap_segmentdata,
+            N=512,
         )
 
     if cmap_norm == 'twoslope':
         cmap_norm = matplotlib.colors.TwoSlopeNorm(
-            vcenter=0, vmin=-cval_max, vmax=cval_max,
+            vcenter=0,
+            vmin=-cval_max,
+            vmax=cval_max,
         )
     elif cmap_norm == 'normalize':
         cmap_norm = matplotlib.colors.Normalize(
-            vmin=cval_min, vmax=cval_max,
+            vmin=cval_min,
+            vmax=cval_max,
         )
     elif cmap_norm == 'nonorm':
         cmap_norm = matplotlib.colors.NoNorm()
@@ -205,7 +211,7 @@ def traceplot(
         if (
             scale_class := matplotlib.scale._scale_mapping.get(cmap_norm, None)  # type: ignore
         ) is None:
-            raise ValueError(f'cmap_norm string {cmap_norm} is not supported')
+            raise ValueError(f"cmap_norm string {cmap_norm} is not supported")
 
         norm_class = matplotlib.colors.make_norm_from_scale(scale_class)
         cmap_norm = norm_class(matplotlib.colors.Normalize)()

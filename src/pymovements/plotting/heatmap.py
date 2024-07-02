@@ -28,20 +28,20 @@ from pymovements.gaze import GazeDataFrame
 
 
 def heatmap(
-        gaze: GazeDataFrame,
-        position_column: str = 'pixel',
-        gridsize: tuple[int, int] = (10, 10),
-        cmap: colors.Colormap | str = 'jet',
-        interpolation: str = 'gaussian',
-        origin: str = 'lower',
-        figsize: tuple[float, float] = (15, 10),
-        cbar_label: str | None = None,
-        show_cbar: bool = True,
-        title: str | None = None,
-        xlabel: str | None = None,
-        ylabel: str | None = None,
-        show: bool = True,
-        savepath: str | None = None,
+    gaze: GazeDataFrame,
+    position_column: str = 'pixel',
+    gridsize: tuple[int, int] = (10, 10),
+    cmap: colors.Colormap | str = 'jet',
+    interpolation: str = 'gaussian',
+    origin: str = 'lower',
+    figsize: tuple[float, float] = (15, 10),
+    cbar_label: str | None = None,
+    show_cbar: bool = True,
+    title: str | None = None,
+    xlabel: str | None = None,
+    ylabel: str | None = None,
+    show: bool = True,
+    savepath: str | None = None,
 ) -> plt.Figure:
     """Plot a heatmap of gaze data.
 

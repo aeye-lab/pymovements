@@ -63,13 +63,23 @@ import pymovements as pm
         ),
         pytest.param(
             {
-                'window_length': 3, 'degree': 1, 'padding': 'foobar', 'sampling_rate': 1,
+                'window_length': 3,
+                'degree': 1,
+                'padding': 'foobar',
+                'sampling_rate': 1,
                 'n_components': 2,
             },
             ValueError,
             (
-                'padding', 'invalid', 'foobar',
-                'valid', 'mirror', 'nearest', 'wrap', 'None', 'scalar',
+                'padding',
+                'invalid',
+                'foobar',
+                'valid',
+                'mirror',
+                'nearest',
+                'wrap',
+                'None',
+                'scalar',
             ),
             id='invalid_padding_raises_value_error',
         ),
@@ -79,7 +89,7 @@ def test_pos2acc_init_raises_error(kwargs, exception, msg_substrings):
     with pytest.raises(exception) as excinfo:
         pm.gaze.transforms.pos2acc(**kwargs)
 
-    msg, = excinfo.value.args
+    (msg,) = excinfo.value.args
     for msg_substring in msg_substrings:
         assert msg_substring.lower() in msg.lower()
 
@@ -89,7 +99,10 @@ def test_pos2acc_init_raises_error(kwargs, exception, msg_substrings):
     [
         pytest.param(
             {
-                'window_length': 3, 'degree': 1, 'padding': None, 'sampling_rate': 1,
+                'window_length': 3,
+                'degree': 1,
+                'padding': None,
+                'sampling_rate': 1,
                 'n_components': 2,
             },
             pl.Series('position', [[1, 1]], pl.List(pl.Float64)),
@@ -106,7 +119,7 @@ def test_pos2acc_raises_error(kwargs, series, exception, msg_substrings):
     with pytest.raises(exception) as excinfo:
         df.select(expression)
 
-    msg, = excinfo.value.args
+    (msg,) = excinfo.value.args
     for msg_substring in msg_substrings:
         assert msg_substring.lower() in msg.lower()
 
@@ -129,7 +142,10 @@ def test_pos2acc_raises_error(kwargs, series, exception, msg_substrings):
         ),
         pytest.param(
             {
-                'window_length': 3, 'degree': 1, 'padding': 'mirror', 'sampling_rate': 1,
+                'window_length': 3,
+                'degree': 1,
+                'padding': 'mirror',
+                'sampling_rate': 1,
                 'n_components': 2,
             },
             pl.Series('position', [[1, 1]], pl.List(pl.Float64)),
@@ -138,7 +154,10 @@ def test_pos2acc_raises_error(kwargs, series, exception, msg_substrings):
         ),
         pytest.param(
             {
-                'window_length': 3, 'degree': 1, 'padding': 'nearest', 'sampling_rate': 1,
+                'window_length': 3,
+                'degree': 1,
+                'padding': 'nearest',
+                'sampling_rate': 1,
                 'n_components': 2,
             },
             pl.Series('position', [[1, 1]], pl.List(pl.Float64)),
@@ -147,7 +166,10 @@ def test_pos2acc_raises_error(kwargs, series, exception, msg_substrings):
         ),
         pytest.param(
             {
-                'window_length': 3, 'degree': 1, 'padding': 'wrap', 'sampling_rate': 1,
+                'window_length': 3,
+                'degree': 1,
+                'padding': 'wrap',
+                'sampling_rate': 1,
                 'n_components': 2,
             },
             pl.Series('position', [[1, 1]], pl.List(pl.Float64)),
@@ -156,7 +178,10 @@ def test_pos2acc_raises_error(kwargs, series, exception, msg_substrings):
         ),
         pytest.param(
             {
-                'window_length': 3, 'degree': 1, 'padding': 1, 'sampling_rate': 1,
+                'window_length': 3,
+                'degree': 1,
+                'padding': 1,
+                'sampling_rate': 1,
                 'n_components': 2,
             },
             pl.Series('position', [[1, 1]], pl.List(pl.Float64)),
@@ -165,7 +190,10 @@ def test_pos2acc_raises_error(kwargs, series, exception, msg_substrings):
         ),
         pytest.param(
             {
-                'window_length': 3, 'degree': 1, 'padding': 'nearest', 'sampling_rate': 1,
+                'window_length': 3,
+                'degree': 1,
+                'padding': 'nearest',
+                'sampling_rate': 1,
                 'n_components': 2,
             },
             pl.Series('position', [[1, 1], [1, 1]], pl.List(pl.Float64)),
@@ -174,7 +202,10 @@ def test_pos2acc_raises_error(kwargs, series, exception, msg_substrings):
         ),
         pytest.param(
             {
-                'window_length': 3, 'degree': 1, 'padding': 'nearest', 'sampling_rate': 1,
+                'window_length': 3,
+                'degree': 1,
+                'padding': 'nearest',
+                'sampling_rate': 1,
                 'n_components': 2,
             },
             pl.Series('position', [[1, 1], [1, 1]], pl.List(pl.Float64)),
@@ -183,7 +214,10 @@ def test_pos2acc_raises_error(kwargs, series, exception, msg_substrings):
         ),
         pytest.param(
             {
-                'window_length': 3, 'degree': 1, 'padding': 'nearest', 'sampling_rate': 1,
+                'window_length': 3,
+                'degree': 1,
+                'padding': 'nearest',
+                'sampling_rate': 1,
                 'n_components': 2,
             },
             pl.Series('position', [[1, 1], [2, 2]], pl.List(pl.Float64)),
@@ -192,7 +226,10 @@ def test_pos2acc_raises_error(kwargs, series, exception, msg_substrings):
         ),
         pytest.param(
             {
-                'window_length': 3, 'degree': 2, 'padding': None, 'sampling_rate': 1,
+                'window_length': 3,
+                'degree': 2,
+                'padding': None,
+                'sampling_rate': 1,
                 'n_components': 2,
             },
             pl.Series('position', [[1, 1], [4, 4], [9, 9]], pl.List(pl.Float64)),
@@ -201,7 +238,10 @@ def test_pos2acc_raises_error(kwargs, series, exception, msg_substrings):
         ),
         pytest.param(
             {
-                'window_length': 3, 'degree': 2, 'padding': None, 'sampling_rate': 10,
+                'window_length': 3,
+                'degree': 2,
+                'padding': None,
+                'sampling_rate': 10,
                 'n_components': 2,
             },
             pl.Series('position', [[1, 1], [4, 4], [9, 9]], pl.List(pl.Float64)),

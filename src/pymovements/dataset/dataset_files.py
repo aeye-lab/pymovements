@@ -69,26 +69,28 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
     if not fileinfo_dicts:
         print(definition.filename_format)
         print(curly_to_regex(definition.filename_format))
-        raise RuntimeError(f'no matching files found in {paths.raw}')
+        raise RuntimeError(f"no matching files found in {paths.raw}")
 
     # Create dataframe from all fileinfo records.
     fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
     fileinfo_df = fileinfo_df.sort(by='filepath')
 
-    fileinfo_df = fileinfo_df.with_columns([
-        pl.col(fileinfo_key).cast(fileinfo_dtype)
-        for fileinfo_key, fileinfo_dtype in definition.filename_format_dtypes.items()
-    ])
+    fileinfo_df = fileinfo_df.with_columns(
+        [
+            pl.col(fileinfo_key).cast(fileinfo_dtype)
+            for fileinfo_key, fileinfo_dtype in definition.filename_format_dtypes.items()
+        ],
+    )
 
     return fileinfo_df
 
 
 def load_event_files(
-        definition: DatasetDefinition,
-        fileinfo: pl.DataFrame,
-        paths: DatasetPaths,
-        events_dirname: str | None = None,
-        extension: str = 'feather',
+    definition: DatasetDefinition,
+    fileinfo: pl.DataFrame,
+    paths: DatasetPaths,
+    events_dirname: str | None = None,
+    extension: str = 'feather',
 ) -> list[EventDataFrame]:
     """Load all event files according to fileinfo dataframe.
 
@@ -129,7 +131,8 @@ def load_event_files(
         filepath = paths.raw / filepath
 
         filepath = paths.raw_to_event_filepath(
-            filepath, events_dirname=events_dirname,
+            filepath,
+            events_dirname=events_dirname,
             extension=extension,
         )
 
@@ -141,7 +144,7 @@ def load_event_files(
             valid_extensions = ['csv', 'txt', 'tsv', 'feather']
             raise ValueError(
                 f'unsupported file format "{extension}".'
-                f'Supported formats are: {valid_extensions}',
+                f"Supported formats are: {valid_extensions}",
             )
 
         # Add fileinfo columns to dataframe.
@@ -157,12 +160,12 @@ def load_event_files(
 
 
 def load_gaze_files(
-        definition: DatasetDefinition,
-        fileinfo: pl.DataFrame,
-        paths: DatasetPaths,
-        preprocessed: bool = False,
-        preprocessed_dirname: str | None = None,
-        extension: str = 'feather',
+    definition: DatasetDefinition,
+    fileinfo: pl.DataFrame,
+    paths: DatasetPaths,
+    preprocessed: bool = False,
+    preprocessed_dirname: str | None = None,
+    extension: str = 'feather',
 ) -> list[GazeDataFrame]:
     """Load all available gaze data files.
 
@@ -208,7 +211,8 @@ def load_gaze_files(
 
         if preprocessed:
             filepath = paths.get_preprocessed_filepath(
-                filepath, preprocessed_dirname=preprocessed_dirname,
+                filepath,
+                preprocessed_dirname=preprocessed_dirname,
                 extension=extension,
             )
 
@@ -225,11 +229,11 @@ def load_gaze_files(
 
 
 def load_gaze_file(
-        filepath: Path,
-        fileinfo_row: dict[str, Any],
-        definition: DatasetDefinition,
-        preprocessed: bool = False,
-        custom_read_kwargs: dict[str, Any] | None = None,
+    filepath: Path,
+    fileinfo_row: dict[str, Any],
+    definition: DatasetDefinition,
+    preprocessed: bool = False,
+    custom_read_kwargs: dict[str, Any] | None = None,
 ) -> GazeDataFrame:
     """Load a gaze data file as GazeDataFrame.
 
@@ -263,8 +267,7 @@ def load_gaze_file(
         custom_read_kwargs = {}
 
     add_columns = {
-        key: fileinfo_row[key] for key in
-        [key for key in fileinfo_row.keys() if key != 'filepath']
+        key: fileinfo_row[key] for key in [key for key in fileinfo_row.keys() if key != 'filepath']
     }
 
     if filepath.suffix in {'.csv', '.txt', '.tsv'}:
@@ -347,16 +350,16 @@ def load_gaze_file(
         valid_extensions = ['csv', 'tsv', 'txt', 'feather', 'asc']
         raise ValueError(
             f'unsupported file format "{filepath.suffix}".'
-            f'Supported formats are: {valid_extensions}',
+            f"Supported formats are: {valid_extensions}",
         )
 
     return gaze_df
 
 
 def add_fileinfo(
-        definition: DatasetDefinition,
-        df: pl.DataFrame,
-        fileinfo: dict[str, Any],
+    definition: DatasetDefinition,
+    df: pl.DataFrame,
+    fileinfo: dict[str, Any],
 ) -> pl.DataFrame:
     """Add columns from fileinfo to dataframe.
 
@@ -379,24 +382,27 @@ def add_fileinfo(
             pl.lit(value).alias(column)
             for column, value in fileinfo.items()
             if column != 'filepath' and column not in df.columns
-        ] + [pl.all()],
+        ]
+        + [pl.all()],
     )
 
     # Cast columns from fileinfo according to specification.
-    df = df.with_columns([
-        pl.col(fileinfo_key).cast(fileinfo_dtype)
-        for fileinfo_key, fileinfo_dtype in definition.filename_format_dtypes.items()
-    ])
+    df = df.with_columns(
+        [
+            pl.col(fileinfo_key).cast(fileinfo_dtype)
+            for fileinfo_key, fileinfo_dtype in definition.filename_format_dtypes.items()
+        ],
+    )
     return df
 
 
 def save_events(
-        events: list[EventDataFrame],
-        fileinfo: pl.DataFrame,
-        paths: DatasetPaths,
-        events_dirname: str | None = None,
-        verbose: int = 1,
-        extension: str = 'feather',
+    events: list[EventDataFrame],
+    fileinfo: pl.DataFrame,
+    paths: DatasetPaths,
+    events_dirname: str | None = None,
+    verbose: int = 1,
+    extension: str = 'feather',
 ) -> None:
     """Save events to files.
 
@@ -432,7 +438,8 @@ def save_events(
     for file_id, event_df in enumerate(tqdm(events, disable=disable_progressbar)):
         raw_filepath = paths.raw / Path(fileinfo[file_id, 'filepath'])
         events_filepath = paths.raw_to_event_filepath(
-            raw_filepath, events_dirname=events_dirname,
+            raw_filepath,
+            events_dirname=events_dirname,
             extension=extension,
         )
 
@@ -453,17 +460,17 @@ def save_events(
             valid_extensions = ['csv', 'feather']
             raise ValueError(
                 f'unsupported file format "{extension}".'
-                f'Supported formats are: {valid_extensions}',
+                f"Supported formats are: {valid_extensions}",
             )
 
 
 def save_preprocessed(
-        gaze: list[GazeDataFrame],
-        fileinfo: pl.DataFrame,
-        paths: DatasetPaths,
-        preprocessed_dirname: str | None = None,
-        verbose: int = 1,
-        extension: str = 'feather',
+    gaze: list[GazeDataFrame],
+    fileinfo: pl.DataFrame,
+    paths: DatasetPaths,
+    preprocessed_dirname: str | None = None,
+    verbose: int = 1,
+    extension: str = 'feather',
 ) -> None:
     """Save preprocessed gaze files.
 
@@ -501,7 +508,8 @@ def save_preprocessed(
 
         raw_filepath = paths.raw / Path(fileinfo[file_id, 'filepath'])
         preprocessed_filepath = paths.get_preprocessed_filepath(
-            raw_filepath, preprocessed_dirname=preprocessed_dirname,
+            raw_filepath,
+            preprocessed_dirname=preprocessed_dirname,
             extension=extension,
         )
 
@@ -524,15 +532,17 @@ def save_preprocessed(
             valid_extensions = ['csv', 'feather']
             raise ValueError(
                 f'unsupported file format "{extension}".'
-                f'Supported formats are: {valid_extensions}',
+                f"Supported formats are: {valid_extensions}",
             )
 
 
 def take_subset(
-        fileinfo: pl.DataFrame,
-        subset: dict[
-            str, bool | float | int | str | list[bool | float | int | str],
-        ] | None = None,
+    fileinfo: pl.DataFrame,
+    subset: dict[
+        str,
+        bool | float | int | str | list[bool | float | int | str],
+    ]
+    | None = None,
 ) -> pl.DataFrame:
     """Take a subset of the fileinfo dataframe.
 
@@ -561,19 +571,19 @@ def take_subset(
         return fileinfo
 
     if not isinstance(subset, dict):
-        raise TypeError(f'subset must be of type dict but is of type {type(subset)}')
+        raise TypeError(f"subset must be of type dict but is of type {type(subset)}")
 
     for subset_key, subset_value in subset.items():
         if not isinstance(subset_key, str):
             raise TypeError(
-                f'subset keys must be of type str but key {subset_key} is of type'
-                f' {type(subset_key)}',
+                f"subset keys must be of type str but key {subset_key} is of type"
+                f" {type(subset_key)}",
             )
 
         if subset_key not in fileinfo.columns:
             raise ValueError(
-                f'subset key {subset_key} must be a column in the fileinfo attribute.'
-                f' Available columns are: {fileinfo.columns}',
+                f"subset key {subset_key} must be a column in the fileinfo attribute."
+                f" Available columns are: {fileinfo.columns}",
             )
 
         if isinstance(subset_value, (bool, float, int, str)):
@@ -582,8 +592,8 @@ def take_subset(
             column_values = subset_value
         else:
             raise TypeError(
-                f'subset values must be of type bool, float, int, str, range, or list, '
-                f'but value of pair {subset_key}: {subset_value} is of type {type(subset_value)}',
+                f"subset values must be of type bool, float, int, str, range, or list, "
+                f"but value of pair {subset_key}: {subset_value} is of type {type(subset_value)}",
             )
 
         fileinfo = fileinfo.filter(pl.col(subset_key).is_in(column_values))

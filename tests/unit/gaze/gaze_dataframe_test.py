@@ -69,8 +69,10 @@ def test_gaze_dataframe_init(init_arg):
         pytest.param(
             pl.DataFrame(
                 schema={
-                    'x_left_vel': pl.Float64, 'y_left_vel': pl.Float64,
-                    'x_right_vel': pl.Float64, 'y_right_vel': pl.Float64,
+                    'x_left_vel': pl.Float64,
+                    'y_left_vel': pl.Float64,
+                    'x_right_vel': pl.Float64,
+                    'y_right_vel': pl.Float64,
                 },
             ),
             ['x_left_vel', 'y_left_vel', 'x_right_vel', 'y_right_vel'],
@@ -110,8 +112,10 @@ def test_gaze_dataframe_velocity_columns(init_df, velocity_columns):
         pytest.param(
             pl.DataFrame(
                 schema={
-                    'x_left_pix': pl.Float64, 'y_left_pix': pl.Float64,
-                    'x_right_pix': pl.Float64, 'y_right_pix': pl.Float64,
+                    'x_left_pix': pl.Float64,
+                    'y_left_pix': pl.Float64,
+                    'x_right_pix': pl.Float64,
+                    'y_right_pix': pl.Float64,
                 },
             ),
             ['x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix'],
@@ -151,8 +155,10 @@ def test_gaze_dataframe_pixel_position_columns(init_df, pixel_columns):
         pytest.param(
             pl.DataFrame(
                 schema={
-                    'x_left_pos': pl.Float64, 'y_left_pos': pl.Float64,
-                    'x_right_pos': pl.Float64, 'y_right_pos': pl.Float64,
+                    'x_left_pos': pl.Float64,
+                    'y_left_pos': pl.Float64,
+                    'x_right_pos': pl.Float64,
+                    'y_right_pos': pl.Float64,
                 },
             ),
             ['x_left_pos', 'y_left_pos', 'x_right_pos', 'y_right_pos'],

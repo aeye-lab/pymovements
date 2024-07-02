@@ -104,9 +104,7 @@ class GazeBase(DatasetDefinition):
 
     name: str = 'GazeBase'
 
-    mirrors: tuple[str] = (
-        'https://figshare.com/ndownloader/files/',
-    )
+    mirrors: tuple[str] = ('https://figshare.com/ndownloader/files/',)
 
     resources: tuple[dict[str, str]] = (
         {
@@ -126,11 +124,7 @@ class GazeBase(DatasetDefinition):
         sampling_rate=1000,
     )
 
-    filename_format: str = (
-        r'S_{round_id:1d}{subject_id:d}'
-        r'_S{session_id:d}'
-        r'_{task_name}.csv'
-    )
+    filename_format: str = r'S_{round_id:1d}{subject_id:d}' r'_S{session_id:d}' r'_{task_name}.csv'
 
     filename_format_dtypes: dict[str, type] = field(
         default_factory=lambda: {

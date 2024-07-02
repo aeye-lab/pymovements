@@ -226,12 +226,12 @@ def test_microsaccades_detects_saccades(kwargs, expected):
         ),
         pytest.param(
             {'method': 'engbert2003'},
-            {'value': np.array((1., 1.))},
+            {'value': np.array((1.0, 1.0))},
             id='engbert2003',
         ),
         pytest.param(
             {'method': 'engbert2015'},
-            {'value': np.array((1., 1.))},
+            {'value': np.array((1.0, 1.0))},
             id='engbert2015',
         ),
     ],

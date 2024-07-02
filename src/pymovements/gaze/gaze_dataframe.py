@@ -175,19 +175,19 @@ class GazeDataFrame:
     """
 
     def __init__(
-            self,
-            data: pl.DataFrame | None = None,
-            experiment: Experiment | None = None,
-            events: pm.EventDataFrame | None = None,
-            *,
-            trial_columns: str | list[str] | None = None,
-            time_column: str | None = None,
-            time_unit: str | None = 'ms',
-            pixel_columns: list[str] | None = None,
-            position_columns: list[str] | None = None,
-            velocity_columns: list[str] | None = None,
-            acceleration_columns: list[str] | None = None,
-            distance_column: str | None = None,
+        self,
+        data: pl.DataFrame | None = None,
+        experiment: Experiment | None = None,
+        events: pm.EventDataFrame | None = None,
+        *,
+        trial_columns: str | list[str] | None = None,
+        time_column: str | None = None,
+        time_unit: str | None = 'ms',
+        pixel_columns: list[str] | None = None,
+        position_columns: list[str] | None = None,
+        velocity_columns: list[str] | None = None,
+        acceleration_columns: list[str] | None = None,
+        distance_column: str | None = None,
     ):
         if data is None:
             data = pl.DataFrame()
@@ -262,9 +262,9 @@ class GazeDataFrame:
             self.events = events.copy()
 
     def apply(
-            self,
-            function: str,
-            **kwargs: Any,
+        self,
+        function: str,
+        **kwargs: Any,
     ) -> None:
         """Apply preprocessing method to GazeDataFrame.
 
@@ -283,9 +283,9 @@ class GazeDataFrame:
             raise ValueError(f"unsupported method '{function}'")
 
     def transform(
-            self,
-            transform_method: str | Callable[..., pl.Expr],
-            **kwargs: Any,
+        self,
+        transform_method: str | Callable[..., pl.Expr],
+        **kwargs: Any,
     ) -> None:
         """Apply transformation method.
 
@@ -303,7 +303,8 @@ class GazeDataFrame:
             downsample_factor = kwargs.pop('factor')
             self.frame = self.frame.select(
                 transforms.downsample(
-                    factor=downsample_factor, **kwargs,
+                    factor=downsample_factor,
+                    **kwargs,
                 ),
             )
 
@@ -318,14 +319,16 @@ class GazeDataFrame:
                 self._check_experiment()
                 assert self.experiment is not None
                 kwargs['screen_resolution'] = (
-                    self.experiment.screen.width_px, self.experiment.screen.height_px,
+                    self.experiment.screen.width_px,
+                    self.experiment.screen.height_px,
                 )
 
             if 'screen_size' in method_kwargs and 'screen_size' not in kwargs:
                 self._check_experiment()
                 assert self.experiment is not None
                 kwargs['screen_size'] = (
-                    self.experiment.screen.width_cm, self.experiment.screen.height_cm,
+                    self.experiment.screen.width_cm,
+                    self.experiment.screen.height_cm,
                 )
 
             if 'distance' in method_kwargs and 'distance' not in kwargs:
@@ -367,17 +370,17 @@ class GazeDataFrame:
                             "Neither is 'position' in the dataframe columns, "
                             'nor is a position column explicitly specified. '
                             "Since the dataframe has a 'pixel' column, consider running "
-                            f'pix2deg() before {transform_method.__name__}(). If you want '
+                            f"pix2deg() before {transform_method.__name__}(). If you want "
                             'to run transformations in pixel units, you can do so by using '
                             f"{transform_method.__name__}(position_column='pixel'). "
-                            f'Available dataframe columns are: {self.frame.columns}',
+                            f"Available dataframe columns are: {self.frame.columns}",
                         )
                     raise pl.exceptions.ColumnNotFoundError(
                         "Neither is 'position' in the dataframe columns, "
                         'nor is a position column explicitly specified. '
                         'You can specify the position column via: '
                         f'{transform_method.__name__}(position_column="your_position_column"). '
-                        f'Available dataframe columns are: {self.frame.columns}',
+                        f"Available dataframe columns are: {self.frame.columns}",
                     )
 
             if transform_method.__name__ in {'pix2deg'}:
@@ -387,13 +390,13 @@ class GazeDataFrame:
                         'nor is a pixel column explicitly specified. '
                         'You can specify the pixel column via: '
                         f'{transform_method.__name__}(pixel_column="name_of_your_pixel_column"). '
-                        f'Available dataframe columns are: {self.frame.columns}',
+                        f"Available dataframe columns are: {self.frame.columns}",
                     )
 
             if transform_method.__name__ in {'deg2pix'}:
                 if (
-                    'position_column' in kwargs and
-                    kwargs.get('position_column') not in self.frame.columns
+                    'position_column' in kwargs
+                    and kwargs.get('position_column') not in self.frame.columns
                 ):
                     raise pl.exceptions.ColumnNotFoundError(
                         f"The specified 'position_column' ({kwargs.get('position_column')}) "
@@ -410,19 +413,20 @@ class GazeDataFrame:
                 self.frame = pl.concat(
                     [
                         df.with_columns(transform_method(**kwargs))
-                        for group, df in
-                        self.frame.group_by(self.trial_columns, maintain_order=True)
+                        for group, df in self.frame.group_by(
+                            self.trial_columns, maintain_order=True,
+                        )
                     ],
                 )
 
     def clip(
-            self,
-            lower_bound: int | float | None,
-            upper_bound: int | float | None,
-            *,
-            input_column: str,
-            output_column: str,
-            **kwargs: Any,
+        self,
+        lower_bound: int | float | None,
+        upper_bound: int | float | None,
+        *,
+        input_column: str,
+        output_column: str,
+        **kwargs: Any,
     ) -> None:
         """Clip gaze signal values.
 
@@ -509,11 +513,11 @@ class GazeDataFrame:
         )
 
     def pos2acc(
-            self,
-            *,
-            degree: int = 2,
-            window_length: int = 7,
-            padding: str | float | int | None = 'nearest',
+        self,
+        *,
+        degree: int = 2,
+        window_length: int = 7,
+        padding: str | float | int | None = 'nearest',
     ) -> None:
         """Compute gaze acceleration in dva/s^2 from dva position coordinates.
 
@@ -539,9 +543,9 @@ class GazeDataFrame:
         self.transform('pos2acc', window_length=window_length, degree=degree, padding=padding)
 
     def pos2vel(
-            self,
-            method: str = 'fivepoint',
-            **kwargs: int | float | str,
+        self,
+        method: str = 'fivepoint',
+        **kwargs: int | float | str,
     ) -> None:
         """Compute gaze velocity in dva/s from dva position coordinates.
 
@@ -566,13 +570,13 @@ class GazeDataFrame:
         self.transform('pos2vel', method=method, **kwargs)
 
     def smooth(
-            self,
-            method: str = 'savitzky_golay',
-            window_length: int = 7,
-            degree: int = 2,
-            column: str = 'position',
-            padding: str | float | int | None = 'nearest',
-            **kwargs: int | float | str,
+        self,
+        method: str = 'savitzky_golay',
+        window_length: int = 7,
+        degree: int = 2,
+        column: str = 'position',
+        padding: str | float | int | None = 'nearest',
+        **kwargs: int | float | str,
     ) -> None:
         """Smooth data in a column.
 
@@ -615,12 +619,12 @@ class GazeDataFrame:
         )
 
     def detect(
-            self,
-            method: Callable[..., pm.EventDataFrame] | str,
-            *,
-            eye: str = 'auto',
-            clear: bool = False,
-            **kwargs: Any,
+        self,
+        method: Callable[..., pm.EventDataFrame] | str,
+        *,
+        eye: str = 'auto',
+        clear: bool = False,
+        **kwargs: Any,
     ) -> None:
         """Detect events by applying a specific event detection method.
 
@@ -674,17 +678,21 @@ class GazeDataFrame:
             )
         else:
             grouped_frames = self.frame.partition_by(
-                self.trial_columns, maintain_order=True, include_key=True, as_dict=True,
+                self.trial_columns,
+                maintain_order=True,
+                include_key=True,
+                as_dict=True,
             )
 
             missing_trial_columns = [
-                trial_column for trial_column in self.trial_columns
+                trial_column
+                for trial_column in self.trial_columns
                 if trial_column not in self.events.frame.columns
             ]
             if missing_trial_columns:
                 raise pl.ColumnNotFoundError(
-                    f'trial columns {missing_trial_columns} missing from events, '
-                    f'available columns: {self.events.frame.columns}',
+                    f"trial columns {missing_trial_columns} missing from events, "
+                    f"available columns: {self.events.frame.columns}",
                 )
 
             new_events_grouped: list[pl.DataFrame] = []
@@ -721,9 +729,9 @@ class GazeDataFrame:
             )
 
     def measure_samples(
-            self,
-            method: str | Callable[..., pl.Expr],
-            **kwargs: Any,
+        self,
+        method: str | Callable[..., pl.Expr],
+        **kwargs: Any,
     ) -> pl.DataFrame:
         """Calculate eye movement measure for gaze data samples.
 
@@ -776,10 +784,10 @@ class GazeDataFrame:
                     [  # add trial columns first, then add column for measure.
                         pl.lit(value).cast(self.frame.schema[name]).alias(name)
                         for name, value in zip(self.trial_columns, trial_values)
-                    ] + [method(**kwargs)],
+                    ]
+                    + [method(**kwargs)],
                 )
-                for trial_values, df in
-                self.frame.group_by(self.trial_columns, maintain_order=True)
+                for trial_values, df in self.frame.group_by(self.trial_columns, maintain_order=True)
             ],
         )
 
@@ -794,9 +802,9 @@ class GazeDataFrame:
         return self.frame.columns
 
     def nest(
-            self,
-            input_columns: list[str],
-            output_column: str,
+        self,
+        input_columns: list[str],
+        output_column: str,
     ) -> None:
         """Nest component columns into a single tuple column.
 
@@ -812,16 +820,15 @@ class GazeDataFrame:
         self._check_component_columns(**{output_column: input_columns})
 
         self.frame = self.frame.with_columns(
-            pl.concat_list([pl.col(component) for component in input_columns])
-            .alias(output_column),
+            pl.concat_list([pl.col(component) for component in input_columns]).alias(output_column),
         ).drop(input_columns)
 
     def unnest(
-            self,
-            input_columns: list[str] | str | None = None,
-            output_suffixes: list[str] | None = None,
-            *,
-            output_columns: list[str] | None = None,
+        self,
+        input_columns: list[str] | str | None = None,
+        output_suffixes: list[str] | None = None,
+        *,
+        output_columns: list[str] | None = None,
     ) -> None:
         """Explode a column of type ``pl.List`` into one column for each list component.
 
@@ -892,20 +899,20 @@ class GazeDataFrame:
 
         if output_suffixes:
             col_names = [
-                [f'{input_col}{suffix}' for suffix in output_suffixes]
+                [f"{input_col}{suffix}" for suffix in output_suffixes]
                 for input_col in input_columns
             ]
 
-        if len([
-            name for name_list in col_names for name in name_list
-        ]) != self.n_components * len(input_columns):
+        if len([name for name_list in col_names for name in name_list]) != self.n_components * len(
+            input_columns,
+        ):
             raise ValueError(
-                f'Number of output columns / suffixes ({len(col_names[0])}) '
-                f'must match number of components ({self.n_components})',
+                f"Number of output columns / suffixes ({len(col_names[0])}) "
+                f"must match number of components ({self.n_components})",
             )
 
         if len({name for name_list in col_names for name in name_list}) != len(
-                [name for name_list in col_names for name in name_list],
+            [name for name_list in col_names for name in name_list],
         ):
             raise ValueError('Output columns / suffixes must be unique')
 
@@ -953,7 +960,7 @@ class GazeDataFrame:
         """
         if self.n_components not in {2, 4, 6}:
             raise AttributeError(
-                f'n_components must be either 2, 4 or 6 but is {self.n_components}',
+                f"n_components must be either 2, 4 or 6 but is {self.n_components}",
             )
 
     def _check_component_columns(self, **kwargs: list[str]) -> None:
@@ -967,34 +974,34 @@ class GazeDataFrame:
         for component_type, columns in kwargs.items():
             if not isinstance(columns, list):
                 raise TypeError(
-                    f'{component_type} must be of type list, '
-                    f'but is of type {type(columns).__name__}',
+                    f"{component_type} must be of type list, "
+                    f"but is of type {type(columns).__name__}",
                 )
 
             for column in columns:
                 if not isinstance(column, str):
                     raise TypeError(
-                        f'all elements in {component_type} must be of type str, '
-                        f'but one of the elements is of type {type(column).__name__}',
+                        f"all elements in {component_type} must be of type str, "
+                        f"but one of the elements is of type {type(column).__name__}",
                     )
 
             if len(columns) not in [2, 4, 6]:
                 raise ValueError(
-                    f'{component_type} must contain either 2, 4 or 6 columns, '
-                    f'but has {len(columns)}',
+                    f"{component_type} must contain either 2, 4 or 6 columns, "
+                    f"but has {len(columns)}",
                 )
 
             for column in columns:
                 if column not in self.frame.columns:
                     raise pl.exceptions.ColumnNotFoundError(
-                        f'column {column} from {component_type} is not available in dataframe',
+                        f"column {column} from {component_type} is not available in dataframe",
                     )
 
             if len(set(self.frame[columns].dtypes)) != 1:
                 types_list = sorted([str(t) for t in set(self.frame[columns].dtypes)])
                 raise ValueError(
-                    f'all columns in {component_type} must be of same type, '
-                    f'but types are {types_list}',
+                    f"all columns in {component_type} must be of same type, "
+                    f"but types are {types_list}",
                 )
 
     def _infer_n_components(self, column_specifiers: list[list[str]]) -> int | None:
@@ -1034,7 +1041,7 @@ class GazeDataFrame:
             list_lengths.add(len(column_specifier_list))
 
         if len(list_lengths) > 1:
-            raise ValueError(f'inconsistent number of components inferred: {list_lengths}')
+            raise ValueError(f"inconsistent number of components inferred: {list_lengths}")
 
         if len(list_lengths) == 0:
             return None
@@ -1093,12 +1100,12 @@ class GazeDataFrame:
         return eye_components
 
     def _fill_event_detection_kwargs(
-            self,
-            method: Callable[..., pm.EventDataFrame],
-            gaze: pl.DataFrame,
-            events: pm.EventDataFrame,
-            eye_components: tuple[int, int] | None,
-            **kwargs: Any,
+        self,
+        method: Callable[..., pm.EventDataFrame],
+        gaze: pl.DataFrame,
+        events: pm.EventDataFrame,
+        eye_components: tuple[int, int] | None,
+        **kwargs: Any,
     ) -> dict[str, Any]:
         """Fill event detection method kwargs with gaze attributes.
 
@@ -1126,8 +1133,7 @@ class GazeDataFrame:
         if 'positions' in method_args:
             if 'position' not in gaze.columns:
                 raise pl.exceptions.ColumnNotFoundError(
-                    f'Column \'position\' not found.'
-                    f' Available columns are: {gaze.columns}',
+                    f"Column 'position' not found." f" Available columns are: {gaze.columns}",
                 )
 
             if eye_components is None:
@@ -1145,8 +1151,7 @@ class GazeDataFrame:
         if 'velocities' in method_args:
             if 'velocity' not in gaze.columns:
                 raise pl.exceptions.ColumnNotFoundError(
-                    f'Column \'velocity\' not found.'
-                    f' Available columns are: {gaze.columns}',
+                    f"Column 'velocity' not found." f" Available columns are: {gaze.columns}",
                 )
 
             if eye_components is None:

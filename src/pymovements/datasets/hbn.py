@@ -99,9 +99,7 @@ class HBN(DatasetDefinition):
 
     name: str = 'HBN'
 
-    mirrors: tuple[str, ...] = (
-        'https://files.osf.io/v1/resources/qknuv/providers/osfstorage/',
-    )
+    mirrors: tuple[str, ...] = ('https://files.osf.io/v1/resources/qknuv/providers/osfstorage/',)
 
     resources: tuple[dict[str, str], ...] = (
         {

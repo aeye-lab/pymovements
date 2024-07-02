@@ -50,12 +50,12 @@ def dispersion(positions: list[list[float]] | np.ndarray) -> float:
 
 @register_event_detection
 def idt(
-        positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
-        timesteps: list[int] | np.ndarray | None = None,
-        minimum_duration: int = 100,
-        dispersion_threshold: float = 1.0,
-        include_nan: bool = False,
-        name: str = 'fixation',
+    positions: list[list[float]] | list[tuple[float, float]] | np.ndarray,
+    timesteps: list[int] | np.ndarray | None = None,
+    minimum_duration: int = 100,
+    dispersion_threshold: float = 1.0,
+    include_nan: bool = False,
+    name: str = 'fixation',
 ) -> EventDataFrame:
     """Fixation identification based on dispersion threshold (I-DT).
 
@@ -126,8 +126,7 @@ def idt(
         raise ValueError('minimum_duration must be greater than 0')
     if not isinstance(minimum_duration, int):
         raise TypeError(
-            'minimum_duration must be of type int'
-            f' but is of type {type(minimum_duration)}',
+            'minimum_duration must be of type int' f" but is of type {type(minimum_duration)}",
         )
 
     onsets = []
@@ -152,7 +151,6 @@ def idt(
     win_end = minimum_sample_duration
 
     while win_start < len(timesteps) and win_end <= len(timesteps):
-
         # Initialize window over first points to cover the duration threshold.
         # This automatically extends the window to the specified minimum event duration.
         win_end = max(win_start + minimum_sample_duration, win_end)
@@ -170,7 +168,7 @@ def idt(
                 win_end += 1
 
             # check for np.nan values
-            if np.sum(np.isnan(positions[win_start:win_end - 1])) > 0:
+            if np.sum(np.isnan(positions[win_start: win_end - 1])) > 0:
                 tmp_candidates = [np.arange(win_start, win_end - 1, 1)]
                 tmp_candidates = filter_candidates_remove_nans(
                     candidates=tmp_candidates,
@@ -185,7 +183,8 @@ def idt(
 
                 # Filter all candidates by minimum duration.
                 tmp_candidates = [
-                    candidate for candidate in tmp_candidates
+                    candidate
+                    for candidate in tmp_candidates
                     if len(candidate) >= minimum_sample_duration
                 ]
                 for candidate in tmp_candidates:

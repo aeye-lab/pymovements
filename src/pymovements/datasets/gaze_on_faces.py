@@ -100,9 +100,7 @@ class GazeOnFaces(DatasetDefinition):
 
     name: str = 'GazeOnFaces'
 
-    mirrors: tuple[str, ...] = (
-        'https://uncloud.univ-nantes.fr/index.php/s/',
-    )
+    mirrors: tuple[str, ...] = ('https://uncloud.univ-nantes.fr/index.php/s/',)
 
     resources: tuple[dict[str, str], ...] = (
         {

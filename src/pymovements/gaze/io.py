@@ -31,21 +31,21 @@ from pymovements.utils.parsing import parse_eyelink
 
 
 def from_csv(
-        file: str | Path,
-        experiment: Experiment | None = None,
-        *,
-        trial_columns: list[str] | None = None,
-        time_column: str | None = None,
-        time_unit: str | None = 'ms',
-        pixel_columns: list[str] | None = None,
-        position_columns: list[str] | None = None,
-        velocity_columns: list[str] | None = None,
-        acceleration_columns: list[str] | None = None,
-        distance_column: str | None = None,
-        column_map: dict[str, str] | None = None,
-        add_columns: dict[str, str] | None = None,
-        column_dtypes: dict[str, Any] | None = None,
-        **read_csv_kwargs: Any,
+    file: str | Path,
+    experiment: Experiment | None = None,
+    *,
+    trial_columns: list[str] | None = None,
+    time_column: str | None = None,
+    time_unit: str | None = 'ms',
+    pixel_columns: list[str] | None = None,
+    position_columns: list[str] | None = None,
+    velocity_columns: list[str] | None = None,
+    acceleration_columns: list[str] | None = None,
+    distance_column: str | None = None,
+    column_map: dict[str, str] | None = None,
+    add_columns: dict[str, str] | None = None,
+    column_dtypes: dict[str, Any] | None = None,
+    **read_csv_kwargs: Any,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
 
@@ -213,26 +213,29 @@ def from_csv(
     # Read data.
     gaze_data = pl.read_csv(file, **read_csv_kwargs)
     if column_map is not None:
-        gaze_data = gaze_data.rename({
-            key: column_map[key] for key in
-            [
-                key for key in column_map.keys()
-                if key in gaze_data.columns
-            ]
-        })
+        gaze_data = gaze_data.rename(
+            {
+                key: column_map[key]
+                for key in [key for key in column_map.keys() if key in gaze_data.columns]
+            },
+        )
 
     if add_columns is not None:
-        gaze_data = gaze_data.with_columns([
-            pl.lit(value).alias(column)
-            for column, value in add_columns.items()
-            if column not in gaze_data.columns
-        ])
+        gaze_data = gaze_data.with_columns(
+            [
+                pl.lit(value).alias(column)
+                for column, value in add_columns.items()
+                if column not in gaze_data.columns
+            ],
+        )
 
     if column_dtypes is not None:
-        gaze_data = gaze_data.with_columns([
-            pl.col(fileinfo_key).cast(fileinfo_dtype)
-            for fileinfo_key, fileinfo_dtype in column_dtypes.items()
-        ])
+        gaze_data = gaze_data.with_columns(
+            [
+                pl.col(fileinfo_key).cast(fileinfo_dtype)
+                for fileinfo_key, fileinfo_dtype in column_dtypes.items()
+            ],
+        )
 
     # Create gaze data frame.
     gaze_df = GazeDataFrame(
@@ -251,13 +254,13 @@ def from_csv(
 
 
 def from_asc(
-        file: str | Path,
-        *,
-        patterns: str | list | None = 'eyelink',
-        schema: dict[str, Any] | None = None,
-        experiment: Experiment | None = None,
-        add_columns: dict[str, str] | None = None,
-        column_dtypes: dict[str, Any] | None = None,
+    file: str | Path,
+    *,
+    patterns: str | list | None = 'eyelink',
+    schema: dict[str, Any] | None = None,
+    experiment: Experiment | None = None,
+    add_columns: dict[str, str] | None = None,
+    column_dtypes: dict[str, Any] | None = None,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
 
@@ -321,17 +324,21 @@ def from_asc(
     gaze_data, _ = parse_eyelink(file, patterns=patterns, schema=schema)
 
     if add_columns is not None:
-        gaze_data = gaze_data.with_columns([
-            pl.lit(value).alias(column)
-            for column, value in add_columns.items()
-            if column not in gaze_data.columns
-        ])
+        gaze_data = gaze_data.with_columns(
+            [
+                pl.lit(value).alias(column)
+                for column, value in add_columns.items()
+                if column not in gaze_data.columns
+            ],
+        )
 
     if column_dtypes is not None:
-        gaze_data = gaze_data.with_columns([
-            pl.col(fileinfo_key).cast(fileinfo_dtype)
-            for fileinfo_key, fileinfo_dtype in column_dtypes.items()
-        ])
+        gaze_data = gaze_data.with_columns(
+            [
+                pl.col(fileinfo_key).cast(fileinfo_dtype)
+                for fileinfo_key, fileinfo_dtype in column_dtypes.items()
+            ],
+        )
 
     # Create gaze data frame.
     gaze_df = GazeDataFrame(
@@ -345,12 +352,12 @@ def from_asc(
 
 
 def from_ipc(
-        file: str | Path,
-        experiment: Experiment | None = None,
-        column_map: dict[str, str] | None = None,
-        add_columns: dict[str, str] | None = None,
-        column_dtypes: dict[str, Any] | None = None,
-        **read_ipc_kwargs: Any,
+    file: str | Path,
+    experiment: Experiment | None = None,
+    column_map: dict[str, str] | None = None,
+    add_columns: dict[str, str] | None = None,
+    column_dtypes: dict[str, Any] | None = None,
+    **read_ipc_kwargs: Any,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
 
@@ -408,26 +415,29 @@ def from_ipc(
     gaze_data = pl.read_ipc(file, **read_ipc_kwargs)
 
     if column_map is not None:
-        gaze_data = gaze_data.rename({
-            key: column_map[key] for key in
-            [
-                key for key in column_map.keys()
-                if key in gaze_data.columns
-            ]
-        })
+        gaze_data = gaze_data.rename(
+            {
+                key: column_map[key]
+                for key in [key for key in column_map.keys() if key in gaze_data.columns]
+            },
+        )
 
     if add_columns is not None:
-        gaze_data = gaze_data.with_columns([
-            pl.lit(value).alias(column)
-            for column, value in add_columns.items()
-            if column not in gaze_data.columns
-        ])
+        gaze_data = gaze_data.with_columns(
+            [
+                pl.lit(value).alias(column)
+                for column, value in add_columns.items()
+                if column not in gaze_data.columns
+            ],
+        )
 
     if column_dtypes is not None:
-        gaze_data = gaze_data.with_columns([
-            pl.col(fileinfo_key).cast(fileinfo_dtype)
-            for fileinfo_key, fileinfo_dtype in column_dtypes.items()
-        ])
+        gaze_data = gaze_data.with_columns(
+            [
+                pl.col(fileinfo_key).cast(fileinfo_dtype)
+                for fileinfo_key, fileinfo_dtype in column_dtypes.items()
+            ],
+        )
 
     # Create gaze data frame.
     gaze_df = GazeDataFrame(

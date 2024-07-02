@@ -32,12 +32,12 @@ from pymovements.utils.filters import filter_candidates_remove_nans
 
 @register_event_detection
 def ivt(
-        velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
-        timesteps: list[int] | np.ndarray | None = None,
-        minimum_duration: int = 100,
-        velocity_threshold: float = 20.0,
-        include_nan: bool = False,
-        name: str = 'fixation',
+    velocities: list[list[float]] | list[tuple[float, float]] | np.ndarray,
+    timesteps: list[int] | np.ndarray | None = None,
+    minimum_duration: int = 100,
+    velocity_threshold: float = 20.0,
+    include_nan: bool = False,
+    name: str = 'fixation',
 ) -> EventDataFrame:
     """Identification of fixations based on velocity-threshold (I-VT).
 
@@ -120,7 +120,8 @@ def ivt(
 
     # Filter all candidates by minimum duration.
     candidates = [
-        candidate for candidate in candidates
+        candidate
+        for candidate in candidates
         if timesteps[candidate[-1]] - timesteps[candidate[0]] >= minimum_duration
     ]
 

@@ -53,9 +53,9 @@ class Dataset:
     """
 
     def __init__(
-            self,
-            definition: str | DatasetDefinition | type[DatasetDefinition],
-            path: str | Path | DatasetPaths,
+        self,
+        definition: str | DatasetDefinition | type[DatasetDefinition],
+        path: str | Path | DatasetPaths,
     ):
         self.fileinfo: pl.DataFrame = pl.DataFrame()
         self.gaze: list[GazeDataFrame] = []
@@ -75,13 +75,13 @@ class Dataset:
         self.paths.fill_name(self.definition.name)
 
     def load(
-            self,
-            events: bool = False,
-            preprocessed: bool = False,
-            subset: dict[str, float | int | str | list[float | int | str]] | None = None,
-            events_dirname: str | None = None,
-            preprocessed_dirname: str | None = None,
-            extension: str = 'feather',
+        self,
+        events: bool = False,
+        preprocessed: bool = False,
+        subset: dict[str, float | int | str | list[float | int | str]] | None = None,
+        events_dirname: str | None = None,
+        preprocessed_dirname: str | None = None,
+        extension: str = 'feather',
     ) -> Dataset:
         """Parse file information and load all gaze files.
 
@@ -122,7 +122,8 @@ class Dataset:
         self.fileinfo = dataset_files.take_subset(fileinfo=self.fileinfo, subset=subset)
 
         self.load_gaze_files(
-            preprocessed=preprocessed, preprocessed_dirname=preprocessed_dirname,
+            preprocessed=preprocessed,
+            preprocessed_dirname=preprocessed_dirname,
             extension=extension,
         )
 
@@ -153,10 +154,10 @@ class Dataset:
         return self
 
     def load_gaze_files(
-            self,
-            preprocessed: bool = False,
-            preprocessed_dirname: str | None = None,
-            extension: str = 'feather',
+        self,
+        preprocessed: bool = False,
+        preprocessed_dirname: str | None = None,
+        extension: str = 'feather',
     ) -> Dataset:
         """Load all available gaze data files.
 
@@ -198,9 +199,9 @@ class Dataset:
         return self
 
     def load_event_files(
-            self,
-            events_dirname: str | None = None,
-            extension: str = 'feather',
+        self,
+        events_dirname: str | None = None,
+        extension: str = 'feather',
     ) -> Dataset:
         """Load all available event files.
 
@@ -238,11 +239,11 @@ class Dataset:
         return self
 
     def apply(
-            self,
-            function: str,
-            *,
-            verbose: bool = True,
-            **kwargs: Any,
+        self,
+        function: str,
+        *,
+        verbose: bool = True,
+        **kwargs: Any,
     ) -> Dataset:
         """Apply preprocessing method to all GazeDataFrames in Dataset.
 
@@ -297,14 +298,14 @@ class Dataset:
         return self
 
     def clip(
-            self,
-            lower_bound: int | float | None,
-            upper_bound: int | float | None,
-            *,
-            input_column: str,
-            output_column: str,
-            verbose: bool = True,
-            **kwargs: Any,
+        self,
+        lower_bound: int | float | None,
+        upper_bound: int | float | None,
+        *,
+        input_column: str,
+        output_column: str,
+        verbose: bool = True,
+        **kwargs: Any,
     ) -> Dataset:
         """Clip gaze signal values.
 
@@ -418,12 +419,12 @@ class Dataset:
         )
 
     def pos2acc(
-            self,
-            *,
-            degree: int = 2,
-            window_length: int = 7,
-            padding: str | float | int | None = 'nearest',
-            verbose: bool = True,
+        self,
+        *,
+        degree: int = 2,
+        window_length: int = 7,
+        padding: str | float | int | None = 'nearest',
+        verbose: bool = True,
     ) -> Dataset:
         """Compute gaze accelerations in dva/s^2 from dva coordinates.
 
@@ -462,11 +463,11 @@ class Dataset:
         )
 
     def pos2vel(
-            self,
-            method: str = 'fivepoint',
-            *,
-            verbose: bool = True,
-            **kwargs: Any,
+        self,
+        method: str = 'fivepoint',
+        *,
+        verbose: bool = True,
+        **kwargs: Any,
     ) -> Dataset:
         """Compute gaze velocites in dva/s from dva coordinates.
 
@@ -498,13 +499,13 @@ class Dataset:
         return self.apply('pos2vel', method=method, verbose=verbose, **kwargs)
 
     def detect_events(
-            self,
-            method: Callable[..., EventDataFrame] | str,
-            *,
-            eye: str = 'auto',
-            clear: bool = False,
-            verbose: bool = True,
-            **kwargs: Any,
+        self,
+        method: Callable[..., EventDataFrame] | str,
+        *,
+        eye: str = 'auto',
+        clear: bool = False,
+        verbose: bool = True,
+        **kwargs: Any,
     ) -> Dataset:
         """Detect events by applying a specific event detection method.
 
@@ -543,13 +544,13 @@ class Dataset:
         )
 
     def detect(
-            self,
-            method: Callable[..., EventDataFrame] | str,
-            *,
-            eye: str = 'auto',
-            clear: bool = False,
-            verbose: bool = True,
-            **kwargs: Any,
+        self,
+        method: Callable[..., EventDataFrame] | str,
+        *,
+        eye: str = 'auto',
+        clear: bool = False,
+        verbose: bool = True,
+        **kwargs: Any,
     ) -> Dataset:
         """Detect events by applying a specific event detection method.
 
@@ -588,7 +589,8 @@ class Dataset:
 
         disable_progressbar = not verbose
         for file_id, (gaze, fileinfo_row) in tqdm(
-                enumerate(zip(self.gaze, self.fileinfo.to_dicts())), disable=disable_progressbar,
+            enumerate(zip(self.gaze, self.fileinfo.to_dicts())),
+            disable=disable_progressbar,
         ):
             gaze.detect(method, eye=eye, clear=clear, **kwargs)
             # workaround until events are fully part of the GazeDataFrame
@@ -601,11 +603,10 @@ class Dataset:
         return self
 
     def compute_event_properties(
-            self,
-            event_properties: str | tuple[str, dict[str, Any]]
-            | list[str | tuple[str, dict[str, Any]]],
-            name: str | None = None,
-            verbose: bool = True,
+        self,
+        event_properties: str | tuple[str, dict[str, Any]] | list[str | tuple[str, dict[str, Any]]],
+        name: str | None = None,
+        verbose: bool = True,
     ) -> Dataset:
         """Calculate an event property for and add it as a column to the event dataframe.
 
@@ -638,7 +639,10 @@ class Dataset:
         disable_progressbar = not verbose
         for events, gaze in tqdm(zip(self.events, self.gaze), disable=disable_progressbar):
             new_properties = processor.process(
-                events, gaze, identifiers=identifier_columns, name=name,
+                events,
+                gaze,
+                identifiers=identifier_columns,
+                name=name,
             )
             join_on = identifier_columns + ['name', 'onset', 'offset']
             events.add_event_properties(new_properties, join_on=join_on)
@@ -646,11 +650,10 @@ class Dataset:
         return self
 
     def compute_properties(
-            self,
-            event_properties: str | tuple[str, dict[str, Any]]
-            | list[str | tuple[str, dict[str, Any]]],
-            name: str | None = None,
-            verbose: bool = True,
+        self,
+        event_properties: str | tuple[str, dict[str, Any]] | list[str | tuple[str, dict[str, Any]]],
+        name: str | None = None,
+        verbose: bool = True,
     ) -> Dataset:
         """Calculate an event property for and add it as a column to the event dataframe.
 
@@ -699,11 +702,11 @@ class Dataset:
         return self
 
     def save(
-            self,
-            events_dirname: str | None = None,
-            preprocessed_dirname: str | None = None,
-            verbose: int = 1,
-            extension: str = 'feather',
+        self,
+        events_dirname: str | None = None,
+        preprocessed_dirname: str | None = None,
+        verbose: int = 1,
+        extension: str = 'feather',
     ) -> Dataset:
         """Save preprocessed gaze and event files.
 
@@ -736,10 +739,10 @@ class Dataset:
         return self
 
     def save_events(
-            self,
-            events_dirname: str | None = None,
-            verbose: int = 1,
-            extension: str = 'feather',
+        self,
+        events_dirname: str | None = None,
+        verbose: int = 1,
+        extension: str = 'feather',
     ) -> Dataset:
         """Save events to files.
 
@@ -780,10 +783,10 @@ class Dataset:
         return self
 
     def save_preprocessed(
-            self,
-            preprocessed_dirname: str | None = None,
-            verbose: int = 1,
-            extension: str = 'feather',
+        self,
+        preprocessed_dirname: str | None = None,
+        verbose: int = 1,
+        extension: str = 'feather',
     ) -> Dataset:
         """Save preprocessed gaze files.
 
@@ -824,11 +827,11 @@ class Dataset:
         return self
 
     def download(
-            self,
-            *,
-            extract: bool = True,
-            remove_finished: bool = False,
-            verbose: int = 1,
+        self,
+        *,
+        extract: bool = True,
+        remove_finished: bool = False,
+        verbose: int = 1,
     ) -> Dataset:
         """Download dataset resources.
 
@@ -876,10 +879,10 @@ class Dataset:
         return self
 
     def extract(
-            self,
-            remove_finished: bool = False,
-            remove_top_level: bool = True,
-            verbose: int = 1,
+        self,
+        remove_finished: bool = False,
+        remove_top_level: bool = True,
+        verbose: int = 1,
     ) -> Dataset:
         """Extract downloaded dataset archive files.
 

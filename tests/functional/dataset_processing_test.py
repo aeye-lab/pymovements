@@ -77,7 +77,6 @@ def fixture_dataset_init_kwargs(request):
             time_column=pm.datasets.SBSAT().time_column,
             time_unit=pm.datasets.SBSAT().time_unit,
             filename_format_dtypes={},
-
         ),
         'gaze_on_faces': pm.datasets.GazeOnFaces(
             filename_format='gaze_on_faces_example.csv',
@@ -121,7 +120,6 @@ def fixture_dataset_init_kwargs(request):
             filename_format_dtypes={},
             trial_columns=None,
         ),
-
     }
     yield pm.dataset.Dataset(
         definition=init_param_dict[request.param],

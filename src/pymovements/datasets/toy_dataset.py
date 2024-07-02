@@ -96,9 +96,7 @@ class ToyDataset(DatasetDefinition):
 
     name: str = 'ToyDataset'
 
-    mirrors: tuple[str, ...] = (
-        'http://github.com/aeye-lab/pymovements-toy-dataset/zipball/',
-    )
+    mirrors: tuple[str, ...] = ('http://github.com/aeye-lab/pymovements-toy-dataset/zipball/',)
 
     resources: tuple[dict[str, str], ...] = (
         {

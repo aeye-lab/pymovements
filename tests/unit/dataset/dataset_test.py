@@ -77,9 +77,11 @@ def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
 
     fileinfo = pl.DataFrame(data={'subject_id': subject_ids}, schema={'subject_id': pl.Int64})
 
-    fileinfo = fileinfo.with_columns([
-        pl.format('{}.' + raw_fileformat, 'subject_id').alias('filepath'),
-    ])
+    fileinfo = fileinfo.with_columns(
+        [
+            pl.format('{}.' + raw_fileformat, 'subject_id').alias('filepath'),
+        ],
+    )
 
     fileinfo = fileinfo.sort(by='filepath')
 
@@ -130,7 +132,12 @@ def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
                 },
             )
             pixel_columns = [
-                'x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix', 'x_avg_pix', 'y_avg_pix',
+                'x_left_pix',
+                'y_left_pix',
+                'x_right_pix',
+                'y_right_pix',
+                'x_avg_pix',
+                'y_avg_pix',
             ]
 
         elif eyes == 'left':
@@ -182,12 +189,14 @@ def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
             )
             pixel_columns = ['x_pix', 'y_pix']
         else:
-            raise ValueError(f'invalid value for eyes: {eyes}')
+            raise ValueError(f"invalid value for eyes: {eyes}")
 
         if remote:
-            gaze_df = gaze_df.with_columns([
-                pl.lit(680.).alias('distance'),
-            ])
+            gaze_df = gaze_df.with_columns(
+                [
+                    pl.lit(680.0).alias('distance'),
+                ],
+            )
 
             distance_column = 'distance'
             distance_cm = None
@@ -200,10 +209,7 @@ def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
     create_raw_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath / 'raw')
 
     # Create GazeDataFrames for passing as ground truth
-    gaze_dfs = [
-        pm.GazeDataFrame(gaze_df, pixel_columns=pixel_columns)
-        for gaze_df in gaze_dfs
-    ]
+    gaze_dfs = [pm.GazeDataFrame(gaze_df, pixel_columns=pixel_columns) for gaze_df in gaze_dfs]
 
     preprocessed_gaze_dfs = []
     for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
@@ -238,7 +244,9 @@ def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
         preprocessed_gaze_dfs.append(gaze_df)
 
     create_preprocessed_gaze_files_from_fileinfo(
-        preprocessed_gaze_dfs, fileinfo, rootpath / 'preprocessed',
+        preprocessed_gaze_dfs,
+        fileinfo,
+        rootpath / 'preprocessed',
     )
 
     event_dfs = []
@@ -316,7 +324,7 @@ def fixture_dataset(request, tmp_path):
     elif request.param == 'ToyRemote':
         dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='both', remote=True)
     else:
-        raise ValueError(f'{request.param} not supported as dataset mock')
+        raise ValueError(f"{request.param} not supported as dataset mock")
 
     yield dataset_dict
 
@@ -565,7 +573,8 @@ def test_deg2pix(dataset_configuration):
     dataset.deg2pix(pixel_column='new_pixel')
 
     expected_schema = {
-        **original_schema, 'position': pl.List(pl.Float64),
+        **original_schema,
+        'position': pl.List(pl.Float64),
         'new_pixel': pl.List(pl.Float64),
     }
     for result_gaze_df in dataset.gaze:
@@ -689,7 +698,9 @@ def test_detect_events_auto_eye(detect_event_kwargs, dataset_configuration):
     dataset.detect_events(**detect_event_kwargs)
 
     expected_schema = {
-        'subject_id': pl.Int64, **pm.events.EventDataFrame._minimal_schema, 'duration': pl.Int64,
+        'subject_id': pl.Int64,
+        **pm.events.EventDataFrame._minimal_schema,
+        'duration': pl.Int64,
     }
     for result_event_df in dataset.events:
         assert result_event_df.schema == expected_schema
@@ -787,8 +798,10 @@ def test_detect_events_explicit_eye(detect_event_kwargs, dataset_configuration):
     ],
 )
 def test_detect_events_multiple_calls(
-        detect_event_kwargs_1, detect_event_kwargs_2,
-        expected_schema, dataset_configuration,
+    detect_event_kwargs_1,
+    detect_event_kwargs_2,
+    expected_schema,
+    dataset_configuration,
 ):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
@@ -877,7 +890,10 @@ def test_detect_events_attribute_error(dataset_configuration):
     ],
 )
 def test_detect_events_raises_column_not_found_error(
-        dataset_configuration, rename_arg, detect_event_kwargs, expected_message,
+    dataset_configuration,
+    rename_arg,
+    detect_event_kwargs,
+    expected_message,
 ):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
@@ -890,7 +906,7 @@ def test_detect_events_raises_column_not_found_error(
     with pytest.raises(pl.exceptions.ColumnNotFoundError) as excinfo:
         dataset.detect_events(**detect_event_kwargs)
 
-    msg, = excinfo.value.args
+    (msg,) = excinfo.value.args
     assert msg == expected_message
 
 
@@ -962,11 +978,11 @@ def test_clear_events(events_init, events_expected, tmp_path):
     ],
 )
 def test_save_events(
-        detect_event_kwargs,
-        events_dirname,
-        expected_save_dirpath,
-        save_kwargs,
-        dataset_configuration,
+    detect_event_kwargs,
+    events_dirname,
+    expected_save_dirpath,
+    save_kwargs,
+    dataset_configuration,
 ):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
@@ -980,9 +996,9 @@ def test_save_events(
     shutil.rmtree(dataset.path / Path(expected_save_dirpath), ignore_errors=True)
     dataset.save_events(events_dirname, **save_kwargs)
 
-    assert (dataset.path / expected_save_dirpath).is_dir(), (
-        f'data was not written to {dataset.path / Path(expected_save_dirpath)}'
-    )
+    assert (
+        dataset.path / expected_save_dirpath
+    ).is_dir(), f"data was not written to {dataset.path / Path(expected_save_dirpath)}"
 
 
 @pytest.mark.parametrize(
@@ -1012,11 +1028,11 @@ def test_save_events(
     ],
 )
 def test_load_previously_saved_events_gaze(
-        detect_event_kwargs,
-        events_dirname,
-        expected_save_dirpath,
-        load_save_kwargs,
-        dataset_configuration,
+    detect_event_kwargs,
+    events_dirname,
+    expected_save_dirpath,
+    load_save_kwargs,
+    dataset_configuration,
 ):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
@@ -1058,7 +1074,9 @@ def test_load_previously_saved_events_gaze(
     ],
 )
 def test_save_preprocessed_directory_exists(
-        preprocessed_dirname, expected_save_dirpath, dataset_configuration,
+    preprocessed_dirname,
+    expected_save_dirpath,
+    dataset_configuration,
 ):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
@@ -1072,9 +1090,9 @@ def test_save_preprocessed_directory_exists(
     shutil.rmtree(dataset.path / Path(expected_save_dirpath), ignore_errors=True)
     dataset.save_preprocessed(preprocessed_dirname)
 
-    assert (dataset.path / expected_save_dirpath).is_dir(), (
-        f'data was not written to {dataset.path / Path(expected_save_dirpath)}'
-    )
+    assert (
+        dataset.path / expected_save_dirpath
+    ).is_dir(), f"data was not written to {dataset.path / Path(expected_save_dirpath)}"
 
 
 @pytest.mark.parametrize(
@@ -1102,9 +1120,9 @@ def test_save_preprocessed(dataset_configuration, drop_column):
     dataset.save_preprocessed(preprocessed_dirname, extension='csv')
     dataset.load_gaze_files(True, preprocessed_dirname, extension='csv')
 
-    assert (dataset.path / preprocessed_dirname).is_dir(), (
-        f'data was not written to {dataset.path / Path(preprocessed_dirname)}'
-    )
+    assert (
+        dataset.path / preprocessed_dirname
+    ).is_dir(), f"data was not written to {dataset.path / Path(preprocessed_dirname)}"
 
 
 @pytest.mark.parametrize(
@@ -1174,10 +1192,10 @@ def test_save_preprocessed_has_no_side_effect(dataset_configuration, drop_column
     ],
 )
 def test_save_creates_correct_directory(
-        expected_save_preprocessed_path,
-        expected_save_events_path,
-        save_kwargs,
-        dataset_configuration,
+    expected_save_preprocessed_path,
+    expected_save_events_path,
+    save_kwargs,
+    dataset_configuration,
 ):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
@@ -1196,12 +1214,12 @@ def test_save_creates_correct_directory(
     shutil.rmtree(dataset.path / Path(expected_save_events_path), ignore_errors=True)
     dataset.save(**save_kwargs)
 
-    assert (dataset.path / Path(expected_save_preprocessed_path)).is_dir(), (
-        f'data was not written to {dataset.path / Path(expected_save_preprocessed_path)}'
-    )
-    assert (dataset.path / Path(expected_save_events_path)).is_dir(), (
-        f'data was not written to {dataset.path / Path(expected_save_events_path)}'
-    )
+    assert (
+        dataset.path / Path(expected_save_preprocessed_path)
+    ).is_dir(), f"data was not written to {dataset.path / Path(expected_save_preprocessed_path)}"
+    assert (
+        dataset.path / Path(expected_save_events_path)
+    ).is_dir(), f"data was not written to {dataset.path / Path(expected_save_events_path)}"
 
 
 @pytest.mark.parametrize(
@@ -1222,10 +1240,10 @@ def test_save_creates_correct_directory(
     ],
 )
 def test_save_files_have_correct_extension(
-        expected_save_preprocessed_path,
-        expected_save_events_path,
-        save_kwargs,
-        dataset_configuration,
+    expected_save_preprocessed_path,
+    expected_save_events_path,
+    save_kwargs,
+    dataset_configuration,
 ):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load()
@@ -1250,17 +1268,17 @@ def test_save_files_have_correct_extension(
     preprocessed_file_list = os.listdir(preprocessed_dir)
     extension_list = [a.endswith(extension) for a in preprocessed_file_list]
     extension_sum = sum(extension_list)
-    assert extension_sum == len(preprocessed_file_list), (
-        f'not all preprocessed files created have correct extension {extension}'
-    )
+    assert extension_sum == len(
+        preprocessed_file_list,
+    ), f"not all preprocessed files created have correct extension {extension}"
 
     events_dir = dataset.path / Path(expected_save_events_path)
     events_file_list = os.listdir(events_dir)
     extension_list = [a.endswith(extension) for a in events_file_list]
     extension_sum = sum(extension_list)
-    assert extension_sum == len(events_file_list), (
-        f'not all events files created have correct extension {extension}'
-    )
+    assert extension_sum == len(
+        events_file_list,
+    ), f"not all events files created have correct extension {extension}"
 
 
 @pytest.mark.parametrize(
@@ -1406,7 +1424,10 @@ def test_velocity_columns(dataset_configuration):
     ],
 )
 def test_event_dataframe_add_property_raises_exceptions(
-        dataset_configuration, property_kwargs, exception, msg_substrings,
+    dataset_configuration,
+    property_kwargs,
+    exception,
+    msg_substrings,
 ):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True)
@@ -1414,7 +1435,7 @@ def test_event_dataframe_add_property_raises_exceptions(
     with pytest.raises(exception) as excinfo:
         dataset.compute_event_properties(**property_kwargs)
 
-    msg, = excinfo.value.args
+    (msg,) = excinfo.value.args
     for msg_substring in msg_substrings:
         assert msg_substring.lower() in msg.lower()
 
@@ -1463,7 +1484,9 @@ def test_event_dataframe_add_property_has_expected_height(dataset_configuration,
     ],
 )
 def test_event_dataframe_add_property_has_expected_schema(
-        dataset_configuration, property_kwargs, expected_schema,
+    dataset_configuration,
+    property_kwargs,
+    expected_schema,
 ):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True)
@@ -1502,7 +1525,9 @@ def test_event_dataframe_add_property_has_expected_schema(
     ],
 )
 def test_event_dataframe_add_property_effect_property_columns(
-        dataset_configuration, property_kwargs, expected_property_columns,
+    dataset_configuration,
+    property_kwargs,
+    expected_property_columns,
 ):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True)
@@ -1518,13 +1543,17 @@ def test_event_dataframe_add_property_effect_property_columns(
     [
         pytest.param(
             {'event_properties': 'peak_velocity', 'name': 'taccade'},
-            RuntimeError, 'No events with name "taccade" found in data frame',
+            RuntimeError,
+            'No events with name "taccade" found in data frame',
             id='name_missing',
         ),
     ],
 )
 def test_event_dataframe_add_property_raises_exception(
-        dataset_configuration, property_kwargs, exception, exception_msg,
+    dataset_configuration,
+    property_kwargs,
+    exception,
+    exception_msg,
 ):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True)
@@ -1532,7 +1561,7 @@ def test_event_dataframe_add_property_raises_exception(
     with pytest.raises(exception) as excinfo:
         dataset.compute_event_properties(**property_kwargs)
 
-    msg, = excinfo.value.args
+    (msg,) = excinfo.value.args
     assert msg == exception_msg
 
 
@@ -1554,7 +1583,8 @@ def test_event_dataframe_add_property_raises_exception(
     ],
 )
 def test_event_dataframe_add_property_does_not_change_length(
-        dataset_configuration, property_kwargs,
+    dataset_configuration,
+    property_kwargs,
 ):
     dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True)
@@ -1574,7 +1604,8 @@ def test_event_dataframe_add_property_does_not_change_length(
                 'event_properties': 'peak_velocity',
                 'name': None,
                 'verbose': True,
-            }, id='peak_velocity',
+            },
+            id='peak_velocity',
         ),
     ],
 )

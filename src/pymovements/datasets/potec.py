@@ -108,9 +108,7 @@ class PoTeC(DatasetDefinition):
 
     name: str = 'PoTeC'
 
-    mirrors: tuple[str, ...] = (
-        'https://osf.io/download/',
-    )
+    mirrors: tuple[str, ...] = ('https://osf.io/download/',)
 
     resources: tuple[dict[str, str], ...] = (
         {
@@ -149,7 +147,8 @@ class PoTeC(DatasetDefinition):
 
     pixel_columns: list[str] = field(
         default_factory=lambda: [
-            'x', 'y',
+            'x',
+            'y',
         ],
     )
 

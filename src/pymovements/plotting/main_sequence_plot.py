@@ -29,16 +29,16 @@ from pymovements.events import EventDataFrame
 
 
 def main_sequence_plot(
-        event_df: EventDataFrame,
-        marker_size: float = 25,
-        color: str = 'purple',
-        alpha: float = 0.5,
-        marker: str = 'o',
-        figsize: tuple[int, int] = (15, 5),
-        title: str | None = None,
-        savepath: str | None = None,
-        show: bool = True,
-        **kwargs: Collection,
+    event_df: EventDataFrame,
+    marker_size: float = 25,
+    color: str = 'purple',
+    alpha: float = 0.5,
+    marker: str = 'o',
+    figsize: tuple[int, int] = (15, 5),
+    title: str | None = None,
+    savepath: str | None = None,
+    show: bool = True,
+    **kwargs: Collection,
 ) -> None:
     """Plot the saccade main sequence.
 

@@ -76,7 +76,7 @@ class EventDetectionLibrary:
 
 
 def register_event_detection(
-        method: Callable[..., EventDataFrame],
+    method: Callable[..., EventDataFrame],
 ) -> Callable[..., EventDataFrame]:
     """Register an event detection method.
 

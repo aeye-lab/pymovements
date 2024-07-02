@@ -54,7 +54,8 @@ class EventProcessor:
             if property_name not in EVENT_PROPERTIES:
                 valid_properties = list(EVENT_PROPERTIES.keys())
                 raise InvalidProperty(
-                    property_name=property_name, valid_properties=valid_properties,
+                    property_name=property_name,
+                    valid_properties=valid_properties,
                 )
 
         self.event_properties = event_properties
@@ -108,9 +109,8 @@ class EventGazeProcessor:
     """
 
     def __init__(
-            self,
-            event_properties: str | tuple[str, dict[str, Any]]
-            | list[str | tuple[str, dict[str, Any]]],
+        self,
+        event_properties: str | tuple[str, dict[str, Any]] | list[str | tuple[str, dict[str, Any]]],
     ):
         if isinstance(event_properties, (str, tuple)):
             event_properties = [event_properties]
@@ -127,7 +127,8 @@ class EventGazeProcessor:
             if property_name not in EVENT_PROPERTIES:
                 valid_properties = list(EVENT_PROPERTIES.keys())
                 raise InvalidProperty(
-                    property_name=property_name, valid_properties=valid_properties,
+                    property_name=property_name,
+                    valid_properties=valid_properties,
                 )
 
             event_properties_with_kwargs.append((property_name, property_kwargs))
@@ -135,11 +136,11 @@ class EventGazeProcessor:
         self.event_properties: list[tuple[str, dict[str, Any]]] = event_properties_with_kwargs
 
     def process(
-            self,
-            events: EventDataFrame,
-            gaze: pm.GazeDataFrame,
-            identifiers: str | list[str],
-            name: str | None = None,
+        self,
+        events: EventDataFrame,
+        gaze: pm.GazeDataFrame,
+        identifiers: str | list[str],
+        name: str | None = None,
     ) -> pl.DataFrame:
         """Process event and gaze dataframe.
 
@@ -203,21 +204,20 @@ class EventGazeProcessor:
 
         joined_frame = gaze.frame.join(events.frame, on=trial_identifiers)
         if name is not None:
-            joined_frame = joined_frame.filter(pl.col('name').str.contains(f'^{name}$'))
+            joined_frame = joined_frame.filter(pl.col('name').str.contains(f"^{name}$"))
 
         if len(joined_frame) == 0:
             raise RuntimeError(f'No events with name "{name}" found in data frame')
 
         result = (
-            joined_frame
-            .filter(pl.col('time').is_between(pl.col('onset'), pl.col('offset')))
+            joined_frame.filter(pl.col('time').is_between(pl.col('onset'), pl.col('offset')))
             .group_by(event_identifiers, maintain_order=True)
             .agg(
                 [
-                    this_property_expression(**this_property_kwargs)
-                    .alias(this_property_name)
-                    for this_property_name, this_property_expression, this_property_kwargs,
-                    in zip(property_names, property_expressions, property_kwargs)
+                    this_property_expression(**this_property_kwargs).alias(this_property_name)
+                    for this_property_name, this_property_expression, this_property_kwargs in zip(
+                        property_names, property_expressions, property_kwargs,
+                    )
                 ],
             )
         )
