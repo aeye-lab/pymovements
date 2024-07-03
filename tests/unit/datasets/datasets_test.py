@@ -66,5 +66,5 @@ def test_public_dataset_registered_correct_attributes(dataset_definition_class):
     assert dataset_definition.resources == registered_definition.resources
     assert dataset_definition.experiment == registered_definition.experiment
     assert dataset_definition.filename_format == registered_definition.filename_format
-    assert dataset_definition.filename_format_dtypes == registered_definition.filename_format_dtypes
+    assert dataset_definition.filename_format_schema_overrides == registered_definition.filename_format_schema_overrides
     assert dataset_definition.custom_read_kwargs == registered_definition.custom_read_kwargs

@@ -64,7 +64,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_dtypes : dict[str, type], optional
+    filename_format_schema_overrides : dict[str, type], optional
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -127,7 +127,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
 
     filename_format: str = r'subject_{subject_id:d}_session_{session_id:d}.asc'
 
-    filename_format_dtypes: dict[str, type] = field(
+    filename_format_schema_overrides: dict[str, type] = field(
         default_factory=lambda: {
             'subject_id': int,
             'session_id': int,

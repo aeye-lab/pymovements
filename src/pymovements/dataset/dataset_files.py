@@ -77,7 +77,7 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
 
     fileinfo_df = fileinfo_df.with_columns([
         pl.col(fileinfo_key).cast(fileinfo_dtype)
-        for fileinfo_key, fileinfo_dtype in definition.filename_format_dtypes.items()
+        for fileinfo_key, fileinfo_dtype in definition.filename_format_schema_overrides.items()
     ])
 
     return fileinfo_df
@@ -277,7 +277,7 @@ def load_gaze_file(
                 trial_columns=definition.trial_columns,
                 time_unit=time_unit,
                 add_columns=add_columns,
-                column_dtypes=definition.filename_format_dtypes,
+                column_schema_overrides=definition.filename_format_schema_overrides,
             )
 
             # suffixes as ordered after using GazeDataFrame.unnest()
@@ -325,7 +325,7 @@ def load_gaze_file(
                 trial_columns=definition.trial_columns,
                 column_map=definition.column_map,
                 add_columns=add_columns,
-                column_dtypes=definition.filename_format_dtypes,
+                column_schema_overrides=definition.filename_format_schema_overrides,
                 **custom_read_kwargs,
             )
     elif filepath.suffix == '.feather':
@@ -333,14 +333,14 @@ def load_gaze_file(
             filepath,
             experiment=definition.experiment,
             add_columns=add_columns,
-            column_dtypes=definition.filename_format_dtypes,
+            column_schema_overrides=definition.filename_format_schema_overrides,
         )
     elif filepath.suffix == '.asc':
         gaze_df = from_asc(
             filepath,
             experiment=definition.experiment,
             add_columns=add_columns,
-            column_dtypes=definition.filename_format_dtypes,
+            column_schema_overrides=definition.filename_format_schema_overrides,
             **custom_read_kwargs,
         )
     else:
@@ -385,7 +385,7 @@ def add_fileinfo(
     # Cast columns from fileinfo according to specification.
     df = df.with_columns([
         pl.col(fileinfo_key).cast(fileinfo_dtype)
-        for fileinfo_key, fileinfo_dtype in definition.filename_format_dtypes.items()
+        for fileinfo_key, fileinfo_dtype in definition.filename_format_schema_overrides.items()
     ])
     return df
 

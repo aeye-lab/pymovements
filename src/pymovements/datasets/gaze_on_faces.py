@@ -67,7 +67,7 @@ class GazeOnFaces(DatasetDefinition):
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_dtypes : dict[str, type], optional
+    filename_format_schema_overrides : dict[str, type], optional
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -124,7 +124,7 @@ class GazeOnFaces(DatasetDefinition):
 
     filename_format: str = r'gaze_sub{sub_id:d}_trial{trial_id:d}.csv'
 
-    filename_format_dtypes: dict[str, type] = field(
+    filename_format_schema_overrides: dict[str, type] = field(
         default_factory=lambda: {
             'sub_id': int,
             'trial_id': int,
@@ -146,6 +146,6 @@ class GazeOnFaces(DatasetDefinition):
             'separator': ',',
             'has_header': False,
             'new_columns': ['x', 'y'],
-            'dtypes': [pl.Float32, pl.Float32],
+            'schema_overrides': [pl.Float32, pl.Float32],
         },
     )

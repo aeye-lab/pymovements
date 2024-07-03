@@ -71,7 +71,7 @@ class GazeBase(DatasetDefinition):
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_dtypes : dict[str, type], optional
+    filename_format_schema_overrides : dict[str, type], optional
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -132,7 +132,7 @@ class GazeBase(DatasetDefinition):
         r'_{task_name}.csv'
     )
 
-    filename_format_dtypes: dict[str, type] = field(
+    filename_format_schema_overrides: dict[str, type] = field(
         default_factory=lambda: {
             'round_id': int,
             'subject_id': int,
@@ -161,7 +161,7 @@ class GazeBase(DatasetDefinition):
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
             'null_values': 'NaN',
-            'dtypes': {
+            'schema_overrides': {
                 'n': pl.Int64,
                 'x': pl.Float32,
                 'y': pl.Float32,
