@@ -63,7 +63,7 @@ class ToyDataset(DatasetDefinition):
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_dtypes : dict[str, type], optional
+    filename_format_schema_overrides : dict[str, type], optional
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -120,7 +120,7 @@ class ToyDataset(DatasetDefinition):
 
     filename_format: str = r'trial_{text_id:d}_{page_id:d}.csv'
 
-    filename_format_dtypes: dict[str, type] = field(
+    filename_format_schema_overrides: dict[str, type] = field(
         default_factory=lambda: {
             'text_id': int,
             'page_id': int,
@@ -140,7 +140,7 @@ class ToyDataset(DatasetDefinition):
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
             'columns': ['timestamp', 'x', 'y', 'stimuli_x', 'stimuli_y'],
-            'dtypes': {
+            'schema_overrides': {
                 'timestamp': pl.Float32,
                 'x': pl.Float32,
                 'y': pl.Float32,

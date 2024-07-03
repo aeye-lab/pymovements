@@ -26,7 +26,7 @@ import numpy as np
 import polars as pl
 import pytest
 from matplotlib import figure
-from polars import ColumnNotFoundError
+from polars.exceptions import ColumnNotFoundError
 
 from pymovements.gaze import Experiment
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
