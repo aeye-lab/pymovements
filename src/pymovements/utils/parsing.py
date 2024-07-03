@@ -31,7 +31,7 @@ import numpy as np
 import polars as pl
 
 EYE_TRACKING_SAMPLE = re.compile(
-    r'(?P<time>(\d+))\s+'
+    r'(?P<time>(\d+[.]?\d*))\s+'
     r'(?P<x_pix>[-]?\d*[.]\d*)\s+'
     r'(?P<y_pix>[-]?\d*[.]\d*)\s+'
     r'(?P<pupil>\d*[.]\d*)\s+'
@@ -47,10 +47,10 @@ EYELINK_META_REGEXES = [
     },
     {'pattern': r'\*\*\s+(?P<version_2>EYELINK.*)'},
     {
-        'pattern': r'MSG\s+\d+\s+DISPLAY_COORDS\s+(?P<resolution>.*)',
+        'pattern': r'MSG\s+\d+[.]?\d*\s+DISPLAY_COORDS\s+(?P<resolution>.*)',
     },
     {
-        'pattern': r'MSG\s+\d+\s+RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+'
+        'pattern': r'MSG\s+\d+[.]?\d*\s+RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+'
                    r'(?P<sampling_rate>\d+)\s+'
                    r'(?P<file_sample_filter>(0|1|2))\s+'
                    r'(?P<link_sample_filter>(0|1|2))\s+'
@@ -60,12 +60,12 @@ EYELINK_META_REGEXES = [
         'pattern': r'PUPIL\s+(?P<pupil_data_type>(AREA|DIAMETER))\s*',
     },
     {
-        'pattern': r'MSG\s+\d+\s+ELCLCFG\s+(?P<mount_configuration>.*)',
+        'pattern': r'MSG\s+\d+[.]?\d*\s+ELCLCFG\s+(?P<mount_configuration>.*)',
     },
 ]
 
 VALIDATION_REGEX = (
-    r'MSG\s+(?P<timestamp>\d+)\s+!CAL\s+VALIDATION\s+HV'
+    r'MSG\s+(?P<timestamp>\d+[.]?\d*)\s+!CAL\s+VALIDATION\s+HV'
     r'(?P<num_points>\d\d?).*'
     r'(?P<tracked_eye>LEFT|RIGHT)\s+'
     r'(?P<error>\D*)\s+'
@@ -73,14 +73,14 @@ VALIDATION_REGEX = (
     r'(?P<validation_score_max>\d.\d\d)\s+max'
 )
 
-BLINK_START_REGEX = r'SBLINK\s+(R|L)\s+(?P<timestamp>(\d+))\s*'
+BLINK_START_REGEX = r'SBLINK\s+(R|L)\s+(?P<timestamp>(\d+[.]?\d*))\s*'
 BLINK_STOP_REGEX = (
-    r'EBLINK\s+(R|L)\s+(?P<timestamp_start>(\d+))\s+'
-    r'(?P<timestamp_end>(\d{6,10}))\s+(?P<duration_ms>(\d+))\s*'
+    r'EBLINK\s+(R|L)\s+(?P<timestamp_start>(\d+[.]?\d*))\s+'
+    r'(?P<timestamp_end>(\d+[.]?\d*))\s+(?P<duration_ms>(\d+[.]?\d*))\s*'
 )
-INVALID_SAMPLE_REGEX = r'(?P<timestamp>(\d{6,10}))\s+\.\s+\.\s+0\.0\s+0\.0\s+\.\.\.\s*'
+INVALID_SAMPLE_REGEX = r'(?P<timestamp>(\d+[.]?\d*))\s+\.\s+\.\s+0\.0\s+0\.0\s+\.\.\.\s*'
 
-CALIBRATION_TIMESTAMP_REGEX = r'MSG\s+(?P<timestamp>\d+)\s+!CAL\s*\n'
+CALIBRATION_TIMESTAMP_REGEX = r'MSG\s+(?P<timestamp>\d+[.]?\d*)\s+!CAL\s*\n'
 
 CALIBRATION_REGEX = (
     r'>+\s+CALIBRATION\s+\(HV(?P<num_points>\d\d?),'
@@ -88,9 +88,9 @@ CALIBRATION_REGEX = (
     r'(?P<tracked_eye>RIGHT|LEFT):\s+<{9}'
 )
 
-START_RECORDING_REGEX = r'START\s+(?P<timestamp>(\d+))\s+(RIGHT|LEFT)\s+(?P<types>.*)'
+START_RECORDING_REGEX = r'START\s+(?P<timestamp>(\d+[.]?\d*))\s+(RIGHT|LEFT)\s+(?P<types>.*)'
 STOP_RECORDING_REGEX = (
-    r'END\s+(?P<timestamp>(\d+))\s+\s+(?P<types>.*)\s+RES\s+'
+    r'END\s+(?P<timestamp>(\d+[.]?\d*))\s+\s+(?P<types>.*)\s+RES\s+'
     r'(?P<xres>[\d\.]*)\s+(?P<yres>[\d\.]*)\s*'
 )
 
@@ -128,7 +128,7 @@ def compile_patterns(patterns: list[dict[str, Any]]) -> list[dict[str, Any]]:
     list[dict[str, Any]]
         Returns from string compiled regex patterns.
     """
-    msg_prefix = r'MSG\s+\d+\s+'
+    msg_prefix = r'MSG\s+\d+[.]?\d*\s+'
 
     compiled_patterns = []
 
@@ -251,7 +251,7 @@ def parse_eyelink(
     blink = False
 
     start_recording_timestamp = ''
-    total_recording_duration = 0
+    total_recording_duration = 0.0
     num_blink_samples = 0
 
     for line in lines:
@@ -289,9 +289,9 @@ def parse_eyelink(
             blink = False
             parsed_blink = match.groupdict()
             blink_info = {
-                'start_timestamp': int(parsed_blink['timestamp_start']),
-                'stop_timestamp': int(parsed_blink['timestamp_end']),
-                'duration_ms': int(parsed_blink['duration_ms']),
+                'start_timestamp': float(parsed_blink['timestamp_start']),
+                'stop_timestamp': float(parsed_blink['timestamp_end']),
+                'duration_ms': float(parsed_blink['duration_ms']),
                 'num_samples': num_blink_samples,
             }
             num_blink_samples = 0
@@ -302,7 +302,7 @@ def parse_eyelink(
 
         elif match := compiled_recording_stop.match(line):
             stop_recording_timestamp = match.groupdict()['timestamp']
-            block_duration = int(stop_recording_timestamp) - int(start_recording_timestamp)
+            block_duration = float(stop_recording_timestamp) - float(start_recording_timestamp)
 
             total_recording_duration += block_duration
 
@@ -313,7 +313,7 @@ def parse_eyelink(
             y_pix_s = eye_tracking_sample_match.group('y_pix')
             pupil_s = eye_tracking_sample_match.group('pupil')
 
-            timestamp = int(timestamp_s)
+            timestamp = float(timestamp_s)
             x_pix = check_nan(x_pix_s)
             y_pix = check_nan(y_pix_s)
             pupil = check_nan(pupil_s)
@@ -372,7 +372,7 @@ def parse_eyelink(
         raise Warning('No metadata found. Please check the file for errors.')
 
     schema_overrides = {
-        'time': pl.Int64,
+        'time': pl.Float64,
         'x_pix': pl.Float64,
         'y_pix': pl.Float64,
         'pupil': pl.Float64,
@@ -440,7 +440,7 @@ def _calculate_data_loss(
         blinks: list[dict[str, Any]],
         invalid_samples: list[str],
         actual_num_samples: int,
-        total_rec_duration: int,
+        total_rec_duration: float,
         sampling_rate: float,
 ) -> tuple[float | str, float | str]:
     """Calculate data loss and blink loss.
@@ -453,7 +453,7 @@ def _calculate_data_loss(
         List of invalid samples.
     actual_num_samples: int
         Number of actual samples recorded.
-    total_rec_duration: int
+    total_rec_duration: float
         Total duration of the recording.
     sampling_rate: float
         Sampling rate of the eye tracker.
