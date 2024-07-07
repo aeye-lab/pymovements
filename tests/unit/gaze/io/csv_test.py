@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test read from csv."""
+import polars as pl
 import pytest
 
 import pymovements as pm
@@ -117,3 +118,34 @@ import pymovements as pm
 def test_shapes(kwargs, shape):
     gaze_dataframe = pm.gaze.from_csv(**kwargs)
     assert gaze_dataframe.frame.shape == shape
+
+
+@pytest.mark.parametrize(
+    ('kwargs', 'dtypes'),
+    [
+        pytest.param(
+            {
+                'file': 'tests/files/monocular_example.csv',
+                'time_column': 'time',
+                'time_unit': 'ms',
+                'pixel_columns': ['x_left_pix', 'y_left_pix'],
+            },
+            [pl.Int64, pl.List(pl.Int64)],
+            id='csv_mono_dtypes',
+        ),
+        pytest.param(
+            {
+                'file': 'tests/files/missing_values_example.csv',
+                'time_column': 'time',
+                'time_unit': 'ms',
+                'pixel_columns': ['pixel_x', 'pixel_y'],
+                'position_columns': ['position_x', 'position_y'],
+            },
+            [pl.Int64, pl.List(pl.Float64), pl.List(pl.Float64)],
+            id='csv_missing_values_dtypes',
+        ),
+    ],
+)
+def test_dtypes(kwargs, dtypes):
+    gaze_dataframe = pm.gaze.from_csv(**kwargs)
+    assert gaze_dataframe.frame.dtypes == dtypes
