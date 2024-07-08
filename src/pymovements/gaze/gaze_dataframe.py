@@ -716,7 +716,7 @@ class GazeDataFrame:
                 else:
                     group_filter_expression = pl.col(self.trial_columns[0]) == group_identifier[0]
                     for name, value in zip(self.trial_columns[1:], group_identifier[1:]):
-                        group_filter_expression = group_filter_expression & pl.col(name) == value
+                        group_filter_expression = group_filter_expression & (pl.col(name) == value)
 
                 # Select group events
                 group_events = pm.EventDataFrame(self.events.frame.filter(group_filter_expression))
