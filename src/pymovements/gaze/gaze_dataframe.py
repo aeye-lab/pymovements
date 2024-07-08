@@ -813,6 +813,70 @@ class GazeDataFrame:
         """List of column names."""
         return self.frame.columns
 
+    def map_to_aois(
+        self,
+        aoi_dataframe: pm.stimulus.TextStimulus,
+        *,
+        eye: str = 'auto',
+    ) -> None:
+        """Map gaze data to aois.
+
+        Parameters
+        ----------
+        aoi_dataframe: pm.stimulus.TextStimulus
+            Area of interest dataframe.
+        eye: str
+            String specificer for inferring eye components. Supported values are: auto, mono, left
+            right, cyclops. Default: auto.
+        """
+        if 'pixel' in self.columns:
+            if eye == 'left':
+                x_eye = 'pixel_xl'
+                y_eye = 'pixel_yl'
+            elif eye == 'right':
+                x_eye = 'pixel_xr'
+                y_eye = 'pixel_yr'
+            else:
+                # auto to right eye
+                x_eye = 'pixel_xr'
+                y_eye = 'pixel_yr'
+        elif 'position' in self.columns:
+            if eye == 'left':
+                x_eye = 'position_xl'
+                y_eye = 'position_yl'
+            elif eye == 'right':
+                x_eye = 'position_xr'
+                y_eye = 'position_yr'
+            else:
+                # auto to right eye
+                x_eye = 'position_xr'
+                y_eye = 'position_yr'
+        else:
+            raise ValueError('neither position nor pixel in gaze dataframe, one needed for mapping')
+        self.unnest()
+
+        def get_aoi(row: pl.DataFrame.row) -> str:
+            try:
+                aoi = aoi_dataframe.aois.filter(
+                    (aoi_dataframe.aois['top_left_x'] <= row[x_eye]) &
+                    (
+                        row[x_eye] <=
+                        aoi_dataframe.aois['top_left_x'] + aoi_dataframe.aois['width']
+                    ) &
+                    (aoi_dataframe.aois['top_left_y'] <= row[y_eye]) &
+                    (
+                        row[y_eye] <=
+                        aoi_dataframe.aois['top_left_y'] + aoi_dataframe.aois['height']
+                    ),
+                )[aoi_dataframe.aoi_column].item()
+                return aoi
+            except ValueError:
+                return ''
+
+        self.frame = self.frame.with_columns(
+            area_of_interest=pl.Series(get_aoi(row) for row in self.frame.iter_rows(named=True)),
+        )
+
     def nest(
             self,
             input_columns: list[str],
