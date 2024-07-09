@@ -316,6 +316,103 @@ EXPECTED_DF = {
             'area_of_interest',
         ],
     ),
+    'char_else_pixel': pl.DataFrame(
+        [
+            (1, 1, 8005274, 649.5, 531.1, 640.6, 529.1, 'e'),
+            (1, 1, 8005275, 649.8, 533.2, 639.7, 528.9, 'e'),
+            (1, 1, 8005276, 647.7, 534.0, 640.6, 529.3, 'e'),
+            (1, 1, 8005277, 646.2, 533.0, 642.1, 531.3, 'e'),
+            (1, 1, 8005278, 646.5, 533.7, 642.9, 531.0, 'e'),
+            (1, 1, 8005279, 647.2, 534.6, 642.6, 531.6, 'e'),
+            (1, 1, 8005280, 647.3, 534.0, 642.3, 530.6, 'e'),
+            (1, 1, 8005281, 647.7, 536.3, 642.2, 529.4, 'e'),
+            (1, 1, 8005282, 647.5, 537.0, 641.4, 531.3, 'e'),
+            (1, 1, 8005283, 648.3, 534.9, 640.9, 529.0, 'e'),
+        ],
+        schema=[
+            'trialId',
+            'pointId',
+            'time',
+            'pixel_xl',
+            'pixel_yl',
+            'pixel_xr',
+            'pixel_yr',
+            'area_of_interest',
+        ],
+    ),
+    'char_else_position': pl.DataFrame(
+        [
+            (1, 1, 8005274, 649.5, 531.1, 640.6, 529.1, 'e'),
+            (1, 1, 8005275, 649.8, 533.2, 639.7, 528.9, 'e'),
+            (1, 1, 8005276, 647.7, 534.0, 640.6, 529.3, 'e'),
+            (1, 1, 8005277, 646.2, 533.0, 642.1, 531.3, 'e'),
+            (1, 1, 8005278, 646.5, 533.7, 642.9, 531.0, 'e'),
+            (1, 1, 8005279, 647.2, 534.6, 642.6, 531.6, 'e'),
+            (1, 1, 8005280, 647.3, 534.0, 642.3, 530.6, 'e'),
+            (1, 1, 8005281, 647.7, 536.3, 642.2, 529.4, 'e'),
+            (1, 1, 8005282, 647.5, 537.0, 641.4, 531.3, 'e'),
+            (1, 1, 8005283, 648.3, 534.9, 640.9, 529.0, 'e'),
+        ],
+        schema=[
+            'trialId',
+            'pointId',
+            'time',
+            'position_xl',
+            'position_yl',
+            'position_xr',
+            'position_yr',
+            'area_of_interest',
+        ],
+    ),
+
+    'word_else_pixel': pl.DataFrame(
+        [
+            (1, 1, 8005274, 649.5, 531.1, 640.6, 529.1, 'files,'),
+            (1, 1, 8005275, 649.8, 533.2, 639.7, 528.9, 'files,'),
+            (1, 1, 8005276, 647.7, 534.0, 640.6, 529.3, 'files,'),
+            (1, 1, 8005277, 646.2, 533.0, 642.1, 531.3, 'files,'),
+            (1, 1, 8005278, 646.5, 533.7, 642.9, 531.0, 'files,'),
+            (1, 1, 8005279, 647.2, 534.6, 642.6, 531.6, 'files,'),
+            (1, 1, 8005280, 647.3, 534.0, 642.3, 530.6, 'files,'),
+            (1, 1, 8005281, 647.7, 536.3, 642.2, 529.4, 'files,'),
+            (1, 1, 8005282, 647.5, 537.0, 641.4, 531.3, 'files,'),
+            (1, 1, 8005283, 648.3, 534.9, 640.9, 529.0, 'files,'),
+        ],
+        schema=[
+            'trialId',
+            'pointId',
+            'time',
+            'pixel_xl',
+            'pixel_yl',
+            'pixel_xr',
+            'pixel_yr',
+            'area_of_interest',
+        ],
+    ),
+    'word_else_position': pl.DataFrame(
+        [
+            (1, 1, 8005274, 649.5, 531.1, 640.6, 529.1, 'files,'),
+            (1, 1, 8005275, 649.8, 533.2, 639.7, 528.9, 'files,'),
+            (1, 1, 8005276, 647.7, 534.0, 640.6, 529.3, 'files,'),
+            (1, 1, 8005277, 646.2, 533.0, 642.1, 531.3, 'files,'),
+            (1, 1, 8005278, 646.5, 533.7, 642.9, 531.0, 'files,'),
+            (1, 1, 8005279, 647.2, 534.6, 642.6, 531.6, 'files,'),
+            (1, 1, 8005280, 647.3, 534.0, 642.3, 530.6, 'files,'),
+            (1, 1, 8005281, 647.7, 536.3, 642.2, 529.4, 'files,'),
+            (1, 1, 8005282, 647.5, 537.0, 641.4, 531.3, 'files,'),
+            (1, 1, 8005283, 648.3, 534.9, 640.9, 529.0, 'files,'),
+        ],
+        schema=[
+            'trialId',
+            'pointId',
+            'time',
+            'position_xl',
+            'position_yl',
+            'position_xr',
+            'position_yr',
+            'area_of_interest',
+        ],
+    ),
 }
 
 
@@ -325,6 +422,7 @@ EXPECTED_DF = {
         'right',
         'left',
         'auto',
+        'else',
     ],
 )
 @pytest.mark.parametrize(
@@ -335,13 +433,13 @@ EXPECTED_DF = {
     ],
 )
 @pytest.mark.parametrize(
-    ('column_type'),
+    ('gaze_type'),
     [
         'pixel',
         'position',
     ],
 )
-def test_gaze_to_aoi_mapping_char(eye, aoi_column, column_type):
+def test_gaze_to_aoi_mapping_char(eye, aoi_column, gaze_type):
     aoi_df = pm.stimulus.text.from_file(
         'tests/files/toy_text_1_1_aoi.csv',
         aoi_column=aoi_column,
@@ -351,21 +449,21 @@ def test_gaze_to_aoi_mapping_char(eye, aoi_column, column_type):
         height_column='height',
         page_column='page',
     )
-    if column_type == 'pixel':
+    if gaze_type == 'pixel':
         gaze_df = pm.gaze.io.from_csv(
             'tests/files/judo1000_example.csv',
             **{'separator': '\t'},
             pixel_columns=['x_left', 'y_left', 'x_right', 'y_right'],
         )
-    elif column_type == 'position':
+    elif gaze_type == 'position':
         gaze_df = pm.gaze.io.from_csv(
             'tests/files/judo1000_example.csv',
             **{'separator': '\t'},
             position_columns=['x_left', 'y_left', 'x_right', 'y_right'],
         )
 
-    gaze_df.map_to_aois(aoi_df, eye=eye)
-    assert_frame_equal(gaze_df.frame, EXPECTED_DF[f'{aoi_column}_{eye}_{column_type}'])
+    gaze_df.map_to_aois(aoi_df, eye=eye, gaze_type=gaze_type)
+    assert_frame_equal(gaze_df.frame, EXPECTED_DF[f'{aoi_column}_{eye}_{gaze_type}'])
 
 
 def test_map_to_aois_raises_value_error():
@@ -381,9 +479,10 @@ def test_map_to_aois_raises_value_error():
     gaze_df = pm.gaze.io.from_csv(
         'tests/files/judo1000_example.csv',
         **{'separator': '\t'},
+        position_columns=['x_left', 'y_left', 'x_right', 'y_right'],
     )
 
     with pytest.raises(ValueError) as excinfo:
-        gaze_df.map_to_aois(aoi_df, eye='right')
+        gaze_df.map_to_aois(aoi_df, eye='right', gaze_type='')
     msg, = excinfo.value.args
     assert msg == 'neither position nor pixel in gaze dataframe, one needed for mapping'
