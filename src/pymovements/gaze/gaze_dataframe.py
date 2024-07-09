@@ -49,6 +49,8 @@ class GazeDataFrame:
         The experiment definition. (default: None)
     events: pm.EventDataFrame | None
         A dataframe of events in the gaze signal. (default: None)
+    auto_column_detect: bool
+        Flag indicating if the column names should be inferred automatically. (default: False)
     trial_columns: str | list[str] | None
         The name of the trial columns in the input data frame. If the list is empty or None,
         the input data frame is assumed to contain only one trial. If the list is not empty,
@@ -180,6 +182,7 @@ class GazeDataFrame:
             experiment: Experiment | None = None,
             events: pm.EventDataFrame | None = None,
             *,
+            auto_column_detect: bool = False,
             trial_columns: str | list[str] | None = None,
             time_column: str | None = None,
             time_unit: str | None = 'ms',
@@ -226,20 +229,38 @@ class GazeDataFrame:
         # The list will be used for inferring n_components.
         column_specifiers: list[list[str]] = []
 
+        component_suffixes = ['x', 'y', 'xl', 'yl', 'xr', 'yr', 'xa', 'ya']
+
+        if auto_column_detect and pixel_columns is None:
+            column_canditates = ['pixel_' + suffix for suffix in component_suffixes]
+            pixel_columns = [c for c in column_canditates if c in self.frame.columns]
+
         if pixel_columns:
             self._check_component_columns(pixel_columns=pixel_columns)
             self.nest(pixel_columns, output_column='pixel')
             column_specifiers.append(pixel_columns)
+
+        if auto_column_detect and position_columns is None:
+            column_canditates = ['position_' + suffix for suffix in component_suffixes]
+            position_columns = [c for c in column_canditates if c in self.frame.columns]
 
         if position_columns:
             self._check_component_columns(position_columns=position_columns)
             self.nest(position_columns, output_column='position')
             column_specifiers.append(position_columns)
 
+        if auto_column_detect and velocity_columns is None:
+            column_canditates = ['velocity_' + suffix for suffix in component_suffixes]
+            velocity_columns = [c for c in column_canditates if c in self.frame.columns]
+
         if velocity_columns:
             self._check_component_columns(velocity_columns=velocity_columns)
             self.nest(velocity_columns, output_column='velocity')
             column_specifiers.append(velocity_columns)
+
+        if auto_column_detect and acceleration_columns is None:
+            column_canditates = ['acceleration_' + suffix for suffix in component_suffixes]
+            acceleration_columns = [c for c in column_canditates if c in self.frame.columns]
 
         if acceleration_columns:
             self._check_component_columns(acceleration_columns=acceleration_columns)
