@@ -882,12 +882,12 @@ class GazeDataFrame:
                 aoi = aoi_dataframe.aois.filter(
                     (aoi_dataframe.aois['top_left_x'] <= row[x_eye]) &
                     (
-                        row[x_eye] <=
+                        row[x_eye] <
                         aoi_dataframe.aois['top_left_x'] + aoi_dataframe.aois['width']
                     ) &
                     (aoi_dataframe.aois['top_left_y'] <= row[y_eye]) &
                     (
-                        row[y_eye] <=
+                        row[y_eye] <
                         aoi_dataframe.aois['top_left_y'] + aoi_dataframe.aois['height']
                     ),
                 )[aoi_dataframe.aoi_column].item()
