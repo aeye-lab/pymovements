@@ -128,7 +128,13 @@ class SBSAT(DatasetDefinition):
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: ['book_name', 'screen_id'])
+    trial_columns: list[str] = field(
+        default_factory=lambda: [
+            'subject_id',
+            'book_name',
+            'screen_id',
+        ],
+    )
 
     time_column: str = 'time'
 

@@ -134,7 +134,7 @@ class GazeGraph(DatasetDefinition):
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: ['task'])
+    trial_columns: list[str] = field(default_factory=lambda: ['subject_id', 'task'])
 
     time_column: Any = None
 
