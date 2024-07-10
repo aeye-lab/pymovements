@@ -153,8 +153,8 @@ class JuDo1000(DatasetDefinition):
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
             'dtypes': {
-                'trialId': pl.Int32,
-                'pointId': pl.Int32,
+                'trialId': pl.Int64,
+                'pointId': pl.Int64,
                 'time': pl.Int64,
                 'x_left': pl.Float32,
                 'y_left': pl.Float32,
