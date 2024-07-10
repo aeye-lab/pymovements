@@ -145,7 +145,7 @@ class SBSAT(DatasetDefinition):
             'dtypes': {
                 'time': pl.Int64,
                 'book_name': pl.Utf8,
-                'screen_id': pl.Int32,
+                'screen_id': pl.Int64,
                 'x_left': pl.Float32,
                 'y_left': pl.Float32,
                 'pupil_left': pl.Float32,
