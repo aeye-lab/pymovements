@@ -228,6 +228,21 @@ def from_csv(
             if column not in gaze_data.columns
         ])
 
+    # Cast numerical columns to Float64 if they were incorrectly inferred to be Utf8.
+    # This can happen if the column only has missing values in the top 100 rows.
+    numerical_columns = (
+        (pixel_columns or [])
+        + (position_columns or [])
+        + (velocity_columns or [])
+        + (acceleration_columns or [])
+        + ([distance_column] if distance_column else [])
+    )
+    for column in numerical_columns:
+        if gaze_data[column].dtype == pl.Utf8:
+            gaze_data = gaze_data.with_columns([
+                pl.col(column).cast(pl.Float64),
+            ])
+
     if column_dtypes is not None:
         gaze_data = gaze_data.with_columns([
             pl.col(fileinfo_key).cast(fileinfo_dtype)

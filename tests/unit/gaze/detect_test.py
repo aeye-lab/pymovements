@@ -208,6 +208,33 @@ from pymovements.synthetic import step_function
         ),
 
         pytest.param(
+            'idt',
+            {
+                'dispersion_threshold': 1,
+                'minimum_duration': 2,
+            },
+            pm.gaze.from_pandas(
+                data=pl.DataFrame({
+                    'trial': ['A'] * 50 + ['B'] * 50,
+                    'screen': ['1'] * 25 + ['2'] * 25 + ['1'] * 25 + ['2'] * 25,
+                    'position': [(0, 0)] * 100,
+                }).to_pandas(),
+                trial_columns=['trial', 'screen'],
+                experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
+            ),
+            pm.EventDataFrame(
+                pl.DataFrame({
+                    'trial': ['A', 'A', 'B', 'B'],
+                    'screen': ['1', '2', '1', '2'],
+                    'name': ['fixation', 'fixation', 'fixation', 'fixation'],
+                    'onset': [0, 25, 50, 75],
+                    'offset': [24, 49, 74, 99],
+                }),
+            ),
+            id='idt_constant_position_single_fixation_per_trial_multiple_trial_columns',
+        ),
+
+        pytest.param(
             'ivt',
             {
                 'velocity_threshold': 1,
