@@ -813,6 +813,92 @@ class GazeDataFrame:
         """List of column names."""
         return self.frame.columns
 
+    def map_to_aois(
+            self,
+            aoi_dataframe: pm.stimulus.TextStimulus,
+            *,
+            eye: str = 'auto',
+            gaze_type: str = 'pixel',
+    ) -> None:
+        """Map gaze data to aois.
+
+        We map each gaze point to an aoi, considering the boundary still part of the
+        area of interest.
+
+        Parameters
+        ----------
+        aoi_dataframe: pm.stimulus.TextStimulus
+            Area of interest dataframe.
+        eye: str
+            String specificer for inferring eye components. Supported values are: auto, mono, left
+            right, cyclops. Default: auto.
+        gaze_type: str
+            String specificer for whether to use position or pixel coordinates for
+            mapping. Default: pixel.
+        """
+        component_suffixes = ['x', 'y', 'xl', 'yl', 'xr', 'yr', 'xa', 'ya']
+        self.unnest()
+
+        pix_column_canditates = ['pixel_' + suffix for suffix in component_suffixes]
+        pixel_columns = [c for c in pix_column_canditates if c in self.frame.columns]
+        pos_column_canditates = ['position_' + suffix for suffix in component_suffixes]
+        position_columns = [
+            c
+            for c in pos_column_canditates
+            if c in self.frame.columns
+        ]
+
+        if gaze_type == 'pixel':
+            if eye == 'left':
+                x_eye = [col for col in pixel_columns if col.endswith('xl')][0]
+                y_eye = [col for col in pixel_columns if col.endswith('yl')][0]
+            elif eye == 'right':
+                x_eye = [col for col in pixel_columns if col.endswith('xr')][0]
+                y_eye = [col for col in pixel_columns if col.endswith('yr')][0]
+            elif eye == 'auto':
+                x_eye = [col for col in pixel_columns if col.endswith('xr')][0]
+                y_eye = [col for col in pixel_columns if col.endswith('yr')][0]
+            else:
+                x_eye = [col for col in pixel_columns if col.endswith('xr')][0]
+                y_eye = [col for col in pixel_columns if col.endswith('yr')][0]
+        elif gaze_type == 'position':
+            if eye == 'left':
+                x_eye = [col for col in position_columns if col.endswith('xl')][0]
+                y_eye = [col for col in position_columns if col.endswith('yl')][0]
+            elif eye == 'right':
+                x_eye = [col for col in position_columns if col.endswith('xr')][0]
+                y_eye = [col for col in position_columns if col.endswith('yr')][0]
+            elif eye == 'auto':
+                x_eye = [col for col in position_columns if col.endswith('xr')][0]
+                y_eye = [col for col in position_columns if col.endswith('yr')][0]
+            else:
+                x_eye = [col for col in position_columns if col.endswith('xr')][0]
+                y_eye = [col for col in position_columns if col.endswith('yr')][0]
+        else:
+            raise ValueError('neither position nor pixel in gaze dataframe, one needed for mapping')
+
+        def get_aoi(row: pl.DataFrame.row) -> str:
+            try:
+                aoi = aoi_dataframe.aois.filter(
+                    (aoi_dataframe.aois['top_left_x'] <= row[x_eye]) &
+                    (
+                        row[x_eye] <
+                        aoi_dataframe.aois['top_left_x'] + aoi_dataframe.aois['width']
+                    ) &
+                    (aoi_dataframe.aois['top_left_y'] <= row[y_eye]) &
+                    (
+                        row[y_eye] <
+                        aoi_dataframe.aois['top_left_y'] + aoi_dataframe.aois['height']
+                    ),
+                )[aoi_dataframe.aoi_column].item()
+                return aoi
+            except ValueError:
+                return ''
+
+        self.frame = self.frame.with_columns(
+            area_of_interest=pl.Series(get_aoi(row) for row in self.frame.iter_rows(named=True)),
+        )
+
     def nest(
             self,
             input_columns: list[str],
