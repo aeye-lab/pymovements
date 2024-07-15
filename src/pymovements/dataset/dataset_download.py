@@ -20,6 +20,7 @@
 """Provides private functions for downloading and extracting datasets."""
 from __future__ import annotations
 
+import shutil
 from urllib.error import URLError
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
@@ -69,45 +70,97 @@ def download_dataset(
     RuntimeError
         If downloading a resource failed for all given mirrors.
     """
-    if len(definition.mirrors) == 0:
-        raise AttributeError('number of mirrors must not be zero to download dataset')
+    if definition.has_gaze_files:
+        if len(definition.gaze_mirrors) == 0:
+            raise AttributeError('number of mirrors must not be zero to download dataset')
 
-    if len(definition.resources) == 0:
-        raise AttributeError('number of resources must not be zero to download dataset')
+        if len(definition.gaze_resources) == 0:
+            raise AttributeError('number of gaze_resources must not be zero to download dataset')
 
-    paths.raw.mkdir(parents=True, exist_ok=True)
+        paths.raw.mkdir(parents=True, exist_ok=True)
 
-    for resource in definition.resources:
-        success = False
+        for resource in definition.gaze_resources:
+            success = False
 
-        for mirror_idx, mirror in enumerate(definition.mirrors):
+            for mirror_idx, mirror in enumerate(definition.gaze_mirrors):
 
-            url = f'{mirror}{resource["gaze_resource"]}'
+                url = f'{mirror}{resource["gaze_resource"]}'
 
-            try:
-                download_file(
-                    url=url,
-                    dirpath=paths.downloads,
-                    filename=resource['filename'],
-                    md5=resource['md5'],
-                    verbose=verbose,
+                try:
+                    download_file(
+                        url=url,
+                        dirpath=paths.downloads,
+                        filename=resource['filename'],
+                        md5=resource['md5'],
+                        verbose=verbose,
+                    )
+                    success = True
+
+                # pylint: disable=overlapping-except
+                except (URLError, OSError, RuntimeError) as error:
+                    # Error downloading the resource, try next mirror
+                    if mirror_idx < len(definition.gaze_mirrors) - 1:
+                        print(f'Failed to download:\n{error}\nTrying next mirror.')
+                    continue
+
+                # downloading the resource was successful, we don't need to try another mirror
+                break
+
+            if not success:
+                raise RuntimeError(
+                    f"downloading resource {resource['gaze_resource']} failed for all mirrors.",
                 )
-                success = True
-
-            # pylint: disable=overlapping-except
-            except (URLError, OSError, RuntimeError) as error:
-                # Error downloading the resource, try next mirror
-                if mirror_idx < len(definition.mirrors) - 1:
-                    print(f'Failed to download:\n{error}\nTrying next mirror.')
-                continue
 
             # downloading the resource was successful, we don't need to try another mirror
             break
 
-        if not success:
-            raise RuntimeError(
-                f"downloading resource {resource['gaze_resource']} failed for all mirrors.",
+    if definition.has_precomputed_event_files:
+        if len(definition.precomputed_event_mirrors) == 0:
+            raise AttributeError('number of mirrors must not be zero to download dataset')
+
+        if len(definition.precomputed_event_resources) == 0:
+            raise AttributeError(
+                'number of precomputed_event_resources must not be zero to download dataset',
             )
+
+        paths.raw.mkdir(parents=True, exist_ok=True)
+
+        for resource in definition.precomputed_event_resources:
+            success = False
+
+            for mirror_idx, mirror in enumerate(definition.precomputed_event_mirrors):
+
+                url = f'{mirror}{resource["precomputed_event_resource"]}'
+
+                try:
+                    download_file(
+                        url=url,
+                        dirpath=paths.downloads,
+                        filename=resource['filename'],
+                        md5=resource['md5'],
+                        verbose=verbose,
+                    )
+                    success = True
+
+                # pylint: disable=overlapping-except
+                except (URLError, OSError, RuntimeError) as error:
+                    # Error downloading the resource, try next mirror
+                    if mirror_idx < len(definition.precomputed_event_mirrors) - 1:
+                        print(f'Failed to download:\n{error}\nTrying next mirror.')
+                    continue
+
+                # downloading the resource was successful, we don't need to try another mirror
+                break
+
+            if not success:
+                raise RuntimeError(
+                    f"downloading resource {
+                        resource['precomputed_event_resource']
+                    } failed for all mirrors.",
+                )
+
+            # downloading the resource was successful, we don't need to try another mirror
+            break
 
     if extract:
         extract_dataset(
@@ -142,17 +195,36 @@ def extract_dataset(
         messages for recursive archives. (2) Print messages for extracting each dataset resource and
         each recursive archive extract. (default: 1)
     """
-    paths.raw.mkdir(parents=True, exist_ok=True)
 
-    for resource in definition.resources:
-        source_path = paths.downloads / resource['filename']
-        destination_path = paths.raw
+    if definition.has_gaze_files and definition.extract_gaze_data:
+        paths.raw.mkdir(parents=True, exist_ok=True)
+        for resource in definition.gaze_resources:
+            source_path = paths.downloads / resource['filename']
+            destination_path = paths.raw
 
-        extract_archive(
-            source_path=source_path,
-            destination_path=destination_path,
-            recursive=True,
-            remove_finished=remove_finished,
-            remove_top_level=remove_top_level,
-            verbose=verbose,
-        )
+            extract_archive(
+                source_path=source_path,
+                destination_path=destination_path,
+                recursive=True,
+                remove_finished=remove_finished,
+                remove_top_level=remove_top_level,
+                verbose=verbose,
+            )
+
+    if definition.has_precomputed_event_files:
+        paths.precomputed_events.mkdir(parents=True, exist_ok=True)
+        for resource in definition.precomputed_event_resources:
+            source_path = paths.downloads / resource['filename']
+            destination_path = paths.precomputed_events
+
+            if definition.extract_precomputed_data:
+                extract_archive(
+                    source_path=source_path,
+                    destination_path=destination_path,
+                    recursive=True,
+                    remove_finished=remove_finished,
+                    remove_top_level=remove_top_level,
+                    verbose=verbose,
+                )
+            else:
+                shutil.move(source_path, destination_path / resource['filename'])

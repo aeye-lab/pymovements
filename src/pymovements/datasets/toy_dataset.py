@@ -47,10 +47,10 @@ class ToyDataset(DatasetDefinition):
     name : str
         The name of the dataset.
 
-    mirrors : tuple[str, ...]
+    gaze_mirrors : tuple[str, ...]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources : tuple[dict[str, str], ...]
+    gaze_resources : tuple[dict[str, str], ...]
         A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -96,17 +96,18 @@ class ToyDataset(DatasetDefinition):
 
     name: str = 'ToyDataset'
 
-    mirrors: tuple[str, ...] = (
+    gaze_mirrors: tuple[str, ...] = (
         'http://github.com/aeye-lab/pymovements-toy-dataset/zipball/',
     )
 
-    resources: tuple[dict[str, str], ...] = (
+    gaze_resources: tuple[dict[str, str], ...] = (
         {
             'gaze_resource': '6cb5d663317bf418cec0c9abe1dde5085a8a8ebd/',
             'filename': 'pymovements-toy-dataset.zip',
             'md5': '4da622457637a8181d86601fe17f3aa8',
         },
     )
+    extract_gaze_data: bool = True
 
     experiment: Experiment = Experiment(
         screen_width_px=1280,
