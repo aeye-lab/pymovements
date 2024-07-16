@@ -47,7 +47,7 @@ dynamic = ["version"]
 [project.optional-dependencies]
 docs = [
   "ipykernel>=6.13.0",
-  "nbconvert>=7.0.0,<7.14",
+  "nbconvert>=7.0.0,<7.17",
   "nbsphinx>=0.8.8,<0.9.5",
   "pandoc",
   "pybtex",
