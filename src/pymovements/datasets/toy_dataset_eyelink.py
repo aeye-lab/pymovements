@@ -103,7 +103,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
 
     resources: tuple[dict[str, str], ...] = (
         {
-            'resource': 'a970d090588542dad745297866e794ab9dad8795/',
+            'gaze_resource': 'a970d090588542dad745297866e794ab9dad8795/',
             'filename': 'pymovements-toy-dataset-eyelink.zip',
             'md5': 'b1d426751403752c8a154fc48d1670ce',
         },

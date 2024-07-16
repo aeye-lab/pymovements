@@ -105,7 +105,7 @@ class HBN(DatasetDefinition):
 
     resources: tuple[dict[str, str], ...] = (
         {
-            'resource': '651190031e76a453918a9971',
+            'gaze_resource': '651190031e76a453918a9971',
             'filename': 'data.zip',
             'md5': '2c523e911022ffc0eab700e34e9f7f30',
         },

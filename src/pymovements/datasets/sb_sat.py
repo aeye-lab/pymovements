@@ -104,7 +104,7 @@ class SBSAT(DatasetDefinition):
 
     resources: tuple[dict[str, str], ...] = (
         {
-            'resource': 'jgae7/',
+            'gaze_resource': 'jgae7/',
             'filename': 'sbsat_csvs.zip',
             'md5': 'a6ef1fb0ecced683cdb489c3bd3e1a5c',
         },
