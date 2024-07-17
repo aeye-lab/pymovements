@@ -114,7 +114,7 @@ class PoTeC(DatasetDefinition):
 
     resources: tuple[dict[str, str], ...] = (
         {
-            'resource': 'tgd9q/',
+            'gaze_resource': 'tgd9q/',
             'filename': 'PoTeC.zip',
             'md5': 'cffd45039757c3777e2fd130e5d8a2ad',
         },

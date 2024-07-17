@@ -108,7 +108,7 @@ class GazeGraph(DatasetDefinition):
 
     resources: tuple[dict[str, str], ...] = (
         {
-            'resource': 'master',
+            'gaze_resource': 'master',
             'filename': 'gaze_graph_data.zip',
             'md5': '181f4b79477cee6e0267482d989610b0',
         },
