@@ -20,7 +20,6 @@
 """Module for event processing."""
 from __future__ import annotations
 
-import inspect
 from collections.abc import Callable
 from typing import Any
 
@@ -187,15 +186,6 @@ class EventGazeProcessor:
         property_kwargs: list[dict[str, Any]] = [
             property_kwargs for _, property_kwargs in self.event_properties
         ]
-
-        for property_id, property_expression in enumerate(property_expressions):
-            property_args = inspect.getfullargspec(property_expression).kwonlyargs
-
-            if 'position_column' in property_args:
-                property_kwargs[property_id]['position_column'] = 'position'
-
-            if 'velocity_column' in property_args:
-                property_kwargs[property_id]['velocity_column'] = 'velocity'
 
         # Each event is uniquely defined by a list of trial identifiers,
         # a name and its on- and offset.
