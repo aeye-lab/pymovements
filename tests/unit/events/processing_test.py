@@ -572,6 +572,54 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
             ),
             id='two_events_location_method_median',
         ),
+        pytest.param(
+            pl.from_dict(
+                {'subject_id': [1, 1], 'name': ['A', 'B'], 'onset': [0, 80], 'offset': [10, 100]},
+                schema={
+                    'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
+                },
+            ),
+            pm.GazeDataFrame(
+                pl.from_dict(
+                    {
+                        'subject_id': np.ones(100),
+                        'time': np.arange(100),
+                        'x_pix': np.concatenate(
+                            [np.ones(11), np.zeros(69), 2 * np.ones(19), [200]],
+                        ),
+                        'y_pix': np.concatenate(
+                            [np.ones(11), np.zeros(69), 2 * np.ones(19), [200]],
+                        ),
+                    },
+                    schema={
+                        'subject_id': pl.Int64,
+                        'time': pl.Int64,
+                        'x_pix': pl.Float64,
+                        'y_pix': pl.Float64,
+                    },
+                ),
+                pixel_columns=['x_pix', 'y_pix'],
+            ),
+            {'event_properties': ('location', {'position_column': 'pixel'})},
+            {'identifiers': 'subject_id'},
+            pl.from_dict(
+                {
+                    'subject_id': [1, 1],
+                    'name': ['A', 'B'],
+                    'onset': [0, 80],
+                    'offset': [10, 100],
+                    'location': [[1.0, 1.0], [11.9, 11.9]],
+                },
+                schema={
+                    'subject_id': pl.Int64,
+                    'name': pl.Utf8,
+                    'onset': pl.Int64,
+                    'offset': pl.Int64,
+                    'location': pl.List(pl.Float64),
+                },
+            ),
+            id='two_events_location_position_column_pixel',
+        ),
     ],
 )
 def test_event_gaze_processor_process_correct_result(
