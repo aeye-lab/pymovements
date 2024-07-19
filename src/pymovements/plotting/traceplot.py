@@ -60,11 +60,6 @@ DEFAULT_SEGMENTDATA: LinearSegmentedColormapType = {
         (0.5, 0.0, 0.0),
         (1.0, 0.0, 0.0),
     ],
-    'alpha': [
-        (1.0, 1.0, 1.0),
-        (1.0, 1.0, 1.0),
-        (1.0, 1.0, 1.0),
-    ],
 }
 
 
@@ -87,12 +82,6 @@ DEFAULT_SEGMENTDATA_TWOSLOPE: LinearSegmentedColormapType = {
         (0.25, 1.0, 1.0),
         (0.5, 0.0, 0.0),
         (1.0, 0.0, 0.0),
-    ],
-    'alpha': [
-        (1.0, 1.0, 1.0),
-        (1.0, 1.0, 1.0),
-        (1.0, 1.0, 1.0),
-        (1.0, 1.0, 1.0),
     ],
 }
 
