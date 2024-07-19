@@ -4,7 +4,7 @@ Please include a clear and concise description of the change and which issue is 
 Please also include excepted improvements, relevant motivation and context.
 List any dependencies that are required for this change.
 
-Fixes issue #
+Fixes #
 
 ## Implemented changes
 
