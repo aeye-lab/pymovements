@@ -131,7 +131,7 @@ import pymovements as pm
     ],
 )
 def test_from_asc_has_shape_and_schema(kwargs, expected_frame):
-    gaze = pm.gaze.from_asc(**kwargs)
+    gaze, _ = pm.gaze.from_asc(**kwargs)
 
     assert_frame_equal(gaze.frame, expected_frame, check_column_order=False)
 

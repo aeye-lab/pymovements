@@ -273,7 +273,7 @@ def from_asc(
         experiment: Experiment | None = None,
         add_columns: dict[str, str] | None = None,
         column_dtypes: dict[str, Any] | None = None,
-) -> GazeDataFrame:
+) -> tuple[GazeDataFrame, dict[str, Any]]:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
 
     Parameters
@@ -296,8 +296,8 @@ def from_asc(
 
     Returns
     -------
-    GazeDataFrame
-        The gaze data frame read from the asc file.
+    tuple[GazeDataFrame, dict[str, Any]]
+        The gaze data frame and a metadata dictionary read from the asc file.
 
     Examples
     --------
@@ -305,7 +305,7 @@ def from_asc(
     We can then load the data into a ``GazeDataFrame``:
 
     >>> from pymovements.gaze.io import from_asc
-    >>> gaze = from_asc(file='tests/files/eyelink_monocular_example.asc', patterns='eyelink')
+    >>> gaze, metadata = from_asc(file='tests/files/eyelink_monocular_example.asc')
     >>> gaze.frame
     shape: (16, 3)
     ┌─────────┬───────┬────────────────┐
@@ -323,7 +323,23 @@ def from_asc(
     │ 2339290 ┆ 618.0 ┆ [637.6, 531.4] │
     │ 2339291 ┆ 618.0 ┆ [637.3, 531.2] │
     └─────────┴───────┴────────────────┘
-
+    >>> metadata
+    {'weekday': 'Wed', 'month': 'Mar', 'day': 8, 'time': '09:25:20', 'year': 2023,
+     'version_1': 'EYELINK II 1',
+     'version_2': 'EYELINK II CL v6.12 Feb  1 2018 (EyeLink Portable Duo)',
+     'resolution': (1280, 1024), 'tracking_mode': 'CR', 'sampling_rate': 1000.0,
+     'file_sample_filter': '2', 'link_sample_filter': '1', 'tracked_eye': 'L',
+     'mount_configuration': {'mount_type': 'Desktop', 'head_stabilization': 'stabilized',
+                             'eyes_recorded': 'binocular / monocular', 'short_name': 'BTABLER'},
+     'pupil_data_type': 'AREA', 'version_number': '6.12', 'model': 'EyeLink Portable Duo',
+     'datetime': datetime.datetime(2023, 3, 8, 9, 25, 20),
+     'calibrations': [{'timestamp': '2135819', 'num_points': '9', 'type': 'P-CR',
+                       'tracked_eye': 'LEFT'}],
+     'validations': [{'timestamp': '2148587', 'num_points': '9', 'tracked_eye': 'LEFT',
+                      'error': 'GOOD ERROR', 'validation_score_avg': '0.27',
+                      'validation_score_max': '0.83'}],
+     'blinks': [], 'data_loss_ratio': 0.9999133899185865, 'data_loss_ratio_blinks': 0.0,
+     'total_recording_duration_ms': 184736.0}
     """
     if isinstance(patterns, str):
         if patterns == 'eyelink':
@@ -333,7 +349,7 @@ def from_asc(
             raise ValueError(f"unknown pattern key '{patterns}'. Supported keys are: eyelink")
 
     # Read data.
-    gaze_data, _ = parse_eyelink(file, patterns=patterns, schema=schema)
+    gaze_data, metadata = parse_eyelink(file, patterns=patterns, schema=schema)
 
     if add_columns is not None:
         gaze_data = gaze_data.with_columns([
@@ -356,7 +372,7 @@ def from_asc(
         time_unit='ms',
         pixel_columns=['x_pix', 'y_pix'],
     )
-    return gaze_df
+    return gaze_df, metadata
 
 
 def from_ipc(
