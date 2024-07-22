@@ -27,10 +27,7 @@ import polars as pl
 
 
 class TextStimulus:
-    """A DataFrame for gaze time series data.
-
-    Each row is a sample at a specific timestep.
-    Each column is a channel in the gaze time series.
+    """A DataFrame for the text stimulus that the gaze data was recorded on.
 
     Parameters
     ----------
