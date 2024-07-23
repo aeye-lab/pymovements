@@ -115,12 +115,12 @@ def check_nan(sample_location: str) -> float:
     return ret
 
 
-def compile_patterns(patterns: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def compile_patterns(patterns: list[dict[str, Any] | str]) -> list[dict[str, Any]]:
     """Compile patterns from strings.
 
     Parameters
     ----------
-    patterns: list[dict[str, Any]]
+    patterns: list[dict[str, Any] | str]
         The list of patterns to compile.
 
     Returns
@@ -161,24 +161,25 @@ def compile_patterns(patterns: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return compiled_patterns
 
 
-def get_additional_columns(compiled_patterns: list[dict[str, Any]]) -> set[str]:
-    """Get additionally needed columns from compiled patterns."""
-    additional_columns = set()
+def get_pattern_keys(compiled_patterns: list[dict[str, Any]], pattern_key: str) -> set[str]:
+    """Get names of capture groups or column/metadata keys."""
+    keys = set()
 
     for compiled_pattern_dict in compiled_patterns:
-        if 'column' in compiled_pattern_dict:
-            additional_columns.add(compiled_pattern_dict['column'])
+        if pattern_key in compiled_pattern_dict:
+            keys.add(compiled_pattern_dict[pattern_key])
 
-        for column in compiled_pattern_dict['pattern'].groupindex.keys():
-            additional_columns.add(column)
+        for key in compiled_pattern_dict['pattern'].groupindex.keys():
+            keys.add(key)
 
-    return additional_columns
+    return keys
 
 
 def parse_eyelink(
         filepath: Path | str,
-        patterns: list[dict[str, Any]] | None = None,
+        patterns: list[dict[str, Any] | str] | None = None,
         schema: dict[str, Any] | None = None,
+        metadata_patterns: list[dict[str, Any] | str] | None = None,
 ) -> tuple[pl.DataFrame, dict[str, Any]]:
     """Process EyeLink asc file.
 
@@ -186,10 +187,12 @@ def parse_eyelink(
     ----------
     filepath: Path | str
         file name of ascii file to convert.
-    patterns: list[dict[str, Any]] | None
+    patterns: list[dict[str, Any] | str] | None
         list of patterns to match for additional columns. (default: None)
     schema: dict[str, Any] | None
         Dictionary to optionally specify types of columns parsed by patterns. (default: None)
+    metadata_patterns: list[dict[str, Any] | str] | None
+        list of patterns to match for additional metadata. (default: None)
 
     Returns
     -------
@@ -205,7 +208,11 @@ def parse_eyelink(
         patterns = []
     compiled_patterns = compile_patterns(patterns)
 
-    additional_columns = get_additional_columns(compiled_patterns)
+    if metadata_patterns is None:
+        metadata_patterns = []
+    compiled_metadata_patterns = compile_patterns(metadata_patterns)
+
+    additional_columns = get_pattern_keys(compiled_patterns, 'column')
     additional: dict[str, list[Any]] = {
         additional_column: [] for additional_column in additional_columns
     }
@@ -227,7 +234,11 @@ def parse_eyelink(
     # will return an empty string if the key does not exist
     metadata: defaultdict = defaultdict(str)
 
-    compiled_metadata_patterns = []
+    # metadata keys specified by the user should have a default value of None
+    metadata_keys = get_pattern_keys(compiled_metadata_patterns, 'key')
+    for key in metadata_keys:
+        metadata[key] = None
+
     for metadata_pattern in EYELINK_META_REGEXES:
         compiled_metadata_patterns.append({'pattern': re.compile(metadata_pattern['pattern'])})
 
@@ -340,8 +351,12 @@ def parse_eyelink(
         elif compiled_metadata_patterns:
             for pattern_dict in compiled_metadata_patterns.copy():
                 if match := pattern_dict['pattern'].match(line):
-                    for column, value in match.groupdict().items():
-                        metadata[column] = value
+                    if 'value' in pattern_dict:
+                        metadata[pattern_dict['key']] = pattern_dict['value']
+
+                    else:
+                        for key, value in match.groupdict().items():
+                            metadata[key] = value
 
                     # each metadata pattern should only match once
                     compiled_metadata_patterns.remove(pattern_dict)

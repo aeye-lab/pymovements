@@ -268,7 +268,8 @@ def from_csv(
 def from_asc(
         file: str | Path,
         *,
-        patterns: str | list | None = 'eyelink',
+        patterns: str | list[dict[str, Any] | str] | None = 'eyelink',
+        metadata_patterns: list[dict[str, Any] | str] | None = None,
         schema: dict[str, Any] | None = None,
         experiment: Experiment | None = None,
         add_columns: dict[str, str] | None = None,
@@ -280,9 +281,12 @@ def from_asc(
     ----------
     file: str | Path
         Path of IPC/feather file.
-    patterns: str | list | None
+    patterns: str | list[dict[str, Any] | str] | None
         list of patterns to match for additional columns or a key identifier of eye tracker specific
         default patterns. Supported values are: eyelink. (default: 'eyelink')
+    metadata_patterns: list[dict[str, Any] | str] | None
+        list of patterns to match for extracting metadata from custom logged messages.
+        (default: None)
     schema: dict[str, Any] | None
         Dictionary to optionally specify types of columns parsed by patterns. (default: None)
     experiment: Experiment | None
@@ -323,23 +327,8 @@ def from_asc(
     │ 2339290 ┆ 618.0 ┆ [637.6, 531.4] │
     │ 2339291 ┆ 618.0 ┆ [637.3, 531.2] │
     └─────────┴───────┴────────────────┘
-    >>> metadata
-    {'weekday': 'Wed', 'month': 'Mar', 'day': 8, 'time': '09:25:20', 'year': 2023,
-     'version_1': 'EYELINK II 1',
-     'version_2': 'EYELINK II CL v6.12 Feb  1 2018 (EyeLink Portable Duo)',
-     'resolution': (1280, 1024), 'tracking_mode': 'CR', 'sampling_rate': 1000.0,
-     'file_sample_filter': '2', 'link_sample_filter': '1', 'tracked_eye': 'L',
-     'mount_configuration': {'mount_type': 'Desktop', 'head_stabilization': 'stabilized',
-                             'eyes_recorded': 'binocular / monocular', 'short_name': 'BTABLER'},
-     'pupil_data_type': 'AREA', 'version_number': '6.12', 'model': 'EyeLink Portable Duo',
-     'datetime': datetime.datetime(2023, 3, 8, 9, 25, 20),
-     'calibrations': [{'timestamp': '2135819', 'num_points': '9', 'type': 'P-CR',
-                       'tracked_eye': 'LEFT'}],
-     'validations': [{'timestamp': '2148587', 'num_points': '9', 'tracked_eye': 'LEFT',
-                      'error': 'GOOD ERROR', 'validation_score_avg': '0.27',
-                      'validation_score_max': '0.83'}],
-     'blinks': [], 'data_loss_ratio': 0.9999133899185865, 'data_loss_ratio_blinks': 0.0,
-     'total_recording_duration_ms': 184736.0}
+    >>> metadata['sampling_rate']
+    1000.0
     """
     if isinstance(patterns, str):
         if patterns == 'eyelink':
@@ -349,7 +338,9 @@ def from_asc(
             raise ValueError(f"unknown pattern key '{patterns}'. Supported keys are: eyelink")
 
     # Read data.
-    gaze_data, metadata = parse_eyelink(file, patterns=patterns, schema=schema)
+    gaze_data, metadata = parse_eyelink(
+        file, patterns=patterns, schema=schema, metadata_patterns=metadata_patterns,
+    )
 
     if add_columns is not None:
         gaze_data = gaze_data.with_columns([
