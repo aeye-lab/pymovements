@@ -104,7 +104,7 @@ class SBSAT(DatasetDefinition):
 
     resources: tuple[dict[str, str], ...] = (
         {
-            'resource': 'jgae7/',
+            'gaze_resource': 'jgae7/',
             'filename': 'sbsat_csvs.zip',
             'md5': 'a6ef1fb0ecced683cdb489c3bd3e1a5c',
         },
@@ -128,7 +128,13 @@ class SBSAT(DatasetDefinition):
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: ['book_name', 'screen_id'])
+    trial_columns: list[str] = field(
+        default_factory=lambda: [
+            'subject_id',
+            'book_name',
+            'screen_id',
+        ],
+    )
 
     time_column: str = 'time'
 

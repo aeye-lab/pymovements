@@ -104,7 +104,7 @@ class JuDo1000(DatasetDefinition):
 
     resources: tuple[dict[str, str], ...] = (
         {
-            'resource': '4wy7s/',
+            'gaze_resource': '4wy7s/',
             'filename': 'JuDo1000.zip',
             'md5': 'b8b9e5bb65b78d6f2bd260451cdd89f8',
         },

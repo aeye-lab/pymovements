@@ -82,7 +82,7 @@ def download_dataset(
 
         for mirror_idx, mirror in enumerate(definition.mirrors):
 
-            url = f'{mirror}{resource["resource"]}'
+            url = f'{mirror}{resource["gaze_resource"]}'
 
             try:
                 download_file(
@@ -106,7 +106,7 @@ def download_dataset(
 
         if not success:
             raise RuntimeError(
-                f"downloading resource {resource['resource']} failed for all mirrors.",
+                f"downloading resource {resource['gaze_resource']} failed for all mirrors.",
             )
 
     if extract:

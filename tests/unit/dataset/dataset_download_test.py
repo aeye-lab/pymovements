@@ -43,7 +43,7 @@ def dataset_definition_fixture():
 
         resources: tuple[dict[str, str], ...] = (
             {
-                'resource': 'test.gz.tar',
+                'gaze_resource': 'test.gz.tar',
                 'filename': 'test.gz.tar',
                 'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
             },
@@ -275,7 +275,7 @@ def test_dataset_download_no_mirrors_raises_exception(tmp_path):
 
         resources: tuple[dict[str, str], ...] = (
             {
-                'resource': 'test.gz.tar',
+                'gaze_resource': 'test.gz.tar',
                 'filename': 'test.gz.tar',
                 'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
             },

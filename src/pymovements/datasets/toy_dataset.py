@@ -102,7 +102,7 @@ class ToyDataset(DatasetDefinition):
 
     resources: tuple[dict[str, str], ...] = (
         {
-            'resource': '6cb5d663317bf418cec0c9abe1dde5085a8a8ebd/',
+            'gaze_resource': '6cb5d663317bf418cec0c9abe1dde5085a8a8ebd/',
             'filename': 'pymovements-toy-dataset.zip',
             'md5': '4da622457637a8181d86601fe17f3aa8',
         },

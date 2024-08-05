@@ -108,7 +108,7 @@ class GazeGraph(DatasetDefinition):
 
     resources: tuple[dict[str, str], ...] = (
         {
-            'resource': 'master',
+            'gaze_resource': 'master',
             'filename': 'gaze_graph_data.zip',
             'md5': '181f4b79477cee6e0267482d989610b0',
         },
@@ -134,7 +134,7 @@ class GazeGraph(DatasetDefinition):
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: ['task'])
+    trial_columns: list[str] = field(default_factory=lambda: ['subject_id', 'task'])
 
     time_column: Any = None
 

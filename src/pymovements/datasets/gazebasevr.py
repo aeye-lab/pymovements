@@ -111,7 +111,7 @@ class GazeBaseVR(DatasetDefinition):
 
     resources: tuple[dict[str, str]] = (
         {
-            'resource': '38844024',
+            'gaze_resource': '38844024',
             'filename': 'gazebasevr.zip',
             'md5': '048c04b00fd64347375cc8d37b451a22',
         },
