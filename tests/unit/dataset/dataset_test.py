@@ -1471,8 +1471,6 @@ def test_event_dataframe_add_property_has_expected_schema(
     dataset.compute_event_properties(**property_kwargs)
 
     for events_df in dataset.events:
-        if events_df.frame.schema != expected_schema:
-            print(events_df.frame)
         assert events_df.frame.schema == expected_schema
 
 
