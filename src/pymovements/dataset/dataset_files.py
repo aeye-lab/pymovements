@@ -29,6 +29,7 @@ from tqdm.auto import tqdm
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events import EventDataFrame
+from pymovements.events.precomputed import PrecomputedEventDataFrame
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
 from pymovements.gaze.io import from_asc
 from pymovements.gaze.io import from_csv
@@ -351,6 +352,54 @@ def load_gaze_file(
         )
 
     return gaze_df
+
+
+def load_precomputed_event_files(
+        definition: DatasetDefinition,
+        paths: DatasetPaths,
+) -> list[PrecomputedEventDataFrame]:
+    precomputed_events = []
+    for resource in definition.precomputed_event_resources:
+        data_path = paths.precomputed_events / resource['filename']
+        precomputed_events.append(load_precomputed_event_file(data_path))
+    return precomputed_events
+
+
+def load_precomputed_event_file(
+        data_path: str | Path,
+        custom_read_kwargs: dict[str, Any] | None = None,
+) -> PrecomputedEventDataFrame:
+    """Load text stimulus from file.
+
+    Parameters
+    ----------
+    data_path:  str | Path
+        Path to file to be read.
+    custom_read_kwargs: dict[str, Any] | None
+        Custom read keyword arguments for polars. (default: None)
+
+    Returns
+    -------
+    PrecomputedEventDataFrame
+        Returns the text stimulus file.
+    """
+    data_path = Path(data_path)
+    if custom_read_kwargs is None:
+        custom_read_kwargs = {}
+
+    valid_extensions = {'.csv', '.tsv', '.txt'}
+    if data_path.suffix in valid_extensions:
+        precomputed_event_df = pl.read_csv(
+            data_path,
+            **custom_read_kwargs,
+        )
+    else:
+        raise ValueError(
+            f'unsupported file format "{data_path.suffix}". '
+            f'Supported formats are: {", ".join(sorted(valid_extensions))}',
+        )
+
+    return PrecomputedEventDataFrame(data=precomputed_event_df)
 
 
 def add_fileinfo(

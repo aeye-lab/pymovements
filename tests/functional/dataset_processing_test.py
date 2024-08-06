@@ -129,6 +129,7 @@ def fixture_dataset_init_kwargs(request):
             root='tests',
             dataset='.',
             raw='files',
+            precomputed_events='files',
         ),
     )
 

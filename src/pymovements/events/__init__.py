@@ -68,6 +68,7 @@ from pymovements.events.detection import microsaccades
 from pymovements.events.detection._library import EventDetectionLibrary
 from pymovements.events.detection._library import register_event_detection
 from pymovements.events.frame import EventDataFrame
+from pymovements.events.precomputed import PrecomputedEventDataFrame
 from pymovements.events.processing import EventGazeProcessor
 from pymovements.events.processing import EventProcessor
 from pymovements.events.properties import amplitude
@@ -88,6 +89,7 @@ __all__ = [
     'ivt',
     'microsaccades',
 
+    'PrecomputedEventDataFrame',
     'EventDataFrame',
 
     'EventGazeProcessor',

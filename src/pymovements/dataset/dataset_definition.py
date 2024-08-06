@@ -35,10 +35,10 @@ class DatasetDefinition:
     ----------
     name: str
         The name of the dataset. (default: '.')
-    mirrors: tuple[str, ...]
+    gaze_mirrors: tuple[str, ...]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
         (default: field(default_factory=tuple))
-    resources: tuple[dict[str, str], ...]
+    gaze_resources: tuple[dict[str, str], ...]
         A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -124,9 +124,13 @@ class DatasetDefinition:
     # pylint: disable=too-many-instance-attributes
     name: str = '.'
 
-    mirrors: tuple[str, ...] = field(default_factory=tuple)
+    gaze_mirrors: tuple[str, ...] = field(default_factory=tuple)
 
-    resources: tuple[dict[str, str], ...] = field(default_factory=tuple)
+    gaze_resources: tuple[dict[str, str], ...] = field(default_factory=tuple)
+
+    precomputed_event_mirrors: tuple[str, ...] = field(default_factory=tuple)
+
+    precomputed_event_resources: tuple[dict[str, str], ...] = field(default_factory=tuple)
 
     experiment: Experiment | None = None
 
@@ -146,3 +150,7 @@ class DatasetDefinition:
     velocity_columns: list[str] | None = None
     acceleration_columns: list[str] | None = None
     distance_column: str | None = None
+    has_gaze_files: bool = True
+    has_precomputed_event_files: bool = False
+    extract_gaze_data: bool = True
+    extract_precomputed_data: bool = True

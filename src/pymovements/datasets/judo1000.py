@@ -49,10 +49,10 @@ class JuDo1000(DatasetDefinition):
     name : str
         The name of the dataset.
 
-    mirrors : tuple[str, ...]
+    gaze_mirrors : tuple[str, ...]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources : tuple[dict[str, str], ...]
+    gaze_resources : tuple[dict[str, str], ...]
         A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -98,11 +98,11 @@ class JuDo1000(DatasetDefinition):
 
     name: str = 'JuDo1000'
 
-    mirrors: tuple[str, ...] = (
+    gaze_mirrors: tuple[str, ...] = (
         'https://osf.io/download/',
     )
 
-    resources: tuple[dict[str, str], ...] = (
+    gaze_resources: tuple[dict[str, str], ...] = (
         {
             'gaze_resource': '4wy7s/',
             'filename': 'JuDo1000.zip',
@@ -164,3 +164,5 @@ class JuDo1000(DatasetDefinition):
             'separator': '\t',
         },
     )
+    has_gaze_files: bool = True
+    has_precomputed_event_files: bool = False

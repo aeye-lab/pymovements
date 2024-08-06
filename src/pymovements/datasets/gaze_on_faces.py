@@ -51,10 +51,10 @@ class GazeOnFaces(DatasetDefinition):
     name : str
         The name of the dataset.
 
-    mirrors : tuple[str, ...]
+    gaze_mirrors : tuple[str, ...]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources : tuple[dict[str, str], ...]
+    gaze_resources : tuple[dict[str, str], ...]
         A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -100,13 +100,13 @@ class GazeOnFaces(DatasetDefinition):
 
     name: str = 'GazeOnFaces'
 
-    mirrors: tuple[str, ...] = (
+    gaze_mirrors: tuple[str, ...] = (
         'https://uncloud.univ-nantes.fr/index.php/s/',
     )
 
-    resources: tuple[dict[str, str], ...] = (
+    gaze_resources: tuple[dict[str, str], ...] = (
         {
-            'resource': '8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip',
+            'gaze_resource': '8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip',
             'filename': 'gaze_csv.zip',
             'md5': 'fe219f07c9253cd9aaee6bd50233c034',
         },
@@ -149,3 +149,5 @@ class GazeOnFaces(DatasetDefinition):
             'dtypes': [pl.Float32, pl.Float32],
         },
     )
+    has_gaze_files: bool = True
+    has_precomputed_event_files: bool = False
