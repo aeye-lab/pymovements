@@ -40,28 +40,24 @@ EYE_TRACKING_SAMPLE = re.compile(
 )
 
 EYELINK_META_REGEXES = [
-    {'pattern': r'\*\*\s+VERSION:\s+(?P<version_1>.*)\s+'},
-    {
-        'pattern': r'\*\*\s+DATE:\s+(?P<weekday>[A-Z,a-z]+)\s+(?P<month>[A-Z,a-z]+)'
-                   r'\s+(?P<day>\d\d?)\s+(?P<time>\d\d:\d\d:\d\d)\s+(?P<year>\d{4})\s*',
-    },
-    {'pattern': r'\*\*\s+(?P<version_2>EYELINK.*)'},
-    {
-        'pattern': r'MSG\s+\d+[.]?\d*\s+DISPLAY_COORDS\s+(?P<resolution>.*)',
-    },
-    {
-        'pattern': r'MSG\s+\d+[.]?\d*\s+RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+'
-                   r'(?P<sampling_rate>\d+)\s+'
-                   r'(?P<file_sample_filter>(0|1|2))\s+'
-                   r'(?P<link_sample_filter>(0|1|2))\s+'
-                   r'(?P<tracked_eye>(L|R|LR))\s*',
-    },
-    {
-        'pattern': r'PUPIL\s+(?P<pupil_data_type>(AREA|DIAMETER))\s*',
-    },
-    {
-        'pattern': r'MSG\s+\d+[.]?\d*\s+ELCLCFG\s+(?P<mount_configuration>.*)',
-    },
+    {'pattern': re.compile(regex)} for regex in (
+        r'\*\*\s+VERSION:\s+(?P<version_1>.*)\s+',
+        (
+            r'\*\*\s+DATE:\s+(?P<weekday>[A-Z,a-z]+)\s+(?P<month>[A-Z,a-z]+)'
+            r'\s+(?P<day>\d\d?)\s+(?P<time>\d\d:\d\d:\d\d)\s+(?P<year>\d{4})\s*'
+        ),
+        r'\*\*\s+(?P<version_2>EYELINK.*)',
+        r'MSG\s+\d+[.]?\d*\s+DISPLAY_COORDS\s+(?P<resolution>.*)',
+        (
+            r'MSG\s+\d+[.]?\d*\s+RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+'
+            r'(?P<sampling_rate>\d+)\s+'
+            r'(?P<file_sample_filter>(0|1|2))\s+'
+            r'(?P<link_sample_filter>(0|1|2))\s+'
+            r'(?P<tracked_eye>(L|R|LR))\s*'
+        ),
+        r'PUPIL\s+(?P<pupil_data_type>(AREA|DIAMETER))\s*',
+        r'MSG\s+\d+[.]?\d*\s+ELCLCFG\s+(?P<mount_configuration>.*)',
+    )
 ]
 
 VALIDATION_REGEX = re.compile(
@@ -243,8 +239,7 @@ def parse_eyelink(
     for key in metadata_keys:
         metadata[key] = None
 
-    for metadata_pattern in EYELINK_META_REGEXES:
-        compiled_metadata_patterns.append({'pattern': re.compile(metadata_pattern['pattern'])})
+    compiled_metadata_patterns.extend(EYELINK_META_REGEXES)
 
     cal_timestamp = ''
 
@@ -354,30 +349,28 @@ def parse_eyelink(
                     # each metadata pattern should only match once
                     compiled_metadata_patterns.remove(pattern_dict)
 
-    if metadata:
-        # if the sampling rate is not found, we cannot calculate the data loss
-        actual_number_of_samples = len(samples['time'])
-
-        data_loss_ratio, data_loss_ratio_blinks = _calculate_data_loss(
-            blinks=blinks,
-            invalid_samples=invalid_samples,
-            actual_num_samples=actual_number_of_samples,
-            total_rec_duration=total_recording_duration,
-            sampling_rate=metadata['sampling_rate'],
-        )
-
-        pre_processed_metadata: dict[str, Any] = _pre_process_metadata(metadata)
-
-        # is not yet pre-processed but should be
-        pre_processed_metadata['calibrations'] = calibrations
-        pre_processed_metadata['validations'] = validations
-        pre_processed_metadata['blinks'] = blinks
-        pre_processed_metadata['data_loss_ratio'] = data_loss_ratio
-        pre_processed_metadata['data_loss_ratio_blinks'] = data_loss_ratio_blinks
-        pre_processed_metadata['total_recording_duration_ms'] = total_recording_duration
-
-    else:
+    if not metadata:
         raise Warning('No metadata found. Please check the file for errors.')
+
+    # if the sampling rate is not found, we cannot calculate the data loss
+    actual_number_of_samples = len(samples['time'])
+
+    data_loss_ratio, data_loss_ratio_blinks = _calculate_data_loss(
+        blinks=blinks,
+        invalid_samples=invalid_samples,
+        actual_num_samples=actual_number_of_samples,
+        total_rec_duration=total_recording_duration,
+        sampling_rate=metadata['sampling_rate'],
+    )
+
+    pre_processed_metadata: dict[str, Any] = _pre_process_metadata(metadata)
+    # is not yet pre-processed but should be
+    pre_processed_metadata['calibrations'] = calibrations
+    pre_processed_metadata['validations'] = validations
+    pre_processed_metadata['blinks'] = blinks
+    pre_processed_metadata['data_loss_ratio'] = data_loss_ratio
+    pre_processed_metadata['data_loss_ratio_blinks'] = data_loss_ratio_blinks
+    pre_processed_metadata['total_recording_duration_ms'] = total_recording_duration
 
     schema_overrides = {
         'time': pl.Float64,
@@ -386,8 +379,7 @@ def parse_eyelink(
         'pupil': pl.Float64,
     }
     if schema is not None:
-        for column, dtype in schema.items():
-            schema_overrides[column] = dtype
+        schema_overrides.update(schema)
 
     df = pl.from_dict(
         data=samples,
