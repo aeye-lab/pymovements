@@ -70,16 +70,16 @@ VALIDATION_REGEX = re.compile(
     r'(?P<tracked_eye>LEFT|RIGHT)\s+'
     r'(?P<error>\D*)\s+'
     r'(?P<validation_score_avg>\d.\d\d)\s+avg\.\s+'
-    r'(?P<validation_score_max>\d.\d\d)\s+max'
+    r'(?P<validation_score_max>\d.\d\d)\s+max',
 )
 
 BLINK_START_REGEX = re.compile(r'SBLINK\s+(R|L)\s+(?P<timestamp>(\d+[.]?\d*))\s*')
 BLINK_STOP_REGEX = re.compile(
     r'EBLINK\s+(R|L)\s+(?P<timestamp_start>(\d+[.]?\d*))\s+'
-    r'(?P<timestamp_end>(\d+[.]?\d*))\s+(?P<duration_ms>(\d+[.]?\d*))\s*'
+    r'(?P<timestamp_end>(\d+[.]?\d*))\s+(?P<duration_ms>(\d+[.]?\d*))\s*',
 )
 INVALID_SAMPLE_REGEX = re.compile(
-    r'(?P<timestamp>(\d+[.]?\d*))\s+\.\s+\.\s+0\.0\s+0\.0\s+\.\.\.\s*'
+    r'(?P<timestamp>(\d+[.]?\d*))\s+\.\s+\.\s+0\.0\s+0\.0\s+\.\.\.\s*',
 )
 
 CALIBRATION_TIMESTAMP_REGEX = re.compile(r'MSG\s+(?P<timestamp>\d+[.]?\d*)\s+!CAL\s*\n')
@@ -87,15 +87,15 @@ CALIBRATION_TIMESTAMP_REGEX = re.compile(r'MSG\s+(?P<timestamp>\d+[.]?\d*)\s+!CA
 CALIBRATION_REGEX = re.compile(
     r'>+\s+CALIBRATION\s+\(HV(?P<num_points>\d\d?),'
     r'(?P<type>.*)\).*'
-    r'(?P<tracked_eye>RIGHT|LEFT):\s+<{9}'
+    r'(?P<tracked_eye>RIGHT|LEFT):\s+<{9}',
 )
 
 START_RECORDING_REGEX = re.compile(
-    r'START\s+(?P<timestamp>(\d+[.]?\d*))\s+(RIGHT|LEFT)\s+(?P<types>.*)'
+    r'START\s+(?P<timestamp>(\d+[.]?\d*))\s+(RIGHT|LEFT)\s+(?P<types>.*)',
 )
 STOP_RECORDING_REGEX = re.compile(
     r'END\s+(?P<timestamp>(\d+[.]?\d*))\s+\s+(?P<types>.*)\s+RES\s+'
-    r'(?P<xres>[\d\.]*)\s+(?P<yres>[\d\.]*)\s*'
+    r'(?P<xres>[\d\.]*)\s+(?P<yres>[\d\.]*)\s*',
 )
 
 
