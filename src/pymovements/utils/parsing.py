@@ -64,7 +64,7 @@ EYELINK_META_REGEXES = [
     },
 ]
 
-VALIDATION_REGEX = (
+VALIDATION_REGEX = re.compile(
     r'MSG\s+(?P<timestamp>\d+[.]?\d*)\s+!CAL\s+VALIDATION\s+HV'
     r'(?P<num_points>\d\d?).*'
     r'(?P<tracked_eye>LEFT|RIGHT)\s+'
@@ -73,23 +73,27 @@ VALIDATION_REGEX = (
     r'(?P<validation_score_max>\d.\d\d)\s+max'
 )
 
-BLINK_START_REGEX = r'SBLINK\s+(R|L)\s+(?P<timestamp>(\d+[.]?\d*))\s*'
-BLINK_STOP_REGEX = (
+BLINK_START_REGEX = re.compile(r'SBLINK\s+(R|L)\s+(?P<timestamp>(\d+[.]?\d*))\s*')
+BLINK_STOP_REGEX = re.compile(
     r'EBLINK\s+(R|L)\s+(?P<timestamp_start>(\d+[.]?\d*))\s+'
     r'(?P<timestamp_end>(\d+[.]?\d*))\s+(?P<duration_ms>(\d+[.]?\d*))\s*'
 )
-INVALID_SAMPLE_REGEX = r'(?P<timestamp>(\d+[.]?\d*))\s+\.\s+\.\s+0\.0\s+0\.0\s+\.\.\.\s*'
+INVALID_SAMPLE_REGEX = re.compile(
+    r'(?P<timestamp>(\d+[.]?\d*))\s+\.\s+\.\s+0\.0\s+0\.0\s+\.\.\.\s*'
+)
 
-CALIBRATION_TIMESTAMP_REGEX = r'MSG\s+(?P<timestamp>\d+[.]?\d*)\s+!CAL\s*\n'
+CALIBRATION_TIMESTAMP_REGEX = re.compile(r'MSG\s+(?P<timestamp>\d+[.]?\d*)\s+!CAL\s*\n')
 
-CALIBRATION_REGEX = (
+CALIBRATION_REGEX = re.compile(
     r'>+\s+CALIBRATION\s+\(HV(?P<num_points>\d\d?),'
     r'(?P<type>.*)\).*'
     r'(?P<tracked_eye>RIGHT|LEFT):\s+<{9}'
 )
 
-START_RECORDING_REGEX = r'START\s+(?P<timestamp>(\d+[.]?\d*))\s+(RIGHT|LEFT)\s+(?P<types>.*)'
-STOP_RECORDING_REGEX = (
+START_RECORDING_REGEX = re.compile(
+    r'START\s+(?P<timestamp>(\d+[.]?\d*))\s+(RIGHT|LEFT)\s+(?P<types>.*)'
+)
+STOP_RECORDING_REGEX = re.compile(
     r'END\s+(?P<timestamp>(\d+[.]?\d*))\s+\s+(?P<types>.*)\s+RES\s+'
     r'(?P<xres>[\d\.]*)\s+(?P<yres>[\d\.]*)\s*'
 )
@@ -242,17 +246,7 @@ def parse_eyelink(
     for metadata_pattern in EYELINK_META_REGEXES:
         compiled_metadata_patterns.append({'pattern': re.compile(metadata_pattern['pattern'])})
 
-    compiled_validation_pattern = re.compile(VALIDATION_REGEX)
-    compiled_calibration_pattern = re.compile(CALIBRATION_REGEX)
-    compiled_calibration_timestamp = re.compile(CALIBRATION_TIMESTAMP_REGEX)
     cal_timestamp = ''
-
-    compiled_blink_start = re.compile(BLINK_START_REGEX)
-    compiled_blink_stop = re.compile(BLINK_STOP_REGEX)
-    compiled_invalid_sample = re.compile(INVALID_SAMPLE_REGEX)
-
-    compiled_recording_start = re.compile(START_RECORDING_REGEX)
-    compiled_recording_stop = re.compile(STOP_RECORDING_REGEX)
 
     validations = []
     calibrations = []
@@ -275,8 +269,7 @@ def parse_eyelink(
                     current_additional[current_column] = pattern_dict['value']
 
                 else:
-                    for column, value in match.groupdict().items():
-                        current_additional[column] = value
+                    current_additional.update(match.groupdict())
 
         if cal_timestamp:
             # if a calibration timestamp has been found, the next line will be a
@@ -288,15 +281,15 @@ def parse_eyelink(
                     'timestamp': cal_timestamp,
                     **match.groupdict(),
                 }
-                if (match := compiled_calibration_pattern.match(line))
+                if (match := CALIBRATION_REGEX.match(line))
                 else {'timestamp': cal_timestamp},
             )
             cal_timestamp = ''
 
-        elif compiled_blink_start.match(line):
+        elif BLINK_START_REGEX.match(line):
             blink = True
 
-        elif match := compiled_blink_stop.match(line):
+        elif match := BLINK_STOP_REGEX.match(line):
             blink = False
             parsed_blink = match.groupdict()
             blink_info = {
@@ -308,10 +301,10 @@ def parse_eyelink(
             num_blink_samples = 0
             blinks.append(blink_info)
 
-        elif match := compiled_recording_start.match(line):
+        elif match := START_RECORDING_REGEX.match(line):
             start_recording_timestamp = match.groupdict()['timestamp']
 
-        elif match := compiled_recording_stop.match(line):
+        elif match := STOP_RECORDING_REGEX.match(line):
             stop_recording_timestamp = match.groupdict()['timestamp']
             block_duration = float(stop_recording_timestamp) - float(start_recording_timestamp)
 
@@ -337,15 +330,16 @@ def parse_eyelink(
             for additional_column in additional_columns:
                 samples[additional_column].append(current_additional[additional_column])
 
-            if (match := compiled_invalid_sample.match(line)) and not blink:
-                invalid_samples.append(match.groupdict()['timestamp'])
-            elif compiled_invalid_sample.match(line) and blink:
-                num_blink_samples += 1
+            if match := INVALID_SAMPLE_REGEX.match(line):
+                if blink:
+                    num_blink_samples += 1
+                else:
+                    invalid_samples.append(match.groupdict()['timestamp'])
 
-        elif match := compiled_calibration_timestamp.match(line):
+        elif match := CALIBRATION_TIMESTAMP_REGEX.match(line):
             cal_timestamp = match.groupdict()['timestamp']
 
-        elif match := compiled_validation_pattern.match(line):
+        elif match := VALIDATION_REGEX.match(line):
             validations.append(match.groupdict())
 
         elif compiled_metadata_patterns:
@@ -355,8 +349,7 @@ def parse_eyelink(
                         metadata[pattern_dict['key']] = pattern_dict['value']
 
                     else:
-                        for key, value in match.groupdict().items():
-                            metadata[key] = value
+                        metadata.update(match.groupdict())
 
                     # each metadata pattern should only match once
                     compiled_metadata_patterns.remove(pattern_dict)
