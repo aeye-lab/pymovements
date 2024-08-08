@@ -20,6 +20,7 @@
 """Module for event processing."""
 from __future__ import annotations
 
+from collections import defaultdict
 from collections.abc import Callable
 from typing import Any
 
@@ -191,18 +192,21 @@ class EventGazeProcessor:
         # a name and its on- and offset.
         event_identifiers = [*trial_identifiers, 'name', 'onset', 'offset']
 
-        joined_frame = gaze.frame.join(events.frame, on=trial_identifiers)
+        events_frame = events.frame
         if name is not None:
-            joined_frame = joined_frame.filter(pl.col('name').str.contains(f'^{name}$'))
+            events_frame = events_frame.filter(pl.col('name').str.contains(f'^{name}$'))
+            if len(events_frame) == 0:
+                raise RuntimeError(f'No events with name "{name}" found in data frame')
 
-        if len(joined_frame) == 0:
-            raise RuntimeError(f'No events with name "{name}" found in data frame')
-
-        result = (
-            joined_frame
-            .filter(pl.col('time').is_between(pl.col('onset'), pl.col('offset')))
-            .group_by(event_identifiers, maintain_order=True)
-            .agg(
+        property_values = defaultdict(list)
+        for event in events_frame.iter_rows(named=True):
+            # Find gaze samples that belong to the current event.
+            filtered_gaze = gaze.frame.filter(
+                pl.col('time').is_between(event['onset'], event['offset']),
+                *[pl.col(identifier) == event[identifier] for identifier in trial_identifiers],
+            )
+            # Compute event property values.
+            values = filtered_gaze.select(
                 [
                     this_property_expression(**this_property_kwargs)
                     .alias(this_property_name)
@@ -210,5 +214,12 @@ class EventGazeProcessor:
                     in zip(property_names, property_expressions, property_kwargs)
                 ],
             )
+            # Collect property values.
+            for property_name in property_names:
+                property_values[property_name].append(values[property_name].item())
+
+        # The resulting DataFrame contains the event identifiers and the computed properties.
+        result = events_frame.select(event_identifiers).with_columns(
+            *[pl.Series(name, values) for name, values in property_values.items()],
         )
         return result
