@@ -65,6 +65,7 @@ the task should be set to None again
 START	10000004 	RIGHT	SAMPLES	EVENTS
 10000004	  850.7	  717.5	  714.0	    0.0	...
 END	10000005 	SAMPLES	EVENTS	RES	  38.54	  31.12
+MSG 10000005 METADATA_1 123
 MSG 10000005 START_B
 the next line now should have the task column set to B
 START	10000006 	RIGHT	SAMPLES	EVENTS
@@ -85,11 +86,14 @@ MSG 10000012 STOP_TRIAL_2
 MSG 10000013 START_TRIAL_3
 the next line now should have the trial column set to 3
 START	10000014 	RIGHT	SAMPLES	EVENTS
+MSG 10000014 METADATA_2 abc
+MSG 10000014 METADATA_1 456
 10000014	  850.7	  717.5	  714.0	    0.0	...
 END	10000015 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000015 STOP_TRIAL_3
 MSG 10000016 STOP_B
 task and trial should be set to None again
+MSG 10000017 METADATA_3
 START	10000017 	RIGHT	SAMPLES	EVENTS
 10000017	  850.7	  717.5	  .	    0.0	...
 SBLINK R 10000018
@@ -123,6 +127,13 @@ PATTERNS = [
         'column': 'trial_id',
         'value': None,
     },
+]
+
+METADATA_PATTERNS = [
+    r'METADATA_1 (?P<metadata_1>\d+)',
+    {'pattern': r'METADATA_2 (?P<metadata_2>\w+)'},
+    {'pattern': r'METADATA_3', 'key': 'metadata_3', 'value': True},
+    {'pattern': r'METADATA_4', 'key': 'metadata_4', 'value': True},
 ]
 
 EXPECTED_DF = pl.from_dict(
@@ -174,6 +185,10 @@ EXPECTED_METADATA = {
         'eyes_recorded': 'binocular / monocular',
         'short_name': 'BTABLER',
     },
+    'metadata_1': '123',
+    'metadata_2': 'abc',
+    'metadata_3': True,
+    'metadata_4': None,
 }
 
 
@@ -184,6 +199,7 @@ def test_parse_eyelink(tmp_path):
     df, metadata = pm.utils.parsing.parse_eyelink(
         filepath,
         patterns=PATTERNS,
+        metadata_patterns=METADATA_PATTERNS,
     )
 
     assert_frame_equal(df, EXPECTED_DF, check_column_order=False)
