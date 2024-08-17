@@ -114,7 +114,8 @@ def download_dataset(
     if definition.has_precomputed_event_files:
         if len(definition.precomputed_event_mirrors) == 0:
             raise AttributeError(
-                'number of precomputed mirrors must not be zero to download dataset')
+                'number of precomputed mirrors must not be zero to download dataset',
+            )
 
         if len(definition.precomputed_event_resources) == 0:
             raise AttributeError(
@@ -189,7 +190,6 @@ def extract_dataset(
         messages for recursive archives. (2) Print messages for extracting each dataset resource and
         each recursive archive extract. (default: 1)
     """
-
     if definition.has_gaze_files and definition.extract_gaze_data:
         paths.raw.mkdir(parents=True, exist_ok=True)
         for resource in definition.gaze_resources:

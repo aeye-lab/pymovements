@@ -61,6 +61,7 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
         If an error occurred during matching filenames or no files have been found.
     """
     # Get all filepaths that match regular expression.
+    fileinfo_dicts = []
     if definition.has_gaze_files:
         fileinfo_dicts = match_filepaths(
             path=paths.raw,
@@ -365,6 +366,20 @@ def load_precomputed_event_files(
         definition: DatasetDefinition,
         paths: DatasetPaths,
 ) -> list[PrecomputedEventDataFrame]:
+    """Load text stimulus from file.
+
+    Parameters
+    ----------
+    definition:  DatasetDefinition
+        Dataset definition to load precomputed events.
+    paths: DatasetPaths
+        Adjustable paths to extract datasets.
+
+    Returns
+    -------
+    list[PrecomputedEventDataFrame]
+        Return list of precomputed event dataframes.
+    """
     precomputed_events = []
     for resource in definition.precomputed_event_resources:
         data_path = paths.precomputed_events / resource['filename']
@@ -376,7 +391,7 @@ def load_precomputed_event_file(
         data_path: str | Path,
         custom_read_kwargs: dict[str, Any] | None = None,
 ) -> PrecomputedEventDataFrame:
-    """Load text stimulus from file.
+    """Load precomputed events from files.
 
     Parameters
     ----------
