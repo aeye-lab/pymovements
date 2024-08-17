@@ -61,11 +61,18 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
         If an error occurred during matching filenames or no files have been found.
     """
     # Get all filepaths that match regular expression.
-    fileinfo_dicts = match_filepaths(
-        path=paths.raw,
-        regex=curly_to_regex(definition.filename_format),
-        relative=True,
-    )
+    if definition.has_gaze_files:
+        fileinfo_dicts = match_filepaths(
+            path=paths.raw,
+            regex=curly_to_regex(definition.filename_format),
+            relative=True,
+        )
+    if definition.has_precomputed_event_files:
+        fileinfo_dicts = match_filepaths(
+            path=paths.precomputed_events,
+            regex=curly_to_regex(definition.filename_format),
+            relative=True,
+        )
 
     if not fileinfo_dicts:
         print(definition.filename_format)

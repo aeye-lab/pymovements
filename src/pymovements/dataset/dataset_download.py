@@ -111,19 +111,17 @@ def download_dataset(
                     f"downloading resource {resource['gaze_resource']} failed for all mirrors.",
                 )
 
-            # downloading the resource was successful, we don't need to try another mirror
-            break
-
     if definition.has_precomputed_event_files:
         if len(definition.precomputed_event_mirrors) == 0:
-            raise AttributeError('number of mirrors must not be zero to download dataset')
+            raise AttributeError(
+                'number of precomputed mirrors must not be zero to download dataset')
 
         if len(definition.precomputed_event_resources) == 0:
             raise AttributeError(
                 'number of precomputed_event_resources must not be zero to download dataset',
             )
 
-        paths.raw.mkdir(parents=True, exist_ok=True)
+        paths.precomputed_events.mkdir(parents=True, exist_ok=True)
 
         for resource in definition.precomputed_event_resources:
             success = False
@@ -157,9 +155,6 @@ def download_dataset(
                     f"downloading resource {resource['precomputed_event_resource']} "
                     'failed for all mirrors.',
                 )
-
-            # downloading the resource was successful, we don't need to try another mirror
-            break
 
     if extract:
         extract_dataset(

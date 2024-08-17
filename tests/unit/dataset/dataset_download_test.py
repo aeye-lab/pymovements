@@ -35,6 +35,7 @@ import pymovements as pm
         'CustomGazeAndPrecomputed',
         'CustomGazeOnly',
         'CustomPrecomputedOnly',
+        'CustomPrecomputedOnlyNoExtract',
     ],
 )
 def dataset_definition_fixture(request):
@@ -119,6 +120,30 @@ def dataset_definition_fixture(request):
                 },
             )
             extract_precomputed_data: bool = True
+
+        return CustomPublicDataset()
+    elif request.param == 'CustomPrecomputedOnlyNoExtract':
+        @dataclass
+        @pm.register_dataset
+        class CustomPublicDataset(pm.DatasetDefinition):
+            name: str = 'CustomPublicDataset'
+
+            has_gaze_files: bool = False
+            extract_gaze_data: bool = False
+            has_precomputed_event_files: bool = True
+            precomputed_event_mirrors: tuple[str, ...] = (
+                'https://example.com/',
+                'https://another_example.com/',
+            )
+
+            precomputed_event_resources: tuple[dict[str, str], ...] = (
+                {
+                    'precomputed_event_resource': 'test_pc.gz.tar',
+                    'filename': 'test_pc.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            )
+            extract_precomputed_data: bool = False
 
         return CustomPublicDataset()
 
@@ -745,6 +770,33 @@ def test_dataset_download_no_gaze_mirrors_raises_exception(tmp_path):
         assert substring in msg
 
 
+def test_dataset_download_no_precomputed_event_mirrors_raises_exception(tmp_path):
+    @dataclass
+    class NoPrecomputedMirrorsDefinition(pm.DatasetDefinition):
+        name: str = 'CustomPublicDataset'
+
+        has_gaze_files: bool = False
+        has_precomputed_event_files: bool = True
+        precomputed_event_mirrors: tuple[str, ...] = ()
+
+        precomputed_event_resources: tuple[dict[str, str], ...] = (
+            {
+                'precomputed_event_resource': 'test_pc.gz.tar',
+                'filename': 'test_pc.gz.tar',
+                'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+            },
+        )
+
+    with pytest.raises(AttributeError) as excinfo:
+        pm.Dataset(NoPrecomputedMirrorsDefinition, path=tmp_path).download()
+
+    msg, = excinfo.value.args
+
+    expected_substrings = ['number', 'mirrors', 'zero', 'download']
+    for substring in expected_substrings:
+        assert substring in msg
+
+
 def test_dataset_download_no_gaze_resources_raises_exception(tmp_path):
     @dataclass
     class NoGazeResourcesDefinition(pm.DatasetDefinition):
@@ -767,6 +819,30 @@ def test_dataset_download_no_gaze_resources_raises_exception(tmp_path):
         assert substring in msg
 
 
+def test_dataset_download_no_precomputed_event_resources_raises_exception(tmp_path):
+    @dataclass
+    class NoPrecomputedResourcesDefinition(pm.DatasetDefinition):
+        name: str = 'CustomPublicDataset'
+
+        has_gaze_files: bool = False
+        has_precomputed_event_files: bool = True
+        precomputed_event_mirrors: tuple[str, ...] = (
+            'https://example.com/',
+            'https://another_example.com/',
+        )
+
+        precomputed_event_resources: tuple[dict[str, str], ...] = ()
+
+    with pytest.raises(AttributeError) as excinfo:
+        pm.Dataset(NoPrecomputedResourcesDefinition, path=tmp_path).download()
+
+    msg, = excinfo.value.args
+
+    expected_substrings = ['number', 'precomputed_event_resources', 'zero', 'download']
+    for substring in expected_substrings:
+        assert substring in msg
+
+
 def test_public_dataset_registered_correct_attributes(tmp_path, dataset_definition):
     dataset = pm.Dataset('CustomPublicDataset', path=tmp_path)
 
@@ -778,3 +854,28 @@ def test_public_dataset_registered_correct_attributes(tmp_path, dataset_definiti
     assert dataset.definition.custom_read_kwargs == dataset_definition.custom_read_kwargs
     assert dataset.definition.has_precomputed_event_files == dataset_definition.has_precomputed_event_files  # noqa: E501
     assert dataset.definition.has_gaze_files == dataset_definition.has_gaze_files
+
+
+def test_extract_dataset_precomputed_move_single_file(tmp_path):
+    class PrecomputedResourcesDefinition(pm.DatasetDefinition):
+        name: str = 'CustomPublicDataset'
+
+        has_gaze_files: bool = False
+        has_precomputed_event_files: bool = True
+        precomputed_event_mirrors: tuple[str, ...] = (
+            'https://example.com/',
+            'https://another_example.com/',
+        )
+
+        precomputed_event_resources: tuple[dict[str, str], ...] = (
+            {
+                'precomputed_event_resource': 'tests/files/',
+                'filename': '18sat_fixfinal.csv',
+                'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+            },
+        )
+        extract_precomputed_data = False
+    pm.dataset.dataset_download.extract_dataset(
+        PrecomputedResourcesDefinition,
+        pm.DatasetPaths(root='tests/files/', downloads='.', precomputed_events='.'),
+    )
