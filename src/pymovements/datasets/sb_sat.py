@@ -53,7 +53,8 @@ class SBSAT(DatasetDefinition):
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     gaze_resources : tuple[dict[str, str], ...]
-        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following keys:
+        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+        keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.

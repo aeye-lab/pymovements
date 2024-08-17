@@ -79,7 +79,6 @@ class Dataset:
     def load(
             self,
             *,
-            gaze: bool | None = None,
             events: bool | None = None,
             preprocessed: bool = False,
             subset: dict[str, float | int | str | list[float | int | str]] | None = None,
@@ -94,8 +93,8 @@ class Dataset:
 
         Parameters
         ----------
-        events: bool
-            If ``True``, load previously saved event data. (default: False)
+        events: bool | None
+            If ``True``, load previously saved event data. (default: None)
         preprocessed: bool
             If ``True``, load previously saved preprocessed data, otherwise load raw data.
             (default: False)
@@ -209,6 +208,7 @@ class Dataset:
         return self
 
     def load_precomputed_events(self) -> None:
+        """Load precomputed events."""
         self._check_fileinfo()
         self.precomputed_events = dataset_files.load_precomputed_event_files(
             self.definition,

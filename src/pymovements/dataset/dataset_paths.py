@@ -37,14 +37,19 @@ class DatasetPaths:
         Name of directory under dataset path that contains raw data. Can be `.` if raw data is
         located in dataset path. We advise the user to keep the original raw data separate from
         the preprocessed / event data. (default: 'raw')
-    events : str
+    events: str
         Name of directory under dataset path that will be used to store event data. We advise
         the user to keep the event data separate from the original raw data. (default: 'events')
+    precomputed_events: str
+        Name of directory under dataset path that contains precomputed event data.
+        Can be `.` if precomputed event data is located in dataset path.
+        We advise the user to keep the original precomputed event data separate
+        from the preprocessed / event data. (default: 'precomputed_events')
     preprocessed: str
         Name of directory under dataset path that will be used to store preprocessed data. We
         advise the user to keep the preprocessed data separate from the original raw data.
         (default: 'preprocessed')
-    downloads : str
+    downloads: str
         Name of directory to store downloaded data. (default: 'downloads')
     """
 
@@ -391,8 +396,8 @@ class DatasetPaths:
         >>> dataset.paths.precomputed_events# doctest: +SKIP
         Path('/path/to/your/datasets/ToyDataset/my_precomputed_events')
 
-        If your precomputed event  data is not in a separate directory under the root path then you can
-        also specify `.` as the directory name. We discourage this and advise the user to keep
+        If your precomputed event  data is not in a separate directory under the root path then you
+        can also specify `.` as the directory name. We discourage this and advise the user to keep
         precomputed data and preprocessed data separated.
         >>> paths = pm.DatasetPaths(root='/path/to/your/datasets/', raw='.')
         >>> dataset = pm.Dataset("ToyDataset", path=paths)
