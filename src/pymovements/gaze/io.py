@@ -282,10 +282,10 @@ def from_asc(
     file: str | Path
         Path of IPC/feather file.
     patterns: str | list[dict[str, Any] | str] | None
-        list of patterns to match for additional columns or a key identifier of eye tracker specific
+        List of patterns to match for additional columns or a key identifier of eye tracker specific
         default patterns. Supported values are: eyelink. (default: 'eyelink')
     metadata_patterns: list[dict[str, Any] | str] | None
-        list of patterns to match for extracting metadata from custom logged messages.
+        List of patterns to match for extracting metadata from custom logged messages.
         (default: None)
     schema: dict[str, Any] | None
         Dictionary to optionally specify types of columns parsed by patterns. (default: None)

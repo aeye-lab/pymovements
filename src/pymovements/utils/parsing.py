@@ -188,7 +188,7 @@ def parse_eyelink(
     filepath: Path | str
         file name of ascii file to convert.
     patterns: list[dict[str, Any] | str] | None
-        list of patterns to match for additional columns. (default: None)
+        List of patterns to match for additional columns. (default: None)
     schema: dict[str, Any] | None
         Dictionary to optionally specify types of columns parsed by patterns. (default: None)
     metadata_patterns: list[dict[str, Any] | str] | None
