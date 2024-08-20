@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides the traceplot plotting function."""
+"""Provides the scanpath plotting function."""
 from __future__ import annotations
 
 import math
@@ -110,7 +110,7 @@ def scanpathplot(
         add_traceplot: bool = False,
         gaze_position_column: str = 'pixel',
 ) -> None:
-    """Plot eye events trace from positional data.
+    """Plot scanpath from positional data.
 
     Parameters
     ----------
