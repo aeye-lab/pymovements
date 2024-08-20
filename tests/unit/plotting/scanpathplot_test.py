@@ -48,10 +48,6 @@ def event_fixture():
 
 @pytest.fixture(name='gaze', scope='session')
 def gaze_fixture():
-    x = np.arange(-100, 100)
-    y = np.arange(-100, 100)
-    arr = np.column_stack((x, y)).transpose()
-
     experiment = pm.Experiment(
         screen_width_px=1280,
         screen_height_px=1024,
@@ -61,7 +57,9 @@ def gaze_fixture():
         origin='upper left',
         sampling_rate=1000.0,
     )
-
+    x = np.arange(-100, 100)
+    y = np.arange(-100, 100)
+    arr = np.column_stack((x, y)).transpose()
     gaze = pm.gaze.from_numpy(
         data=arr,
         schema=['x_pix', 'y_pix'],

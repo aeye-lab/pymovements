@@ -22,8 +22,6 @@ from __future__ import annotations
 
 import math
 import sys
-from collections.abc import Sequence
-from typing import Literal
 
 import matplotlib.colors
 import matplotlib.pyplot as plt
@@ -31,10 +29,12 @@ import matplotlib.scale
 import numpy as np
 from matplotlib.collections import LineCollection
 from matplotlib.patches import Circle
-from typing_extensions import TypeAlias
 
 from pymovements.events import EventDataFrame
 from pymovements.gaze import GazeDataFrame
+from pymovements.utils.plotting import DEFAULT_SEGMENTDATA
+from pymovements.utils.plotting import DEFAULT_SEGMENTDATA_TWOSLOPE
+from pymovements.utils.plotting import LinearSegmentedColormapType
 
 
 # This is really a dirty workaround to use the Agg backend if runnning pytest.
@@ -42,51 +42,6 @@ from pymovements.gaze import GazeDataFrame
 # Unfortunately the Agg module cannot show plots in jupyter notebooks.
 if 'pytest' in sys.modules:  # pragma: no cover
     matplotlib.use('Agg')
-
-LinearSegmentedColormapType: TypeAlias = dict[
-    Literal['red', 'green', 'blue', 'alpha'], Sequence[tuple[float, ...]],
-]
-
-DEFAULT_SEGMENTDATA: LinearSegmentedColormapType = {
-    'red': [
-        (0.0, 0.0, 0.0),
-        (0.5, 1.0, 1.0),
-        (1.0, 1.0, 1.0),
-    ],
-    'green': [
-        (0.0, 0.0, 0.0),
-        (0.5, 1.0, 1.0),
-        (1.0, 0.0, 0.0),
-    ],
-    'blue': [
-        (0.0, 0.0, 0.0),
-        (0.5, 0.0, 0.0),
-        (1.0, 0.0, 0.0),
-    ],
-}
-
-
-DEFAULT_SEGMENTDATA_TWOSLOPE: LinearSegmentedColormapType = {
-    'red': [
-        (0.0, 0.0, 0.0),
-        (0.5, 0.0, 0.0),
-        (0.75, 1.0, 1.0),
-        (1.0, 1.0, 1.0),
-    ],
-    'green': [
-        (0.0, 0.0, 0.0),
-        (0.25, 1.0, 1.0),
-        (0.5, 0.0, 0.0),
-        (0.75, 1.0, 1.0),
-        (1.0, 0.0, 0.0),
-    ],
-    'blue': [
-        (0.0, 1.0, 1.0),
-        (0.25, 1.0, 1.0),
-        (0.5, 0.0, 0.0),
-        (1.0, 0.0, 0.0),
-    ],
-}
 
 
 def scanpathplot(
