@@ -182,6 +182,51 @@ def setup_matplotlib(
 
     return fig, ax, cmap, cmap_norm, cval, show_cbar
 
+LinearSegmentedColormapType: TypeAlias = dict[
+    Literal['red', 'green', 'blue', 'alpha'], Sequence[tuple[float, ...]],
+]
+
+DEFAULT_SEGMENTDATA: LinearSegmentedColormapType = {
+    'red': [
+        (0.0, 0.0, 0.0),
+        (0.5, 1.0, 1.0),
+        (1.0, 1.0, 1.0),
+    ],
+    'green': [
+        (0.0, 0.0, 0.0),
+        (0.5, 1.0, 1.0),
+        (1.0, 0.0, 0.0),
+    ],
+    'blue': [
+        (0.0, 0.0, 0.0),
+        (0.5, 0.0, 0.0),
+        (1.0, 0.0, 0.0),
+    ],
+}
+
+
+DEFAULT_SEGMENTDATA_TWOSLOPE: LinearSegmentedColormapType = {
+    'red': [
+        (0.0, 0.0, 0.0),
+        (0.5, 0.0, 0.0),
+        (0.75, 1.0, 1.0),
+        (1.0, 1.0, 1.0),
+    ],
+    'green': [
+        (0.0, 0.0, 0.0),
+        (0.25, 1.0, 1.0),
+        (0.5, 0.0, 0.0),
+        (0.75, 1.0, 1.0),
+        (1.0, 0.0, 0.0),
+    ],
+    'blue': [
+        (0.0, 1.0, 1.0),
+        (0.25, 1.0, 1.0),
+        (0.5, 0.0, 0.0),
+        (1.0, 0.0, 0.0),
+    ],
+}
+
 
 def draw_image_stimulus(
         image_stimulus: str | Path,
