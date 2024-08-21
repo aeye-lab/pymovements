@@ -22,9 +22,12 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from typing import Literal
-from typing import TypeAlias
+
+from typing_extensions import TypeAlias
+
 LinearSegmentedColormapType: TypeAlias = dict[
-    Literal['red', 'green', 'blue', 'alpha'], Sequence[tuple[float, ...]],
+    Literal['red', 'green', 'blue', 'alpha'],
+    Sequence[tuple[float, ...]],
 ]
 
 DEFAULT_SEGMENTDATA: LinearSegmentedColormapType = {
