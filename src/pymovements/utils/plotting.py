@@ -182,8 +182,10 @@ def setup_matplotlib(
 
     return fig, ax, cmap, cmap_norm, cval, show_cbar
 
+
 LinearSegmentedColormapType: TypeAlias = dict[
-    Literal['red', 'green', 'blue', 'alpha'], Sequence[tuple[float, ...]],
+    Literal['red', 'green', 'blue', 'alpha'],
+    Sequence[tuple[float, ...]],
 ]
 
 DEFAULT_SEGMENTDATA: LinearSegmentedColormapType = {
