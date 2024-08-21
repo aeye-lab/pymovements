@@ -28,6 +28,7 @@ import polars as pl
 
 from pymovements.events.properties import duration
 from pymovements.utils import checks
+from pymovements.utils.aois import get_aoi
 
 
 class EventDataFrame:
@@ -291,6 +292,14 @@ class EventDataFrame:
             ] + [pl.all()],
         )
         return df
+
+    def map_to_aois(
+            self,
+            aoi_dataframe: pm.stimulus.TextStimulus,
+            *,
+            eye: str = 'auto',
+    ) -> None:
+        get_aoi(aoi_dataframe, row, x_eye, y_eye)
 
     def __str__(self: Any) -> str:
         """Return string representation of event dataframe."""
