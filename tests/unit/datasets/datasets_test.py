@@ -29,6 +29,7 @@ import pymovements as pm
 
 @pytest.mark.parametrize(
     ('public_dataset', 'dataset_name'),
+    # XXX: add public dataset in alphabetical order
     [
         pytest.param(pm.datasets.GazeBase, 'GazeBase', id='GazeBase'),
         pytest.param(pm.datasets.GazeBaseVR, 'GazeBaseVR', id='GazeBaseVR'),
