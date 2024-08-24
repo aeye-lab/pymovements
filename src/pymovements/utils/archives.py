@@ -151,10 +151,13 @@ def _extract_tar(
         Compression filename suffix.
     """
     with tarfile.open(source_path, f'r:{compression[1:]}' if compression else 'r') as archive:
-        if sys.version_info < (3, 12):  # pragma: <3.12 cover
-            archive.extractall(destination_path)
-        else:  # pragma: >=3.12 cover
-            archive.extractall(destination_path, filter='tar')
+        for member in archive.getnames():
+            if os.path.exists(os.path.join(destination_path, member)):
+                continue
+            if sys.version_info < (3, 12):  # pragma: <3.12 cover
+                archive.extract(member, destination_path)
+            else:  # pragma: >=3.12 cover
+                archive.extract(member, destination_path, filter='tar')
 
 
 def _extract_zip(
@@ -175,7 +178,10 @@ def _extract_zip(
     """
     compression_id = _ZIP_COMPRESSION_MAP[compression] if compression else zipfile.ZIP_STORED
     with zipfile.ZipFile(source_path, 'r', compression=compression_id) as archive:
-        archive.extractall(destination_path)
+        for member in archive.namelist():
+            if os.path.exists(os.path.join(destination_path, member)):
+                continue
+            archive.extract(member, destination_path)
 
 
 _ARCHIVE_EXTRACTORS: dict[str, Callable[[Path, Path, str | None], None]] = {
