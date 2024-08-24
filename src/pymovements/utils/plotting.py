@@ -230,10 +230,11 @@ DEFAULT_SEGMENTDATA_TWOSLOPE: LinearSegmentedColormapType = {
     ],
 }
 
-CmapNormType: TypeAlias = matplotlib.colors.TwoSlopeNorm | \
-    matplotlib.colors.Normalize | \
-    matplotlib.colors.NoNorm
-
+CmapNormType: TypeAlias = Union[
+    matplotlib.colors.TwoSlopeNorm,
+    matplotlib.colors.Normalize,
+    matplotlib.colors.NoNorm,
+]
 MatplotlibSetupType: TypeAlias = tuple[
     matplotlib.pyplot.figure,
     matplotlib.pyplot.Axes,
