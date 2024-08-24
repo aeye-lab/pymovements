@@ -152,7 +152,10 @@ def _extract_tar(
     """
     with tarfile.open(source_path, f'r:{compression[1:]}' if compression else 'r') as archive:
         for member in archive.getnames():
-            if os.path.exists(os.path.join(destination_path, member)):
+            if (
+                os.path.exists(os.path.join(destination_path, member)) and
+                member[-4:] not in _ARCHIVE_EXTRACTORS
+            ):
                 continue
             if sys.version_info < (3, 12):  # pragma: <3.12 cover
                 archive.extract(member, destination_path)
@@ -179,7 +182,10 @@ def _extract_zip(
     compression_id = _ZIP_COMPRESSION_MAP[compression] if compression else zipfile.ZIP_STORED
     with zipfile.ZipFile(source_path, 'r', compression=compression_id) as archive:
         for member in archive.namelist():
-            if os.path.exists(os.path.join(destination_path, member)):
+            if (
+                os.path.exists(os.path.join(destination_path, member)) and
+                member[-4:] not in _ARCHIVE_EXTRACTORS
+            ):
                 continue
             archive.extract(member, destination_path)
 
