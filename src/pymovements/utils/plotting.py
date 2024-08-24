@@ -22,6 +22,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from typing import Literal
+from typing import Union
 
 import matplotlib.pyplot
 import numpy as np
@@ -74,9 +75,11 @@ DEFAULT_SEGMENTDATA_TWOSLOPE: LinearSegmentedColormapType = {
     ],
 }
 
-CmapNormType: TypeAlias = matplotlib.colors.TwoSlopeNorm | \
-    matplotlib.colors.Normalize | \
-    matplotlib.colors.NoNorm
+CmapNormType: TypeAlias = Union[
+    matplotlib.colors.TwoSlopeNorm,
+    matplotlib.colors.Normalize,
+    matplotlib.colors.NoNorm,
+]
 MatplotlibSetupType: TypeAlias = tuple[
     matplotlib.pyplot.figure,
     matplotlib.pyplot.Axes,
