@@ -68,5 +68,5 @@ def test_public_dataset_registered_correct_attributes(dataset_definition_class):
     assert dataset_definition.filename_format == registered_definition.filename_format
     assert dataset_definition.filename_format_dtypes == registered_definition.filename_format_dtypes
     assert dataset_definition.has_gaze_files == registered_definition.has_gaze_files
-    assert dataset_definition.has_precomputed_event_files == registered_definition.has_precomputed_event_files
+    assert dataset_definition.has_precomputed_event_files == registered_definition.has_precomputed_event_files  # noqa: E501
     assert dataset_definition.custom_read_kwargs == registered_definition.custom_read_kwargs
