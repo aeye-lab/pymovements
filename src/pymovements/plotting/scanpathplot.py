@@ -32,9 +32,8 @@ from matplotlib.patches import Circle
 
 from pymovements.events import EventDataFrame
 from pymovements.gaze import GazeDataFrame
-from pymovements.utils.plotting import DEFAULT_SEGMENTDATA
-from pymovements.utils.plotting import DEFAULT_SEGMENTDATA_TWOSLOPE
 from pymovements.utils.plotting import LinearSegmentedColormapType
+from pymovements.utils.plotting import setup_matplotlib
 
 
 # This is really a dirty workaround to use the Agg backend if runnning pytest.
@@ -118,64 +117,16 @@ def scanpathplot(
     x_signal = events.frame[position_column].list.get(0)
     y_signal = events.frame[position_column].list.get(1)
 
-    n = len(x_signal)
+    fig, ax, cmap, cmap_norm, cval, show_cbar = setup_matplotlib(
+        x_signal,
+        figsize,
+        cmap,
+        cmap_norm,
+        cmap_segmentdata,
+        cval,
+        show_cbar,
+    )
 
-    fig = plt.figure(figsize=figsize)
-    ax = fig.gca()
-
-    if cval is None:
-        cval = np.zeros(n)
-        show_cbar = False
-
-    cval_max = np.nanmax(np.abs(cval))
-    cval_min = np.nanmin(cval).astype(float)
-
-    if cmap_norm is None:
-        if cval_max and cval_min < 0:
-            cmap_norm = 'twoslope'
-        elif cval_max:
-            cmap_norm = 'normalize'
-        else:
-            cmap_norm = 'nonorm'
-
-    if cmap is None:
-        if cmap_segmentdata is None:
-            if cmap_norm == 'twoslope':
-                cmap_segmentdata = DEFAULT_SEGMENTDATA_TWOSLOPE
-            else:
-                cmap_segmentdata = DEFAULT_SEGMENTDATA
-
-        cmap = matplotlib.colors.LinearSegmentedColormap(
-            'line_cmap', segmentdata=cmap_segmentdata, N=512,
-        )
-
-    if cmap_norm == 'twoslope':
-        cmap_norm = matplotlib.colors.TwoSlopeNorm(
-            vcenter=0, vmin=-cval_max, vmax=cval_max,
-        )
-    elif cmap_norm == 'normalize':
-        cmap_norm = matplotlib.colors.Normalize(
-            vmin=cval_min, vmax=cval_max,
-        )
-    elif cmap_norm == 'nonorm':
-        cmap_norm = matplotlib.colors.NoNorm()
-
-    elif isinstance(cmap_norm, str):
-        # pylint: disable=protected-access
-
-        # to handle after https://github.com/pydata/xarray/pull/8030 is merged
-        if (
-            scale_class := matplotlib.scale._scale_mapping.get(cmap_norm, None)  # type: ignore
-        ) is None:
-            raise ValueError(f'cmap_norm string {cmap_norm} is not supported')
-
-        norm_class = matplotlib.colors.make_norm_from_scale(scale_class)
-        cmap_norm = norm_class(matplotlib.colors.Normalize)()
-
-    # Create a set of line segments so that we can color them individually
-    # This creates the points as a N x 1 x 2 array so that we can stack points
-    # together easily to get the segments. The segments array for line collection
-    # needs to be (numlines) x (points per line) x 2 (for x and y)
     for row in events.frame.iter_rows(named=True):
         fixation = Circle(
             row[position_column],
