@@ -47,7 +47,6 @@ __all__ = [
     'checks',
     'decorators',
     'downloads',
-    'plotting',
     'parsing',
     'plotting',
     'paths',
