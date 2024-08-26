@@ -57,3 +57,5 @@ docs/source/tutorials/data
 .coverage.*
 coverage.xml
 htmlcov/
+tests/preprocessed/
+toy_dataset/

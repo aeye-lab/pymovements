@@ -71,7 +71,7 @@ repos:
     rev: v1.10.0
     hooks:
     -   id: mypy
-        additional_dependencies: [types-all, pandas-stubs, types-tqdm]
+        additional_dependencies: [pandas-stubs, types-tqdm]
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:

@@ -201,8 +201,6 @@ def test_microsaccades_raises_error(kwargs, expected):
 def test_microsaccades_detects_saccades(kwargs, expected):
     events = pm.events.microsaccades(**kwargs)
 
-    print(events)
-    print(expected)
     assert_frame_equal(events.frame, expected.frame)
 
 
