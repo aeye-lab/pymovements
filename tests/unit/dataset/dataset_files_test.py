@@ -218,3 +218,25 @@ def test_load_eyelink_file(tmp_path, read_kwargs):
 
     assert_frame_equal(gaze.frame, expected_df, check_column_order=False)
     assert gaze.experiment is not None
+
+
+def test_load_precomputed_file():
+    filepath = 'tests/files/18sat_fixfinal.csv'
+
+    gaze = pm.dataset.dataset_files.load_precomputed_event_file(
+        filepath,
+        custom_read_kwargs={'separator': ','},
+    )
+    expected_df = pl.read_csv(filepath)
+
+    assert_frame_equal(gaze.frame, expected_df, check_column_order=False)
+
+
+def test_load_precomputed_file_unsupported_file_format():
+    filepath = 'tests/files/18sat_fixfinal.feather'
+
+    with pytest.raises(ValueError) as exc:
+        pm.dataset.dataset_files.load_precomputed_event_file(filepath)
+
+    msg, = exc.value.args
+    assert msg == 'unsupported file format ".feather". Supported formats are: .csv, .tsv, .txt'

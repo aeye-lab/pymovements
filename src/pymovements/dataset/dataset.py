@@ -34,6 +34,7 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events.frame import EventDataFrame
+from pymovements.events.precomputed import PrecomputedEventDataFrame
 from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import GazeDataFrame
 
@@ -60,6 +61,7 @@ class Dataset:
         self.fileinfo: pl.DataFrame = pl.DataFrame()
         self.gaze: list[GazeDataFrame] = []
         self.events: list[EventDataFrame] = []
+        self.precomputed_events: list[PrecomputedEventDataFrame] = []
 
         if isinstance(definition, str):
             definition = DatasetLibrary.get(definition)()
@@ -76,7 +78,8 @@ class Dataset:
 
     def load(
             self,
-            events: bool = False,
+            *,
+            events: bool | None = None,
             preprocessed: bool = False,
             subset: dict[str, float | int | str | list[float | int | str]] | None = None,
             events_dirname: str | None = None,
@@ -90,8 +93,8 @@ class Dataset:
 
         Parameters
         ----------
-        events: bool
-            If ``True``, load previously saved event data. (default: False)
+        events: bool | None
+            If ``True``, load previously saved event data. (default: None)
         preprocessed: bool
             If ``True``, load previously saved preprocessed data, otherwise load raw data.
             (default: False)
@@ -121,11 +124,18 @@ class Dataset:
         self.scan()
         self.fileinfo = dataset_files.take_subset(fileinfo=self.fileinfo, subset=subset)
 
-        self.load_gaze_files(
-            preprocessed=preprocessed, preprocessed_dirname=preprocessed_dirname,
-            extension=extension,
-        )
+        if self.definition.has_gaze_files:
+            self.load_gaze_files(
+                preprocessed=preprocessed,
+                preprocessed_dirname=preprocessed_dirname,
+                extension=extension,
+            )
 
+        # Event files precomuted by authors of the dataset
+        if self.definition.has_precomputed_event_files:
+            self.load_precomputed_events()
+
+        # Events extracted previously by pymovements
         if events:
             self.load_event_files(
                 events_dirname=events_dirname,
@@ -196,6 +206,14 @@ class Dataset:
             extension=extension,
         )
         return self
+
+    def load_precomputed_events(self) -> None:
+        """Load precomputed events."""
+        self._check_fileinfo()
+        self.precomputed_events = dataset_files.load_precomputed_event_files(
+            self.definition,
+            self.paths,
+        )
 
     def load_event_files(
             self,
