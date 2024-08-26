@@ -49,11 +49,12 @@ class SBSAT(DatasetDefinition):
     name : str
         The name of the dataset.
 
-    mirrors : tuple[str, ...]
+    gaze_mirrors : tuple[str, ...]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources : tuple[dict[str, str], ...]
-        A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
+    gaze_resources : tuple[dict[str, str], ...]
+        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+        keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
@@ -98,17 +99,31 @@ class SBSAT(DatasetDefinition):
 
     name: str = 'SBSAT'
 
-    mirrors: tuple[str, ...] = (
+    has_gaze_files: bool = True
+    gaze_mirrors: tuple[str, ...] = (
         'https://osf.io/download/',
     )
-
-    resources: tuple[dict[str, str], ...] = (
+    gaze_resources: tuple[dict[str, str], ...] = (
         {
             'gaze_resource': 'jgae7/',
             'filename': 'sbsat_csvs.zip',
             'md5': 'a6ef1fb0ecced683cdb489c3bd3e1a5c',
         },
     )
+    extract_gaze_data: bool = True
+
+    has_precomputed_event_files: bool = True
+    precomputed_event_mirrors: tuple[str, ...] = (
+        'https://raw.githubusercontent.com/ahnchive/SB-SAT/master/fixation/',
+    )
+    precomputed_event_resources: tuple[dict[str, str], ...] = (
+        {
+            'precomputed_event_resource': '18sat_fixfinal.csv',
+            'filename': '18sat_fixfinal.csv',
+            'md5': '4cf3212a71e6fc2fbe7041ce7c691927',
+        },
+    )
+    extract_precomputed_data: bool = False
 
     experiment: Experiment = Experiment(
         screen_width_px=768,
