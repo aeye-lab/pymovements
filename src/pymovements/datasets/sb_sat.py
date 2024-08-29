@@ -79,7 +79,7 @@ class SBSAT(DatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.GazeOnFaces` definition:
+    :py:class:`~pymovements.SBSAT` definition:
 
     >>> import pymovements as pm
     >>>
