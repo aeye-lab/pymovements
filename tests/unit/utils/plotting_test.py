@@ -31,11 +31,11 @@ import pymovements as pm
     ('image_stimulus'),
     (
         pytest.param(
-            './tests/files/reading-genome-1.png',
+            './tests/files/pexels-zoorg-1000498.jpg',
             id='image_stimulus_str',
         ),
         pytest.param(
-            Path('./tests/files/reading-genome-1.png'),
+            Path('./tests/files/pexels-zoorg-1000498.jpg'),
             id='image_stimulus_Path',
         ),
     ),
@@ -65,11 +65,11 @@ def test_show_image_stimulus(image_stimulus, origin, monkeypatch):
     ('image_stimulus'),
     (
         pytest.param(
-            './tests/files/reading-genome-1.png',
+            './tests/files/pexels-zoorg-1000498.jpg',
             id='image_stimulus_str',
         ),
         pytest.param(
-            Path('./tests/files/reading-genome-1.png'),
+            Path('./tests/files/pexels-zoorg-1000498.jpg'),
             id='image_stimulus_Path',
         ),
     ),
