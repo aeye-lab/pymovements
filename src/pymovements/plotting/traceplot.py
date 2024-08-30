@@ -189,10 +189,8 @@ def traceplot(
 
     elif isinstance(cmap_norm, str):
         # pylint: disable=protected-access
-
-        # to handle after https://github.com/pydata/xarray/pull/8030 is merged
         if (
-            scale_class := matplotlib.scale._scale_mapping.get(cmap_norm, None)  # type: ignore
+            scale_class := matplotlib.scale._scale_mapping.get(cmap_norm, None)
         ) is None:
             raise ValueError(f'cmap_norm string {cmap_norm} is not supported')
 
