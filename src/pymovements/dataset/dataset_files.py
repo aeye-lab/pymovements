@@ -29,6 +29,7 @@ from tqdm.auto import tqdm
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events import EventDataFrame
+from pymovements.events.precomputed import PrecomputedEventDataFrame
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
 from pymovements.gaze.io import from_asc
 from pymovements.gaze.io import from_csv
@@ -60,11 +61,19 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
         If an error occurred during matching filenames or no files have been found.
     """
     # Get all filepaths that match regular expression.
-    fileinfo_dicts = match_filepaths(
-        path=paths.raw,
-        regex=curly_to_regex(definition.filename_format),
-        relative=True,
-    )
+    fileinfo_dicts = []
+    if definition.has_gaze_files:
+        fileinfo_dicts = match_filepaths(
+            path=paths.raw,
+            regex=curly_to_regex(definition.filename_format),
+            relative=True,
+        )
+    if definition.has_precomputed_event_files:
+        fileinfo_dicts = match_filepaths(
+            path=paths.precomputed_events,
+            regex=curly_to_regex(definition.filename_format),
+            relative=True,
+        )
 
     if not fileinfo_dicts:
         raise RuntimeError(f'no matching files found in {paths.raw}')
@@ -349,6 +358,68 @@ def load_gaze_file(
         )
 
     return gaze_df
+
+
+def load_precomputed_event_files(
+        definition: DatasetDefinition,
+        paths: DatasetPaths,
+) -> list[PrecomputedEventDataFrame]:
+    """Load text stimulus from file.
+
+    Parameters
+    ----------
+    definition:  DatasetDefinition
+        Dataset definition to load precomputed events.
+    paths: DatasetPaths
+        Adjustable paths to extract datasets.
+
+    Returns
+    -------
+    list[PrecomputedEventDataFrame]
+        Return list of precomputed event dataframes.
+    """
+    precomputed_events = []
+    for resource in definition.precomputed_event_resources:
+        data_path = paths.precomputed_events / resource['filename']
+        precomputed_events.append(load_precomputed_event_file(data_path))
+    return precomputed_events
+
+
+def load_precomputed_event_file(
+        data_path: str | Path,
+        custom_read_kwargs: dict[str, Any] | None = None,
+) -> PrecomputedEventDataFrame:
+    """Load precomputed events from files.
+
+    Parameters
+    ----------
+    data_path:  str | Path
+        Path to file to be read.
+    custom_read_kwargs: dict[str, Any] | None
+        Custom read keyword arguments for polars. (default: None)
+
+    Returns
+    -------
+    PrecomputedEventDataFrame
+        Returns the text stimulus file.
+    """
+    data_path = Path(data_path)
+    if custom_read_kwargs is None:
+        custom_read_kwargs = {}
+
+    valid_extensions = {'.csv', '.tsv', '.txt'}
+    if data_path.suffix in valid_extensions:
+        precomputed_event_df = pl.read_csv(
+            data_path,
+            **custom_read_kwargs,
+        )
+    else:
+        raise ValueError(
+            f'unsupported file format "{data_path.suffix}". '
+            f'Supported formats are: {", ".join(sorted(valid_extensions))}',
+        )
+
+    return PrecomputedEventDataFrame(data=precomputed_event_df)
 
 
 def add_fileinfo(
