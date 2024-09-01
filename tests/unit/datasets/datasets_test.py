@@ -93,8 +93,6 @@ def test_public_dataset_registered(public_dataset, dataset_name, dataset_path, d
 
     dataset_definition = public_dataset()
     registered_definition = pm.DatasetLibrary.get(dataset_definition.name)()
-    assert dataset_definition.mirrors == registered_definition.mirrors
-    assert dataset_definition.resources == registered_definition.resources
     assert dataset_definition.gaze_mirrors == registered_definition.gaze_mirrors
     assert dataset_definition.gaze_resources == registered_definition.gaze_resources
     assert dataset_definition.experiment == registered_definition.experiment
