@@ -73,7 +73,7 @@ class SBSAT(DatasetDefinition):
     column_map : dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
 
-    custom_read_kwargs : dict[str, Any], optional
+    gaze_custom_read_kwargs : dict[str, Any], optional
         If specified, these keyword arguments will be passed to the file reading function.
 
     Examples
@@ -159,7 +159,7 @@ class SBSAT(DatasetDefinition):
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 
-    custom_read_kwargs: dict[str, Any] = field(
+    gaze_custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
             'separator': '\t',
             'columns': ['time', 'book_name', 'screen_id', 'x_left', 'y_left', 'pupil_left'],

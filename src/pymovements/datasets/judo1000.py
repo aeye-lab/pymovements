@@ -72,7 +72,7 @@ class JuDo1000(DatasetDefinition):
     column_map : dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
 
-    custom_read_kwargs : dict[str, Any], optional
+    gaze_custom_read_kwargs : dict[str, Any], optional
         If specified, these keyword arguments will be passed to the file reading function.
 
     Examples
@@ -150,7 +150,7 @@ class JuDo1000(DatasetDefinition):
         },
     )
 
-    custom_read_kwargs: dict[str, Any] = field(
+    gaze_custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
             'dtypes': {
                 'trialId': pl.Int64,

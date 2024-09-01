@@ -52,7 +52,7 @@ class DatasetDefinition:
     filename_format_dtypes: dict[str, type]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype. (default: field(default_factory=dict))
-    custom_read_kwargs : dict[str, Any]
+    gaze_custom_read_kwargs : dict[str, Any]
         If specified, these keyword arguments will be passed to the file reading function. The
         behavior of this argument depends on the file extension of the dataset files.
         If the file extension is `.csv` the keyword arguments will be passed
@@ -102,23 +102,25 @@ class DatasetDefinition:
 
     Notes
     -----
-    When working with the ``custom_read_kwargs`` attribute there are specific use cases and
+    When working with the ``gaze_custom_read_kwargs`` attribute there are specific use cases and
     considerations to keep in mind, especially for reading csv files:
 
     1. Custom separator
     To read a csv file with a custom separator, you can pass the `separator` keyword argument to
-    ``custom_read_kwargs``. For example pass ``custom_read_kwargs={'separator': ';'}`` to read a
-    semicolon-separated csv file.
+    ``gaze_custom_read_kwargs``. For example pass ``gaze_custom_read_kwargs={'separator': ';'}`` to
+    read a semicolon-separated csv file.
 
     2. Reading subset of columns
-    To read only specific columns, specify them in ``custom_read_kwargs``. For example:
-    ``custom_read_kwargs={'columns': ['col1', 'col2']}``
+    To read only specific columns, specify them in ``gaze_custom_read_kwargs``. For example:
+    ``gaze_custom_read_kwargs={'columns': ['col1', 'col2']}``
 
     3. Specifying column datatypes
     ``polars.read_csv`` infers data types from a fixed number of rows, which might not be accurate
     for the entire dataset. To ensure correct data types, you can pass a dictionary to the
-    ``dtypes`` keyword argument in ``custom_read_kwargs``. Use data types from the `polars` library.
-    For instance: ``custom_read_kwargs={'dtypes': {'col1': polars.Int64, 'col2': polars.Float64}}``
+    ``dtypes`` keyword argument in ``gaze_custom_read_kwargs``.
+    Use data types from the `polars` library.
+    For instance:
+        ``gaze_custom_read_kwargs={'dtypes': {'col1': polars.Int64, 'col2': polars.Float64}}``
     """
 
     # pylint: disable=too-many-instance-attributes
@@ -138,7 +140,8 @@ class DatasetDefinition:
 
     filename_format_dtypes: dict[str, type] = field(default_factory=dict)
 
-    custom_read_kwargs: dict[str, Any] = field(default_factory=dict)
+    precomputed_event_custom_read_kwargs: dict[str, Any] = field(default_factory=dict)
+    gaze_custom_read_kwargs: dict[str, Any] = field(default_factory=dict)
 
     column_map: dict[str, str] = field(default_factory=dict)
 
