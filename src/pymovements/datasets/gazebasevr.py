@@ -85,7 +85,7 @@ class GazeBaseVR(DatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.GazeBase` definition:
+    :py:class:`~pymovements.GazeBaseVR` definition:
 
     >>> import pymovements as pm
     >>>
