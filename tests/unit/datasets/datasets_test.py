@@ -95,9 +95,13 @@ def test_public_dataset_registered(public_dataset, dataset_name, dataset_path, d
     registered_definition = pm.DatasetLibrary.get(dataset_definition.name)()
     assert dataset_definition.mirrors == registered_definition.mirrors
     assert dataset_definition.resources == registered_definition.resources
+    assert dataset_definition.gaze_mirrors == registered_definition.gaze_mirrors
+    assert dataset_definition.gaze_resources == registered_definition.gaze_resources
     assert dataset_definition.experiment == registered_definition.experiment
     assert dataset_definition.filename_format == registered_definition.filename_format
     assert dataset_definition.filename_format_dtypes == registered_definition.filename_format_dtypes
+    assert dataset_definition.has_gaze_files == registered_definition.has_gaze_files
+    assert dataset_definition.has_precomputed_event_files == registered_definition.has_precomputed_event_files  # noqa: E501
     assert dataset_definition.custom_read_kwargs == registered_definition.custom_read_kwargs
 
     dataset, expected_paths = construct_public_dataset(

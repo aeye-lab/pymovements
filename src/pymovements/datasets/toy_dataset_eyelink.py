@@ -48,10 +48,10 @@ class ToyDatasetEyeLink(DatasetDefinition):
     name : str
         The name of the dataset.
 
-    mirrors : tuple[str, ...]
+    gaze_mirrors : tuple[str, ...]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources : tuple[dict[str, str], ...]
+    gaze_resources : tuple[dict[str, str], ...]
         A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -77,7 +77,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.Dataset` object with the
-    :py:class:`~pymovements.ToyDataset` definition:
+    :py:class:`~pymovements.ToyDatasetEyeLink` definition:
 
     >>> import pymovements as pm
     >>>
@@ -97,17 +97,18 @@ class ToyDatasetEyeLink(DatasetDefinition):
 
     name: str = 'ToyDatasetEyeLink'
 
-    mirrors: tuple[str, ...] = (
+    gaze_mirrors: tuple[str, ...] = (
         'http://github.com/aeye-lab/pymovements-toy-dataset-eyelink/zipball/',
     )
 
-    resources: tuple[dict[str, str], ...] = (
+    gaze_resources: tuple[dict[str, str], ...] = (
         {
             'gaze_resource': 'a970d090588542dad745297866e794ab9dad8795/',
             'filename': 'pymovements-toy-dataset-eyelink.zip',
             'md5': 'b1d426751403752c8a154fc48d1670ce',
         },
     )
+    extract_gaze_data: bool = True
 
     experiment: Experiment = Experiment(
         screen_width_px=1280,

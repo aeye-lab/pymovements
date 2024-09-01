@@ -50,10 +50,10 @@ class HBN(DatasetDefinition):
     name : str
         The name of the dataset.
 
-    mirrors : tuple[str, ...]
+    gaze_mirrors : tuple[str, ...]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources : tuple[dict[str, str], ...]
+    gaze_resources : tuple[dict[str, str], ...]
         A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -99,11 +99,11 @@ class HBN(DatasetDefinition):
 
     name: str = 'HBN'
 
-    mirrors: tuple[str, ...] = (
+    gaze_mirrors: tuple[str, ...] = (
         'https://files.osf.io/v1/resources/qknuv/providers/osfstorage/',
     )
 
-    resources: tuple[dict[str, str], ...] = (
+    gaze_resources: tuple[dict[str, str], ...] = (
         {
             'gaze_resource': '651190031e76a453918a9971',
             'filename': 'data.zip',
@@ -151,3 +151,5 @@ class HBN(DatasetDefinition):
             },
         },
     )
+    has_gaze_files: bool = True
+    has_precomputed_event_files: bool = False
