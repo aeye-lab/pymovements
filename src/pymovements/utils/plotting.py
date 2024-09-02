@@ -21,12 +21,15 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from pathlib import Path
 from typing import Literal
 from typing import Union
 
 import matplotlib.pyplot
 import numpy as np
 from typing_extensions import TypeAlias
+
+import PIL.Image
 
 LinearSegmentedColormapType: TypeAlias = dict[
     Literal['red', 'green', 'blue', 'alpha'],
@@ -178,3 +181,32 @@ def setup_matplotlib(
         cmap_norm = norm_class(matplotlib.colors.Normalize)()
 
     return fig, ax, cmap, cmap_norm, cval, show_cbar
+
+
+def draw_image_stimulus(
+        image_stimulus: str | Path,
+        origin: str = 'upper',
+        show: bool = False,
+) -> tuple[matplotlib.pyplot.figure, matplotlib.pyplot.Axes]:
+    """Draw stimulus.
+
+    Parameters
+    ----------
+    image_stimulus: str | Path
+        Path to image stimulus.
+    origin: str
+        Origin how to draw the image.
+    show: bool
+        Boolean whether to show the image.
+
+    Returns
+    -------
+    fig: matplotlib.pyplot.figure
+    ax: matplotlib.pyplot.Axes
+    """
+    img = PIL.Image.open(image_stimulus)
+    fig, ax = matplotlib.pyplot.subplots()
+    ax.imshow(img, origin=origin)
+    if show:
+        matplotlib.pyplot.show()
+    return fig, ax
