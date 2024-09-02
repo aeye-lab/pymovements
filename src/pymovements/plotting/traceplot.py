@@ -98,7 +98,7 @@ def traceplot(
     """
     x_signal = gaze.frame[position_column].list.get(0)
     y_signal = gaze.frame[position_column].list.get(1)
-    
+
     fig, ax, cmap, cmap_norm, cval, show_cbar = setup_matplotlib(
         x_signal,
         figsize,

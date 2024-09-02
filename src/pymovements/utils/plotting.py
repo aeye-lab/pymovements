@@ -27,9 +27,8 @@ from typing import Union
 
 import matplotlib.pyplot
 import numpy as np
-from typing_extensions import TypeAlias
-
 import PIL.Image
+from typing_extensions import TypeAlias
 
 LinearSegmentedColormapType: TypeAlias = dict[
     Literal['red', 'green', 'blue', 'alpha'],
@@ -244,7 +243,7 @@ MatplotlibSetupType: TypeAlias = tuple[
     bool,
 ]
 
-  
+
 def draw_image_stimulus(
         image_stimulus: str | Path,
         origin: str = 'upper',
