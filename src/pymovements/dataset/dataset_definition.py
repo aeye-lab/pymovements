@@ -120,7 +120,7 @@ class DatasetDefinition:
     ``dtypes`` keyword argument in ``gaze_custom_read_kwargs``.
     Use data types from the `polars` library.
     For instance:
-        ``gaze_custom_read_kwargs={'dtypes': {'col1': polars.Int64, 'col2': polars.Float64}}``
+    ``gaze_custom_read_kwargs={'dtypes': {'col1': polars.Int64, 'col2': polars.Float64}}``
     """
 
     # pylint: disable=too-many-instance-attributes
