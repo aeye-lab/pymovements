@@ -126,10 +126,10 @@ class SBSAT(DatasetDefinition):
     extract_precomputed_data: bool = False
 
     experiment: Experiment = Experiment(
-        screen_width_px=768,
-        screen_height_px=1024,
-        screen_width_cm=42.4,
-        screen_height_cm=44.5,
+        screen_width_px=1024,
+        screen_height_px=768,
+        screen_width_cm=44.5,
+        screen_height_cm=42.4,
         distance_cm=70,
         origin='center',
         sampling_rate=1000,
