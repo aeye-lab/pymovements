@@ -17,21 +17,39 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides access to stimulus classes.
+"""Functions for plotting."""
+from __future__ import annotations
 
-.. rubric:: Classes
+from pathlib import Path
 
-.. autosummary::
-   :toctree:
-   :template: class.rst
-
-    pymovements.stimulus.TextStimulus
-"""
-from pymovements.stimulus.image import ImageStimulus
-from pymovements.stimulus.text import TextStimulus
+import PIL.Image
+from matplotlib import pyplot
 
 
-__all__ = [
-    'ImageStimulus',
-    'TextStimulus',
-]
+def draw_image_stimulus(
+        image_stimulus: str | Path,
+        origin: str = 'upper',
+        show: bool = False,
+) -> tuple[pyplot.figure, pyplot.Axes]:
+    """Draw stimulus.
+
+    Parameters
+    ----------
+    image_stimulus: str | Path
+        Path to image stimulus.
+    origin: str
+        Origin how to draw the image.
+    show: bool
+        Boolean whether to show the image.
+
+    Returns
+    -------
+    fig: pyplot.figure
+    ax: pyplot.Axes
+    """
+    img = PIL.Image.open(image_stimulus)
+    fig, ax = pyplot.subplots()
+    ax.imshow(img, origin=origin)
+    if show:
+        pyplot.show()
+    return fig, ax
