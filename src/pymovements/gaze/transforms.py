@@ -1055,10 +1055,10 @@ def clip(
 
 
 def _apply_on_columns(
-    frame: pl.DataFrame,
-    columns: list[str],
-    transformation: Callable,
-    n_components: int | None = None,
+        frame: pl.DataFrame,
+        columns: list[str],
+        transformation: Callable,
+        n_components: int | None = None,
 ) -> pl.DataFrame:
     """Apply a function on nested and normal columns of a DataFrame.
 
