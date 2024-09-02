@@ -77,7 +77,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.Dataset` object with the
-    :py:class:`~pymovements.ToyDataset` definition:
+    :py:class:`~pymovements.ToyDatasetEyeLink` definition:
 
     >>> import pymovements as pm
     >>>
