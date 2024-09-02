@@ -100,8 +100,8 @@ def test_public_dataset_registered(public_dataset, dataset_name, dataset_path, d
     assert dataset_definition.filename_format_dtypes == registered_definition.filename_format_dtypes
     assert dataset_definition.has_gaze_files == registered_definition.has_gaze_files
     assert dataset_definition.has_precomputed_event_files == registered_definition.has_precomputed_event_files  # noqa: E501
-    assert dataset_definition.custom_read_kwargs == registered_definition.custom_read_kwargs
-
+    assert dataset_definition.gaze_custom_read_kwargs == registered_definition.gaze_custom_read_kwargs  # noqa: E501
+    assert dataset_definition.precomputed_event_custom_read_kwargs == registered_definition.precomputed_event_custom_read_kwargs  # noqa: E501
     dataset, expected_paths = construct_public_dataset(
         public_dataset,
         dataset_path,

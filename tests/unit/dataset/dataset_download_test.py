@@ -75,7 +75,7 @@ def dataset_definition_fixture(request):
             extract_precomputed_data: bool = True
 
         return CustomPublicDataset()
-    elif request.param == 'CustomGazeOnly':
+    if request.param == 'CustomGazeOnly':
         @dataclass
         @pm.register_dataset
         class CustomPublicDataset(pm.DatasetDefinition):
@@ -98,7 +98,7 @@ def dataset_definition_fixture(request):
             has_precomputed_event_files: bool = False
 
         return CustomPublicDataset()
-    elif request.param == 'CustomPrecomputedOnly':
+    if request.param == 'CustomPrecomputedOnly':
         @dataclass
         @pm.register_dataset
         class CustomPublicDataset(pm.DatasetDefinition):
@@ -122,7 +122,7 @@ def dataset_definition_fixture(request):
             extract_precomputed_data: bool = True
 
         return CustomPublicDataset()
-    elif request.param == 'CustomPrecomputedOnlyNoExtract':
+    if request.param == 'CustomPrecomputedOnlyNoExtract':
         @dataclass
         @pm.register_dataset
         class CustomPublicDataset(pm.DatasetDefinition):
@@ -851,12 +851,12 @@ def test_public_dataset_registered_correct_attributes(tmp_path, dataset_definiti
     assert dataset.definition.experiment == dataset_definition.experiment
     assert dataset.definition.filename_format == dataset_definition.filename_format
     assert dataset.definition.filename_format_dtypes == dataset_definition.filename_format_dtypes
-    assert dataset.definition.custom_read_kwargs == dataset_definition.custom_read_kwargs
+    assert dataset.definition.gaze_custom_read_kwargs == dataset_definition.gaze_custom_read_kwargs
     assert dataset.definition.has_precomputed_event_files == dataset_definition.has_precomputed_event_files  # noqa: E501
     assert dataset.definition.has_gaze_files == dataset_definition.has_gaze_files
 
 
-def test_extract_dataset_precomputed_move_single_file(tmp_path):
+def test_extract_dataset_precomputed_move_single_file():
     class PrecomputedResourcesDefinition(pm.DatasetDefinition):
         name: str = 'CustomPublicDataset'
 

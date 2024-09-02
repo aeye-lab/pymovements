@@ -224,7 +224,7 @@ def load_gaze_files(
             fileinfo_row=fileinfo_row,
             definition=definition,
             preprocessed=preprocessed,
-            custom_read_kwargs=definition.custom_read_kwargs,
+            custom_read_kwargs=definition.gaze_custom_read_kwargs,
         )
         gaze_dfs.append(gaze_df)
 
@@ -381,7 +381,12 @@ def load_precomputed_event_files(
     precomputed_events = []
     for resource in definition.precomputed_event_resources:
         data_path = paths.precomputed_events / resource['filename']
-        precomputed_events.append(load_precomputed_event_file(data_path))
+        precomputed_events.append(
+            load_precomputed_event_file(
+                data_path,
+                definition.precomputed_event_custom_read_kwargs,
+            ),
+        )
     return precomputed_events
 
 
