@@ -47,33 +47,33 @@ class HBN(DatasetDefinition):
 
     Attributes
     ----------
-    name : str
+    name: str
         The name of the dataset.
 
-    gaze_mirrors : tuple[str, ...]
+    mirrors: dict[str, tuple[str, ...]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    gaze_resources : tuple[dict[str, str], ...]
+    resources: dict[str, tuple[dict[str, str], ...]]
         A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    experiment : Experiment
+    experiment: Experiment
         The experiment definition.
 
-    filename_format : str
+    filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_dtypes : dict[str, type], optional
+    filename_format_dtypes: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
-    column_map : dict[str, str]
+    column_map: dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
 
-    gaze_custom_read_kwargs : dict[str, Any], optional
+    custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function.
 
     Examples
@@ -99,17 +99,30 @@ class HBN(DatasetDefinition):
 
     name: str = 'HBN'
 
-    gaze_mirrors: tuple[str, ...] = (
-        'https://files.osf.io/v1/resources/qknuv/providers/osfstorage/',
+    has_files: dict[str, bool] = field(
+        default_factory=lambda: {'gaze': True, 'precomputed_events': False},
     )
-
-    gaze_resources: tuple[dict[str, str], ...] = (
-        {
-            'gaze_resource': '651190031e76a453918a9971',
-            'filename': 'data.zip',
-            'md5': '2c523e911022ffc0eab700e34e9f7f30',
+    mirrors: dict[str, tuple[str, ...]] = field(
+        default_factory=lambda: {
+            'gaze': (
+                'https://files.osf.io/v1/resources/qknuv/providers/osfstorage/',
+            ),
         },
     )
+
+    resources: dict[str, tuple[dict[str, str], ...]] = field(
+        default_factory=lambda: {
+            'gaze': (
+                {
+                    'resource': '651190031e76a453918a9971',
+                    'filename': 'data.zip',
+                    'md5': '2c523e911022ffc0eab700e34e9f7f30',
+                },
+            ),
+        },
+    )
+
+    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     experiment: Experiment = Experiment(
         screen_width_px=800,
@@ -121,12 +134,18 @@ class HBN(DatasetDefinition):
         sampling_rate=120,
     )
 
-    filename_format: str = r'{subject_id:12}_{video_id}.csv'
-
-    filename_format_dtypes: dict[str, type] = field(
+    filename_format: dict[str, str] = field(
         default_factory=lambda: {
-            'subject_id': str,
-            'video_id': str,
+            'gaze': r'{subject_id:12}_{video_id}.csv',
+        },
+    )
+
+    filename_format_dtypes: dict[str, dict[str, type]] = field(
+        default_factory=lambda: {
+            'gaze': {
+                'subject_id': str,
+                'video_id': str,
+            },
         },
     )
 
@@ -140,16 +159,16 @@ class HBN(DatasetDefinition):
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 
-    gaze_custom_read_kwargs: dict[str, Any] = field(
+    custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
-            'separator': ',',
-            'columns': ['time', 'x_pix', 'y_pix'],
-            'dtypes': {
-                'time': pl.Int64,
-                'x_pix': pl.Float32,
-                'y_pix': pl.Float32,
+            'gaze': {
+                'separator': ',',
+                'columns': ['time', 'x_pix', 'y_pix'],
+                'dtypes': {
+                    'time': pl.Int64,
+                    'x_pix': pl.Float32,
+                    'y_pix': pl.Float32,
+                },
             },
         },
     )
-    has_gaze_files: bool = True
-    has_precomputed_event_files: bool = False
