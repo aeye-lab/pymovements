@@ -113,7 +113,7 @@ class SBSAT(DatasetDefinition):
                 ),
             },
     )
-    resources: tuple[dict[str, str], ...] = field(
+    resources: dict[str, tuple[dict[str, str], ...]] = field(
         default_factory=lambda:
             {
                 'gaze': (
