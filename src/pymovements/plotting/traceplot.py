@@ -80,7 +80,7 @@ def traceplot(
         Absolute padding value.
         If None it is inferred from pad_factor and limits. (default: None)
     pad_factor: float | None
-        Relative padding factor to construct padding value if not given. (default: None)
+        Relative padding factor to construct padding value if not given. (default: 0.5)
     figsize: tuple[int, int]
         Figure size. (default: (15, 5))
     title: str | None
