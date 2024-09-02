@@ -244,6 +244,7 @@ MatplotlibSetupType: TypeAlias = tuple[
     bool,
 ]
 
+  
 def draw_image_stimulus(
         image_stimulus: str | Path,
         origin: str = 'upper',
