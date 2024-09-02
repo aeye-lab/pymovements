@@ -35,24 +35,26 @@ class DatasetDefinition:
     ----------
     name: str
         The name of the dataset. (default: '.')
-    gaze_mirrors: tuple[str, ...]
+    mirrors: dict[str, tuple[str, ...]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
-        (default: field(default_factory=tuple))
-    gaze_resources: tuple[dict[str, str], ...]
+        (default: field(default_factory=dict))
+    resources: dict[str, tuple[dict[str, str], ...]]
         A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
-        (default: field(default_factory=tuple))
+        (default: field(default_factory=dict))
     experiment: Experiment
         The experiment definition. (default: None)
-    filename_format: str
+    filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
-        appear in the `fileinfo` dataframe. (default: '.*')
-    filename_format_dtypes: dict[str, type]
+        appear in the `fileinfo` dataframe. (default: field(default_factory=dict))
+    filename_format_dtypes: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype. (default: field(default_factory=dict))
-    gaze_custom_read_kwargs : dict[str, Any]
+    extract: dict[str, bool]
+        Decide whether to extract the data.
+    custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function. The
         behavior of this argument depends on the file extension of the dataset files.
         If the file extension is `.csv` the keyword arguments will be passed
@@ -125,23 +127,20 @@ class DatasetDefinition:
 
     # pylint: disable=too-many-instance-attributes
     name: str = '.'
+    has_files: dict[str, bool] = field(default_factory=dict)
 
-    gaze_mirrors: tuple[str, ...] = field(default_factory=tuple)
+    mirrors: dict[str, tuple[str, ...]] = field(default_factory=dict)
 
-    gaze_resources: tuple[dict[str, str], ...] = field(default_factory=tuple)
-
-    precomputed_event_mirrors: tuple[str, ...] = field(default_factory=tuple)
-
-    precomputed_event_resources: tuple[dict[str, str], ...] = field(default_factory=tuple)
+    resources: dict[str, tuple[dict[str, str], ...]] = field(default_factory=dict)
 
     experiment: Experiment | None = None
+    extract: dict[str, bool] = field(default_factory=dict)
 
-    filename_format: str = '.*'
+    filename_format: dict[str, str] = field(default_factory=dict)
 
-    filename_format_dtypes: dict[str, type] = field(default_factory=dict)
+    filename_format_dtypes: dict[str, dict[str, type]] = field(default_factory=dict)
 
-    precomputed_event_custom_read_kwargs: dict[str, Any] = field(default_factory=dict)
-    gaze_custom_read_kwargs: dict[str, Any] = field(default_factory=dict)
+    custom_read_kwargs: dict[str, dict[str, Any]] = field(default_factory=dict)
 
     column_map: dict[str, str] = field(default_factory=dict)
 
@@ -153,7 +152,3 @@ class DatasetDefinition:
     velocity_columns: list[str] | None = None
     acceleration_columns: list[str] | None = None
     distance_column: str | None = None
-    has_gaze_files: bool = True
-    has_precomputed_event_files: bool = False
-    extract_gaze_data: bool = True
-    extract_precomputed_data: bool = True

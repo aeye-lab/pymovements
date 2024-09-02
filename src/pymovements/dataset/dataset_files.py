@@ -61,33 +61,27 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
         If an error occurred during matching filenames or no files have been found.
     """
     # Get all filepaths that match regular expression.
-    fileinfo_dicts = []
-    if definition.has_gaze_files:
+    fileinfo_df_dict = {}
+    if definition.has_files['gaze']:
         fileinfo_dicts = match_filepaths(
             path=paths.raw,
-            regex=curly_to_regex(definition.filename_format),
+            regex=curly_to_regex(definition.filename_format['gaze']),
             relative=True,
         )
-    if definition.has_precomputed_event_files:
+        fileinfo_df_dict['gaze'] = fileinfo_dicts
+
+    if definition.has_files['precomputed_events']:
         fileinfo_dicts = match_filepaths(
             path=paths.precomputed_events,
-            regex=curly_to_regex(definition.filename_format),
+            regex=curly_to_regex(definition.filename_format['precomputed_events']),
             relative=True,
         )
+        fileinfo_df_dict['precomputed_events'] = fileinfo_dicts
 
-    if not fileinfo_dicts:
+    if not fileinfo_df_dict:
         raise RuntimeError(f'no matching files found in {paths.raw}')
 
-    # Create dataframe from all fileinfo records.
-    fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
-    fileinfo_df = fileinfo_df.sort(by='filepath')
-
-    fileinfo_df = fileinfo_df.with_columns([
-        pl.col(fileinfo_key).cast(fileinfo_dtype)
-        for fileinfo_key, fileinfo_dtype in definition.filename_format_dtypes.items()
-    ])
-
-    return fileinfo_df
+    return fileinfo_df_dict
 
 
 def load_event_files(
@@ -131,12 +125,13 @@ def load_event_files(
     event_dfs: list[EventDataFrame] = []
 
     # read and preprocess input files
-    for fileinfo_row in tqdm(fileinfo.to_dicts()):
+    for fileinfo_row in tqdm(fileinfo):
         filepath = Path(fileinfo_row['filepath'])
         filepath = paths.raw / filepath
 
         filepath = paths.raw_to_event_filepath(
-            filepath, events_dirname=events_dirname,
+            filepath,
+            events_dirname=events_dirname,
             extension=extension,
         )
 
@@ -209,7 +204,7 @@ def load_gaze_files(
     gaze_dfs: list[GazeDataFrame] = []
 
     # Read gaze files from fileinfo attribute.
-    for fileinfo_row in tqdm(fileinfo.to_dicts()):
+    for fileinfo_row in tqdm(fileinfo):
         filepath = Path(fileinfo_row['filepath'])
         filepath = paths.raw / filepath
 
@@ -224,7 +219,7 @@ def load_gaze_files(
             fileinfo_row=fileinfo_row,
             definition=definition,
             preprocessed=preprocessed,
-            custom_read_kwargs=definition.gaze_custom_read_kwargs,
+            custom_read_kwargs=definition.custom_read_kwargs['gaze'],
         )
         gaze_dfs.append(gaze_df)
 
@@ -284,7 +279,7 @@ def load_gaze_file(
                 trial_columns=definition.trial_columns,
                 time_unit=time_unit,
                 add_columns=add_columns,
-                column_dtypes=definition.filename_format_dtypes,
+                column_dtypes=definition.filename_format_dtypes['gaze'],
             )
 
             # suffixes as ordered after using GazeDataFrame.unnest()
@@ -332,7 +327,7 @@ def load_gaze_file(
                 trial_columns=definition.trial_columns,
                 column_map=definition.column_map,
                 add_columns=add_columns,
-                column_dtypes=definition.filename_format_dtypes,
+                column_dtypes=definition.filename_format_dtypes['gaze'],
                 **custom_read_kwargs,
             )
     elif filepath.suffix == '.feather':
@@ -340,14 +335,14 @@ def load_gaze_file(
             filepath,
             experiment=definition.experiment,
             add_columns=add_columns,
-            column_dtypes=definition.filename_format_dtypes,
+            column_dtypes=definition.filename_format_dtypes['gaze'],
         )
     elif filepath.suffix == '.asc':
         gaze_df = from_asc(
             filepath,
             experiment=definition.experiment,
             add_columns=add_columns,
-            column_dtypes=definition.filename_format_dtypes,
+            column_dtypes=definition.filename_format_dtypes['gaze'],
             **custom_read_kwargs,
         )
     else:
@@ -362,6 +357,7 @@ def load_gaze_file(
 
 def load_precomputed_event_files(
         definition: DatasetDefinition,
+        fileinfo: list[dict[str, str]],
         paths: DatasetPaths,
 ) -> list[PrecomputedEventDataFrame]:
     """Load text stimulus from file.
@@ -370,6 +366,8 @@ def load_precomputed_event_files(
     ----------
     definition:  DatasetDefinition
         Dataset definition to load precomputed events.
+    fileinfo: list[dict[str, str]]
+        Information about the files.
     paths: DatasetPaths
         Adjustable paths to extract datasets.
 
@@ -379,12 +377,12 @@ def load_precomputed_event_files(
         Return list of precomputed event dataframes.
     """
     precomputed_events = []
-    for resource in definition.precomputed_event_resources:
-        data_path = paths.precomputed_events / resource['filename']
+    for filepath in fileinfo:
+        data_path = paths.precomputed_events / filepath['filepath']
         precomputed_events.append(
             load_precomputed_event_file(
                 data_path,
-                definition.precomputed_event_custom_read_kwargs,
+                definition.custom_read_kwargs['precomputed_events'],
             ),
         )
     return precomputed_events
@@ -414,10 +412,7 @@ def load_precomputed_event_file(
 
     valid_extensions = {'.csv', '.tsv', '.txt'}
     if data_path.suffix in valid_extensions:
-        precomputed_event_df = pl.read_csv(
-            data_path,
-            **custom_read_kwargs,
-        )
+        precomputed_event_df = pl.read_csv(data_path, **custom_read_kwargs)
     else:
         raise ValueError(
             f'unsupported file format "{data_path.suffix}". '
