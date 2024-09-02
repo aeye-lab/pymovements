@@ -73,7 +73,7 @@ def scanpathplot(
     gaze: GazeDataFrame | None
         Optional Gaze Dataframe. (default: None)
     position_column: str
-        The column name of the x and y position data (default: 'pixel')
+        The column name of the x and y position data (default: 'location')
     cval: np.ndarray | None
         Line color values. (default: None)
     cmap: matplotlib.colors.Colormap | None
@@ -90,7 +90,7 @@ def scanpathplot(
         Absolute padding value.
         If None it is inferred from pad_factor and limits. (default: None)
     pad_factor: float | None
-        Relative padding factor to construct padding value if not given. (default: None)
+        Relative padding factor to construct padding value if not given. (default: 0.5)
     figsize: tuple[int, int]
         Figure size. (default: (15, 5))
     title: str | None
