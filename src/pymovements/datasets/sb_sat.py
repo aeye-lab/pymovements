@@ -46,34 +46,34 @@ class SBSAT(DatasetDefinition):
 
     Attributes
     ----------
-    name : str
+    name: str
         The name of the dataset.
 
-    mirrors : dict[str, tuple[str, ...]]
+    mirrors: dict[str, tuple[str, ...]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources : dict[str, tuple[dict[str, str], ...]]
+    resources: dict[str, tuple[dict[str, str], ...]]
         A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    experiment : Experiment
+    experiment: Experiment
         The experiment definition.
 
-    filename_format : dict[str, str]
+    filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_dtypes : dict[str, dict[str, type]]
+    filename_format_dtypes: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
-    column_map : dict[str, str]
+    column_map: dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
 
-    custom_read_kwargs : dict[str, dict[str, Any]]
+    custom_read_kwargs: dict[str, dict[str, dict[str, Any]]]
         If specified, these keyword arguments will be passed to the file reading function.
 
     Examples
