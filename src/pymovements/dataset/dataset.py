@@ -436,11 +436,11 @@ class Dataset:
         return self.apply('pix2deg', verbose=verbose)
 
     def deg2pix(
-        self,
-        pixel_origin: str = 'upper left',
-        position_column: str = 'position',
-        pixel_column: str = 'pixel',
-        verbose: bool = True,
+            self,
+            pixel_origin: str = 'upper left',
+            position_column: str = 'position',
+            pixel_column: str = 'pixel',
+            verbose: bool = True,
     ) -> Dataset:
         """Compute gaze positions in pixel coordinates from degrees of visual angle.
 

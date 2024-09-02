@@ -20,15 +20,17 @@
 """Test public dataset definitions."""
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 import pymovements as pm
 
 
 @pytest.mark.parametrize(
-    ('definition_class', 'dataset_name'),
+    ('public_dataset', 'dataset_name'),
+    # XXX: add public dataset in alphabetical order
     [
-        pytest.param(pm.datasets.ToyDataset, 'ToyDataset', id='ToyDataset'),
         pytest.param(pm.datasets.GazeBase, 'GazeBase', id='GazeBase'),
         pytest.param(pm.datasets.GazeBaseVR, 'GazeBaseVR', id='GazeBaseVR'),
         pytest.param(pm.datasets.GazeOnFaces, 'GazeOnFaces', id='GazeOnFaces'),
@@ -36,32 +38,61 @@ import pymovements as pm
         pytest.param(pm.datasets.JuDo1000, 'JuDo1000', id='JuDo1000'),
         pytest.param(pm.datasets.PoTeC, 'PoTeC', id='PoTeC'),
         pytest.param(pm.datasets.SBSAT, 'SBSAT', id='SBSAT'),
+        pytest.param(pm.datasets.ToyDataset, 'ToyDataset', id='ToyDataset'),
+        pytest.param(pm.datasets.ToyDatasetEyeLink, 'ToyDatasetEyeLink', id='ToyDatasetEyeLink'),
     ],
 )
-def test_public_dataset_registered(definition_class, dataset_name):
+@pytest.mark.parametrize(
+    ('dataset_path'),
+    [
+        pytest.param(
+            None,
+            id='dataset_path_None',
+        ),
+        pytest.param(
+            '.',
+            id='dataset_path_dot',
+        ),
+        pytest.param(
+            'dataset_path',
+            id='dataset_path_dataset',
+        ),
+    ],
+)
+@pytest.mark.parametrize(
+    ('downloads'),
+    [
+        pytest.param(
+            'downloads',
+            id='downloads_None',
+        ),
+        pytest.param(
+            'custom_downloads',
+            id='downloads_custom_downloads',
+        ),
+
+    ],
+)
+@pytest.mark.parametrize(
+    ('str_root'),
+    [
+        pytest.param(
+            True,
+            id='path_str',
+        ),
+        pytest.param(
+            False,
+            id='path_DatasetPaths',
+        ),
+    ],
+)
+def test_public_dataset_registered(public_dataset, dataset_name, dataset_path, downloads, str_root):
     assert dataset_name in pm.DatasetLibrary.definitions
-    assert pm.DatasetLibrary.get(dataset_name) == definition_class
+    assert pm.DatasetLibrary.get(dataset_name) == public_dataset
     assert pm.DatasetLibrary.get(dataset_name)().name == dataset_name
 
-
-@pytest.mark.parametrize(
-    'dataset_definition_class',
-    [
-        pytest.param(pm.datasets.ToyDataset, id='ToyDataset'),
-        pytest.param(pm.datasets.GazeBase, id='GazeBase'),
-        pytest.param(pm.datasets.GazeBaseVR, id='GazeBaseVR'),
-        pytest.param(pm.datasets.GazeOnFaces, id='GazeOnFaces'),
-        pytest.param(pm.datasets.HBN, id='HBN'),
-        pytest.param(pm.datasets.JuDo1000, id='JuDo1000'),
-        pytest.param(pm.datasets.PoTeC, id='PoTeC'),
-        pytest.param(pm.datasets.SBSAT, id='SBSAT'),
-    ],
-)
-def test_public_dataset_registered_correct_attributes(dataset_definition_class):
-    dataset_definition = dataset_definition_class()
-
+    dataset_definition = public_dataset()
     registered_definition = pm.DatasetLibrary.get(dataset_definition.name)()
-
     assert dataset_definition.gaze_mirrors == registered_definition.gaze_mirrors
     assert dataset_definition.gaze_resources == registered_definition.gaze_resources
     assert dataset_definition.experiment == registered_definition.experiment
@@ -70,3 +101,48 @@ def test_public_dataset_registered_correct_attributes(dataset_definition_class):
     assert dataset_definition.has_gaze_files == registered_definition.has_gaze_files
     assert dataset_definition.has_precomputed_event_files == registered_definition.has_precomputed_event_files  # noqa: E501
     assert dataset_definition.custom_read_kwargs == registered_definition.custom_read_kwargs
+
+    dataset, expected_paths = construct_public_dataset(
+        public_dataset,
+        dataset_path,
+        downloads,
+        str_root,
+    )
+    assert dataset.paths.root == expected_paths['root']
+    assert dataset.path == expected_paths['dataset']
+    assert dataset.paths.dataset == expected_paths['dataset']
+    assert dataset.paths.downloads == expected_paths['downloads']
+
+
+def construct_public_dataset(
+        public_dataset,
+        dataset_path,
+        downloads,
+        str_root,
+):
+    expected = {}
+    expected['root'] = Path('/data/set/path')
+
+    if str_root:
+        init_path = '/data/set/path'
+        expected['dataset'] = Path('/data/set/path')
+        expected['downloads'] = Path('/data/set/path/downloads')
+
+        dataset = pm.Dataset(public_dataset, path=init_path)
+        return dataset, expected
+    init_path = pm.DatasetPaths(
+        root='/data/set/path',
+        dataset=dataset_path,
+        downloads=downloads,
+    )
+
+    if dataset_path == '.':
+        expected['dataset'] = Path('/data/set/path')
+    elif dataset_path == 'dataset_path':
+        expected['dataset'] = Path('/data/set/path/dataset_path')
+    else:
+        expected['dataset'] = Path(f'/data/set/path/{public_dataset.__name__}')
+    expected['downloads'] = expected['dataset'] / Path(downloads)
+
+    dataset = pm.Dataset(public_dataset, path=init_path)
+    return dataset, expected
