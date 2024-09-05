@@ -84,7 +84,7 @@ def fixture_gaze_init_kwargs(request):
             'time_unit': pm.datasets.SBSAT().time_unit,
             'pixel_columns': pm.datasets.SBSAT().pixel_columns,
             'experiment': pm.datasets.SBSAT().experiment,
-            **pm.datasets.SBSAT().gaze_custom_read_kwargs,
+            **pm.datasets.SBSAT().custom_read_kwargs['gaze'],
         },
         'gaze_on_faces': {
             'file': 'tests/files/gaze_on_faces_example.csv',
@@ -92,7 +92,7 @@ def fixture_gaze_init_kwargs(request):
             'time_unit': pm.datasets.GazeOnFaces().time_unit,
             'pixel_columns': pm.datasets.GazeOnFaces().pixel_columns,
             'experiment': pm.datasets.GazeOnFaces().experiment,
-            **pm.datasets.GazeOnFaces().gaze_custom_read_kwargs,
+            **pm.datasets.GazeOnFaces().custom_read_kwargs['gaze'],
         },
         'gazebase': {
             'file': 'tests/files/gazebase_example.csv',
@@ -114,7 +114,7 @@ def fixture_gaze_init_kwargs(request):
             'time_unit': pm.datasets.JuDo1000().time_unit,
             'pixel_columns': pm.datasets.JuDo1000().pixel_columns,
             'experiment': pm.datasets.JuDo1000().experiment,
-            **pm.datasets.JuDo1000().gaze_custom_read_kwargs,
+            **pm.datasets.JuDo1000().custom_read_kwargs['gaze'],
         },
         'potec': {
             'file': 'tests/files/potec_example.tsv',
@@ -122,7 +122,7 @@ def fixture_gaze_init_kwargs(request):
             'time_unit': pm.datasets.PoTeC().time_unit,
             'pixel_columns': pm.datasets.PoTeC().pixel_columns,
             'experiment': pm.datasets.PoTeC().experiment,
-            **pm.datasets.PoTeC().gaze_custom_read_kwargs,
+            **pm.datasets.PoTeC().custom_read_kwargs['gaze'],
         },
 
     }

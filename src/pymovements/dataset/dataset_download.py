@@ -153,7 +153,7 @@ def download_dataset(
 
             if not success:
                 raise RuntimeError(
-                    f"downloading resource {resource['precomputed_event_resource']} "
+                    f"downloading resource {resource['resource']} "
                     'failed for all mirrors.',
                 )
 

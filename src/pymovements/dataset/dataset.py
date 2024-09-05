@@ -607,7 +607,8 @@ class Dataset:
 
         disable_progressbar = not verbose
         for file_id, (gaze, fileinfo_row) in tqdm(
-                enumerate(zip(self.gaze, self.fileinfo['gaze'])), disable=disable_progressbar,
+                enumerate(zip(self.gaze, self.fileinfo['gaze'].to_dicts())),
+                disable=disable_progressbar,
         ):
             gaze.detect(method, eye=eye, clear=clear, **kwargs)
             # workaround until events are fully part of the GazeDataFrame

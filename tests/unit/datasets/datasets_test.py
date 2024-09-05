@@ -93,15 +93,15 @@ def test_public_dataset_registered(public_dataset, dataset_name, dataset_path, d
 
     dataset_definition = public_dataset()
     registered_definition = pm.DatasetLibrary.get(dataset_definition.name)()
-    assert dataset_definition.gaze_mirrors == registered_definition.gaze_mirrors
-    assert dataset_definition.gaze_resources == registered_definition.gaze_resources
+    assert dataset_definition.mirrors['gaze'] == registered_definition.mirrors['gaze']
+    assert dataset_definition.resources['gaze'] == registered_definition.resources['gaze']
     assert dataset_definition.experiment == registered_definition.experiment
-    assert dataset_definition.filename_format == registered_definition.filename_format
-    assert dataset_definition.filename_format_dtypes == registered_definition.filename_format_dtypes
-    assert dataset_definition.has_gaze_files == registered_definition.has_gaze_files
-    assert dataset_definition.has_precomputed_event_files == registered_definition.has_precomputed_event_files  # noqa: E501
-    assert dataset_definition.gaze_custom_read_kwargs == registered_definition.gaze_custom_read_kwargs  # noqa: E501
-    assert dataset_definition.precomputed_event_custom_read_kwargs == registered_definition.precomputed_event_custom_read_kwargs  # noqa: E501
+    assert dataset_definition.filename_format['gaze'] == registered_definition.filename_format['gaze']  # noqa: E501
+    assert dataset_definition.filename_format_dtypes['gaze'] == registered_definition.filename_format_dtypes['gaze']  # noqa: E501
+    assert dataset_definition.has_files['gaze'] == registered_definition.has_files['gaze']
+    assert dataset_definition.has_files['precomputed_events'] == registered_definition.has_files['precomputed_events']  # noqa: E501
+    assert dataset_definition.custom_read_kwargs['gaze'] == registered_definition.custom_read_kwargs['gaze']  # noqa: E501
+
     dataset, expected_paths = construct_public_dataset(
         public_dataset,
         dataset_path,

@@ -61,14 +61,25 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
         If an error occurred during matching filenames or no files have been found.
     """
     # Get all filepaths that match regular expression.
-    fileinfo_df_dict = {}
+    _fileinfo_dicts = {}
     if definition.has_files['gaze']:
         fileinfo_dicts = match_filepaths(
             path=paths.raw,
             regex=curly_to_regex(definition.filename_format['gaze']),
             relative=True,
         )
-        fileinfo_df_dict['gaze'] = fileinfo_dicts
+        if not fileinfo_dicts:
+            raise RuntimeError(f'no matching files found in {paths.raw}')
+
+        fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
+        fileinfo_df = fileinfo_df.sort(by='filepath')
+        if definition.filename_format_dtypes['gaze']:
+            items = definition.filename_format_dtypes['gaze'].items()
+            fileinfo_df = fileinfo_df.with_columns([
+                pl.col(fileinfo_key).cast(fileinfo_dtype)
+                for fileinfo_key, fileinfo_dtype in items
+            ])
+        _fileinfo_dicts['gaze'] = fileinfo_df
 
     if definition.has_files['precomputed_events']:
         fileinfo_dicts = match_filepaths(
@@ -76,12 +87,19 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
             regex=curly_to_regex(definition.filename_format['precomputed_events']),
             relative=True,
         )
-        fileinfo_df_dict['precomputed_events'] = fileinfo_dicts
+        if not fileinfo_dicts:
+            raise RuntimeError(f'no matching files found in {paths.precomputed_events}')
+        fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
+        fileinfo_df = fileinfo_df.sort(by='filepath')
+        if definition.filename_format_dtypes['precomputed_events']:
+            items = definition.filename_format_dtypes['precomputed_events'].items()
+            fileinfo_df = fileinfo_df.with_columns([
+                pl.col(fileinfo_key).cast(fileinfo_dtype)
+                for fileinfo_key, fileinfo_dtype in items
+            ])
+        _fileinfo_dicts['precomputed_events'] = fileinfo_df
 
-    if not fileinfo_df_dict:
-        raise RuntimeError(f'no matching files found in {paths.raw}')
-
-    return fileinfo_df_dict
+    return _fileinfo_dicts
 
 
 def load_event_files(
@@ -125,7 +143,7 @@ def load_event_files(
     event_dfs: list[EventDataFrame] = []
 
     # read and preprocess input files
-    for fileinfo_row in tqdm(fileinfo):
+    for fileinfo_row in tqdm(fileinfo.to_dicts()):
         filepath = Path(fileinfo_row['filepath'])
         filepath = paths.raw / filepath
 
@@ -204,7 +222,7 @@ def load_gaze_files(
     gaze_dfs: list[GazeDataFrame] = []
 
     # Read gaze files from fileinfo attribute.
-    for fileinfo_row in tqdm(fileinfo):
+    for fileinfo_row in tqdm(fileinfo.to_dicts()):
         filepath = Path(fileinfo_row['filepath'])
         filepath = paths.raw / filepath
 
@@ -357,7 +375,7 @@ def load_gaze_file(
 
 def load_precomputed_event_files(
         definition: DatasetDefinition,
-        fileinfo: list[dict[str, str]],
+        fileinfo: pl.DataFrame,
         paths: DatasetPaths,
 ) -> list[PrecomputedEventDataFrame]:
     """Load text stimulus from file.
@@ -366,7 +384,7 @@ def load_precomputed_event_files(
     ----------
     definition:  DatasetDefinition
         Dataset definition to load precomputed events.
-    fileinfo: list[dict[str, str]]
+    fileinfo: pl.DataFrame
         Information about the files.
     paths: DatasetPaths
         Adjustable paths to extract datasets.
@@ -377,8 +395,8 @@ def load_precomputed_event_files(
         Return list of precomputed event dataframes.
     """
     precomputed_events = []
-    for filepath in fileinfo:
-        data_path = paths.precomputed_events / filepath['filepath']
+    for filepath in fileinfo.to_dicts():
+        data_path = paths.precomputed_events / Path(filepath['filepath'])
         precomputed_events.append(
             load_precomputed_event_file(
                 data_path,
@@ -454,7 +472,7 @@ def add_fileinfo(
     # Cast columns from fileinfo according to specification.
     df = df.with_columns([
         pl.col(fileinfo_key).cast(fileinfo_dtype)
-        for fileinfo_key, fileinfo_dtype in definition.filename_format_dtypes.items()
+        for fileinfo_key, fileinfo_dtype in definition.filename_format_dtypes['gaze'].items()
     ])
     return df
 
@@ -639,10 +657,10 @@ def take_subset(
                 f' {type(subset_key)}',
             )
 
-        if subset_key not in fileinfo.columns:
+        if subset_key not in fileinfo['gaze'].columns:
             raise ValueError(
                 f'subset key {subset_key} must be a column in the fileinfo attribute.'
-                f' Available columns are: {fileinfo.columns}',
+                f' Available columns are: {fileinfo['gaze'].columns}',
             )
 
         if isinstance(subset_value, (bool, float, int, str)):
@@ -655,5 +673,5 @@ def take_subset(
                 f'but value of pair {subset_key}: {subset_value} is of type {type(subset_value)}',
             )
 
-        fileinfo = fileinfo.filter(pl.col(subset_key).is_in(column_values))
+        fileinfo['gaze'] = fileinfo['gaze'].filter(pl.col(subset_key).is_in(column_values))
     return fileinfo
