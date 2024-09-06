@@ -660,7 +660,7 @@ def take_subset(
         if subset_key not in fileinfo['gaze'].columns:
             raise ValueError(
                 f'subset key {subset_key} must be a column in the fileinfo attribute.'
-                f' Available columns are: {fileinfo['gaze'].columns}',
+                f" Available columns are: {fileinfo['gaze'].columns}",
             )
 
         if isinstance(subset_value, (bool, float, int, str)):
