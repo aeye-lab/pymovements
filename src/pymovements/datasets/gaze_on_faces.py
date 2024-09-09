@@ -51,10 +51,10 @@ class GazeOnFaces(DatasetDefinition):
     name : str
         The name of the dataset.
 
-    gaze_mirrors : tuple[str, ...]
+    mirrors : dict[str, tuple[str, ...]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    gaze_resources : tuple[dict[str, str], ...]
+    resources : dict[str, tuple[dict[str, str], ...]]
         A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -63,18 +63,18 @@ class GazeOnFaces(DatasetDefinition):
     experiment : Experiment
         The experiment definition.
 
-    filename_format : str
+    filename_format : dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_dtypes : dict[str, type], optional
+    filename_format_dtypes : dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
     column_map : dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
 
-    gaze_custom_read_kwargs : dict[str, Any], optional
+    custom_read_kwargs : dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function.
 
     Examples
@@ -100,17 +100,31 @@ class GazeOnFaces(DatasetDefinition):
 
     name: str = 'GazeOnFaces'
 
-    gaze_mirrors: tuple[str, ...] = (
-        'https://uncloud.univ-nantes.fr/index.php/s/',
+    has_files: dict[str, bool] = field(
+        default_factory=lambda: {'gaze': True, 'precomputed_events': False},
     )
 
-    gaze_resources: tuple[dict[str, str], ...] = (
-        {
-            'gaze_resource': '8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip',
-            'filename': 'gaze_csv.zip',
-            'md5': 'fe219f07c9253cd9aaee6bd50233c034',
+    mirrors: dict[str, tuple[str, ...]] = field(
+        default_factory=lambda: {
+            'gaze': (
+                'https://uncloud.univ-nantes.fr/index.php/s/',
+            ),
         },
     )
+
+    resources: dict[str, tuple[dict[str, str], ...]] = field(
+        default_factory=lambda: {
+            'gaze': (
+                {
+                    'resource': '8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip',
+                    'filename': 'gaze_csv.zip',
+                    'md5': 'fe219f07c9253cd9aaee6bd50233c034',
+                },
+            ),
+        },
+    )
+
+    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     experiment: Experiment = Experiment(
         screen_width_px=1280,
@@ -122,12 +136,18 @@ class GazeOnFaces(DatasetDefinition):
         sampling_rate=60,
     )
 
-    filename_format: str = r'gaze_sub{sub_id:d}_trial{trial_id:d}.csv'
-
-    filename_format_dtypes: dict[str, type] = field(
+    filename_format: dict[str, str] = field(
         default_factory=lambda: {
-            'sub_id': int,
-            'trial_id': int,
+            'gaze': r'gaze_sub{sub_id:d}_trial{trial_id:d}.csv',
+        },
+    )
+
+    filename_format_dtypes: dict[str, dict[str, type]] = field(
+        default_factory=lambda: {
+            'gaze': {
+                'sub_id': int,
+                'trial_id': int,
+            },
         },
     )
 
@@ -141,13 +161,13 @@ class GazeOnFaces(DatasetDefinition):
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 
-    gaze_custom_read_kwargs: dict[str, Any] = field(
+    custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
-            'separator': ',',
-            'has_header': False,
-            'new_columns': ['x', 'y'],
-            'dtypes': [pl.Float32, pl.Float32],
+            'gaze': {
+                'separator': ',',
+                'has_header': False,
+                'new_columns': ['x', 'y'],
+                'dtypes': [pl.Float32, pl.Float32],
+            },
         },
     )
-    has_gaze_files: bool = True
-    has_precomputed_event_files: bool = False

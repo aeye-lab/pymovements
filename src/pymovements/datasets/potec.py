@@ -56,33 +56,33 @@ class PoTeC(DatasetDefinition):
 
     Attributes
     ----------
-    name : str
+    name: str
         The name of the dataset.
 
-    gaze_mirrors : tuple[str, ...]
+    mirrors: dict[str, tuple[str, ...]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    gaze_resources : tuple[dict[str, str], ...]
+    resources: dict[str, tuple[dict[str, str], ...]]
         A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    experiment : Experiment
+    experiment: Experiment
         The experiment definition.
 
-    filename_format : str
+    filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_dtypes : dict[str, type], optional
+    filename_format_dtypes: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
-    column_map : dict[str, str]
+    column_map: dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
 
-    gaze_custom_read_kwargs : dict[str, Any], optional
+    custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function.
 
     Examples
@@ -108,17 +108,29 @@ class PoTeC(DatasetDefinition):
 
     name: str = 'PoTeC'
 
-    gaze_mirrors: tuple[str, ...] = (
-        'https://osf.io/download/',
+    has_files: dict[str, bool] = field(
+        default_factory=lambda: {'gaze': True, 'precomputed_events': False},
     )
 
-    gaze_resources: tuple[dict[str, str], ...] = (
-        {
-            'gaze_resource': 'tgd9q/',
-            'filename': 'PoTeC.zip',
-            'md5': 'cffd45039757c3777e2fd130e5d8a2ad',
+    mirrors: dict[str, tuple[str, ...]] = field(
+        default_factory=lambda: {
+            'gaze': ('https://osf.io/download/',),
         },
     )
+
+    resources: dict[str, tuple[dict[str, str], ...]] = field(
+        default_factory=lambda: {
+            'gaze': (
+                {
+                    'resource': 'tgd9q/',
+                    'filename': 'PoTeC.zip',
+                    'md5': 'cffd45039757c3777e2fd130e5d8a2ad',
+                },
+            ),
+        },
+    )
+
+    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     experiment: Experiment = Experiment(
         screen_width_px=1680,
@@ -130,12 +142,18 @@ class PoTeC(DatasetDefinition):
         sampling_rate=1000,
     )
 
-    filename_format: str = r'reader{subject_id:d}_{text_id}_raw_data.tsv'
-
-    filename_format_dtypes: dict[str, type] = field(
+    filename_format: dict[str, str] = field(
         default_factory=lambda: {
-            'subject_id': int,
-            'text_id': str,
+            'gaze': r'reader{subject_id:d}_{text_id}_raw_data.tsv',
+        },
+    )
+
+    filename_format_dtypes: dict[str, dict[str, type]] = field(
+        default_factory=lambda: {
+            'gaze': {
+                'subject_id': int,
+                'text_id': str,
+            },
         },
     )
 
@@ -153,16 +171,16 @@ class PoTeC(DatasetDefinition):
         ],
     )
 
-    gaze_custom_read_kwargs: dict[str, Any] = field(
+    custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
-            'dtypes': {
-                'time': pl.Int64,
-                'x': pl.Float32,
-                'y': pl.Float32,
-                'pupil_diameter': pl.Float32,
+            'gaze': {
+                'dtypes': {
+                    'time': pl.Int64,
+                    'x': pl.Float32,
+                    'y': pl.Float32,
+                    'pupil_diameter': pl.Float32,
+                },
+                'separator': '\t',
             },
-            'separator': '\t',
         },
     )
-    has_gaze_files: bool = True
-    has_precomputed_event_files: bool = False

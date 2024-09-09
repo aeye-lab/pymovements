@@ -124,7 +124,7 @@ class Dataset:
         self.scan()
         self.fileinfo = dataset_files.take_subset(fileinfo=self.fileinfo, subset=subset)
 
-        if self.definition.has_gaze_files:
+        if self.definition.has_files['gaze']:
             self.load_gaze_files(
                 preprocessed=preprocessed,
                 preprocessed_dirname=preprocessed_dirname,
@@ -132,7 +132,7 @@ class Dataset:
             )
 
         # Event files precomuted by authors of the dataset
-        if self.definition.has_precomputed_event_files:
+        if self.definition.has_files['precomputed_events']:
             self.load_precomputed_events()
 
         # Events extracted previously by pymovements
@@ -199,7 +199,7 @@ class Dataset:
         self._check_fileinfo()
         self.gaze = dataset_files.load_gaze_files(
             definition=self.definition,
-            fileinfo=self.fileinfo,
+            fileinfo=self.fileinfo['gaze'],
             paths=self.paths,
             preprocessed=preprocessed,
             preprocessed_dirname=preprocessed_dirname,
@@ -212,6 +212,7 @@ class Dataset:
         self._check_fileinfo()
         self.precomputed_events = dataset_files.load_precomputed_event_files(
             self.definition,
+            self.fileinfo['precomputed_events'],
             self.paths,
         )
 
@@ -248,7 +249,7 @@ class Dataset:
         self._check_fileinfo()
         self.events = dataset_files.load_event_files(
             definition=self.definition,
-            fileinfo=self.fileinfo,
+            fileinfo=self.fileinfo['gaze'],
             paths=self.paths,
             events_dirname=events_dirname,
             extension=extension,
@@ -606,7 +607,8 @@ class Dataset:
 
         disable_progressbar = not verbose
         for file_id, (gaze, fileinfo_row) in tqdm(
-                enumerate(zip(self.gaze, self.fileinfo.to_dicts())), disable=disable_progressbar,
+                enumerate(zip(self.gaze, self.fileinfo['gaze'].to_dicts())),
+                disable=disable_progressbar,
         ):
             gaze.detect(method, eye=eye, clear=clear, **kwargs)
             # workaround until events are fully part of the GazeDataFrame
@@ -651,7 +653,11 @@ class Dataset:
         """
         processor = EventGazeProcessor(event_properties)
 
-        identifier_columns = [column for column in self.fileinfo.columns if column != 'filepath']
+        identifier_columns = [
+            column
+            for column in self.fileinfo['gaze'].columns
+            if column != 'filepath'
+        ]
 
         disable_progressbar = not verbose
         for events, gaze in tqdm(zip(self.events, self.gaze), disable=disable_progressbar):
@@ -789,7 +795,7 @@ class Dataset:
         """
         dataset_files.save_events(
             events=self.events,
-            fileinfo=self.fileinfo,
+            fileinfo=self.fileinfo['gaze'],
             paths=self.paths,
             events_dirname=events_dirname,
             verbose=verbose,
@@ -833,7 +839,7 @@ class Dataset:
         """
         dataset_files.save_preprocessed(
             gaze=self.gaze,
-            fileinfo=self.fileinfo,
+            fileinfo=self.fileinfo['gaze'],
             paths=self.paths,
             preprocessed_dirname=preprocessed_dirname,
             verbose=verbose,

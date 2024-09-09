@@ -61,8 +61,8 @@ import pymovements as pm
         pytest.param(
             {
                 'file': 'tests/files/eyelink_monocular_example.asc',
-                'patterns': pm.datasets.ToyDatasetEyeLink().gaze_custom_read_kwargs['patterns'],
-                'schema': pm.datasets.ToyDatasetEyeLink().gaze_custom_read_kwargs['schema'],
+                'patterns': pm.datasets.ToyDatasetEyeLink().custom_read_kwargs['gaze']['patterns'],
+                'schema': pm.datasets.ToyDatasetEyeLink().custom_read_kwargs['gaze']['schema'],
             },
             pl.DataFrame(
                 data={
