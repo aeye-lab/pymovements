@@ -186,6 +186,8 @@ def draw_image_stimulus(
         image_stimulus: str | Path,
         origin: str = 'upper',
         show: bool = False,
+        figsize: tuple[float, float] = (15, 10),
+        extent: list[float] | None = None,
 ) -> tuple[matplotlib.pyplot.figure, matplotlib.pyplot.Axes]:
     """Draw stimulus.
 
@@ -196,7 +198,11 @@ def draw_image_stimulus(
     origin: str
         Origin how to draw the image.
     show: bool
-        Boolean whether to show the image.
+        Boolean whether to show the image. (default: False)
+    figsize: tuple[float, float]
+        Size of the figure. (default: (15, 10))
+    extent: list[float] | None
+        Extent of image. (default: None)
 
     Returns
     -------
@@ -204,8 +210,8 @@ def draw_image_stimulus(
     ax: matplotlib.pyplot.Axes
     """
     img = PIL.Image.open(image_stimulus)
-    fig, ax = matplotlib.pyplot.subplots()
-    ax.imshow(img, origin=origin)
+    fig, ax = matplotlib.pyplot.subplots(figsize=figsize)
+    ax.imshow(img, origin=origin, extent=extent)
     if show:
         matplotlib.pyplot.show()
     return fig, ax
