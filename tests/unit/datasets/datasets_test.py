@@ -93,14 +93,23 @@ def test_public_dataset_registered(public_dataset, dataset_name, dataset_path, d
 
     dataset_definition = public_dataset()
     registered_definition = pm.DatasetLibrary.get(dataset_definition.name)()
-    assert dataset_definition.mirrors['gaze'] == registered_definition.mirrors['gaze']
-    assert dataset_definition.resources['gaze'] == registered_definition.resources['gaze']
-    assert dataset_definition.experiment == registered_definition.experiment
-    assert dataset_definition.filename_format['gaze'] == registered_definition.filename_format['gaze']  # noqa: E501
-    assert dataset_definition.filename_format_dtypes['gaze'] == registered_definition.filename_format_dtypes['gaze']  # noqa: E501
     assert dataset_definition.has_files['gaze'] == registered_definition.has_files['gaze']
     assert dataset_definition.has_files['precomputed_events'] == registered_definition.has_files['precomputed_events']  # noqa: E501
-    assert dataset_definition.custom_read_kwargs['gaze'] == registered_definition.custom_read_kwargs['gaze']  # noqa: E501
+    if dataset_definition.has_files['gaze']:
+        assert dataset_definition.mirrors['gaze'] == registered_definition.mirrors['gaze']
+        assert dataset_definition.resources['gaze'] == registered_definition.resources['gaze']
+        assert dataset_definition.experiment == registered_definition.experiment
+        assert dataset_definition.filename_format['gaze'] == registered_definition.filename_format['gaze']  # noqa: E501
+        assert dataset_definition.filename_format_dtypes['gaze'] == registered_definition.filename_format_dtypes['gaze']  # noqa: E501
+        assert dataset_definition.custom_read_kwargs['gaze'] == registered_definition.custom_read_kwargs['gaze']  # noqa: E501
+
+    if dataset_definition.has_files['precomputed_events']:
+        assert dataset_definition.mirrors['precomputed_events'] == registered_definition.mirrors['precomputed_events']  # noqa: E501
+        assert dataset_definition.resources['precomputed_events'] == registered_definition.resources['precomputed_events']  # noqa: E501
+        assert dataset_definition.experiment == registered_definition.experiment
+        assert dataset_definition.filename_format['precomputed_events'] == registered_definition.filename_format['precomputed_events']  # noqa: E501
+        assert dataset_definition.filename_format_dtypes['precomputed_events'] == registered_definition.filename_format_dtypes['precomputed_events']  # noqa: E501
+        assert dataset_definition.custom_read_kwargs['precomputed_events'] == registered_definition.custom_read_kwargs['precomputed_events']  # noqa: E501
 
     dataset, expected_paths = construct_public_dataset(
         public_dataset,
