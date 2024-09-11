@@ -116,7 +116,8 @@ class CopCo(DatasetDefinition):
         default_factory=lambda: {
             'precomputed_events': (
                 {
-                    'resource': 'v1/resources/ud8s5/providers/osfstorage/61e13174c99ebd02df017c14/?zip=',  # noqa: E501
+                    'resource':
+                    'v1/resources/ud8s5/providers/osfstorage/61e13174c99ebd02df017c14/?zip=',
                     'filename': 'FixationReports.zip',
                     'md5': None,  # type:ignore
                 },
