@@ -24,8 +24,9 @@
 .. autosummary::
    :toctree:
    :template: class.rst
-
+   
     pymovements.datasets.CopCo
+    pymovements.datasets.EMTeC
     pymovements.datasets.GazeBase
     pymovements.datasets.GazeBaseVR
     pymovements.datasets.GazeGraph
@@ -46,6 +47,7 @@
     pymovements.datasets.ToyDatasetEyeLink
 """
 from pymovements.datasets.copco import CopCo
+from pymovements.datasets.emtec import EMTeC
 from pymovements.datasets.gaze_graph import GazeGraph
 from pymovements.datasets.gaze_on_faces import GazeOnFaces
 from pymovements.datasets.gazebase import GazeBase
@@ -60,6 +62,7 @@ from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
 
 __all__ = [
     'CopCo',
+    'EMTeC',
     'GazeBase',
     'GazeBaseVR',
     'GazeGraph',
