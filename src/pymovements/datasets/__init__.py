@@ -24,7 +24,7 @@
 .. autosummary::
    :toctree:
    :template: class.rst
-   
+
     pymovements.datasets.CopCo
     pymovements.datasets.EMTeC
     pymovements.datasets.GazeBase
