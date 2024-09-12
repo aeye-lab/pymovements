@@ -118,6 +118,16 @@ def args_fixture(experiment_fixture, request):
         pytest.param(
             {'show_cbar': False}, id='show_cbar_false',
         ),
+        pytest.param(
+            {
+                'add_stimulus': True,
+                'path_to_image_stimulus': './tests/files/pexels-zoorg-1000498.jpg',
+                'stimulus_origin': 'lower',
+            }, id='add_stimulus_true',
+        ),
+        pytest.param(
+            {'add_stimulus': False}, id='add_stimulus_false',
+        ),
     ],
 )
 def test_heatmap_show(args, kwargs, monkeypatch):
