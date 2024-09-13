@@ -55,6 +55,10 @@ def traceplot(
         title: str | None = None,
         savepath: str | None = None,
         show: bool = True,
+        add_stimulus: bool = False,
+        path_to_image_stimulus: str | Path | None = None,
+        stimulus_origin: str = 'upper',
+        alpha: float = 1.,
 ) -> None:
     """Plot eye gaze trace from positional data.
 
@@ -89,6 +93,14 @@ def traceplot(
         If given, figure will be saved to this path. (default: None)
     show: bool
         If True, figure will be shown. (default: True)
+    add_stimulus: bool
+        Define whether stimulus should be included. (default: False)
+    path_to_image_stimulus: str | Path | None
+        Path to image stimulus. (default: None)
+    stimulus_origin: str
+        Origin of stimulus. (default: 'upper')
+    alpha: float
+        Alpha value of heatmap. (default: 1.)
 
     Raises
     ------
@@ -107,6 +119,9 @@ def traceplot(
         cmap_segmentdata,
         cval,
         show_cbar,
+        add_stimulus,
+        path_to_image_stimulus,
+        stimulus_origin,
     )
 
     # Create a set of line segments so that we can color them individually

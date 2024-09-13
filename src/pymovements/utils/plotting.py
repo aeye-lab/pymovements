@@ -93,19 +93,27 @@ MatplotlibSetupType: TypeAlias = tuple[
 
 
 def setup_matplotlib(
-        signal: np.ndarray,
+        x_signal: np.ndarray,
+        y_signal: np.ndarray,
         figsize: tuple[int, int],
         cmap: matplotlib.colors.Colormap | None = None,
         cmap_norm: matplotlib.colors.Normalize | str | None = None,
         cmap_segmentdata: LinearSegmentedColormapType | None = None,
         cval: np.ndarray | None = None,
         show_cbar: bool = False,
+        add_stimulus: bool = False,
+        path_to_image_stimulus: str | None = None,
+        stimulus_origin: str = 'upper',
+        padding: float | None = None,
+        pad_factor: float | None = 0.05,
 ) -> MatplotlibSetupType:
     """Configure cmap.
 
     Parameters
     ----------
-    signal: np.ndarray
+    x_signal: np.ndarray
+        Time-step array.
+    y_signal: np.ndarray
         Time-step array.
     figsize: tuple[int, int]
         Figure size.
@@ -119,16 +127,33 @@ def setup_matplotlib(
         Line color values. (default: None)
     show_cbar: bool
         Shows color bar if True. (default: False)
+    padding: float | None
+        Absolute padding value. If None it is inferred from pad_factor and limits. (default: None)
+    pad_factor: float | None
+        Relative padding factor to construct padding from value. (default: 0.05)
 
     Returns
     -------
     MatplotlibSetupType
         Configures fig, ax, cmap, cmap_norm, cmap_segmentdata, cval, and show_cbar.
     """
-    n = len(signal)
+    n = len(x_signal)
 
     fig = matplotlib.pyplot.figure(figsize=figsize)
     ax = fig.gca()
+    if padding is None:
+        x_pad = (np.nanmax(x_signal) - np.nanmin(x_signal)) * pad_factor
+        y_pad = (np.nanmax(y_signal) - np.nanmin(y_signal)) * pad_factor
+    else:
+        x_pad = padding
+        y_pad = padding
+
+    ax.set_xlim(np.nanmin(x_signal) - x_pad, np.nanmax(x_signal) + x_pad)
+    ax.set_ylim(np.nanmin(y_signal) - y_pad, np.nanmax(y_signal) + y_pad)
+
+    if add_stimulus:
+        img = PIL.Image.open(path_to_image_stimulus)
+        ax.imshow(img, origin=stimulus_origin)
 
     if cval is None:
         cval = np.zeros(n)
@@ -188,6 +213,8 @@ def draw_image_stimulus(
         show: bool = False,
         figsize: tuple[float, float] = (15, 10),
         extent: list[float] | None = None,
+        fig: matplotlib.pyplot.figure | None = None,
+        ax: matplotlib.pyplot.Axes | None = None,
 ) -> tuple[matplotlib.pyplot.figure, matplotlib.pyplot.Axes]:
     """Draw stimulus.
 
@@ -210,7 +237,8 @@ def draw_image_stimulus(
     ax: matplotlib.pyplot.Axes
     """
     img = PIL.Image.open(image_stimulus)
-    fig, ax = matplotlib.pyplot.subplots(figsize=figsize)
+    if not fig:
+        fig, ax = matplotlib.pyplot.subplots(figsize=figsize)
     ax.imshow(img, origin=origin, extent=extent)
     if show:
         matplotlib.pyplot.show()

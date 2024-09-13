@@ -63,6 +63,9 @@ def scanpathplot(
         alpha: float = 0.5,
         add_traceplot: bool = False,
         gaze_position_column: str = 'pixel',
+        add_stimulus: bool = False,
+        path_to_image_stimulus: str | None = None,
+        stimulus_origin: str = 'upper',
 ) -> None:
     """Plot scanpath from positional data.
 
@@ -119,12 +122,18 @@ def scanpathplot(
 
     fig, ax, cmap, cmap_norm, cval, show_cbar = setup_matplotlib(
         x_signal,
+        y_signal,
         figsize,
         cmap,
         cmap_norm,
         cmap_segmentdata,
         cval,
         show_cbar,
+        add_stimulus,
+        path_to_image_stimulus,
+        stimulus_origin,
+        padding,
+        pad_factor,
     )
 
     for row in events.frame.iter_rows(named=True):
@@ -155,16 +164,6 @@ def scanpathplot(
             # sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
             # sm.set_array(cval)
             fig.colorbar(line, label=cbar_label, ax=ax)
-
-    if padding is None:
-        x_pad = (np.nanmax(x_signal) - np.nanmin(x_signal)) * pad_factor
-        y_pad = (np.nanmax(y_signal) - np.nanmin(y_signal)) * pad_factor
-    else:
-        x_pad = padding
-        y_pad = padding
-
-    ax.set_xlim(np.nanmin(x_signal) - x_pad, np.nanmax(x_signal) + x_pad)
-    ax.set_ylim(np.nanmin(y_signal) - y_pad, np.nanmax(y_signal) + y_pad)
 
     if title:
         ax.set_title(title)
