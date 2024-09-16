@@ -216,6 +216,24 @@ class Dataset:
             self.paths,
         )
 
+    def split_precomputed_events(
+            self,
+            by: list[str] | str,
+    ) -> None:
+        """Split precomputed event data into seperated PrecomputedEventDataFrame's.
+
+        Parameters
+        ----------
+        by: list[str] | str
+            Column's to split dataframe by.
+        """
+        if isinstance(by, str):
+            by = [by]
+        self.precomputed_events = [
+            PrecomputedEventDataFrame(new_frame) for _frame in self.precomputed_events
+            for new_frame in _frame.frame.partition_by(by=by)
+        ]
+
     def load_event_files(
             self,
             events_dirname: str | None = None,
