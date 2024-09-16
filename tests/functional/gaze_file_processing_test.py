@@ -33,6 +33,8 @@ import pymovements as pm
         'ipc_monocular',
         'ipc_binocular',
         'eyelink_monocular',
+        'didec',
+        'emtec',
         'hbn',
         'sbsat',
         'gaze_on_faces',
@@ -70,6 +72,22 @@ def fixture_gaze_init_kwargs(request):
         'eyelink_monocular': {
             'file': 'tests/files/eyelink_monocular_example.asc',
             'experiment': pm.datasets.ToyDatasetEyeLink().experiment,
+        },
+        'didec': {
+            'file': 'tests/files/didec_example.txt',
+            'time_column': pm.datasets.DIDEC().time_column,
+            'time_unit': pm.datasets.DIDEC().time_unit,
+            'pixel_columns': pm.datasets.DIDEC().pixel_columns,
+            'experiment': pm.datasets.DIDEC().experiment,
+            **pm.datasets.DIDEC().custom_read_kwargs['gaze'],
+        },
+        'emtec': {
+            'file': 'tests/files/emtec_example.csv',
+            'time_column': pm.datasets.EMTeC().time_column,
+            'time_unit': pm.datasets.EMTeC().time_unit,
+            'pixel_columns': pm.datasets.EMTeC().pixel_columns,
+            'experiment': pm.datasets.EMTeC().experiment,
+            **pm.datasets.EMTeC().custom_read_kwargs['gaze'],
         },
         'hbn': {
             'file': 'tests/files/hbn_example.csv',
