@@ -251,6 +251,7 @@ def draw_image_stimulus(
     img = PIL.Image.open(image_stimulus)
     if not fig:
         fig, ax = matplotlib.pyplot.subplots(figsize=figsize)
+    assert ax
     ax.imshow(img, origin=origin, extent=extent)
     if show:
         matplotlib.pyplot.show()

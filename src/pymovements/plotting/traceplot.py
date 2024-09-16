@@ -56,7 +56,7 @@ def traceplot(
         savepath: str | None = None,
         show: bool = True,
         add_stimulus: bool = False,
-        path_to_image_stimulus: str | Path | None = None,
+        path_to_image_stimulus: str | None = None,
         stimulus_origin: str = 'upper',
         alpha: float = 1.,
 ) -> None:
