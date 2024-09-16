@@ -95,7 +95,7 @@ def traceplot(
         If True, figure will be shown. (default: True)
     add_stimulus: bool
         Define whether stimulus should be included. (default: False)
-    path_to_image_stimulus: str | Path | None
+    path_to_image_stimulus: str | None
         Path to image stimulus. (default: None)
     stimulus_origin: str
         Origin of stimulus. (default: 'upper')
