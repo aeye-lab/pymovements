@@ -112,9 +112,9 @@ def scanpathplot(
         Position column in the gaze dataframe. (default: 'pixel')
     add_stimulus: bool
         Boolean value indicationg whether to plot the scanpath on the stimuls. (default: False)
-    path_to_image_stimulus: str | None 
+    path_to_image_stimulus: str | None
         Path of the stimulus to be shown. (default: None)
-    stimulus_origin: str 
+    stimulus_origin: str
         Origin of stimuls to plot on the stimulus. (default: 'upper')
 
     Raises
@@ -142,7 +142,6 @@ def scanpathplot(
         pad_factor,
     )
 
-    
     for row in events.frame.iter_rows(named=True):
         fixation = Circle(
             row[position_column],
@@ -171,7 +170,7 @@ def scanpathplot(
             # sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
             # sm.set_array(cval)
             fig.colorbar(line, label=cbar_label, ax=ax)
-    
+
     if title:
         ax.set_title(title)
 
