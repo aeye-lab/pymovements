@@ -113,6 +113,7 @@ def traceplot(
 
     fig, ax, cmap, cmap_norm, cval, show_cbar = setup_matplotlib(
         x_signal,
+        y_signal,
         figsize,
         cmap,
         cmap_norm,
@@ -122,6 +123,8 @@ def traceplot(
         add_stimulus,
         path_to_image_stimulus,
         stimulus_origin,
+        padding,
+        pad_factor,
     )
 
     # Create a set of line segments so that we can color them individually
@@ -137,16 +140,6 @@ def traceplot(
     line_collection.set_array(cval)
     line_collection.set_linewidth(2)
     line = ax.add_collection(line_collection)
-
-    if padding is None:
-        x_pad = (np.nanmax(x_signal) - np.nanmin(x_signal)) * pad_factor
-        y_pad = (np.nanmax(y_signal) - np.nanmin(y_signal)) * pad_factor
-    else:
-        x_pad = padding
-        y_pad = padding
-
-    ax.set_xlim(np.nanmin(x_signal) - x_pad, np.nanmax(x_signal) + x_pad)
-    ax.set_ylim(np.nanmin(y_signal) - y_pad, np.nanmax(y_signal) + y_pad)
 
     if show_cbar:
         # sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
