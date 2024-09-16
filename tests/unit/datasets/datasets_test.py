@@ -32,6 +32,7 @@ import pymovements as pm
     # XXX: add public dataset in alphabetical order
     [
         pytest.param(pm.datasets.CopCo, 'CopCo', id='CopCo'),
+        pytest.param(pm.datasets.DIDEC, 'DIDEC', id='DIDEC'),
         pytest.param(pm.datasets.EMTeC, 'EMTeC', id='EMTeC'),
         pytest.param(pm.datasets.GazeBase, 'GazeBase', id='GazeBase'),
         pytest.param(pm.datasets.GazeBaseVR, 'GazeBaseVR', id='GazeBaseVR'),
