@@ -329,7 +329,7 @@ def mock_toy(
                 'CURRENT_FIXATION_DURATION': np.arange(1000),
                 'CURRENT_FIX_X': np.zeros(1000),
                 'CURRENT_FIX_Y': np.zeros(1000),
-                'trial_id_1': np.concat([np.zeros(500), np.ones(500)]),
+                'trial_id_1': np.concatenate([np.zeros(500), np.ones(500)]),
                 'trial_id_2': ['a'] * 200 + ['b'] * 200 + ['c'] * 600,
             },
             schema={
