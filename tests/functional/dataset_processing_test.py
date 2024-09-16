@@ -30,6 +30,7 @@ import pymovements as pm
         'csv_binocular',
         'ipc_monocular',
         'ipc_binocular',
+        'emtec',
         'hbn',
         'sbsat',
         'gaze_on_faces',
@@ -76,6 +77,14 @@ def fixture_dataset_init_kwargs(request):
             experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             filename_format_dtypes={'gaze': {}},
             custom_read_kwargs={'gaze': {}},
+        ),
+        'emtec': pm.datasets.EMTeC(
+            has_files={'gaze': True, 'precomputed_events': False},
+            filename_format={'gaze': 'emtec_example.csv'},
+            time_column=pm.datasets.EMTeC().time_column,
+            time_unit=pm.datasets.EMTeC().time_unit,
+            filename_format_dtypes={'gaze': {}},
+            trial_columns=None,
         ),
         'hbn': pm.datasets.HBN(
             has_files={'gaze': True, 'precomputed_events': False},
