@@ -28,6 +28,7 @@ from typing import Union
 import matplotlib.pyplot
 import numpy as np
 import PIL.Image
+from matplotlib.collections import LineCollection
 from typing_extensions import TypeAlias
 
 LinearSegmentedColormapType: TypeAlias = dict[
@@ -256,3 +257,49 @@ def draw_image_stimulus(
     if show:
         matplotlib.pyplot.show()
     return fig, ax
+
+
+def draw_line_data(
+        x_signal: np.ndarray,
+        y_signal: np.ndarray,
+        ax: matplotlib.pyplot.Axes,
+        cmap: matplotlib.colors.Colormap | None = None,
+        cmap_norm: matplotlib.colors.Normalize | str | None = None,
+        cval: np.ndarray | None = None,
+) -> matplotlib.pyplot.Axes:
+    """Draw line data.
+
+    Parameters
+    ----------
+    x_signal: np.ndarray
+        Data to be plotted.
+    y_signal: np.ndarray
+        Data to be plotted.
+    ax: matplotlib.pyplot.Axes
+        Matplotlib axes.
+    cmap: matplotlib.colors.Colormap | None
+        Color map for line color values. (default: None)
+    cmap_norm: matplotlib.colors.Normalize | str | None
+        Normalization for color values. (default: None)
+    cval: np.ndarray | None
+        Line color values. (default: None)
+
+    Returns
+    -------
+    matplotlib.pyplot.Axes
+        Axes with added line data.
+
+    """
+    # Create a set of line segments so that we can color them individually
+    # This creates the points as a N x 1 x 2 array so that we can stack points
+    # together easily to get the segments. The segments array for line collection
+    # needs to be (numlines) x (points per line) x 2 (for x and y)
+    points = np.array([x_signal, y_signal]).T.reshape((-1, 1, 2))
+    segments = np.concatenate([points[:-1], points[1:]], axis=1)
+    # Create a continuous norm to map from data points to colors
+    line_collection = LineCollection(segments, cmap=cmap, norm=cmap_norm)
+    # Set the values used for colormapping
+    line_collection.set_array(cval)
+    line_collection.set_linewidth(2)
+    line = ax.add_collection(line_collection)
+    return line

@@ -27,11 +27,11 @@ import matplotlib.colors
 import matplotlib.pyplot as plt
 import matplotlib.scale
 import numpy as np
-from matplotlib.collections import LineCollection
 from matplotlib.patches import Circle
 
 from pymovements.events import EventDataFrame
 from pymovements.gaze import GazeDataFrame
+from pymovements.utils.plotting import draw_line_data
 from pymovements.utils.plotting import LinearSegmentedColormapType
 from pymovements.utils.plotting import setup_matplotlib
 
@@ -123,6 +123,7 @@ def scanpathplot(
         If length of x and y coordinates do not match or if ``cmap_norm`` is unknown.
 
     """
+    # pylint: disable=duplicate-code
     x_signal = events.frame[position_column].list.get(0)
     y_signal = events.frame[position_column].list.get(1)
 
@@ -157,15 +158,15 @@ def scanpathplot(
         assert gaze
         gaze_x_signal = gaze.frame[gaze_position_column].list.get(0)
         gaze_y_signal = gaze.frame[gaze_position_column].list.get(1)
-        points = np.array([gaze_x_signal, gaze_y_signal]).T.reshape((-1, 1, 2))
-        segments = np.concatenate([points[:-1], points[1:]], axis=1)
+        line = draw_line_data(
+            gaze_x_signal,
+            gaze_y_signal,
+            ax,
+            cmap,
+            cmap_norm,
+            cval,
+        )
 
-        # Create a continuous norm to map from data points to colors
-        line_collection = LineCollection(segments, cmap=cmap, norm=cmap_norm)
-        # Set the values used for colormapping
-        line_collection.set_array(cval)
-        line_collection.set_linewidth(2)
-        line = ax.add_collection(line_collection)
         if show_cbar:
             # sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
             # sm.set_array(cval)
