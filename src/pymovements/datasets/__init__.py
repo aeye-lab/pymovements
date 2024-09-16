@@ -64,6 +64,7 @@ from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
 
 __all__ = [
     'CopCo',
+    'DIDEC',
     'EMTeC',
     'GazeBase',
     'GazeBaseVR',
