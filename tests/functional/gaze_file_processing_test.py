@@ -34,6 +34,7 @@ import pymovements as pm
         'ipc_binocular',
         'eyelink_monocular',
         'didec',
+        'emtec',
         'hbn',
         'sbsat',
         'gaze_on_faces',
@@ -79,6 +80,14 @@ def fixture_gaze_init_kwargs(request):
             'pixel_columns': pm.datasets.DIDEC().pixel_columns,
             'experiment': pm.datasets.DIDEC().experiment,
             **pm.datasets.DIDEC().custom_read_kwargs['gaze'],
+        },
+        'emtec': {
+            'file': 'tests/files/emtec_example.csv',
+            'time_column': pm.datasets.EMTeC().time_column,
+            'time_unit': pm.datasets.EMTeC().time_unit,
+            'pixel_columns': pm.datasets.EMTeC().pixel_columns,
+            'experiment': pm.datasets.EMTeC().experiment,
+            **pm.datasets.EMTeC().custom_read_kwargs['gaze'],
         },
         'hbn': {
             'file': 'tests/files/hbn_example.csv',
