@@ -127,6 +127,12 @@ def setup_matplotlib(
         Line color values. (default: None)
     show_cbar: bool
         Shows color bar if True. (default: False)
+    add_stimulus: bool
+        Boolean value indicationg whether to plot the scanpath on the stimuls. (default: False)
+    path_to_image_stimulus: str | None 
+        Path of the stimulus to be shown. (default: None)
+    stimulus_origin: str 
+        Origin of stimuls to plot on the stimulus. (default: 'upper')
     padding: float | None
         Absolute padding value. If None it is inferred from pad_factor and limits. (default: None)
     pad_factor: float | None
@@ -141,20 +147,22 @@ def setup_matplotlib(
 
     fig = matplotlib.pyplot.figure(figsize=figsize)
     ax = fig.gca()
-    if padding is None:
-        x_pad = (np.nanmax(x_signal) - np.nanmin(x_signal)) * pad_factor
-        y_pad = (np.nanmax(y_signal) - np.nanmin(y_signal)) * pad_factor
-    else:
-        x_pad = padding
-        y_pad = padding
-
-    ax.set_xlim(np.nanmin(x_signal) - x_pad, np.nanmax(x_signal) + x_pad)
-    ax.set_ylim(np.nanmin(y_signal) - y_pad, np.nanmax(y_signal) + y_pad)
-
+    
     if add_stimulus:
         img = PIL.Image.open(path_to_image_stimulus)
-        ax.imshow(img, origin=stimulus_origin)
-
+        ax.imshow(img, origin=stimulus_origin, extent=None)
+    else:
+        if padding is None:
+            x_pad = (np.nanmax(x_signal) - np.nanmin(x_signal)) * pad_factor
+            y_pad = (np.nanmax(y_signal) - np.nanmin(y_signal)) * pad_factor
+        else:
+            x_pad = padding
+            y_pad = padding
+    
+        ax.set_xlim(np.nanmin(x_signal) - x_pad, np.nanmax(x_signal) + x_pad)
+        ax.set_ylim(np.nanmin(y_signal) - y_pad, np.nanmax(y_signal) + y_pad)
+        ax.invert_yaxis()
+    
     if cval is None:
         cval = np.zeros(n)
         show_cbar = False
@@ -204,6 +212,7 @@ def setup_matplotlib(
         norm_class = matplotlib.colors.make_norm_from_scale(scale_class)
         cmap_norm = norm_class(matplotlib.colors.Normalize)()
 
+    
     return fig, ax, cmap, cmap_norm, cval, show_cbar
 
 
