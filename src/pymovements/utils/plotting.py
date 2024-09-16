@@ -238,6 +238,10 @@ def draw_image_stimulus(
         Size of the figure. (default: (15, 10))
     extent: list[float] | None
         Extent of image. (default: None)
+    fig: matplotlib.pyplot.figure | None
+        Matplotlib canvas. (default: None)
+    ax: matplotlib.pyplot.Axes | None
+        Matplotlib axes. (default: None)
 
     Returns
     -------
