@@ -30,6 +30,7 @@ import pymovements as pm
         'csv_binocular',
         'ipc_monocular',
         'ipc_binocular',
+        'didec',
         'hbn',
         'sbsat',
         'gaze_on_faces',
@@ -76,6 +77,14 @@ def fixture_dataset_init_kwargs(request):
             experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             filename_format_dtypes={'gaze': {}},
             custom_read_kwargs={'gaze': {}},
+        ),
+        'didec': pm.datasets.DIDEC(
+            has_files={'gaze': True, 'precomputed_events': False},
+            filename_format={'gaze': 'didec_example.txt'},
+            time_column=pm.datasets.DIDEC().time_column,
+            time_unit=pm.datasets.DIDEC().time_unit,
+            filename_format_dtypes={'gaze': {}},
+            trial_columns=None,
         ),
         'hbn': pm.datasets.HBN(
             has_files={'gaze': True, 'precomputed_events': False},

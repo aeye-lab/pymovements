@@ -26,6 +26,7 @@
    :template: class.rst
 
     pymovements.datasets.CopCo
+    pymovements.datasets.DIDEC
     pymovements.datasets.EMTeC
     pymovements.datasets.GazeBase
     pymovements.datasets.GazeBaseVR
@@ -47,6 +48,7 @@
     pymovements.datasets.ToyDatasetEyeLink
 """
 from pymovements.datasets.copco import CopCo
+from pymovements.datasets.didec import DIDEC
 from pymovements.datasets.emtec import EMTeC
 from pymovements.datasets.gaze_graph import GazeGraph
 from pymovements.datasets.gaze_on_faces import GazeOnFaces
