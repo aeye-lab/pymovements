@@ -26,9 +26,9 @@ import matplotlib.colors
 import matplotlib.pyplot as plt
 import matplotlib.scale
 import numpy as np
-from matplotlib.collections import LineCollection
 
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
+from pymovements.utils.plotting import draw_line_data
 from pymovements.utils.plotting import LinearSegmentedColormapType
 from pymovements.utils.plotting import setup_matplotlib
 
@@ -55,6 +55,9 @@ def traceplot(
         title: str | None = None,
         savepath: str | None = None,
         show: bool = True,
+        add_stimulus: bool = False,
+        path_to_image_stimulus: str | None = None,
+        stimulus_origin: str = 'upper',
 ) -> None:
     """Plot eye gaze trace from positional data.
 
@@ -89,6 +92,12 @@ def traceplot(
         If given, figure will be saved to this path. (default: None)
     show: bool
         If True, figure will be shown. (default: True)
+    add_stimulus: bool
+        Define whether stimulus should be included. (default: False)
+    path_to_image_stimulus: str | None
+        Path to image stimulus. (default: None)
+    stimulus_origin: str
+        Origin of stimulus. (default: 'upper')
 
     Raises
     ------
@@ -96,42 +105,34 @@ def traceplot(
         If length of x and y coordinates do not match or if ``cmap_norm`` is unknown.
 
     """
+    # pylint: disable=duplicate-code
     x_signal = gaze.frame[position_column].list.get(0)
     y_signal = gaze.frame[position_column].list.get(1)
 
     fig, ax, cmap, cmap_norm, cval, show_cbar = setup_matplotlib(
         x_signal,
+        y_signal,
         figsize,
         cmap,
         cmap_norm,
         cmap_segmentdata,
         cval,
         show_cbar,
+        add_stimulus,
+        path_to_image_stimulus,
+        stimulus_origin,
+        padding,
+        pad_factor,
     )
 
-    # Create a set of line segments so that we can color them individually
-    # This creates the points as a N x 1 x 2 array so that we can stack points
-    # together easily to get the segments. The segments array for line collection
-    # needs to be (numlines) x (points per line) x 2 (for x and y)
-    points = np.array([x_signal, y_signal]).T.reshape((-1, 1, 2))
-    segments = np.concatenate([points[:-1], points[1:]], axis=1)
-
-    # Create a continuous norm to map from data points to colors
-    line_collection = LineCollection(segments, cmap=cmap, norm=cmap_norm)
-    # Set the values used for colormapping
-    line_collection.set_array(cval)
-    line_collection.set_linewidth(2)
-    line = ax.add_collection(line_collection)
-
-    if padding is None:
-        x_pad = (np.nanmax(x_signal) - np.nanmin(x_signal)) * pad_factor
-        y_pad = (np.nanmax(y_signal) - np.nanmin(y_signal)) * pad_factor
-    else:
-        x_pad = padding
-        y_pad = padding
-
-    ax.set_xlim(np.nanmin(x_signal) - x_pad, np.nanmax(x_signal) + x_pad)
-    ax.set_ylim(np.nanmin(y_signal) - y_pad, np.nanmax(y_signal) + y_pad)
+    line = draw_line_data(
+        x_signal,
+        y_signal,
+        ax,
+        cmap,
+        cmap_norm,
+        cval,
+    )
 
     if show_cbar:
         # sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)

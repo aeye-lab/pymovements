@@ -27,11 +27,11 @@ import matplotlib.colors
 import matplotlib.pyplot as plt
 import matplotlib.scale
 import numpy as np
-from matplotlib.collections import LineCollection
 from matplotlib.patches import Circle
 
 from pymovements.events import EventDataFrame
 from pymovements.gaze import GazeDataFrame
+from pymovements.utils.plotting import draw_line_data
 from pymovements.utils.plotting import LinearSegmentedColormapType
 from pymovements.utils.plotting import setup_matplotlib
 
@@ -63,6 +63,9 @@ def scanpathplot(
         alpha: float = 0.5,
         add_traceplot: bool = False,
         gaze_position_column: str = 'pixel',
+        add_stimulus: bool = False,
+        path_to_image_stimulus: str | None = None,
+        stimulus_origin: str = 'upper',
 ) -> None:
     """Plot scanpath from positional data.
 
@@ -107,6 +110,12 @@ def scanpathplot(
         Boolean value indicating whether to add traceplot to the scanpath plot. (default: False)
     gaze_position_column: str
         Position column in the gaze dataframe. (default: 'pixel')
+    add_stimulus: bool
+        Boolean value indicationg whether to plot the scanpath on the stimuls. (default: False)
+    path_to_image_stimulus: str | None
+        Path of the stimulus to be shown. (default: None)
+    stimulus_origin: str
+        Origin of stimuls to plot on the stimulus. (default: 'upper')
 
     Raises
     ------
@@ -114,17 +123,24 @@ def scanpathplot(
         If length of x and y coordinates do not match or if ``cmap_norm`` is unknown.
 
     """
+    # pylint: disable=duplicate-code
     x_signal = events.frame[position_column].list.get(0)
     y_signal = events.frame[position_column].list.get(1)
 
     fig, ax, cmap, cmap_norm, cval, show_cbar = setup_matplotlib(
         x_signal,
+        y_signal,
         figsize,
         cmap,
         cmap_norm,
         cmap_segmentdata,
         cval,
         show_cbar,
+        add_stimulus,
+        path_to_image_stimulus,
+        stimulus_origin,
+        padding,
+        pad_factor,
     )
 
     for row in events.frame.iter_rows(named=True):
@@ -142,29 +158,19 @@ def scanpathplot(
         assert gaze
         gaze_x_signal = gaze.frame[gaze_position_column].list.get(0)
         gaze_y_signal = gaze.frame[gaze_position_column].list.get(1)
-        points = np.array([gaze_x_signal, gaze_y_signal]).T.reshape((-1, 1, 2))
-        segments = np.concatenate([points[:-1], points[1:]], axis=1)
+        line = draw_line_data(
+            gaze_x_signal,
+            gaze_y_signal,
+            ax,
+            cmap,
+            cmap_norm,
+            cval,
+        )
 
-        # Create a continuous norm to map from data points to colors
-        line_collection = LineCollection(segments, cmap=cmap, norm=cmap_norm)
-        # Set the values used for colormapping
-        line_collection.set_array(cval)
-        line_collection.set_linewidth(2)
-        line = ax.add_collection(line_collection)
         if show_cbar:
             # sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
             # sm.set_array(cval)
             fig.colorbar(line, label=cbar_label, ax=ax)
-
-    if padding is None:
-        x_pad = (np.nanmax(x_signal) - np.nanmin(x_signal)) * pad_factor
-        y_pad = (np.nanmax(y_signal) - np.nanmin(y_signal)) * pad_factor
-    else:
-        x_pad = padding
-        y_pad = padding
-
-    ax.set_xlim(np.nanmin(x_signal) - x_pad, np.nanmax(x_signal) + x_pad)
-    ax.set_ylim(np.nanmin(y_signal) - y_pad, np.nanmax(y_signal) + y_pad)
 
     if title:
         ax.set_title(title)
