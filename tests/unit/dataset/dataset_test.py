@@ -352,12 +352,16 @@ def mock_toy(
                 'CURRENT_FIXATION_DURATION': np.arange(1000),
                 'CURRENT_FIX_X': np.zeros(1000),
                 'CURRENT_FIX_Y': np.zeros(1000),
+                'trial_id_1': np.concatenate([np.zeros(500), np.ones(500)]),
+                'trial_id_2': ['a'] * 200 + ['b'] * 200 + ['c'] * 600,
             },
             schema={
                 'subject_id': pl.Int64,
                 'CURRENT_FIXATION_DURATION': pl.Float64,
                 'CURRENT_FIX_X': pl.Float64,
                 'CURRENT_FIX_Y': pl.Float64,
+                'trial_id_1': pl.Float64,
+                'trial_id_2': pl.Utf8,
             },
         )
         precomputed_dfs.append(precomputed_event_df)
@@ -1825,6 +1829,7 @@ def test_load_no_files_precomputed_raises_exception(precomputed_dataset_configur
         dataset.load()
 
 
+
 @pytest.fixture(
     name='precomputed_rm_dataset_configuration',
     params=[
@@ -1896,3 +1901,29 @@ def test_load_no_files_precomputed_rm_raises_exception(precomputed_rm_dataset_co
 
     with pytest.raises(RuntimeError):
         dataset.load()
+
+@pytest.mark.parametrize(
+    ('by', 'expected_len'),
+    [
+        pytest.param(
+            'trial_id_1',
+            40,
+            id='subset_int',
+        ),
+        pytest.param(
+            'trial_id_2',
+            60,
+            id='subset_int',
+        ),
+        pytest.param(
+            ['trial_id_1', 'trial_id_2'],
+            80,
+            id='subset_int',
+        ),
+    ],
+)
+def test_load_split_precomputed_events(precomputed_dataset_configuration, by, expected_len):
+    dataset = pm.Dataset(**precomputed_dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.split_precomputed_events(by)
+    assert len(dataset.precomputed_events) == expected_len
