@@ -230,7 +230,7 @@ class Dataset:
             self.fileinfo['precomputed_reading_measures'],
             self.paths,
         )
-        
+
     def split_precomputed_events(
             self,
             by: list[str] | str,

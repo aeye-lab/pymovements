@@ -1829,7 +1829,6 @@ def test_load_no_files_precomputed_raises_exception(precomputed_dataset_configur
         dataset.load()
 
 
-
 @pytest.fixture(
     name='precomputed_rm_dataset_configuration',
     params=[
@@ -1901,6 +1900,7 @@ def test_load_no_files_precomputed_rm_raises_exception(precomputed_rm_dataset_co
 
     with pytest.raises(RuntimeError):
         dataset.load()
+
 
 @pytest.mark.parametrize(
     ('by', 'expected_len'),
