@@ -17,14 +17,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the PoTeC dataset."""
+"""Provides a definition for the CopCo dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
-
-import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import register_dataset
@@ -33,66 +31,60 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 @register_dataset
-class PoTeC(DatasetDefinition):
-    """PoTeC dataset :cite:p:`potec`.
+class CopCo(DatasetDefinition):
+    """CopCo dataset :cite:p:`CopCoL1Hollenstein`.
 
-    The Potsdam Textbook Corpus (PoTeC) is a naturalistic eye-tracking-while-reading
-    corpus containing data from 75 participants reading 12 scientific texts.
-    PoTeC is the first naturalistic eye-tracking-while-reading corpus that contains
-    eye-movements from domain-experts as well as novices in a within-participant
-    manipulation: It is based on a 2×2×2 fully-crossed factorial design which includes
-    the participants' level of study and the participants' discipline of study as
-    between-subject factors and the text domain as a within-subject factor. The
-    participants' reading comprehension was assessed by a series of text comprehension
-    questions and their domain knowledge was tested by text-independent
-    background questions for each of the texts. The materials are annotated for a
-    variety of linguistic features at different levels. We envision PoTeC to be used
-    for a wide range of studies including but not limited to analyses of expert and
-    non-expert reading strategies.
+    This dataset includes monocular eye tracking data from a single participants in a single
+    session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
+    eye tracker and are provided as pixel coordinates.
 
-    The corpus and all the accompanying data at all
-    stages of the preprocessing pipeline and all code used to preprocess the data are
-    made available via `GitHub. <https://github.com/DiLi-Lab/PoTeC>`_
+    The participant is instructed to read texts and answer questions.
+
+    The dataset includes the data from three papers:
+        the L1 data: :cite:p:`CopCoL1Hollenstein`,
+        the L1 data with dylsexia: :cite:p:`CopCoL1DysBjornsdottir`,
+        the L2 data: :cite:p:`CopCoL2`,
 
     Attributes
     ----------
-    name: str
+    name : str
         The name of the dataset.
 
-    mirrors: dict[str, tuple[str, ...]]
+    mirrors : tuple[str, ...]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
+    resources : tuple[dict[str, str], ...]
+        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+        keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    experiment: Experiment
+    experiment : Experiment
         The experiment definition.
 
-    filename_format: dict[str, str]
+    filename_format : str
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_dtypes: dict[str, dict[str, type]]
+    filename_format_dtypes : dict[str, type], optional
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
-    column_map: dict[str, str]
+    column_map : dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
 
-    custom_read_kwargs: dict[str, dict[str, Any]]
+    custom_read_kwargs : dict[str, Any], optional
         If specified, these keyword arguments will be passed to the file reading function.
 
     Examples
     --------
     Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.PoTeC` definition:
+    :py:class:`~pymovements.CopCo` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("PoTeC", path='data/PoTeC')
+    >>> dataset = pm.Dataset("CopCo", path='data/CopCo')
 
     Download the dataset resources:
 
@@ -106,81 +98,71 @@ class PoTeC(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'PoTeC'
+    name: str = 'CopCo'
 
     has_files: dict[str, bool] = field(
-        default_factory=lambda: {'gaze': True, 'precomputed_events': False},
-    )
-
-    mirrors: dict[str, tuple[str, ...]] = field(
         default_factory=lambda: {
-            'gaze': ('https://osf.io/download/',),
+            'gaze': False,
+            'precomputed_events': True,
         },
     )
-
-    resources: dict[str, tuple[dict[str, str], ...]] = field(
+    extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': True})
+    mirrors: dict[str, tuple[str, ...]] = field(
         default_factory=lambda: {
-            'gaze': (
+            'precomputed_events': ('https://files.de-1.osf.io/',),
+        },
+    )
+    resources: dict[str, tuple[dict[str, str | None], ...]] = field(
+        default_factory=lambda: {
+            'precomputed_events': (
                 {
-                    'resource': 'tgd9q/',
-                    'filename': 'PoTeC.zip',
-                    'md5': 'cffd45039757c3777e2fd130e5d8a2ad',
+                    'resource':
+                    'v1/resources/ud8s5/providers/osfstorage/61e13174c99ebd02df017c14/?zip=',
+                    'filename': 'FixationReports.zip',
+                    'md5': None,  # type:ignore
                 },
             ),
         },
     )
 
-    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
-
     experiment: Experiment = Experiment(
-        screen_width_px=1680,
-        screen_height_px=1050,
-        screen_width_cm=47.5,
-        screen_height_cm=30,
-        distance_cm=65,
-        origin='upper left',
+        screen_width_px=1920,
+        screen_height_px=1080,
+        screen_width_cm=59.,
+        screen_height_cm=33.5,
+        distance_cm=85,
+        origin='center',
         sampling_rate=1000,
     )
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
-            'gaze': r'reader{subject_id:d}_{text_id}_raw_data.tsv',
+            'precomputed_events': r'FIX_report_P{subject_id:d}.txt',
         },
     )
 
     filename_format_dtypes: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
-            'gaze': {
-                'subject_id': int,
-                'text_id': str,
-            },
+            'precomputed_events': {},
         },
     )
 
-    trial_columns: list[str] = field(
-        default_factory=lambda: ['subject_id', 'text_id'],
-    )
+    trial_columns: list[str] = field(default_factory=lambda: [])
 
-    time_column: str = 'time'
+    time_column: str = ''
 
-    time_unit: str = 'ms'
+    time_unit: str = ''
 
-    pixel_columns: list[str] = field(
-        default_factory=lambda: [
-            'x', 'y',
-        ],
-    )
+    pixel_columns: list[str] = field(default_factory=lambda: [])
+
+    column_map: dict[str, str] = field(default_factory=lambda: {})
 
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
-            'gaze': {
-                'dtypes': {
-                    'time': pl.Int64,
-                    'x': pl.Float32,
-                    'y': pl.Float32,
-                    'pupil_diameter': pl.Float32,
-                },
+            'precomputed_events': {
                 'separator': '\t',
+                'null_values': '.',
+                'quote_char': '"',
             },
         },
     )

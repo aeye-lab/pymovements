@@ -85,18 +85,31 @@ def create_precomputed_files_from_fileinfo(precomputed_dfs, fileinfo, rootpath):
         precomputed_df.write_csv(rootpath / filepath)
 
 
-def mock_gaze_toy(
+def mock_toy(
         rootpath,
         raw_fileformat,
         eyes,
         remote=False,
-        has_gaze_files=True,
-        has_precomputed_event_files=False,
-        extract_precomputed_data=True,
+        has_files={'gaze': True, 'precomputed_events': False},
+        extract={'gaze': True, 'precomputed_events': True},
+        filename_format_dtypes={
+            'gaze': {'subject_id': pl.Int64},
+            'precomputed_events': {'subject_id': pl.Int64},
+        },
 ):
-    subject_ids = list(range(1, 21))
 
-    fileinfo = pl.DataFrame(data={'subject_id': subject_ids}, schema={'subject_id': pl.Int64})
+    if filename_format_dtypes['precomputed_events']:
+        subject_ids = list(range(1, 21))
+        fileinfo = pl.DataFrame(
+            data={'subject_id': subject_ids},
+            schema={'subject_id': pl.Int64},
+        )
+    else:
+        subject_ids = [str(idx) for idx in range(1, 21)]
+        fileinfo = pl.DataFrame(
+            data={'subject_id': subject_ids},
+            schema={'subject_id': pl.Utf8},
+        )
 
     fileinfo = fileinfo.with_columns([
         pl.format('{}.' + raw_fileformat, 'subject_id').alias('filepath'),
@@ -294,15 +307,18 @@ def mock_gaze_toy(
             origin='upper left',
             sampling_rate=1000,
         ),
-        filename_format=r'{subject_id:d}.' + raw_fileformat,
-        filename_format_dtypes={'subject_id': pl.Int64},
+        filename_format={
+            'gaze': r'{subject_id:d}.' + raw_fileformat,
+            'precomputed_events': r'{subject_id:d}.' + raw_fileformat,
+        },
+        filename_format_dtypes=filename_format_dtypes,
+        custom_read_kwargs={'gaze': {}, 'precomputed_events': {}},
         time_column='time',
         time_unit='ms',
         distance_column=distance_column,
         pixel_columns=pixel_columns,
-        has_gaze_files=has_gaze_files,
-        has_precomputed_event_files=has_precomputed_event_files,
-        extract_precomputed_data=extract_precomputed_data,
+        has_files=has_files,
+        extract=extract,
     )
 
     precomputed_dfs = []
@@ -313,12 +329,16 @@ def mock_gaze_toy(
                 'CURRENT_FIXATION_DURATION': np.arange(1000),
                 'CURRENT_FIX_X': np.zeros(1000),
                 'CURRENT_FIX_Y': np.zeros(1000),
+                'trial_id_1': np.concatenate([np.zeros(500), np.ones(500)]),
+                'trial_id_2': ['a'] * 200 + ['b'] * 200 + ['c'] * 600,
             },
             schema={
                 'subject_id': pl.Int64,
                 'CURRENT_FIXATION_DURATION': pl.Float64,
                 'CURRENT_FIX_X': pl.Float64,
                 'CURRENT_FIX_Y': pl.Float64,
+                'trial_id_1': pl.Float64,
+                'trial_id_2': pl.Utf8,
             },
         )
         precomputed_dfs.append(precomputed_event_df)
@@ -334,7 +354,7 @@ def mock_gaze_toy(
             'definition': dataset_definition,
             'path': pm.DatasetPaths(root=rootpath, dataset='.'),
         },
-        'fileinfo': fileinfo,
+        'fileinfo': {'gaze': fileinfo, 'precomputed_events': fileinfo},
         'raw_gaze_dfs': gaze_dfs,
         'preprocessed_gaze_dfs': preprocessed_gaze_dfs,
         'event_dfs': event_dfs,
@@ -358,19 +378,19 @@ def gaze_fixture_dataset(request, tmp_path):
 
     dataset_type = request.param
     if dataset_type == 'ToyBino':
-        dataset_dict = mock_gaze_toy(rootpath, raw_fileformat='csv', eyes='both')
+        dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='both')
     elif dataset_type == 'ToyBino+Avg':
-        dataset_dict = mock_gaze_toy(rootpath, raw_fileformat='csv', eyes='both+avg')
+        dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='both+avg')
     elif dataset_type == 'ToyMono':
-        dataset_dict = mock_gaze_toy(rootpath, raw_fileformat='csv', eyes='none')
+        dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='none')
     elif dataset_type == 'ToyLeft':
-        dataset_dict = mock_gaze_toy(rootpath, raw_fileformat='csv', eyes='left')
+        dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='left')
     elif dataset_type == 'ToyRight':
-        dataset_dict = mock_gaze_toy(rootpath, raw_fileformat='csv', eyes='right')
+        dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='right')
     elif dataset_type == 'ToyMat':
-        dataset_dict = mock_gaze_toy(rootpath, raw_fileformat='mat', eyes='both')
+        dataset_dict = mock_toy(rootpath, raw_fileformat='mat', eyes='both')
     elif dataset_type == 'ToyRemote':
-        dataset_dict = mock_gaze_toy(rootpath, raw_fileformat='csv', eyes='both', remote=True)
+        dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='both', remote=True)
     else:
         raise ValueError(f'{request.param} not supported as dataset mock')
 
@@ -382,7 +402,7 @@ def test_load_correct_fileinfo(gaze_dataset_configuration):
     dataset.load()
 
     expected_fileinfo = gaze_dataset_configuration['fileinfo']
-    assert_frame_equal(dataset.fileinfo, expected_fileinfo)
+    assert_frame_equal(dataset.fileinfo['gaze'], expected_fileinfo['gaze'])
 
 
 def test_load_correct_raw_gaze_dfs(gaze_dataset_configuration):
@@ -453,9 +473,9 @@ def test_load_subset(subset, fileinfo_idx, gaze_dataset_configuration):
     dataset.load(subset=subset)
 
     expected_fileinfo = gaze_dataset_configuration['fileinfo']
-    expected_fileinfo = expected_fileinfo[fileinfo_idx]
+    expected_fileinfo = expected_fileinfo['gaze'][fileinfo_idx]
 
-    assert_frame_equal(dataset.fileinfo, expected_fileinfo)
+    assert_frame_equal(dataset.fileinfo['gaze'], expected_fileinfo)
 
 
 @pytest.mark.parametrize(
@@ -519,10 +539,9 @@ def test_save_gaze_exceptions(init_kwargs, save_kwargs, exception, gaze_dataset_
 
 
 @pytest.mark.parametrize(
-    ('init_kwargs', 'load_kwargs', 'exception'),
+    ('load_kwargs', 'exception'),
     [
         pytest.param(
-            {},
             {'extension': 'invalid'},
             ValueError,
             id='wrong_extension_load_events',
@@ -530,15 +549,14 @@ def test_save_gaze_exceptions(init_kwargs, save_kwargs, exception, gaze_dataset_
     ],
 )
 def test_load_events_exceptions(
-        init_kwargs,
         load_kwargs,
         exception,
         gaze_dataset_configuration,
 ):
-    init_kwargs = {**gaze_dataset_configuration['init_kwargs'], **init_kwargs}
+    init_kwargs = {**gaze_dataset_configuration['init_kwargs']}
     dataset = pm.Dataset(**init_kwargs)
 
-    with pytest.raises(exception):
+    with pytest.raises(exception) as excinfo:
         dataset.load()
         dataset.pix2deg()
         dataset.pos2vel()
@@ -549,6 +567,11 @@ def test_load_events_exceptions(
         )
         dataset.save_events()
         dataset.load_event_files(**load_kwargs)
+
+    msg, = excinfo.value.args
+    assert msg == """\
+unsupported file format "invalid".\
+Supported formats are: [\'csv\', \'txt\', \'tsv\', \'feather\']"""
 
 
 @pytest.mark.parametrize(
@@ -1697,29 +1720,27 @@ def precomputed_fixture_dataset(request, tmp_path):
 
     dataset_type = request.param
     if dataset_type == 'ToyRightPrecomputedEventAndGaze':
-        dataset_dict = mock_gaze_toy(
+        dataset_dict = mock_toy(
             rootpath,
             raw_fileformat='csv',
             eyes='right',
-            has_gaze_files=True,
-            has_precomputed_event_files=True,
+            has_files={'gaze': True, 'precomputed_events': True},
         )
     elif dataset_type == 'ToyPrecomputedEvent':
-        dataset_dict = mock_gaze_toy(
+        dataset_dict = mock_toy(
             rootpath,
             raw_fileformat='csv',
             eyes='right',
-            has_gaze_files=False,
-            has_precomputed_event_files=True,
+            has_files={'gaze': False, 'precomputed_events': True},
         )
     elif dataset_type == 'ToyPrecomputedEventNoExtract':
-        dataset_dict = mock_gaze_toy(
+        dataset_dict = mock_toy(
             rootpath,
             raw_fileformat='csv',
             eyes='right',
-            has_gaze_files=False,
-            has_precomputed_event_files=True,
-            extract_precomputed_data=False,
+            has_files={'gaze': False, 'precomputed_events': True},
+            extract={'precomputed_events': False},
+            filename_format_dtypes={'precomputed_events': {}},
         )
     else:
         raise ValueError(f'{request.param} not supported as dataset mock')
@@ -1731,5 +1752,43 @@ def test_load_correct_fileinfo_precomputed(precomputed_dataset_configuration):
     dataset = pm.Dataset(**precomputed_dataset_configuration['init_kwargs'])
     dataset.load()
 
-    expected_fileinfo = precomputed_dataset_configuration['fileinfo']
-    assert_frame_equal(dataset.fileinfo, expected_fileinfo)
+    expected_fileinfo = precomputed_dataset_configuration['fileinfo']['precomputed_events']
+    assert_frame_equal(dataset.fileinfo['precomputed_events'], expected_fileinfo)
+
+
+def test_load_no_files_precomputed_raises_exception(precomputed_dataset_configuration):
+    init_kwargs = {**precomputed_dataset_configuration['init_kwargs']}
+    dataset = pm.Dataset(**init_kwargs)
+
+    shutil.rmtree(dataset.paths.precomputed_events, ignore_errors=True)
+    dataset.paths.precomputed_events.mkdir()
+
+    with pytest.raises(RuntimeError):
+        dataset.load()
+
+
+@pytest.mark.parametrize(
+    ('by', 'expected_len'),
+    [
+        pytest.param(
+            'trial_id_1',
+            40,
+            id='subset_int',
+        ),
+        pytest.param(
+            'trial_id_2',
+            60,
+            id='subset_int',
+        ),
+        pytest.param(
+            ['trial_id_1', 'trial_id_2'],
+            80,
+            id='subset_int',
+        ),
+    ],
+)
+def test_load_split_precomputed_events(precomputed_dataset_configuration, by, expected_len):
+    dataset = pm.Dataset(**precomputed_dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.split_precomputed_events(by)
+    assert len(dataset.precomputed_events) == expected_len

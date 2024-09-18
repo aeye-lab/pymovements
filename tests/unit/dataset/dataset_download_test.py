@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from dataclasses import field
 from pathlib import Path
 from unittest import mock
 
@@ -45,105 +46,152 @@ def dataset_definition_fixture(request):
         class CustomPublicDataset(pm.DatasetDefinition):
             name: str = 'CustomPublicDataset'
 
-            has_gaze_files: bool = True
-            gaze_mirrors: tuple[str, ...] = (
-                'https://example.com/',
-                'https://another_example.com/',
-            )
-
-            gaze_resources: tuple[dict[str, str], ...] = (
-                {
-                    'gaze_resource': 'test.gz.tar',
-                    'filename': 'test.gz.tar',
-                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+            has_files: dict[str, bool] = field(
+                default_factory=lambda: {
+                    'gaze': True,
+                    'precomputed_events': True,
                 },
             )
-            extract_gaze_data: bool = True
-            has_precomputed_event_files: bool = True
-            precomputed_event_mirrors: tuple[str, ...] = (
-                'https://example.com/',
-                'https://another_example.com/',
-            )
-
-            precomputed_event_resources: tuple[dict[str, str], ...] = (
-                {
-                    'precomputed_event_resource': 'test_pc.gz.tar',
-                    'filename': 'test_pc.gz.tar',
-                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+            mirrors: dict[str, tuple[str, ...]] = field(
+                default_factory=lambda: {
+                    'gaze': (
+                        'https://example.com/',
+                        'https://another_example.com/',
+                    ),
+                    'precomputed_events': (
+                        'https://example.com/',
+                        'https://another_example.com/',
+                    ),
                 },
             )
-            extract_precomputed_data: bool = True
-
+            resources: dict[str, tuple[dict[str, str], ...]] = field(
+                default_factory=lambda: {
+                    'gaze': (
+                        {
+                            'resource': 'test.gz.tar',
+                            'filename': 'test.gz.tar',
+                            'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                        },
+                    ),
+                    'precomputed_events': (
+                        {
+                            'resource': 'test_pc.gz.tar',
+                            'filename': 'test_pc.gz.tar',
+                            'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                        },
+                    ),
+                },
+            )
+            extract: dict[str, bool] = field(
+                default_factory=lambda: {
+                    'gaze': True,
+                    'precomputed_events': True,
+                },
+            )
         return CustomPublicDataset()
-    elif request.param == 'CustomGazeOnly':
+    if request.param == 'CustomGazeOnly':
         @dataclass
         @pm.register_dataset
         class CustomPublicDataset(pm.DatasetDefinition):
             name: str = 'CustomPublicDataset'
 
-            has_gaze_files: bool = True
-            gaze_mirrors: tuple[str, ...] = (
-                'https://example.com/',
-                'https://another_example.com/',
-            )
-
-            gaze_resources: tuple[dict[str, str], ...] = (
-                {
-                    'gaze_resource': 'test.gz.tar',
-                    'filename': 'test.gz.tar',
-                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+            has_files: dict[str, bool] = field(
+                default_factory=lambda: {
+                    'gaze': True,
+                    'precomputed_events': False,
                 },
             )
-            extract_gaze_data: bool = True
-            has_precomputed_event_files: bool = False
+            mirrors: dict[str, [tuple[str, ...]]] = field(
+                default_factory=lambda: {
+                    'gaze': (
+                        'https://example.com/',
+                        'https://another_example.com/',
+                    ),
+                },
+            )
+
+            resources: dict[str, tuple[dict[str, str], ...]] = field(
+                default_factory=lambda: {
+                    'gaze': (
+                        {
+                            'resource': 'test.gz.tar',
+                            'filename': 'test.gz.tar',
+                            'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                        },
+                    ),
+                },
+            )
+            extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
         return CustomPublicDataset()
-    elif request.param == 'CustomPrecomputedOnly':
+    if request.param == 'CustomPrecomputedOnly':
         @dataclass
         @pm.register_dataset
         class CustomPublicDataset(pm.DatasetDefinition):
             name: str = 'CustomPublicDataset'
 
-            has_gaze_files: bool = False
-            extract_gaze_data: bool = False
-            has_precomputed_event_files: bool = True
-            precomputed_event_mirrors: tuple[str, ...] = (
-                'https://example.com/',
-                'https://another_example.com/',
-            )
-
-            precomputed_event_resources: tuple[dict[str, str], ...] = (
-                {
-                    'precomputed_event_resource': 'test_pc.gz.tar',
-                    'filename': 'test_pc.gz.tar',
-                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+            has_files: dict[str, bool] = field(
+                default_factory=lambda: {
+                    'gaze': False,
+                    'precomputed_events': True,
                 },
             )
-            extract_precomputed_data: bool = True
+            extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': True})
+            mirrors: dict[str, [tuple[str, ...]]] = field(
+                default_factory=lambda: {
+                    'precomputed_events': (
+                        'https://example.com/',
+                        'https://another_example.com/',
+                    ),
+                },
+            )
+
+            resources: dict[str, tuple[dict[str, str], ...]] = field(
+                default_factory=lambda: {
+                    'precomputed_events': (
+                        {
+                            'resource': 'test_pc.gz.tar',
+                            'filename': 'test_pc.gz.tar',
+                            'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                        },
+                    ),
+                },
+            )
 
         return CustomPublicDataset()
-    elif request.param == 'CustomPrecomputedOnlyNoExtract':
+    if request.param == 'CustomPrecomputedOnlyNoExtract':
         @dataclass
         @pm.register_dataset
         class CustomPublicDataset(pm.DatasetDefinition):
             name: str = 'CustomPublicDataset'
 
-            has_gaze_files: bool = False
-            extract_gaze_data: bool = False
-            has_precomputed_event_files: bool = True
-            precomputed_event_mirrors: tuple[str, ...] = (
-                'https://example.com/',
-                'https://another_example.com/',
-            )
-
-            precomputed_event_resources: tuple[dict[str, str], ...] = (
-                {
-                    'precomputed_event_resource': 'test_pc.gz.tar',
-                    'filename': 'test_pc.gz.tar',
-                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+            has_files: dict[str, bool] = field(
+                default_factory=lambda: {
+                    'gaze': False,
+                    'precomputed_events': True,
                 },
             )
-            extract_precomputed_data: bool = False
+            extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': False})
+            mirrors: dict[str, [tuple[str, ...]]] = field(
+                default_factory=lambda: {
+                    'precomputed_events': (
+                        'https://example.com/',
+                        'https://another_example.com/',
+                    ),
+                },
+            )
+
+            resources: dict[str, tuple[dict[str, str], ...]] = field(
+                default_factory=lambda: {
+                    'precomputed_events': (
+                        {
+                            'resource': 'test_pc.gz.tar',
+                            'filename': 'test_pc.gz.tar',
+                            'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                        },
+                    ),
+                },
+            )
 
         return CustomPublicDataset()
 
@@ -208,11 +256,15 @@ def test_paths(init_path, expected_paths, dataset_definition):
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @pytest.mark.parametrize('dataset_definition', ['CustomGazeOnly'], indirect=['dataset_definition'])
-def test_dataset_download_both_gaze_mirrors_fail(mock_download_file, tmp_path, dataset_definition):
-    mock_download_file.side_effect = OSError
-
+def test_dataset_download_both_mirrors_fail_gaze_only(
+        mock_download_file,
+        tmp_path,
+        dataset_definition,
+):
     paths = pm.DatasetPaths(root=tmp_path, dataset='.')
     dataset = pm.Dataset(dataset_definition, path=paths)
+
+    mock_download_file.side_effect = OSError
 
     with pytest.raises(
         RuntimeError,
@@ -284,7 +336,7 @@ def test_dataset_download_both_precomputed_mirrors_fail(
     ['CustomGazeAndPrecomputed'],
     indirect=['dataset_definition'],
 )
-def test_dataset_download_both_mirrors_fail(
+def test_dataset_download_both_mirrors_fail_precomputed_and_gaze(
         mock_download_file,
         tmp_path,
         dataset_definition,
@@ -745,18 +797,28 @@ def test_dataset_download_default_extract_precomputed(
     mock_extract.assert_called_once()
 
 
-def test_dataset_download_no_gaze_mirrors_raises_exception(tmp_path):
+def test_dataset_download_no_mirrors_raises_exception(tmp_path):
     @dataclass
     class NoGazeMirrorsDefinition(pm.DatasetDefinition):
         name: str = 'CustomPublicDataset'
 
-        gaze_mirrors: tuple[str, ...] = ()
+        has_files: dict[str, bool] = field(
+            default_factory=lambda: {
+                'gaze': True,
+                'precomputed_events': False,
+            },
+        )
+        mirrors: dict[str, tuple[str, ...]] = field(default_factory=lambda: {'gaze': ()})
 
-        gaze_resources: tuple[dict[str, str], ...] = (
-            {
-                'gaze_resource': 'test.gz.tar',
-                'filename': 'test.gz.tar',
-                'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+        resources: dict[str, tuple[dict[str, str], ...]] = field(
+            default_factory=lambda: {
+                'gaze': (
+                    {
+                        'resource': 'test.gz.tar',
+                        'filename': 'test.gz.tar',
+                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                    },
+                ),
             },
         )
 
@@ -770,20 +832,32 @@ def test_dataset_download_no_gaze_mirrors_raises_exception(tmp_path):
         assert substring in msg
 
 
-def test_dataset_download_no_precomputed_event_mirrors_raises_exception(tmp_path):
+def test_dataset_download_no_mirrors_precomputed_raises_exception(tmp_path):
     @dataclass
     class NoPrecomputedMirrorsDefinition(pm.DatasetDefinition):
         name: str = 'CustomPublicDataset'
 
-        has_gaze_files: bool = False
-        has_precomputed_event_files: bool = True
-        precomputed_event_mirrors: tuple[str, ...] = ()
+        has_files: dict[str, bool] = field(
+            default_factory=lambda: {
+                'gaze': False,
+                'precomputed_events': True,
+            },
+        )
+        mirrors: dict[str, tuple[str, ...]] = field(
+            default_factory=lambda: {
+                'precomputed_events': (),
+            },
+        )
 
-        precomputed_event_resources: tuple[dict[str, str], ...] = (
-            {
-                'precomputed_event_resource': 'test_pc.gz.tar',
-                'filename': 'test_pc.gz.tar',
-                'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+        resources: dict[str, tuple[dict[str, str], ...]] = field(
+            default_factory=lambda: {
+                'precomputed_events': (
+                    {
+                        'resource': 'test_pc.gz.tar',
+                        'filename': 'test_pc.gz.tar',
+                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                    },
+                ),
             },
         )
 
@@ -797,24 +871,38 @@ def test_dataset_download_no_precomputed_event_mirrors_raises_exception(tmp_path
         assert substring in msg
 
 
-def test_dataset_download_no_gaze_resources_raises_exception(tmp_path):
+def test_dataset_download_no_resources_raises_exception(tmp_path):
     @dataclass
     class NoGazeResourcesDefinition(pm.DatasetDefinition):
         name: str = 'CustomPublicDataset'
 
-        gaze_mirrors: tuple[str, ...] = (
-            'https://example.com/',
-            'https://another_example.com/',
+        has_files: dict[str, bool] = field(
+            default_factory=lambda: {
+                'gaze': True,
+                'precomputed_events': False,
+            },
+        )
+        mirrors: dict[str, tuple[str, ...]] = field(
+            default_factory=lambda: {
+                'gaze': (
+                    'https://example.com/',
+                    'https://another_example.com/',
+                ),
+            },
         )
 
-        gaze_resources: tuple[dict[str, str], ...] = ()
+        resources: dict[str, tuple[dict[str, str], ...]] = field(
+            default_factory=lambda: {
+                'gaze': (),
+            },
+        )
 
     with pytest.raises(AttributeError) as excinfo:
         pm.Dataset(NoGazeResourcesDefinition, path=tmp_path).download()
 
     msg, = excinfo.value.args
 
-    expected_substrings = ['number', 'gaze_resources', 'zero', 'download']
+    expected_substrings = ['number', 'resources', 'zero', 'download']
     for substring in expected_substrings:
         assert substring in msg
 
@@ -824,14 +912,26 @@ def test_dataset_download_no_precomputed_event_resources_raises_exception(tmp_pa
     class NoPrecomputedResourcesDefinition(pm.DatasetDefinition):
         name: str = 'CustomPublicDataset'
 
-        has_gaze_files: bool = False
-        has_precomputed_event_files: bool = True
-        precomputed_event_mirrors: tuple[str, ...] = (
-            'https://example.com/',
-            'https://another_example.com/',
+        has_files: dict[str, bool] = field(
+            default_factory=lambda: {
+                'gaze': False,
+                'precomputed_events': True,
+            },
+        )
+        mirrors: dict[str, tuple[str, ...]] = field(
+            default_factory=lambda: {
+                'precomputed_events': (
+                    'https://example.com/',
+                    'https://another_example.com/',
+                ),
+            },
         )
 
-        precomputed_event_resources: tuple[dict[str, str], ...] = ()
+        resources: dict[str, tuple[dict[str, str], ...]] = field(
+            default_factory=lambda: {
+                'precomputed_events': (),
+            },
+        )
 
     with pytest.raises(AttributeError) as excinfo:
         pm.Dataset(NoPrecomputedResourcesDefinition, path=tmp_path).download()
@@ -844,38 +944,51 @@ def test_dataset_download_no_precomputed_event_resources_raises_exception(tmp_pa
 
 
 def test_public_dataset_registered_correct_attributes(tmp_path, dataset_definition):
-    dataset = pm.Dataset('CustomPublicDataset', path=tmp_path)
+    dataset = pm.Dataset(dataset_definition, path=tmp_path)
 
-    assert dataset.definition.gaze_mirrors == dataset_definition.gaze_mirrors
-    assert dataset.definition.gaze_resources == dataset_definition.gaze_resources
+    assert dataset.definition.mirrors == dataset_definition.mirrors
+    assert dataset.definition.resources == dataset_definition.resources
     assert dataset.definition.experiment == dataset_definition.experiment
     assert dataset.definition.filename_format == dataset_definition.filename_format
     assert dataset.definition.filename_format_dtypes == dataset_definition.filename_format_dtypes
-    assert dataset.definition.custom_read_kwargs == dataset_definition.custom_read_kwargs
-    assert dataset.definition.has_precomputed_event_files == dataset_definition.has_precomputed_event_files  # noqa: E501
-    assert dataset.definition.has_gaze_files == dataset_definition.has_gaze_files
+    assert dataset.definition.has_files == dataset_definition.has_files
 
 
-def test_extract_dataset_precomputed_move_single_file(tmp_path):
+def test_extract_dataset_precomputed_move_single_file():
+    @dataclass
+    @pm.register_dataset
     class PrecomputedResourcesDefinition(pm.DatasetDefinition):
         name: str = 'CustomPublicDataset'
 
-        has_gaze_files: bool = False
-        has_precomputed_event_files: bool = True
-        precomputed_event_mirrors: tuple[str, ...] = (
-            'https://example.com/',
-            'https://another_example.com/',
-        )
-
-        precomputed_event_resources: tuple[dict[str, str], ...] = (
-            {
-                'precomputed_event_resource': 'tests/files/',
-                'filename': '18sat_fixfinal.csv',
-                'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+        has_files: dict[str, bool] = field(
+            default_factory=lambda: {
+                'gaze': False,
+                'precomputed_events': True,
             },
         )
-        extract_precomputed_data = False
+        mirrors: dict[str, tuple[str, ...]] = field(
+            default_factory=lambda: {
+                'precompued_events': (
+                    'https://example.com/',
+                    'https://another_example.com/',
+                ),
+            },
+        )
+
+        resources: dict[str, tuple[dict[str, str], ...]] = field(
+            default_factory=lambda: {
+                'precomputed_events': (
+                    {
+                        'resource': 'tests/files/',
+                        'filename': '18sat_fixfinal.csv',
+                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                    },
+                ),
+            },
+        )
+        extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': False})
+
     pm.dataset.dataset_download.extract_dataset(
-        PrecomputedResourcesDefinition,
+        PrecomputedResourcesDefinition(),
         pm.DatasetPaths(root='tests/files/', downloads='.', precomputed_events='.'),
     )

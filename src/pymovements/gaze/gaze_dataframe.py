@@ -495,10 +495,10 @@ class GazeDataFrame:
         self.transform('pix2deg')
 
     def deg2pix(
-        self,
-        pixel_origin: str = 'upper left',
-        position_column: str = 'position',
-        pixel_column: str = 'pixel',
+            self,
+            pixel_origin: str = 'upper left',
+            position_column: str = 'position',
+            pixel_column: str = 'pixel',
     ) -> None:
         """Compute gaze positions in pixel position coordinates from degrees of visual angle.
 

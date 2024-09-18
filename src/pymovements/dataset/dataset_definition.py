@@ -35,24 +35,26 @@ class DatasetDefinition:
     ----------
     name: str
         The name of the dataset. (default: '.')
-    gaze_mirrors: tuple[str, ...]
+    mirrors: dict[str, tuple[str, ...]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
-        (default: field(default_factory=tuple))
-    gaze_resources: tuple[dict[str, str], ...]
+        (default: field(default_factory=dict))
+    resources: dict[str, tuple[dict[str, str], ...]]
         A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
-        (default: field(default_factory=tuple))
+        (default: field(default_factory=dict))
     experiment: Experiment
         The experiment definition. (default: None)
-    filename_format: str
+    filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
-        appear in the `fileinfo` dataframe. (default: '.*')
-    filename_format_dtypes: dict[str, type]
+        appear in the `fileinfo` dataframe. (default: field(default_factory=dict))
+    filename_format_dtypes: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype. (default: field(default_factory=dict))
-    custom_read_kwargs : dict[str, Any]
+    extract: dict[str, bool]
+        Decide whether to extract the data.
+    custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function. The
         behavior of this argument depends on the file extension of the dataset files.
         If the file extension is `.csv` the keyword arguments will be passed
@@ -102,43 +104,43 @@ class DatasetDefinition:
 
     Notes
     -----
-    When working with the ``custom_read_kwargs`` attribute there are specific use cases and
+    When working with the ``gaze_custom_read_kwargs`` attribute there are specific use cases and
     considerations to keep in mind, especially for reading csv files:
 
     1. Custom separator
     To read a csv file with a custom separator, you can pass the `separator` keyword argument to
-    ``custom_read_kwargs``. For example pass ``custom_read_kwargs={'separator': ';'}`` to read a
-    semicolon-separated csv file.
+    ``gaze_custom_read_kwargs``. For example pass ``gaze_custom_read_kwargs={'separator': ';'}`` to
+    read a semicolon-separated csv file.
 
     2. Reading subset of columns
-    To read only specific columns, specify them in ``custom_read_kwargs``. For example:
-    ``custom_read_kwargs={'columns': ['col1', 'col2']}``
+    To read only specific columns, specify them in ``gaze_custom_read_kwargs``. For example:
+    ``gaze_custom_read_kwargs={'columns': ['col1', 'col2']}``
 
     3. Specifying column datatypes
     ``polars.read_csv`` infers data types from a fixed number of rows, which might not be accurate
     for the entire dataset. To ensure correct data types, you can pass a dictionary to the
-    ``dtypes`` keyword argument in ``custom_read_kwargs``. Use data types from the `polars` library.
-    For instance: ``custom_read_kwargs={'dtypes': {'col1': polars.Int64, 'col2': polars.Float64}}``
+    ``dtypes`` keyword argument in ``gaze_custom_read_kwargs``.
+    Use data types from the `polars` library.
+    For instance:
+    ``gaze_custom_read_kwargs={'dtypes': {'col1': polars.Int64, 'col2': polars.Float64}}``
     """
 
     # pylint: disable=too-many-instance-attributes
     name: str = '.'
+    has_files: dict[str, bool] = field(default_factory=dict)
 
-    gaze_mirrors: tuple[str, ...] = field(default_factory=tuple)
+    mirrors: dict[str, tuple[str, ...]] = field(default_factory=dict)
 
-    gaze_resources: tuple[dict[str, str], ...] = field(default_factory=tuple)
-
-    precomputed_event_mirrors: tuple[str, ...] = field(default_factory=tuple)
-
-    precomputed_event_resources: tuple[dict[str, str], ...] = field(default_factory=tuple)
+    resources: dict[str, tuple[dict[str, str], ...]] = field(default_factory=dict)
 
     experiment: Experiment | None = None
+    extract: dict[str, bool] = field(default_factory=dict)
 
-    filename_format: str = '.*'
+    filename_format: dict[str, str] = field(default_factory=dict)
 
-    filename_format_dtypes: dict[str, type] = field(default_factory=dict)
+    filename_format_dtypes: dict[str, dict[str, type]] = field(default_factory=dict)
 
-    custom_read_kwargs: dict[str, Any] = field(default_factory=dict)
+    custom_read_kwargs: dict[str, dict[str, Any]] = field(default_factory=dict)
 
     column_map: dict[str, str] = field(default_factory=dict)
 
@@ -150,7 +152,3 @@ class DatasetDefinition:
     velocity_columns: list[str] | None = None
     acceleration_columns: list[str] | None = None
     distance_column: str | None = None
-    has_gaze_files: bool = True
-    has_precomputed_event_files: bool = False
-    extract_gaze_data: bool = True
-    extract_precomputed_data: bool = True

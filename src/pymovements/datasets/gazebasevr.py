@@ -53,39 +53,39 @@ class GazeBaseVR(DatasetDefinition):
 
     Attributes
     ----------
-    name : str
+    name: str
         The name of the dataset.
 
-    gaze_mirrors : tuple[str, ...]
+    gaze_mirrors: dict[str, tuple[str, ...]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    gaze_resources : tuple[dict[str, str], ...]
+    gaze_resources: dict[str, tuple[dict[str, str], ...]]
         A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    experiment : Experiment
+    experiment: Experiment
         The experiment definition.
 
-    filename_format : str
+    filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_dtypes : dict[str, type], optional
+    filename_format_dtypes: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
-    column_map : dict[str, str]
+    column_map: dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
 
-    custom_read_kwargs : dict[str, Any], optional
+    custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function.
 
     Examples
     --------
     Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.GazeBase` definition:
+    :py:class:`~pymovements.GazeBaseVR` definition:
 
     >>> import pymovements as pm
     >>>
@@ -105,17 +105,30 @@ class GazeBaseVR(DatasetDefinition):
 
     name: str = 'GazeBaseVR'
 
-    gaze_mirrors: tuple[str] = (
-        'https://figshare.com/ndownloader/files/',
+    has_files: dict[str, bool] = field(
+        default_factory=lambda: {'gaze': True, 'precomputed_events': False},
     )
-
-    gaze_resources: tuple[dict[str, str]] = (
-        {
-            'gaze_resource': '38844024',
-            'filename': 'gazebasevr.zip',
-            'md5': '048c04b00fd64347375cc8d37b451a22',
+    mirrors: dict[str, tuple[str, ...]] = field(
+        default_factory=lambda: {
+            'gaze': (
+                'https://figshare.com/ndownloader/files/',
+            ),
         },
     )
+
+    resources: dict[str, tuple[dict[str, str], ...]] = field(
+        default_factory=lambda: {
+            'gaze': (
+                {
+                    'resource': '38844024',
+                    'filename': 'gazebasevr.zip',
+                    'md5': '048c04b00fd64347375cc8d37b451a22',
+                },
+            ),
+        },
+    )
+
+    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     experiment: Experiment = Experiment(
         screen_width_px=1680,
@@ -127,17 +140,23 @@ class GazeBaseVR(DatasetDefinition):
         sampling_rate=250,
     )
 
-    filename_format: str = (
-        r'S_{round_id:1d}{subject_id:d}'
-        r'_S{session_id:d}'
-        r'_{task_name}.csv'
+    filename_format: dict[str, str] = field(
+        default_factory=lambda: {
+            'gaze': (
+                r'S_{round_id:1d}{subject_id:d}'
+                r'_S{session_id:d}'
+                r'_{task_name}.csv'
+            ),
+        },
     )
 
-    filename_format_dtypes: dict[str, type] = field(
+    filename_format_dtypes: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
-            'round_id': int,
-            'subject_id': int,
-            'session_id': int,
+            'gaze': {
+                'round_id': int,
+                'subject_id': int,
+                'session_id': int,
+            },
         },
     )
 
@@ -158,27 +177,27 @@ class GazeBaseVR(DatasetDefinition):
         },
     )
 
-    custom_read_kwargs: dict[str, Any] = field(
+    custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
-            'dtypes': {
-                'n': pl.Float32,
-                'x': pl.Float32,
-                'y': pl.Float32,
-                'lx': pl.Float32,
-                'ly': pl.Float32,
-                'rx': pl.Float32,
-                'ry': pl.Float32,
-                'xT': pl.Float32,
-                'yT': pl.Float32,
-                'zT': pl.Float32,
-                'clx': pl.Float32,
-                'cly': pl.Float32,
-                'clz': pl.Float32,
-                'crx': pl.Float32,
-                'cry': pl.Float32,
-                'crz': pl.Float32,
+            'gaze': {
+                'dtypes': {
+                    'n': pl.Float32,
+                    'x': pl.Float32,
+                    'y': pl.Float32,
+                    'lx': pl.Float32,
+                    'ly': pl.Float32,
+                    'rx': pl.Float32,
+                    'ry': pl.Float32,
+                    'xT': pl.Float32,
+                    'yT': pl.Float32,
+                    'zT': pl.Float32,
+                    'clx': pl.Float32,
+                    'cly': pl.Float32,
+                    'clz': pl.Float32,
+                    'crx': pl.Float32,
+                    'cry': pl.Float32,
+                    'crz': pl.Float32,
+                },
             },
         },
     )
-    has_gaze_files: bool = True
-    has_precomputed_event_files: bool = False
