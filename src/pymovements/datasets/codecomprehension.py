@@ -101,6 +101,7 @@ class CodeComprehension(DatasetDefinition):
         default_factory=lambda: {
             'gaze': False,
             'precomputed_events': True,
+            'precomputed_reading_measures': False,
         },
     )
     extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': True})
@@ -124,15 +125,14 @@ class CodeComprehension(DatasetDefinition):
         },
     )
 
-    # TODO
     experiment: Experiment = Experiment(
-        screen_width_px=1920,
-        screen_height_px=1080,
-        screen_width_cm=59.,
-        screen_height_cm=33.5,
-        distance_cm=85,
-        origin='center',
-        sampling_rate=1000,
+        screen_width_px=None,
+        screen_height_px=None,
+        screen_width_cm=None,
+        screen_height_cm=None,
+        distance_cm=None,
+        origin=None,
+        sampling_rate=None,
     )
 
     filename_format: dict[str, str] = field(

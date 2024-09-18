@@ -31,6 +31,7 @@ import pymovements as pm
     ('public_dataset', 'dataset_name'),
     # XXX: add public dataset in alphabetical order
     [
+        pytest.param(pm.datasets.CodeComprehension, 'CodeComprehension', id='CodeComprehension'),
         pytest.param(pm.datasets.CopCo, 'CopCo', id='CopCo'),
         pytest.param(pm.datasets.DIDEC, 'DIDEC', id='DIDEC'),
         pytest.param(pm.datasets.EMTeC, 'EMTeC', id='EMTeC'),
