@@ -390,7 +390,7 @@ class DatasetPaths:
         >>> dataset.paths.precomputed_events# doctest: +SKIP
         Path('path/to/your/common/root/ToyDataset/precomputed_events')
 
-        This way you can also explicitely specify the precomputed directory name. 
+        This way you can also explicitely specify the precomputed directory name.
         The default is `precomputed_events`.
         >>> paths = pm.DatasetPaths(
         >>>     root='/path/to/your/datasets/',
