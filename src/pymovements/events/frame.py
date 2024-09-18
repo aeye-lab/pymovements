@@ -27,6 +27,7 @@ import numpy as np
 import polars as pl
 
 from pymovements.events.properties import duration
+from pymovements.stimulus.text import TextStimulus
 from pymovements.utils import checks
 from pymovements.utils.aois import get_aoi
 
@@ -293,13 +294,43 @@ class EventDataFrame:
         )
         return df
 
-    def map_to_aois(
-            self,
-            aoi_dataframe: pm.stimulus.TextStimulus,
-            *,
-            eye: str = 'auto',
-    ) -> None:
-        get_aoi(aoi_dataframe, row, x_eye, y_eye)
+    def unnest(self) -> None:
+        """Explode a column of type ``pl.List`` into one column for each list component."""
+        cols = ['location']
+        input_columns = [col for col in cols if col in self.frame.columns]
+
+        output_suffixes = ['_x', '_y']
+
+        col_names = [
+            [f'{input_col}{suffix}' for suffix in output_suffixes]
+            for input_col in input_columns
+        ]
+
+        for input_col, column_names in zip(input_columns, col_names):
+            self.frame = self.frame.with_columns(
+                [
+                    pl.col(input_col).list.get(component_id).alias(names)
+                    for component_id, names in enumerate(column_names)
+                ],
+            ).drop(input_col)
+
+    def map_to_aois(self, aoi_dataframe: TextStimulus) -> None:
+        """Map events to aois.
+
+        Parameters
+        ----------
+        aoi_dataframe: TextStimulus
+            Text dataframe to map fixation to.
+        """
+        self.unnest()
+        self.frame = self.frame.with_columns(
+            area_of_interest=pl.Series(
+                get_aoi(
+                    aoi_dataframe, row, 'location_x', 'location_y',
+                )
+                for row in self.frame.iter_rows(named=True)
+            ),
+        )
 
     def __str__(self: Any) -> str:
         """Return string representation of event dataframe."""
