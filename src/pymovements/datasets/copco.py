@@ -103,13 +103,20 @@ class CopCo(DatasetDefinition):
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': False,
-            'precomputed_events': True,
+            'precomputed_events': False,
+            'precomputed_reading_measures': True,
         },
     )
-    extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': True})
+    extract: dict[str, bool] = field(
+        default_factory=lambda: {
+            'precomputed_events': True,
+            'precomputed_reading_measures': True,
+        },
+    )
     mirrors: dict[str, tuple[str, ...]] = field(
         default_factory=lambda: {
             'precomputed_events': ('https://files.de-1.osf.io/',),
+            'precomputed_reading_measures': ('https://files.de-1.osf.io/',),
         },
     )
     resources: dict[str, tuple[dict[str, str | None], ...]] = field(
@@ -119,6 +126,14 @@ class CopCo(DatasetDefinition):
                     'resource':
                     'v1/resources/ud8s5/providers/osfstorage/61e13174c99ebd02df017c14/?zip=',
                     'filename': 'FixationReports.zip',
+                    'md5': None,  # type:ignore
+                },
+            ),
+            'precomputed_reading_measures': (
+                {
+                    'resource':
+                    'v1/resources/ud8s5/providers/osfstorage/61e1317cc99ebd02df017c4f/?zip=',
+                    'filename': 'ReadingMeasures.zip',
                     'md5': None,  # type:ignore
                 },
             ),
@@ -138,12 +153,14 @@ class CopCo(DatasetDefinition):
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
             'precomputed_events': r'FIX_report_P{subject_id:d}.txt',
+            'precomputed_reading_measures': r'P{subject_id:d}.csv',
         },
     )
 
     filename_format_dtypes: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
             'precomputed_events': {},
+            'precomputed_reading_measures': {},
         },
     )
 
@@ -164,5 +181,6 @@ class CopCo(DatasetDefinition):
                 'null_values': '.',
                 'quote_char': '"',
             },
+            'precomputed_reading_measures': {},
         },
     )

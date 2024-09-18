@@ -34,6 +34,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
 from pymovements.gaze.io import from_asc
 from pymovements.gaze.io import from_csv
 from pymovements.gaze.io import from_ipc
+from pymovements.reading_measures import ReadingMeasures
 from pymovements.utils.paths import match_filepaths
 from pymovements.utils.strings import curly_to_regex
 
@@ -98,6 +99,24 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
                 for fileinfo_key, fileinfo_dtype in items
             ])
         _fileinfo_dicts['precomputed_events'] = fileinfo_df
+
+    if definition.has_files['precomputed_reading_measures']:
+        fileinfo_dicts = match_filepaths(
+            path=paths.precomputed_reading_measures,
+            regex=curly_to_regex(definition.filename_format['precomputed_reading_measures']),
+            relative=True,
+        )
+        if not fileinfo_dicts:
+            raise RuntimeError(f'no matching files found in {paths.precomputed_reading_measures}')
+        fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
+        fileinfo_df = fileinfo_df.sort(by='filepath')
+        if definition.filename_format_dtypes['precomputed_reading_measures']:
+            items = definition.filename_format_dtypes['precomputed_reading_measures'].items()
+            fileinfo_df = fileinfo_df.with_columns([
+                pl.col(fileinfo_key).cast(fileinfo_dtype)
+                for fileinfo_key, fileinfo_dtype in items
+            ])
+        _fileinfo_dicts['precomputed_reading_measures'] = fileinfo_df
 
     return _fileinfo_dicts
 
@@ -371,6 +390,73 @@ def load_gaze_file(
         )
 
     return gaze_df
+
+
+def load_precomputed_reading_measures(
+        definition: DatasetDefinition,
+        fileinfo: pl.DataFrame,
+        paths: DatasetPaths,
+) -> list[ReadingMeasures]:
+    """Load text stimulus from file.
+
+    Parameters
+    ----------
+    definition:  DatasetDefinition
+        Dataset definition to load precomputed events.
+    fileinfo: pl.DataFrame
+        Information about the files.
+    paths: DatasetPaths
+        Adjustable paths to extract datasets.
+
+    Returns
+    -------
+    list[ReadingMeasures]
+        Return list of precomputed event dataframes.
+    """
+    precomputed_reading_measures = []
+    for filepath in fileinfo.to_dicts():
+        data_path = paths.precomputed_reading_measures / Path(filepath['filepath'])
+        precomputed_reading_measures.append(
+            load_precomputed_reading_measure_file(
+                data_path,
+                definition.custom_read_kwargs['precomputed_reading_measures'],
+            ),
+        )
+    return precomputed_reading_measures
+
+
+def load_precomputed_reading_measure_file(
+        data_path: str | Path,
+        custom_read_kwargs: dict[str, Any] | None = None,
+) -> ReadingMeasures:
+    """Load precomputed events from files.
+
+    Parameters
+    ----------
+    data_path:  str | Path
+        Path to file to be read.
+    custom_read_kwargs: dict[str, Any] | None
+        Custom read keyword arguments for polars. (default: None)
+
+    Returns
+    -------
+    ReadingMeasures
+        Returns the text stimulus file.
+    """
+    data_path = Path(data_path)
+    if custom_read_kwargs is None:
+        custom_read_kwargs = {}
+
+    valid_extensions = {'.csv', '.tsv', '.txt'}
+    if data_path.suffix in valid_extensions:
+        precomputed_reading_measure_df = pl.read_csv(data_path, **custom_read_kwargs)
+    else:
+        raise ValueError(
+            f'unsupported file format "{data_path.suffix}". '
+            f'Supported formats are: {", ".join(sorted(valid_extensions))}',
+        )
+
+    return ReadingMeasures(precomputed_reading_measure_df)
 
 
 def load_precomputed_event_files(

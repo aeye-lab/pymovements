@@ -114,6 +114,14 @@ def test_public_dataset_registered(public_dataset, dataset_name, dataset_path, d
         assert dataset_definition.filename_format_dtypes['precomputed_events'] == registered_definition.filename_format_dtypes['precomputed_events']  # noqa: E501
         assert dataset_definition.custom_read_kwargs['precomputed_events'] == registered_definition.custom_read_kwargs['precomputed_events']  # noqa: E501
 
+    if dataset_definition.has_files['precomputed_reading_measures']:
+        assert dataset_definition.mirrors['precomputed_reading_measures'] == registered_definition.mirrors['precomputed_reading_measures']  # noqa: E501
+        assert dataset_definition.resources['precomputed_reading_measures'] == registered_definition.resources['precomputed_reading_measures']  # noqa: E501
+        assert dataset_definition.experiment == registered_definition.experiment
+        assert dataset_definition.filename_format['precomputed_reading_measures'] == registered_definition.filename_format['precomputed_reading_measures']  # noqa: E501
+        assert dataset_definition.filename_format_dtypes['precomputed_reading_measures'] == registered_definition.filename_format_dtypes['precomputed_reading_measures']  # noqa: E501
+        assert dataset_definition.custom_read_kwargs['precomputed_reading_measures'] == registered_definition.custom_read_kwargs['precomputed_reading_measures']  # noqa: E501
+
     dataset, expected_paths = construct_public_dataset(
         public_dataset,
         dataset_path,

@@ -100,7 +100,11 @@ class SBSAT(DatasetDefinition):
     name: str = 'SBSAT'
 
     has_files: dict[str, bool] = field(
-        default_factory=lambda: {'gaze': True, 'precomputed_events': True},
+        default_factory=lambda: {
+            'gaze': True,
+            'precomputed_events': True,
+            'precomputed_reading_measures': False,
+        },
     )
     mirrors: dict[str, tuple[str, ...]] = field(
         default_factory=lambda:

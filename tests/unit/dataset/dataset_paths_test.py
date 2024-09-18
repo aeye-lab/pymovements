@@ -34,6 +34,8 @@ import pymovements as pm
                 'root': Path('/data/set/path/'),
                 'dataset': Path('/data/set/path/'),
                 'raw': Path('/data/set/path/raw'),
+                'precomputed_events': Path('/data/set/path/precomputed_events'),
+                'precomputed_reading_measures': Path('/data/set/path/precomputed_reading_measures'),
                 'preprocessed': Path('/data/set/path/preprocessed'),
                 'events': Path('/data/set/path/events'),
                 'downloads': Path('/data/set/path/downloads'),
@@ -46,6 +48,8 @@ import pymovements as pm
                 'root': Path('/data/set/path/'),
                 'dataset': Path('/data/set/path/'),
                 'raw': Path('/data/set/path/raw'),
+                'precomputed_events': Path('/data/set/path/precomputed_events'),
+                'precomputed_reading_measures': Path('/data/set/path/precomputed_reading_measures'),
                 'preprocessed': Path('/data/set/path/preprocessed'),
                 'events': Path('/data/set/path/events'),
                 'downloads': Path('/data/set/path/downloads'),
@@ -58,6 +62,9 @@ import pymovements as pm
                 'root': Path('/data/set/path/'),
                 'dataset': Path('/data/set/path/dataset'),
                 'raw': Path('/data/set/path/dataset/raw'),
+                'precomputed_events': Path('/data/set/path/dataset/precomputed_events'),
+                'precomputed_reading_measures':
+                Path('/data/set/path/dataset/precomputed_reading_measures'),
                 'preprocessed': Path('/data/set/path/dataset/preprocessed'),
                 'events': Path('/data/set/path/dataset/events'),
                 'downloads': Path('/data/set/path/dataset/downloads'),
@@ -70,6 +77,9 @@ import pymovements as pm
                 'root': Path('/data/set/path/'),
                 'dataset': Path('/data/set/path/dataset'),
                 'raw': Path('/data/set/path/dataset/raw'),
+                'precomputed_events': Path('/data/set/path/dataset/precomputed_events'),
+                'precomputed_reading_measures':
+                Path('/data/set/path/dataset/precomputed_reading_measures'),
                 'preprocessed': Path('/data/set/path/dataset/preprocessed'),
                 'events': Path('/data/set/path/dataset/custom_events'),
                 'downloads': Path('/data/set/path/dataset/downloads'),
@@ -82,6 +92,9 @@ import pymovements as pm
                 'root': Path('/data/set/path/'),
                 'dataset': Path('/data/set/path/dataset'),
                 'raw': Path('/data/set/path/dataset/raw'),
+                'precomputed_events': Path('/data/set/path/dataset/precomputed_events'),
+                'precomputed_reading_measures':
+                Path('/data/set/path/dataset/precomputed_reading_measures'),
                 'preprocessed': Path('/data/set/path/dataset/custom_preprocessed'),
                 'events': Path('/data/set/path/dataset/events'),
                 'downloads': Path('/data/set/path/dataset/downloads'),
@@ -94,6 +107,9 @@ import pymovements as pm
                 'root': Path('/data/set/path/'),
                 'dataset': Path('/data/set/path/dataset'),
                 'raw': Path('/data/set/path/dataset/custom_raw'),
+                'precomputed_events': Path('/data/set/path/dataset/precomputed_events'),
+                'precomputed_reading_measures':
+                Path('/data/set/path/dataset/precomputed_reading_measures'),
                 'preprocessed': Path('/data/set/path/dataset/preprocessed'),
                 'events': Path('/data/set/path/dataset/events'),
                 'downloads': Path('/data/set/path/dataset/downloads'),
@@ -105,12 +121,52 @@ import pymovements as pm
             {
                 'root': Path('/data/set/path/'),
                 'dataset': Path('/data/set/path/dataset'),
+                'precomputed_events': Path('/data/set/path/dataset/precomputed_events'),
+                'precomputed_reading_measures':
+                Path('/data/set/path/dataset/precomputed_reading_measures'),
                 'raw': Path('/data/set/path/dataset/raw'),
                 'preprocessed': Path('/data/set/path/dataset/preprocessed'),
                 'events': Path('/data/set/path/dataset/events'),
                 'downloads': Path('/data/set/path/dataset/custom_downloads'),
             },
             id='explicit_downloads',
+        ),
+        pytest.param(
+            {
+                'root': '/data/set/path',
+                'dataset': 'dataset',
+                'precomputed_events': 'custom_precomputed_events',
+            },
+            {
+                'root': Path('/data/set/path/'),
+                'dataset': Path('/data/set/path/dataset'),
+                'precomputed_events': Path('/data/set/path/dataset/custom_precomputed_events'),
+                'precomputed_reading_measures':
+                Path('/data/set/path/dataset/precomputed_reading_measures'),
+                'raw': Path('/data/set/path/dataset/raw'),
+                'preprocessed': Path('/data/set/path/dataset/preprocessed'),
+                'events': Path('/data/set/path/dataset/events'),
+                'downloads': Path('/data/set/path/dataset/downloads'),
+            },
+            id='explicit_precomputed_events',
+        ),
+        pytest.param(
+            {
+                'root': '/data/set/path',
+                'dataset': 'dataset',
+                'precomputed_reading_measures': 'custom_prm',
+            },
+            {
+                'root': Path('/data/set/path/'),
+                'dataset': Path('/data/set/path/dataset'),
+                'precomputed_events': Path('/data/set/path/dataset/precomputed_events'),
+                'precomputed_reading_measures': Path('/data/set/path/dataset/custom_prm'),
+                'raw': Path('/data/set/path/dataset/raw'),
+                'preprocessed': Path('/data/set/path/dataset/preprocessed'),
+                'events': Path('/data/set/path/dataset/events'),
+                'downloads': Path('/data/set/path/dataset/downloads'),
+            },
+            id='explicit_precomputed_reading_measures',
         ),
     ],
 )
@@ -120,6 +176,8 @@ def test_dataset_paths(init_kwargs, expected_paths):
     assert paths.root == expected_paths['root']
     assert paths.dataset == expected_paths['dataset']
     assert paths.raw == expected_paths['raw']
+    assert paths.precomputed_events == expected_paths['precomputed_events']
+    assert paths.precomputed_reading_measures == expected_paths['precomputed_reading_measures']
     assert paths.preprocessed == expected_paths['preprocessed']
     assert paths.events == expected_paths['events']
     assert paths.downloads == expected_paths['downloads']

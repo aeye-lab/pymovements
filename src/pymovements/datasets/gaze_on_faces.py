@@ -101,7 +101,11 @@ class GazeOnFaces(DatasetDefinition):
     name: str = 'GazeOnFaces'
 
     has_files: dict[str, bool] = field(
-        default_factory=lambda: {'gaze': True, 'precomputed_events': False},
+        default_factory=lambda: {
+            'gaze': True,
+            'precomputed_events': False,
+            'precomputed_reading_measures': False,
+        },
     )
 
     mirrors: dict[str, tuple[str, ...]] = field(
