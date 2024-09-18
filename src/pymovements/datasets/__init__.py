@@ -25,6 +25,7 @@
    :toctree:
    :template: class.rst
 
+    pymovements.datasets.CodeComprehension
     pymovements.datasets.CopCo
     pymovements.datasets.DIDEC
     pymovements.datasets.EMTeC
@@ -47,6 +48,7 @@
     pymovements.datasets.ToyDataset
     pymovements.datasets.ToyDatasetEyeLink
 """
+from pymovements.datasets.codecomprehension import CodeComprehension
 from pymovements.datasets.copco import CopCo
 from pymovements.datasets.didec import DIDEC
 from pymovements.datasets.emtec import EMTeC
@@ -64,6 +66,7 @@ from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
 
 
 __all__ = [
+    'CodeComprehension',
     'CopCo',
     'DIDEC',
     'EMTeC',
