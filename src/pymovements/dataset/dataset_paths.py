@@ -392,13 +392,10 @@ class DatasetPaths:
 
         This way you can also explicitely specify the precomputed directory name.
         The default is `precomputed_events`.
-        >>> paths = pm.DatasetPaths(
-        >>>     root='/path/to/your/datasets/',
-        >>>     precomputed_events='my_precomputed_events',
-        >>> )
+        >>> paths = pm.DatasetPaths(root='/path/to/your/datasets/', precomputed_events='my_pe')
         >>> dataset = pm.Dataset("ToyDataset", path=paths)
         >>> dataset.paths.precomputed_events# doctest: +SKIP
-        Path('/path/to/your/datasets/ToyDataset/my_precomputed_events')
+        Path('/path/to/your/datasets/ToyDataset/my_pe')
 
         If your precomputed event data is not in a separate directory under the root path then you
         can also specify `.` as the directory name. We discourage this and advise the user to keep
