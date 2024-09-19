@@ -37,6 +37,7 @@ import pymovements as pm
         'CustomGazeOnly',
         'CustomPrecomputedOnly',
         'CustomPrecomputedOnlyNoExtract',
+        'CustomPrecomputedRMOnly',
     ],
 )
 def dataset_definition_fixture(request):
@@ -50,6 +51,7 @@ def dataset_definition_fixture(request):
                 default_factory=lambda: {
                     'gaze': True,
                     'precomputed_events': True,
+                    'precomputed_reading_measures': False,
                 },
             )
             mirrors: dict[str, tuple[str, ...]] = field(
@@ -99,6 +101,7 @@ def dataset_definition_fixture(request):
                 default_factory=lambda: {
                     'gaze': True,
                     'precomputed_events': False,
+                    'precomputed_reading_measures': False,
                 },
             )
             mirrors: dict[str, [tuple[str, ...]]] = field(
@@ -134,6 +137,7 @@ def dataset_definition_fixture(request):
                 default_factory=lambda: {
                     'gaze': False,
                     'precomputed_events': True,
+                    'precomputed_reading_measures': False,
                 },
             )
             extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': True})
@@ -169,6 +173,7 @@ def dataset_definition_fixture(request):
                 default_factory=lambda: {
                     'gaze': False,
                     'precomputed_events': True,
+                    'precomputed_reading_measures': False,
                 },
             )
             extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': False})
@@ -187,6 +192,46 @@ def dataset_definition_fixture(request):
                         {
                             'resource': 'test_pc.gz.tar',
                             'filename': 'test_pc.gz.tar',
+                            'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                        },
+                    ),
+                },
+            )
+
+        return CustomPublicDataset()
+    if request.param == 'CustomPrecomputedRMOnly':
+        @dataclass
+        @pm.register_dataset
+        class CustomPublicDataset(pm.DatasetDefinition):
+            name: str = 'CustomPublicDataset'
+
+            has_files: dict[str, bool] = field(
+                default_factory=lambda: {
+                    'gaze': False,
+                    'precomputed_events': False,
+                    'precomputed_reading_measures': True,
+                },
+            )
+            extract: dict[str, bool] = field(
+                default_factory=lambda: {
+                    'precomputed_reading_measures': True,
+                },
+            )
+            mirrors: dict[str, [tuple[str, ...]]] = field(
+                default_factory=lambda: {
+                    'precomputed_reading_measures': (
+                        'https://example.com/',
+                        'https://another_example.com/',
+                    ),
+                },
+            )
+
+            resources: dict[str, tuple[dict[str, str], ...]] = field(
+                default_factory=lambda: {
+                    'precomputed_reading_measures': (
+                        {
+                            'resource': 'test_rm.gz.tar',
+                            'filename': 'test_rm.gz.tar',
                             'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                         },
                     ),
@@ -333,6 +378,46 @@ def test_dataset_download_both_precomputed_mirrors_fail(
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @pytest.mark.parametrize(
     'dataset_definition',
+    ['CustomPrecomputedRMOnly'],
+    indirect=['dataset_definition'],
+)
+def test_dataset_download_both_precomputed_mirrors_fail_rm(
+        mock_download_file,
+        tmp_path,
+        dataset_definition,
+):
+    mock_download_file.side_effect = OSError()
+
+    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
+    dataset = pm.Dataset(dataset_definition, path=paths)
+
+    with pytest.raises(
+        RuntimeError,
+        match='downloading resource test_rm.gz.tar failed for all mirrors',
+    ):
+        dataset.download()
+
+    mock_download_file.assert_has_calls([
+        mock.call(
+            url='https://example.com/test_rm.gz.tar',
+            dirpath=tmp_path / 'downloads',
+            filename='test_rm.gz.tar',
+            md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+            verbose=True,
+        ),
+        mock.call(
+            url='https://another_example.com/test_rm.gz.tar',
+            dirpath=tmp_path / 'downloads',
+            filename='test_rm.gz.tar',
+            md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+            verbose=True,
+        ),
+    ])
+
+
+@mock.patch('pymovements.dataset.dataset_download.download_file')
+@pytest.mark.parametrize(
+    'dataset_definition',
     ['CustomGazeAndPrecomputed'],
     indirect=['dataset_definition'],
 )
@@ -421,6 +506,37 @@ def test_dataset_download_first_mirror_precomputed_fails(
             url='https://another_example.com/test_pc.gz.tar',
             dirpath=tmp_path / 'downloads',
             filename='test_pc.gz.tar',
+            md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+            verbose=True,
+        ),
+    ])
+
+
+@mock.patch('pymovements.dataset.dataset_download.download_file')
+@pytest.mark.parametrize(
+    'dataset_definition',
+    ['CustomPrecomputedRMOnly'], indirect=['dataset_definition'],
+)
+def test_dataset_download_first_mirror_precomputed_fails_rm(
+        mock_download_file, tmp_path, dataset_definition,
+):
+    mock_download_file.side_effect = [OSError(), None]
+
+    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
+    dataset = pm.Dataset(dataset_definition, path=paths)
+    dataset.download(extract=False)
+    mock_download_file.assert_has_calls([
+        mock.call(
+            url='https://example.com/test_rm.gz.tar',
+            dirpath=tmp_path / 'downloads',
+            filename='test_rm.gz.tar',
+            md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+            verbose=True,
+        ),
+        mock.call(
+            url='https://another_example.com/test_rm.gz.tar',
+            dirpath=tmp_path / 'downloads',
+            filename='test_rm.gz.tar',
             md5='52bbf03a7c50ee7152ccb9d357c2bb30',
             verbose=True,
         ),
@@ -571,6 +687,31 @@ def test_dataset_download_precomputed_no_extract(mock_download_file, tmp_path, d
     ])
 
 
+@mock.patch('pymovements.dataset.dataset_download.download_file')
+@pytest.mark.parametrize(
+    'dataset_definition',
+    ['CustomPrecomputedRMOnly'], indirect=['dataset_definition'],
+)
+def test_dataset_download_precomputed_no_extract_rm(
+        mock_download_file, tmp_path, dataset_definition,
+):
+    mock_download_file.return_value = 'path'
+
+    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
+    dataset = pm.Dataset(dataset_definition, path=paths)
+    dataset.download(extract=False)
+
+    mock_download_file.assert_has_calls([
+        mock.call(
+            url='https://example.com/test_rm.gz.tar',
+            dirpath=tmp_path / 'downloads',
+            filename='test_rm.gz.tar',
+            md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+            verbose=True,
+        ),
+    ])
+
+
 @mock.patch('pymovements.dataset.dataset_download.extract_archive')
 @pytest.mark.parametrize('dataset_definition', ['CustomGazeOnly'], indirect=['dataset_definition'])
 def test_dataset_extract_remove_finished_true_gaze(
@@ -591,6 +732,35 @@ def test_dataset_extract_remove_finished_true_gaze(
             recursive=True,
             remove_finished=True,
             remove_top_level=False,
+            verbose=1,
+        ),
+    ])
+
+
+@mock.patch('pymovements.dataset.dataset_download.extract_archive')
+@pytest.mark.parametrize(
+    'dataset_definition',
+    ['CustomPrecomputedRMOnly'],
+    indirect=['dataset_definition'],
+)
+def test_dataset_extract_rm(
+        mock_extract_archive,
+        tmp_path,
+        dataset_definition,
+):
+    mock_extract_archive.return_value = 'path'
+
+    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
+    dataset = pm.Dataset(dataset_definition, path=paths)
+    dataset.extract(verbose=1)
+
+    mock_extract_archive.assert_has_calls([
+        mock.call(
+            source_path=tmp_path / 'downloads' / 'test_rm.gz.tar',
+            destination_path=tmp_path / 'precomputed_reading_measures',
+            recursive=True,
+            remove_finished=False,
+            remove_top_level=True,
             verbose=1,
         ),
     ])
@@ -806,6 +976,7 @@ def test_dataset_download_no_mirrors_raises_exception(tmp_path):
             default_factory=lambda: {
                 'gaze': True,
                 'precomputed_events': False,
+                'precomputed_reading_measures': False,
             },
         )
         mirrors: dict[str, tuple[str, ...]] = field(default_factory=lambda: {'gaze': ()})
@@ -841,6 +1012,7 @@ def test_dataset_download_no_mirrors_precomputed_raises_exception(tmp_path):
             default_factory=lambda: {
                 'gaze': False,
                 'precomputed_events': True,
+                'precomputed_reading_measures': False,
             },
         )
         mirrors: dict[str, tuple[str, ...]] = field(
@@ -871,6 +1043,46 @@ def test_dataset_download_no_mirrors_precomputed_raises_exception(tmp_path):
         assert substring in msg
 
 
+def test_dataset_download_no_mirrors_precomputed_rm_raises_exception(tmp_path):
+    @dataclass
+    class NoPrecomputedMirrorsDefinition(pm.DatasetDefinition):
+        name: str = 'CustomPublicDataset'
+
+        has_files: dict[str, bool] = field(
+            default_factory=lambda: {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': True,
+            },
+        )
+        mirrors: dict[str, tuple[str, ...]] = field(
+            default_factory=lambda: {
+                'precomputed_reading_measures': (),
+            },
+        )
+
+        resources: dict[str, tuple[dict[str, str], ...]] = field(
+            default_factory=lambda: {
+                'precomputed_reading_measures': (
+                    {
+                        'resource': 'test_rm.gz.tar',
+                        'filename': 'test_rm.gz.tar',
+                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                    },
+                ),
+            },
+        )
+
+    with pytest.raises(AttributeError) as excinfo:
+        pm.Dataset(NoPrecomputedMirrorsDefinition, path=tmp_path).download()
+
+    msg, = excinfo.value.args
+
+    expected_substrings = ['number', 'mirrors', 'zero', 'download']
+    for substring in expected_substrings:
+        assert substring in msg
+
+
 def test_dataset_download_no_resources_raises_exception(tmp_path):
     @dataclass
     class NoGazeResourcesDefinition(pm.DatasetDefinition):
@@ -880,6 +1092,7 @@ def test_dataset_download_no_resources_raises_exception(tmp_path):
             default_factory=lambda: {
                 'gaze': True,
                 'precomputed_events': False,
+                'precomputed_reading_measures': False,
             },
         )
         mirrors: dict[str, tuple[str, ...]] = field(
@@ -916,6 +1129,7 @@ def test_dataset_download_no_precomputed_event_resources_raises_exception(tmp_pa
             default_factory=lambda: {
                 'gaze': False,
                 'precomputed_events': True,
+                'precomputed_reading_measures': False,
             },
         )
         mirrors: dict[str, tuple[str, ...]] = field(
@@ -964,6 +1178,7 @@ def test_extract_dataset_precomputed_move_single_file():
             default_factory=lambda: {
                 'gaze': False,
                 'precomputed_events': True,
+                'precomputed_reading_measures': False,
             },
         )
         mirrors: dict[str, tuple[str, ...]] = field(
@@ -992,3 +1207,85 @@ def test_extract_dataset_precomputed_move_single_file():
         PrecomputedResourcesDefinition(),
         pm.DatasetPaths(root='tests/files/', downloads='.', precomputed_events='.'),
     )
+
+
+def test_extract_dataset_precomputed_rm_move_single_file():
+    @dataclass
+    @pm.register_dataset
+    class PrecomputedResourcesDefinition(pm.DatasetDefinition):
+        name: str = 'CustomPublicDataset'
+
+        has_files: dict[str, bool] = field(
+            default_factory=lambda: {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': True,
+            },
+        )
+        mirrors: dict[str, tuple[str, ...]] = field(
+            default_factory=lambda: {
+                'precomputed_reading_measures': (
+                    'https://example.com/',
+                    'https://another_example.com/',
+                ),
+            },
+        )
+
+        resources: dict[str, tuple[dict[str, str], ...]] = field(
+            default_factory=lambda: {
+                'precomputed_reading_measures': (
+                    {
+                        'resource': 'tests/files/',
+                        'filename': 'copco_rm_dummy.csv',
+                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                    },
+                ),
+            },
+        )
+        extract: dict[str, bool] = field(
+            default_factory=lambda: {
+                'precomputed_reading_measures': False,
+            },
+        )
+
+    pm.dataset.dataset_download.extract_dataset(
+        PrecomputedResourcesDefinition(),
+        pm.DatasetPaths(root='tests/files/', downloads='.', precomputed_reading_measures='.'),
+    )
+
+
+def test_dataset_download_no_precomputed_rm_resources_raises_exception(tmp_path):
+    @dataclass
+    class NoPrecomputedResourcesDefinition(pm.DatasetDefinition):
+        name: str = 'CustomPublicDataset'
+
+        has_files: dict[str, bool] = field(
+            default_factory=lambda: {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': True,
+            },
+        )
+        mirrors: dict[str, tuple[str, ...]] = field(
+            default_factory=lambda: {
+                'precomputed_reading_measures': (
+                    'https://example.com/',
+                    'https://another_example.com/',
+                ),
+            },
+        )
+
+        resources: dict[str, tuple[dict[str, str], ...]] = field(
+            default_factory=lambda: {
+                'precomputed_reading_measures': (),
+            },
+        )
+
+    with pytest.raises(AttributeError) as excinfo:
+        pm.Dataset(NoPrecomputedResourcesDefinition, path=tmp_path).download()
+
+    msg, = excinfo.value.args
+
+    expected_substrings = ['number', 'precomputed_reading_measures resources', 'zero', 'download']
+    for substring in expected_substrings:
+        assert substring in msg

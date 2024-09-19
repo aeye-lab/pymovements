@@ -25,6 +25,7 @@ from pymovements import exceptions
 from pymovements import gaze
 from pymovements import measure
 from pymovements import plotting
+from pymovements import reading_measures
 from pymovements import stimulus
 from pymovements import synthetic
 from pymovements import utils
@@ -69,6 +70,7 @@ __all__ = [
     'register_sample_measure',
 
     'plotting',
+    'reading_measures',
     'stimulus',
     'synthetic',
     'utils',

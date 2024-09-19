@@ -85,16 +85,34 @@ def create_precomputed_files_from_fileinfo(precomputed_dfs, fileinfo, rootpath):
         precomputed_df.write_csv(rootpath / filepath)
 
 
+def create_precomputed_rm_files_from_fileinfo(precomputed_rm_df, fileinfo, rootpath):
+    rootpath.mkdir(parents=True, exist_ok=True)
+
+    for precomputed_rm_df, fileinfo_row in zip(precomputed_rm_df, fileinfo.to_dicts()):
+        filepath = fileinfo_row['filepath']
+
+        for key in fileinfo_row.keys():
+            if key in precomputed_rm_df.columns:
+                precomputed_rm_df = precomputed_rm_df.drop(key)
+
+        precomputed_rm_df.write_csv(rootpath / filepath)
+
+
 def mock_toy(
         rootpath,
         raw_fileformat,
         eyes,
         remote=False,
-        has_files={'gaze': True, 'precomputed_events': False},
+        has_files={
+            'gaze': True,
+            'precomputed_events': False,
+            'precomputed_reading_measures': False,
+        },
         extract={'gaze': True, 'precomputed_events': True},
         filename_format_dtypes={
             'gaze': {'subject_id': pl.Int64},
             'precomputed_events': {'subject_id': pl.Int64},
+            'precomputed_reading_measures': {'subject_id': pl.Int64},
         },
 ):
 
@@ -310,9 +328,14 @@ def mock_toy(
         filename_format={
             'gaze': r'{subject_id:d}.' + raw_fileformat,
             'precomputed_events': r'{subject_id:d}.' + raw_fileformat,
+            'precomputed_reading_measures': r'{subject_id:d}.' + raw_fileformat,
         },
         filename_format_dtypes=filename_format_dtypes,
-        custom_read_kwargs={'gaze': {}, 'precomputed_events': {}},
+        custom_read_kwargs={
+            'gaze': {},
+            'precomputed_events': {},
+            'precomputed_reading_measures': {},
+        },
         time_column='time',
         time_unit='ms',
         distance_column=distance_column,
@@ -349,15 +372,42 @@ def mock_toy(
         rootpath / 'precomputed_events',
     )
 
+    precomputed_rm_dfs = []
+    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
+        precomputed_rm_df = pl.from_dict(
+            {
+                'subject_id': fileinfo_row['subject_id'],
+                'number_fix': np.arange(1000),
+                'mean_fix_dur': np.zeros(1000),
+            },
+            schema={
+                'subject_id': pl.Int64,
+                'number_fix': pl.Float64,
+                'mean_fix_dur': pl.Float64,
+            },
+        )
+        precomputed_rm_dfs.append(precomputed_rm_df)
+
+    create_precomputed_rm_files_from_fileinfo(
+        precomputed_rm_dfs,
+        fileinfo,
+        rootpath / 'precomputed_reading_measures',
+    )
+
     return {
         'init_kwargs': {
             'definition': dataset_definition,
             'path': pm.DatasetPaths(root=rootpath, dataset='.'),
         },
-        'fileinfo': {'gaze': fileinfo, 'precomputed_events': fileinfo},
+        'fileinfo': {
+            'gaze': fileinfo,
+            'precomputed_events': fileinfo,
+            'precomputed_reading_measures': fileinfo,
+        },
         'raw_gaze_dfs': gaze_dfs,
         'preprocessed_gaze_dfs': preprocessed_gaze_dfs,
         'event_dfs': event_dfs,
+        'precomputed_rm_dfs': precomputed_rm_dfs,
         'eyes': eyes,
     }
 
@@ -1724,21 +1774,33 @@ def precomputed_fixture_dataset(request, tmp_path):
             rootpath,
             raw_fileformat='csv',
             eyes='right',
-            has_files={'gaze': True, 'precomputed_events': True},
+            has_files={
+                'gaze': True,
+                'precomputed_events': True,
+                'precomputed_reading_measures': False,
+            },
         )
     elif dataset_type == 'ToyPrecomputedEvent':
         dataset_dict = mock_toy(
             rootpath,
             raw_fileformat='csv',
             eyes='right',
-            has_files={'gaze': False, 'precomputed_events': True},
+            has_files={
+                'gaze': False,
+                'precomputed_events': True,
+                'precomputed_reading_measures': False,
+            },
         )
     elif dataset_type == 'ToyPrecomputedEventNoExtract':
         dataset_dict = mock_toy(
             rootpath,
             raw_fileformat='csv',
             eyes='right',
-            has_files={'gaze': False, 'precomputed_events': True},
+            has_files={
+                'gaze': False,
+                'precomputed_events': True,
+                'precomputed_reading_measures': False,
+            },
             extract={'precomputed_events': False},
             filename_format_dtypes={'precomputed_events': {}},
         )
@@ -1762,6 +1824,79 @@ def test_load_no_files_precomputed_raises_exception(precomputed_dataset_configur
 
     shutil.rmtree(dataset.paths.precomputed_events, ignore_errors=True)
     dataset.paths.precomputed_events.mkdir()
+
+    with pytest.raises(RuntimeError):
+        dataset.load()
+
+
+@pytest.fixture(
+    name='precomputed_rm_dataset_configuration',
+    params=[
+        'ToyRightPrecomputedEventAndGazeAndRM',
+        'ToyPrecomputedRM',
+        'ToyPrecomputedRMNoExtract',
+    ],
+)
+def precomputed_rm_fixture_dataset(request, tmp_path):
+    rootpath = tmp_path
+
+    dataset_type = request.param
+    if dataset_type == 'ToyRightPrecomputedEventAndGazeAndRM':
+        dataset_dict = mock_toy(
+            rootpath,
+            raw_fileformat='csv',
+            eyes='right',
+            has_files={
+                'gaze': True,
+                'precomputed_events': True,
+                'precomputed_reading_measures': True,
+            },
+        )
+    elif dataset_type == 'ToyPrecomputedRM':
+        dataset_dict = mock_toy(
+            rootpath,
+            raw_fileformat='csv',
+            eyes='right',
+            has_files={
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': True,
+            },
+        )
+    elif dataset_type == 'ToyPrecomputedRMNoExtract':
+        dataset_dict = mock_toy(
+            rootpath,
+            raw_fileformat='csv',
+            eyes='right',
+            has_files={
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': True,
+            },
+            extract={'precomputed_reading_measures': False},
+            filename_format_dtypes={'precomputed_events': {}, 'precomputed_reading_measures': {}},
+        )
+    else:
+        raise ValueError(f'{request.param} not supported as dataset mock')
+
+    yield dataset_dict
+
+
+def test_load_correct_fileinfo_precomputed_rm(precomputed_rm_dataset_configuration):
+    dataset = pm.Dataset(**precomputed_rm_dataset_configuration['init_kwargs'])
+    dataset.load()
+
+    all_fileinfo = precomputed_rm_dataset_configuration['fileinfo']
+    expected_fileinfo = all_fileinfo['precomputed_reading_measures']
+    assert_frame_equal(dataset.fileinfo['precomputed_reading_measures'], expected_fileinfo)
+
+
+def test_load_no_files_precomputed_rm_raises_exception(precomputed_rm_dataset_configuration):
+    init_kwargs = {**precomputed_rm_dataset_configuration['init_kwargs']}
+    dataset = pm.Dataset(**init_kwargs)
+
+    shutil.rmtree(dataset.paths.precomputed_reading_measures, ignore_errors=True)
+    dataset.paths.precomputed_reading_measures.mkdir()
 
     with pytest.raises(RuntimeError):
         dataset.load()

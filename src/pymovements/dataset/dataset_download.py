@@ -157,6 +157,53 @@ def download_dataset(
                     'failed for all mirrors.',
                 )
 
+    if definition.has_files['precomputed_reading_measures']:
+        if len(definition.mirrors['precomputed_reading_measures']) == 0:
+            raise AttributeError(
+                'number of precomputed mirrors must not be zero to download dataset',
+            )
+
+        if len(definition.resources['precomputed_reading_measures']) == 0:
+            raise AttributeError(
+                'number of precomputed_reading_measures resources '
+                'must not be zero to download dataset',
+            )
+
+        paths.precomputed_reading_measures.mkdir(parents=True, exist_ok=True)
+
+        for resource in definition.resources['precomputed_reading_measures']:
+            success = False
+
+            for mirror_idx, mirror in enumerate(definition.mirrors['precomputed_reading_measures']):
+
+                url = f'{mirror}{resource["resource"]}'
+
+                try:
+                    download_file(
+                        url=url,
+                        dirpath=paths.downloads,
+                        filename=resource['filename'],
+                        md5=resource['md5'],
+                        verbose=verbose,
+                    )
+                    success = True
+
+                # pylint: disable=overlapping-except
+                except (URLError, OSError, RuntimeError) as error:
+                    # Error downloading the resource, try next mirror
+                    if mirror_idx < len(definition.mirrors['precomputed_reading_measures']) - 1:
+                        print(f'Failed to download:\n{error}\nTrying next mirror.')
+                    continue
+
+                # downloading the resource was successful, we don't need to try another mirror
+                break
+
+            if not success:
+                raise RuntimeError(
+                    f"downloading resource {resource['resource']} "
+                    'failed for all mirrors.',
+                )
+
     if extract:
         extract_dataset(
             definition=definition,
@@ -212,6 +259,24 @@ def extract_dataset(
             destination_path = paths.precomputed_events
 
             if definition.extract['precomputed_events']:
+                extract_archive(
+                    source_path=source_path,
+                    destination_path=destination_path,
+                    recursive=True,
+                    remove_finished=remove_finished,
+                    remove_top_level=remove_top_level,
+                    verbose=verbose,
+                )
+            else:
+                shutil.move(source_path, destination_path / resource['filename'])
+
+    if definition.has_files['precomputed_reading_measures']:
+        paths.precomputed_reading_measures.mkdir(parents=True, exist_ok=True)
+        for resource in definition.resources['precomputed_reading_measures']:
+            source_path = paths.downloads / resource['filename']
+            destination_path = paths.precomputed_reading_measures
+
+            if definition.extract['precomputed_reading_measures']:
                 extract_archive(
                     source_path=source_path,
                     destination_path=destination_path,

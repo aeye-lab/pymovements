@@ -37,6 +37,7 @@ from pymovements.events.frame import EventDataFrame
 from pymovements.events.precomputed import PrecomputedEventDataFrame
 from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import GazeDataFrame
+from pymovements.reading_measures.frame import ReadingMeasures
 
 
 class Dataset:
@@ -62,6 +63,7 @@ class Dataset:
         self.gaze: list[GazeDataFrame] = []
         self.events: list[EventDataFrame] = []
         self.precomputed_events: list[PrecomputedEventDataFrame] = []
+        self.precomputed_reading_measures: list[ReadingMeasures] = []
 
         if isinstance(definition, str):
             definition = DatasetLibrary.get(definition)()
@@ -134,6 +136,10 @@ class Dataset:
         # Event files precomuted by authors of the dataset
         if self.definition.has_files['precomputed_events']:
             self.load_precomputed_events()
+
+        # Reading measures files precomuted by authors of the dataset
+        if self.definition.has_files['precomputed_reading_measures']:
+            self.load_precomputed_reading_measures()
 
         # Events extracted previously by pymovements
         if events:
@@ -213,6 +219,15 @@ class Dataset:
         self.precomputed_events = dataset_files.load_precomputed_event_files(
             self.definition,
             self.fileinfo['precomputed_events'],
+            self.paths,
+        )
+
+    def load_precomputed_reading_measures(self) -> None:
+        """Load precomputed events."""
+        self._check_fileinfo()
+        self.precomputed_reading_measures = dataset_files.load_precomputed_reading_measures(
+            self.definition,
+            self.fileinfo['precomputed_reading_measures'],
             self.paths,
         )
 
