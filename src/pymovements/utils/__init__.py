@@ -33,6 +33,7 @@
     pymovements.utils.parsing
     pymovements.utils.paths
 """
+from pymovements.utils import aois
 from pymovements.utils import archives
 from pymovements.utils import checks
 from pymovements.utils import decorators
@@ -43,6 +44,7 @@ from pymovements.utils import plotting
 
 
 __all__ = [
+    'aois',
     'archives',
     'checks',
     'decorators',

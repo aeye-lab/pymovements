@@ -157,11 +157,11 @@ class ToyDataset(DatasetDefinition):
             'gaze': {
                 'columns': ['timestamp', 'x', 'y', 'stimuli_x', 'stimuli_y'],
                 'dtypes': {
-                    'timestamp': pl.Float32,
-                    'x': pl.Float32,
-                    'y': pl.Float32,
-                    'stimuli_x': pl.Float32,
-                    'stimuli_y': pl.Float32,
+                    'timestamp': pl.Float64,
+                    'x': pl.Float64,
+                    'y': pl.Float64,
+                    'stimuli_x': pl.Float64,
+                    'stimuli_y': pl.Float64,
                 },
                 'separator': '\t',
                 'null_values': '-32768.00',
