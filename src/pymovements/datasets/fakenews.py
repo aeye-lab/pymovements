@@ -19,15 +19,15 @@
 # SOFTWARE.
 """Provides a definition for the FakeNewsPerception dataset."""
 from __future__ import annotations
+
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
-from __future__ import annotations
-from dataclasses import dataclass, field
-from typing import Any
+
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import register_dataset
 from pymovements.gaze.experiment import Experiment
+
 
 @register_dataset
 @dataclass
@@ -36,7 +36,7 @@ class FakeNewsPerception(DatasetDefinition):
     FakeNewsPerception dataset consists of eye movements during reading, perceived believability scores,
     and questionnaires including Cognitive Reflection Test (CRT) and News-Find-Me (NFM) perception, collected from 25 participants
     with 60 news items. Eye movements are recorded to provide objective measures of information processing during news reading.
-    
+
     Attributes
     ----------
     name : str
@@ -76,8 +76,9 @@ class FakeNewsPerception(DatasetDefinition):
         'processed_features': False
     })
     mirrors: dict[str, tuple[str, ...]] = field(default_factory=lambda: {
-        'precomputed_events': ('https://doi.org/10.7910/DVN/C1UD2A',), # TODO: not sure if this is the correct link??? 
-        'questionnaire': ('https://doi.org/10.7910/DVN/C1UD2A',), # ditto
+        # TODO: not sure if this is the correct link???
+        'precomputed_events': ('https://doi.org/10.7910/DVN/C1UD2A',),
+        'questionnaire': ('https://doi.org/10.7910/DVN/C1UD2A',),  # ditto
         'processed_features': ('https://doi.org/10.7910/DVN/C1UD2A',)
     })
     resources: dict[str, tuple[dict[str, str | None], ...]] = field(default_factory=lambda: {
