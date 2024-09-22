@@ -1,4 +1,4 @@
-# Copyright (c) 2024 The pymovements Project Authors
+# Copyright (c) 2022-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,3 +17,129 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Provides a definition for the FakeNewsPerception dataset."""
+from __future__ import annotations
+from dataclasses import dataclass
+from dataclasses import field
+from typing import Any
+from __future__ import annotations
+from dataclasses import dataclass, field
+from typing import Any
+from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.dataset_library import register_dataset
+from pymovements.gaze.experiment import Experiment
+
+@register_dataset
+@dataclass
+class FakeNewsPerception(DatasetDefinition):
+    """
+    FakeNewsPerception dataset consists of eye movements during reading, perceived believability scores,
+    and questionnaires including Cognitive Reflection Test (CRT) and News-Find-Me (NFM) perception, collected from 25 participants
+    with 60 news items. Eye movements are recorded to provide objective measures of information processing during news reading.
+    
+    Attributes
+    ----------
+    name : str
+        The name of the dataset.
+    mirrors : tuple[str, ...]
+        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
+    resources : tuple[dict[str, str], ...]
+        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+        keys:
+        - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
+        - `filename`: The filename under which the file is saved as.
+        - `md5`: The MD5 checksum of the respective file.
+    experiment : Experiment
+        The experiment definition.
+    filename_format : str
+        Regular expression which will be matched before trying to load the file. Namedgroups will
+        appear in the `fileinfo` dataframe.
+    filename_format_dtypes : dict[str, type], optional
+        If named groups are present in the `filename_format`, this makes it possible to cast
+        specific named groups to a particular datatype.
+    column_map : dict[str, str]
+        The keys are the columns to read, the values are the names to which they should be renamed.
+    custom_read_kwargs : dict[str, Any], optional
+        If specified, these keyword arguments will be passed to the file reading function.
+    """
+
+    name: str = 'FakeNewsPerception'
+    has_files: dict[str, bool] = field(default_factory=lambda: {
+        'gaze': True,
+        'precomputed_events': True,
+        'questionnaire': True,
+        'processed_features': True
+    })
+    extract: dict[str, bool] = field(default_factory=lambda: {
+        'precomputed_events': True,
+        'questionnaire': False,
+        'processed_features': False
+    })
+    mirrors: dict[str, tuple[str, ...]] = field(default_factory=lambda: {
+        'precomputed_events': ('https://doi.org/10.7910/DVN/C1UD2A',), # TODO: not sure if this is the correct link??? 
+        'questionnaire': ('https://doi.org/10.7910/DVN/C1UD2A',), # ditto
+        'processed_features': ('https://doi.org/10.7910/DVN/C1UD2A',)
+    })
+    resources: dict[str, tuple[dict[str, str | None], ...]] = field(default_factory=lambda: {
+        'precomputed_events': (
+            {
+                'resource': 'api/access/datafile/4200164',
+                'filename': 'D3-Eye-movements-data.zip',
+                'md5': 'ab009f28cd703f433e9b6c02b0bb38d2'
+            },
+        ),
+        'questionnaire': (
+            {
+                'resource': 'api/access/datafile/4200165',
+                'filename': 'D1-Questionnaire.tab,
+                'md5': '640037f05cc6ee5eaca8c87126e7a742'
+            },
+        ),
+        'processed_features': (
+            {
+                'resource': 'api/access/datafile/4200163',
+                'filename': 'D2-Processed-features.tab',
+                'md5': '70dacd714e111f7902326790d47e7e8c'
+            },
+        )
+    }
+)
+    experiment: Experiment = Experiment(
+        screen_width_px=1920,
+        screen_height_px=1080,
+        screen_width_cm=52.7,
+        screen_height_cm=29.6,
+        distance_cm=85,  # Assumed because not specified
+        origin='center',  # not specified
+        sampling_rate=600
+    )
+
+    filename_format: dict[str, str] = field(
+        default_factory=lambda: {
+            'precomputed_events': r'P(\d{2})_S(\d{2})_(fake|true)\.csv',
+        }
+    )
+    filename_format_dtypes: dict[str, dict[str, type]] = field(
+        default_factory=lambda: {
+            'precomputed_events': {'subject_id': int, 'session_id': int, 'truth_value': str},
+        }
+    )
+    trial_columns: list[str] = field(default_factory=lambda: ['eventType', 'meanPupilDiameter'])
+    time_column: str = 'starttime'
+    time_unit: str = 'milliseconds'
+    pixel_columns: list[str] = field(default_factory=lambda: ['meanX', 'meanY', 'startSaccadeX', 'startSaccadeY', 'endSaccadeX', 'endSaccadeY'])
+    column_map: dict[str, str] = field(default_factory=lambda: {
+        'meanX': 'x',
+        'meanY': 'y',
+        'startSaccadeX': 'start_x',
+        'startSaccadeY': 'start_y',
+        'endSaccadeX': 'end_x',
+        'endSaccadeY': 'end_y'
+    })
+    custom_read_kwargs: dict[str, Any] = field(default_factory=lambda: {
+        'precomputed_events': {
+            'separator': ',',
+            'null_values': 'NA',
+            'quote_char': '"',
+        },
+    })
