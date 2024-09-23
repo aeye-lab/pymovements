@@ -65,21 +65,17 @@ class FakeNewsPerception(DatasetDefinition):
 
     name: str = 'FakeNewsPerception'
     has_files: dict[str, bool] = field(default_factory=lambda: {
-        'gaze': True,
+        'gaze': False,
         'precomputed_events': True,
-        'questionnaire': True,
-        'processed_features': True
+        'precomputed_reading_measures': False,
     })
     extract: dict[str, bool] = field(default_factory=lambda: {
+        'gaze': False,
         'precomputed_events': True,
-        'questionnaire': False,
-        'processed_features': False
+        'precomputed_reading_measures': False,
     })
     mirrors: dict[str, tuple[str, ...]] = field(default_factory=lambda: {
-        # TODO: not sure if this is the correct link???
         'precomputed_events': ('https://doi.org/10.7910/DVN/C1UD2A',),
-        'questionnaire': ('https://doi.org/10.7910/DVN/C1UD2A',),  # ditto
-        'processed_features': ('https://doi.org/10.7910/DVN/C1UD2A',)
     })
     resources: dict[str, tuple[dict[str, str | None], ...]] = field(default_factory=lambda: {
         'precomputed_events': (
@@ -89,20 +85,6 @@ class FakeNewsPerception(DatasetDefinition):
                 'md5': 'ab009f28cd703f433e9b6c02b0bb38d2'
             },
         ),
-        'questionnaire': (
-            {
-                'resource': 'api/access/datafile/4200165',
-                'filename': 'D1-Questionnaire.tab,
-                'md5': '640037f05cc6ee5eaca8c87126e7a742'
-            },
-        ),
-        'processed_features': (
-            {
-                'resource': 'api/access/datafile/4200163',
-                'filename': 'D2-Processed-features.tab',
-                'md5': '70dacd714e111f7902326790d47e7e8c'
-            },
-        )
     }
 )
     experiment: Experiment = Experiment(

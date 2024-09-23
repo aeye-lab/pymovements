@@ -40,6 +40,7 @@ import pymovements as pm
         'gazegraph',
         'judo1000',
         'potec',
+        'fakenews',
     ],
 )
 def fixture_dataset_init_kwargs(request):
@@ -215,7 +216,18 @@ def fixture_dataset_init_kwargs(request):
             filename_format_dtypes={'gaze': {}},
             trial_columns=None,
         ),
-
+        'fakenews': pm.datasets.FakeNewsPerception(
+            has_files={
+                'gaze': False,
+                'precomputed_events': True,
+                'precomputed_reading_measures': False,
+            },
+            filename_format={'precomputed_events': 'fake_news_example.csv'},
+            time_column=pm.datasets.FakeNewsPerception().time_column,
+            time_unit=pm.datasets.FakeNewsPerception().time_unit,
+            filename_format_dtypes={'precomputed_events': {}},
+            trial_columns=pm.datasets.FakeNewsPerception().trial_columns,
+        ),
     }
     yield pm.dataset.Dataset(
         definition=init_param_dict[request.param],
