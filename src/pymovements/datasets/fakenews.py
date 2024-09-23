@@ -124,7 +124,9 @@ class FakeNewsPerception(DatasetDefinition):
             'startSaccadeX',
             'startSaccadeY',
             'endSaccadeX',
-            'endSaccadeY'])
+            'endSaccadeY',
+        ],
+    )
     column_map: dict[str, str] = field(
         default_factory=lambda: {
             'meanX': 'x',
