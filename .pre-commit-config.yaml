@@ -13,7 +13,7 @@ repos:
     hooks:
     -   id: add-trailing-comma
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v3.16.0
+    rev: v3.17.0
     hooks:
     -   id: pyupgrade
         args: [--py39-plus]
@@ -53,12 +53,12 @@ repos:
         args: [--use-current-year]
         types: [python]
 -   repo: https://github.com/jsh9/pydoclint
-    rev: 0.4.2
+    rev: 0.5.8
     hooks:
     - id: pydoclint
       args: ["--config=pyproject.toml"]
 -   repo: https://github.com/nbQA-dev/nbQA
-    rev: 1.8.5
+    rev: 1.8.7
     hooks:
     -   id: nbqa-autopep8
     -   id: nbqa-flake8
@@ -68,7 +68,7 @@ repos:
     -   id: nbqa-pyupgrade
         args: ["--py39-plus"]
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.10.0
+    rev: v1.11.2
     hooks:
     -   id: mypy
         additional_dependencies: [pandas-stubs, types-tqdm]
@@ -90,7 +90,7 @@ repos:
     -   id: requirements-txt-fixer
     -   id: trailing-whitespace
 -   repo: https://github.com/hhatto/autopep8
-    rev: v2.3.0
+    rev: v2.3.1
     hooks:
     -   id: autopep8
 -   repo: https://github.com/PyCQA/autoflake
@@ -98,11 +98,11 @@ repos:
     hooks:
     -   id: autoflake
 -   repo: https://github.com/PyCQA/doc8
-    rev: v1.1.1
+    rev: v1.1.2
     hooks:
     -   id: doc8
 -   repo: https://github.com/PyCQA/flake8
-    rev: 7.1.0
+    rev: 7.1.1
     hooks:
     -   id: flake8
 -   repo: https://github.com/pycqa/pydocstyle
@@ -121,7 +121,7 @@ repos:
             '--ignore=D103,D107,D213',
           ]
 -   repo: https://github.com/PyCQA/pylint
-    rev: v3.2.3
+    rev: v3.3.0
     hooks:
       - id: pylint
         name: pylint
