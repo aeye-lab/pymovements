@@ -64,29 +64,36 @@ class FakeNewsPerception(DatasetDefinition):
     """
 
     name: str = 'FakeNewsPerception'
-    has_files: dict[str, bool] = field(default_factory=lambda: {
-        'gaze': False,
-        'precomputed_events': True,
-        'precomputed_reading_measures': False,
-    })
-    extract: dict[str, bool] = field(default_factory=lambda: {
-        'gaze': False,
-        'precomputed_events': True,
-        'precomputed_reading_measures': False,
-    })
-    mirrors: dict[str, tuple[str, ...]] = field(default_factory=lambda: {
-        'precomputed_events': ('https://doi.org/10.7910/DVN/C1UD2A',),
-    })
-    resources: dict[str, tuple[dict[str, str | None], ...]] = field(default_factory=lambda: {
-        'precomputed_events': (
-            {
-                'resource': 'api/access/datafile/4200164',
-                'filename': 'D3-Eye-movements-data.zip',
-                'md5': 'ab009f28cd703f433e9b6c02b0bb38d2'
-            },
-        ),
-    }
-)
+    has_files: dict[str, bool] = field(
+        default_factory=lambda: {
+            'gaze': False,
+            'precomputed_events': True,
+            'precomputed_reading_measures': False,
+        },
+    )
+    extract: dict[str, bool] = field(
+        default_factory=lambda: {
+            'gaze': False,
+            'precomputed_events': True,
+            'precomputed_reading_measures': False,
+        },
+    )
+    mirrors: dict[str, tuple[str, ...]] = field(
+        default_factory=lambda: {
+            'precomputed_events': ('https://doi.org/10.7910/DVN/C1UD2A',),
+        },
+    )
+    resources: dict[str, tuple[dict[str, str | None], ...]] = field(
+        default_factory=lambda: {
+            'precomputed_events': (
+                {
+                    'resource': 'api/access/datafile/4200164',
+                    'filename': 'D3-Eye-movements-data.zip',
+                    'md5': 'ab009f28cd703f433e9b6c02b0bb38d2',
+                },
+            ),
+        },
+    )
     experiment: Experiment = Experiment(
         screen_width_px=1920,
         screen_height_px=1080,
@@ -94,35 +101,46 @@ class FakeNewsPerception(DatasetDefinition):
         screen_height_cm=29.6,
         distance_cm=85,  # Assumed because not specified
         origin='center',  # not specified
-        sampling_rate=600
+        sampling_rate=600,
     )
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
             'precomputed_events': r'P(\d{2})_S(\d{2})_(fake|true)\.csv',
-        }
+        },
     )
     filename_format_dtypes: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
             'precomputed_events': {'subject_id': int, 'session_id': int, 'truth_value': str},
-        }
+        },
     )
     trial_columns: list[str] = field(default_factory=lambda: ['eventType', 'meanPupilDiameter'])
     time_column: str = 'starttime'
     time_unit: str = 'milliseconds'
-    pixel_columns: list[str] = field(default_factory=lambda: ['meanX', 'meanY', 'startSaccadeX', 'startSaccadeY', 'endSaccadeX', 'endSaccadeY'])
-    column_map: dict[str, str] = field(default_factory=lambda: {
-        'meanX': 'x',
-        'meanY': 'y',
-        'startSaccadeX': 'start_x',
-        'startSaccadeY': 'start_y',
-        'endSaccadeX': 'end_x',
-        'endSaccadeY': 'end_y'
-    })
-    custom_read_kwargs: dict[str, Any] = field(default_factory=lambda: {
-        'precomputed_events': {
-            'separator': ',',
-            'null_values': 'NA',
-            'quote_char': '"',
+    pixel_columns: list[str] = field(
+        default_factory=lambda: [
+            'meanX',
+            'meanY',
+            'startSaccadeX',
+            'startSaccadeY',
+            'endSaccadeX',
+            'endSaccadeY'])
+    column_map: dict[str, str] = field(
+        default_factory=lambda: {
+            'meanX': 'x',
+            'meanY': 'y',
+            'startSaccadeX': 'start_x',
+            'startSaccadeY': 'start_y',
+            'endSaccadeX': 'end_x',
+            'endSaccadeY': 'end_y',
         },
-    })
+    )
+    custom_read_kwargs: dict[str, Any] = field(
+        default_factory=lambda: {
+            'precomputed_events': {
+                'separator': ',',
+                'null_values': 'NA',
+                'quote_char': '"',
+            },
+        },
+    )
