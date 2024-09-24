@@ -83,7 +83,7 @@ class FakeNewsPerception(DatasetDefinition):
             'precomputed_events': ('https://doi.org/10.7910/DVN/C1UD2A',),
         },
     )
-    resources: dict[str, tuple[dict[str, str | None], ...]] = field(
+    resources: dict[str, tuple[dict[str, str], ...]] = field(
         default_factory=lambda: {
             'precomputed_events': (
                 {
