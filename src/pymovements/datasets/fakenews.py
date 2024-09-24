@@ -40,6 +40,8 @@ class FakeNewsPerception(DatasetDefinition):
     Eye movements are recorded to provide objective measures
     of information processing during news reading.
 
+    For more details see :cite:p:`FakeNewsPerception`.
+
     Attributes
     ----------
     name : str
@@ -74,13 +76,7 @@ class FakeNewsPerception(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-    extract: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': False,
-            'precomputed_events': True,
-            'precomputed_reading_measures': False,
-        },
-    )
+    extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': True })
     mirrors: dict[str, tuple[str, ...]] = field(
         default_factory=lambda: {
             'precomputed_events': ('https://doi.org/10.7910/DVN/C1UD2A',),
@@ -102,14 +98,14 @@ class FakeNewsPerception(DatasetDefinition):
         screen_height_px=1080,
         screen_width_cm=52.7,
         screen_height_cm=29.6,
-        distance_cm=85,  # Assumed because not specified
-        origin='center',  # not specified
+        distance_cm=None,
+        origin=None,
         sampling_rate=600,
     )
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
-            'precomputed_events': r'P(\d{2})_S(\d{2})_(fake|true)\.csv',
+            'precomputed_events': r'P{subject_id:d}_{session_id:d}_{truth_value:s}.csv',
         },
     )
     filename_format_dtypes: dict[str, dict[str, type]] = field(
@@ -117,33 +113,14 @@ class FakeNewsPerception(DatasetDefinition):
             'precomputed_events': {'subject_id': int, 'session_id': int, 'truth_value': str},
         },
     )
-    trial_columns: list[str] = field(default_factory=lambda: ['eventType', 'meanPupilDiameter'])
+    trial_columns: list[str] = field(default_factory=lambda: [])
     time_column: str = 'starttime'
     time_unit: str = 'milliseconds'
-    pixel_columns: list[str] = field(
-        default_factory=lambda: [
-            'meanX',
-            'meanY',
-            'startSaccadeX',
-            'startSaccadeY',
-            'endSaccadeX',
-            'endSaccadeY',
-        ],
-    )
-    column_map: dict[str, str] = field(
-        default_factory=lambda: {
-            'meanX': 'x',
-            'meanY': 'y',
-            'startSaccadeX': 'start_x',
-            'startSaccadeY': 'start_y',
-            'endSaccadeX': 'end_x',
-            'endSaccadeY': 'end_y',
-        },
-    )
+    pixel_columns: list[str] = field(default_factory=lambda: [])
+    column_map: dict[str, str] = field(default_factory=lambda: {})
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
             'precomputed_events': {
-                'separator': ',',
                 'null_values': 'NA',
                 'quote_char': '"',
             },
