@@ -33,9 +33,12 @@ from pymovements.gaze.experiment import Experiment
 @dataclass
 class FakeNewsPerception(DatasetDefinition):
     """
-    FakeNewsPerception dataset consists of eye movements during reading, perceived believability scores,
-    and questionnaires including Cognitive Reflection Test (CRT) and News-Find-Me (NFM) perception, collected from 25 participants
-    with 60 news items. Eye movements are recorded to provide objective measures of information processing during news reading.
+    FakeNewsPerception dataset :cite:p:`FakeNewsPerception`.
+
+    FakeNewsPerception dataset consists of eye movements during reading,
+    perceived believability scores, and questionnaires including Cognitive Reflection Test (CRT)
+    and News-Find-Me (NFM) perception, collected from 25 participants with 60 news items.
+    Eye movements are recorded to provide objective measures of information processing during news reading.
 
     Attributes
     ----------
@@ -87,9 +90,9 @@ class FakeNewsPerception(DatasetDefinition):
         default_factory=lambda: {
             'precomputed_events': (
                 {
-                    'resource': 'api/access/datafile/4200164',
-                    'filename': 'D3-Eye-movements-data.zip',
-                    'md5': 'ab009f28cd703f433e9b6c02b0bb38d2',
+                'resource': 'api/access/datafile/4200164',
+                'filename': 'D3-Eye-movements-data.zip',
+                'md5': 'ab009f28cd703f433e9b6c02b0bb38d2',
                 },
             ),
         },
