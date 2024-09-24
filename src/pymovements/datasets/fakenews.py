@@ -32,8 +32,7 @@ from pymovements.gaze.experiment import Experiment
 @register_dataset
 @dataclass
 class FakeNewsPerception(DatasetDefinition):
-    """
-    FakeNewsPerception dataset :cite:p:`FakeNewsPerception`.
+    """FakeNewsPerception dataset :cite:p:`FakeNewsPerception`.
 
     FakeNewsPerception dataset consists of eye movements during reading,
     perceived believability scores, and questionnaires including Cognitive Reflection Test (CRT)
