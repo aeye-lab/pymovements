@@ -76,7 +76,7 @@ class FakeNewsPerception(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-    extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': True })
+    extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': True})
     mirrors: dict[str, tuple[str, ...]] = field(
         default_factory=lambda: {
             'precomputed_events': ('https://doi.org/10.7910/DVN/C1UD2A',),
