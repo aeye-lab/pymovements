@@ -38,7 +38,8 @@ class FakeNewsPerception(DatasetDefinition):
     FakeNewsPerception dataset consists of eye movements during reading,
     perceived believability scores, and questionnaires including Cognitive Reflection Test (CRT)
     and News-Find-Me (NFM) perception, collected from 25 participants with 60 news items.
-    Eye movements are recorded to provide objective measures of information processing during news reading.
+    Eye movements are recorded to provide objective measures
+    of information processing during news reading.
 
     Attributes
     ----------
