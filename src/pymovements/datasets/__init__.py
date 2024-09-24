@@ -50,6 +50,7 @@
 from pymovements.datasets.copco import CopCo
 from pymovements.datasets.didec import DIDEC
 from pymovements.datasets.emtec import EMTeC
+from pymovements.datasets.fakenews import FakeNewsPerception
 from pymovements.datasets.gaze_graph import GazeGraph
 from pymovements.datasets.gaze_on_faces import GazeOnFaces
 from pymovements.datasets.gazebase import GazeBase
@@ -66,6 +67,7 @@ __all__ = [
     'CopCo',
     'DIDEC',
     'EMTeC',
+    'FakeNewsPerception',
     'GazeBase',
     'GazeBaseVR',
     'GazeGraph',

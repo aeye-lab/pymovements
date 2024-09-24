@@ -215,7 +215,6 @@ def fixture_dataset_init_kwargs(request):
             filename_format_dtypes={'gaze': {}},
             trial_columns=None,
         ),
-
     }
     yield pm.dataset.Dataset(
         definition=init_param_dict[request.param],
