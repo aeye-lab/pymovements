@@ -26,7 +26,6 @@ import numpy as np
 import polars as pl
 import pytest
 from matplotlib import figure
-from polars import ColumnNotFoundError
 
 from pymovements.gaze import Experiment
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
@@ -197,7 +196,7 @@ def test_heatmap_invalid_position_columns(args):
     else:
         position_column = 'pixel'
 
-    with pytest.raises(ColumnNotFoundError):
+    with pytest.raises(pl.exceptions.ColumnNotFoundError):
         heatmap(gaze=args[0], position_column=position_column, show=False)
 
 
