@@ -46,33 +46,33 @@ class JuDo1000(DatasetDefinition):
 
     Attributes
     ----------
-    name : str
+    name: str
         The name of the dataset.
 
-    gaze_mirrors : tuple[str, ...]
+    mirrors: dict[str, tuple[str, ...]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    gaze_resources : tuple[dict[str, str], ...]
+    resources: dict[str, tuple[dict[str, str], ...]]
         A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    experiment : Experiment
+    experiment: Experiment
         The experiment definition.
 
-    filename_format : str
+    filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_dtypes : dict[str, type], optional
+    filename_format_dtypes: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
-    column_map : dict[str, str]
+    column_map: dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
 
-    custom_read_kwargs : dict[str, Any], optional
+    custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function.
 
     Examples
@@ -98,17 +98,33 @@ class JuDo1000(DatasetDefinition):
 
     name: str = 'JuDo1000'
 
-    gaze_mirrors: tuple[str, ...] = (
-        'https://osf.io/download/',
-    )
-
-    gaze_resources: tuple[dict[str, str], ...] = (
-        {
-            'gaze_resource': '4wy7s/',
-            'filename': 'JuDo1000.zip',
-            'md5': 'b8b9e5bb65b78d6f2bd260451cdd89f8',
+    has_files: dict[str, bool] = field(
+        default_factory=lambda: {
+            'gaze': True,
+            'precomputed_events': False,
+            'precomputed_reading_measures': False,
         },
     )
+    mirrors: dict[str, tuple[str, ...]] = field(
+        default_factory=lambda: {
+            'gaze': (
+                'https://osf.io/download/',
+            ),
+        },
+    )
+
+    resources: dict[str, tuple[dict[str, str], ...]] = field(
+        default_factory=lambda: {
+            'gaze': (
+                {
+                    'resource': '4wy7s/',
+                    'filename': 'JuDo1000.zip',
+                    'md5': 'b8b9e5bb65b78d6f2bd260451cdd89f8',
+                },
+            ),
+        },
+    )
+    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     experiment: Experiment = Experiment(
         screen_width_px=1280,
@@ -120,12 +136,18 @@ class JuDo1000(DatasetDefinition):
         sampling_rate=1000,
     )
 
-    filename_format: str = r'{subject_id:d}_{session_id:d}.csv'
-
-    filename_format_dtypes: dict[str, type] = field(
+    filename_format: dict[str, str] = field(
         default_factory=lambda: {
-            'subject_id': int,
-            'session_id': int,
+            'gaze': r'{subject_id:d}_{session_id:d}.csv',
+        },
+    )
+
+    filename_format_dtypes: dict[str, dict[str, type]] = field(
+        default_factory=lambda: {
+            'gaze': {
+                'subject_id': int,
+                'session_id': int,
+            },
         },
     )
 
@@ -152,17 +174,17 @@ class JuDo1000(DatasetDefinition):
 
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
-            'dtypes': {
-                'trialId': pl.Int64,
-                'pointId': pl.Int64,
-                'time': pl.Int64,
-                'x_left': pl.Float32,
-                'y_left': pl.Float32,
-                'x_right': pl.Float32,
-                'y_right': pl.Float32,
+            'gaze': {
+                'dtypes': {
+                    'trialId': pl.Int64,
+                    'pointId': pl.Int64,
+                    'time': pl.Int64,
+                    'x_left': pl.Float32,
+                    'y_left': pl.Float32,
+                    'x_right': pl.Float32,
+                    'y_right': pl.Float32,
+                },
+                'separator': '\t',
             },
-            'separator': '\t',
         },
     )
-    has_gaze_files: bool = True
-    has_precomputed_event_files: bool = False

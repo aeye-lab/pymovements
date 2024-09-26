@@ -46,34 +46,34 @@ class SBSAT(DatasetDefinition):
 
     Attributes
     ----------
-    name : str
+    name: str
         The name of the dataset.
 
-    gaze_mirrors : tuple[str, ...]
+    mirrors: dict[str, tuple[str, ...]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    gaze_resources : tuple[dict[str, str], ...]
+    resources: dict[str, tuple[dict[str, str], ...]]
         A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    experiment : Experiment
+    experiment: Experiment
         The experiment definition.
 
-    filename_format : str
+    filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_dtypes : dict[str, type], optional
+    filename_format_dtypes: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
-    column_map : dict[str, str]
+    column_map: dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
 
-    custom_read_kwargs : dict[str, Any], optional
+    custom_read_kwargs: dict[str, dict[str, dict[str, Any]]]
         If specified, these keyword arguments will be passed to the file reading function.
 
     Examples
@@ -99,48 +99,73 @@ class SBSAT(DatasetDefinition):
 
     name: str = 'SBSAT'
 
-    has_gaze_files: bool = True
-    gaze_mirrors: tuple[str, ...] = (
-        'https://osf.io/download/',
-    )
-    gaze_resources: tuple[dict[str, str], ...] = (
-        {
-            'gaze_resource': 'jgae7/',
-            'filename': 'sbsat_csvs.zip',
-            'md5': 'a6ef1fb0ecced683cdb489c3bd3e1a5c',
+    has_files: dict[str, bool] = field(
+        default_factory=lambda: {
+            'gaze': True,
+            'precomputed_events': True,
+            'precomputed_reading_measures': False,
         },
     )
-    extract_gaze_data: bool = True
-
-    has_precomputed_event_files: bool = True
-    precomputed_event_mirrors: tuple[str, ...] = (
-        'https://raw.githubusercontent.com/ahnchive/SB-SAT/master/fixation/',
+    mirrors: dict[str, tuple[str, ...]] = field(
+        default_factory=lambda:
+            {
+                'gaze': (
+                    'https://osf.io/download/',
+                ),
+                'precomputed_events': (
+                    'https://raw.githubusercontent.com/ahnchive/SB-SAT/master/fixation/',
+                ),
+            },
     )
-    precomputed_event_resources: tuple[dict[str, str], ...] = (
-        {
-            'precomputed_event_resource': '18sat_fixfinal.csv',
-            'filename': '18sat_fixfinal.csv',
-            'md5': '4cf3212a71e6fc2fbe7041ce7c691927',
+    resources: dict[str, tuple[dict[str, str], ...]] = field(
+        default_factory=lambda:
+            {
+                'gaze': (
+                    {
+                        'resource': 'jgae7/',
+                        'filename': 'sbsat_csvs.zip',
+                        'md5': 'a6ef1fb0ecced683cdb489c3bd3e1a5c',
+                    },
+                ),
+                'precomputed_events': (
+                    {
+                        'resource': '18sat_fixfinal.csv',
+                        'filename': '18sat_fixfinal.csv',
+                        'md5': '4cf3212a71e6fc2fbe7041ce7c691927',
+                    },
+                ),
+            },
+    )
+    extract: dict[str, bool] = field(
+        default_factory=lambda: {
+            'gaze': True, 'precomputed_events': False,
         },
     )
-    extract_precomputed_data: bool = False
 
     experiment: Experiment = Experiment(
-        screen_width_px=768,
-        screen_height_px=1024,
-        screen_width_cm=42.4,
-        screen_height_cm=44.5,
+        screen_width_px=1024,
+        screen_height_px=768,
+        screen_width_cm=44.5,
+        screen_height_cm=42.4,
         distance_cm=70,
         origin='center',
         sampling_rate=1000,
     )
 
-    filename_format: str = r'msd{subject_id:d}.csv'
+    filename_format: dict[str, str] = field(
+        default_factory=lambda:
+            {
+                'gaze': r'msd{subject_id:d}.csv',
+                'precomputed_events': '18sat_fixfinal.csv',
+            },
+    )
 
-    filename_format_dtypes: dict[str, type] = field(
-        default_factory=lambda: {
-            'subject_id': int,
-        },
+    filename_format_dtypes: dict[str, dict[str, type]] = field(
+        default_factory=lambda:
+            {
+                'gaze': {'subject_id': int},
+                'precomputed_events': {},
+            },
     )
 
     trial_columns: list[str] = field(
@@ -159,17 +184,21 @@ class SBSAT(DatasetDefinition):
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 
-    custom_read_kwargs: dict[str, Any] = field(
-        default_factory=lambda: {
-            'separator': '\t',
-            'columns': ['time', 'book_name', 'screen_id', 'x_left', 'y_left', 'pupil_left'],
-            'dtypes': {
-                'time': pl.Int64,
-                'book_name': pl.Utf8,
-                'screen_id': pl.Int64,
-                'x_left': pl.Float32,
-                'y_left': pl.Float32,
-                'pupil_left': pl.Float32,
+    custom_read_kwargs: dict[str, dict[str, Any]] = field(
+        default_factory=lambda:
+            {
+                'gaze': {
+                    'separator': '\t',
+                    'columns': ['time', 'book_name', 'screen_id', 'x_left', 'y_left', 'pupil_left'],
+                    'dtypes': {
+                        'time': pl.Int64,
+                        'book_name': pl.Utf8,
+                        'screen_id': pl.Int64,
+                        'x_left': pl.Float32,
+                        'y_left': pl.Float32,
+                        'pupil_left': pl.Float32,
+                    },
+                },
+                'precomputed_events': {'separator': ','},
             },
-        },
     )

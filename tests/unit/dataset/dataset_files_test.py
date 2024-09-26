@@ -207,6 +207,7 @@ def test_load_eyelink_file(tmp_path, read_kwargs):
         fileinfo_row={},
         definition=DatasetDefinition(
             experiment=pm.Experiment(1024, 768, 38, 30, None, 'center', 100),
+            filename_format_dtypes={'gaze': {}, 'precomputed_events': {}},
         ),
         custom_read_kwargs=read_kwargs,
     )
@@ -218,6 +219,39 @@ def test_load_eyelink_file(tmp_path, read_kwargs):
 
     assert_frame_equal(gaze.frame, expected_df, check_column_order=False)
     assert gaze.experiment is not None
+
+
+def test_load_precomputed_rm_file():
+    filepath = 'tests/files/copco_rm_dummy.csv'
+
+    reading_measure = pm.dataset.dataset_files.load_precomputed_reading_measure_file(
+        filepath,
+        custom_read_kwargs={'separator': ','},
+    )
+    expected_df = pl.read_csv(filepath)
+
+    assert_frame_equal(reading_measure.frame, expected_df, check_column_order=False)
+
+
+def test_load_precomputed_rm_file_no_kwargs():
+    filepath = 'tests/files/copco_rm_dummy.csv'
+
+    reading_measure = pm.dataset.dataset_files.load_precomputed_reading_measure_file(
+        filepath,
+    )
+    expected_df = pl.read_csv(filepath)
+
+    assert_frame_equal(reading_measure.frame, expected_df, check_column_order=False)
+
+
+def test_load_precomputed_rm_file_unsupported_file_format():
+    filepath = 'tests/files/copco_rm_dummy.feather'
+
+    with pytest.raises(ValueError) as exc:
+        pm.dataset.dataset_files.load_precomputed_reading_measure_file(filepath)
+
+    msg, = exc.value.args
+    assert msg == 'unsupported file format ".feather". Supported formats are: .csv, .tsv, .txt'
 
 
 def test_load_precomputed_file():

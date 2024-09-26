@@ -17,24 +17,37 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test traceplot."""
+"""Test scanpathplot."""
 from unittest.mock import Mock
 
 import matplotlib.colors
 import matplotlib.pyplot as plt
 import numpy as np
+import polars as pl
 import pytest
 from matplotlib import figure
 
 import pymovements as pm
 
 
+@pytest.fixture(name='events', scope='session')
+def event_fixture():
+    return pm.EventDataFrame(
+        pl.DataFrame(
+            data={
+                'trial': [1, 1],
+                'name': ['foo', 'foo'],
+                'onset': [0, 2],
+                'offset': [1, 3],
+                'duration': [1, 1],
+                'location': [(1, 2), (2, 3)],
+            },
+        ),
+    )
+
+
 @pytest.fixture(name='gaze', scope='session')
 def gaze_fixture():
-    x = np.arange(-100, 100)
-    y = np.arange(-100, 100)
-    arr = np.column_stack((x, y)).transpose()
-
     experiment = pm.Experiment(
         screen_width_px=1280,
         screen_height_px=1024,
@@ -44,7 +57,9 @@ def gaze_fixture():
         origin='upper left',
         sampling_rate=1000.0,
     )
-
+    x = np.arange(-100, 100)
+    y = np.arange(-100, 100)
+    arr = np.column_stack((x, y)).transpose()
     gaze = pm.gaze.from_numpy(
         data=arr,
         schema=['x_pix', 'y_pix'],
@@ -122,26 +137,27 @@ def gaze_fixture():
         ),
     ],
 )
-def test_traceplot_show(gaze, kwargs, monkeypatch):
+def test_scanpathplot_show(events, gaze, kwargs, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
-    pm.plotting.traceplot(gaze=gaze, **kwargs)
+    pm.plotting.scanpathplot(events=events, gaze=gaze, **kwargs)
     plt.close()
     mock.assert_called_once()
 
 
-def test_traceplot_noshow(gaze, monkeypatch):
+def test_scanpathplot_noshow(events, gaze, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
-    pm.plotting.traceplot(gaze=gaze, show=False)
+    pm.plotting.scanpathplot(events=events, gaze=gaze, show=False)
     plt.close()
     mock.assert_not_called()
 
 
-def test_traceplot_save(gaze, monkeypatch, tmp_path):
+def test_scanpathplot_save(events, gaze, monkeypatch, tmp_path):
     mock = Mock()
     monkeypatch.setattr(figure.Figure, 'savefig', mock)
-    pm.plotting.traceplot(
+    pm.plotting.scanpathplot(
+        events=events,
         gaze=gaze,
         show=False,
         savepath=str(
@@ -166,9 +182,9 @@ def test_traceplot_save(gaze, monkeypatch, tmp_path):
         ),
     ],
 )
-def test_traceplot_exceptions(gaze, kwargs, exception, monkeypatch):
+def test_scanpathplot_exceptions(events, gaze, kwargs, exception, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
 
     with pytest.raises(exception):
-        pm.plotting.traceplot(gaze=gaze, **kwargs)
+        pm.plotting.scanpathplot(events=events, gaze=gaze, **kwargs)

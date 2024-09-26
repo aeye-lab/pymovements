@@ -50,34 +50,34 @@ class GazeGraph(DatasetDefinition):
 
     Attributes
     ----------
-    name : str
+    name: str
         The name of the dataset.
 
-    gaze_mirrors : tuple[str, ...]
+    mirrors: dict[str, tuple[str, ...]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    gaze_resources : tuple[dict[str, str], ...]
+    resources: dict[str, tuple[dict[str, str], ...]]
         A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    experiment : Experiment
+    experiment: Experiment
         The experiment definition.
 
-    filename_format : str
+    filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_dtypes : dict[str, type], optional
+    filename_format_dtypes: dict[str, Any]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
-    column_map : dict[str, str]
+    column_map: dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
 
-    custom_read_kwargs : dict[str, Any], optional
+    custom_read_kwargs: dict[str, Any]
         If specified, these keyword arguments will be passed to the file reading function.
 
     Examples
@@ -103,15 +103,31 @@ class GazeGraph(DatasetDefinition):
 
     name: str = 'GazeGraph'
 
-    gaze_mirrors: tuple[str, ...] = (
-        'https://codeload.github.com/GazeGraphResource/GazeGraph/zip/refs/heads/',
+    has_files: dict[str, bool] = field(
+        default_factory=lambda: {
+            'gaze': True,
+            'precomputed_events': False,
+            'precomputed_reading_measures': False,
+        },
     )
 
-    gaze_resources: tuple[dict[str, str], ...] = (
-        {
-            'gaze_resource': 'master',
-            'filename': 'gaze_graph_data.zip',
-            'md5': '181f4b79477cee6e0267482d989610b0',
+    mirrors: dict[str, tuple[str, ...]] = field(
+        default_factory=lambda: {
+            'gaze': ('https://codeload.github.com/GazeGraphResource/GazeGraph/zip/refs/heads/',),
+        },
+    )
+
+    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
+
+    resources: dict[str, tuple[dict[str, str], ...]] = field(
+        default_factory=lambda: {
+            'gaze': (
+                {
+                    'resource': 'master',
+                    'filename': 'gaze_graph_data.zip',
+                    'md5': '181f4b79477cee6e0267482d989610b0',
+                },
+            ),
         },
     )
 
@@ -126,12 +142,18 @@ class GazeGraph(DatasetDefinition):
         sampling_rate=30,
     )
 
-    filename_format: str = r'P{subject_id}_{task}.csv'
-
-    filename_format_dtypes: dict[str, type] = field(
+    filename_format: dict[str, str] = field(
         default_factory=lambda: {
-            'subject_id': int,
-            'task': str,
+            'gaze': r'P{subject_id}_{task}.csv',
+        },
+    )
+
+    filename_format_dtypes: dict[str, dict[str, type]] = field(
+        default_factory=lambda: {
+            'gaze': {
+                'subject_id': int,
+                'task': str,
+            },
         },
     )
 
@@ -145,13 +167,13 @@ class GazeGraph(DatasetDefinition):
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 
-    custom_read_kwargs: dict[str, Any] = field(
+    custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
-            'separator': ',',
-            'has_header': False,
-            'new_columns': ['x', 'y'],
-            'dtypes': [pl.Float32, pl.Float32],
+            'gaze': {
+                'separator': ',',
+                'has_header': False,
+                'new_columns': ['x', 'y'],
+                'dtypes': [pl.Float32, pl.Float32],
+            },
         },
     )
-    has_gaze_files: bool = True
-    has_precomputed_event_files: bool = False

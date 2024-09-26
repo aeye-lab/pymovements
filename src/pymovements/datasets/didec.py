@@ -17,14 +17,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the PoTeC dataset."""
+"""Provides a definition for the DIDEC dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
-
-import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import register_dataset
@@ -33,26 +31,16 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 @register_dataset
-class PoTeC(DatasetDefinition):
-    """PoTeC dataset :cite:p:`potec`.
+class DIDEC(DatasetDefinition):
+    """DIDEC dataset :cite:p:`DIDEC`.
 
-    The Potsdam Textbook Corpus (PoTeC) is a naturalistic eye-tracking-while-reading
-    corpus containing data from 75 participants reading 12 scientific texts.
-    PoTeC is the first naturalistic eye-tracking-while-reading corpus that contains
-    eye-movements from domain-experts as well as novices in a within-participant
-    manipulation: It is based on a 2×2×2 fully-crossed factorial design which includes
-    the participants' level of study and the participants' discipline of study as
-    between-subject factors and the text domain as a within-subject factor. The
-    participants' reading comprehension was assessed by a series of text comprehension
-    questions and their domain knowledge was tested by text-independent
-    background questions for each of the texts. The materials are annotated for a
-    variety of linguistic features at different levels. We envision PoTeC to be used
-    for a wide range of studies including but not limited to analyses of expert and
-    non-expert reading strategies.
+    The DIDEC eye-tracking data has two different data collections, (1) for the
+    description viewing task is more coherent than for the free-viewing task;
+    (2) variation in image descriptions. The data was collected using BeGaze eye-tracker
+    with a sampling rate of 250 Hz. The data collection contains 112 Dutch students,
+    54 students completed the free viewing task, while 58 completed the image description task.
 
-    The corpus and all the accompanying data at all
-    stages of the preprocessing pipeline and all code used to preprocess the data are
-    made available via `GitHub. <https://github.com/DiLi-Lab/PoTeC>`_
+    Check the respective paper for details :cite:p:`DIDEC`.
 
     Attributes
     ----------
@@ -88,11 +76,11 @@ class PoTeC(DatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.PoTeC` definition:
+    :py:class:`~pymovements.DIDEC` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("PoTeC", path='data/PoTeC')
+    >>> dataset = pm.Dataset("DIDEC", path='data/DIDEC')
 
     Download the dataset resources:
 
@@ -106,7 +94,7 @@ class PoTeC(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'PoTeC'
+    name: str = 'DIDEC'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
@@ -118,7 +106,7 @@ class PoTeC(DatasetDefinition):
 
     mirrors: dict[str, tuple[str, ...]] = field(
         default_factory=lambda: {
-            'gaze': ('https://osf.io/download/',),
+            'gaze': ('https://didec.uvt.nl/corpus/',),
         },
     )
 
@@ -126,9 +114,9 @@ class PoTeC(DatasetDefinition):
         default_factory=lambda: {
             'gaze': (
                 {
-                    'resource': 'tgd9q/',
-                    'filename': 'PoTeC.zip',
-                    'md5': 'cffd45039757c3777e2fd130e5d8a2ad',
+                    'resource': 'DIDEC_only_the_eyetracking_data.zip',
+                    'filename': 'DIDEC_only_the_eyetracking_data.zip',
+                    'md5': 'd572b0b41828986ca48a2fcf6966728a',
                 },
             ),
         },
@@ -139,52 +127,80 @@ class PoTeC(DatasetDefinition):
     experiment: Experiment = Experiment(
         screen_width_px=1680,
         screen_height_px=1050,
-        screen_width_cm=47.5,
-        screen_height_cm=30,
-        distance_cm=65,
+        screen_width_cm=47.4,
+        screen_height_cm=29.7,
+        distance_cm=70,
         origin='upper left',
         sampling_rate=1000,
     )
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
-            'gaze': r'reader{subject_id:d}_{text_id}_raw_data.tsv',
+            'gaze':
+                (
+                    r'Ruud_exp{experiment:d}_'
+                    r'list{list:d}_v{version:d}_'
+                    r'ppn{participant:d}_{session:d}_'
+                    r'Trial{trial:d} Samples.txt'
+                ),
         },
     )
 
     filename_format_dtypes: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
             'gaze': {
-                'subject_id': int,
-                'text_id': str,
+                'experiment': int,
+                'list': int,
+                'version': int,
+                'participant': int,
+                'session': int,
+                'trial': int,
             },
         },
     )
 
     trial_columns: list[str] = field(
-        default_factory=lambda: ['subject_id', 'text_id'],
+        default_factory=lambda: ['Stimulus'],
     )
 
-    time_column: str = 'time'
+    time_column: str = 'Time'
 
     time_unit: str = 'ms'
 
     pixel_columns: list[str] = field(
         default_factory=lambda: [
-            'x', 'y',
+            'L POR X [px]',
+            'L POR Y [px]',
+            'R POR X [px]',
+            'R POR Y [px]',
         ],
     )
 
-    custom_read_kwargs: dict[str, Any] = field(
+    column_map: dict[str, str] = field(default_factory=lambda: {})
+
+    custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
             'gaze': {
-                'dtypes': {
-                    'time': pl.Int64,
-                    'x': pl.Float32,
-                    'y': pl.Float32,
-                    'pupil_diameter': pl.Float32,
-                },
                 'separator': '\t',
+                # skip begaze tracker data
+                'skip_rows': 43,
+                'has_header': False,
+                'new_columns': [
+                    'Time',
+                    'Type',
+                    'Trial',
+                    'L POR X [px]',
+                    'L POR Y [px]',
+                    'R POR X [px]',
+                    'R POR Y [px]',
+                    'Timing',
+                    'Pupil Confidence',
+                    'L Plane',
+                    'R Plane',
+                    'L Event Info',
+                    'R Event Info',
+                    'Stimulus',
+                ],
             },
         },
     )

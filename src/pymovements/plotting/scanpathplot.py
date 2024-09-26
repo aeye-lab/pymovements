@@ -17,17 +17,20 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides the traceplot plotting function."""
+"""Provides the scanpath plotting function."""
 from __future__ import annotations
 
+import math
 import sys
 
 import matplotlib.colors
 import matplotlib.pyplot as plt
 import matplotlib.scale
 import numpy as np
+from matplotlib.patches import Circle
 
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
+from pymovements.events import EventDataFrame
+from pymovements.gaze import GazeDataFrame
 from pymovements.utils.plotting import draw_line_data
 from pymovements.utils.plotting import LinearSegmentedColormapType
 from pymovements.utils.plotting import setup_matplotlib
@@ -40,9 +43,10 @@ if 'pytest' in sys.modules:  # pragma: no cover
     matplotlib.use('Agg')
 
 
-def traceplot(
-        gaze: GazeDataFrame,
-        position_column: str = 'pixel',
+def scanpathplot(
+        events: EventDataFrame,
+        gaze: GazeDataFrame | None = None,
+        position_column: str = 'location',
         cval: np.ndarray | None = None,  # pragma: no cover
         cmap: matplotlib.colors.Colormap | None = None,
         cmap_norm: matplotlib.colors.Normalize | str | None = None,
@@ -55,18 +59,24 @@ def traceplot(
         title: str | None = None,
         savepath: str | None = None,
         show: bool = True,
+        color: str = 'blue',
+        alpha: float = 0.5,
+        add_traceplot: bool = False,
+        gaze_position_column: str = 'pixel',
         add_stimulus: bool = False,
         path_to_image_stimulus: str | None = None,
         stimulus_origin: str = 'upper',
 ) -> None:
-    """Plot eye gaze trace from positional data.
+    """Plot scanpath from positional data.
 
     Parameters
     ----------
-    gaze: GazeDataFrame
-        The GazeDataFrame to plot.
+    events: EventDataFrame
+        The EventDataFrame to plot.
+    gaze: GazeDataFrame | None
+        Optional Gaze Dataframe. (default: None)
     position_column: str
-        The column name of the x and y position data (default: 'pixel')
+        The column name of the x and y position data (default: 'location')
     cval: np.ndarray | None
         Line color values. (default: None)
     cmap: matplotlib.colors.Colormap | None
@@ -92,12 +102,20 @@ def traceplot(
         If given, figure will be saved to this path. (default: None)
     show: bool
         If True, figure will be shown. (default: True)
+    color: str
+        Color of fixations. (default: 'blue')
+    alpha: float
+        Alpha value of scanpath. (default: 0.5)
+    add_traceplot: bool
+        Boolean value indicating whether to add traceplot to the scanpath plot. (default: False)
+    gaze_position_column: str
+        Position column in the gaze dataframe. (default: 'pixel')
     add_stimulus: bool
-        Define whether stimulus should be included. (default: False)
+        Boolean value indicationg whether to plot the scanpath on the stimuls. (default: False)
     path_to_image_stimulus: str | None
-        Path to image stimulus. (default: None)
+        Path of the stimulus to be shown. (default: None)
     stimulus_origin: str
-        Origin of stimulus. (default: 'upper')
+        Origin of stimuls to plot on the stimulus. (default: 'upper')
 
     Raises
     ------
@@ -106,8 +124,8 @@ def traceplot(
 
     """
     # pylint: disable=duplicate-code
-    x_signal = gaze.frame[position_column].list.get(0)
-    y_signal = gaze.frame[position_column].list.get(1)
+    x_signal = events.frame[position_column].list.get(0)
+    y_signal = events.frame[position_column].list.get(1)
 
     fig, ax, cmap, cmap_norm, cval, show_cbar = setup_matplotlib(
         x_signal,
@@ -125,19 +143,34 @@ def traceplot(
         pad_factor,
     )
 
-    line = draw_line_data(
-        x_signal,
-        y_signal,
-        ax,
-        cmap,
-        cmap_norm,
-        cval,
-    )
+    for row in events.frame.iter_rows(named=True):
+        fixation = Circle(
+            row[position_column],
+            math.sqrt(row['duration']),
+            color=color,
+            fill=True,
+            alpha=alpha,
+            zorder=10,
+        )
+        ax.add_patch(fixation)
 
-    if show_cbar:
-        # sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
-        # sm.set_array(cval)
-        fig.colorbar(line, label=cbar_label, ax=ax)
+    if add_traceplot:
+        assert gaze
+        gaze_x_signal = gaze.frame[gaze_position_column].list.get(0)
+        gaze_y_signal = gaze.frame[gaze_position_column].list.get(1)
+        line = draw_line_data(
+            gaze_x_signal,
+            gaze_y_signal,
+            ax,
+            cmap,
+            cmap_norm,
+            cval,
+        )
+
+        if show_cbar:
+            # sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
+            # sm.set_array(cval)
+            fig.colorbar(line, label=cbar_label, ax=ax)
 
     if title:
         ax.set_title(title)

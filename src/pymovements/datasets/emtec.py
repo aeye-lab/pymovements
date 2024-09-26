@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the PoTeC dataset."""
+"""Provides a definition for the EMTeC dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -33,26 +33,14 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 @register_dataset
-class PoTeC(DatasetDefinition):
-    """PoTeC dataset :cite:p:`potec`.
+class EMTeC(DatasetDefinition):
+    """EMTeC dataset :cite:p:`EMTeC`.
 
-    The Potsdam Textbook Corpus (PoTeC) is a naturalistic eye-tracking-while-reading
-    corpus containing data from 75 participants reading 12 scientific texts.
-    PoTeC is the first naturalistic eye-tracking-while-reading corpus that contains
-    eye-movements from domain-experts as well as novices in a within-participant
-    manipulation: It is based on a 2×2×2 fully-crossed factorial design which includes
-    the participants' level of study and the participants' discipline of study as
-    between-subject factors and the text domain as a within-subject factor. The
-    participants' reading comprehension was assessed by a series of text comprehension
-    questions and their domain knowledge was tested by text-independent
-    background questions for each of the texts. The materials are annotated for a
-    variety of linguistic features at different levels. We envision PoTeC to be used
-    for a wide range of studies including but not limited to analyses of expert and
-    non-expert reading strategies.
+    This dataset includes eye-tracking data from 107 native speakers of English reading
+    machine generated texts.  Eye movements are recorded at a sampling frequency of 1,000 Hz
+    using an EyeLink 1000 eye tracker and are provided as pixel coordinates.
 
-    The corpus and all the accompanying data at all
-    stages of the preprocessing pipeline and all code used to preprocess the data are
-    made available via `GitHub. <https://github.com/DiLi-Lab/PoTeC>`_
+    Check the respective paper for details :cite:p:`EMTeC`.
 
     Attributes
     ----------
@@ -63,7 +51,8 @@ class PoTeC(DatasetDefinition):
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
+        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+        keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
@@ -82,17 +71,17 @@ class PoTeC(DatasetDefinition):
     column_map: dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
 
-    custom_read_kwargs: dict[str, dict[str, Any]]
+    custom_read_kwargs: dict[str, dict[str, dict[str, Any]]]
         If specified, these keyword arguments will be passed to the file reading function.
 
     Examples
     --------
     Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.PoTeC` definition:
+    :py:class:`~pymovements.EMTeC` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("PoTeC", path='data/PoTeC')
+    >>> dataset = pm.Dataset("EMTeC", path='data/EMTeC')
 
     Download the dataset resources:
 
@@ -106,85 +95,117 @@ class PoTeC(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'PoTeC'
+    name: str = 'EMTeC'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
-            'precomputed_events': False,
+            'precomputed_events': True,
             'precomputed_reading_measures': False,
         },
     )
-
     mirrors: dict[str, tuple[str, ...]] = field(
-        default_factory=lambda: {
-            'gaze': ('https://osf.io/download/',),
-        },
+        default_factory=lambda:
+            {
+                'gaze': (
+                    'https://osf.io/download/',
+                ),
+                'precomputed_events': (
+                    'https://osf.io/download/',
+                ),
+            },
     )
-
     resources: dict[str, tuple[dict[str, str], ...]] = field(
         default_factory=lambda: {
             'gaze': (
                 {
-                    'resource': 'tgd9q/',
-                    'filename': 'PoTeC.zip',
-                    'md5': 'cffd45039757c3777e2fd130e5d8a2ad',
+                    'resource': '374sk/',
+                    'filename': 'subject_level_data.zip',
+                    'md5': 'dca99e47ef43f3696acec4fd70967750',
+                },
+            ),
+            'precomputed_events': (
+                {
+                    'resource': '2hs8p/',
+                    'filename': 'fixations.csv',
+                    'md5': '5e05a364a1d8a044d8b36506aa91437e',
                 },
             ),
         },
     )
-
-    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
+    extract: dict[str, bool] = field(
+        default_factory=lambda: {
+            'gaze': True,
+            'precomputed_events': False,
+        },
+    )
 
     experiment: Experiment = Experiment(
-        screen_width_px=1680,
-        screen_height_px=1050,
-        screen_width_cm=47.5,
-        screen_height_cm=30,
-        distance_cm=65,
-        origin='upper left',
-        sampling_rate=1000,
+        screen_width_px=1280,
+        screen_height_px=1024,
+        screen_width_cm=38.2,
+        screen_height_cm=30.2,
+        distance_cm=60,
+        origin='center',
+        sampling_rate=2000,
     )
 
     filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze': r'reader{subject_id:d}_{text_id}_raw_data.tsv',
-        },
+        default_factory=lambda:
+            {
+                'gaze': r'ET_{subject_id:d}.csv',
+                'precomputed_events': r'fixations.csv',
+            },
     )
 
     filename_format_dtypes: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'subject_id': int,
-                'text_id': str,
+        default_factory=lambda:
+            {
+                'gaze': {'subject_id': int},
+                'precomputed_events': {},
             },
-        },
     )
 
     trial_columns: list[str] = field(
-        default_factory=lambda: ['subject_id', 'text_id'],
+        default_factory=lambda: [
+            'subject_id',
+            'item_id',
+        ],
     )
 
     time_column: str = 'time'
 
     time_unit: str = 'ms'
 
-    pixel_columns: list[str] = field(
-        default_factory=lambda: [
-            'x', 'y',
-        ],
-    )
+    pixel_columns: list[str] = field(default_factory=lambda: ['x', 'y'])
 
-    custom_read_kwargs: dict[str, Any] = field(
+    custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
             'gaze': {
+                'separator': '\t',
+                'columns': [
+                    'item_id',
+                    'TRIAL_ID',
+                    'Trial_Index_',
+                    'model',
+                    'decoding_strategy',
+                    'time',
+                    'x',
+                    'y',
+                    'pupil_right',
+                ],
                 'dtypes': {
+                    'item_id': pl.Utf8,
+                    'TRIAL_ID': pl.Int64,
+                    'Trial_Index_': pl.Int64,
+                    'model': pl.Utf8,
+                    'decoding_strategy': pl.Utf8,
                     'time': pl.Int64,
                     'x': pl.Float32,
                     'y': pl.Float32,
-                    'pupil_diameter': pl.Float32,
+                    'pupil_right': pl.Float32,
                 },
-                'separator': '\t',
             },
+            'precomputed_events': {'separator': '\t'},
         },
     )

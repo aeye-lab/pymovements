@@ -45,33 +45,33 @@ class ToyDatasetEyeLink(DatasetDefinition):
 
     Attributes
     ----------
-    name : str
+    name: str
         The name of the dataset.
 
-    gaze_mirrors : tuple[str, ...]
+    mirrors: dict[str, tuple[str, ...]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    gaze_resources : tuple[dict[str, str], ...]
+    resources: dict[str, tuple[dict[str, str], ...]]
         A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    experiment : Experiment
+    experiment: Experiment
         The experiment definition.
 
-    filename_format : str
+    filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_dtypes : dict[str, type], optional
+    filename_format_dtypes: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
-    column_map : dict[str, str]
+    column_map: dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
 
-    custom_read_kwargs : dict[str, Any], optional
+    custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function.
 
     Examples
@@ -97,18 +97,34 @@ class ToyDatasetEyeLink(DatasetDefinition):
 
     name: str = 'ToyDatasetEyeLink'
 
-    gaze_mirrors: tuple[str, ...] = (
-        'http://github.com/aeye-lab/pymovements-toy-dataset-eyelink/zipball/',
-    )
-
-    gaze_resources: tuple[dict[str, str], ...] = (
-        {
-            'gaze_resource': 'a970d090588542dad745297866e794ab9dad8795/',
-            'filename': 'pymovements-toy-dataset-eyelink.zip',
-            'md5': 'b1d426751403752c8a154fc48d1670ce',
+    has_files: dict[str, bool] = field(
+        default_factory=lambda: {
+            'gaze': True,
+            'precomputed_events': False,
+            'precomputed_reading_measures': False,
         },
     )
-    extract_gaze_data: bool = True
+    mirrors: dict[str, tuple[str, ...]] = field(
+        default_factory=lambda: {
+            'gaze': (
+                'http://github.com/aeye-lab/pymovements-toy-dataset-eyelink/zipball/',
+            ),
+        },
+    )
+
+    resources: dict[str, tuple[dict[str, str], ...]] = field(
+        default_factory=lambda: {
+            'gaze':
+                (
+                    {
+                        'resource': 'a970d090588542dad745297866e794ab9dad8795/',
+                        'filename': 'pymovements-toy-dataset-eyelink.zip',
+                        'md5': 'b1d426751403752c8a154fc48d1670ce',
+                    },
+                ),
+        },
+    )
+    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     experiment: Experiment = Experiment(
         screen_width_px=1280,
@@ -126,12 +142,18 @@ class ToyDatasetEyeLink(DatasetDefinition):
         ),
     )
 
-    filename_format: str = r'subject_{subject_id:d}_session_{session_id:d}.asc'
-
-    filename_format_dtypes: dict[str, type] = field(
+    filename_format: dict[str, str] = field(
         default_factory=lambda: {
-            'subject_id': int,
-            'session_id': int,
+            'gaze': r'subject_{subject_id:d}_session_{session_id:d}.asc',
+        },
+    )
+
+    filename_format_dtypes: dict[str, dict[str, type]] = field(
+        default_factory=lambda: {
+            'gaze': {
+                'subject_id': int,
+                'session_id': int,
+            },
         },
     )
 
@@ -145,51 +167,53 @@ class ToyDatasetEyeLink(DatasetDefinition):
 
     pixel_columns: list[str] = field(default_factory=lambda: ['x_pix', 'y_pix'])
 
-    custom_read_kwargs: dict[str, Any] = field(
+    custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
-            'patterns': [
-                {
-                    'pattern': 'SYNCTIME_READING_SCREEN',
-                    'column': 'task',
-                    'value': 'reading',
-                },
-                {
-                    'pattern': 'SYNCTIME_JUDO',
-                    'column': 'task',
-                    'value': 'judo',
-                },
-                {
-                    'pattern': ('READING[.]STOP', 'JUDO[.]STOP'),
-                    'column': 'task',
-                    'value': None,
-                },
+            'gaze': {
+                'patterns': [
+                    {
+                        'pattern': 'SYNCTIME_READING_SCREEN',
+                        'column': 'task',
+                        'value': 'reading',
+                    },
+                    {
+                        'pattern': 'SYNCTIME_JUDO',
+                        'column': 'task',
+                        'value': 'judo',
+                    },
+                    {
+                        'pattern': ('READING[.]STOP', 'JUDO[.]STOP'),
+                        'column': 'task',
+                        'value': None,
+                    },
 
-                r'TRIALID (?P<trial_id>\d+)',
-                {
-                    'pattern': 'TRIAL_RESULT',
-                    'column': 'trial_id',
-                    'value': None,
-                },
+                    r'TRIALID (?P<trial_id>\d+)',
+                    {
+                        'pattern': 'TRIAL_RESULT',
+                        'column': 'trial_id',
+                        'value': None,
+                    },
 
-                r'SYNCTIME_READING_SCREEN_(?P<screen_id>\d+)',
-                {
-                    'pattern': 'READING[.]STOP',
-                    'column': 'screen_id',
-                    'value': None,
-                },
+                    r'SYNCTIME_READING_SCREEN_(?P<screen_id>\d+)',
+                    {
+                        'pattern': 'READING[.]STOP',
+                        'column': 'screen_id',
+                        'value': None,
+                    },
 
-                r'SYNCTIME.P(?P<point_id>\d+)',
-                {
-                    'pattern': r'P\d[.]STOP',
-                    'column': 'point_id',
-                    'value': None,
+                    r'SYNCTIME.P(?P<point_id>\d+)',
+                    {
+                        'pattern': r'P\d[.]STOP',
+                        'column': 'point_id',
+                        'value': None,
+                    },
+                ],
+                'schema': {
+                    'trial_id': pl.Int64,
+                    'screen_id': pl.Int64,
+                    'point_id': pl.Int64,
+                    'task': pl.Utf8,
                 },
-            ],
-            'schema': {
-                'trial_id': pl.Int64,
-                'screen_id': pl.Int64,
-                'point_id': pl.Int64,
-                'task': pl.Utf8,
             },
         },
     )

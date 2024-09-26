@@ -37,6 +37,7 @@ from pymovements.events.frame import EventDataFrame
 from pymovements.events.precomputed import PrecomputedEventDataFrame
 from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import GazeDataFrame
+from pymovements.reading_measures.frame import ReadingMeasures
 
 
 class Dataset:
@@ -62,6 +63,7 @@ class Dataset:
         self.gaze: list[GazeDataFrame] = []
         self.events: list[EventDataFrame] = []
         self.precomputed_events: list[PrecomputedEventDataFrame] = []
+        self.precomputed_reading_measures: list[ReadingMeasures] = []
 
         if isinstance(definition, str):
             definition = DatasetLibrary.get(definition)()
@@ -124,7 +126,7 @@ class Dataset:
         self.scan()
         self.fileinfo = dataset_files.take_subset(fileinfo=self.fileinfo, subset=subset)
 
-        if self.definition.has_gaze_files:
+        if self.definition.has_files['gaze']:
             self.load_gaze_files(
                 preprocessed=preprocessed,
                 preprocessed_dirname=preprocessed_dirname,
@@ -132,8 +134,12 @@ class Dataset:
             )
 
         # Event files precomuted by authors of the dataset
-        if self.definition.has_precomputed_event_files:
+        if self.definition.has_files['precomputed_events']:
             self.load_precomputed_events()
+
+        # Reading measures files precomuted by authors of the dataset
+        if self.definition.has_files['precomputed_reading_measures']:
+            self.load_precomputed_reading_measures()
 
         # Events extracted previously by pymovements
         if events:
@@ -199,7 +205,7 @@ class Dataset:
         self._check_fileinfo()
         self.gaze = dataset_files.load_gaze_files(
             definition=self.definition,
-            fileinfo=self.fileinfo,
+            fileinfo=self.fileinfo['gaze'],
             paths=self.paths,
             preprocessed=preprocessed,
             preprocessed_dirname=preprocessed_dirname,
@@ -212,8 +218,36 @@ class Dataset:
         self._check_fileinfo()
         self.precomputed_events = dataset_files.load_precomputed_event_files(
             self.definition,
+            self.fileinfo['precomputed_events'],
             self.paths,
         )
+
+    def load_precomputed_reading_measures(self) -> None:
+        """Load precomputed events."""
+        self._check_fileinfo()
+        self.precomputed_reading_measures = dataset_files.load_precomputed_reading_measures(
+            self.definition,
+            self.fileinfo['precomputed_reading_measures'],
+            self.paths,
+        )
+
+    def split_precomputed_events(
+            self,
+            by: list[str] | str,
+    ) -> None:
+        """Split precomputed event data into seperated PrecomputedEventDataFrame's.
+
+        Parameters
+        ----------
+        by: list[str] | str
+            Column's to split dataframe by.
+        """
+        if isinstance(by, str):
+            by = [by]
+        self.precomputed_events = [
+            PrecomputedEventDataFrame(new_frame) for _frame in self.precomputed_events
+            for new_frame in _frame.frame.partition_by(by=by)
+        ]
 
     def load_event_files(
             self,
@@ -248,7 +282,7 @@ class Dataset:
         self._check_fileinfo()
         self.events = dataset_files.load_event_files(
             definition=self.definition,
-            fileinfo=self.fileinfo,
+            fileinfo=self.fileinfo['gaze'],
             paths=self.paths,
             events_dirname=events_dirname,
             extension=extension,
@@ -606,7 +640,8 @@ class Dataset:
 
         disable_progressbar = not verbose
         for file_id, (gaze, fileinfo_row) in tqdm(
-                enumerate(zip(self.gaze, self.fileinfo.to_dicts())), disable=disable_progressbar,
+                enumerate(zip(self.gaze, self.fileinfo['gaze'].to_dicts())),
+                disable=disable_progressbar,
         ):
             gaze.detect(method, eye=eye, clear=clear, **kwargs)
             # workaround until events are fully part of the GazeDataFrame
@@ -651,7 +686,11 @@ class Dataset:
         """
         processor = EventGazeProcessor(event_properties)
 
-        identifier_columns = [column for column in self.fileinfo.columns if column != 'filepath']
+        identifier_columns = [
+            column
+            for column in self.fileinfo['gaze'].columns
+            if column != 'filepath'
+        ]
 
         disable_progressbar = not verbose
         for events, gaze in tqdm(zip(self.events, self.gaze), disable=disable_progressbar):
@@ -789,7 +828,7 @@ class Dataset:
         """
         dataset_files.save_events(
             events=self.events,
-            fileinfo=self.fileinfo,
+            fileinfo=self.fileinfo['gaze'],
             paths=self.paths,
             events_dirname=events_dirname,
             verbose=verbose,
@@ -833,7 +872,7 @@ class Dataset:
         """
         dataset_files.save_preprocessed(
             gaze=self.gaze,
-            fileinfo=self.fileinfo,
+            fileinfo=self.fileinfo['gaze'],
             paths=self.paths,
             preprocessed_dirname=preprocessed_dirname,
             verbose=verbose,

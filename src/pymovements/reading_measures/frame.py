@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,39 +17,21 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides utility functions.
+"""Module for the Reading Measure DataFrame."""
+from __future__ import annotations
 
-.. rubric:: Modules
-
-.. autosummary::
-   :toctree:
-   :template: module.rst
-
-    pymovements.utils.archives
-    pymovements.utils.checks
-    pymovements.utils.decorators
-    pymovements.utils.downloads
-    pymovements.utils.filters
-    pymovements.utils.parsing
-    pymovements.utils.paths
-"""
-from pymovements.utils import aois
-from pymovements.utils import archives
-from pymovements.utils import checks
-from pymovements.utils import decorators
-from pymovements.utils import downloads
-from pymovements.utils import parsing
-from pymovements.utils import paths
-from pymovements.utils import plotting
+import polars as pl
 
 
-__all__ = [
-    'aois',
-    'archives',
-    'checks',
-    'decorators',
-    'downloads',
-    'parsing',
-    'plotting',
-    'paths',
-]
+class ReadingMeasures:
+    """A DataFrame for reading measures.
+
+    Parameters
+    ----------
+    reading_measure_df: pl.DataFrame
+        A reading measure dataframe.
+    """
+
+    def __init__(self, reading_measure_df: pl.DataFrame) -> None:
+
+        self.frame = reading_measure_df.clone()

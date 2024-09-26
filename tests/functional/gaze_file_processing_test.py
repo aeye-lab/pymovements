@@ -33,6 +33,8 @@ import pymovements as pm
         'ipc_monocular',
         'ipc_binocular',
         'eyelink_monocular',
+        'didec',
+        'emtec',
         'hbn',
         'sbsat',
         'gaze_on_faces',
@@ -71,6 +73,22 @@ def fixture_gaze_init_kwargs(request):
             'file': 'tests/files/eyelink_monocular_example.asc',
             'experiment': pm.datasets.ToyDatasetEyeLink().experiment,
         },
+        'didec': {
+            'file': 'tests/files/didec_example.txt',
+            'time_column': pm.datasets.DIDEC().time_column,
+            'time_unit': pm.datasets.DIDEC().time_unit,
+            'pixel_columns': pm.datasets.DIDEC().pixel_columns,
+            'experiment': pm.datasets.DIDEC().experiment,
+            **pm.datasets.DIDEC().custom_read_kwargs['gaze'],
+        },
+        'emtec': {
+            'file': 'tests/files/emtec_example.csv',
+            'time_column': pm.datasets.EMTeC().time_column,
+            'time_unit': pm.datasets.EMTeC().time_unit,
+            'pixel_columns': pm.datasets.EMTeC().pixel_columns,
+            'experiment': pm.datasets.EMTeC().experiment,
+            **pm.datasets.EMTeC().custom_read_kwargs['gaze'],
+        },
         'hbn': {
             'file': 'tests/files/hbn_example.csv',
             'time_column': pm.datasets.HBN().time_column,
@@ -84,7 +102,7 @@ def fixture_gaze_init_kwargs(request):
             'time_unit': pm.datasets.SBSAT().time_unit,
             'pixel_columns': pm.datasets.SBSAT().pixel_columns,
             'experiment': pm.datasets.SBSAT().experiment,
-            **pm.datasets.SBSAT().custom_read_kwargs,
+            **pm.datasets.SBSAT().custom_read_kwargs['gaze'],
         },
         'gaze_on_faces': {
             'file': 'tests/files/gaze_on_faces_example.csv',
@@ -92,7 +110,7 @@ def fixture_gaze_init_kwargs(request):
             'time_unit': pm.datasets.GazeOnFaces().time_unit,
             'pixel_columns': pm.datasets.GazeOnFaces().pixel_columns,
             'experiment': pm.datasets.GazeOnFaces().experiment,
-            **pm.datasets.GazeOnFaces().custom_read_kwargs,
+            **pm.datasets.GazeOnFaces().custom_read_kwargs['gaze'],
         },
         'gazebase': {
             'file': 'tests/files/gazebase_example.csv',
@@ -114,7 +132,7 @@ def fixture_gaze_init_kwargs(request):
             'time_unit': pm.datasets.JuDo1000().time_unit,
             'pixel_columns': pm.datasets.JuDo1000().pixel_columns,
             'experiment': pm.datasets.JuDo1000().experiment,
-            **pm.datasets.JuDo1000().custom_read_kwargs,
+            **pm.datasets.JuDo1000().custom_read_kwargs['gaze'],
         },
         'potec': {
             'file': 'tests/files/potec_example.tsv',
@@ -122,7 +140,7 @@ def fixture_gaze_init_kwargs(request):
             'time_unit': pm.datasets.PoTeC().time_unit,
             'pixel_columns': pm.datasets.PoTeC().pixel_columns,
             'experiment': pm.datasets.PoTeC().experiment,
-            **pm.datasets.PoTeC().custom_read_kwargs,
+            **pm.datasets.PoTeC().custom_read_kwargs['gaze'],
         },
 
     }
