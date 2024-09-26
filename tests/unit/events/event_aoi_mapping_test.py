@@ -112,6 +112,7 @@ EXPECTED_DF = {
             'location_y',
             'area_of_interest',
         ],
+        orient='row',
     ),
     'word': pl.DataFrame(
         [
@@ -212,6 +213,7 @@ EXPECTED_DF = {
             'location_y',
             'area_of_interest',
         ],
+        orient='row',
     ),
 }
 
