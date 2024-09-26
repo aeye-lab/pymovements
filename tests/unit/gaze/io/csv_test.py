@@ -148,4 +148,4 @@ def test_shapes(kwargs, shape):
 )
 def test_schema_overrides(kwargs, schema_overrides):
     gaze_dataframe = pm.gaze.from_csv(**kwargs)
-    assert gaze_dataframe.frame.schema_overrides == schema_overrides
+    assert gaze_dataframe.frame.dtypes == schema_overrides
