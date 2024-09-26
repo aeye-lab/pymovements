@@ -71,7 +71,7 @@ class EMTeC(DatasetDefinition):
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_dtypes: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -183,7 +183,7 @@ class EMTeC(DatasetDefinition):
             },
     )
 
-    filename_format_dtypes: dict[str, dict[str, type]] = field(
+    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda:
             {
                 'gaze': {'subject_id': int},
@@ -219,7 +219,7 @@ class EMTeC(DatasetDefinition):
                     'y',
                     'pupil_right',
                 ],
-                'dtypes': {
+                'schema_overrides': {
                     'item_id': pl.Utf8,
                     'TRIAL_ID': pl.Int64,
                     'Trial_Index_': pl.Int64,

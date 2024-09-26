@@ -74,7 +74,7 @@ class HBN(DatasetDefinition):
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_dtypes: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -173,7 +173,7 @@ class HBN(DatasetDefinition):
         },
     )
 
-    filename_format_dtypes: dict[str, dict[str, type]] = field(
+    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
             'gaze': {
                 'subject_id': str,
@@ -197,7 +197,7 @@ class HBN(DatasetDefinition):
             'gaze': {
                 'separator': ',',
                 'columns': ['time', 'x_pix', 'y_pix'],
-                'dtypes': {
+                'schema_overrides': {
                     'time': pl.Int64,
                     'x_pix': pl.Float32,
                     'y_pix': pl.Float32,

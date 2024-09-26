@@ -73,7 +73,7 @@ class SBSAT(DatasetDefinition):
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_dtypes: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -188,7 +188,7 @@ class SBSAT(DatasetDefinition):
             },
     )
 
-    filename_format_dtypes: dict[str, dict[str, type]] = field(
+    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda:
             {
                 'gaze': {'subject_id': int},
@@ -218,7 +218,7 @@ class SBSAT(DatasetDefinition):
                 'gaze': {
                     'separator': '\t',
                     'columns': ['time', 'book_name', 'screen_id', 'x_left', 'y_left', 'pupil_left'],
-                    'dtypes': {
+                    'schema_overrides': {
                         'time': pl.Int64,
                         'book_name': pl.Utf8,
                         'screen_id': pl.Int64,

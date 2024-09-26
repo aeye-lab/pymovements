@@ -44,7 +44,7 @@ def from_csv(
         distance_column: str | None = None,
         column_map: dict[str, str] | None = None,
         add_columns: dict[str, str] | None = None,
-        column_dtypes: dict[str, type] | None = None,
+        column_schema_overrides: dict[str, type] | None = None,
         **read_csv_kwargs: Any,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
@@ -94,7 +94,7 @@ def from_csv(
     add_columns: dict[str, str] | None
         Dictionary containing columns to add to loaded data frame.
         (default: None)
-    column_dtypes:  dict[str, type] | None
+    column_schema_overrides:  dict[str, type] | None
         Dictionary containing types for columns.
         (default: None)
     **read_csv_kwargs: Any
@@ -180,7 +180,7 @@ def from_csv(
 
     Please be aware that data types are inferred from a fixed number of rows. To ensure
     correct data types, you can pass a dictionary of column names and data types to the
-    `dtypes` keyword argument of :py:func:`polars.read_csv`:
+    `schema_overrides` keyword argument of :py:func:`polars.read_csv`:
 
     >>> from pymovements.gaze.io import from_csv
     >>> import polars as pl
@@ -189,7 +189,7 @@ def from_csv(
     ...     time_column = 'time',
     ...     time_unit='ms',
     ...     pixel_columns = ['x_left_pix','y_left_pix'],
-    ...     dtypes = {'time': pl.Int64, 'x_left_pix': pl.Int64, 'y_left_pix': pl.Int64},
+    ...     schema_overrides = {'time': pl.Int64, 'x_left_pix': pl.Int64, 'y_left_pix': pl.Int64},
     ... )
     >>> gaze.frame
     shape: (10, 2)
@@ -243,10 +243,10 @@ def from_csv(
                 pl.col(column).cast(pl.Float64),
             ])
 
-    if column_dtypes is not None:
+    if column_schema_overrides is not None:
         gaze_data = gaze_data.with_columns([
             pl.col(fileinfo_key).cast(fileinfo_dtype)
-            for fileinfo_key, fileinfo_dtype in column_dtypes.items()
+            for fileinfo_key, fileinfo_dtype in column_schema_overrides.items()
         ])
 
     # Create gaze data frame.
@@ -272,7 +272,7 @@ def from_asc(
         schema: dict[str, Any] | None = None,
         experiment: Experiment | None = None,
         add_columns: dict[str, str] | None = None,
-        column_dtypes: dict[str, type] | None = None,
+        column_schema_overrides: dict[str, type] | None = None,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
 
@@ -290,7 +290,7 @@ def from_asc(
     add_columns: dict[str, str] | None
         Dictionary containing columns to add to loaded data frame.
         (default: None)
-    column_dtypes:  dict[str, type] | None
+    column_schema_overrides:  dict[str, type] | None
         Dictionary containing types for columns.
         (default: None)
 
@@ -342,10 +342,10 @@ def from_asc(
             if column not in gaze_data.columns
         ])
 
-    if column_dtypes is not None:
+    if column_schema_overrides is not None:
         gaze_data = gaze_data.with_columns([
             pl.col(fileinfo_key).cast(fileinfo_dtype)
-            for fileinfo_key, fileinfo_dtype in column_dtypes.items()
+            for fileinfo_key, fileinfo_dtype in column_schema_overrides.items()
         ])
 
     # Create gaze data frame.
@@ -364,7 +364,7 @@ def from_ipc(
         experiment: Experiment | None = None,
         column_map: dict[str, str] | None = None,
         add_columns: dict[str, str] | None = None,
-        column_dtypes: dict[str, type] | None = None,
+        column_schema_overrides: dict[str, type] | None = None,
         **read_ipc_kwargs: Any,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
@@ -382,7 +382,7 @@ def from_ipc(
     add_columns: dict[str, str] | None
         Dictionary containing columns to add to loaded data frame.
         (default: None)
-    column_dtypes:  dict[str, type] | None
+    column_schema_overrides:  dict[str, type] | None
         Dictionary containing types for columns.
         (default: None)
     **read_ipc_kwargs: Any
@@ -438,10 +438,10 @@ def from_ipc(
             if column not in gaze_data.columns
         ])
 
-    if column_dtypes is not None:
+    if column_schema_overrides is not None:
         gaze_data = gaze_data.with_columns([
             pl.col(fileinfo_key).cast(fileinfo_dtype)
-            for fileinfo_key, fileinfo_dtype in column_dtypes.items()
+            for fileinfo_key, fileinfo_dtype in column_schema_overrides.items()
         ])
 
     # Create gaze data frame.

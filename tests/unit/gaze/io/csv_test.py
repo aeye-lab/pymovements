@@ -121,7 +121,7 @@ def test_shapes(kwargs, shape):
 
 
 @pytest.mark.parametrize(
-    ('kwargs', 'dtypes'),
+    ('kwargs', 'schema_overrides'),
     [
         pytest.param(
             {
@@ -131,7 +131,7 @@ def test_shapes(kwargs, shape):
                 'pixel_columns': ['x_left_pix', 'y_left_pix'],
             },
             [pl.Int64, pl.List(pl.Int64)],
-            id='csv_mono_dtypes',
+            id='csv_mono_schema_overrides',
         ),
         pytest.param(
             {
@@ -142,10 +142,10 @@ def test_shapes(kwargs, shape):
                 'position_columns': ['position_x', 'position_y'],
             },
             [pl.Int64, pl.List(pl.Float64), pl.List(pl.Float64)],
-            id='csv_missing_values_dtypes',
+            id='csv_missing_values_schema_overrides',
         ),
     ],
 )
-def test_dtypes(kwargs, dtypes):
+def test_schema_overrides(kwargs, schema_overrides):
     gaze_dataframe = pm.gaze.from_csv(**kwargs)
-    assert gaze_dataframe.frame.dtypes == dtypes
+    assert gaze_dataframe.frame.schema_overrides == schema_overrides
