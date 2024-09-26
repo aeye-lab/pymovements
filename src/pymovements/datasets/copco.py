@@ -164,7 +164,9 @@ class CopCo(DatasetDefinition):
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: [])
+    trial_columns: list[str] = field(
+        default_factory=lambda: ['paragraphid', 'speechid'],
+    )
 
     time_column: str = ''
 
