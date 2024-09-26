@@ -59,7 +59,7 @@ class FakeNewsPerception(DatasetDefinition):
     filename_format : str
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
-    filename_format_dtypes : dict[str, type], optional
+    filename_format_schema_overrides : dict[str, type], optional
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
     column_map : dict[str, str]
@@ -108,7 +108,7 @@ class FakeNewsPerception(DatasetDefinition):
             'precomputed_events': r'P{subject_id:d}_{session_id:d}_{truth_value:s}.csv',
         },
     )
-    filename_format_dtypes: dict[str, dict[str, type]] = field(
+    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
             'precomputed_events': {'subject_id': int, 'session_id': int, 'truth_value': str},
         },
