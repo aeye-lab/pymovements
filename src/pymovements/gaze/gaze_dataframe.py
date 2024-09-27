@@ -29,9 +29,12 @@ from typing import Any
 import numpy as np
 import polars as pl
 
-import pymovements as pm  # pylint: disable=cyclic-import
+from pymovements.events.detection import EventDetectionLibrary
+from pymovements.events.frame import EventDataFrame
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
+from pymovements.measure.library import SampleMeasureLibrary
+from pymovements.stimulus.text import TextStimulus
 from pymovements.utils import checks
 from pymovements.utils.aois import get_aoi
 
@@ -48,7 +51,7 @@ class GazeDataFrame:
         A dataframe to be transformed to a polars dataframe. (default: None)
     experiment : Experiment | None
         The experiment definition. (default: None)
-    events: pm.EventDataFrame | None
+    events: EventDataFrame | None
         A dataframe of events in the gaze signal. (default: None)
     auto_column_detect: bool
         Flag indicating if the column names should be inferred automatically. (default: False)
@@ -181,7 +184,7 @@ class GazeDataFrame:
             self,
             data: pl.DataFrame | None = None,
             experiment: Experiment | None = None,
-            events: pm.EventDataFrame | None = None,
+            events: EventDataFrame | None = None,
             *,
             auto_column_detect: bool = False,
             trial_columns: str | list[str] | None = None,
@@ -272,9 +275,9 @@ class GazeDataFrame:
 
         if events is None:
             if self.trial_columns is None:
-                self.events = pm.EventDataFrame()
+                self.events = EventDataFrame()
             else:  # Ensure that trial columns with correct dtype are present in event dataframe.
-                self.events = pm.EventDataFrame(
+                self.events = EventDataFrame(
                     data=pl.DataFrame(
                         schema={column: self.frame.schema[column] for column in self.trial_columns},
                     ),
@@ -299,7 +302,7 @@ class GazeDataFrame:
         """
         if transforms.TransformLibrary.__contains__(function):
             self.transform(function, **kwargs)
-        elif pm.events.EventDetectionLibrary.__contains__(function):
+        elif EventDetectionLibrary.__contains__(function):
             self.detect(function, **kwargs)
         else:
             raise ValueError(f"unsupported method '{function}'")
@@ -637,7 +640,7 @@ class GazeDataFrame:
 
     def detect(
             self,
-            method: Callable[..., pm.EventDataFrame] | str,
+            method: Callable[..., EventDataFrame] | str,
             *,
             eye: str = 'auto',
             clear: bool = False,
@@ -647,7 +650,7 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        method: Callable[..., pm.EventDataFrame] | str
+        method: Callable[..., EventDataFrame] | str
             The event detection method to be applied.
         eye: str
             Select which eye to choose. Valid options are ``auto``, ``left``, ``right`` or ``None``.
@@ -661,9 +664,9 @@ class GazeDataFrame:
         """
         if self.events is None or clear:
             if self.trial_columns is None:
-                self.events = pm.EventDataFrame()
+                self.events = EventDataFrame()
             else:  # Ensure that trial columns with correct dtype are present in event dataframe.
-                self.events = pm.EventDataFrame(
+                self.events = EventDataFrame(
                     data=pl.DataFrame(
                         schema={column: self.frame.schema[column] for column in self.trial_columns},
                     ),
@@ -671,7 +674,7 @@ class GazeDataFrame:
                 )
 
         if isinstance(method, str):
-            method = pm.events.EventDetectionLibrary.get(method)
+            method = EventDetectionLibrary.get(method)
 
         if self.n_components is not None:
             eye_components = self._infer_eye_components(eye)
@@ -720,7 +723,7 @@ class GazeDataFrame:
                         group_filter_expression = group_filter_expression & (pl.col(name) == value)
 
                 # Select group events
-                group_events = pm.EventDataFrame(self.events.frame.filter(group_filter_expression))
+                group_events = EventDataFrame(self.events.frame.filter(group_filter_expression))
 
                 method_kwargs = self._fill_event_detection_kwargs(
                     method,
@@ -782,7 +785,7 @@ class GazeDataFrame:
         └────────────┘
         """
         if isinstance(method, str):
-            method = pm.measure.SampleMeasureLibrary.get(method)
+            method = SampleMeasureLibrary.get(method)
 
         if 'column_dtype' in inspect.getfullargspec(method).args:
             kwargs['column_dtype'] = self.frame[kwargs['column']].dtype
@@ -816,7 +819,7 @@ class GazeDataFrame:
 
     def map_to_aois(
             self,
-            aoi_dataframe: pm.stimulus.TextStimulus,
+            aoi_dataframe: TextStimulus,
             *,
             eye: str = 'auto',
             gaze_type: str = 'pixel',
@@ -828,7 +831,7 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        aoi_dataframe: pm.stimulus.TextStimulus
+        aoi_dataframe: TextStimulus
             Area of interest dataframe.
         eye: str
             String specificer for inferring eye components. Supported values are: auto, mono, left
@@ -1188,9 +1191,9 @@ class GazeDataFrame:
 
     def _fill_event_detection_kwargs(
             self,
-            method: Callable[..., pm.EventDataFrame],
+            method: Callable[..., EventDataFrame],
             gaze: pl.DataFrame,
-            events: pm.EventDataFrame,
+            events: EventDataFrame,
             eye_components: tuple[int, int] | None,
             **kwargs: Any,
     ) -> dict[str, Any]:
@@ -1198,11 +1201,11 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        method: Callable[..., pm.EventDataFrame]
+        method: Callable[..., EventDataFrame]
             The method for which the keyword argument dictionary will be filled.
         gaze: pl.DataFrame
             The gaze dataframe to be used for filling event detection keyword arguments.
-        events: pm.EventDataFrame
+        events: EventDataFrame
             The event dataframe to be used for filling event detection keyword arguments.
         eye_components: tuple[int, int] | None
             The eye components to be used for filling event detection keyword arguments.

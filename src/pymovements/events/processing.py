@@ -26,10 +26,10 @@ from typing import Any
 
 import polars as pl
 
-import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.events.frame import EventDataFrame
 from pymovements.events.properties import EVENT_PROPERTIES
 from pymovements.exceptions import InvalidProperty
+from pymovements.gaze import GazeDataFrame
 
 
 class EventProcessor:
@@ -137,7 +137,7 @@ class EventGazeProcessor:
     def process(
             self,
             events: EventDataFrame,
-            gaze: pm.GazeDataFrame,
+            gaze: GazeDataFrame,
             identifiers: str | list[str],
             name: str | None = None,
     ) -> pl.DataFrame:
@@ -147,7 +147,7 @@ class EventGazeProcessor:
         ----------
         events: EventDataFrame
             Event data to process event properties from.
-        gaze: pm.GazeDataFrame
+        gaze: GazeDataFrame
             Gaze data to process event properties from.
         identifiers: str | list[str]
             Column names to join on events and gaze dataframes.
