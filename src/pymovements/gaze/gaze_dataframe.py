@@ -703,7 +703,7 @@ class GazeDataFrame:
                 if trial_column not in self.events.frame.columns
             ]
             if missing_trial_columns:
-                raise pl.ColumnNotFoundError(
+                raise pl.exceptions.ColumnNotFoundError(
                     f'trial columns {missing_trial_columns} missing from events, '
                     f'available columns: {self.events.frame.columns}',
                 )
