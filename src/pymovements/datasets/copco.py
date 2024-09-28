@@ -131,7 +131,7 @@ class CopCo(DatasetDefinition):
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': False,
-            'precomputed_events': False,
+            'precomputed_events': True,
             'precomputed_reading_measures': True,
         },
     )
