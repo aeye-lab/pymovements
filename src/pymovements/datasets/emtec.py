@@ -47,6 +47,10 @@ class EMTeC(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    has_files: dict[str, bool]
+        Indicate whether the dataset contains 'gaze', 'precomputed_events', and
+        'precomputed_reading_measures'.
+
     mirrors: dict[str, tuple[str, ...]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
@@ -56,6 +60,9 @@ class EMTeC(DatasetDefinition):
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
+
+    extract: dict[str, bool]
+        Decide whether to extract the data.
 
     experiment: Experiment
         The experiment definition.
@@ -68,10 +75,28 @@ class EMTeC(DatasetDefinition):
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
-    column_map: dict[str, str]
-        The keys are the columns to read, the values are the names to which they should be renamed.
+    trial_columns: list[str]
+            The name of the trial columns in the input data frame. If the list is empty or None,
+            the input data frame is assumed to contain only one trial. If the list is not empty,
+            the input data frame is assumed to contain multiple trials and the transformation
+            methods will be applied to each trial separately.
 
-    custom_read_kwargs: dict[str, dict[str, dict[str, Any]]]
+    time_column: str
+        The name of the timestamp column in the input data frame. This column will be renamed to
+        ``time``.
+
+    time_unit: str
+        The unit of the timestamps in the timestamp column in the input data frame. Supported
+        units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
+        'step' the experiment definition must be specified. All timestamps will be converted to
+        milliseconds.
+
+    pixel_columns: list[str]
+        The name of the pixel position columns in the input data frame. These columns will be
+        nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
+        column will not be created.
+
+    custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function.
 
     Examples
