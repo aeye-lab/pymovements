@@ -71,7 +71,7 @@ class ToyDataset(DatasetDefinition):
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_dtypes: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -166,7 +166,7 @@ class ToyDataset(DatasetDefinition):
         default_factory=lambda: {'gaze': r'trial_{text_id:d}_{page_id:d}.csv'},
     )
 
-    filename_format_dtypes: dict[str, dict[str, type]] = field(
+    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
             'gaze': {
                 'text_id': int,
@@ -189,7 +189,7 @@ class ToyDataset(DatasetDefinition):
         default_factory=lambda: {
             'gaze': {
                 'columns': ['timestamp', 'x', 'y', 'stimuli_x', 'stimuli_y'],
-                'dtypes': {
+                'schema_overrides': {
                     'timestamp': pl.Float64,
                     'x': pl.Float64,
                     'y': pl.Float64,
