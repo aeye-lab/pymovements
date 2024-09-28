@@ -379,7 +379,7 @@ def test_event_dataframe_init_expected_trial_column_list(kwargs, expected_trial_
                 ),
                 'trial_columns': 'trial',
             },
-            pl.DataFrame({'trial': [1, 1]}),
+            pl.DataFrame({'trial': [1, 1]}, schema_overrides={'trial': pl.Int32}),
             id='two_rows_plain_trial',
         ),
     ],

@@ -74,14 +74,16 @@ class CopCo(DatasetDefinition):
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_dtypes: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
+
     trial_columns: list[str]
             The name of the trial columns in the input data frame. If the list is empty or None,
             the input data frame is assumed to contain only one trial. If the list is not empty,
             the input data frame is assumed to contain multiple trials and the transformation
             methods will be applied to each trial separately.
+
     time_column: str
         The name of the timestamp column in the input data frame. This column will be renamed to
         ``time``.
@@ -184,7 +186,7 @@ class CopCo(DatasetDefinition):
         },
     )
 
-    filename_format_dtypes: dict[str, dict[str, type]] = field(
+    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
             'precomputed_events': {},
             'precomputed_reading_measures': {},

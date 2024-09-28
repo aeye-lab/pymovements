@@ -55,7 +55,7 @@ def fixture_dataset_init_kwargs(request):
             pixel_columns=['x_left_pix', 'y_left_pix'],
             experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             filename_format={'gaze': 'monocular_example.csv'},
-            filename_format_dtypes={'gaze': {}},
+            filename_format_schema_overrides={'gaze': {}},
             custom_read_kwargs={'gaze': {}},
         ),
         'csv_binocular': pm.dataset.DatasetDefinition(
@@ -70,7 +70,7 @@ def fixture_dataset_init_kwargs(request):
             pixel_columns=['x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix'],
             position_columns=['x_left_pos', 'y_left_pos', 'x_right_pos', 'y_right_pos'],
             experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
-            filename_format_dtypes={'gaze': {}},
+            filename_format_schema_overrides={'gaze': {}},
             custom_read_kwargs={'gaze': {}},
         ),
         'ipc_monocular': pm.dataset.DatasetDefinition(
@@ -81,7 +81,7 @@ def fixture_dataset_init_kwargs(request):
             },
             filename_format={'gaze': 'monocular_example.feather'},
             experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
-            filename_format_dtypes={'gaze': {}},
+            filename_format_schema_overrides={'gaze': {}},
             custom_read_kwargs={'gaze': {}},
         ),
         'ipc_binocular': pm.dataset.DatasetDefinition(
@@ -92,7 +92,7 @@ def fixture_dataset_init_kwargs(request):
             },
             filename_format={'gaze': 'binocular_example.feather'},
             experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
-            filename_format_dtypes={'gaze': {}},
+            filename_format_schema_overrides={'gaze': {}},
             custom_read_kwargs={'gaze': {}},
         ),
         'emtec': pm.datasets.EMTeC(
@@ -104,7 +104,7 @@ def fixture_dataset_init_kwargs(request):
             filename_format={'gaze': 'emtec_example.csv'},
             time_column=pm.datasets.EMTeC().time_column,
             time_unit=pm.datasets.EMTeC().time_unit,
-            filename_format_dtypes={'gaze': {}},
+            filename_format_schema_overrides={'gaze': {}},
             trial_columns=None,
         ),
         'didec': pm.datasets.DIDEC(
@@ -116,7 +116,7 @@ def fixture_dataset_init_kwargs(request):
             filename_format={'gaze': 'didec_example.txt'},
             time_column=pm.datasets.DIDEC().time_column,
             time_unit=pm.datasets.DIDEC().time_unit,
-            filename_format_dtypes={'gaze': {}},
+            filename_format_schema_overrides={'gaze': {}},
             trial_columns=None,
         ),
         'hbn': pm.datasets.HBN(
@@ -128,7 +128,7 @@ def fixture_dataset_init_kwargs(request):
             filename_format={'gaze': 'hbn_example.csv'},
             time_column=pm.datasets.HBN().time_column,
             time_unit=pm.datasets.HBN().time_unit,
-            filename_format_dtypes={'gaze': {}},
+            filename_format_schema_overrides={'gaze': {}},
             trial_columns=None,
         ),
         'sbsat': pm.datasets.SBSAT(
@@ -140,7 +140,7 @@ def fixture_dataset_init_kwargs(request):
             filename_format={'gaze': 'sbsat_example.csv'},
             time_column=pm.datasets.SBSAT().time_column,
             time_unit=pm.datasets.SBSAT().time_unit,
-            filename_format_dtypes={'gaze': {}},
+            filename_format_schema_overrides={'gaze': {}},
             trial_columns=None,
         ),
         'gaze_on_faces': pm.datasets.GazeOnFaces(
@@ -152,7 +152,7 @@ def fixture_dataset_init_kwargs(request):
             filename_format={'gaze': 'gaze_on_faces_example.csv'},
             time_column=pm.datasets.GazeOnFaces().time_column,
             time_unit=pm.datasets.GazeOnFaces().time_unit,
-            filename_format_dtypes={'gaze': {}},
+            filename_format_schema_overrides={'gaze': {}},
             trial_columns=None,
         ),
         'gazebase': pm.datasets.GazeBase(
@@ -164,7 +164,7 @@ def fixture_dataset_init_kwargs(request):
             filename_format={'gaze': 'gazebase_example.csv'},
             time_column=pm.datasets.GazeBase().time_column,
             time_unit=pm.datasets.GazeBase().time_unit,
-            filename_format_dtypes={'gaze': {}},
+            filename_format_schema_overrides={'gaze': {}},
             trial_columns=None,
         ),
         'gazebase_vr': pm.datasets.GazeBaseVR(
@@ -176,7 +176,7 @@ def fixture_dataset_init_kwargs(request):
             filename_format={'gaze': 'gazebase_vr_example.csv'},
             time_column=pm.datasets.GazeBaseVR().time_column,
             time_unit=pm.datasets.GazeBaseVR().time_unit,
-            filename_format_dtypes={'gaze': {}},
+            filename_format_schema_overrides={'gaze': {}},
             trial_columns=None,
         ),
         'gazegraph': pm.datasets.GazeGraph(
@@ -188,7 +188,7 @@ def fixture_dataset_init_kwargs(request):
             filename_format={'gaze': 'gazegraph_example.csv'},
             time_column=pm.datasets.GazeGraph().time_column,
             time_unit=pm.datasets.GazeGraph().time_unit,
-            filename_format_dtypes={'gaze': {}},
+            filename_format_schema_overrides={'gaze': {}},
             trial_columns=None,
         ),
         'judo1000': pm.datasets.JuDo1000(
@@ -200,7 +200,7 @@ def fixture_dataset_init_kwargs(request):
             filename_format={'gaze': 'judo1000_example.csv'},
             time_column=pm.datasets.JuDo1000().time_column,
             time_unit=pm.datasets.JuDo1000().time_unit,
-            filename_format_dtypes={'gaze': {}},
+            filename_format_schema_overrides={'gaze': {}},
             trial_columns=['trial_id'],
         ),
         'potec': pm.datasets.PoTeC(
@@ -212,7 +212,7 @@ def fixture_dataset_init_kwargs(request):
             filename_format={'gaze': 'potec_example.tsv'},
             time_column=pm.datasets.PoTeC().time_column,
             time_unit=pm.datasets.PoTeC().time_unit,
-            filename_format_dtypes={'gaze': {}},
+            filename_format_schema_overrides={'gaze': {}},
             trial_columns=None,
         ),
     }

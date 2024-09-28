@@ -109,14 +109,14 @@ def mock_toy(
             'precomputed_reading_measures': False,
         },
         extract={'gaze': True, 'precomputed_events': True},
-        filename_format_dtypes={
+        filename_format_schema_overrides={
             'gaze': {'subject_id': pl.Int64},
             'precomputed_events': {'subject_id': pl.Int64},
             'precomputed_reading_measures': {'subject_id': pl.Int64},
         },
 ):
 
-    if filename_format_dtypes['precomputed_events']:
+    if filename_format_schema_overrides['precomputed_events']:
         subject_ids = list(range(1, 21))
         fileinfo = pl.DataFrame(
             data={'subject_id': subject_ids},
@@ -330,7 +330,7 @@ def mock_toy(
             'precomputed_events': r'{subject_id:d}.' + raw_fileformat,
             'precomputed_reading_measures': r'{subject_id:d}.' + raw_fileformat,
         },
-        filename_format_dtypes=filename_format_dtypes,
+        filename_format_schema_overrides=filename_format_schema_overrides,
         custom_read_kwargs={
             'gaze': {},
             'precomputed_events': {},
@@ -739,7 +739,7 @@ def test_clip(gaze_dataset_configuration):
 
     original_schema = dataset.gaze[0].schema
 
-    dataset.clip(-1000, 1000, input_column='pixel', output_column='pixel_clipped', n_components=4)
+    dataset.clip(-1000, 1000, input_column='pixel', output_column='pixel_clipped', n_components=2)
 
     expected_schema = {**original_schema, 'pixel_clipped': pl.List(pl.Float64)}
     for result_gaze_df in dataset.gaze:
@@ -1802,7 +1802,7 @@ def precomputed_fixture_dataset(request, tmp_path):
                 'precomputed_reading_measures': False,
             },
             extract={'precomputed_events': False},
-            filename_format_dtypes={'precomputed_events': {}},
+            filename_format_schema_overrides={'precomputed_events': {}},
         )
     else:
         raise ValueError(f'{request.param} not supported as dataset mock')
@@ -1874,7 +1874,10 @@ def precomputed_rm_fixture_dataset(request, tmp_path):
                 'precomputed_reading_measures': True,
             },
             extract={'precomputed_reading_measures': False},
-            filename_format_dtypes={'precomputed_events': {}, 'precomputed_reading_measures': {}},
+            filename_format_schema_overrides={
+                'precomputed_events': {},
+                'precomputed_reading_measures': {},
+            },
         )
     else:
         raise ValueError(f'{request.param} not supported as dataset mock')
