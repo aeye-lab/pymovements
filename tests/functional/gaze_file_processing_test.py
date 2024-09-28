@@ -102,6 +102,7 @@ def fixture_gaze_init_kwargs(request):
             'time_unit': pm.datasets.SBSAT().time_unit,
             'pixel_columns': pm.datasets.SBSAT().pixel_columns,
             'experiment': pm.datasets.SBSAT().experiment,
+            'trial_columns': pm.datasets.SBSAT().trial_columns,
             **pm.datasets.SBSAT().custom_read_kwargs['gaze'],
         },
         'gaze_on_faces': {
@@ -151,7 +152,7 @@ def test_gaze_file_processing(gaze_from_kwargs):
     # Load in gaze file.
     file_extension = os.path.splitext(gaze_from_kwargs['file'])[1]
     gaze = None
-    if file_extension in {'.txt', '.csv', '.tsv'}:
+    if file_extension in {'.csv', '.tsv', '.txt'}:
         gaze = pm.gaze.from_csv(**gaze_from_kwargs)
     elif file_extension in {'.feather', '.ipc'}:
         gaze = pm.gaze.from_ipc(**gaze_from_kwargs)
@@ -165,6 +166,7 @@ def test_gaze_file_processing(gaze_from_kwargs):
         gaze.pix2deg()
     gaze.pos2vel()
     gaze.pos2acc()
+    gaze.resample(resampling_rate=2000)
 
     assert 'position' in gaze.columns
     assert 'velocity' in gaze.columns
