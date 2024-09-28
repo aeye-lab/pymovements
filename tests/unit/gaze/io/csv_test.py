@@ -65,7 +65,7 @@ import pymovements as pm
                 'time_column': pm.datasets.SBSAT().time_column,
                 'time_unit': pm.datasets.SBSAT().time_unit,
                 'pixel_columns': pm.datasets.SBSAT().pixel_columns,
-                **pm.datasets.SBSAT().custom_read_kwargs,
+                **pm.datasets.SBSAT().custom_read_kwargs['gaze'],
             },
             (10, 5),
             id='sbsat_dataset_example',
@@ -76,7 +76,7 @@ import pymovements as pm
                 'time_column': pm.datasets.GazeBase().time_column,
                 'time_unit': pm.datasets.GazeBase().time_unit,
                 'position_columns': pm.datasets.GazeBase().position_columns,
-                **pm.datasets.GazeBase().custom_read_kwargs,
+                **pm.datasets.GazeBase().custom_read_kwargs['gaze'],
             },
             (10, 7),
             id='gazebase_dataset_example',
@@ -87,7 +87,7 @@ import pymovements as pm
                 'time_column': pm.datasets.GazeOnFaces().time_column,
                 'time_unit': pm.datasets.GazeOnFaces().time_unit,
                 'pixel_columns': pm.datasets.GazeOnFaces().pixel_columns,
-                **pm.datasets.GazeOnFaces().custom_read_kwargs,
+                **pm.datasets.GazeOnFaces().custom_read_kwargs['gaze'],
             },
             (10, 1),
             id='gaze_on_faces_dataset_example',
@@ -108,7 +108,7 @@ import pymovements as pm
                 'time_column': pm.datasets.JuDo1000().time_column,
                 'time_unit': pm.datasets.JuDo1000().time_unit,
                 'pixel_columns': pm.datasets.JuDo1000().pixel_columns,
-                **pm.datasets.JuDo1000().custom_read_kwargs,
+                **pm.datasets.JuDo1000().custom_read_kwargs['gaze'],
             },
             (10, 4),
             id='judo1000_dataset_example',
@@ -121,7 +121,7 @@ def test_shapes(kwargs, shape):
 
 
 @pytest.mark.parametrize(
-    ('kwargs', 'dtypes'),
+    ('kwargs', 'schema_overrides'),
     [
         pytest.param(
             {
@@ -131,7 +131,7 @@ def test_shapes(kwargs, shape):
                 'pixel_columns': ['x_left_pix', 'y_left_pix'],
             },
             [pl.Int64, pl.List(pl.Int64)],
-            id='csv_mono_dtypes',
+            id='csv_mono_schema_overrides',
         ),
         pytest.param(
             {
@@ -142,10 +142,10 @@ def test_shapes(kwargs, shape):
                 'position_columns': ['position_x', 'position_y'],
             },
             [pl.Int64, pl.List(pl.Float64), pl.List(pl.Float64)],
-            id='csv_missing_values_dtypes',
+            id='csv_missing_values_schema_overrides',
         ),
     ],
 )
-def test_dtypes(kwargs, dtypes):
+def test_schema_overrides(kwargs, schema_overrides):
     gaze_dataframe = pm.gaze.from_csv(**kwargs)
-    assert gaze_dataframe.frame.dtypes == dtypes
+    assert gaze_dataframe.frame.dtypes == schema_overrides

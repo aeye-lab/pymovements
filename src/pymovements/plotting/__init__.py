@@ -32,12 +32,14 @@
 """
 from pymovements.plotting.heatmap import heatmap
 from pymovements.plotting.main_sequence_plot import main_sequence_plot
+from pymovements.plotting.scanpathplot import scanpathplot
 from pymovements.plotting.traceplot import traceplot
 from pymovements.plotting.tsplot import tsplot
 
 __all__ = [
     'heatmap',
     'main_sequence_plot',
+    'scanpathplot',
     'traceplot',
     'tsplot',
 ]

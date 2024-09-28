@@ -17,14 +17,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the GazeOnFaces dataset."""
+"""Provides a definition for the CopCo dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
-
-import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import register_dataset
@@ -33,18 +31,19 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 @register_dataset
-class GazeOnFaces(DatasetDefinition):
-    """GazeOnFaces dataset :cite:p:`GazeOnFaces`.
+class CopCo(DatasetDefinition):
+    """CopCo dataset :cite:p:`CopCoL1Hollenstein`.
 
-    This dataset includes monocular eye tracking data from single participants in a single
-    session. Eye movements are recorded at a sampling frequency of 60 Hz
-    using an EyeLink 1000 video-based eye tracker and are provided as pixel coordinates.
+    This dataset includes monocular eye tracking data from a single participants in a single
+    session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
+    eye tracker and are provided as pixel coordinates.
 
-    Participants were sat 57 cm away from the screen (19inch LCD monitor,
-    screen res=1280×1024, 60 Hz). Recordings of the eye movements of one eye in monocular
-    pupil/corneal reflection tracking mode.
+    The participant is instructed to read texts and answer questions.
 
-    Check the respective paper for details :cite:p:`GazeOnFaces`.
+    The dataset includes the data from three papers:
+        the L1 data: :cite:p:`CopCoL1Hollenstein`,
+        the L1 data with dylsexia: :cite:p:`CopCoL1DysBjornsdottir`,
+        the L2 data: :cite:p:`CopCoL2`,
 
     Attributes
     ----------
@@ -58,24 +57,24 @@ class GazeOnFaces(DatasetDefinition):
     mirrors: dict[str, tuple[str, ...]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources: dict[str, tuple[dict[str, str], ...]]
+    resources: dict[str, tuple[dict[str, str | None], ...]]
         A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    extract: dict[str, bool]
-        Decide whether to extract the data.
-
     experiment: Experiment
         The experiment definition.
+
+    extract: dict[str, bool]
+        Decide whether to extract the data.
 
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides : dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -85,11 +84,11 @@ class GazeOnFaces(DatasetDefinition):
             the input data frame is assumed to contain multiple trials and the transformation
             methods will be applied to each trial separately.
 
-    time_column: Any
+    time_column: str
         The name of the timestamp column in the input data frame. This column will be renamed to
         ``time``.
 
-    time_unit: Any
+    time_unit: str
         The unit of the timestamps in the timestamp column in the input data frame. Supported
         units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
         'step' the experiment definition must be specified. All timestamps will be converted to
@@ -103,17 +102,17 @@ class GazeOnFaces(DatasetDefinition):
     column_map: dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
 
-    custom_read_kwargs: dict[str, dict[str, Any]]
+    custom_read_kwargs: dict[str, Any]
         If specified, these keyword arguments will be passed to the file reading function.
 
     Examples
     --------
     Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.GazeOnFaces` definition:
+    :py:class:`~pymovements.CopCo` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("GazeOnFaces", path='data/GazeOnFaces')
+    >>> dataset = pm.Dataset("CopCo", path='data/CopCo')
 
     Download the dataset resources:
 
@@ -127,80 +126,92 @@ class GazeOnFaces(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'GazeOnFaces'
+    name: str = 'CopCo'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
-            'gaze': True,
+            'gaze': False,
             'precomputed_events': False,
-            'precomputed_reading_measures': False,
+            'precomputed_reading_measures': True,
         },
     )
-
     mirrors: dict[str, tuple[str, ...]] = field(
         default_factory=lambda: {
-            'gaze': (
-                'https://uncloud.univ-nantes.fr/index.php/s/',
-            ),
+            'precomputed_events': ('https://files.de-1.osf.io/',),
+            'precomputed_reading_measures': ('https://files.de-1.osf.io/',),
         },
     )
-
-    resources: dict[str, tuple[dict[str, str], ...]] = field(
+    resources: dict[str, tuple[dict[str, str | None], ...]] = field(
         default_factory=lambda: {
-            'gaze': (
+            'precomputed_events': (
                 {
-                    'resource': '8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip',
-                    'filename': 'gaze_csv.zip',
-                    'md5': 'fe219f07c9253cd9aaee6bd50233c034',
+                    'resource':
+                    'v1/resources/ud8s5/providers/osfstorage/61e13174c99ebd02df017c14/?zip=',
+                    'filename': 'FixationReports.zip',
+                    'md5': None,  # type:ignore
+                },
+            ),
+            'precomputed_reading_measures': (
+                {
+                    'resource':
+                    'v1/resources/ud8s5/providers/osfstorage/61e1317cc99ebd02df017c4f/?zip=',
+                    'filename': 'ReadingMeasures.zip',
+                    'md5': None,  # type:ignore
                 },
             ),
         },
     )
 
-    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
-
     experiment: Experiment = Experiment(
-        screen_width_px=1280,
-        screen_height_px=1024,
-        screen_width_cm=38,
-        screen_height_cm=30,
-        distance_cm=57,
+        screen_width_px=1920,
+        screen_height_px=1080,
+        screen_width_cm=59.,
+        screen_height_cm=33.5,
+        distance_cm=85,
         origin='center',
-        sampling_rate=60,
+        sampling_rate=1000,
+    )
+
+    extract: dict[str, bool] = field(
+        default_factory=lambda: {
+            'precomputed_events': True,
+            'precomputed_reading_measures': True,
+        },
     )
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
-            'gaze': r'gaze_sub{sub_id:d}_trial{trial_id:d}.csv',
+            'precomputed_events': r'FIX_report_P{subject_id:d}.txt',
+            'precomputed_reading_measures': r'P{subject_id:d}.csv',
         },
     )
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
-            'gaze': {
-                'sub_id': int,
-                'trial_id': int,
-            },
+            'precomputed_events': {},
+            'precomputed_reading_measures': {},
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: ['sub_id', 'trial_id'])
+    trial_columns: list[str] = field(
+        default_factory=lambda: ['paragraphid', 'speechid'],
+    )
 
-    time_column: Any = None
+    time_column: str = ''
 
-    time_unit: Any = None
+    time_unit: str = ''
 
-    pixel_columns: list[str] = field(default_factory=lambda: ['x', 'y'])
+    pixel_columns: list[str] = field(default_factory=lambda: [])
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 
-    custom_read_kwargs: dict[str, dict[str, Any]] = field(
+    custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
-            'gaze': {
-                'separator': ',',
-                'has_header': False,
-                'new_columns': ['x', 'y'],
-                'schema_overrides': [pl.Float32, pl.Float32],
+            'precomputed_events': {
+                'separator': '\t',
+                'null_values': '.',
+                'quote_char': '"',
             },
+            'precomputed_reading_measures': {},
         },
     )

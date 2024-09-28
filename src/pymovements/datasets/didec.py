@@ -17,14 +17,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the GazeOnFaces dataset."""
+"""Provides a definition for the DIDEC dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
-
-import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import register_dataset
@@ -33,18 +31,16 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 @register_dataset
-class GazeOnFaces(DatasetDefinition):
-    """GazeOnFaces dataset :cite:p:`GazeOnFaces`.
+class DIDEC(DatasetDefinition):
+    """DIDEC dataset :cite:p:`DIDEC`.
 
-    This dataset includes monocular eye tracking data from single participants in a single
-    session. Eye movements are recorded at a sampling frequency of 60 Hz
-    using an EyeLink 1000 video-based eye tracker and are provided as pixel coordinates.
+    The DIDEC eye-tracking data has two different data collections, (1) for the
+    description viewing task is more coherent than for the free-viewing task;
+    (2) variation in image descriptions. The data was collected using BeGaze eye-tracker
+    with a sampling rate of 250 Hz. The data collection contains 112 Dutch students,
+    54 students completed the free viewing task, while 58 completed the image description task.
 
-    Participants were sat 57 cm away from the screen (19inch LCD monitor,
-    screen res=1280×1024, 60 Hz). Recordings of the eye movements of one eye in monocular
-    pupil/corneal reflection tracking mode.
-
-    Check the respective paper for details :cite:p:`GazeOnFaces`.
+    Check the respective paper for details :cite:p:`DIDEC`.
 
     Attributes
     ----------
@@ -59,23 +55,22 @@ class GazeOnFaces(DatasetDefinition):
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
-        keys:
+        A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    extract: dict[str, bool]
-        Decide whether to extract the data.
-
     experiment: Experiment
         The experiment definition.
+
+    extract: dict[str, bool]
+        Decide whether to extract the data.
 
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides : dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -85,11 +80,11 @@ class GazeOnFaces(DatasetDefinition):
             the input data frame is assumed to contain multiple trials and the transformation
             methods will be applied to each trial separately.
 
-    time_column: Any
+    time_column: str
         The name of the timestamp column in the input data frame. This column will be renamed to
         ``time``.
 
-    time_unit: Any
+    time_unit: str
         The unit of the timestamps in the timestamp column in the input data frame. Supported
         units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
         'step' the experiment definition must be specified. All timestamps will be converted to
@@ -109,11 +104,11 @@ class GazeOnFaces(DatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.GazeOnFaces` definition:
+    :py:class:`~pymovements.DIDEC` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("GazeOnFaces", path='data/GazeOnFaces')
+    >>> dataset = pm.Dataset("DIDEC", path='data/DIDEC')
 
     Download the dataset resources:
 
@@ -127,7 +122,7 @@ class GazeOnFaces(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'GazeOnFaces'
+    name: str = 'DIDEC'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
@@ -139,9 +134,7 @@ class GazeOnFaces(DatasetDefinition):
 
     mirrors: dict[str, tuple[str, ...]] = field(
         default_factory=lambda: {
-            'gaze': (
-                'https://uncloud.univ-nantes.fr/index.php/s/',
-            ),
+            'gaze': ('https://didec.uvt.nl/corpus/',),
         },
     )
 
@@ -149,58 +142,93 @@ class GazeOnFaces(DatasetDefinition):
         default_factory=lambda: {
             'gaze': (
                 {
-                    'resource': '8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip',
-                    'filename': 'gaze_csv.zip',
-                    'md5': 'fe219f07c9253cd9aaee6bd50233c034',
+                    'resource': 'DIDEC_only_the_eyetracking_data.zip',
+                    'filename': 'DIDEC_only_the_eyetracking_data.zip',
+                    'md5': 'd572b0b41828986ca48a2fcf6966728a',
                 },
             ),
         },
     )
 
-    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
-
     experiment: Experiment = Experiment(
-        screen_width_px=1280,
-        screen_height_px=1024,
-        screen_width_cm=38,
-        screen_height_cm=30,
-        distance_cm=57,
-        origin='center',
-        sampling_rate=60,
+        screen_width_px=1680,
+        screen_height_px=1050,
+        screen_width_cm=47.4,
+        screen_height_cm=29.7,
+        distance_cm=70,
+        origin='upper left',
+        sampling_rate=1000,
     )
+
+    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
-            'gaze': r'gaze_sub{sub_id:d}_trial{trial_id:d}.csv',
+            'gaze':
+                (
+                    r'Ruud_exp{experiment:d}_'
+                    r'list{list:d}_v{version:d}_'
+                    r'ppn{participant:d}_{session:d}_'
+                    r'Trial{trial:d} Samples.txt'
+                ),
         },
     )
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
             'gaze': {
-                'sub_id': int,
-                'trial_id': int,
+                'experiment': int,
+                'list': int,
+                'version': int,
+                'participant': int,
+                'session': int,
+                'trial': int,
             },
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: ['sub_id', 'trial_id'])
+    trial_columns: list[str] = field(
+        default_factory=lambda: ['Stimulus'],
+    )
 
-    time_column: Any = None
+    time_column: str = 'Time'
 
-    time_unit: Any = None
+    time_unit: str = 'ms'
 
-    pixel_columns: list[str] = field(default_factory=lambda: ['x', 'y'])
+    pixel_columns: list[str] = field(
+        default_factory=lambda: [
+            'L POR X [px]',
+            'L POR Y [px]',
+            'R POR X [px]',
+            'R POR Y [px]',
+        ],
+    )
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
             'gaze': {
-                'separator': ',',
+                'separator': '\t',
+                # skip begaze tracker data
+                'skip_rows': 43,
                 'has_header': False,
-                'new_columns': ['x', 'y'],
-                'schema_overrides': [pl.Float32, pl.Float32],
+                'new_columns': [
+                    'Time',
+                    'Type',
+                    'Trial',
+                    'L POR X [px]',
+                    'L POR Y [px]',
+                    'R POR X [px]',
+                    'R POR Y [px]',
+                    'Timing',
+                    'Pupil Confidence',
+                    'L Plane',
+                    'R Plane',
+                    'L Event Info',
+                    'R Event Info',
+                    'Stimulus',
+                ],
             },
         },
     )

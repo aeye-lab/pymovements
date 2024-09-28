@@ -52,34 +52,64 @@ class GazeBase(DatasetDefinition):
 
     Attributes
     ----------
-    name : str
+    name: str
         The name of the dataset.
 
-    gaze_mirrors : tuple[str, ...]
+    has_files: dict[str, bool]
+        Indicate whether the dataset contains 'gaze', 'precomputed_events', and
+        'precomputed_reading_measures'.
+
+    mirrors: dict[str, tuple[str, ...]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    gaze_resources : tuple[dict[str, str], ...]
-        A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
+    resources: dict[str, tuple[dict[str, str], ...]]
+        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+        keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    experiment : Experiment
+    extract: dict[str, bool]
+        Decide whether to extract the data.
+
+    experiment: Experiment
         The experiment definition.
 
-    filename_format : str
+    filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_dtypes : dict[str, type], optional
+    filename_format_schema_overrides: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
-    column_map : dict[str, str]
+    trial_columns: list[str]
+            The name of the trial columns in the input data frame. If the list is empty or None,
+            the input data frame is assumed to contain only one trial. If the list is not empty,
+            the input data frame is assumed to contain multiple trials and the transformation
+            methods will be applied to each trial separately.
+
+    time_column: str
+        The name of the timestamp column in the input data frame. This column will be renamed to
+        ``time``.
+
+    time_unit: str
+        The unit of the timestamps in the timestamp column in the input data frame. Supported
+        units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
+        'step' the experiment definition must be specified. All timestamps will be converted to
+        milliseconds.
+
+    position_columns: list[str]
+        The name of the dva position columns in the input data frame. These columns will be
+        nested into the column ``position``. If the list is empty or None, the nested
+        ``position`` column will not be created.
+
+    column_map: dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
 
-    custom_read_kwargs : dict[str, Any], optional
+    custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function.
+
 
     Examples
     --------
@@ -104,17 +134,33 @@ class GazeBase(DatasetDefinition):
 
     name: str = 'GazeBase'
 
-    gaze_mirrors: tuple[str] = (
-        'https://figshare.com/ndownloader/files/',
-    )
-
-    gaze_resources: tuple[dict[str, str]] = (
-        {
-            'gaze_resource': '27039812',
-            'filename': 'GazeBase_v2_0.zip',
-            'md5': 'cb7eb895fb48f8661decf038ab998c9a',
+    has_files: dict[str, bool] = field(
+        default_factory=lambda: {
+            'gaze': True,
+            'precomputed_events': False,
+            'precomputed_reading_measures': False,
         },
     )
+
+    mirrors: dict[str, tuple[str, ...]] = field(
+        default_factory=lambda: {
+            'gaze': ('https://figshare.com/ndownloader/files/',),
+        },
+    )
+
+    resources: dict[str, tuple[dict[str, str], ...]] = field(
+        default_factory=lambda: {
+            'gaze': (
+                {
+                    'resource': '27039812',
+                    'filename': 'GazeBase_v2_0.zip',
+                    'md5': 'cb7eb895fb48f8661decf038ab998c9a',
+                },
+            ),
+        },
+    )
+
+    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     experiment: Experiment = Experiment(
         screen_width_px=1680,
@@ -126,17 +172,20 @@ class GazeBase(DatasetDefinition):
         sampling_rate=1000,
     )
 
-    filename_format: str = (
-        r'S_{round_id:1d}{subject_id:d}'
-        r'_S{session_id:d}'
-        r'_{task_name}.csv'
+    filename_format: dict[str, str] = field(
+        default_factory=lambda: {
+            'gaze':
+                (
+                    r'S_{round_id:1d}{subject_id:d}'
+                    r'_S{session_id:d}'
+                    r'_{task_name}.csv'
+                ),
+        },
     )
 
-    filename_format_dtypes: dict[str, type] = field(
+    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
-            'round_id': int,
-            'subject_id': int,
-            'session_id': int,
+            'gaze': {'round_id': int, 'subject_id': int, 'session_id': int},
         },
     )
 
@@ -158,20 +207,20 @@ class GazeBase(DatasetDefinition):
         },
     )
 
-    custom_read_kwargs: dict[str, Any] = field(
+    custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
-            'null_values': 'NaN',
-            'dtypes': {
-                'n': pl.Int64,
-                'x': pl.Float32,
-                'y': pl.Float32,
-                'val': pl.Int64,
-                'dP': pl.Float32,
-                'lab': pl.Int64,
-                'xT': pl.Float32,
-                'yT': pl.Float32,
+            'gaze': {
+                'null_values': 'NaN',
+                'schema_overrides': {
+                    'n': pl.Int64,
+                    'x': pl.Float32,
+                    'y': pl.Float32,
+                    'val': pl.Int64,
+                    'dP': pl.Float32,
+                    'lab': pl.Int64,
+                    'xT': pl.Float32,
+                    'yT': pl.Float32,
+                },
             },
         },
     )
-    has_gaze_files: bool = True
-    has_precomputed_event_files: bool = False

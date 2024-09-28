@@ -33,6 +33,7 @@ import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
 from pymovements.utils import checks
+from pymovements.utils.aois import get_aoi
 
 
 class GazeDataFrame:
@@ -844,7 +845,7 @@ class GazeDataFrame:
                 if trial_column not in self.events.frame.columns
             ]
             if missing_trial_columns:
-                raise pl.ColumnNotFoundError(
+                raise pl.exceptions.ColumnNotFoundError(
                     f'trial columns {missing_trial_columns} missing from events, '
                     f'available columns: {self.events.frame.columns}',
                 )
@@ -854,7 +855,7 @@ class GazeDataFrame:
             for group_identifier, group_gaze in grouped_frames.items():
                 # Create filter expression for selecting respective group rows.
                 if len(self.trial_columns) == 1:
-                    group_filter_expression = pl.col(self.trial_columns[0]) == group_identifier
+                    group_filter_expression = pl.col(self.trial_columns[0]) == group_identifier[0]
                 else:
                     group_filter_expression = pl.col(self.trial_columns[0]) == group_identifier[0]
                     for name, value in zip(self.trial_columns[1:], group_identifier[1:]):
@@ -1019,26 +1020,13 @@ class GazeDataFrame:
         else:
             raise ValueError('neither position nor pixel in gaze dataframe, one needed for mapping')
 
-        def get_aoi(row: pl.DataFrame.row) -> str:
-            try:
-                aoi = aoi_dataframe.aois.filter(
-                    (aoi_dataframe.aois['top_left_x'] <= row[x_eye]) &
-                    (
-                        row[x_eye] <
-                        aoi_dataframe.aois['top_left_x'] + aoi_dataframe.aois['width']
-                    ) &
-                    (aoi_dataframe.aois['top_left_y'] <= row[y_eye]) &
-                    (
-                        row[y_eye] <
-                        aoi_dataframe.aois['top_left_y'] + aoi_dataframe.aois['height']
-                    ),
-                )[aoi_dataframe.aoi_column].item()
-                return aoi
-            except ValueError:
-                return ''
-
         self.frame = self.frame.with_columns(
-            area_of_interest=pl.Series(get_aoi(row) for row in self.frame.iter_rows(named=True)),
+            area_of_interest=pl.Series(
+                get_aoi(
+                    aoi_dataframe, row, x_eye, y_eye,
+                )
+                for row in self.frame.iter_rows(named=True)
+            ),
         )
 
     def nest(

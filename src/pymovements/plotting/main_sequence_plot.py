@@ -23,7 +23,6 @@ from __future__ import annotations
 import matplotlib.pyplot as plt
 import polars as pl
 from matplotlib.collections import Collection
-from polars import ColumnNotFoundError
 
 from pymovements.events import EventDataFrame
 
@@ -85,7 +84,7 @@ def main_sequence_plot(
 
     try:
         peak_velocities = saccades['peak_velocity'].to_list()
-    except ColumnNotFoundError as exc:
+    except pl.exceptions.ColumnNotFoundError as exc:
         raise KeyError(
             'The input dataframe you provided does not contain '
             'the saccade peak velocities which are needed to create '
@@ -94,7 +93,7 @@ def main_sequence_plot(
 
     try:
         amplitudes = saccades['amplitude'].to_list()
-    except ColumnNotFoundError as exc:
+    except pl.exceptions.ColumnNotFoundError as exc:
         raise KeyError(
             'The input dataframe you provided does not contain '
             'the saccade amplitudes which are needed to create '

@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the GazeOnFaces dataset."""
+"""Provides a definition for the EMTeC dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -33,18 +33,14 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 @register_dataset
-class GazeOnFaces(DatasetDefinition):
-    """GazeOnFaces dataset :cite:p:`GazeOnFaces`.
+class EMTeC(DatasetDefinition):
+    """EMTeC dataset :cite:p:`EMTeC`.
 
-    This dataset includes monocular eye tracking data from single participants in a single
-    session. Eye movements are recorded at a sampling frequency of 60 Hz
-    using an EyeLink 1000 video-based eye tracker and are provided as pixel coordinates.
+    This dataset includes eye-tracking data from 107 native speakers of English reading
+    machine generated texts.  Eye movements are recorded at a sampling frequency of 1,000 Hz
+    using an EyeLink 1000 eye tracker and are provided as pixel coordinates.
 
-    Participants were sat 57 cm away from the screen (19inch LCD monitor,
-    screen res=1280×1024, 60 Hz). Recordings of the eye movements of one eye in monocular
-    pupil/corneal reflection tracking mode.
-
-    Check the respective paper for details :cite:p:`GazeOnFaces`.
+    Check the respective paper for details :cite:p:`EMTeC`.
 
     Attributes
     ----------
@@ -75,7 +71,7 @@ class GazeOnFaces(DatasetDefinition):
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides : dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -85,11 +81,11 @@ class GazeOnFaces(DatasetDefinition):
             the input data frame is assumed to contain multiple trials and the transformation
             methods will be applied to each trial separately.
 
-    time_column: Any
+    time_column: str
         The name of the timestamp column in the input data frame. This column will be renamed to
         ``time``.
 
-    time_unit: Any
+    time_unit: str
         The unit of the timestamps in the timestamp column in the input data frame. Supported
         units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
         'step' the experiment definition must be specified. All timestamps will be converted to
@@ -100,20 +96,17 @@ class GazeOnFaces(DatasetDefinition):
         nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
         column will not be created.
 
-    column_map: dict[str, str]
-        The keys are the columns to read, the values are the names to which they should be renamed.
-
     custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function.
 
     Examples
     --------
     Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.GazeOnFaces` definition:
+    :py:class:`~pymovements.EMTeC` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("GazeOnFaces", path='data/GazeOnFaces')
+    >>> dataset = pm.Dataset("EMTeC", path='data/EMTeC')
 
     Download the dataset resources:
 
@@ -127,80 +120,117 @@ class GazeOnFaces(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'GazeOnFaces'
+    name: str = 'EMTeC'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
-            'precomputed_events': False,
+            'precomputed_events': True,
             'precomputed_reading_measures': False,
         },
     )
-
     mirrors: dict[str, tuple[str, ...]] = field(
-        default_factory=lambda: {
-            'gaze': (
-                'https://uncloud.univ-nantes.fr/index.php/s/',
-            ),
-        },
+        default_factory=lambda:
+            {
+                'gaze': (
+                    'https://osf.io/download/',
+                ),
+                'precomputed_events': (
+                    'https://osf.io/download/',
+                ),
+            },
     )
-
     resources: dict[str, tuple[dict[str, str], ...]] = field(
         default_factory=lambda: {
             'gaze': (
                 {
-                    'resource': '8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip',
-                    'filename': 'gaze_csv.zip',
-                    'md5': 'fe219f07c9253cd9aaee6bd50233c034',
+                    'resource': '374sk/',
+                    'filename': 'subject_level_data.zip',
+                    'md5': 'dca99e47ef43f3696acec4fd70967750',
+                },
+            ),
+            'precomputed_events': (
+                {
+                    'resource': '2hs8p/',
+                    'filename': 'fixations.csv',
+                    'md5': '5e05a364a1d8a044d8b36506aa91437e',
                 },
             ),
         },
     )
-
-    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
+    extract: dict[str, bool] = field(
+        default_factory=lambda: {
+            'gaze': True,
+            'precomputed_events': False,
+        },
+    )
 
     experiment: Experiment = Experiment(
         screen_width_px=1280,
         screen_height_px=1024,
-        screen_width_cm=38,
-        screen_height_cm=30,
-        distance_cm=57,
+        screen_width_cm=38.2,
+        screen_height_cm=30.2,
+        distance_cm=60,
         origin='center',
-        sampling_rate=60,
+        sampling_rate=2000,
     )
 
     filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze': r'gaze_sub{sub_id:d}_trial{trial_id:d}.csv',
-        },
+        default_factory=lambda:
+            {
+                'gaze': r'ET_{subject_id:d}.csv',
+                'precomputed_events': r'fixations.csv',
+            },
     )
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'sub_id': int,
-                'trial_id': int,
+        default_factory=lambda:
+            {
+                'gaze': {'subject_id': int},
+                'precomputed_events': {},
             },
-        },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: ['sub_id', 'trial_id'])
+    trial_columns: list[str] = field(
+        default_factory=lambda: [
+            'subject_id',
+            'item_id',
+        ],
+    )
 
-    time_column: Any = None
+    time_column: str = 'time'
 
-    time_unit: Any = None
+    time_unit: str = 'ms'
 
     pixel_columns: list[str] = field(default_factory=lambda: ['x', 'y'])
-
-    column_map: dict[str, str] = field(default_factory=lambda: {})
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
             'gaze': {
-                'separator': ',',
-                'has_header': False,
-                'new_columns': ['x', 'y'],
-                'schema_overrides': [pl.Float32, pl.Float32],
+                'separator': '\t',
+                'columns': [
+                    'item_id',
+                    'TRIAL_ID',
+                    'Trial_Index_',
+                    'model',
+                    'decoding_strategy',
+                    'time',
+                    'x',
+                    'y',
+                    'pupil_right',
+                ],
+                'schema_overrides': {
+                    'item_id': pl.Utf8,
+                    'TRIAL_ID': pl.Int64,
+                    'Trial_Index_': pl.Int64,
+                    'model': pl.Utf8,
+                    'decoding_strategy': pl.Utf8,
+                    'time': pl.Int64,
+                    'x': pl.Float32,
+                    'y': pl.Float32,
+                    'pupil_right': pl.Float32,
+                },
             },
+            'precomputed_events': {'separator': '\t'},
         },
     )

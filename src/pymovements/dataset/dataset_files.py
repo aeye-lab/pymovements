@@ -34,6 +34,7 @@ from pymovements.gaze.gaze_dataframe import GazeDataFrame
 from pymovements.gaze.io import from_asc
 from pymovements.gaze.io import from_csv
 from pymovements.gaze.io import from_ipc
+from pymovements.reading_measures import ReadingMeasures
 from pymovements.utils.paths import match_filepaths
 from pymovements.utils.strings import curly_to_regex
 
@@ -61,33 +62,65 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
         If an error occurred during matching filenames or no files have been found.
     """
     # Get all filepaths that match regular expression.
-    fileinfo_dicts = []
-    if definition.has_gaze_files:
+    _fileinfo_dicts = {}
+    if definition.has_files['gaze']:
         fileinfo_dicts = match_filepaths(
             path=paths.raw,
-            regex=curly_to_regex(definition.filename_format),
+            regex=curly_to_regex(definition.filename_format['gaze']),
             relative=True,
         )
-    if definition.has_precomputed_event_files:
+        if not fileinfo_dicts:
+            raise RuntimeError(f'no matching files found in {paths.raw}')
+
+        fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
+        fileinfo_df = fileinfo_df.sort(by='filepath')
+        if definition.filename_format_schema_overrides['gaze']:
+            items = definition.filename_format_schema_overrides['gaze'].items()
+            fileinfo_df = fileinfo_df.with_columns([
+                pl.col(fileinfo_key).cast(fileinfo_dtype)
+                for fileinfo_key, fileinfo_dtype in items
+            ])
+        _fileinfo_dicts['gaze'] = fileinfo_df
+
+    if definition.has_files['precomputed_events']:
         fileinfo_dicts = match_filepaths(
             path=paths.precomputed_events,
-            regex=curly_to_regex(definition.filename_format),
+            regex=curly_to_regex(definition.filename_format['precomputed_events']),
             relative=True,
         )
+        if not fileinfo_dicts:
+            raise RuntimeError(f'no matching files found in {paths.precomputed_events}')
+        fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
+        fileinfo_df = fileinfo_df.sort(by='filepath')
+        if definition.filename_format_schema_overrides['precomputed_events']:
+            items = definition.filename_format_schema_overrides['precomputed_events'].items()
+            fileinfo_df = fileinfo_df.with_columns([
+                pl.col(fileinfo_key).cast(fileinfo_dtype)
+                for fileinfo_key, fileinfo_dtype in items
+            ])
+        _fileinfo_dicts['precomputed_events'] = fileinfo_df
 
-    if not fileinfo_dicts:
-        raise RuntimeError(f'no matching files found in {paths.raw}')
+    pc_rm = 'precomputed_reading_measures'
+    if definition.has_files[pc_rm]:
+        fileinfo_dicts = match_filepaths(
+            path=paths.precomputed_reading_measures,
+            regex=curly_to_regex(definition.filename_format[pc_rm]),
+            relative=True,
+        )
+        if not fileinfo_dicts:
+            raise RuntimeError(f'no matching files found in {paths.precomputed_reading_measures}')
+        fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
+        fileinfo_df = fileinfo_df.sort(by='filepath')
+        if definition.filename_format_schema_overrides[pc_rm]:
+            _schema_overrides = definition.filename_format_schema_overrides[pc_rm]
+            items = _schema_overrides.items()
+            fileinfo_df = fileinfo_df.with_columns([
+                pl.col(fileinfo_key).cast(fileinfo_dtype)
+                for fileinfo_key, fileinfo_dtype in items
+            ])
+        _fileinfo_dicts[pc_rm] = fileinfo_df
 
-    # Create dataframe from all fileinfo records.
-    fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
-    fileinfo_df = fileinfo_df.sort(by='filepath')
-
-    fileinfo_df = fileinfo_df.with_columns([
-        pl.col(fileinfo_key).cast(fileinfo_dtype)
-        for fileinfo_key, fileinfo_dtype in definition.filename_format_dtypes.items()
-    ])
-
-    return fileinfo_df
+    return _fileinfo_dicts
 
 
 def load_event_files(
@@ -136,7 +169,8 @@ def load_event_files(
         filepath = paths.raw / filepath
 
         filepath = paths.raw_to_event_filepath(
-            filepath, events_dirname=events_dirname,
+            filepath,
+            events_dirname=events_dirname,
             extension=extension,
         )
 
@@ -224,7 +258,7 @@ def load_gaze_files(
             fileinfo_row=fileinfo_row,
             definition=definition,
             preprocessed=preprocessed,
-            custom_read_kwargs=definition.custom_read_kwargs,
+            custom_read_kwargs=definition.custom_read_kwargs['gaze'],
         )
         gaze_dfs.append(gaze_df)
 
@@ -284,7 +318,7 @@ def load_gaze_file(
                 trial_columns=definition.trial_columns,
                 time_unit=time_unit,
                 add_columns=add_columns,
-                column_dtypes=definition.filename_format_dtypes,
+                column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
             )
 
             # suffixes as ordered after using GazeDataFrame.unnest()
@@ -332,7 +366,7 @@ def load_gaze_file(
                 trial_columns=definition.trial_columns,
                 column_map=definition.column_map,
                 add_columns=add_columns,
-                column_dtypes=definition.filename_format_dtypes,
+                column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
                 **custom_read_kwargs,
             )
     elif filepath.suffix == '.feather':
@@ -340,14 +374,14 @@ def load_gaze_file(
             filepath,
             experiment=definition.experiment,
             add_columns=add_columns,
-            column_dtypes=definition.filename_format_dtypes,
+            column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
         )
     elif filepath.suffix == '.asc':
         gaze_df = from_asc(
             filepath,
             experiment=definition.experiment,
             add_columns=add_columns,
-            column_dtypes=definition.filename_format_dtypes,
+            column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
             **custom_read_kwargs,
         )
     else:
@@ -360,8 +394,76 @@ def load_gaze_file(
     return gaze_df
 
 
+def load_precomputed_reading_measures(
+        definition: DatasetDefinition,
+        fileinfo: pl.DataFrame,
+        paths: DatasetPaths,
+) -> list[ReadingMeasures]:
+    """Load text stimulus from file.
+
+    Parameters
+    ----------
+    definition:  DatasetDefinition
+        Dataset definition to load precomputed events.
+    fileinfo: pl.DataFrame
+        Information about the files.
+    paths: DatasetPaths
+        Adjustable paths to extract datasets.
+
+    Returns
+    -------
+    list[ReadingMeasures]
+        Return list of precomputed event dataframes.
+    """
+    precomputed_reading_measures = []
+    for filepath in fileinfo.to_dicts():
+        data_path = paths.precomputed_reading_measures / Path(filepath['filepath'])
+        precomputed_reading_measures.append(
+            load_precomputed_reading_measure_file(
+                data_path,
+                definition.custom_read_kwargs['precomputed_reading_measures'],
+            ),
+        )
+    return precomputed_reading_measures
+
+
+def load_precomputed_reading_measure_file(
+        data_path: str | Path,
+        custom_read_kwargs: dict[str, Any] | None = None,
+) -> ReadingMeasures:
+    """Load precomputed events from files.
+
+    Parameters
+    ----------
+    data_path:  str | Path
+        Path to file to be read.
+    custom_read_kwargs: dict[str, Any] | None
+        Custom read keyword arguments for polars. (default: None)
+
+    Returns
+    -------
+    ReadingMeasures
+        Returns the text stimulus file.
+    """
+    data_path = Path(data_path)
+    if custom_read_kwargs is None:
+        custom_read_kwargs = {}
+
+    valid_extensions = {'.csv', '.tsv', '.txt'}
+    if data_path.suffix in valid_extensions:
+        precomputed_reading_measure_df = pl.read_csv(data_path, **custom_read_kwargs)
+    else:
+        raise ValueError(
+            f'unsupported file format "{data_path.suffix}". '
+            f'Supported formats are: {", ".join(sorted(valid_extensions))}',
+        )
+
+    return ReadingMeasures(precomputed_reading_measure_df)
+
+
 def load_precomputed_event_files(
         definition: DatasetDefinition,
+        fileinfo: pl.DataFrame,
         paths: DatasetPaths,
 ) -> list[PrecomputedEventDataFrame]:
     """Load text stimulus from file.
@@ -370,6 +472,8 @@ def load_precomputed_event_files(
     ----------
     definition:  DatasetDefinition
         Dataset definition to load precomputed events.
+    fileinfo: pl.DataFrame
+        Information about the files.
     paths: DatasetPaths
         Adjustable paths to extract datasets.
 
@@ -379,9 +483,14 @@ def load_precomputed_event_files(
         Return list of precomputed event dataframes.
     """
     precomputed_events = []
-    for resource in definition.precomputed_event_resources:
-        data_path = paths.precomputed_events / resource['filename']
-        precomputed_events.append(load_precomputed_event_file(data_path))
+    for filepath in fileinfo.to_dicts():
+        data_path = paths.precomputed_events / Path(filepath['filepath'])
+        precomputed_events.append(
+            load_precomputed_event_file(
+                data_path,
+                definition.custom_read_kwargs['precomputed_events'],
+            ),
+        )
     return precomputed_events
 
 
@@ -409,10 +518,7 @@ def load_precomputed_event_file(
 
     valid_extensions = {'.csv', '.tsv', '.txt'}
     if data_path.suffix in valid_extensions:
-        precomputed_event_df = pl.read_csv(
-            data_path,
-            **custom_read_kwargs,
-        )
+        precomputed_event_df = pl.read_csv(data_path, **custom_read_kwargs)
     else:
         raise ValueError(
             f'unsupported file format "{data_path.suffix}". '
@@ -452,9 +558,10 @@ def add_fileinfo(
     )
 
     # Cast columns from fileinfo according to specification.
+    _schema_overrides = definition.filename_format_schema_overrides['gaze']
     df = df.with_columns([
         pl.col(fileinfo_key).cast(fileinfo_dtype)
-        for fileinfo_key, fileinfo_dtype in definition.filename_format_dtypes.items()
+        for fileinfo_key, fileinfo_dtype in _schema_overrides.items()
     ])
     return df
 
@@ -639,10 +746,10 @@ def take_subset(
                 f' {type(subset_key)}',
             )
 
-        if subset_key not in fileinfo.columns:
+        if subset_key not in fileinfo['gaze'].columns:
             raise ValueError(
                 f'subset key {subset_key} must be a column in the fileinfo attribute.'
-                f' Available columns are: {fileinfo.columns}',
+                f" Available columns are: {fileinfo['gaze'].columns}",
             )
 
         if isinstance(subset_value, (bool, float, int, str)):
@@ -655,5 +762,5 @@ def take_subset(
                 f'but value of pair {subset_key}: {subset_value} is of type {type(subset_value)}',
             )
 
-        fileinfo = fileinfo.filter(pl.col(subset_key).is_in(column_values))
+        fileinfo['gaze'] = fileinfo['gaze'].filter(pl.col(subset_key).is_in(column_values))
     return fileinfo

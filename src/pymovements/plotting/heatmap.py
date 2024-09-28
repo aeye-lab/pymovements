@@ -20,11 +20,14 @@
 """Heatmap module."""
 from __future__ import annotations
 
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import colors
 
 from pymovements.gaze import GazeDataFrame
+from pymovements.utils.plotting import draw_image_stimulus
 
 
 def heatmap(
@@ -42,6 +45,10 @@ def heatmap(
         ylabel: str | None = None,
         show: bool = True,
         savepath: str | None = None,
+        add_stimulus: bool = False,
+        path_to_image_stimulus: str | Path | None = None,
+        stimulus_origin: str = 'upper',
+        alpha: float = 1.,
 ) -> plt.Figure:
     """Plot a heatmap of gaze data.
 
@@ -81,6 +88,14 @@ def heatmap(
         Whether to show the plot. (default: True)
     savepath: str | None
         If provided, the figure will be saved to this path. (default: None)
+    add_stimulus: bool
+        Define whether stimulus should be included. (default: False)
+    path_to_image_stimulus: str | Path | None
+        Path to image stimulus. (default: None)
+    stimulus_origin: str
+        Origin of stimulus. (default: 'upper')
+    alpha: float
+        Alpha value of heatmap. (default: 1.)
 
     Raises
     ------
@@ -138,8 +153,19 @@ def heatmap(
     # Convert heatmap values from sample count to seconds
     heatmap_value /= gaze.experiment.sampling_rate
 
+    extent = [x_edges[0], x_edges[-1], y_edges[0], y_edges[-1]]
+
     # Create the plot
-    fig, ax = plt.subplots(figsize=figsize)
+    if add_stimulus:
+        assert path_to_image_stimulus
+        fig, ax = draw_image_stimulus(
+            path_to_image_stimulus,
+            origin=stimulus_origin,
+            figsize=figsize,
+            extent=extent,
+        )
+    else:
+        fig, ax = plt.subplots(figsize=figsize)
 
     # Plot the heatmap
     heatmap_plot = ax.imshow(
@@ -147,7 +173,8 @@ def heatmap(
         cmap=cmap,
         origin=origin,
         interpolation=interpolation,
-        extent=[x_edges[0], x_edges[-1], y_edges[0], y_edges[-1]],
+        extent=extent,
+        alpha=alpha,
     )
 
     # Set the plot title and axis labels

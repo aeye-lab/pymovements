@@ -93,3 +93,44 @@ def test_no_show_image_stimulus(image_stimulus, origin, monkeypatch):
     pm.utils.plotting.draw_image_stimulus(image_stimulus, origin=origin, show=False)
     pyplot.close()
     mock.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    ('image_stimulus'),
+    (
+        pytest.param(
+            './tests/files/pexels-zoorg-1000498.jpg',
+            id='image_stimulus_str',
+        ),
+        pytest.param(
+            Path('./tests/files/pexels-zoorg-1000498.jpg'),
+            id='image_stimulus_Path',
+        ),
+    ),
+)
+@pytest.mark.parametrize(
+    ('origin'),
+    (
+        pytest.param(
+            'upper',
+            id='origin_upper',
+        ),
+        pytest.param(
+            'lower',
+            id='origin_lower',
+        ),
+    ),
+)
+def test_image_stimulus_fig_not_None(image_stimulus, origin, monkeypatch):
+    mock = Mock()
+    monkeypatch.setattr(pyplot, 'show', mock)
+    fig, ax = pyplot.subplots(figsize=(15, 10))
+    pm.utils.plotting.draw_image_stimulus(
+        image_stimulus,
+        origin=origin,
+        fig=fig,
+        ax=ax,
+        show=True,
+    )
+    pyplot.close()
+    mock.assert_called_once()

@@ -219,19 +219,6 @@ class _DownloadProgressBar(tqdm):  # pylint: disable=inconsistent-mro
     Parameters
     ----------
     **kwargs : Any
-
-    Attributes
-    ----------
-    unit: str
-        Unit of progress bar.
-    unit_scale: bool
-        If True, scale progress bar to unit.
-    unit_divisor: int
-        Divisor of progress bar.
-    miniters: int
-        Minimum number of iterations between updates.
-    **kwargs: Any
-        Keyword arguments passed to `tqdm.tqdm`.
     """
 
     def __init__(self, **kwargs: Any):
