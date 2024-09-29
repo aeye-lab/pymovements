@@ -116,6 +116,7 @@ def from_file(
             aoi_path,
             **custom_read_kwargs,
         )
+        stimulus_df = stimulus_df.fill_null(' ')
     else:
         raise ValueError(
             f'unsupported file format "{aoi_path.suffix}".'

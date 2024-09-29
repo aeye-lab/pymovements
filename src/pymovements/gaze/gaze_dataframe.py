@@ -703,7 +703,7 @@ class GazeDataFrame:
                 if trial_column not in self.events.frame.columns
             ]
             if missing_trial_columns:
-                raise pl.ColumnNotFoundError(
+                raise pl.exceptions.ColumnNotFoundError(
                     f'trial columns {missing_trial_columns} missing from events, '
                     f'available columns: {self.events.frame.columns}',
                 )
@@ -713,7 +713,7 @@ class GazeDataFrame:
             for group_identifier, group_gaze in grouped_frames.items():
                 # Create filter expression for selecting respective group rows.
                 if len(self.trial_columns) == 1:
-                    group_filter_expression = pl.col(self.trial_columns[0]) == group_identifier
+                    group_filter_expression = pl.col(self.trial_columns[0]) == group_identifier[0]
                 else:
                     group_filter_expression = pl.col(self.trial_columns[0]) == group_identifier[0]
                     for name, value in zip(self.trial_columns[1:], group_identifier[1:]):

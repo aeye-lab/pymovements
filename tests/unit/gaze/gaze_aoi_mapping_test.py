@@ -48,6 +48,7 @@ EXPECTED_DF = {
             'pixel_yr',
             'area_of_interest',
         ],
+        orient='row',
     ),
     'char_right_pixel': pl.DataFrame(
         [
@@ -72,8 +73,8 @@ EXPECTED_DF = {
             'pixel_yr',
             'area_of_interest',
         ],
+        orient='row',
     ),
-
     'word_left_pixel': pl.DataFrame(
         [
             (1, 1, 8005274, 649.5, 531.1, 640.6, 529.1, 'files,'),
@@ -97,6 +98,7 @@ EXPECTED_DF = {
             'pixel_yr',
             'area_of_interest',
         ],
+        orient='row',
     ),
     'word_right_pixel': pl.DataFrame(
         [
@@ -121,6 +123,7 @@ EXPECTED_DF = {
             'pixel_yr',
             'area_of_interest',
         ],
+        orient='row',
     ),
     'char_left_position': pl.DataFrame(
         [
@@ -145,6 +148,7 @@ EXPECTED_DF = {
             'position_yr',
             'area_of_interest',
         ],
+        orient='row',
     ),
     'char_right_position': pl.DataFrame(
         [
@@ -169,6 +173,7 @@ EXPECTED_DF = {
             'position_yr',
             'area_of_interest',
         ],
+        orient='row',
     ),
 
     'word_left_position': pl.DataFrame(
@@ -194,6 +199,7 @@ EXPECTED_DF = {
             'position_yr',
             'area_of_interest',
         ],
+        orient='row',
     ),
     'word_right_position': pl.DataFrame(
         [
@@ -218,6 +224,7 @@ EXPECTED_DF = {
             'position_yr',
             'area_of_interest',
         ],
+        orient='row',
     ),
     'char_auto_pixel': pl.DataFrame(
         [
@@ -242,6 +249,7 @@ EXPECTED_DF = {
             'pixel_yr',
             'area_of_interest',
         ],
+        orient='row',
     ),
     'char_auto_position': pl.DataFrame(
         [
@@ -266,6 +274,7 @@ EXPECTED_DF = {
             'position_yr',
             'area_of_interest',
         ],
+        orient='row',
     ),
 
     'word_auto_pixel': pl.DataFrame(
@@ -291,6 +300,7 @@ EXPECTED_DF = {
             'pixel_yr',
             'area_of_interest',
         ],
+        orient='row',
     ),
     'word_auto_position': pl.DataFrame(
         [
@@ -315,6 +325,7 @@ EXPECTED_DF = {
             'position_yr',
             'area_of_interest',
         ],
+        orient='row',
     ),
     'char_else_pixel': pl.DataFrame(
         [
@@ -339,6 +350,7 @@ EXPECTED_DF = {
             'pixel_yr',
             'area_of_interest',
         ],
+        orient='row',
     ),
     'char_else_position': pl.DataFrame(
         [
@@ -363,6 +375,7 @@ EXPECTED_DF = {
             'position_yr',
             'area_of_interest',
         ],
+        orient='row',
     ),
 
     'word_else_pixel': pl.DataFrame(
@@ -388,6 +401,7 @@ EXPECTED_DF = {
             'pixel_yr',
             'area_of_interest',
         ],
+        orient='row',
     ),
     'word_else_position': pl.DataFrame(
         [
@@ -412,6 +426,7 @@ EXPECTED_DF = {
             'position_yr',
             'area_of_interest',
         ],
+        orient='row',
     ),
 }
 

@@ -35,6 +35,9 @@ class DatasetDefinition:
     ----------
     name: str
         The name of the dataset. (default: '.')
+    has_files: dict[str, bool]
+        Indicate whether the dataset contains 'gaze', 'precomputed_events', and
+        'precomputed_reading_measures'.
     mirrors: dict[str, tuple[str, ...]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
         (default: field(default_factory=dict))
@@ -44,16 +47,16 @@ class DatasetDefinition:
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
         (default: field(default_factory=dict))
-    experiment: Experiment
+    experiment: Experiment | None
         The experiment definition. (default: None)
+    extract: dict[str, bool]
+        Decide whether to extract the data.
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe. (default: field(default_factory=dict))
-    filename_format_dtypes: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype. (default: field(default_factory=dict))
-    extract: dict[str, bool]
-        Decide whether to extract the data.
     custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function. The
         behavior of this argument depends on the file extension of the dataset files.
@@ -119,10 +122,10 @@ class DatasetDefinition:
     3. Specifying column datatypes
     ``polars.read_csv`` infers data types from a fixed number of rows, which might not be accurate
     for the entire dataset. To ensure correct data types, you can pass a dictionary to the
-    ``dtypes`` keyword argument in ``gaze_custom_read_kwargs``.
+    ``schema_overrides`` keyword argument in ``gaze_custom_read_kwargs``.
     Use data types from the `polars` library.
     For instance:
-    ``gaze_custom_read_kwargs={'dtypes': {'col1': polars.Int64, 'col2': polars.Float64}}``
+    ``gaze_custom_read_kwargs={'schema_overrides': {'col1': polars.Int64, 'col2': polars.Float64}}``
     """
 
     # pylint: disable=too-many-instance-attributes
@@ -138,7 +141,7 @@ class DatasetDefinition:
 
     filename_format: dict[str, str] = field(default_factory=dict)
 
-    filename_format_dtypes: dict[str, dict[str, type]] = field(default_factory=dict)
+    filename_format_schema_overrides: dict[str, dict[str, type]] = field(default_factory=dict)
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(default_factory=dict)
 

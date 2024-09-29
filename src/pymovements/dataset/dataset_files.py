@@ -74,8 +74,8 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
 
         fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
         fileinfo_df = fileinfo_df.sort(by='filepath')
-        if definition.filename_format_dtypes['gaze']:
-            items = definition.filename_format_dtypes['gaze'].items()
+        if definition.filename_format_schema_overrides['gaze']:
+            items = definition.filename_format_schema_overrides['gaze'].items()
             fileinfo_df = fileinfo_df.with_columns([
                 pl.col(fileinfo_key).cast(fileinfo_dtype)
                 for fileinfo_key, fileinfo_dtype in items
@@ -92,31 +92,33 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
             raise RuntimeError(f'no matching files found in {paths.precomputed_events}')
         fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
         fileinfo_df = fileinfo_df.sort(by='filepath')
-        if definition.filename_format_dtypes['precomputed_events']:
-            items = definition.filename_format_dtypes['precomputed_events'].items()
+        if definition.filename_format_schema_overrides['precomputed_events']:
+            items = definition.filename_format_schema_overrides['precomputed_events'].items()
             fileinfo_df = fileinfo_df.with_columns([
                 pl.col(fileinfo_key).cast(fileinfo_dtype)
                 for fileinfo_key, fileinfo_dtype in items
             ])
         _fileinfo_dicts['precomputed_events'] = fileinfo_df
 
-    if definition.has_files['precomputed_reading_measures']:
+    pc_rm = 'precomputed_reading_measures'
+    if definition.has_files[pc_rm]:
         fileinfo_dicts = match_filepaths(
             path=paths.precomputed_reading_measures,
-            regex=curly_to_regex(definition.filename_format['precomputed_reading_measures']),
+            regex=curly_to_regex(definition.filename_format[pc_rm]),
             relative=True,
         )
         if not fileinfo_dicts:
             raise RuntimeError(f'no matching files found in {paths.precomputed_reading_measures}')
         fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
         fileinfo_df = fileinfo_df.sort(by='filepath')
-        if definition.filename_format_dtypes['precomputed_reading_measures']:
-            items = definition.filename_format_dtypes['precomputed_reading_measures'].items()
+        if definition.filename_format_schema_overrides[pc_rm]:
+            _schema_overrides = definition.filename_format_schema_overrides[pc_rm]
+            items = _schema_overrides.items()
             fileinfo_df = fileinfo_df.with_columns([
                 pl.col(fileinfo_key).cast(fileinfo_dtype)
                 for fileinfo_key, fileinfo_dtype in items
             ])
-        _fileinfo_dicts['precomputed_reading_measures'] = fileinfo_df
+        _fileinfo_dicts[pc_rm] = fileinfo_df
 
     return _fileinfo_dicts
 
@@ -316,7 +318,7 @@ def load_gaze_file(
                 trial_columns=definition.trial_columns,
                 time_unit=time_unit,
                 add_columns=add_columns,
-                column_dtypes=definition.filename_format_dtypes['gaze'],
+                column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
             )
 
             # suffixes as ordered after using GazeDataFrame.unnest()
@@ -364,7 +366,7 @@ def load_gaze_file(
                 trial_columns=definition.trial_columns,
                 column_map=definition.column_map,
                 add_columns=add_columns,
-                column_dtypes=definition.filename_format_dtypes['gaze'],
+                column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
                 **custom_read_kwargs,
             )
     elif filepath.suffix == '.feather':
@@ -372,14 +374,14 @@ def load_gaze_file(
             filepath,
             experiment=definition.experiment,
             add_columns=add_columns,
-            column_dtypes=definition.filename_format_dtypes['gaze'],
+            column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
         )
     elif filepath.suffix == '.asc':
         gaze_df, _ = from_asc(
             filepath,
             experiment=definition.experiment,
             add_columns=add_columns,
-            column_dtypes=definition.filename_format_dtypes['gaze'],
+            column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
             **custom_read_kwargs,
         )
     else:
@@ -556,9 +558,10 @@ def add_fileinfo(
     )
 
     # Cast columns from fileinfo according to specification.
+    _schema_overrides = definition.filename_format_schema_overrides['gaze']
     df = df.with_columns([
         pl.col(fileinfo_key).cast(fileinfo_dtype)
-        for fileinfo_key, fileinfo_dtype in definition.filename_format_dtypes['gaze'].items()
+        for fileinfo_key, fileinfo_dtype in _schema_overrides.items()
     ])
     return df
 

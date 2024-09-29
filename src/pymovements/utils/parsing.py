@@ -381,10 +381,7 @@ def parse_eyelink(
     if schema is not None:
         schema_overrides.update(schema)
 
-    df = pl.from_dict(
-        data=samples,
-        schema_overrides=schema_overrides,
-    )
+    df = pl.from_dict(data=samples).cast(schema_overrides)
 
     return df, pre_processed_metadata
 

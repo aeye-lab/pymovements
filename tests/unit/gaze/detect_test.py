@@ -1042,7 +1042,7 @@ def test_gaze_detect_missing_trial_column_events_raises_exception():
     gaze.events.frame = gaze.events.frame.drop(gaze.trial_columns)
     assert gaze.trial_columns[0] not in gaze.events.frame.columns
 
-    with pytest.raises(pl.ColumnNotFoundError) as exc_info:
+    with pytest.raises(pl.exceptions.ColumnNotFoundError) as exc_info:
         gaze.detect('fill')
 
     msg, = exc_info.value.args

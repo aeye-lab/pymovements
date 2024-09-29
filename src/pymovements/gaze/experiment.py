@@ -82,14 +82,6 @@ class Experiment:
     -12.42...
     >>> experiment.screen.y_max_dva# doctest:+ELLIPSIS
     12.42...
-
-
-    Attributes
-    ----------
-    screen: Screen
-        Screen object for experiment
-    eyetracker : EyeTracker | None
-        Eye tracker for experiment
     """
 
     def __init__(
