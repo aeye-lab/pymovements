@@ -294,7 +294,7 @@ def from_asc(
     add_columns: dict[str, str] | None
         Dictionary containing columns to add to loaded data frame.
         (default: None)
-    column_dtypes:  dict[str, type] | None
+    column_dtypes: dict[str, Any] | None
         Dictionary containing types for columns.
         (default: None)
 
