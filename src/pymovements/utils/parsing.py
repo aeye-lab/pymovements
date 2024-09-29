@@ -40,58 +40,58 @@ EYE_TRACKING_SAMPLE = re.compile(
 )
 
 EYELINK_META_REGEXES = [
-    {'pattern': r'\*\*\s+VERSION:\s+(?P<version_1>.*)\s+'},
-    {
-        'pattern': r'\*\*\s+DATE:\s+(?P<weekday>[A-Z,a-z]+)\s+(?P<month>[A-Z,a-z]+)'
-                   r'\s+(?P<day>\d\d?)\s+(?P<time>\d\d:\d\d:\d\d)\s+(?P<year>\d{4})\s*',
-    },
-    {'pattern': r'\*\*\s+(?P<version_2>EYELINK.*)'},
-    {
-        'pattern': r'MSG\s+\d+[.]?\d*\s+DISPLAY_COORDS\s+(?P<resolution>.*)',
-    },
-    {
-        'pattern': r'MSG\s+\d+[.]?\d*\s+RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+'
-                   r'(?P<sampling_rate>\d+)\s+'
-                   r'(?P<file_sample_filter>(0|1|2))\s+'
-                   r'(?P<link_sample_filter>(0|1|2))\s+'
-                   r'(?P<tracked_eye>(L|R|LR))\s*',
-    },
-    {
-        'pattern': r'PUPIL\s+(?P<pupil_data_type>(AREA|DIAMETER))\s*',
-    },
-    {
-        'pattern': r'MSG\s+\d+[.]?\d*\s+ELCLCFG\s+(?P<mount_configuration>.*)',
-    },
+    {'pattern': re.compile(regex)} for regex in (
+        r'\*\*\s+VERSION:\s+(?P<version_1>.*)\s+',
+        (
+            r'\*\*\s+DATE:\s+(?P<weekday>[A-Z,a-z]+)\s+(?P<month>[A-Z,a-z]+)'
+            r'\s+(?P<day>\d\d?)\s+(?P<time>\d\d:\d\d:\d\d)\s+(?P<year>\d{4})\s*'
+        ),
+        r'\*\*\s+(?P<version_2>EYELINK.*)',
+        r'MSG\s+\d+[.]?\d*\s+DISPLAY_COORDS\s+(?P<resolution>.*)',
+        (
+            r'MSG\s+\d+[.]?\d*\s+RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+'
+            r'(?P<sampling_rate>\d+)\s+'
+            r'(?P<file_sample_filter>(0|1|2))\s+'
+            r'(?P<link_sample_filter>(0|1|2))\s+'
+            r'(?P<tracked_eye>(L|R|LR))\s*'
+        ),
+        r'PUPIL\s+(?P<pupil_data_type>(AREA|DIAMETER))\s*',
+        r'MSG\s+\d+[.]?\d*\s+ELCLCFG\s+(?P<mount_configuration>.*)',
+    )
 ]
 
-VALIDATION_REGEX = (
+VALIDATION_REGEX = re.compile(
     r'MSG\s+(?P<timestamp>\d+[.]?\d*)\s+!CAL\s+VALIDATION\s+HV'
     r'(?P<num_points>\d\d?).*'
     r'(?P<tracked_eye>LEFT|RIGHT)\s+'
     r'(?P<error>\D*)\s+'
     r'(?P<validation_score_avg>\d.\d\d)\s+avg\.\s+'
-    r'(?P<validation_score_max>\d.\d\d)\s+max'
+    r'(?P<validation_score_max>\d.\d\d)\s+max',
 )
 
-BLINK_START_REGEX = r'SBLINK\s+(R|L)\s+(?P<timestamp>(\d+[.]?\d*))\s*'
-BLINK_STOP_REGEX = (
+BLINK_START_REGEX = re.compile(r'SBLINK\s+(R|L)\s+(?P<timestamp>(\d+[.]?\d*))\s*')
+BLINK_STOP_REGEX = re.compile(
     r'EBLINK\s+(R|L)\s+(?P<timestamp_start>(\d+[.]?\d*))\s+'
-    r'(?P<timestamp_end>(\d+[.]?\d*))\s+(?P<duration_ms>(\d+[.]?\d*))\s*'
+    r'(?P<timestamp_end>(\d+[.]?\d*))\s+(?P<duration_ms>(\d+[.]?\d*))\s*',
 )
-INVALID_SAMPLE_REGEX = r'(?P<timestamp>(\d+[.]?\d*))\s+\.\s+\.\s+0\.0\s+0\.0\s+\.\.\.\s*'
+INVALID_SAMPLE_REGEX = re.compile(
+    r'(?P<timestamp>(\d+[.]?\d*))\s+\.\s+\.\s+0\.0\s+0\.0\s+\.\.\.\s*',
+)
 
-CALIBRATION_TIMESTAMP_REGEX = r'MSG\s+(?P<timestamp>\d+[.]?\d*)\s+!CAL\s*\n'
+CALIBRATION_TIMESTAMP_REGEX = re.compile(r'MSG\s+(?P<timestamp>\d+[.]?\d*)\s+!CAL\s*\n')
 
-CALIBRATION_REGEX = (
+CALIBRATION_REGEX = re.compile(
     r'>+\s+CALIBRATION\s+\(HV(?P<num_points>\d\d?),'
     r'(?P<type>.*)\).*'
-    r'(?P<tracked_eye>RIGHT|LEFT):\s+<{9}'
+    r'(?P<tracked_eye>RIGHT|LEFT):\s+<{9}',
 )
 
-START_RECORDING_REGEX = r'START\s+(?P<timestamp>(\d+[.]?\d*))\s+(RIGHT|LEFT)\s+(?P<types>.*)'
-STOP_RECORDING_REGEX = (
+START_RECORDING_REGEX = re.compile(
+    r'START\s+(?P<timestamp>(\d+[.]?\d*))\s+(RIGHT|LEFT)\s+(?P<types>.*)',
+)
+STOP_RECORDING_REGEX = re.compile(
     r'END\s+(?P<timestamp>(\d+[.]?\d*))\s+\s+(?P<types>.*)\s+RES\s+'
-    r'(?P<xres>[\d\.]*)\s+(?P<yres>[\d\.]*)\s*'
+    r'(?P<xres>[\d\.]*)\s+(?P<yres>[\d\.]*)\s*',
 )
 
 
@@ -115,12 +115,12 @@ def check_nan(sample_location: str) -> float:
     return ret
 
 
-def compile_patterns(patterns: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def compile_patterns(patterns: list[dict[str, Any] | str]) -> list[dict[str, Any]]:
     """Compile patterns from strings.
 
     Parameters
     ----------
-    patterns: list[dict[str, Any]]
+    patterns: list[dict[str, Any] | str]
         The list of patterns to compile.
 
     Returns
@@ -161,24 +161,25 @@ def compile_patterns(patterns: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return compiled_patterns
 
 
-def get_additional_columns(compiled_patterns: list[dict[str, Any]]) -> set[str]:
-    """Get additionally needed columns from compiled patterns."""
-    additional_columns = set()
+def get_pattern_keys(compiled_patterns: list[dict[str, Any]], pattern_key: str) -> set[str]:
+    """Get names of capture groups or column/metadata keys."""
+    keys = set()
 
     for compiled_pattern_dict in compiled_patterns:
-        if 'column' in compiled_pattern_dict:
-            additional_columns.add(compiled_pattern_dict['column'])
+        if pattern_key in compiled_pattern_dict:
+            keys.add(compiled_pattern_dict[pattern_key])
 
-        for column in compiled_pattern_dict['pattern'].groupindex.keys():
-            additional_columns.add(column)
+        for key in compiled_pattern_dict['pattern'].groupindex.keys():
+            keys.add(key)
 
-    return additional_columns
+    return keys
 
 
 def parse_eyelink(
         filepath: Path | str,
-        patterns: list[dict[str, Any]] | None = None,
+        patterns: list[dict[str, Any] | str] | None = None,
         schema: dict[str, Any] | None = None,
+        metadata_patterns: list[dict[str, Any] | str] | None = None,
 ) -> tuple[pl.DataFrame, dict[str, Any]]:
     """Process EyeLink asc file.
 
@@ -186,10 +187,12 @@ def parse_eyelink(
     ----------
     filepath: Path | str
         file name of ascii file to convert.
-    patterns: list[dict[str, Any]] | None
-        list of patterns to match for additional columns. (default: None)
+    patterns: list[dict[str, Any] | str] | None
+        List of patterns to match for additional columns. (default: None)
     schema: dict[str, Any] | None
         Dictionary to optionally specify types of columns parsed by patterns. (default: None)
+    metadata_patterns: list[dict[str, Any] | str] | None
+        list of patterns to match for additional metadata. (default: None)
 
     Returns
     -------
@@ -205,7 +208,11 @@ def parse_eyelink(
         patterns = []
     compiled_patterns = compile_patterns(patterns)
 
-    additional_columns = get_additional_columns(compiled_patterns)
+    if metadata_patterns is None:
+        metadata_patterns = []
+    compiled_metadata_patterns = compile_patterns(metadata_patterns)
+
+    additional_columns = get_pattern_keys(compiled_patterns, 'column')
     additional: dict[str, list[Any]] = {
         additional_column: [] for additional_column in additional_columns
     }
@@ -227,21 +234,14 @@ def parse_eyelink(
     # will return an empty string if the key does not exist
     metadata: defaultdict = defaultdict(str)
 
-    compiled_metadata_patterns = []
-    for metadata_pattern in EYELINK_META_REGEXES:
-        compiled_metadata_patterns.append({'pattern': re.compile(metadata_pattern['pattern'])})
+    # metadata keys specified by the user should have a default value of None
+    metadata_keys = get_pattern_keys(compiled_metadata_patterns, 'key')
+    for key in metadata_keys:
+        metadata[key] = None
 
-    compiled_validation_pattern = re.compile(VALIDATION_REGEX)
-    compiled_calibration_pattern = re.compile(CALIBRATION_REGEX)
-    compiled_calibration_timestamp = re.compile(CALIBRATION_TIMESTAMP_REGEX)
+    compiled_metadata_patterns.extend(EYELINK_META_REGEXES)
+
     cal_timestamp = ''
-
-    compiled_blink_start = re.compile(BLINK_START_REGEX)
-    compiled_blink_stop = re.compile(BLINK_STOP_REGEX)
-    compiled_invalid_sample = re.compile(INVALID_SAMPLE_REGEX)
-
-    compiled_recording_start = re.compile(START_RECORDING_REGEX)
-    compiled_recording_stop = re.compile(STOP_RECORDING_REGEX)
 
     validations = []
     calibrations = []
@@ -264,8 +264,7 @@ def parse_eyelink(
                     current_additional[current_column] = pattern_dict['value']
 
                 else:
-                    for column, value in match.groupdict().items():
-                        current_additional[column] = value
+                    current_additional.update(match.groupdict())
 
         if cal_timestamp:
             # if a calibration timestamp has been found, the next line will be a
@@ -277,15 +276,15 @@ def parse_eyelink(
                     'timestamp': cal_timestamp,
                     **match.groupdict(),
                 }
-                if (match := compiled_calibration_pattern.match(line))
+                if (match := CALIBRATION_REGEX.match(line))
                 else {'timestamp': cal_timestamp},
             )
             cal_timestamp = ''
 
-        elif compiled_blink_start.match(line):
+        elif BLINK_START_REGEX.match(line):
             blink = True
 
-        elif match := compiled_blink_stop.match(line):
+        elif match := BLINK_STOP_REGEX.match(line):
             blink = False
             parsed_blink = match.groupdict()
             blink_info = {
@@ -297,10 +296,10 @@ def parse_eyelink(
             num_blink_samples = 0
             blinks.append(blink_info)
 
-        elif match := compiled_recording_start.match(line):
+        elif match := START_RECORDING_REGEX.match(line):
             start_recording_timestamp = match.groupdict()['timestamp']
 
-        elif match := compiled_recording_stop.match(line):
+        elif match := STOP_RECORDING_REGEX.match(line):
             stop_recording_timestamp = match.groupdict()['timestamp']
             block_duration = float(stop_recording_timestamp) - float(start_recording_timestamp)
 
@@ -326,50 +325,52 @@ def parse_eyelink(
             for additional_column in additional_columns:
                 samples[additional_column].append(current_additional[additional_column])
 
-            if (match := compiled_invalid_sample.match(line)) and not blink:
-                invalid_samples.append(match.groupdict()['timestamp'])
-            elif compiled_invalid_sample.match(line) and blink:
-                num_blink_samples += 1
+            if match := INVALID_SAMPLE_REGEX.match(line):
+                if blink:
+                    num_blink_samples += 1
+                else:
+                    invalid_samples.append(match.groupdict()['timestamp'])
 
-        elif match := compiled_calibration_timestamp.match(line):
+        elif match := CALIBRATION_TIMESTAMP_REGEX.match(line):
             cal_timestamp = match.groupdict()['timestamp']
 
-        elif match := compiled_validation_pattern.match(line):
+        elif match := VALIDATION_REGEX.match(line):
             validations.append(match.groupdict())
 
         elif compiled_metadata_patterns:
             for pattern_dict in compiled_metadata_patterns.copy():
                 if match := pattern_dict['pattern'].match(line):
-                    for column, value in match.groupdict().items():
-                        metadata[column] = value
+                    if 'value' in pattern_dict:
+                        metadata[pattern_dict['key']] = pattern_dict['value']
+
+                    else:
+                        metadata.update(match.groupdict())
 
                     # each metadata pattern should only match once
                     compiled_metadata_patterns.remove(pattern_dict)
 
-    if metadata:
-        # if the sampling rate is not found, we cannot calculate the data loss
-        actual_number_of_samples = len(samples['time'])
-
-        data_loss_ratio, data_loss_ratio_blinks = _calculate_data_loss(
-            blinks=blinks,
-            invalid_samples=invalid_samples,
-            actual_num_samples=actual_number_of_samples,
-            total_rec_duration=total_recording_duration,
-            sampling_rate=metadata['sampling_rate'],
-        )
-
-        pre_processed_metadata: dict[str, Any] = _pre_process_metadata(metadata)
-
-        # is not yet pre-processed but should be
-        pre_processed_metadata['calibrations'] = calibrations
-        pre_processed_metadata['validations'] = validations
-        pre_processed_metadata['blinks'] = blinks
-        pre_processed_metadata['data_loss_ratio'] = data_loss_ratio
-        pre_processed_metadata['data_loss_ratio_blinks'] = data_loss_ratio_blinks
-        pre_processed_metadata['total_recording_duration_ms'] = total_recording_duration
-
-    else:
+    if not metadata:
         raise Warning('No metadata found. Please check the file for errors.')
+
+    # if the sampling rate is not found, we cannot calculate the data loss
+    actual_number_of_samples = len(samples['time'])
+
+    data_loss_ratio, data_loss_ratio_blinks = _calculate_data_loss(
+        blinks=blinks,
+        invalid_samples=invalid_samples,
+        actual_num_samples=actual_number_of_samples,
+        total_rec_duration=total_recording_duration,
+        sampling_rate=metadata['sampling_rate'],
+    )
+
+    pre_processed_metadata: dict[str, Any] = _pre_process_metadata(metadata)
+    # is not yet pre-processed but should be
+    pre_processed_metadata['calibrations'] = calibrations
+    pre_processed_metadata['validations'] = validations
+    pre_processed_metadata['blinks'] = blinks
+    pre_processed_metadata['data_loss_ratio'] = data_loss_ratio
+    pre_processed_metadata['data_loss_ratio_blinks'] = data_loss_ratio_blinks
+    pre_processed_metadata['total_recording_duration_ms'] = total_recording_duration
 
     schema_overrides = {
         'time': pl.Float64,
@@ -378,8 +379,7 @@ def parse_eyelink(
         'pupil': pl.Float64,
     }
     if schema is not None:
-        for column, dtype in schema.items():
-            schema_overrides[column] = dtype
+        schema_overrides.update(schema)
 
     df = pl.from_dict(data=samples).cast(schema_overrides)
 
