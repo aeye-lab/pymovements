@@ -209,8 +209,10 @@ class CopCo(DatasetDefinition):
         default_factory=lambda: {
             'precomputed_events': {
                 'separator': '\t',
-                'null_values': '.',
-                'quote_char': '"',
+                'null_values': ['.', 'UNDEFINEDnull'],
+                'infer_schema_length': 100000,
+                'truncate_ragged_lines': True,
+                'decimal_comma': True,
             },
             'precomputed_reading_measures': {},
         },
