@@ -237,14 +237,36 @@ def dataset_fixture():
         'char',
     ],
 )
-def test_gaze_to_aoi_mapping_char(aoi_column, dataset):
+def test_gaze_to_aoi_mapping_char_width_height(aoi_column, dataset):
     aoi_df = pm.stimulus.text.from_file(
         'tests/files/toy_text_1_1_aoi.csv',
         aoi_column=aoi_column,
-        pixel_x_column='top_left_x',
-        pixel_y_column='top_left_y',
+        start_x_column='top_left_x',
+        start_y_column='top_left_y',
         width_column='width',
         height_column='height',
+        page_column='page',
+    )
+
+    dataset.events[0].map_to_aois(aoi_df)
+    assert_frame_equal(dataset.events[0].frame, EXPECTED_DF[aoi_column])
+
+
+@pytest.mark.parametrize(
+    ('aoi_column'),
+    [
+        'word',
+        'char',
+    ],
+)
+def test_gaze_to_aoi_mapping_char_end(aoi_column, dataset):
+    aoi_df = pm.stimulus.text.from_file(
+        'tests/files/toy_text_1_1_aoi.csv',
+        aoi_column=aoi_column,
+        start_x_column='top_left_x',
+        start_y_column='top_left_y',
+        end_x_column='bottom_left_x',
+        end_y_column='bottom_left_y',
         page_column='page',
     )
 
@@ -256,8 +278,8 @@ def test_map_to_aois_raises_value_error():
     aoi_df = pm.stimulus.text.from_file(
         'tests/files/toy_text_1_1_aoi.csv',
         aoi_column='char',
-        pixel_x_column='top_left_x',
-        pixel_y_column='top_left_y',
+        start_x_column='top_left_x',
+        start_y_column='top_left_y',
         width_column='width',
         height_column='height',
         page_column='page',
@@ -272,3 +294,17 @@ def test_map_to_aois_raises_value_error():
         gaze_df.map_to_aois(aoi_df, eye='right', gaze_type='')
     msg, = excinfo.value.args
     assert msg == 'neither position nor pixel in gaze dataframe, one needed for mapping'
+
+
+def test_map_to_aois_raises_value_error_missing_width_height(dataset):
+    aoi_df = pm.stimulus.text.from_file(
+        'tests/files/toy_text_1_1_aoi.csv',
+        aoi_column='char',
+        start_x_column='top_left_x',
+        start_y_column='top_left_y',
+        page_column='page',
+    )
+    with pytest.raises(ValueError) as excinfo:
+        dataset.events[0].map_to_aois(aoi_df)
+    msg, = excinfo.value.args
+    assert msg == 'either aoi_dataframe.width or aoi_dataframe.end_x_column have to be not None'

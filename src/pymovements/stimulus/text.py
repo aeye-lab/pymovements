@@ -35,16 +35,24 @@ class TextStimulus:
         A stimulus dataframe.
     aoi_column: str
         Name of the column that contains the content of the aois.
-    pixel_x_column: str
-        Name of the column which contains the x coordinate of the areas of interest.
-    pixel_y_column: str
-        Name of the column which contains the y coordinate of the areas of interest.
-    width_column: str
-        Name of the column which contains the width of the area of interest.
-    height_column: str
-        Name of the column which contains the height of the area of interest.
-    page_column: str
+    start_x_column: str
+        Name of the column which contains the x coordinate's start position of the
+        areas of interest.
+    start_y_column: str
+        Name of the column which contains the y coordinate's start position of the
+        areas of interest.
+    width_column: str | None
+        Name of the column which contains the width of the area of interest. (default: None)
+    height_column: str | None
+        Name of the column which contains the height of the area of interest. (default: None)
+    end_x_column: str | None
+        Name of the column which contains the x coordinate's end position of the areas of interest.
+        (default: None)
+    end_y_column: str | None
+        Name of the column which contains the y coordinate's end position of the areas of interest.
+    page_column: str | None
         Name of the column which contains the page information of the area of interest.
+        (default: None)
     """
 
     def __init__(
@@ -52,19 +60,23 @@ class TextStimulus:
             aois: pl.DataFrame,
             *,
             aoi_column: str,
-            pixel_x_column: str,
-            pixel_y_column: str,
-            width_column: str,
-            height_column: str,
-            page_column: str,
+            start_x_column: str,
+            start_y_column: str,
+            width_column: str | None = None,
+            height_column: str | None = None,
+            end_x_column: str | None = None,
+            end_y_column: str | None = None,
+            page_column: str | None = None,
     ) -> None:
 
         self.aois = aois.clone()
         self.aoi_column = aoi_column
-        self.pixel_x_column = pixel_x_column
-        self.pixel_y_column = pixel_y_column
         self.width_column = width_column
         self.height_column = height_column
+        self.start_x_column = start_x_column
+        self.start_y_column = start_y_column
+        self.end_x_column = end_x_column
+        self.end_y_column = end_y_column
         self.page_column = page_column
 
 
@@ -72,11 +84,13 @@ def from_file(
         aoi_path: str | Path,
         *,
         aoi_column: str,
-        pixel_x_column: str,
-        pixel_y_column: str,
-        width_column: str,
-        height_column: str,
-        page_column: str,
+        start_x_column: str,
+        start_y_column: str,
+        width_column: str | None = None,
+        height_column: str | None = None,
+        end_x_column: str | None = None,
+        end_y_column: str | None = None,
+        page_column: str | None = None,
         custom_read_kwargs: dict[str, Any] | None = None,
 ) -> TextStimulus:
     """Load text stimulus from file.
@@ -87,18 +101,28 @@ def from_file(
         Path to file to be read.
     aoi_column: str
         Name of the column that contains the content of the aois.
-    pixel_x_column: str
-        Name of the column which contains the x coordinate of the areas of interest.
-    pixel_y_column: str
-        Name of the column which contains the y coordinate of the areas of interest.
-    width_column: str
-        Name of the column which contains the width of the area of interest.
-    height_column: str
-        Name of the column which contains the height of the area of interest.
-    page_column: str
+    start_x_column: str
+        Name of the column which contains the x coordinate's start position of the
+        areas of interest.
+    start_y_column: str
+        Name of the column which contains the y coordinate's start position of the
+        areas of interest.
+    width_column: str | None
+        Name of the column which contains the width of the area of interest. (default: None)
+    height_column: str | None
+        Name of the column which contains the height of the area of interest. (default: None)
+    end_x_column: str | None
+        Name of the column which contains the x coordinate's end position of the areas of interest.
+        (default: None)
+    end_y_column: str | None
+        Name of the column which contains the y coordinate's end position of the areas of interest.
+        (default: None)
+    page_column: str | None
         Name of the column which contains the page information of the area of interest.
+        (default: None)
     custom_read_kwargs: dict[str, Any] | None
         Custom read keyword arguments for polars. (default: None)
+
 
     Returns
     -------
@@ -126,9 +150,11 @@ def from_file(
     return TextStimulus(
         aois=stimulus_df,
         aoi_column=aoi_column,
-        pixel_x_column=pixel_x_column,
-        pixel_y_column=pixel_y_column,
+        start_x_column=start_x_column,
+        start_y_column=start_y_column,
         width_column=width_column,
         height_column=height_column,
+        end_x_column=end_x_column,
+        end_y_column=end_y_column,
         page_column=page_column,
     )
