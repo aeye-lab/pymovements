@@ -195,7 +195,7 @@ def check_is_length_matching(**kwargs: Sized) -> None:
 
 
 def check_is_not_none(**kwargs: Any) -> None:
-    """Check if all passed values are None.
+    """Check if all passed values are not None.
 
     Parameters
     ----------
