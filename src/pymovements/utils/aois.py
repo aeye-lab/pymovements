@@ -23,6 +23,7 @@ from __future__ import annotations
 import polars as pl
 
 from pymovements.stimulus import TextStimulus
+from pymovements.utils import checks
 
 
 def get_aoi(
@@ -32,6 +33,10 @@ def get_aoi(
         y_eye: str,
 ) -> str:
     """Given eye movement and aoi dataframe, return aoi.
+
+    If `width` is used, calculation: start_x_column <= x_eye < start_x_column + width.
+    If `end_x_column` is used, calculation: start_x_column <= x_eye < end_x_column.
+    Analog for y coordinate and height.
 
     Parameters
     ----------
@@ -48,20 +53,53 @@ def get_aoi(
     -------
     str
         Looked at area of interest.
+
+    Raises
+    ------
+    ValueError
+        If width and end_TYPE_column is None.
     """
-    try:
-        aoi = aoi_dataframe.aois.filter(
-            (aoi_dataframe.aois['top_left_x'] <= row[x_eye]) &
-            (
-                row[x_eye] <
-                aoi_dataframe.aois['top_left_x'] + aoi_dataframe.aois['width']
-            ) &
-            (aoi_dataframe.aois['top_left_y'] <= row[y_eye]) &
-            (
-                row[y_eye] <
-                aoi_dataframe.aois['top_left_y'] + aoi_dataframe.aois['height']
-            ),
-        )[aoi_dataframe.aoi_column].item()
-        return aoi
-    except ValueError:
-        return ''
+    if aoi_dataframe.width_column is not None:
+        checks.check_is_none_is_mutual(
+            height_column=aoi_dataframe.width_column,
+            width_column=aoi_dataframe.height_column,
+        )
+        try:
+            aoi = aoi_dataframe.aois.filter(
+                (aoi_dataframe.aois[aoi_dataframe.start_x_column] <= row[x_eye]) &
+                (
+                    row[x_eye] <
+                    aoi_dataframe.aois[aoi_dataframe.start_x_column] +
+                    aoi_dataframe.aois[aoi_dataframe.width_column]
+                ) &
+                (aoi_dataframe.aois[aoi_dataframe.start_y_column] <= row[y_eye]) &
+                (
+                    row[y_eye] <
+                    aoi_dataframe.aois[aoi_dataframe.start_y_column] +
+                    aoi_dataframe.aois[aoi_dataframe.height_column]
+                ),
+            )[aoi_dataframe.aoi_column].item()
+            return aoi
+        except ValueError:
+            return ''
+    elif aoi_dataframe.end_x_column is not None:
+        checks.check_is_none_is_mutual(
+            end_x_column=aoi_dataframe.end_x_column,
+            end_y_column=aoi_dataframe.end_y_column,
+        )
+        try:
+            aoi = aoi_dataframe.aois.filter(
+                # x-coordinate: within bounding box
+                (aoi_dataframe.aois[aoi_dataframe.start_x_column] <= row[x_eye]) &
+                (row[x_eye] < aoi_dataframe.aois[aoi_dataframe.end_x_column]) &
+                # y-coordinate: within bounding box
+                (aoi_dataframe.aois[aoi_dataframe.start_y_column] <= row[y_eye]) &
+                (row[y_eye] < aoi_dataframe.aois[aoi_dataframe.end_y_column]),
+            )[aoi_dataframe.aoi_column].item()
+            return aoi
+        except ValueError:
+            return ''
+    else:
+        raise ValueError(
+            'either aoi_dataframe.width or aoi_dataframe.end_x_column have to be not None',
+        )

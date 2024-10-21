@@ -454,14 +454,64 @@ EXPECTED_DF = {
         'position',
     ],
 )
-def test_gaze_to_aoi_mapping_char(eye, aoi_column, gaze_type):
+def test_gaze_to_aoi_mapping_char_width_height(eye, aoi_column, gaze_type):
     aoi_df = pm.stimulus.text.from_file(
         'tests/files/toy_text_1_1_aoi.csv',
         aoi_column=aoi_column,
-        pixel_x_column='top_left_x',
-        pixel_y_column='top_left_y',
+        start_x_column='top_left_x',
+        start_y_column='top_left_y',
         width_column='width',
         height_column='height',
+        page_column='page',
+    )
+    if gaze_type == 'pixel':
+        gaze_df = pm.gaze.io.from_csv(
+            'tests/files/judo1000_example.csv',
+            **{'separator': '\t'},
+            pixel_columns=['x_left', 'y_left', 'x_right', 'y_right'],
+        )
+    elif gaze_type == 'position':
+        gaze_df = pm.gaze.io.from_csv(
+            'tests/files/judo1000_example.csv',
+            **{'separator': '\t'},
+            position_columns=['x_left', 'y_left', 'x_right', 'y_right'],
+        )
+
+    gaze_df.map_to_aois(aoi_df, eye=eye, gaze_type=gaze_type)
+    assert_frame_equal(gaze_df.frame, EXPECTED_DF[f'{aoi_column}_{eye}_{gaze_type}'])
+
+
+@pytest.mark.parametrize(
+    ('eye'),
+    [
+        'right',
+        'left',
+        'auto',
+        'else',
+    ],
+)
+@pytest.mark.parametrize(
+    ('aoi_column'),
+    [
+        'word',
+        'char',
+    ],
+)
+@pytest.mark.parametrize(
+    ('gaze_type'),
+    [
+        'pixel',
+        'position',
+    ],
+)
+def test_gaze_to_aoi_mapping_char_end(eye, aoi_column, gaze_type):
+    aoi_df = pm.stimulus.text.from_file(
+        'tests/files/toy_text_1_1_aoi.csv',
+        aoi_column=aoi_column,
+        start_x_column='top_left_x',
+        start_y_column='top_left_y',
+        end_x_column='bottom_left_x',
+        end_y_column='bottom_left_y',
         page_column='page',
     )
     if gaze_type == 'pixel':
@@ -485,8 +535,8 @@ def test_map_to_aois_raises_value_error():
     aoi_df = pm.stimulus.text.from_file(
         'tests/files/toy_text_1_1_aoi.csv',
         aoi_column='char',
-        pixel_x_column='top_left_x',
-        pixel_y_column='top_left_y',
+        start_x_column='top_left_x',
+        start_y_column='top_left_y',
         width_column='width',
         height_column='height',
         page_column='page',

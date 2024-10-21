@@ -13,17 +13,17 @@ repos:
     hooks:
     -   id: add-trailing-comma
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v3.17.0
+    rev: v3.18.0
     hooks:
     -   id: pyupgrade
         args: [--py39-plus]
 -   repo: https://github.com/asottile/reorder-python-imports
-    rev: v3.13.0
+    rev: v3.14.0
     hooks:
     -   id: reorder-python-imports
         args: [--application-directories=src, --py39-plus]
 -   repo: https://github.com/asottile/reorder-python-imports
-    rev: v3.13.0
+    rev: v3.14.0
     hooks:
     -   id: reorder-python-imports
         files: ^src/
@@ -53,7 +53,7 @@ repos:
         args: [--use-current-year]
         types: [python]
 -   repo: https://github.com/jsh9/pydoclint
-    rev: 0.4.2
+    rev: 0.5.9
     hooks:
     - id: pydoclint
       args: ["--config=pyproject.toml"]
@@ -73,7 +73,7 @@ repos:
     -   id: mypy
         additional_dependencies: [pandas-stubs, types-tqdm]
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
     -   id: check-builtin-literals
     -   id: check-case-conflict
