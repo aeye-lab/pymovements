@@ -235,5 +235,6 @@ def test_dataset_save_load_preprocessed(datasets):
         dataset.pix2deg()
 
     dataset.pos2vel()
+    dataset.resample(resampling_rate=2000)
     dataset.save()
     dataset.load(preprocessed=True)
