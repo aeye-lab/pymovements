@@ -855,7 +855,7 @@ def resample(
         # Replace the pre-existing NaN values with Null
         frame = _apply_on_columns(
             frame,
-            columns=columns,
+            columns=[column for column in columns if frame[column].dtype != pl.String],
             transformation=lambda series: series.fill_nan(None),
             n_components=n_components,
         )
