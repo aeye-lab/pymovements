@@ -102,6 +102,7 @@ def fixture_gaze_init_kwargs(request):
             'time_unit': pm.datasets.SBSAT().time_unit,
             'pixel_columns': pm.datasets.SBSAT().pixel_columns,
             'experiment': pm.datasets.SBSAT().experiment,
+            'trial_columns': pm.datasets.SBSAT().trial_columns,
             **pm.datasets.SBSAT().custom_read_kwargs['gaze'],
         },
         'gaze_on_faces': {
