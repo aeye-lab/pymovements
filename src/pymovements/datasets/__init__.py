@@ -34,6 +34,7 @@
     pymovements.datasets.GazeGraph
     pymovements.datasets.GazeOnFaces
     pymovements.datasets.HBN
+    pymovements.datasets.InteRead
     pymovements.datasets.JuDo1000
     pymovements.datasets.PoTeC
     pymovements.datasets.SBSAT
@@ -58,6 +59,7 @@ from pymovements.datasets.gaze_on_faces import GazeOnFaces
 from pymovements.datasets.gazebase import GazeBase
 from pymovements.datasets.gazebasevr import GazeBaseVR
 from pymovements.datasets.hbn import HBN
+from pymovements.datasets.interead import InteRead
 from pymovements.datasets.judo1000 import JuDo1000
 from pymovements.datasets.potec import PoTeC
 from pymovements.datasets.sb_sat import SBSAT
@@ -76,6 +78,7 @@ __all__ = [
     'GazeGraph',
     'GazeOnFaces',
     'HBN',
+    'InteRead',
     'JuDo1000',
     'PoTeC',
     'SBSAT',
