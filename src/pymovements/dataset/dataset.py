@@ -231,6 +231,40 @@ class Dataset:
             self.paths,
         )
 
+    def _split_gaze_data(
+            self,
+            by: list[str] | str,
+    ) -> None:
+        """Split gaze data into seperated GazeDataFrame's.
+
+        Parameters
+        ----------
+        by: list[str] | str
+            Column's to split dataframe by.
+        """
+        if isinstance(by, str):
+            by = [by]
+        new_data = [
+            (
+                GazeDataFrame(
+                    new_frame,
+                    experiment=_frame.experiment,
+                    trial_columns=self.definition.trial_columns,
+                    time_column=self.definition.time_column,
+                    time_unit=self.definition.time_unit,
+                    position_columns=self.definition.position_columns,
+                    velocity_columns=self.definition.velocity_columns,
+                    acceleration_columns=self.definition.acceleration_columns,
+                    distance_column=self.definition.distance_column,
+                ),
+                fileinfo_row,
+            )
+            for (_frame, fileinfo_row) in zip(self.gaze, self.fileinfo['gaze'].to_dicts())
+            for new_frame in _frame.frame.partition_by(by=by)
+        ]
+        self.gaze = [data[0] for data in new_data]
+        self.fileinfo['gaze'] = pl.concat([pl.from_dict(data[1]) for data in new_data])
+
     def split_precomputed_events(
             self,
             by: list[str] | str,
