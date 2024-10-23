@@ -130,19 +130,27 @@ class CopCo(DatasetDefinition):
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
-            'gaze': False,
+            'gaze': True,
             'precomputed_events': True,
             'precomputed_reading_measures': True,
         },
     )
     mirrors: dict[str, tuple[str, ...]] = field(
         default_factory=lambda: {
+            'gaze': ('https://osf.io/download/',),
             'precomputed_events': ('https://files.de-1.osf.io/',),
             'precomputed_reading_measures': ('https://files.de-1.osf.io/',),
         },
     )
     resources: dict[str, tuple[dict[str, str | None], ...]] = field(
         default_factory=lambda: {
+            'gaze': (
+                {
+                    'resource': 'bg9r4/',
+                    'filename': 'csvs.zip',
+                    'md5': '9dc3276714397b7fccac1e179a14c52b',  # type:ignore
+                },
+            ),
             'precomputed_events': (
                 {
                     'resource':
@@ -174,6 +182,7 @@ class CopCo(DatasetDefinition):
 
     extract: dict[str, bool] = field(
         default_factory=lambda: {
+            'gaze': True,
             'precomputed_events': True,
             'precomputed_reading_measures': True,
         },
@@ -181,6 +190,7 @@ class CopCo(DatasetDefinition):
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
+            'gaze': r'P{subject_id:d}.csv',
             'precomputed_events': r'FIX_report_P{subject_id:d}.txt',
             'precomputed_reading_measures': r'P{subject_id:d}.csv',
         },
@@ -188,25 +198,25 @@ class CopCo(DatasetDefinition):
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
-            'precomputed_events': {},
-            'precomputed_reading_measures': {},
+            'gaze': {'subject_id': int},
+            'precomputed_events': {'subject_id': int},
+            'precomputed_reading_measures': {'subject_id': int},
         },
     )
 
-    trial_columns: list[str] = field(
-        default_factory=lambda: ['paragraphid', 'speechid'],
-    )
+    trial_columns: list[str] = field(default_factory=lambda: ['paragraph_id', 'speech_id'])
 
-    time_column: str = ''
+    time_column: str = 'time'
 
-    time_unit: str = ''
+    time_unit: str = 'ms'
 
-    pixel_columns: list[str] = field(default_factory=lambda: [])
+    pixel_columns: list[str] = field(default_factory=lambda: ['x_right', 'y_right'])
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
+            'gaze': {},
             'precomputed_events': {
                 'separator': '\t',
                 'null_values': ['.', 'UNDEFINEDnull'],

@@ -198,7 +198,6 @@ class SBSAT(DatasetDefinition):
 
     trial_columns: list[str] = field(
         default_factory=lambda: [
-            'subject_id',
             'book_name',
             'screen_id',
         ],
