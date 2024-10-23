@@ -268,7 +268,7 @@ def extract_dataset(
                     verbose=verbose,
                 )
             else:
-                shutil.move(source_path, destination_path / resource['filename'])
+                shutil.copy(source_path, destination_path / resource['filename'])
 
     if definition.has_files['precomputed_reading_measures']:
         paths.precomputed_reading_measures.mkdir(parents=True, exist_ok=True)
