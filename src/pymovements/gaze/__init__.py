@@ -26,6 +26,7 @@
    :template: class.rst
 
     pymovements.gaze.Experiment
+    pymovements.gaze.EyeTracker
     pymovements.gaze.Screen
     pymovements.gaze.GazeDataFrame
 
