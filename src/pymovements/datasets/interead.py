@@ -37,8 +37,8 @@ class InteRead(DatasetDefinition):
     This dataset includes monocular eye tracking data in an interrupted reading task.
     Automatic interruption occured during a reading task and participants continued
     reading after the pause.
-    Eye movements are recorded at a sampling frequency of 1200Hz video-based eye tracker.
-    Data provided are raw gaze samples and precomputed event files both pixel coordinates.
+    Eye movements are recorded at a sampling frequency of 1200Hz with video-based eye tracker.
+    Provided data are raw gaze samples and precomputed event files both in pixel coordinates.
 
     For more details, check the paper :cite:p:`InteRead`.
 
