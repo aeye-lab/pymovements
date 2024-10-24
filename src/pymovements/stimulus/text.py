@@ -82,17 +82,21 @@ class TextStimulus:
 
     def split_aois_by(
             self,
-            by: str | list[str],
-    ) -> None:
+            by: str,
+    ) -> list[TextStimulus]:
         """Split the AOI df.
 
         Parameters
         ----------
-        by: str | list[str]
-            Splitting criteria
+        by: str
+            Splitting criteria.
 
+        Returns
+        -------
+        list[TextStimulus]
+            A list of TextStimulus objects.
         """
-        self.aois = self.aois.partition_by(by=by, as_dict=False)
+        return self.aois.partition_by(by=by, as_dict=False)
 
 
 def from_file(
