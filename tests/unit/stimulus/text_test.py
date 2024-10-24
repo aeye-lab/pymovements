@@ -255,5 +255,5 @@ def test_text_stimulus_splitting(aoi_file, custom_read_kwargs):
         custom_read_kwargs=custom_read_kwargs,
     )
 
-    aois_df = aois_df.split_aois_by(by='line_idx')
+    aois_df = aois_df.split(by='line_idx')
     assert len(aois_df) == 2

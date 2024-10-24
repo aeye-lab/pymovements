@@ -80,7 +80,7 @@ class TextStimulus:
         self.end_y_column = end_y_column
         self.page_column = page_column
 
-    def split_aois_by(
+    def split(
             self,
             by: str,
     ) -> list[TextStimulus]:
