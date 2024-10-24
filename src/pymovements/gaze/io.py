@@ -374,81 +374,69 @@ def from_asc(
     if experiment.eyetracker is None:
         experiment.eyetracker = EyeTracker()
 
-    # resolution compariosn with ascii file and experiment
+   # Resolution comparison with ASCII file and experiment
     if metadata['resolution'] == (experiment.screen.height_px, experiment.screen.width_px):
         pass
-    elif (experiment.screen.height_px, experiment.screen.width_px) is None:
+    if (experiment.screen.height_px, experiment.screen.width_px) is None:
         experiment.screen.height_px, experiment.screen.width_px = metadata['resolution']
 
-    else:
+    if metadata['resolution'] != (experiment.screen.height_px, experiment.screen.width_px):
         raise ValueError(
-            f"Ascii file says resolution should be this: {
-                metadata['resolution']
-            }. But resolution provided this: {
-                experiment.screen.height_px,
-                experiment.screen.width_px
-            }",
+            f"Ascii file says resolution should be this: {metadata['resolution']}. "
+            f'But resolution provided is this: '
+            f'({experiment.screen.height_px}, {experiment.screen.width_px})',
         )
 
-    # sample rate comparion between metadata and eyetracker metadata
+    # Sample rate comparison between metadata and eyetracker metadata
     if metadata['sampling_rate'] != experiment.eyetracker.sampling_rate:
         raise ValueError(
-            f"Ascii file says sampling rate should be this: {
-                metadata['sampling_rate']
-            }. But sampling rate provided this: {
-                experiment.eyetracker.sampling_rate
-            }",
+            f"Ascii file says sampling rate should be this: {metadata['sampling_rate']}. "
+            f'But sampling rate provided is this: {experiment.eyetracker.sampling_rate}',
         )
-    elif experiment.eyetracker.sampling_rate is None:
+
+    if experiment.eyetracker.sampling_rate is None:
         experiment.eyetracker.sampling_rate = metadata['sampling_rate']
 
-    else:
-        pass
+# Left Eye or Right Eye
+
     # left Eye or right Eye
     if metadata['traked_eye'] == 'R' and not experiment.eyetracker.right:
         raise ValueError(
-            f"Ascii file syas its is:{
-                metadata['traked_eye']
-            }. But eye was used by experiment is :{
-                experiment.eyetracker.right
-            }",
+            f"Ascii file says it is: {metadata['tracked_eye']}. "
+            f'But the eye used by the experiment is: {experiment.eyetracker.right}',
         )
-    elif experiment.eyetracker.right is None:
+
+    if experiment.eyetracker.right is None:
         experiment.eyetracker.right = metadata['traked_eye']
 
     if metadata['traked_eye'] == 'L' and not experiment.eyetracker.left:
         raise ValueError(
-            f"Ascii file syas its is:{
-                metadata['traked_eye']
-            }. But eye was used by experiment is :{
-                experiment.eyetracker.left
-            }",
+            f"Ascii file says it is: {metadata['tracked_eye']}. "
+            f'But the eye used by the experiment is: {experiment.eyetracker.left}',
         )
-    elif experiment.eyetracker.left is None:
+
+    if experiment.eyetracker.left is None:
         experiment.eyetracker.left = metadata['traked_eye']
 
     # Cheking Mount configration
     if metadata['mount_configuration']['mount_type'] != experiment.eyetracker.mount:
         raise ValueError(
-            f"Ascii file says mount config should be this: {
-                metadata['mount_configuration']['mount_type']
-            }. But mount config provided this: {
-                experiment.eyetracker.mount
-            }",
+            f'Ascii file says mount config should be this: '
+            f"{metadata['mount_configuration']['mount_type']}. "
+            f'But mount config provided is: {experiment.eyetracker.mount}',
         )
-    elif experiment.eyetracker.mount is None:
+
+    if experiment.eyetracker.mount is None:
         experiment.eyetracker.mount = metadata['mount_configuration']['mount_type']
 
     # model check git
     if metadata['model'] != experiment.eyetracker.model:
         raise ValueError(
-            f"Ascii file says model should be this: {
-                metadata['model']
-            }. But model provided this: {
-                experiment.eyetracker.model
-            }",
+            f"Ascii file says model should be this: {metadata['model']}. "
+            f'But model provided is: {experiment.eyetracker.model}',
         )
-    elif experiment.eyetracker.model is None:
+
+    if experiment.eyetracker.model is None:
         experiment.eyetracker.model = metadata['model']
 
     # Create gaze data frame.
