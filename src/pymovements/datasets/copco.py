@@ -223,6 +223,7 @@ class CopCo(DatasetDefinition):
                 'infer_schema_length': 100000,
                 'truncate_ragged_lines': True,
                 'decimal_comma': True,
+                'quote_char': None,
             },
             'precomputed_reading_measures': {},
         },
