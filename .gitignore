@@ -26,6 +26,14 @@ share/python-wheels/
 *.egg
 MANIFEST
 pymovement_faizy
+meta3.py
+meta4.py
+meta5.py
+asc_metadata.py
+metadat.py
+metadata.py
+metadata_output.json
+
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

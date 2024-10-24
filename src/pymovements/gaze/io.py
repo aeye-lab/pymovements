@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Functionality to load GazeDataFrame from a csv file."""
-from __future__ import annotations
+from __future__ import annotations 
 
 from pathlib import Path
 from typing import Any
@@ -362,7 +362,7 @@ def from_asc(
     # resolution compariosn with ascii file and experiment
     if metadata['resolution']==(experiment.screen.height_px,experiment.screen.width_px):
         pass
-    elif metadata['resolution']==None:
+    elif (experiment.screen.height_px,experiment.screen.width_px)==None:
         experiment.screen.height_px,experiment.screen.width_px=metadata['resolution']
 
     else:
@@ -371,19 +371,27 @@ def from_asc(
     # sample rate comparion between metadata and eyetracker metadata
     if metadata['sampling_rate']!= experiment.eyetracker.sampling_rate:
         raise ValueError(f"Ascii file says sampling rate should be this: {metadata['sampling_rate']}. But sampling rate provided this: {experiment.eyetracker.sampling_rate}")
+    elif experiment.eyetracker.sampling==None:
+        experiment.eyetracker.sampling_rate=metadata['sampling_rate']
+
     else:
         pass
     # left Eye or right Eye
     if metadata['traked_eye']=='R' and not experiment.eyetracker.right:
         raise ValueError(f"Ascii file syas its is:{metadata['traked_eye']}. But eye was used by experiment is :{experiment.eyetracker.right}")
+    elif experiment.eyetracker.right==None:
+        experiment.eyetracker.right=metadata['traked_eye']    
         
     if metadata['traked_eye']=='L' and not experiment.eyetracker.left:
         raise ValueError(f"Ascii file syas its is:{metadata['traked_eye']}. But eye was used by experiment is :{experiment.eyetracker.left}")  
+    elif experiment.eyetracker.left==None:
+        experiment.eyetracker.left=metadata['traked_eye']    
 
     # Cheking Mount configration
     if metadata['mount_configuration']['mount_type']!= experiment.eyetracker.mount:
         raise ValueError(f"Ascii file says mount config should be this: {['mount_configuration']['mount_type']}. But mount config provided this: {experiment.eyetracker.mount}")
-    
+    elif experiment.eyetracker.mount==None:
+        experiment.eyetracker.mount=metadata['mount_configuration']['mount_type']
     
     # model check git 
     if metadata['model']!= experiment.eyetracker.model:
