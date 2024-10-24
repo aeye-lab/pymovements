@@ -21,18 +21,16 @@
 from __future__ import annotations
 
 import matplotlib.pyplot as plt
+import numpy as np
 import polars as pl
 from matplotlib.collections import Collection
+from sklearn.metrics import r2_score
 
 from pymovements.events import EventDataFrame
 
-from sklearn.metrics import r2_score
-import numpy as np
-
-
 
 def main_sequence_plot(
- event_df: EventDataFrame,
+    event_df: EventDataFrame,
         marker_size: float = 25,
         color: str = 'purple',
         color_line: str = 'red',
@@ -107,28 +105,28 @@ def main_sequence_plot(
             'the main sequence plot. ',
         ) from exc
 
+    a, b = np.polyfit(amplitudes, peak_velocities, 1)
 
-    
-
-    a, b = np.polyfit(amplitudes,peak_velocities,1)
-    
     # line plotting estimation
     min_ampl = min(amplitudes)
     max_ampl = max(amplitudes)
-    line_x = [min_ampl,max_ampl]
-    line_y = [a*min_ampl+b,a*max_ampl+b]
-    
+    line_x = [min_ampl, max_ampl]
+    line_y = [a * min_ampl + b, a * max_ampl + b]
+
     # residual calcualtion
-    y_pred = np.array(amplitudes)*a + b
+    y_pred = np.array(amplitudes) * a + b
     y_true = peak_velocities
-    
-    R2 = r2_score(y_true,y_pred)
-    R2 = np.round(R2,3)
+
+    R2 = r2_score(y_true, y_pred)
+    R2 = np.round(R2, 3)
 
     fig = plt.figure(figsize=figsize)
 
-    plt.text(0.05,0.8, f'R2 value: {R2}',bbox=dict(facecolor=None, ec=(0, 0, 0),fc=(1., 1, 1),pad =4),transform = plt.gca().transAxes)
-
+    plt.text(
+        0.05, 0.8, f'R2 value: {R2}', bbox=dict(
+            facecolor=None, ec=(
+                0, 0, 0), fc=(
+                1., 1, 1), pad=4), transform=plt.gca().transAxes)
 
     plt.scatter(
         amplitudes,
@@ -139,8 +137,8 @@ def main_sequence_plot(
         marker=marker,
         **kwargs,
     )
-    
-    plt.plot(line_x,line_y, c = color_line)
+
+    plt.plot(line_x, line_y, c=color_line)
 
     if title:
         plt.title(title)
