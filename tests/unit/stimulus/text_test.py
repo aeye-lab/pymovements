@@ -229,23 +229,21 @@ def test_text_stimulus_unsupported_format():
 
 
 @pytest.mark.parametrize(
-    ('aoi_file', 'custom_read_kwargs', 'expected'),
+    ('aoi_file', 'custom_read_kwargs'),
     [
         pytest.param(
             'tests/files/toy_text_1_1_aoi.csv',
             None,
-            EXPECTED_DF,
             id='toy_text_1_1_aoi',
         ),
         pytest.param(
             Path('tests/files/toy_text_1_1_aoi.csv'),
             {'separator': ','},
-            EXPECTED_DF,
             id='toy_text_1_1_aoi',
         ),
     ],
 )
-def test_text_stimulus_splitting(aoi_file, custom_read_kwargs, expected):
+def test_text_stimulus_splitting(aoi_file, custom_read_kwargs):
     aois_df = pm.stimulus.text.from_file(
         aoi_file,
         aoi_column='char',
@@ -257,7 +255,5 @@ def test_text_stimulus_splitting(aoi_file, custom_read_kwargs, expected):
         custom_read_kwargs=custom_read_kwargs,
     )
 
-    aois_df.split_aois_by(by="line_idx")
+    aois_df.split_aois_by(by='line_idx')
     assert len(aois_df.aois) == 2
-
-
