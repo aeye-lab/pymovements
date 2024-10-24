@@ -226,3 +226,38 @@ def test_text_stimulus_unsupported_format():
     expected = 'unsupported file format ".pickle".Supported formats are: '\
         '[\'.csv\', \'.tsv\', \'.txt\']'
     assert msg == expected
+
+
+@pytest.mark.parametrize(
+    ('aoi_file', 'custom_read_kwargs', 'expected'),
+    [
+        pytest.param(
+            'tests/files/toy_text_1_1_aoi.csv',
+            None,
+            EXPECTED_DF,
+            id='toy_text_1_1_aoi',
+        ),
+        pytest.param(
+            Path('tests/files/toy_text_1_1_aoi.csv'),
+            {'separator': ','},
+            EXPECTED_DF,
+            id='toy_text_1_1_aoi',
+        ),
+    ],
+)
+def test_text_stimulus_splitting(aoi_file, custom_read_kwargs, expected):
+    aois_df = pm.stimulus.text.from_file(
+        aoi_file,
+        aoi_column='char',
+        start_x_column='top_left_x',
+        start_y_column='top_left_y',
+        width_column='width',
+        height_column='height',
+        page_column='page',
+        custom_read_kwargs=custom_read_kwargs,
+    )
+
+    aois_df.split_aois_by(by="line_idx")
+    assert len(aois_df.aois) == 2
+
+

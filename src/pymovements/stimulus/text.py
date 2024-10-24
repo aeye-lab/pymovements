@@ -80,6 +80,16 @@ class TextStimulus:
         self.end_y_column = end_y_column
         self.page_column = page_column
 
+    def split_aois_by(self, by: str | list[str]) -> None:
+        """
+
+        Parameters
+        ----------
+        by: str | list[str]
+            Splitting criteria
+
+        """
+        self.aois = self.aois.partition_by(by=by, as_dict=False)
 
 def from_file(
         aoi_path: str | Path,
