@@ -359,6 +359,53 @@ def from_asc(
             pl.col(fileinfo_key).cast(fileinfo_dtype)
             for fileinfo_key, fileinfo_dtype in column_schema_overrides.items()
         ])
+    # resolution compariosn with ascii file and experiment
+    if metadata['resolution']==(experiment.screen.height_px,experiment.screen.width_px):
+        pass
+    elif metadata['resolution']==None:
+        experiment.screen.height_px,experiment.screen.width_px=metadata['resolution']
+
+    else:
+        raise ValueError(f"Ascii file says resolution should be this: {metadata['resolution']}. But resolution provided this: {experiment.screen.height_px, experiment.screen.width_px}")
+    
+    # sample rate comparion between metadata and eyetracker metadata
+    if metadata['sampling_rate']!= experiment.eyetracker.sampling_rate:
+        raise ValueError(f"Ascii file says sampling rate should be this: {metadata['sampling_rate']}. But sampling rate provided this: {experiment.eyetracker.sampling_rate}")
+    else:
+        pass
+    # left Eye or right Eye
+    if metadata['traked_eye']=='R' and not experiment.eyetracker.right:
+        raise ValueError(f"Ascii file syas its is:{metadata['traked_eye']}. But eye was used by experiment is :{experiment.eyetracker.right}")
+        
+    if metadata['traked_eye']=='L' and not experiment.eyetracker.left:
+        raise ValueError(f"Ascii file syas its is:{metadata['traked_eye']}. But eye was used by experiment is :{experiment.eyetracker.left}")  
+
+    # Cheking Mount configration
+    if metadata['mount_configuration']['mount_type']!= experiment.eyetracker.mount:
+        raise ValueError(f"Ascii file says mount config should be this: {['mount_configuration']['mount_type']}. But mount config provided this: {experiment.eyetracker.mount}")
+    
+    
+    # model check git 
+    if metadata['model']!= experiment.eyetracker.model:
+        raise ValueError(f"Ascii file says model should be this: {metadata['model']}. But model provided this: {experiment.eyetracker.model}")
+    elif experiment.eyetracker.model== None:
+        experiment.eyetracker.model=metadata['model']
+
+
+    
+    
+    
+
+
+
+
+    # Convert time column to milliseconds.
+    gaze_data = gaze_data.with_columns([
+        pl.col('time').cast(pl.Int64).alias('time_ms')
+    ])    
+
+
+   
 
     # Create gaze data frame.
     gaze_df = GazeDataFrame(
