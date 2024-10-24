@@ -34,7 +34,7 @@ from pymovements.gaze.experiment import Experiment
 class BSC(DatasetDefinition):
     """BSC dataset :cite:p:`BSC`.
 
-    This dataset includes monocular eye tracking data from a single participants in a single
+    This dataset includes monocular eye tracking data from a single participant in a single
     session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
     eye tracker and precomputed events on aoi level are reported.
 
