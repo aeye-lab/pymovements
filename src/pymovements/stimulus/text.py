@@ -153,7 +153,7 @@ def from_file(
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
 
-    valid_extensions = {'.csv', '.tsv', '.txt'}
+    valid_extensions = {'.csv', '.tsv', '.txt', '.ias'}
     if aoi_path.suffix in valid_extensions:
         stimulus_df = pl.read_csv(
             aoi_path,
