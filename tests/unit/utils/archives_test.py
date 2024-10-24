@@ -104,6 +104,8 @@ def fixture_archive(request, tmp_path):
         archive_path = rootpath / f'test.{compression}'
     elif compression is not None and extension is not None:
         archive_path = rootpath / f'test.{extension}.{compression}'
+    else:
+        raise ValueError(f'{request.param} not supported for archive fixture')
 
     if compression is None and extension == 'zip':
         with zipfile.ZipFile(archive_path, 'w') as zip_open:
@@ -495,3 +497,54 @@ def test_decompress_unknown_compression_suffix():
         _decompress(pathlib.Path('test.zip.zip'))
     msg, = excinfo.value.args
     assert msg == "Couldn't detect a compression from suffix .zip."
+
+
+@pytest.mark.parametrize(
+    ('recursive', 'remove_top_level', 'expected_files'),
+    [
+        pytest.param(
+            False, False,
+            (
+                'toplevel',
+                os.path.join('toplevel', 'recursive.zip'),
+            ),
+            id='recursive_false_remove_finished_false',
+        ),
+        pytest.param(
+            True, False,
+            (
+                'toplevel',
+                os.path.join('toplevel', 'recursive.zip'),
+                os.path.join('toplevel', 'recursive'),
+                os.path.join('toplevel', 'recursive', 'singlechild'),
+                os.path.join('toplevel', 'recursive', 'singlechild', 'test.file'),
+            ),
+            id='recursive_true_remove_finished_false',
+        ),
+    ],
+)
+def test_extract_archive_destination_path_not_None_no_remove_top_level_no_remove_finished_twice(
+        recursive, remove_top_level, archive, tmp_path, expected_files,
+):
+    destination_path = tmp_path / pathlib.Path('tmpfoo')
+    extract_archive(
+        source_path=archive,
+        destination_path=destination_path,
+        recursive=recursive,
+        remove_finished=False,
+        remove_top_level=remove_top_level,
+    )
+    extract_archive(
+        source_path=archive,
+        destination_path=destination_path,
+        recursive=recursive,
+        remove_finished=False,
+        remove_top_level=remove_top_level,
+    )
+
+    if destination_path.is_file():
+        destination_path = destination_path.parent
+
+    result_files = {str(file.relative_to(destination_path)) for file in destination_path.rglob('*')}
+
+    assert result_files == set(expected_files)
