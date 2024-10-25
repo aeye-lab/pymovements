@@ -295,7 +295,7 @@ Make sure:
   - if the PR fixes an issue, that something like "Fixes #xxx." occurs in the body of the message
 (not in the subject).
   - to use Markdown for formatting.
- 
+
 
 # Releasing
 
