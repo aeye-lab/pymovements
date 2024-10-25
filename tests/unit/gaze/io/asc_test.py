@@ -166,6 +166,6 @@ def test_from_asc_fills_in_experiment_metadata():
     assert gaze.experiment.eyetracker.left is True
     assert gaze.experiment.eyetracker.right is False
     assert gaze.experiment.eyetracker.model == 'EyeLink Portable Duo'
-    assert gaze.experiment.eyetracker.version== '6.12'
+    assert gaze.experiment.eyetracker.version == '6.12'
     assert gaze.experiment.eyetracker.vendor == 'EyeLink'
     assert gaze.experiment.eyetracker.mount == 'Desktop'

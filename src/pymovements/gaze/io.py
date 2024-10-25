@@ -362,7 +362,6 @@ def from_asc(
             for fileinfo_key, fileinfo_dtype in column_schema_overrides.items()
         ])
 
-
     if experiment is None:
         experiment = Experiment(sampling_rate=metadata['sampling_rate'])
     if experiment.screen is None:
