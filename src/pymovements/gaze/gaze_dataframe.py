@@ -20,8 +20,8 @@
 """Module for the GazeDataFrame."""
 from __future__ import annotations
 
-import logging
 import inspect
+import logging
 import warnings
 from collections.abc import Callable
 from copy import deepcopy
@@ -29,7 +29,6 @@ from typing import Any
 
 import numpy as np
 import polars as pl
-from tqdm import tqdm
 
 import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.events.processing import EventGazeProcessor
@@ -922,8 +921,10 @@ class GazeDataFrame:
             Returns self, useful for method cascading.
         """
         if self.events is None:
-            raise RuntimeError('No events available to compute event properties. '
-                               'Consider calling detect before.')
+            raise RuntimeError(
+                'No events available to compute event properties. '
+                'Consider calling detect before.',
+            )
 
         if verbose is True:
             logger.debug(f'Processing events {event_properties} matching {name} \

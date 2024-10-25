@@ -35,7 +35,6 @@ from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events.frame import EventDataFrame
 from pymovements.events.precomputed import PrecomputedEventDataFrame
-from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import GazeDataFrame
 from pymovements.reading_measures.frame import ReadingMeasures
 

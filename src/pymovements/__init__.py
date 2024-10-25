@@ -18,7 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Provides top-level access to submodules."""
-
 import logging
 import os
 
@@ -83,6 +82,6 @@ __all__ = [
 
 __version__ = _version.get_versions()['version']
 
-LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
-LOG_CONFIG = "[%(levelname)s] %(asctime)s %(name)s:%(lineno)d - %(message)s"
+LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
+LOG_CONFIG = '[%(levelname)s] %(asctime)s %(name)s:%(lineno)d - %(message)s'
 logging.basicConfig(level=LOG_LEVEL, format=LOG_CONFIG)
