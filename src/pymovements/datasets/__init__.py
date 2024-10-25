@@ -25,6 +25,7 @@
    :toctree:
    :template: class.rst
 
+    pymovements.datasets.BSC
     pymovements.datasets.CodeComprehension
     pymovements.datasets.CopCo
     pymovements.datasets.DIDEC
@@ -34,6 +35,7 @@
     pymovements.datasets.GazeGraph
     pymovements.datasets.GazeOnFaces
     pymovements.datasets.HBN
+    pymovements.datasets.InteRead
     pymovements.datasets.JuDo1000
     pymovements.datasets.PoTeC
     pymovements.datasets.SBSAT
@@ -48,6 +50,7 @@
     pymovements.datasets.ToyDataset
     pymovements.datasets.ToyDatasetEyeLink
 """
+from pymovements.datasets.bsc import BSC
 from pymovements.datasets.codecomprehension import CodeComprehension
 from pymovements.datasets.copco import CopCo
 from pymovements.datasets.didec import DIDEC
@@ -58,6 +61,7 @@ from pymovements.datasets.gaze_on_faces import GazeOnFaces
 from pymovements.datasets.gazebase import GazeBase
 from pymovements.datasets.gazebasevr import GazeBaseVR
 from pymovements.datasets.hbn import HBN
+from pymovements.datasets.interead import InteRead
 from pymovements.datasets.judo1000 import JuDo1000
 from pymovements.datasets.potec import PoTeC
 from pymovements.datasets.sb_sat import SBSAT
@@ -66,6 +70,7 @@ from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
 
 
 __all__ = [
+    'BSC',
     'CodeComprehension',
     'CopCo',
     'DIDEC',
@@ -76,6 +81,7 @@ __all__ = [
     'GazeGraph',
     'GazeOnFaces',
     'HBN',
+    'InteRead',
     'JuDo1000',
     'PoTeC',
     'SBSAT',
