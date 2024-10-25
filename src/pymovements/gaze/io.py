@@ -25,7 +25,9 @@ from typing import Any
 
 import polars as pl
 
-from pymovements.gaze import Experiment  # pylint: disable=cyclic-import
+from pymovements.gaze import Experiment
+from pymovements.gaze import EyeTracker
+from pymovements.gaze import Screen
 from pymovements.gaze.gaze_dataframe import GazeDataFrame  # pylint: disable=cyclic-import
 from pymovements.utils.parsing import parse_eyelink
 
@@ -343,7 +345,7 @@ def from_asc(
             raise ValueError(f"unknown pattern key '{patterns}'. Supported keys are: eyelink")
 
     # Read data.
-    gaze_data, _ = parse_eyelink(
+    gaze_data, metadata = parse_eyelink(
         file, patterns=patterns, schema=schema, metadata_patterns=metadata_patterns,
     )
 
@@ -359,6 +361,95 @@ def from_asc(
             pl.col(fileinfo_key).cast(fileinfo_dtype)
             for fileinfo_key, fileinfo_dtype in column_schema_overrides.items()
         ])
+
+    # Convert time column to milliseconds.
+    gaze_data = gaze_data.with_columns([
+        pl.col('time').cast(pl.Int64).alias('time_ms'),
+    ])
+
+    if experiment is None:
+        experiment = Experiment()
+    if experiment.screen is None:
+        experiment.screen = Screen()
+    if experiment.eyetracker is None:
+        experiment.eyetracker = EyeTracker()
+
+    # resolution compariosn with ascii file and experiment
+    if metadata['resolution'] == (experiment.screen.height_px, experiment.screen.width_px):
+        pass
+    elif (experiment.screen.height_px, experiment.screen.width_px) is None:
+        experiment.screen.height_px, experiment.screen.width_px = metadata['resolution']
+
+    else:
+        raise ValueError(
+            f"Ascii file says resolution should be this: {
+                metadata['resolution']
+            }. But resolution provided this: {
+                experiment.screen.height_px,
+                experiment.screen.width_px
+            }",
+        )
+
+    # sample rate comparion between metadata and eyetracker metadata
+    if metadata['sampling_rate'] != experiment.eyetracker.sampling_rate:
+        raise ValueError(
+            f"Ascii file says sampling rate should be this: {
+                metadata['sampling_rate']
+            }. But sampling rate provided this: {
+                experiment.eyetracker.sampling_rate
+            }",
+        )
+    elif experiment.eyetracker.sampling_rate is None:
+        experiment.eyetracker.sampling_rate = metadata['sampling_rate']
+
+    else:
+        pass
+    # left Eye or right Eye
+    if metadata['traked_eye'] == 'R' and not experiment.eyetracker.right:
+        raise ValueError(
+            f"Ascii file syas its is:{
+                metadata['traked_eye']
+            }. But eye was used by experiment is :{
+                experiment.eyetracker.right
+            }",
+        )
+    elif experiment.eyetracker.right is None:
+        experiment.eyetracker.right = metadata['traked_eye']
+
+    if metadata['traked_eye'] == 'L' and not experiment.eyetracker.left:
+        raise ValueError(
+            f"Ascii file syas its is:{
+                metadata['traked_eye']
+            }. But eye was used by experiment is :{
+                experiment.eyetracker.left
+            }",
+        )
+    elif experiment.eyetracker.left is None:
+        experiment.eyetracker.left = metadata['traked_eye']
+
+    # Cheking Mount configration
+    if metadata['mount_configuration']['mount_type'] != experiment.eyetracker.mount:
+        raise ValueError(
+            f"Ascii file says mount config should be this: {
+                metadata['mount_configuration']['mount_type']
+            }. But mount config provided this: {
+                experiment.eyetracker.mount
+            }",
+        )
+    elif experiment.eyetracker.mount is None:
+        experiment.eyetracker.mount = metadata['mount_configuration']['mount_type']
+
+    # model check git
+    if metadata['model'] != experiment.eyetracker.model:
+        raise ValueError(
+            f"Ascii file says model should be this: {
+                metadata['model']
+            }. But model provided this: {
+                experiment.eyetracker.model
+            }",
+        )
+    elif experiment.eyetracker.model is None:
+        experiment.eyetracker.model = metadata['model']
 
     # Create gaze data frame.
     gaze_df = GazeDataFrame(
