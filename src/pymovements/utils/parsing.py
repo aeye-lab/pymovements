@@ -53,7 +53,6 @@ EYELINK_META_REGEXES = [
             r'(?P<sampling_rate>\d+)\s+'
             r'(?P<file_sample_filter>(0|1|2))\s+'
             r'(?P<link_sample_filter>(0|1|2))\s+'
-            r'(?P<tracked_eye>(L|R|LR))\s*'
         ),
         r'PUPIL\s+(?P<pupil_data_type>(AREA|DIAMETER))\s*',
         r'MSG\s+\d+[.]?\d*\s+ELCLCFG\s+(?P<mount_configuration>.*)',
@@ -93,8 +92,11 @@ STOP_RECORDING_REGEX = re.compile(
     r'END\s+(?P<timestamp>(\d+[.]?\d*))\s+\s+(?P<types>.*)\s+RES\s+'
     r'(?P<xres>[\d\.]*)\s+(?P<yres>[\d\.]*)\s*',
 )
-
-
+TRACKED_EYE_REGEX = re.compile(
+    r'MSG\s+(?P<timestamp>\d+[.]?\d*)\s+'
+    r'RECCFG\s+[A-Z,a-z]+\s+\d+\s+(0|1|2)\s+(0|1|2)\s+'
+    r'(?P<tracked_eye>(L|R|LR))\s*',
+)
 def check_nan(sample_location: str) -> float:
     """Return position as float or np.nan depending on validity of sample.
 
@@ -247,7 +249,7 @@ def parse_eyelink(
     calibrations = []
     blinks = []
     invalid_samples = []
-
+    tracked_eyes = []
     blink = False
 
     start_recording_timestamp = ''
@@ -304,6 +306,10 @@ def parse_eyelink(
             block_duration = float(stop_recording_timestamp) - float(start_recording_timestamp)
 
             total_recording_duration += block_duration
+
+        elif eye_side_match := TRACKED_EYE_REGEX.match(line):
+            tracked_eyes.append(eye_side_match.groupdict())
+
 
         elif eye_tracking_sample_match := EYE_TRACKING_SAMPLE.match(line):
 
@@ -371,6 +377,7 @@ def parse_eyelink(
     pre_processed_metadata['data_loss_ratio'] = data_loss_ratio
     pre_processed_metadata['data_loss_ratio_blinks'] = data_loss_ratio_blinks
     pre_processed_metadata['total_recording_duration_ms'] = total_recording_duration
+    pre_processed_metadata['tracked_eyes'] = tracked_eyes
 
     schema_overrides = {
         'time': pl.Float64,
