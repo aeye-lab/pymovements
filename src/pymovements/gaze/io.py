@@ -277,7 +277,7 @@ def from_asc(
         experiment: Experiment | None = None,
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, Any] | None = None,
-) -> tuple[GazeDataFrame, dict[str, Any]]:
+) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
 
     Parameters
@@ -303,8 +303,8 @@ def from_asc(
 
     Returns
     -------
-    tuple[GazeDataFrame, dict[str, Any]]
-        The gaze data frame and a metadata dictionary read from the asc file.
+    GazeDataFrame
+        The gaze data frame read from the asc file.
 
     Examples
     --------
@@ -312,7 +312,7 @@ def from_asc(
     We can then load the data into a ``GazeDataFrame``:
 
     >>> from pymovements.gaze.io import from_asc
-    >>> gaze, metadata = from_asc(file='tests/files/eyelink_monocular_example.asc')
+    >>> gaze = from_asc(file='tests/files/eyelink_monocular_example.asc')
     >>> gaze.frame
     shape: (16, 3)
     ┌─────────┬───────┬────────────────┐
@@ -332,7 +332,7 @@ def from_asc(
     │ 2339290 ┆ 618.0 ┆ [637.6, 531.4] │
     │ 2339291 ┆ 618.0 ┆ [637.3, 531.2] │
     └─────────┴───────┴────────────────┘
-    >>> metadata['sampling_rate']
+    >>> gaze.experiment.eye_tracker.sampling_rate
     1000.0
     """
     if isinstance(patterns, str):
@@ -343,7 +343,7 @@ def from_asc(
             raise ValueError(f"unknown pattern key '{patterns}'. Supported keys are: eyelink")
 
     # Read data.
-    gaze_data, metadata = parse_eyelink(
+    gaze_data, _ = parse_eyelink(
         file, patterns=patterns, schema=schema, metadata_patterns=metadata_patterns,
     )
 
@@ -368,7 +368,7 @@ def from_asc(
         time_unit='ms',
         pixel_columns=['x_pix', 'y_pix'],
     )
-    return gaze_df, metadata
+    return gaze_df
 
 
 def from_ipc(
