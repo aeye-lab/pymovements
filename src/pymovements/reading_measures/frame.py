@@ -20,15 +20,14 @@
 """Module for the Reading Measure DataFrame."""
 from __future__ import annotations
 
-import polars as pl
-import pandas as pd
-from tqdm import tqdm
 import os
-import pdb
 
-from pymovements.stimulus.text import TextStimulus
-from pymovements.events import EventDataFrame
+import pandas as pd
+import polars as pl
+from tqdm import tqdm
+
 from pymovements.stimulus.text import from_file
+
 
 class ReadingMeasures:
     """A DataFrame for reading measures.
@@ -44,7 +43,6 @@ class ReadingMeasures:
         if reading_measure_df is None:
             self.frame = []
 
-    
     def process_dataset(self, dataset, aoi_dict, save_path) -> int:
         for event_idx in tqdm(range(len(dataset.events))):
             tmp_df = dataset.events[event_idx]
@@ -85,7 +83,7 @@ class ReadingMeasures:
 
             # Append the computed reading measures DataFrame to the list
             self.frame.append(rm_df)
-            
+
             # Save to CSV if save_path is provided
             if save_path is not None:
                 rm_filename = f'{subject_id}-{text_id}-reading_measures.csv'
@@ -94,8 +92,8 @@ class ReadingMeasures:
 
         return 0
 
-    
-    def compute_reading_measures(self, fixations_df: pd.DataFrame, aoi_df: pd.DataFrame) -> pd.DataFrame:
+    def compute_reading_measures(self, fixations_df: pd.DataFrame,
+                                 aoi_df: pd.DataFrame) -> pd.DataFrame:
         """
         Computes reading measures from fixation sequences.
 
@@ -130,13 +128,15 @@ class ReadingMeasures:
         text_strs = aoi_df['character'].tolist()
 
         # Initialize dictionary for reading measures per word.
-        word_dict = {int(word_index): {
-            'word': word,
-            'word_index': word_index,
-            'FFD': 0, 'SFD': 0, 'FD': 0, 'FPRT': 0, 'FRT': 0, 'TFT': 0, 'RRT': 0,
-            'RPD_inc': 0, 'RPD_exc': 0, 'RBRT': 0, 'Fix': 0, 'FPF': 0, 'RR': 0,
-            'FPReg': 0, 'TRC_out': 0, 'TRC_in': 0, 'SL_in': 0, 'SL_out': 0, 'TFC': 0,
-        } for word_index, word in zip(text_aois, text_strs)}
+        word_dict = {
+            int(word_index): {
+                'word': word,
+                'word_index': word_index,
+                'FFD': 0, 'SFD': 0, 'FD': 0, 'FPRT': 0, 'FRT': 0, 'TFT': 0, 'RRT': 0,
+                'RPD_inc': 0, 'RPD_exc': 0, 'RBRT': 0, 'Fix': 0, 'FPF': 0, 'RR': 0,
+                'FPReg': 0, 'TRC_out': 0, 'TRC_in': 0, 'SL_in': 0, 'SL_out': 0, 'TFC': 0,
+            } for word_index, word in zip(text_aois, text_strs)
+        }
 
         # Variables to track fixation progress.
         right_most_word, cur_fix_word_idx, next_fix_word_idx, next_fix_dur = -1, -1, -1, -1
@@ -215,4 +215,3 @@ class ReadingMeasures:
                 rm_df = pd.concat([rm_df, pd.DataFrame([word_rm])])
 
         return rm_df
-    
