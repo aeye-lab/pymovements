@@ -97,6 +97,8 @@ TRACKED_EYE_REGEX = re.compile(
     r'RECCFG\s+[A-Z,a-z]+\s+\d+\s+(0|1|2)\s+(0|1|2)\s+'
     r'(?P<tracked_eye>(L|R|LR))\s*',
 )
+
+
 def check_nan(sample_location: str) -> float:
     """Return position as float or np.nan depending on validity of sample.
 
@@ -309,7 +311,6 @@ def parse_eyelink(
 
         elif eye_side_match := TRACKED_EYE_REGEX.match(line):
             tracked_eyes.append(eye_side_match.groupdict())
-
 
         elif eye_tracking_sample_match := EYE_TRACKING_SAMPLE.match(line):
 
