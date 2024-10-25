@@ -257,3 +257,66 @@ def test_text_stimulus_splitting(aoi_file, custom_read_kwargs):
 
     aois_df = aois_df.split(by='line_idx')
     assert len(aois_df) == 2
+
+
+@pytest.mark.parametrize(
+    ('aoi_file', 'custom_read_kwargs'),
+    [
+        pytest.param(
+            'tests/files/toy_text_1_1_aoi.csv',
+            None,
+            id='toy_text_1_1_aoi',
+        ),
+        pytest.param(
+            Path('tests/files/toy_text_1_1_aoi.csv'),
+            {'separator': ','},
+            id='toy_text_1_1_aoi',
+        ),
+    ],
+)
+def test_text_stimulus_splitting_unique_within(aoi_file, custom_read_kwargs):
+    aois_df = pm.stimulus.text.from_file(
+        aoi_file,
+        aoi_column='char',
+        start_x_column='top_left_x',
+        start_y_column='top_left_y',
+        width_column='width',
+        height_column='height',
+        page_column='page',
+        custom_read_kwargs=custom_read_kwargs,
+    )
+
+    aois_df = aois_df.split(by='line_idx')
+    assert sum(df.n_unique(subset=['line_idx']) for df in aois_df) == len(aois_df)
+
+
+@pytest.mark.parametrize(
+    ('aoi_file', 'custom_read_kwargs'),
+    [
+        pytest.param(
+            'tests/files/toy_text_1_1_aoi.csv',
+            None,
+            id='toy_text_1_1_aoi',
+        ),
+        pytest.param(
+            Path('tests/files/toy_text_1_1_aoi.csv'),
+            {'separator': ','},
+            id='toy_text_1_1_aoi',
+        ),
+    ],
+)
+def test_text_stimulus_splitting_different_between(aoi_file, custom_read_kwargs):
+    aois_df = pm.stimulus.text.from_file(
+        aoi_file,
+        aoi_column='char',
+        start_x_column='top_left_x',
+        start_y_column='top_left_y',
+        width_column='width',
+        height_column='height',
+        page_column='page',
+        custom_read_kwargs=custom_read_kwargs,
+    )
+
+    n_unique = aois_df.aois.n_unique(subset=['line_idx'])
+    aois_df = aois_df.split(by='line_idx')
+    assert n_unique == len(aois_df)
