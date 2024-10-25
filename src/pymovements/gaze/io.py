@@ -334,7 +334,7 @@ def from_asc(
     │ 2339290 ┆ 618.0 ┆ [637.6, 531.4] │
     │ 2339291 ┆ 618.0 ┆ [637.3, 531.2] │
     └─────────┴───────┴────────────────┘
-    >>> gaze.experiment.eye_tracker.sampling_rate
+    >>> gaze.experiment.eyetracker.sampling_rate
     1000.0
     """
     if isinstance(patterns, str):
