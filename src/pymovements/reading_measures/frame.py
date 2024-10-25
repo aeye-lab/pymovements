@@ -92,8 +92,10 @@ class ReadingMeasures:
 
         return 0
 
-    def compute_reading_measures(self, fixations_df: pd.DataFrame,
-                                 aoi_df: pd.DataFrame) -> pd.DataFrame:
+    def compute_reading_measures(
+        self, fixations_df: pd.DataFrame,
+        aoi_df: pd.DataFrame,
+    ) -> pd.DataFrame:
         """
         Computes reading measures from fixation sequences.
 
