@@ -374,7 +374,7 @@ def from_asc(
     if experiment.eyetracker is None:
         experiment.eyetracker = EyeTracker()
 
-   # Resolution comparison with ASCII file and experiment
+    # Resolution comparison with ASCII file and experiment
     if metadata['resolution'] == (experiment.screen.height_px, experiment.screen.width_px):
         pass
     if (experiment.screen.height_px, experiment.screen.width_px) is None:
