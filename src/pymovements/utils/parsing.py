@@ -48,7 +48,6 @@ EYELINK_META_REGEXES = [
         ),
         r'\*\*\s+(?P<version_2>EYELINK.*)',
         r'MSG\s+\d+[.]?\d*\s+DISPLAY_COORDS\s+(?P<resolution>.*)',
-
         r'PUPIL\s+(?P<pupil_data_type>(AREA|DIAMETER))\s*',
         r'MSG\s+\d+[.]?\d*\s+ELCLCFG\s+(?P<mount_configuration>.*)',
     )
@@ -93,7 +92,7 @@ RECORDING_CONFIG = re.compile(
     r'(?P<sampling_rate>\d+)\s+'
     r'(?P<file_sample_filter>(0|1|2))\s+'
     r'(?P<link_sample_filter>(0|1|2))\s+'
-    r'(?P<tracked_eye>(L|R|LR))\s*',
+    r'(?P<tracked_eye>(L|R|S))\s*',
 )
 
 
@@ -232,10 +231,11 @@ def parse_eyelink(
 
     with open(filepath, encoding='ascii') as asc_file:
         lines = asc_file.readlines()
+        print(" ascifile lines", lines)
 
     # will return an empty string if the key does not exist
     metadata: defaultdict = defaultdict(str)
-
+    print("metadat initial:  ", metadata)
     # metadata keys specified by the user should have a default value of None
     metadata_keys = get_pattern_keys(compiled_metadata_patterns, 'key')
     for key in metadata_keys:
@@ -257,8 +257,9 @@ def parse_eyelink(
     num_blink_samples = 0
 
     for line in lines:
-
+        print("line in asci file:   ", line)
         for pattern_dict in compiled_patterns:
+
 
             if match := pattern_dict['pattern'].match(line):
                 if 'value' in pattern_dict:
@@ -284,10 +285,12 @@ def parse_eyelink(
             cal_timestamp = ''
 
         elif BLINK_START_REGEX.match(line):
+            print('blink start')
             blink = True
 
         elif match := BLINK_STOP_REGEX.match(line):
             blink = False
+            print('blink end')
             parsed_blink = match.groupdict()
             blink_info = {
                 'start_timestamp': float(parsed_blink['timestamp_start']),
@@ -297,6 +300,7 @@ def parse_eyelink(
             }
             num_blink_samples = 0
             blinks.append(blink_info)
+            print('blinks:  ', blinks)
 
         elif match := START_RECORDING_REGEX.match(line):
             start_recording_timestamp = match.groupdict()['timestamp']
@@ -307,8 +311,6 @@ def parse_eyelink(
 
             total_recording_duration += block_duration
 
-        elif eye_side_match := RECORDING_CONFIG.match(line):
-            recording_config.append(eye_side_match.groupdict())
 
         elif eye_tracking_sample_match := EYE_TRACKING_SAMPLE.match(line):
 
@@ -352,10 +354,17 @@ def parse_eyelink(
                         metadata.update(match.groupdict())
 
                     # each metadata pattern should only match once
+                    print("comqiled metadata patterns before removing:  ", compiled_metadata_patterns)
                     compiled_metadata_patterns.remove(pattern_dict)
+                    print("comqiled metadata patternsafter removing :  ", compiled_metadata_patterns)
 
-    if not metadata:
-        raise Warning('No metadata found. Please check the file for errors.')
+        elif eye_side_match := RECORDING_CONFIG.match(line):
+            print("i matched recording config")
+            recording_config.append(eye_side_match.groupdict())
+
+    print("recording config:", recording_config, "Regex: ", RECORDING_CONFIG)
+    print("metadata:  ", metadata)
+
 
     # if the sampling rate is not found, we cannot calculate the data loss
     actual_number_of_samples = len(samples['time'])
@@ -365,7 +374,7 @@ def parse_eyelink(
         invalid_samples=invalid_samples,
         actual_num_samples=actual_number_of_samples,
         total_rec_duration=total_recording_duration,
-        sampling_rate=metadata['sampling_rate'],
+        sampling_rate=recording_config[0]['sampling_rate'],
     )
 
     pre_processed_metadata: dict[str, Any] = _pre_process_metadata(metadata)
@@ -377,7 +386,9 @@ def parse_eyelink(
     pre_processed_metadata['data_loss_ratio_blinks'] = data_loss_ratio_blinks
     pre_processed_metadata['total_recording_duration_ms'] = total_recording_duration
     pre_processed_metadata['recording_config'] = recording_config
-
+    print("pre_processed_metadata:  ", pre_processed_metadata)
+    if not metadata:
+        raise Warning('No metadata found. Please check the file for errors.')
     schema_overrides = {
         'time': pl.Float64,
         'x_pix': pl.Float64,
@@ -467,6 +478,7 @@ def _calculate_data_loss(
         Data loss ratio and blink loss ratio.
     """
     if not sampling_rate or not total_rec_duration:
+        print(f'samlpingrate {sampling_rate}, total_rec_tim:', total_rec_duration)
         return 'unknown', 'unknown'
 
     dl_ratio_blinks = 0.0
