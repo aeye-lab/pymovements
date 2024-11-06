@@ -88,12 +88,12 @@ STOP_RECORDING_REGEX = re.compile(
     r'(?P<xres>[\d\.]*)\s+(?P<yres>[\d\.]*)\s*',
 )
 RECORDING_CONFIG = re.compile(
-        r'MSG\s+(?P<timestamp>\d+[.]?\d*)\s+'
-        r'RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+'
-        r'(?P<sampling_rate>\d+)\s+'
-        r'(?P<file_sample_filter>(0|1|2))\s+'
-        r'(?P<link_sample_filter>(0|1|2))\s+'
-        r'(?P<tracked_eye>(L|R|LR))\s*'
+    r'MSG\s+(?P<timestamp>\d+[.]?\d*)\s+'
+    r'RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+'
+    r'(?P<sampling_rate>\d+)\s+'
+    r'(?P<file_sample_filter>(0|1|2))\s+'
+    r'(?P<link_sample_filter>(0|1|2))\s+'
+    r'(?P<tracked_eye>(L|R|LR))\s*',
 )
 
 
