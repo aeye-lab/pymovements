@@ -169,3 +169,67 @@ def test_from_asc_fills_in_experiment_metadata():
     assert gaze.experiment.eyetracker.version == '6.12'
     assert gaze.experiment.eyetracker.vendor == 'EyeLink'
     assert gaze.experiment.eyetracker.mount == 'Desktop'
+
+
+@pytest.mark.parametrize(
+    ('experiment_kwargs', 'issues'),
+    [
+        pytest.param(
+            {
+                'screen_width_px': 1920,
+                'screen_height_px': 1080,
+                'sampling_rate': 1000,
+            },
+            ['Screen resolution: (1920, 1080) vs. (1280, 1024)'],
+            id='screen_resolution',
+        ),
+        pytest.param(
+            {
+                'eyetracker': pm.EyeTracker(sampling_rate=500),
+            },
+            ['Sampling rate: 500 vs. 1000.0'],
+            id='eyetracker_sampling_rate',
+        ),
+        pytest.param(
+            {
+                'eyetracker': pm.EyeTracker(
+                    left=False,
+                    right=True,
+                    sampling_rate=1000,
+                ),
+            },
+            [
+                'Left eye tracked: False vs. True',
+                'Right eye tracked: True vs. False',
+            ],
+            id='eyetracker_tracked_eye',
+        ),
+        pytest.param(
+            {
+                'eyetracker': pm.EyeTracker(
+                    vendor='Tobii',
+                    model='Tobii Pro Spectrum',
+                    version='1.0',
+                    sampling_rate=1000,
+                ),
+            },
+            [
+                'Eye tracker vendor: Tobii vs. EyeLink',
+                'Eye tracker model: Tobii Pro Spectrum vs. EyeLink Portable Duo',
+                'Eye tracker software version: 1.0 vs. 6.12',
+            ],
+            id='eyetracker_vendor_model_version',
+        ),
+    ],
+)
+def test_from_asc_detects_mismatches_in_experiment_metadata(experiment_kwargs, issues):
+    with pytest.raises(ValueError) as excinfo:
+        pm.gaze.from_asc(
+            'tests/files/eyelink_monocular_example.asc',
+            experiment=pm.Experiment(**experiment_kwargs),
+        )
+
+    msg, = excinfo.value.args
+    expected_msg = 'Experiment metadata does not match the metadata in the ASC file:\n'
+    expected_msg += '\n'.join(f'- {issue}' for issue in issues)
+    assert msg == expected_msg
