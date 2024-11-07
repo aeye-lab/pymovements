@@ -382,8 +382,6 @@ def parse_eyelink(
     pre_processed_metadata['total_recording_duration_ms'] = total_recording_duration
     pre_processed_metadata['recording_config'] = recording_config
 
-    if not metadata:
-        raise Warning('No metadata found. Please check the file for errors.')
     schema_overrides = {
         'time': pl.Float64,
         'x_pix': pl.Float64,
@@ -442,6 +440,17 @@ def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:
     return return_metadata
 
 def _check_sampling_rate(recording_config: list[dict[str, Any]]) -> float | None:
+    """Check if the sampling rate is available in the recording config.
+    Parameters
+    ----------
+    recording_config : list[dict[str, Any]]
+        List of dictionaries containing recording configuration details.
+
+    Returns
+    -------
+    float | None
+        The sampling rate as a float if available, otherwise None.
+    """
     if not recording_config:
         sampling_rate = None
     else:
