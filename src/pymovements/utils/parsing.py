@@ -92,11 +92,8 @@ RECORDING_CONFIG = re.compile(
     r'(?P<sampling_rate>\d+)\s+'
     r'(?P<file_sample_filter>0|1|2)\s+'
     r'(?P<link_sample_filter>0|1|2)\s+'
-    r'(?P<tracked_eye>LR|[LR])\s*', #Todo retun to initial state of the regex
+    r'(?P<tracked_eye>LR|[LR])\s*',
 )
-
-RECORDING_CONFIG_new = re.compile(r'MSG\s+(?P<timestamp>\d+[.]?\d?)\s+RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+(?P<sampling_rate>\d+)\s+(?P<file_sample_filter>0|1|2)\s+(?P<link_sample_filter>0|1|2)\s+(?P<tracked_eye>LR|[RL])\s*')
-
 
 def check_nan(sample_location: str) -> float:
     """Return position as float or np.nan depending on validity of sample.
@@ -233,11 +230,11 @@ def parse_eyelink(
 
     with open(filepath, encoding='ascii') as asc_file:
         lines = asc_file.readlines()
-        print(" ascifile lines", lines)
+
 
     # will return an empty string if the key does not exist
     metadata: defaultdict = defaultdict(str)
-    print("metadat initial:  ", metadata)
+
     # metadata keys specified by the user should have a default value of None
     metadata_keys = get_pattern_keys(compiled_metadata_patterns, 'key')
     for key in metadata_keys:
@@ -259,7 +256,6 @@ def parse_eyelink(
     num_blink_samples = 0
 
     for line in lines:
-        print("line in asci file:   ", line)
         for pattern_dict in compiled_patterns:
 
 
@@ -287,12 +283,10 @@ def parse_eyelink(
             cal_timestamp = ''
 
         elif BLINK_START_REGEX.match(line):
-            print('blink start')
             blink = True
 
         elif match := BLINK_STOP_REGEX.match(line):
             blink = False
-            print('blink end')
             parsed_blink = match.groupdict()
             blink_info = {
                 'start_timestamp': float(parsed_blink['timestamp_start']),
@@ -302,10 +296,9 @@ def parse_eyelink(
             }
             num_blink_samples = 0
             blinks.append(blink_info)
-            print('blinks:  ', blinks)
+
 
         elif eye_side_match := RECORDING_CONFIG.match(line):
-            print("i matched recording config")
             recording_config.append(eye_side_match.groupdict())
 
         elif match := START_RECORDING_REGEX.match(line):
@@ -360,14 +353,7 @@ def parse_eyelink(
                         metadata.update(match.groupdict())
 
                     # each metadata pattern should only match once
-                    #print("comqiled metadata patterns before removing:  ", compiled_metadata_patterns)
                     compiled_metadata_patterns.remove(pattern_dict)
-                    #print("comqiled metadata patternsafter removing :  ", compiled_metadata_patterns)
-
-
-    print("recording config:", recording_config, "Regex: ", RECORDING_CONFIG)
-    print("blinks:", blinks, "Regex: ", BLINK_STOP_REGEX)
-    print("metadata:  ", metadata)
 
 
     # if the sampling rate is not found, we cannot calculate the data loss
@@ -388,6 +374,7 @@ def parse_eyelink(
     )
     if not metadata:
         raise Warning('No metadata found. Please check the file for errors.')
+
     pre_processed_metadata: dict[str, Any] = _pre_process_metadata(metadata)
     # is not yet pre-processed but should be
     pre_processed_metadata['calibrations'] = calibrations
@@ -397,7 +384,7 @@ def parse_eyelink(
     pre_processed_metadata['data_loss_ratio_blinks'] = data_loss_ratio_blinks
     pre_processed_metadata['total_recording_duration_ms'] = total_recording_duration
     pre_processed_metadata['recording_config'] = recording_config
-    print("pre_processed_metadata:  ", pre_processed_metadata)
+
     if not metadata:
         raise Warning('No metadata found. Please check the file for errors.')
     schema_overrides = {
@@ -463,7 +450,7 @@ def _calculate_data_loss(
         invalid_samples: list[str],
         actual_num_samples: int,
         total_rec_duration: float,
-        sampling_rate: float,
+        sampling_rate: float | None,
 ) -> tuple[float | str, float | str]:
     """Calculate data loss and blink loss.
 
@@ -486,7 +473,6 @@ def _calculate_data_loss(
         Data loss ratio and blink loss ratio.
     """
     if not sampling_rate or not total_rec_duration:
-        print(f'samlpingrate {sampling_rate}, total_rec_tim:', total_rec_duration)
         return 'unknown', 'unknown'
 
     dl_ratio_blinks = 0.0
