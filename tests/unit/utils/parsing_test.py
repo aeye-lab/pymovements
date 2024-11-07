@@ -17,7 +17,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
 # Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -533,19 +532,20 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
 @pytest.mark.parametrize(
     ('metadata', 'expected_blink_ratio', 'expected_overall_ratio'),
     [
-        pytest.param('** DATE: Wed Mar  8 09:25:20 2023\n'
-                     'MSG	2154555 RECCFG CR 1000 2 1 L\n'
-                     'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
-                     'SBLINK R 10000018\n'
-                     '10000019	   .	   .	    0.0	    0.0	...\n'
-                     '10000020	   .	   .	    0.0	    0.0	...\n'
-                     'EBLINK R 10000018	10000020	2\n'
-                     'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
-                     # asc snipped which gets processed by the function
-                     1,  # expected_blink_ratio
-                     1,  # expected_overall_ratio
-                     id='only_blinks',
-                     ),
+        pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
+            'SBLINK R 10000018\n'
+            '10000019	   .	   .	    0.0	    0.0	...\n'
+            '10000020	   .	   .	    0.0	    0.0	...\n'
+            'EBLINK R 10000018	10000020	2\n'
+            'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            # asc snipped which gets processed by the function
+            1,  # expected_blink_ratio
+            1,  # expected_overall_ratio
+            id='only_blinks',
+        ),
         pytest.param(
             '** DATE: Wed Mar  8 09:25:20 2023\n'
             'START	10000018 	RIGHT	SAMPLES	EVENTS\n'

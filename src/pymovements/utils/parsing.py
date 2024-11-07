@@ -359,18 +359,15 @@ def parse_eyelink(
     # if the sampling rate is not found, we cannot calculate the data loss
     actual_number_of_samples = len(samples['time'])
     # if we don't have any recording config, we cannot calculate the data loss
-    if not recording_config:
-        actual_sampling_rate = None
+    sampling_rate = _check_sampling_rate(recording_config)
 
-    else:
-        actual_sampling_rate = float(recording_config[0]['sampling_rate'])
 
     data_loss_ratio, data_loss_ratio_blinks = _calculate_data_loss(
         blinks=blinks,
         invalid_samples=invalid_samples,
         actual_num_samples=actual_number_of_samples,
         total_rec_duration=total_recording_duration,
-        sampling_rate=actual_sampling_rate,
+        sampling_rate=sampling_rate,
     )
     if not metadata:
         raise Warning('No metadata found. Please check the file for errors.')
@@ -444,6 +441,12 @@ def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:
 
     return return_metadata
 
+def _check_sampling_rate(recording_config: list[dict[str, Any]]) -> float | None:
+    if not recording_config:
+        sampling_rate = None
+    else:
+        sampling_rate = float(recording_config[0]['sampling_rate'])
+    return sampling_rate
 
 def _calculate_data_loss(
         blinks: list[dict[str, Any]],
