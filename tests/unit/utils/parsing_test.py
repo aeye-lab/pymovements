@@ -1,3 +1,23 @@
+# Copyright (c) 2024 The pymovements Project Authors
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 # Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -9,7 +29,7 @@
 #
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-#git
+# git
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -186,21 +206,25 @@ EXPECTED_METADATA = {
     'metadata_2': 'abc',
     'metadata_3': True,
     'metadata_4': None,
-    'recording_config': [{
-        'sampling_rate': '1000',  # MSG	2154555 RECCFG CR 1000 2 1 L
-        'file_sample_filter': '2',
-        'link_sample_filter': '1',
-        'timestamp': '2154555',
-        'tracked_eye': 'L',
-        'tracking_mode': 'CR',
-    },
-        {'sampling_rate': '2000',  # MSG	10000013.5 RECCFG CR 2000 1 1 R
-         'file_sample_filter': '1',
-         'link_sample_filter': '1',
-         'timestamp': '10000013.5',
-         'tracked_eye': 'R',
-         'tracking_mode': 'CR',
-         }]}
+    'recording_config': [
+        {
+            'sampling_rate': '1000',  # MSG	2154555 RECCFG CR 1000 2 1 L
+            'file_sample_filter': '2',
+            'link_sample_filter': '1',
+            'timestamp': '2154555',
+            'tracked_eye': 'L',
+            'tracking_mode': 'CR',
+        },
+        {
+            'sampling_rate': '2000',  # MSG	10000013.5 RECCFG CR 2000 1 1 R
+            'file_sample_filter': '1',
+            'link_sample_filter': '1',
+            'timestamp': '10000013.5',
+            'tracked_eye': 'R',
+            'tracking_mode': 'CR',
+        },
+    ],
+}
 
 
 def test_parse_eyelink(tmp_path):
@@ -412,7 +436,7 @@ def test_val_cal_eyelink(tmp_path, metadata, expected_validation, expected_calib
 
 def test_parse_val_cal_eyelink_monocular_file():
     example_asc_monocular_path = Path(__file__).parent.parent.parent / \
-                                 'files/eyelink_monocular_example.asc'
+        'files/eyelink_monocular_example.asc'
 
     _, metadata = pm.utils.parsing.parse_eyelink(example_asc_monocular_path)
 
@@ -435,22 +459,23 @@ def test_parse_val_cal_eyelink_monocular_file():
 @pytest.mark.parametrize(
     ('metadata', 'expected_blinks'),
     [
-        pytest.param('MSG	2154555 RECCFG CR 1000 2 1 L\n'
-                     '** DATE: Wed Mar  8 09:25:20 2023\n'
-                     'MSG	2154555 RECCFG CR 1000 2 1 L\n'
-                     'EVENTS	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2\n'
-                     'SBLINK R 10000018\n'
-                     '10000019	   .	   .	    0.0	    0.0	...\n'
-                     '10000020	   .	   .	    0.0	    0.0	...\n'
-                     'EBLINK R 10000018	10000020	2\n',
-                     [{
-                         'duration_ms': 2,
-                         'num_samples': 2,
-                         'start_timestamp': 10000018,
-                         'stop_timestamp': 10000020,
-                     }],
-                     id='blink',
-                     ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'EVENTS	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2\n'
+            'SBLINK R 10000018\n'
+            '10000019	   .	   .	    0.0	    0.0	...\n'
+            '10000020	   .	   .	    0.0	    0.0	...\n'
+            'EBLINK R 10000018	10000020	2\n',
+            [{
+                'duration_ms': 2,
+                'num_samples': 2,
+                'start_timestamp': 10000018,
+                'stop_timestamp': 10000020,
+            }],
+            id='blink',
+        ),
         pytest.param(
             '** DATE: Wed Mar  8 09:25:20 2023\n'
             'EVENTS	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2\n'
@@ -508,19 +533,19 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
 @pytest.mark.parametrize(
     ('metadata', 'expected_blink_ratio', 'expected_overall_ratio'),
     [
-        pytest.param(    '** DATE: Wed Mar  8 09:25:20 2023\n'
-            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
-            'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
-            'SBLINK R 10000018\n'
-            '10000019	   .	   .	    0.0	    0.0	...\n'
-            '10000020	   .	   .	    0.0	    0.0	...\n'
-            'EBLINK R 10000018	10000020	2\n'
-            'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
-            # asc snipped which gets processed by the function
-            1,  # expected_blink_ratio
-            1,  # expected_overall_ratio
-            id='only_blinks',
-        ),
+        pytest.param('** DATE: Wed Mar  8 09:25:20 2023\n'
+                     'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+                     'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
+                     'SBLINK R 10000018\n'
+                     '10000019	   .	   .	    0.0	    0.0	...\n'
+                     '10000020	   .	   .	    0.0	    0.0	...\n'
+                     'EBLINK R 10000018	10000020	2\n'
+                     'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+                     # asc snipped which gets processed by the function
+                     1,  # expected_blink_ratio
+                     1,  # expected_overall_ratio
+                     id='only_blinks',
+                     ),
         pytest.param(
             '** DATE: Wed Mar  8 09:25:20 2023\n'
             'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
@@ -579,7 +604,7 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
             id='missing_timestamps',
         ),
         pytest.param(
-    '** DATE: Wed Mar  8 09:25:20 2023\n'
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
             'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
             '10000019	   850.7	  717.5	  714.0	    0.0	...\n'
@@ -635,7 +660,7 @@ def test_parse_eyelink_data_loss_ratio(
     filepath.write_text(metadata)
 
     _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
-    print(f"parsed_metadata: {parsed_metadata}, \nmetadata: {metadata}")
+    print(f'parsed_metadata: {parsed_metadata}, \nmetadata: {metadata}')
 
     assert parsed_metadata['data_loss_ratio_blinks'] == expected_blink_ratio
     assert parsed_metadata['data_loss_ratio'] == expected_overall_ratio
