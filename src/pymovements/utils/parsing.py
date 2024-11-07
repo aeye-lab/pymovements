@@ -90,10 +90,12 @@ RECORDING_CONFIG = re.compile(
     r'MSG\s+(?P<timestamp>\d+[.]?\d*)\s+'
     r'RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+'
     r'(?P<sampling_rate>\d+)\s+'
-    r'(?P<file_sample_filter>(0|1|2))\s+'
-    r'(?P<link_sample_filter>(0|1|2))\s+'
-    r'(?P<tracked_eye>(L|R|S))\s*',
+    r'(?P<file_sample_filter>0|1|2)\s+'
+    r'(?P<link_sample_filter>0|1|2)\s+'
+    r'(?P<tracked_eye>LR|[LR])\s*', #Todo retun to initial state of the regex
 )
+
+RECORDING_CONFIG_new = re.compile(r'MSG\s+(?P<timestamp>\d+[.]?\d?)\s+RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+(?P<sampling_rate>\d+)\s+(?P<file_sample_filter>0|1|2)\s+(?P<link_sample_filter>0|1|2)\s+(?P<tracked_eye>LR|[RL])\s*')
 
 
 def check_nan(sample_location: str) -> float:
@@ -302,6 +304,10 @@ def parse_eyelink(
             blinks.append(blink_info)
             print('blinks:  ', blinks)
 
+        elif eye_side_match := RECORDING_CONFIG.match(line):
+            print("i matched recording config")
+            recording_config.append(eye_side_match.groupdict())
+
         elif match := START_RECORDING_REGEX.match(line):
             start_recording_timestamp = match.groupdict()['timestamp']
 
@@ -354,29 +360,34 @@ def parse_eyelink(
                         metadata.update(match.groupdict())
 
                     # each metadata pattern should only match once
-                    print("comqiled metadata patterns before removing:  ", compiled_metadata_patterns)
+                    #print("comqiled metadata patterns before removing:  ", compiled_metadata_patterns)
                     compiled_metadata_patterns.remove(pattern_dict)
-                    print("comqiled metadata patternsafter removing :  ", compiled_metadata_patterns)
+                    #print("comqiled metadata patternsafter removing :  ", compiled_metadata_patterns)
 
-        elif eye_side_match := RECORDING_CONFIG.match(line):
-            print("i matched recording config")
-            recording_config.append(eye_side_match.groupdict())
 
     print("recording config:", recording_config, "Regex: ", RECORDING_CONFIG)
+    print("blinks:", blinks, "Regex: ", BLINK_STOP_REGEX)
     print("metadata:  ", metadata)
 
 
     # if the sampling rate is not found, we cannot calculate the data loss
     actual_number_of_samples = len(samples['time'])
+    # if we don't have any recording config, we cannot calculate the data loss
+    if not recording_config:
+        actual_sampling_rate = None
+
+    else:
+        actual_sampling_rate = float(recording_config[0]['sampling_rate'])
 
     data_loss_ratio, data_loss_ratio_blinks = _calculate_data_loss(
         blinks=blinks,
         invalid_samples=invalid_samples,
         actual_num_samples=actual_number_of_samples,
         total_rec_duration=total_recording_duration,
-        sampling_rate=recording_config[0]['sampling_rate'],
+        sampling_rate=actual_sampling_rate,
     )
-
+    if not metadata:
+        raise Warning('No metadata found. Please check the file for errors.')
     pre_processed_metadata: dict[str, Any] = _pre_process_metadata(metadata)
     # is not yet pre-processed but should be
     pre_processed_metadata['calibrations'] = calibrations
@@ -426,10 +437,7 @@ def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:
         resolution = (coordinates[2] - coordinates[0] + 1, coordinates[3] - coordinates[1] + 1)
         metadata['resolution'] = resolution
 
-    if metadata['sampling_rate']:
-        metadata['sampling_rate'] = float(metadata['sampling_rate'])
-    else:
-        metadata['sampling_rate'] = 'unknown'
+
 
     # if the date has been parsed fully, convert the date to a datetime object
     if 'day' in metadata and 'year' in metadata and 'month' in metadata and 'time' in metadata:

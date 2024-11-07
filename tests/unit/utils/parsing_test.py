@@ -9,7 +9,7 @@
 #
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-#
+#git
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -65,7 +65,7 @@ the task should be set to None again
 START	10000004 	RIGHT	SAMPLES	EVENTS
 10000004	  850.7	  717.5	  714.0	    0.0	...
 END	10000005 	SAMPLES	EVENTS	RES	  38.54	  31.12
-MSG	10000005 RECCFG CR 2000 1 1 R
+MSG	10000013.5 RECCFG CR 2000 1 1 R
 MSG 10000005 METADATA_1 123
 MSG 10000005 START_B
 the next line now should have the task column set to B
@@ -508,7 +508,7 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
 @pytest.mark.parametrize(
     ('metadata', 'expected_blink_ratio', 'expected_overall_ratio'),
     [
-        pytest.param(
+        pytest.param(    '** DATE: Wed Mar  8 09:25:20 2023\n'
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
             'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
             'SBLINK R 10000018\n'
@@ -534,6 +534,7 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
             id='unknown_sampling_rate_only_blinks',
         ),
         pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
             'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
             '10000019	   .	   .	    0.0	    0.0	...\n'
@@ -543,6 +544,7 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
             id='lost_samples_no_blinks',
         ),
         pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
             'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
             'SBLINK R 10000018\n'
@@ -565,6 +567,7 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
             id='lost_samples_no_sampling_rate',
         ),
         pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
             'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
             '10000019	   850.7	  717.5	  714.0	    0.0	...\n'
@@ -576,6 +579,7 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
             id='missing_timestamps',
         ),
         pytest.param(
+    '** DATE: Wed Mar  8 09:25:20 2023\n'
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
             'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
             '10000019	   850.7	  717.5	  714.0	    0.0	...\n'
@@ -587,6 +591,7 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
             id='missing_timestamps_lost_samples',
         ),
         pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
             'START	10000020 	RIGHT	SAMPLES	EVENTS\n'
             '10000020	   850.7	  717.5	  714.0	    0.0	...\n'
@@ -600,6 +605,7 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
             id='missing_timestamps_lost_samples4',
         ),
         pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
             'SBLINK R 10000018\n'
             '10000019	   .	   .	    0.0	    0.0	...\n'
@@ -612,6 +618,7 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
             id='blinks_and_lost_samples_no_start_end',
         ),
         pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
             'START	10000020 	RIGHT	SAMPLES	EVENTS\n'
             'END	10000021 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
