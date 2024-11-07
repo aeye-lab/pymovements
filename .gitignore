@@ -41,8 +41,9 @@ pip-delete-this-directory.txt
 \#*\#
 .\#*
 
-# PyCharm files
+# editor files
 .idea
+*.swp
 
 # Docs
 docs/build
@@ -59,3 +60,4 @@ coverage.xml
 htmlcov/
 tests/preprocessed/
 toy_dataset/
+.DS_Store

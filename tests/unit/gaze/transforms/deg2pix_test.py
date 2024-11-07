@@ -508,9 +508,10 @@ def test_deg2pix_returns(kwargs, series, expected_df, distance_as_column):
         # unit of distance values has to be in mm when passing as column
         distance_value = kwargs['distance'] * 10
 
-        df = df.with_columns(
-            pl.Series('distance', [distance_value], pl.Float64),
-        )
+        try:
+            df = df.with_columns(pl.Series('distance', [distance_value], pl.Float64))
+        except pl.exceptions.InvalidOperationError:
+            df = df.with_columns(distance=distance_value)
 
         kwargs['distance'] = 'distance'
 

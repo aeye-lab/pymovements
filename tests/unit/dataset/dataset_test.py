@@ -72,10 +72,62 @@ def create_event_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):
         gaze_df.write_ipc(rootpath / filepath)
 
 
-def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
-    subject_ids = list(range(1, 21))
+def create_precomputed_files_from_fileinfo(precomputed_dfs, fileinfo, rootpath):
+    rootpath.mkdir(parents=True, exist_ok=True)
 
-    fileinfo = pl.DataFrame(data={'subject_id': subject_ids}, schema={'subject_id': pl.Int64})
+    for precomputed_df, fileinfo_row in zip(precomputed_dfs, fileinfo.to_dicts()):
+        filepath = fileinfo_row['filepath']
+
+        for key in fileinfo_row.keys():
+            if key in precomputed_df.columns:
+                precomputed_df = precomputed_df.drop(key)
+
+        precomputed_df.write_csv(rootpath / filepath)
+
+
+def create_precomputed_rm_files_from_fileinfo(precomputed_rm_df, fileinfo, rootpath):
+    rootpath.mkdir(parents=True, exist_ok=True)
+
+    for precomputed_rm_df, fileinfo_row in zip(precomputed_rm_df, fileinfo.to_dicts()):
+        filepath = fileinfo_row['filepath']
+
+        for key in fileinfo_row.keys():
+            if key in precomputed_rm_df.columns:
+                precomputed_rm_df = precomputed_rm_df.drop(key)
+
+        precomputed_rm_df.write_csv(rootpath / filepath)
+
+
+def mock_toy(
+        rootpath,
+        raw_fileformat,
+        eyes,
+        remote=False,
+        has_files={
+            'gaze': True,
+            'precomputed_events': False,
+            'precomputed_reading_measures': False,
+        },
+        extract={'gaze': True, 'precomputed_events': True},
+        filename_format_schema_overrides={
+            'gaze': {'subject_id': pl.Int64},
+            'precomputed_events': {'subject_id': pl.Int64},
+            'precomputed_reading_measures': {'subject_id': pl.Int64},
+        },
+):
+
+    if filename_format_schema_overrides['precomputed_events']:
+        subject_ids = list(range(1, 21))
+        fileinfo = pl.DataFrame(
+            data={'subject_id': subject_ids},
+            schema={'subject_id': pl.Int64},
+        )
+    else:
+        subject_ids = [str(idx) for idx in range(1, 21)]
+        fileinfo = pl.DataFrame(
+            data={'subject_id': subject_ids},
+            schema={'subject_id': pl.Utf8},
+        )
 
     fileinfo = fileinfo.with_columns([
         pl.format('{}.' + raw_fileformat, 'subject_id').alias('filepath'),
@@ -273,12 +325,73 @@ def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
             origin='upper left',
             sampling_rate=1000,
         ),
-        filename_format=r'{subject_id:d}.' + raw_fileformat,
-        filename_format_dtypes={'subject_id': pl.Int64},
+        filename_format={
+            'gaze': r'{subject_id:d}.' + raw_fileformat,
+            'precomputed_events': r'{subject_id:d}.' + raw_fileformat,
+            'precomputed_reading_measures': r'{subject_id:d}.' + raw_fileformat,
+        },
+        filename_format_schema_overrides=filename_format_schema_overrides,
+        custom_read_kwargs={
+            'gaze': {},
+            'precomputed_events': {},
+            'precomputed_reading_measures': {},
+        },
         time_column='time',
         time_unit='ms',
         distance_column=distance_column,
         pixel_columns=pixel_columns,
+        has_files=has_files,
+        extract=extract,
+    )
+
+    precomputed_dfs = []
+    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
+        precomputed_event_df = pl.from_dict(
+            {
+                'subject_id': fileinfo_row['subject_id'],
+                'CURRENT_FIXATION_DURATION': np.arange(1000),
+                'CURRENT_FIX_X': np.zeros(1000),
+                'CURRENT_FIX_Y': np.zeros(1000),
+                'trial_id_1': np.concatenate([np.zeros(500), np.ones(500)]),
+                'trial_id_2': ['a'] * 200 + ['b'] * 200 + ['c'] * 600,
+            },
+            schema={
+                'subject_id': pl.Int64,
+                'CURRENT_FIXATION_DURATION': pl.Float64,
+                'CURRENT_FIX_X': pl.Float64,
+                'CURRENT_FIX_Y': pl.Float64,
+                'trial_id_1': pl.Float64,
+                'trial_id_2': pl.Utf8,
+            },
+        )
+        precomputed_dfs.append(precomputed_event_df)
+
+    create_precomputed_files_from_fileinfo(
+        precomputed_dfs,
+        fileinfo,
+        rootpath / 'precomputed_events',
+    )
+
+    precomputed_rm_dfs = []
+    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
+        precomputed_rm_df = pl.from_dict(
+            {
+                'subject_id': fileinfo_row['subject_id'],
+                'number_fix': np.arange(1000),
+                'mean_fix_dur': np.zeros(1000),
+            },
+            schema={
+                'subject_id': pl.Int64,
+                'number_fix': pl.Float64,
+                'mean_fix_dur': pl.Float64,
+            },
+        )
+        precomputed_rm_dfs.append(precomputed_rm_df)
+
+    create_precomputed_rm_files_from_fileinfo(
+        precomputed_rm_dfs,
+        fileinfo,
+        rootpath / 'precomputed_reading_measures',
     )
 
     return {
@@ -286,34 +399,47 @@ def mock_toy(rootpath, raw_fileformat, eyes, remote=False):
             'definition': dataset_definition,
             'path': pm.DatasetPaths(root=rootpath, dataset='.'),
         },
-        'fileinfo': fileinfo,
+        'fileinfo': {
+            'gaze': fileinfo,
+            'precomputed_events': fileinfo,
+            'precomputed_reading_measures': fileinfo,
+        },
         'raw_gaze_dfs': gaze_dfs,
         'preprocessed_gaze_dfs': preprocessed_gaze_dfs,
         'event_dfs': event_dfs,
+        'precomputed_rm_dfs': precomputed_rm_dfs,
         'eyes': eyes,
     }
 
 
 @pytest.fixture(
-    name='dataset_configuration',
-    params=['ToyMono', 'ToyBino', 'ToyLeft', 'ToyRight', 'ToyBino+Avg', 'ToyRemote'],
+    name='gaze_dataset_configuration',
+    params=[
+        'ToyMono',
+        'ToyBino',
+        'ToyLeft',
+        'ToyRight',
+        'ToyBino+Avg',
+        'ToyRemote',
+    ],
 )
-def fixture_dataset(request, tmp_path):
+def gaze_fixture_dataset(request, tmp_path):
     rootpath = tmp_path
 
-    if request.param == 'ToyBino':
+    dataset_type = request.param
+    if dataset_type == 'ToyBino':
         dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='both')
-    elif request.param == 'ToyBino+Avg':
+    elif dataset_type == 'ToyBino+Avg':
         dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='both+avg')
-    elif request.param == 'ToyMono':
+    elif dataset_type == 'ToyMono':
         dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='none')
-    elif request.param == 'ToyLeft':
+    elif dataset_type == 'ToyLeft':
         dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='left')
-    elif request.param == 'ToyRight':
+    elif dataset_type == 'ToyRight':
         dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='right')
-    elif request.param == 'ToyMat':
+    elif dataset_type == 'ToyMat':
         dataset_dict = mock_toy(rootpath, raw_fileformat='mat', eyes='both')
-    elif request.param == 'ToyRemote':
+    elif dataset_type == 'ToyRemote':
         dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='both', remote=True)
     else:
         raise ValueError(f'{request.param} not supported as dataset mock')
@@ -321,19 +447,19 @@ def fixture_dataset(request, tmp_path):
     yield dataset_dict
 
 
-def test_load_correct_fileinfo(dataset_configuration):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+def test_load_correct_fileinfo(gaze_dataset_configuration):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
 
-    expected_fileinfo = dataset_configuration['fileinfo']
-    assert_frame_equal(dataset.fileinfo, expected_fileinfo)
+    expected_fileinfo = gaze_dataset_configuration['fileinfo']
+    assert_frame_equal(dataset.fileinfo['gaze'], expected_fileinfo['gaze'])
 
 
-def test_load_correct_raw_gaze_dfs(dataset_configuration):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+def test_load_correct_raw_gaze_dfs(gaze_dataset_configuration):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
 
-    expected_gaze_dfs = dataset_configuration['raw_gaze_dfs']
+    expected_gaze_dfs = gaze_dataset_configuration['raw_gaze_dfs']
     for result_gaze_df, expected_gaze_df in zip(dataset.gaze, expected_gaze_dfs):
         assert_frame_equal(
             result_gaze_df.frame,
@@ -342,19 +468,19 @@ def test_load_correct_raw_gaze_dfs(dataset_configuration):
         )
 
 
-def test_load_gaze_has_position_columns(dataset_configuration):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+def test_load_gaze_has_position_columns(gaze_dataset_configuration):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True)
 
     for result_gaze_df in dataset.gaze:
         assert 'position' in result_gaze_df.columns
 
 
-def test_load_correct_preprocessed_gaze_dfs(dataset_configuration):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+def test_load_correct_preprocessed_gaze_dfs(gaze_dataset_configuration):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True)
 
-    expected_gaze_dfs = dataset_configuration['preprocessed_gaze_dfs']
+    expected_gaze_dfs = gaze_dataset_configuration['preprocessed_gaze_dfs']
     for result_gaze_df, expected_gaze_df in zip(dataset.gaze, expected_gaze_dfs):
         assert_frame_equal(
             result_gaze_df.frame,
@@ -363,11 +489,11 @@ def test_load_correct_preprocessed_gaze_dfs(dataset_configuration):
         )
 
 
-def test_load_correct_event_dfs(dataset_configuration):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+def test_load_correct_event_dfs(gaze_dataset_configuration):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(events=True)
 
-    expected_event_dfs = dataset_configuration['event_dfs']
+    expected_event_dfs = gaze_dataset_configuration['event_dfs']
     for result_event_df, expected_event_df in zip(dataset.events, expected_event_dfs):
         assert_frame_equal(result_event_df.frame, expected_event_df)
 
@@ -392,14 +518,14 @@ def test_load_correct_event_dfs(dataset_configuration):
         ),
     ],
 )
-def test_load_subset(subset, fileinfo_idx, dataset_configuration):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+def test_load_subset(subset, fileinfo_idx, gaze_dataset_configuration):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(subset=subset)
 
-    expected_fileinfo = dataset_configuration['fileinfo']
-    expected_fileinfo = expected_fileinfo[fileinfo_idx]
+    expected_fileinfo = gaze_dataset_configuration['fileinfo']
+    expected_fileinfo = expected_fileinfo['gaze'][fileinfo_idx]
 
-    assert_frame_equal(dataset.fileinfo, expected_fileinfo)
+    assert_frame_equal(dataset.fileinfo['gaze'], expected_fileinfo)
 
 
 @pytest.mark.parametrize(
@@ -431,8 +557,8 @@ def test_load_subset(subset, fileinfo_idx, dataset_configuration):
         ),
     ],
 )
-def test_load_exceptions(init_kwargs, load_kwargs, exception, dataset_configuration):
-    init_kwargs = {**dataset_configuration['init_kwargs'], **init_kwargs}
+def test_load_exceptions(init_kwargs, load_kwargs, exception, gaze_dataset_configuration):
+    init_kwargs = {**gaze_dataset_configuration['init_kwargs'], **init_kwargs}
     dataset = pm.Dataset(**init_kwargs)
 
     with pytest.raises(exception):
@@ -450,8 +576,8 @@ def test_load_exceptions(init_kwargs, load_kwargs, exception, dataset_configurat
         ),
     ],
 )
-def test_save_gaze_exceptions(init_kwargs, save_kwargs, exception, dataset_configuration):
-    init_kwargs = {**dataset_configuration['init_kwargs'], **init_kwargs}
+def test_save_gaze_exceptions(init_kwargs, save_kwargs, exception, gaze_dataset_configuration):
+    init_kwargs = {**gaze_dataset_configuration['init_kwargs'], **init_kwargs}
     dataset = pm.Dataset(**init_kwargs)
 
     with pytest.raises(exception):
@@ -463,21 +589,24 @@ def test_save_gaze_exceptions(init_kwargs, save_kwargs, exception, dataset_confi
 
 
 @pytest.mark.parametrize(
-    ('init_kwargs', 'load_kwargs', 'exception'),
+    ('load_kwargs', 'exception'),
     [
         pytest.param(
-            {},
             {'extension': 'invalid'},
             ValueError,
             id='wrong_extension_load_events',
         ),
     ],
 )
-def test_load_events_exceptions(init_kwargs, load_kwargs, exception, dataset_configuration):
-    init_kwargs = {**dataset_configuration['init_kwargs'], **init_kwargs}
+def test_load_events_exceptions(
+        load_kwargs,
+        exception,
+        gaze_dataset_configuration,
+):
+    init_kwargs = {**gaze_dataset_configuration['init_kwargs']}
     dataset = pm.Dataset(**init_kwargs)
 
-    with pytest.raises(exception):
+    with pytest.raises(exception) as excinfo:
         dataset.load()
         dataset.pix2deg()
         dataset.pos2vel()
@@ -488,6 +617,11 @@ def test_load_events_exceptions(init_kwargs, load_kwargs, exception, dataset_con
         )
         dataset.save_events()
         dataset.load_event_files(**load_kwargs)
+
+    msg, = excinfo.value.args
+    assert msg == """\
+unsupported file format "invalid".\
+Supported formats are: [\'csv\', \'txt\', \'tsv\', \'feather\']"""
 
 
 @pytest.mark.parametrize(
@@ -501,8 +635,8 @@ def test_load_events_exceptions(init_kwargs, load_kwargs, exception, dataset_con
         ),
     ],
 )
-def test_save_events_exceptions(init_kwargs, save_kwargs, exception, dataset_configuration):
-    init_kwargs = {**dataset_configuration['init_kwargs'], **init_kwargs}
+def test_save_events_exceptions(init_kwargs, save_kwargs, exception, gaze_dataset_configuration):
+    init_kwargs = {**gaze_dataset_configuration['init_kwargs'], **init_kwargs}
     dataset = pm.Dataset(**init_kwargs)
 
     with pytest.raises(exception):
@@ -517,8 +651,8 @@ def test_save_events_exceptions(init_kwargs, save_kwargs, exception, dataset_con
         dataset.save_events(**save_kwargs)
 
 
-def test_load_no_files_raises_exception(dataset_configuration):
-    init_kwargs = {**dataset_configuration['init_kwargs']}
+def test_load_no_files_raises_exception(gaze_dataset_configuration):
+    init_kwargs = {**gaze_dataset_configuration['init_kwargs']}
     dataset = pm.Dataset(**init_kwargs)
 
     shutil.rmtree(dataset.paths.raw, ignore_errors=True)
@@ -529,21 +663,19 @@ def test_load_no_files_raises_exception(dataset_configuration):
 
 
 @pytest.mark.parametrize(
-    'exception',
-    [
-        pytest.param(ValueError, id='matlab_dataset'),
-    ],
+    'gaze_dataset_configuration',
+    ['ToyMat'],
+    indirect=['gaze_dataset_configuration'],
 )
-@pytest.mark.parametrize('dataset_configuration', ['ToyMat'], indirect=['dataset_configuration'])
-def test_load_mat_file_exception(exception, dataset_configuration):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+def test_load_mat_file_exception(gaze_dataset_configuration):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
 
-    with pytest.raises(exception):
+    with pytest.raises(ValueError):
         dataset.load()
 
 
-def test_pix2deg(dataset_configuration):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+def test_pix2deg(gaze_dataset_configuration):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
 
     original_schema = dataset.gaze[0].schema
@@ -555,8 +687,8 @@ def test_pix2deg(dataset_configuration):
         assert result_gaze_df.schema == expected_schema
 
 
-def test_deg2pix(dataset_configuration):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+def test_deg2pix(gaze_dataset_configuration):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
 
     original_schema = dataset.gaze[0].schema
@@ -572,8 +704,8 @@ def test_deg2pix(dataset_configuration):
         assert result_gaze_df.schema == expected_schema
 
 
-def test_pos2acc(dataset_configuration):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+def test_pos2acc(gaze_dataset_configuration):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
 
@@ -586,8 +718,8 @@ def test_pos2acc(dataset_configuration):
         assert result_gaze_df.schema == expected_schema
 
 
-def test_pos2vel(dataset_configuration):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+def test_pos2vel(gaze_dataset_configuration):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
 
@@ -600,14 +732,14 @@ def test_pos2vel(dataset_configuration):
         assert result_gaze_df.schema == expected_schema
 
 
-def test_clip(dataset_configuration):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+def test_clip(gaze_dataset_configuration):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
 
     original_schema = dataset.gaze[0].schema
 
-    dataset.clip(-1000, 1000, input_column='pixel', output_column='pixel_clipped', n_components=4)
+    dataset.clip(-1000, 1000, input_column='pixel', output_column='pixel_clipped', n_components=2)
 
     expected_schema = {**original_schema, 'pixel_clipped': pl.List(pl.Float64)}
     for result_gaze_df in dataset.gaze:
@@ -681,8 +813,8 @@ def test_clip(dataset_configuration):
         ),
     ],
 )
-def test_detect_events_auto_eye(detect_event_kwargs, dataset_configuration):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+def test_detect_events_auto_eye(detect_event_kwargs, gaze_dataset_configuration):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -716,13 +848,13 @@ def test_detect_events_auto_eye(detect_event_kwargs, dataset_configuration):
         ),
     ],
 )
-def test_detect_events_explicit_eye(detect_event_kwargs, dataset_configuration):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+def test_detect_events_explicit_eye(detect_event_kwargs, gaze_dataset_configuration):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
 
-    dataset_eyes = dataset_configuration['eyes']
+    dataset_eyes = gaze_dataset_configuration['eyes']
 
     exception = None
     if not dataset_eyes.startswith('both') and detect_event_kwargs['eye'] is not None:
@@ -787,10 +919,12 @@ def test_detect_events_explicit_eye(detect_event_kwargs, dataset_configuration):
     ],
 )
 def test_detect_events_multiple_calls(
-        detect_event_kwargs_1, detect_event_kwargs_2,
-        expected_schema, dataset_configuration,
+        detect_event_kwargs_1,
+        detect_event_kwargs_2,
+        expected_schema,
+        gaze_dataset_configuration,
 ):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -816,8 +950,8 @@ def test_detect_events_multiple_calls(
         ),
     ],
 )
-def test_detect_events_alias(dataset_configuration, detect_kwargs, monkeypatch):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+def test_detect_events_alias(gaze_dataset_configuration, detect_kwargs, monkeypatch):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -829,9 +963,13 @@ def test_detect_events_alias(dataset_configuration, detect_kwargs, monkeypatch):
     mock.assert_called_with(**detect_kwargs)
 
 
-@pytest.mark.parametrize('dataset_configuration', ['ToyMono'], indirect=['dataset_configuration'])
-def test_detect_events_attribute_error(dataset_configuration):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+@pytest.mark.parametrize(
+    'gaze_dataset_configuration',
+    ['ToyMono'],
+    indirect=['gaze_dataset_configuration'],
+)
+def test_detect_events_attribute_error(gaze_dataset_configuration):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -846,7 +984,11 @@ def test_detect_events_attribute_error(dataset_configuration):
         dataset.detect_events(**detect_event_kwargs)
 
 
-@pytest.mark.parametrize('dataset_configuration', ['ToyMono'], indirect=['dataset_configuration'])
+@pytest.mark.parametrize(
+    'gaze_dataset_configuration',
+    ['ToyMono'],
+    indirect=['gaze_dataset_configuration'],
+)
 @pytest.mark.parametrize(
     ('rename_arg', 'detect_event_kwargs', 'expected_message'),
     [
@@ -877,9 +1019,12 @@ def test_detect_events_attribute_error(dataset_configuration):
     ],
 )
 def test_detect_events_raises_column_not_found_error(
-        dataset_configuration, rename_arg, detect_event_kwargs, expected_message,
+        gaze_dataset_configuration,
+        rename_arg,
+        detect_event_kwargs,
+        expected_message,
 ):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -966,9 +1111,9 @@ def test_save_events(
         events_dirname,
         expected_save_dirpath,
         save_kwargs,
-        dataset_configuration,
+        gaze_dataset_configuration,
 ):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -1016,9 +1161,9 @@ def test_load_previously_saved_events_gaze(
         events_dirname,
         expected_save_dirpath,
         load_save_kwargs,
-        dataset_configuration,
+        gaze_dataset_configuration,
 ):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -1058,9 +1203,11 @@ def test_load_previously_saved_events_gaze(
     ],
 )
 def test_save_preprocessed_directory_exists(
-        preprocessed_dirname, expected_save_dirpath, dataset_configuration,
+        preprocessed_dirname,
+        expected_save_dirpath,
+        gaze_dataset_configuration,
 ):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -1087,8 +1234,8 @@ def test_save_preprocessed_directory_exists(
         'acceleration',
     ],
 )
-def test_save_preprocessed(dataset_configuration, drop_column):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+def test_save_preprocessed(gaze_dataset_configuration, drop_column):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -1117,8 +1264,8 @@ def test_save_preprocessed(dataset_configuration, drop_column):
         'acceleration',
     ],
 )
-def test_save_preprocessed_has_no_side_effect(dataset_configuration, drop_column):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+def test_save_preprocessed_has_no_side_effect(gaze_dataset_configuration, drop_column):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -1177,9 +1324,9 @@ def test_save_creates_correct_directory(
         expected_save_preprocessed_path,
         expected_save_events_path,
         save_kwargs,
-        dataset_configuration,
+        gaze_dataset_configuration,
 ):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -1225,9 +1372,9 @@ def test_save_files_have_correct_extension(
         expected_save_preprocessed_path,
         expected_save_events_path,
         save_kwargs,
-        dataset_configuration,
+        gaze_dataset_configuration,
 ):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -1375,19 +1522,27 @@ def test_check_gaze_dataframe(new_gaze, exception, tmp_path):
         dataset._check_gaze_dataframe()
 
 
-@pytest.mark.parametrize('dataset_configuration', ['ToyBino'], indirect=['dataset_configuration'])
-def test_check_experiment(dataset_configuration):
-    dataset_configuration['init_kwargs']['definition'].experiment = None
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+@pytest.mark.parametrize(
+    'gaze_dataset_configuration',
+    ['ToyBino'],
+    indirect=['gaze_dataset_configuration'],
+)
+def test_check_experiment(gaze_dataset_configuration):
+    gaze_dataset_configuration['init_kwargs']['definition'].experiment = None
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
 
     with pytest.raises(AttributeError):
         dataset.gaze[0]._check_experiment()
 
 
-@pytest.mark.parametrize('dataset_configuration', ['ToyBino'], indirect=['dataset_configuration'])
-def test_velocity_columns(dataset_configuration):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+@pytest.mark.parametrize(
+    'gaze_dataset_configuration',
+    ['ToyBino'],
+    indirect=['gaze_dataset_configuration'],
+)
+def test_velocity_columns(gaze_dataset_configuration):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True)
 
     for gaze_df in dataset.gaze:
@@ -1406,9 +1561,12 @@ def test_velocity_columns(dataset_configuration):
     ],
 )
 def test_event_dataframe_add_property_raises_exceptions(
-        dataset_configuration, property_kwargs, exception, msg_substrings,
+        gaze_dataset_configuration,
+        property_kwargs,
+        exception,
+        msg_substrings,
 ):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True)
 
     with pytest.raises(exception) as excinfo:
@@ -1425,8 +1583,11 @@ def test_event_dataframe_add_property_raises_exceptions(
         pytest.param({'event_properties': 'peak_velocity'}, id='peak_velocity'),
     ],
 )
-def test_event_dataframe_add_property_has_expected_height(dataset_configuration, property_kwargs):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+def test_event_dataframe_add_property_has_expected_height(
+        gaze_dataset_configuration,
+        property_kwargs,
+):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True)
 
     expected_heights = [len(event_df) for event_df in dataset.events]
@@ -1463,9 +1624,11 @@ def test_event_dataframe_add_property_has_expected_height(dataset_configuration,
     ],
 )
 def test_event_dataframe_add_property_has_expected_schema(
-        dataset_configuration, property_kwargs, expected_schema,
+        gaze_dataset_configuration,
+        property_kwargs,
+        expected_schema,
 ):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True)
 
     dataset.compute_event_properties(**property_kwargs)
@@ -1500,9 +1663,11 @@ def test_event_dataframe_add_property_has_expected_schema(
     ],
 )
 def test_event_dataframe_add_property_effect_property_columns(
-        dataset_configuration, property_kwargs, expected_property_columns,
+        gaze_dataset_configuration,
+        property_kwargs,
+        expected_property_columns,
 ):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True)
 
     dataset.compute_event_properties(**property_kwargs)
@@ -1522,9 +1687,12 @@ def test_event_dataframe_add_property_effect_property_columns(
     ],
 )
 def test_event_dataframe_add_property_raises_exception(
-        dataset_configuration, property_kwargs, exception, exception_msg,
+        gaze_dataset_configuration,
+        property_kwargs,
+        exception,
+        exception_msg,
 ):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True)
 
     with pytest.raises(exception) as excinfo:
@@ -1552,9 +1720,10 @@ def test_event_dataframe_add_property_raises_exception(
     ],
 )
 def test_event_dataframe_add_property_does_not_change_length(
-        dataset_configuration, property_kwargs,
+        gaze_dataset_configuration,
+        property_kwargs,
 ):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True)
 
     lengths_pre = [len(events_df.frame) for events_df in dataset.events]
@@ -1572,12 +1741,13 @@ def test_event_dataframe_add_property_does_not_change_length(
                 'event_properties': 'peak_velocity',
                 'name': None,
                 'verbose': True,
-            }, id='peak_velocity',
+            },
+            id='peak_velocity',
         ),
     ],
 )
-def test_compute_event_properties_alias(dataset_configuration, property_kwargs, monkeypatch):
-    dataset = pm.Dataset(**dataset_configuration['init_kwargs'])
+def test_compute_event_properties_alias(gaze_dataset_configuration, property_kwargs, monkeypatch):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True)
 
     mock = Mock()
@@ -1585,3 +1755,178 @@ def test_compute_event_properties_alias(dataset_configuration, property_kwargs, 
 
     dataset.compute_properties(**property_kwargs)
     mock.assert_called_with(**property_kwargs)
+
+
+@pytest.fixture(
+    name='precomputed_dataset_configuration',
+    params=[
+        'ToyRightPrecomputedEventAndGaze',
+        'ToyPrecomputedEvent',
+        'ToyPrecomputedEventNoExtract',
+    ],
+)
+def precomputed_fixture_dataset(request, tmp_path):
+    rootpath = tmp_path
+
+    dataset_type = request.param
+    if dataset_type == 'ToyRightPrecomputedEventAndGaze':
+        dataset_dict = mock_toy(
+            rootpath,
+            raw_fileformat='csv',
+            eyes='right',
+            has_files={
+                'gaze': True,
+                'precomputed_events': True,
+                'precomputed_reading_measures': False,
+            },
+        )
+    elif dataset_type == 'ToyPrecomputedEvent':
+        dataset_dict = mock_toy(
+            rootpath,
+            raw_fileformat='csv',
+            eyes='right',
+            has_files={
+                'gaze': False,
+                'precomputed_events': True,
+                'precomputed_reading_measures': False,
+            },
+        )
+    elif dataset_type == 'ToyPrecomputedEventNoExtract':
+        dataset_dict = mock_toy(
+            rootpath,
+            raw_fileformat='csv',
+            eyes='right',
+            has_files={
+                'gaze': False,
+                'precomputed_events': True,
+                'precomputed_reading_measures': False,
+            },
+            extract={'precomputed_events': False},
+            filename_format_schema_overrides={'precomputed_events': {}},
+        )
+    else:
+        raise ValueError(f'{request.param} not supported as dataset mock')
+
+    yield dataset_dict
+
+
+def test_load_correct_fileinfo_precomputed(precomputed_dataset_configuration):
+    dataset = pm.Dataset(**precomputed_dataset_configuration['init_kwargs'])
+    dataset.load()
+
+    expected_fileinfo = precomputed_dataset_configuration['fileinfo']['precomputed_events']
+    assert_frame_equal(dataset.fileinfo['precomputed_events'], expected_fileinfo)
+
+
+def test_load_no_files_precomputed_raises_exception(precomputed_dataset_configuration):
+    init_kwargs = {**precomputed_dataset_configuration['init_kwargs']}
+    dataset = pm.Dataset(**init_kwargs)
+
+    shutil.rmtree(dataset.paths.precomputed_events, ignore_errors=True)
+    dataset.paths.precomputed_events.mkdir()
+
+    with pytest.raises(RuntimeError):
+        dataset.load()
+
+
+@pytest.fixture(
+    name='precomputed_rm_dataset_configuration',
+    params=[
+        'ToyRightPrecomputedEventAndGazeAndRM',
+        'ToyPrecomputedRM',
+        'ToyPrecomputedRMNoExtract',
+    ],
+)
+def precomputed_rm_fixture_dataset(request, tmp_path):
+    rootpath = tmp_path
+
+    dataset_type = request.param
+    if dataset_type == 'ToyRightPrecomputedEventAndGazeAndRM':
+        dataset_dict = mock_toy(
+            rootpath,
+            raw_fileformat='csv',
+            eyes='right',
+            has_files={
+                'gaze': True,
+                'precomputed_events': True,
+                'precomputed_reading_measures': True,
+            },
+        )
+    elif dataset_type == 'ToyPrecomputedRM':
+        dataset_dict = mock_toy(
+            rootpath,
+            raw_fileformat='csv',
+            eyes='right',
+            has_files={
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': True,
+            },
+        )
+    elif dataset_type == 'ToyPrecomputedRMNoExtract':
+        dataset_dict = mock_toy(
+            rootpath,
+            raw_fileformat='csv',
+            eyes='right',
+            has_files={
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': True,
+            },
+            extract={'precomputed_reading_measures': False},
+            filename_format_schema_overrides={
+                'precomputed_events': {},
+                'precomputed_reading_measures': {},
+            },
+        )
+    else:
+        raise ValueError(f'{request.param} not supported as dataset mock')
+
+    yield dataset_dict
+
+
+def test_load_correct_fileinfo_precomputed_rm(precomputed_rm_dataset_configuration):
+    dataset = pm.Dataset(**precomputed_rm_dataset_configuration['init_kwargs'])
+    dataset.load()
+
+    all_fileinfo = precomputed_rm_dataset_configuration['fileinfo']
+    expected_fileinfo = all_fileinfo['precomputed_reading_measures']
+    assert_frame_equal(dataset.fileinfo['precomputed_reading_measures'], expected_fileinfo)
+
+
+def test_load_no_files_precomputed_rm_raises_exception(precomputed_rm_dataset_configuration):
+    init_kwargs = {**precomputed_rm_dataset_configuration['init_kwargs']}
+    dataset = pm.Dataset(**init_kwargs)
+
+    shutil.rmtree(dataset.paths.precomputed_reading_measures, ignore_errors=True)
+    dataset.paths.precomputed_reading_measures.mkdir()
+
+    with pytest.raises(RuntimeError):
+        dataset.load()
+
+
+@pytest.mark.parametrize(
+    ('by', 'expected_len'),
+    [
+        pytest.param(
+            'trial_id_1',
+            40,
+            id='subset_int',
+        ),
+        pytest.param(
+            'trial_id_2',
+            60,
+            id='subset_int',
+        ),
+        pytest.param(
+            ['trial_id_1', 'trial_id_2'],
+            80,
+            id='subset_int',
+        ),
+    ],
+)
+def test_load_split_precomputed_events(precomputed_dataset_configuration, by, expected_len):
+    dataset = pm.Dataset(**precomputed_dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.split_precomputed_events(by)
+    assert len(dataset.precomputed_events) == expected_len

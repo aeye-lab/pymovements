@@ -113,6 +113,13 @@ def gaze_fixture():
             {'cval': np.arange(0, 200), 'title': 'foo'},
             id='set_title',
         ),
+        pytest.param(
+            {
+                'add_stimulus': True,
+                'path_to_image_stimulus': './tests/files/pexels-zoorg-1000498.jpg',
+            },
+            id='set_stimulus',
+        ),
     ],
 )
 def test_traceplot_show(gaze, kwargs, monkeypatch):

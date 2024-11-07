@@ -33,6 +33,7 @@ import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
 from pymovements.utils import checks
+from pymovements.utils.aois import get_aoi
 
 
 class GazeDataFrame:
@@ -328,6 +329,54 @@ class GazeDataFrame:
                 ),
             )
 
+            # sampling rate
+        elif transform_method.__name__ == 'resample':
+            resample_rate = kwargs.pop('resampling_rate')
+
+            if self.trial_columns is None:
+                self.frame = transforms.resample(
+                    frame=self.frame,
+                    resampling_rate=resample_rate,
+                    n_components=self.n_components,
+                    **kwargs,
+                )
+            else:
+                # Manipulate columns to exclude trial columns
+                resample_columns = kwargs.pop('columns', 'all')
+
+                if resample_columns == 'all':
+                    resample_columns = self.frame.columns
+                elif isinstance(resample_columns, str):
+                    resample_columns = [resample_columns]
+
+                if resample_columns is not None:
+                    resample_columns = [
+                        col for col in resample_columns if col not in self.trial_columns
+                    ]
+
+                self.frame = pl.concat(
+                    [
+                        transforms.resample(
+                            frame=df,
+                            resampling_rate=resample_rate,
+                            n_components=self.n_components,
+                            columns=resample_columns,
+                            **kwargs,
+                        )
+                        for group, df in
+                        self.frame.group_by(self.trial_columns, maintain_order=True)
+                    ],
+                )
+
+                # forward fill trial columns
+                self.frame = self.frame.with_columns(
+                    pl.col(self.trial_columns).fill_null(strategy='forward'),
+                )
+
+            # set new sampling rate in experiment
+            if self.experiment is not None:
+                self.experiment.sampling_rate = resample_rate
+
         else:
             method_kwargs = inspect.getfullargspec(transform_method).kwonlyargs
             if 'origin' in method_kwargs and 'origin' not in kwargs:
@@ -494,10 +543,10 @@ class GazeDataFrame:
         self.transform('pix2deg')
 
     def deg2pix(
-        self,
-        pixel_origin: str = 'upper left',
-        position_column: str = 'position',
-        pixel_column: str = 'pixel',
+            self,
+            pixel_origin: str = 'upper left',
+            position_column: str = 'position',
+            pixel_column: str = 'pixel',
     ) -> None:
         """Compute gaze positions in pixel position coordinates from degrees of visual angle.
 
@@ -584,6 +633,100 @@ class GazeDataFrame:
             if experiment is None.
         """
         self.transform('pos2vel', method=method, **kwargs)
+
+    def resample(
+            self,
+            resampling_rate: float,
+            columns: str | list[str] = 'all',
+            fill_null_strategy: str = 'interpolate_linear',
+    ) -> None:
+        """Resample a DataFrame to a new sampling rate by timestamps in time column.
+
+        The DataFrame is resampled by upsampling or downsampling the data to the new sampling rate.
+        Can also be used to achieve a constant sampling rate for inconsistent data.
+
+        Parameters
+        ----------
+        resampling_rate: float
+            The new sampling rate.
+        columns: str | list[str]
+            The columns to apply the fill null strategy. Specify a single column name or a list of
+            column names. If 'all' is specified, the fill null strategy is applied to all columns.
+            (default: 'all')
+        fill_null_strategy: str
+            The strategy to fill null values of the resampled DataFrame. Supported strategies
+            are: 'forward', 'backward', 'interpolate_linear', 'interpolate_nearest'.
+            (default: 'interpolate_linear')
+
+        Examples
+        --------
+        Lets create an example GazeDataFrame of 1000Hz with a time column and a position column.
+        Please note that time is always stored in milliseconds in the GazeDataFrame.
+        >>> df = pl.DataFrame({
+        ...     'time': [0, 1, 2, 3, 4],
+        ...     'x': [1, 2, 3, 4, 5],
+        ...     'y': [1, 2, 3, 4, 5],
+        ... })
+        >>> gaze = GazeDataFrame(data=df, time_column='time', pixel_columns=['x', 'y'])
+        >>> gaze.frame
+        shape: (5, 2)
+        ┌──────┬───────────┐
+        │ time ┆ pixel     │
+        │ ---  ┆ ---       │
+        │ i64  ┆ list[i64] │
+        ╞══════╪═══════════╡
+        │ 0    ┆ [1, 1]    │
+        │ 1    ┆ [2, 2]    │
+        │ 2    ┆ [3, 3]    │
+        │ 3    ┆ [4, 4]    │
+        │ 4    ┆ [5, 5]    │
+        └──────┴───────────┘
+
+        We can now upsample the GazeDataFrame to 2000Hz with interpolating the values in
+        the pixel column.
+        >>> gaze.resample(
+        ...     resampling_rate=2000,
+        ...     fill_null_strategy='interpolate_linear',
+        ...     columns=['pixel'],
+        ... )
+        >>> gaze.frame
+        shape: (9, 2)
+        ┌──────┬────────────┐
+        │ time ┆ pixel      │
+        │ ---  ┆ ---        │
+        │ f64  ┆ list[f64]  │
+        ╞══════╪════════════╡
+        │ 0.0  ┆ [1.0, 1.0] │
+        │ 0.5  ┆ [1.5, 1.5] │
+        │ 1.0  ┆ [2.0, 2.0] │
+        │ 1.5  ┆ [2.5, 2.5] │
+        │ 2.0  ┆ [3.0, 3.0] │
+        │ 2.5  ┆ [3.5, 3.5] │
+        │ 3.0  ┆ [4.0, 4.0] │
+        │ 3.5  ┆ [4.5, 4.5] │
+        │ 4.0  ┆ [5.0, 5.0] │
+        └──────┴────────────┘
+
+        Downsample the GazeDataFrame to 500Hz results in the following DataFrame.
+        >>> gaze.resample(resampling_rate=500)
+        >>> gaze.frame
+        shape: (3, 2)
+        ┌──────┬────────────┐
+        │ time ┆ pixel      │
+        │ ---  ┆ ---        │
+        │ i64  ┆ list[f64]  │
+        ╞══════╪════════════╡
+        │ 0    ┆ [1.0, 1.0] │
+        │ 2    ┆ [3.0, 3.0] │
+        │ 4    ┆ [5.0, 5.0] │
+        └──────┴────────────┘
+        """
+        self.transform(
+            'resample',
+            resampling_rate=resampling_rate,
+            columns=columns,
+            fill_null_strategy=fill_null_strategy,
+        )
 
     def smooth(
             self,
@@ -702,7 +845,7 @@ class GazeDataFrame:
                 if trial_column not in self.events.frame.columns
             ]
             if missing_trial_columns:
-                raise pl.ColumnNotFoundError(
+                raise pl.exceptions.ColumnNotFoundError(
                     f'trial columns {missing_trial_columns} missing from events, '
                     f'available columns: {self.events.frame.columns}',
                 )
@@ -712,7 +855,7 @@ class GazeDataFrame:
             for group_identifier, group_gaze in grouped_frames.items():
                 # Create filter expression for selecting respective group rows.
                 if len(self.trial_columns) == 1:
-                    group_filter_expression = pl.col(self.trial_columns[0]) == group_identifier
+                    group_filter_expression = pl.col(self.trial_columns[0]) == group_identifier[0]
                 else:
                     group_filter_expression = pl.col(self.trial_columns[0]) == group_identifier[0]
                     for name, value in zip(self.trial_columns[1:], group_identifier[1:]):
@@ -877,26 +1020,13 @@ class GazeDataFrame:
         else:
             raise ValueError('neither position nor pixel in gaze dataframe, one needed for mapping')
 
-        def get_aoi(row: pl.DataFrame.row) -> str:
-            try:
-                aoi = aoi_dataframe.aois.filter(
-                    (aoi_dataframe.aois['top_left_x'] <= row[x_eye]) &
-                    (
-                        row[x_eye] <
-                        aoi_dataframe.aois['top_left_x'] + aoi_dataframe.aois['width']
-                    ) &
-                    (aoi_dataframe.aois['top_left_y'] <= row[y_eye]) &
-                    (
-                        row[y_eye] <
-                        aoi_dataframe.aois['top_left_y'] + aoi_dataframe.aois['height']
-                    ),
-                )[aoi_dataframe.aoi_column].item()
-                return aoi
-            except ValueError:
-                return ''
-
         self.frame = self.frame.with_columns(
-            area_of_interest=pl.Series(get_aoi(row) for row in self.frame.iter_rows(named=True)),
+            area_of_interest=pl.Series(
+                get_aoi(
+                    aoi_dataframe, row, x_eye, y_eye,
+                )
+                for row in self.frame.iter_rows(named=True)
+            ),
         )
 
     def nest(

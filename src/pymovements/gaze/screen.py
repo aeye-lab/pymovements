@@ -51,29 +51,6 @@ class Screen:
         Specifies the screen location of the origin of the pixel
         coordinate system. (default: 'upper left')
 
-    Attributes
-    ----------
-    width_px: int
-        Screen width in pixels
-    height_px: int
-        Screen height in pixels
-    width_cm: float
-        Screen width in centimeters
-    height_cm: float
-        Screen height in centimeters
-    distance_cm: float
-        Eye-to-screen distance in centimeters
-    origin: str
-        Specifies the screen location of the origin of the pixel coordinate system.
-    x_max_dva: float
-        Maximum screen x-coordinate in degrees of visual angle
-    y_max_dva: float
-        Minimum screen y-coordinate in degrees of visual angle
-    x_min_dva: float
-        Maximum screen x-coordinate in degrees of visual angle
-    y_min_dva: float
-        Minimum screen y-coordinate in degrees of visual angle
-
     Examples
     --------
     >>> screen = Screen(

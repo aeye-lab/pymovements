@@ -61,8 +61,8 @@ import pymovements as pm
         pytest.param(
             {
                 'file': 'tests/files/eyelink_monocular_example.asc',
-                'patterns': pm.datasets.ToyDatasetEyeLink().custom_read_kwargs['patterns'],
-                'schema': pm.datasets.ToyDatasetEyeLink().custom_read_kwargs['schema'],
+                'patterns': pm.datasets.ToyDatasetEyeLink().custom_read_kwargs['gaze']['patterns'],
+                'schema': pm.datasets.ToyDatasetEyeLink().custom_read_kwargs['gaze']['schema'],
             },
             pl.DataFrame(
                 data={
@@ -131,9 +131,45 @@ import pymovements as pm
     ],
 )
 def test_from_asc_has_shape_and_schema(kwargs, expected_frame):
-    gaze = pm.gaze.from_asc(**kwargs)
+    gaze, _ = pm.gaze.from_asc(**kwargs)
 
     assert_frame_equal(gaze.frame, expected_frame, check_column_order=False)
+
+
+@pytest.mark.parametrize(
+    ('kwargs', 'expected_metadata'),
+    [
+        pytest.param(
+            {
+                'file': 'tests/files/eyelink_monocular_example.asc',
+                'metadata_patterns': [
+                    {'pattern': r'!V TRIAL_VAR SUBJECT_ID (?P<subject_id>-?\d+)'},
+                    r'!V TRIAL_VAR STIMULUS_COMBINATION_ID (?P<stimulus_combination_id>.+)',
+                ],
+            },
+            {
+                'subject_id': '-1',
+                'stimulus_combination_id': 'start',
+            },
+            id='eyelink_asc_metadata_patterns',
+        ),
+        pytest.param(
+            {
+                'file': 'tests/files/eyelink_monocular_example.asc',
+                'metadata_patterns': [r'inexistent pattern (?P<value>-?\d+)'],
+            },
+            {
+                'value': None,
+            },
+            id='eyelink_asc_metadata_pattern_not_found',
+        ),
+    ],
+)
+def test_from_asc_metadata_patterns(kwargs, expected_metadata):
+    _, metadata = pm.gaze.from_asc(**kwargs)
+
+    for key, value in expected_metadata.items():
+        assert metadata[key] == value
 
 
 @pytest.mark.parametrize(

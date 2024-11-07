@@ -44,7 +44,7 @@ def from_csv(
         distance_column: str | None = None,
         column_map: dict[str, str] | None = None,
         add_columns: dict[str, str] | None = None,
-        column_dtypes: dict[str, Any] | None = None,
+        column_schema_overrides: dict[str, type] | None = None,
         **read_csv_kwargs: Any,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
@@ -94,7 +94,7 @@ def from_csv(
     add_columns: dict[str, str] | None
         Dictionary containing columns to add to loaded data frame.
         (default: None)
-    column_dtypes:  dict[str, Any] | None
+    column_schema_overrides:  dict[str, type] | None
         Dictionary containing types for columns.
         (default: None)
     **read_csv_kwargs: Any
@@ -141,7 +141,8 @@ def from_csv(
     │ 1    ┆ 0          ┆ 0          │
     │ 2    ┆ 0          ┆ 0          │
     │ 3    ┆ 0          ┆ 0          │
-    │ …    ┆ …          ┆ …          │
+    │ 4    ┆ 0          ┆ 0          │
+    │ 5    ┆ 0          ┆ 0          │
     │ 6    ┆ 0          ┆ 0          │
     │ 7    ┆ 0          ┆ 0          │
     │ 8    ┆ 0          ┆ 0          │
@@ -171,7 +172,8 @@ def from_csv(
     │ 1    ┆ [0, 0]    │
     │ 2    ┆ [0, 0]    │
     │ 3    ┆ [0, 0]    │
-    │ …    ┆ …         │
+    │ 4    ┆ [0, 0]    │
+    │ 5    ┆ [0, 0]    │
     │ 6    ┆ [0, 0]    │
     │ 7    ┆ [0, 0]    │
     │ 8    ┆ [0, 0]    │
@@ -180,7 +182,7 @@ def from_csv(
 
     Please be aware that data types are inferred from a fixed number of rows. To ensure
     correct data types, you can pass a dictionary of column names and data types to the
-    `dtypes` keyword argument of :py:func:`polars.read_csv`:
+    `schema_overrides` keyword argument of :py:func:`polars.read_csv`:
 
     >>> from pymovements.gaze.io import from_csv
     >>> import polars as pl
@@ -189,7 +191,7 @@ def from_csv(
     ...     time_column = 'time',
     ...     time_unit='ms',
     ...     pixel_columns = ['x_left_pix','y_left_pix'],
-    ...     dtypes = {'time': pl.Int64, 'x_left_pix': pl.Int64, 'y_left_pix': pl.Int64},
+    ...     schema_overrides = {'time': pl.Int64, 'x_left_pix': pl.Int64, 'y_left_pix': pl.Int64},
     ... )
     >>> gaze.frame
     shape: (10, 2)
@@ -202,7 +204,8 @@ def from_csv(
     │ 1    ┆ [0, 0]    │
     │ 2    ┆ [0, 0]    │
     │ 3    ┆ [0, 0]    │
-    │ …    ┆ …         │
+    │ 4    ┆ [0, 0]    │
+    │ 5    ┆ [0, 0]    │
     │ 6    ┆ [0, 0]    │
     │ 7    ┆ [0, 0]    │
     │ 8    ┆ [0, 0]    │
@@ -243,10 +246,10 @@ def from_csv(
                 pl.col(column).cast(pl.Float64),
             ])
 
-    if column_dtypes is not None:
+    if column_schema_overrides is not None:
         gaze_data = gaze_data.with_columns([
             pl.col(fileinfo_key).cast(fileinfo_dtype)
-            for fileinfo_key, fileinfo_dtype in column_dtypes.items()
+            for fileinfo_key, fileinfo_dtype in column_schema_overrides.items()
         ])
 
     # Create gaze data frame.
@@ -268,21 +271,25 @@ def from_csv(
 def from_asc(
         file: str | Path,
         *,
-        patterns: str | list | None = 'eyelink',
+        patterns: str | list[dict[str, Any] | str] | None = 'eyelink',
+        metadata_patterns: list[dict[str, Any] | str] | None = None,
         schema: dict[str, Any] | None = None,
         experiment: Experiment | None = None,
         add_columns: dict[str, str] | None = None,
-        column_dtypes: dict[str, Any] | None = None,
-) -> GazeDataFrame:
+        column_schema_overrides: dict[str, Any] | None = None,
+) -> tuple[GazeDataFrame, dict[str, Any]]:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
 
     Parameters
     ----------
     file: str | Path
         Path of IPC/feather file.
-    patterns: str | list | None
-        list of patterns to match for additional columns or a key identifier of eye tracker specific
+    patterns: str | list[dict[str, Any] | str] | None
+        List of patterns to match for additional columns or a key identifier of eye tracker specific
         default patterns. Supported values are: eyelink. (default: 'eyelink')
+    metadata_patterns: list[dict[str, Any] | str] | None
+        List of patterns to match for extracting metadata from custom logged messages.
+        (default: None)
     schema: dict[str, Any] | None
         Dictionary to optionally specify types of columns parsed by patterns. (default: None)
     experiment: Experiment | None
@@ -290,14 +297,14 @@ def from_asc(
     add_columns: dict[str, str] | None
         Dictionary containing columns to add to loaded data frame.
         (default: None)
-    column_dtypes:  dict[str, Any] | None
+    column_schema_overrides: dict[str, Any] | None
         Dictionary containing types for columns.
         (default: None)
 
     Returns
     -------
-    GazeDataFrame
-        The gaze data frame read from the asc file.
+    tuple[GazeDataFrame, dict[str, Any]]
+        The gaze data frame and a metadata dictionary read from the asc file.
 
     Examples
     --------
@@ -305,7 +312,7 @@ def from_asc(
     We can then load the data into a ``GazeDataFrame``:
 
     >>> from pymovements.gaze.io import from_asc
-    >>> gaze = from_asc(file='tests/files/eyelink_monocular_example.asc', patterns='eyelink')
+    >>> gaze, metadata = from_asc(file='tests/files/eyelink_monocular_example.asc')
     >>> gaze.frame
     shape: (16, 3)
     ┌─────────┬───────┬────────────────┐
@@ -317,13 +324,16 @@ def from_asc(
     │ 2154557 ┆ 778.0 ┆ [138.2, 132.7] │
     │ 2154560 ┆ 777.0 ┆ [137.9, 131.6] │
     │ 2154564 ┆ 778.0 ┆ [138.1, 131.0] │
+    │ 2154596 ┆ 784.0 ┆ [139.6, 132.1] │
     │ …       ┆ …     ┆ …              │
+    │ 2339246 ┆ 622.0 ┆ [629.9, 531.9] │
     │ 2339271 ┆ 617.0 ┆ [639.4, 531.9] │
     │ 2339272 ┆ 617.0 ┆ [639.0, 531.9] │
     │ 2339290 ┆ 618.0 ┆ [637.6, 531.4] │
     │ 2339291 ┆ 618.0 ┆ [637.3, 531.2] │
     └─────────┴───────┴────────────────┘
-
+    >>> metadata['sampling_rate']
+    1000.0
     """
     if isinstance(patterns, str):
         if patterns == 'eyelink':
@@ -333,7 +343,9 @@ def from_asc(
             raise ValueError(f"unknown pattern key '{patterns}'. Supported keys are: eyelink")
 
     # Read data.
-    gaze_data, _ = parse_eyelink(file, patterns=patterns, schema=schema)
+    gaze_data, metadata = parse_eyelink(
+        file, patterns=patterns, schema=schema, metadata_patterns=metadata_patterns,
+    )
 
     if add_columns is not None:
         gaze_data = gaze_data.with_columns([
@@ -342,10 +354,10 @@ def from_asc(
             if column not in gaze_data.columns
         ])
 
-    if column_dtypes is not None:
+    if column_schema_overrides is not None:
         gaze_data = gaze_data.with_columns([
             pl.col(fileinfo_key).cast(fileinfo_dtype)
-            for fileinfo_key, fileinfo_dtype in column_dtypes.items()
+            for fileinfo_key, fileinfo_dtype in column_schema_overrides.items()
         ])
 
     # Create gaze data frame.
@@ -356,7 +368,7 @@ def from_asc(
         time_unit='ms',
         pixel_columns=['x_pix', 'y_pix'],
     )
-    return gaze_df
+    return gaze_df, metadata
 
 
 def from_ipc(
@@ -364,7 +376,7 @@ def from_ipc(
         experiment: Experiment | None = None,
         column_map: dict[str, str] | None = None,
         add_columns: dict[str, str] | None = None,
-        column_dtypes: dict[str, Any] | None = None,
+        column_schema_overrides: dict[str, type] | None = None,
         **read_ipc_kwargs: Any,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
@@ -382,7 +394,7 @@ def from_ipc(
     add_columns: dict[str, str] | None
         Dictionary containing columns to add to loaded data frame.
         (default: None)
-    column_dtypes:  dict[str, Any] | None
+    column_schema_overrides:  dict[str, type] | None
         Dictionary containing types for columns.
         (default: None)
     **read_ipc_kwargs: Any
@@ -411,7 +423,8 @@ def from_ipc(
     │ 1    ┆ [0, 0]    │
     │ 2    ┆ [0, 0]    │
     │ 3    ┆ [0, 0]    │
-    │ …    ┆ …         │
+    │ 4    ┆ [0, 0]    │
+    │ 5    ┆ [0, 0]    │
     │ 6    ┆ [0, 0]    │
     │ 7    ┆ [0, 0]    │
     │ 8    ┆ [0, 0]    │
@@ -438,10 +451,10 @@ def from_ipc(
             if column not in gaze_data.columns
         ])
 
-    if column_dtypes is not None:
+    if column_schema_overrides is not None:
         gaze_data = gaze_data.with_columns([
             pl.col(fileinfo_key).cast(fileinfo_dtype)
-            for fileinfo_key, fileinfo_dtype in column_dtypes.items()
+            for fileinfo_key, fileinfo_dtype in column_schema_overrides.items()
         ])
 
     # Create gaze data frame.

@@ -35,11 +35,6 @@ from pymovements.exceptions import InvalidProperty
 class EventProcessor:
     """Processes event and gaze dataframes.
 
-    Attributes
-    ----------
-    event_properties: list[str]
-        A list of property names.
-
     Parameters
     ----------
     event_properties: str | list[str]
@@ -94,12 +89,6 @@ class EventProcessor:
 
 class EventGazeProcessor:
     """Processes event and gaze dataframes.
-
-    Attributes
-    ----------
-    event_properties: list[str]
-        A list of property names.
-
 
     Parameters
     ----------
