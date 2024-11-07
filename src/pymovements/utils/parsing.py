@@ -95,6 +95,7 @@ RECORDING_CONFIG = re.compile(
     r'(?P<tracked_eye>LR|[LR])\s*',
 )
 
+
 def check_nan(sample_location: str) -> float:
     """Return position as float or np.nan depending on validity of sample.
 
@@ -231,7 +232,6 @@ def parse_eyelink(
     with open(filepath, encoding='ascii') as asc_file:
         lines = asc_file.readlines()
 
-
     # will return an empty string if the key does not exist
     metadata: defaultdict = defaultdict(str)
 
@@ -257,7 +257,6 @@ def parse_eyelink(
 
     for line in lines:
         for pattern_dict in compiled_patterns:
-
 
             if match := pattern_dict['pattern'].match(line):
                 if 'value' in pattern_dict:
@@ -297,7 +296,6 @@ def parse_eyelink(
             num_blink_samples = 0
             blinks.append(blink_info)
 
-
         elif eye_side_match := RECORDING_CONFIG.match(line):
             recording_config.append(eye_side_match.groupdict())
 
@@ -309,7 +307,6 @@ def parse_eyelink(
             block_duration = float(stop_recording_timestamp) - float(start_recording_timestamp)
 
             total_recording_duration += block_duration
-
 
         elif eye_tracking_sample_match := EYE_TRACKING_SAMPLE.match(line):
 
@@ -355,12 +352,10 @@ def parse_eyelink(
                     # each metadata pattern should only match once
                     compiled_metadata_patterns.remove(pattern_dict)
 
-
     # if the sampling rate is not found, we cannot calculate the data loss
     actual_number_of_samples = len(samples['time'])
     # if we don't have any recording config, we cannot calculate the data loss
     sampling_rate = _check_sampling_rate(recording_config)
-
 
     data_loss_ratio, data_loss_ratio_blinks = _calculate_data_loss(
         blinks=blinks,
@@ -419,8 +414,6 @@ def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:
         resolution = (coordinates[2] - coordinates[0] + 1, coordinates[3] - coordinates[1] + 1)
         metadata['resolution'] = resolution
 
-
-
     # if the date has been parsed fully, convert the date to a datetime object
     if 'day' in metadata and 'year' in metadata and 'month' in metadata and 'time' in metadata:
         metadata['day'] = int(metadata['day'])
@@ -439,8 +432,10 @@ def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:
 
     return return_metadata
 
+
 def _check_sampling_rate(recording_config: list[dict[str, Any]]) -> float | None:
     """Check if the sampling rate is available in the recording config.
+
     Parameters
     ----------
     recording_config : list[dict[str, Any]]
@@ -456,6 +451,7 @@ def _check_sampling_rate(recording_config: list[dict[str, Any]]) -> float | None
     else:
         sampling_rate = float(recording_config[0]['sampling_rate'])
     return sampling_rate
+
 
 def _calculate_data_loss(
         blinks: list[dict[str, Any]],
