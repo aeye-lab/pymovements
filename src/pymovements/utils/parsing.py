@@ -457,7 +457,7 @@ def _calculate_data_loss(
         blinks: list[dict[str, Any]],
         invalid_samples: list[str],
         actual_num_samples: int,
-        total_rec_duration: float,
+        total_rec_duration: float | None = None,
         sampling_rate: float | None = None,
 ) -> tuple[float | str, float | str]:
     """Calculate data loss and blink loss.
@@ -470,9 +470,9 @@ def _calculate_data_loss(
         List of invalid samples.
     actual_num_samples: int
         Number of actual samples recorded.
-    total_rec_duration: float
+    total_rec_duration: float | None
         Total duration of the recording.
-    sampling_rate: float
+    sampling_rate: float | None
         Sampling rate of the eye tracker.
 
     Returns
