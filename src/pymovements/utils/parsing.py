@@ -458,7 +458,7 @@ def _calculate_data_loss(
         invalid_samples: list[str],
         actual_num_samples: int,
         total_rec_duration: float,
-        sampling_rate: float | None,
+        sampling_rate: float | None = None,
 ) -> tuple[float | str, float | str]:
     """Calculate data loss and blink loss.
 
