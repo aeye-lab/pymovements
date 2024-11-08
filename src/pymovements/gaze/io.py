@@ -385,11 +385,7 @@ def from_asc(
         experiment.eyetracker.sampling_rate = metadata['sampling_rate']
     elif experiment.eyetracker.sampling_rate != metadata['sampling_rate']:
         issues.append(
-            f"Sampling rate: {
-                experiment.eyetracker.sampling_rate
-            } vs. {
-                metadata['sampling_rate']
-            }",
+            f"Sampling rate: {experiment.eyetracker.sampling_rate} vs. {metadata['sampling_rate']}",
         )
 
     # Tracked eye
@@ -408,13 +404,8 @@ def from_asc(
     if experiment.eyetracker.mount is None:
         experiment.eyetracker.mount = metadata['mount_configuration']['mount_type']
     elif experiment.eyetracker.mount != metadata['mount_configuration']['mount_type']:
-        issues.append(
-            f"Mount configuration: {
-                experiment.eyetracker.mount
-            } vs. {
-                metadata['mount_configuration']['mount_type']
-            }",
-        )
+        issues.append(f"Mount configuration: {experiment.eyetracker.mount} vs. "
+                      f"{metadata['mount_configuration']['mount_type']}")
 
     # Eye tracker vendor
     asc_vendor = 'EyeLink' if 'EyeLink' in metadata['model'] else None
@@ -433,13 +424,8 @@ def from_asc(
     if experiment.eyetracker.version is None:
         experiment.eyetracker.version = metadata['version_number']
     if experiment.eyetracker.version != metadata['version_number']:
-        issues.append(
-            f"Eye tracker software version: {
-                experiment.eyetracker.version
-            } vs. {
-                metadata['version_number']
-            }",
-        )
+        issues.append(f"Eye tracker software version: {experiment.eyetracker.version} vs. "
+                      f"{metadata['version_number']}")
 
     if issues:
         raise ValueError(
