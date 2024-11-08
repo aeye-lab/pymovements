@@ -71,7 +71,7 @@ def fixture_gaze_init_kwargs(request):
         },
         'eyelink_monocular': {
             'file': 'tests/files/eyelink_monocular_example.asc',
-            'experiment': pm.datasets.ToyDatasetEyeLink().experiment,
+            'experiment': pm.Experiment(1280, 1024, 38, 30, 60, 'upper left', 1000),
         },
         'didec': {
             'file': 'tests/files/didec_example.txt',
