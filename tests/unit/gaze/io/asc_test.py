@@ -158,11 +158,18 @@ def test_from_asc_raises_exception(kwargs, exception, message):
     assert msg == message
 
 
-def test_from_asc_fills_in_experiment_metadata():
-    gaze = pm.gaze.from_asc('tests/files/eyelink_monocular_example.asc', experiment=None)
+@pytest.mark.parametrize(
+    ('file', 'sampling_rate'),
+    [
+        pytest.param('tests/files/eyelink_monocular_example.asc', 1000.0, id='1khz'),
+        pytest.param('tests/files/eyelink_monocular_2khz_example.asc', 2000.0, id='2khz'),
+    ],
+)
+def test_from_asc_fills_in_experiment_metadata(file, sampling_rate):
+    gaze = pm.gaze.from_asc(file, experiment=None)
     assert gaze.experiment.screen.width_px == 1280
     assert gaze.experiment.screen.height_px == 1024
-    assert gaze.experiment.eyetracker.sampling_rate == 1000.0
+    assert gaze.experiment.eyetracker.sampling_rate == sampling_rate
     assert gaze.experiment.eyetracker.left is True
     assert gaze.experiment.eyetracker.right is False
     assert gaze.experiment.eyetracker.model == 'EyeLink Portable Duo'
@@ -219,6 +226,16 @@ def test_from_asc_fills_in_experiment_metadata():
                 'Eye tracker software version: 1.0 vs. 6.12',
             ],
             id='eyetracker_vendor_model_version',
+        ),
+        pytest.param(
+            {
+                'eyetracker': pm.EyeTracker(
+                    mount='Remote',
+                    sampling_rate=1000,
+                ),
+            },
+            ['Mount configuration: Remote vs. Desktop'],
+            id='eyetracker_mount',
         ),
     ],
 )
