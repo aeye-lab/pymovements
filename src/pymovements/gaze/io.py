@@ -370,7 +370,7 @@ def from_asc(
     # Fill in missing metadata in experiment definition and raise an error if there are conflicts
     issues = []
 
-    # Screen resolution
+    # Screen resolution (assuming that width and height will always be missing or set together)
     experiment_resolution = (experiment.screen.width_px, experiment.screen.height_px)
     if experiment_resolution == (None, None):
         experiment.screen.width_px, experiment.screen.height_px = metadata['resolution']
