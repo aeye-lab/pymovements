@@ -895,7 +895,7 @@ class GazeDataFrame:
             | list[str | tuple[str, dict[str, Any]]],
             name: str | None = None,
             verbose: bool = True,
-    ) -> pm.EventDataFrame:
+    ) -> None:
         """Calculate an event property for and add it as a column to the event dataframe.
 
         Parameters
@@ -936,7 +936,6 @@ for \n{self.events.frame.head()}')
         )
         join_on = self.trial_columns + ['name', 'onset', 'offset']
         self.events.add_event_properties(new_properties, join_on=join_on)
-        return self
 
     def measure_samples(
             self,
