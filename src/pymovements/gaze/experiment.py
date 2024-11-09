@@ -95,7 +95,7 @@ class Experiment:
             sampling_rate: float | None = None,
             eyetracker: EyeTracker | None = None,
     ):
-        self.screen = Screen(
+        self._screen = Screen(
             width_px=screen_width_px,
             height_px=screen_height_px,
             width_cm=screen_width_cm,
@@ -106,14 +106,24 @@ class Experiment:
 
         checks.check_is_mutual_exclusive(sampling_rate=sampling_rate, eyetracker=eyetracker)
 
-        self.eyetracker = eyetracker
+        self._eyetracker = eyetracker
 
         self._sampling_rate = sampling_rate
 
         checks.check_is_not_none(sampling_rate=self.sampling_rate)
-        assert self.sampling_rate is not None
+        checks.check_is_not_none(sampling_rate=self.sampling_rate)
 
         checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
+
+    @property
+    def screen(self) -> Screen:
+        """Get the Screen object for the experiment."""
+        return self._screen
+
+    @property
+    def eyetracker(self) -> EyeTracker | None:
+        """Get the EyeTracker object for the experiment."""
+        return self._eyetracker
 
     @property
     def sampling_rate(self) -> float | None:
