@@ -86,7 +86,7 @@ class FakeNewsPerception(DatasetDefinition):
         default_factory=lambda: {
             'precomputed_events': (
                 {
-                    'resource': 'api/access/datafile/4200164',
+                    'resource': 'https://dataverse.harvard.edu/api/access/datafile/4200164',
                     'filename': 'D3-Eye-movements-data.zip',
                     'md5': 'ab009f28cd703f433e9b6c02b0bb38d2',
                 },

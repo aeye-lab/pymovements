@@ -23,7 +23,8 @@ from __future__ import annotations
 import matplotlib.pyplot as plt
 import polars as pl
 from matplotlib.collections import Collection
-from polars import ColumnNotFoundError
+from polars.exceptions import ColumnNotFoundError
+
 
 from pymovements.events import EventDataFrame
 
