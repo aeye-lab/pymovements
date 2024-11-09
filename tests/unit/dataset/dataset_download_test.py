@@ -1205,7 +1205,7 @@ def test_extract_dataset_precomputed_move_single_file():
 
     pm.dataset.dataset_download.extract_dataset(
         PrecomputedResourcesDefinition(),
-        pm.DatasetPaths(root='tests/files/', downloads='.', precomputed_events='.'),
+        pm.DatasetPaths(root='tests/files/', downloads='.'),
     )
 
 

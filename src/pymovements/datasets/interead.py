@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the CopCo dataset."""
+"""Provides a definition for the InteRead dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -31,19 +31,16 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 @register_dataset
-class CopCo(DatasetDefinition):
-    """CopCo dataset :cite:p:`CopCoL1Hollenstein`.
+class InteRead(DatasetDefinition):
+    """InteRead dataset :cite:p:`InteRead`.
 
-    This dataset includes monocular eye tracking data from a single participants in a single
-    session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
-    eye tracker and are provided as pixel coordinates.
+    This dataset includes monocular eye tracking data in an interrupted reading task.
+    Automatic interruption occured during a reading task and participants continued
+    reading after the pause.
+    Eye movements are recorded at a sampling frequency of 1200Hz with video-based eye tracker.
+    Provided data are raw gaze samples and precomputed event files both in pixel coordinates.
 
-    The participant is instructed to read texts and answer questions.
-
-    The dataset includes the data from three papers:
-        the L1 data: :cite:p:`CopCoL1Hollenstein`,
-        the L1 data with dylsexia: :cite:p:`CopCoL1DysBjornsdottir`,
-        the L2 data: :cite:p:`CopCoL2`,
+    For more details, check the paper :cite:p:`InteRead`.
 
     Attributes
     ----------
@@ -57,18 +54,18 @@ class CopCo(DatasetDefinition):
     mirrors: dict[str, tuple[str, ...]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources: dict[str, tuple[dict[str, str | None], ...]]
+    resources: dict[str, tuple[dict[str, str], ...]]
         A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    experiment: Experiment
-        The experiment definition.
-
     extract: dict[str, bool]
         Decide whether to extract the data.
+
+    experiment: Experiment
+        The experiment definition.
 
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
@@ -102,17 +99,18 @@ class CopCo(DatasetDefinition):
     column_map: dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
 
-    custom_read_kwargs: dict[str, Any]
+    custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function.
+
 
     Examples
     --------
     Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.CopCo` definition:
+    :py:class:`~pymovements.InteRead` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("CopCo", path='data/CopCo')
+    >>> dataset = pm.Dataset("InteRead", path='data/InteRead')
 
     Download the dataset resources:
 
@@ -126,105 +124,99 @@ class CopCo(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'CopCo'
+    name: str = 'InteRead'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
             'precomputed_events': True,
-            'precomputed_reading_measures': True,
+            'precomputed_reading_measures': False,
         },
     )
     mirrors: dict[str, tuple[str, ...]] = field(
         default_factory=lambda: {
-            'gaze': ('https://osf.io/download/',),
-            'precomputed_events': ('https://files.de-1.osf.io/',),
-            'precomputed_reading_measures': ('https://files.de-1.osf.io/',),
+            'gaze': (
+                'https://osf.io/download/',
+            ),
+            'precomputed_events': (
+                'https://osf.io/download/',
+            ),
         },
     )
-    resources: dict[str, tuple[dict[str, str | None], ...]] = field(
+
+    resources: dict[str, tuple[dict[str, str], ...]] = field(
         default_factory=lambda: {
             'gaze': (
                 {
-                    'resource': 'bg9r4/',
-                    'filename': 'csvs.zip',
-                    'md5': '9dc3276714397b7fccac1e179a14c52b',  # type:ignore
+                    'resource': '6ju3x/',
+                    'filename': 'resampled_gaze.csv.zip',
+                    'md5': '06b2cdff1827086fa125a703ee9d4324',
                 },
             ),
             'precomputed_events': (
                 {
-                    'resource':
-                    'v1/resources/ud8s5/providers/osfstorage/61e13174c99ebd02df017c14/?zip=',
-                    'filename': 'FixationReports.zip',
-                    'md5': None,  # type:ignore
+                    'resource': '85ckh/',
+                    'filename': 'resumption_fixation.csv',
+                    'md5': '44edb7c58318ad76af1fa6f1bc1f1ceb',
                 },
             ),
-            'precomputed_reading_measures': (
-                {
-                    'resource':
-                    'v1/resources/ud8s5/providers/osfstorage/61e1317cc99ebd02df017c4f/?zip=',
-                    'filename': 'ReadingMeasures.zip',
-                    'md5': None,  # type:ignore
-                },
-            ),
+        },
+    )
+    extract: dict[str, bool] = field(
+        default_factory=lambda: {
+            'gaze': True,
+            'precomputed_events': False,
         },
     )
 
     experiment: Experiment = Experiment(
         screen_width_px=1920,
         screen_height_px=1080,
-        screen_width_cm=59.,
-        screen_height_cm=33.5,
-        distance_cm=85,
+        screen_width_cm=52.8,
+        screen_height_cm=29.7,
+        distance_cm=57,
         origin='center',
-        sampling_rate=1000,
-    )
-
-    extract: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': True,
-            'precomputed_reading_measures': True,
-        },
+        sampling_rate=1200,
     )
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
-            'gaze': r'P{subject_id:d}.csv',
-            'precomputed_events': r'FIX_report_P{subject_id:d}.txt',
-            'precomputed_reading_measures': r'P{subject_id:d}.csv',
+            'gaze': r'resampled_gaze.csv',
+            'precomputed_events': r'resumption_fixation.csv',
         },
     )
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
-            'gaze': {'subject_id': int},
-            'precomputed_events': {'subject_id': int},
-            'precomputed_reading_measures': {'subject_id': int},
+            'gaze': {},
+            'precomputed_events': {},
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: ['paragraph_id', 'speech_id'])
+    trial_columns: list[str] = field(
+        default_factory=lambda: [
+            'participant_id',
+            'page_id',
+            'interruption_state',
+        ],
+    )
 
-    time_column: str = 'time'
+    time_column: str = ''
 
     time_unit: str = 'ms'
 
-    pixel_columns: list[str] = field(default_factory=lambda: ['x_right', 'y_right'])
+    pixel_columns: list[str] = field(
+        default_factory=lambda: [
+            'x',
+            'y',
+        ],
+    )
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 
-    custom_read_kwargs: dict[str, Any] = field(
+    custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
             'gaze': {},
-            'precomputed_events': {
-                'separator': '\t',
-                'null_values': ['.', 'UNDEFINEDnull'],
-                'infer_schema_length': 100000,
-                'truncate_ragged_lines': True,
-                'decimal_comma': True,
-                'quote_char': None,
-            },
-            'precomputed_reading_measures': {},
+            'precomputed_events': {},
         },
     )

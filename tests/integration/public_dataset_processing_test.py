@@ -39,14 +39,15 @@ def test_public_dataset_processing(dataset_name, tmp_path):
     dataset.load()
 
     # Do some basic transformations.
-    if 'pixel' in dataset.gaze[0].columns:
-        dataset.pix2deg()
-    dataset.pos2vel()
-    dataset.pos2acc()
+    if dataset.definition.has_files['gaze']:
+        if 'pixel' in dataset.gaze[0].columns:
+            dataset.pix2deg()
+        dataset.pos2vel()
+        dataset.pos2acc()
 
-    for gaze in dataset.gaze:
-        assert 'position' in gaze.columns
-        assert 'velocity' in gaze.columns
-        assert 'acceleration' in gaze.columns
+        for gaze in dataset.gaze:
+            assert 'position' in gaze.columns
+            assert 'velocity' in gaze.columns
+            assert 'acceleration' in gaze.columns
 
-    shutil.rmtree(dataset_path, ignore_errors=True)
+        shutil.rmtree(dataset_path, ignore_errors=True)

@@ -29,8 +29,9 @@ import pymovements as pm
 
 @pytest.mark.parametrize(
     ('public_dataset', 'dataset_name'),
-    # XXX: add public dataset in alphabetical order
+    # please add datasets in alphabetical order
     [
+        pytest.param(pm.datasets.BSC, 'BSC', id='BSC'),
         pytest.param(pm.datasets.CodeComprehension, 'CodeComprehension', id='CodeComprehension'),
         pytest.param(pm.datasets.CopCo, 'CopCo', id='CopCo'),
         pytest.param(pm.datasets.DIDEC, 'DIDEC', id='DIDEC'),
@@ -40,6 +41,7 @@ import pymovements as pm
         pytest.param(pm.datasets.GazeBaseVR, 'GazeBaseVR', id='GazeBaseVR'),
         pytest.param(pm.datasets.GazeOnFaces, 'GazeOnFaces', id='GazeOnFaces'),
         pytest.param(pm.datasets.HBN, 'HBN', id='HBN'),
+        pytest.param(pm.datasets.InteRead, 'InteRead', id='InteRead'),
         pytest.param(pm.datasets.JuDo1000, 'JuDo1000', id='JuDo1000'),
         pytest.param(pm.datasets.PoTeC, 'PoTeC', id='PoTeC'),
         pytest.param(pm.datasets.SBSAT, 'SBSAT', id='SBSAT'),

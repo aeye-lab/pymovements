@@ -224,5 +224,5 @@ def test_text_stimulus_unsupported_format():
         )
     msg, = excinfo.value.args
     expected = 'unsupported file format ".pickle".Supported formats are: '\
-        '[\'.csv\', \'.tsv\', \'.txt\']'
+        '[\'.csv\', \'.ias\', \'.tsv\', \'.txt\']'
     assert msg == expected
