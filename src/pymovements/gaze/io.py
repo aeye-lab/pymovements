@@ -420,7 +420,7 @@ def from_asc(
     # Eye tracker software version
     if experiment.eyetracker.version is None:
         experiment.eyetracker.version = metadata['version_number']
-    if experiment.eyetracker.version != metadata['version_number']:
+    elif experiment.eyetracker.version != metadata['version_number']:
         issues.append(f"Eye tracker software version: {experiment.eyetracker.version} vs. "
                       f"{metadata['version_number']}")
 
