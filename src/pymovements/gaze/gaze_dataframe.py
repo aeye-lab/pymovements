@@ -283,6 +283,8 @@ class GazeDataFrame:
         else:
             self.events = events.copy()
 
+        self._metadata: dict | None = None
+
     def apply(
             self,
             function: str,

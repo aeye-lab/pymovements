@@ -28,7 +28,6 @@ import polars as pl
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
 from pymovements.gaze.gaze_dataframe import GazeDataFrame  # pylint: disable=cyclic-import
-from pymovements.gaze.screen import Screen
 from pymovements.utils.parsing import parse_eyelink
 
 
@@ -364,8 +363,6 @@ def from_asc(
 
     if experiment is None:
         experiment = Experiment(sampling_rate=metadata['sampling_rate'])
-    if experiment.screen is None:
-        experiment.screen = Screen()
     if experiment.eyetracker is None:
         experiment.eyetracker = EyeTracker()
 
@@ -441,6 +438,7 @@ def from_asc(
         time_unit='ms',
         pixel_columns=['x_pix', 'y_pix'],
     )
+    gaze_df._metadata = metadata  # pylint: disable=protected-access
     return gaze_df
 
 
