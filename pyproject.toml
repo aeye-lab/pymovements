@@ -1,7 +1,7 @@
 [build-system]
 requires = [
   "setuptools>=61.0.0",
-  "setuptools-git-versioning<2",
+  "setuptools-git-versioning<3",
   "versioneer[toml]>=0.29,<1.0",
   "wheel"
 ]
