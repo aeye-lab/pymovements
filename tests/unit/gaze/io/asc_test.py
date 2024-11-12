@@ -203,6 +203,7 @@ def test_from_asc_fills_in_experiment_metadata(file, sampling_rate):
                     left=False,
                     right=True,
                     sampling_rate=1000,
+                    mount='Desktop',
                 ),
             },
             [
@@ -218,6 +219,8 @@ def test_from_asc_fills_in_experiment_metadata(file, sampling_rate):
                     model='Tobii Pro Spectrum',
                     version='1.0',
                     sampling_rate=1000,
+                    left=True,
+                    right=False,
                 ),
             },
             [
@@ -232,6 +235,9 @@ def test_from_asc_fills_in_experiment_metadata(file, sampling_rate):
                 'eyetracker': pm.EyeTracker(
                     mount='Remote',
                     sampling_rate=1000,
+                    vendor='EyeLink',
+                    model='EyeLink Portable Duo',
+                    version='6.12',
                 ),
             },
             ['Mount configuration: Remote vs. Desktop'],
