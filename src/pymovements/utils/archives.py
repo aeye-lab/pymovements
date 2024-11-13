@@ -153,8 +153,9 @@ def _extract_tar(
     with tarfile.open(source_path, f'r:{compression[1:]}' if compression else 'r') as archive:
         for member in archive.getnames():
             if (
-                os.path.exists(os.path.join(destination_path, member)) and
-                member[-4:] not in _ARCHIVE_EXTRACTORS
+                    os.path.exists(os.path.join(destination_path, member)) and
+                    member[-4:] not in _ARCHIVE_EXTRACTORS and
+                    tarfile.TarInfo(os.path.join(destination_path, member)).size > 0
             ):
                 continue
             if sys.version_info < (3, 12):  # pragma: <3.12 cover
