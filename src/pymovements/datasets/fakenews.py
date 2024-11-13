@@ -102,7 +102,7 @@ class FakeNewsPerception(DatasetDefinition):
 
     mirrors: dict[str, tuple[str, ...]] = field(
         default_factory=lambda: {
-            'precomputed_events': ('https://doi.org/10.7910/DVN/C1UD2A',),
+            'precomputed_events': ('https://dataverse.harvard.edu/',),
         },
     )
 
@@ -132,7 +132,7 @@ class FakeNewsPerception(DatasetDefinition):
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
-            'precomputed_events': r'P{subject_id:d}_{session_id:d}_{truth_value:s}.csv',
+            'precomputed_events': r'P{subject_id:d}_S{session_id:d}_{truth_value:s}.csv',
         },
     )
 
