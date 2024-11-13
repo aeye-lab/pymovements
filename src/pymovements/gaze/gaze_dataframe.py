@@ -283,7 +283,8 @@ class GazeDataFrame:
         else:
             self.events = events.copy()
 
-        self._metadata: dict | None = None
+        # Remove this attribute once #893 is fixed
+        self._metadata: dict[str, Any] | None = None
 
     def apply(
             self,
