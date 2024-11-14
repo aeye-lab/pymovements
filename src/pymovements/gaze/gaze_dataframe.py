@@ -283,6 +283,9 @@ class GazeDataFrame:
         else:
             self.events = events.copy()
 
+        # Remove this attribute once #893 is fixed
+        self._metadata: dict[str, Any] | None = None
+
     def apply(
             self,
             function: str,

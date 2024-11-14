@@ -377,7 +377,7 @@ def load_gaze_file(
             column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
         )
     elif filepath.suffix == '.asc':
-        gaze_df, _ = from_asc(
+        gaze_df = from_asc(
             filepath,
             experiment=definition.experiment,
             add_columns=add_columns,
