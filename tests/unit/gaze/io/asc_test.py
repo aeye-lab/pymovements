@@ -131,45 +131,9 @@ import pymovements as pm
     ],
 )
 def test_from_asc_has_shape_and_schema(kwargs, expected_frame):
-    gaze, _ = pm.gaze.from_asc(**kwargs)
+    gaze = pm.gaze.from_asc(**kwargs)
 
     assert_frame_equal(gaze.frame, expected_frame, check_column_order=False)
-
-
-@pytest.mark.parametrize(
-    ('kwargs', 'expected_metadata'),
-    [
-        pytest.param(
-            {
-                'file': 'tests/files/eyelink_monocular_example.asc',
-                'metadata_patterns': [
-                    {'pattern': r'!V TRIAL_VAR SUBJECT_ID (?P<subject_id>-?\d+)'},
-                    r'!V TRIAL_VAR STIMULUS_COMBINATION_ID (?P<stimulus_combination_id>.+)',
-                ],
-            },
-            {
-                'subject_id': '-1',
-                'stimulus_combination_id': 'start',
-            },
-            id='eyelink_asc_metadata_patterns',
-        ),
-        pytest.param(
-            {
-                'file': 'tests/files/eyelink_monocular_example.asc',
-                'metadata_patterns': [r'inexistent pattern (?P<value>-?\d+)'],
-            },
-            {
-                'value': None,
-            },
-            id='eyelink_asc_metadata_pattern_not_found',
-        ),
-    ],
-)
-def test_from_asc_metadata_patterns(kwargs, expected_metadata):
-    _, metadata = pm.gaze.from_asc(**kwargs)
-
-    for key, value in expected_metadata.items():
-        assert metadata[key] == value
 
 
 @pytest.mark.parametrize(
@@ -192,3 +156,103 @@ def test_from_asc_raises_exception(kwargs, exception, message):
 
     msg, = excinfo.value.args
     assert msg == message
+
+
+@pytest.mark.parametrize(
+    ('file', 'sampling_rate'),
+    [
+        pytest.param('tests/files/eyelink_monocular_example.asc', 1000.0, id='1khz'),
+        pytest.param('tests/files/eyelink_monocular_2khz_example.asc', 2000.0, id='2khz'),
+    ],
+)
+def test_from_asc_fills_in_experiment_metadata(file, sampling_rate):
+    gaze = pm.gaze.from_asc(file, experiment=None)
+    assert gaze.experiment.screen.width_px == 1280
+    assert gaze.experiment.screen.height_px == 1024
+    assert gaze.experiment.eyetracker.sampling_rate == sampling_rate
+    assert gaze.experiment.eyetracker.left is True
+    assert gaze.experiment.eyetracker.right is False
+    assert gaze.experiment.eyetracker.model == 'EyeLink Portable Duo'
+    assert gaze.experiment.eyetracker.version == '6.12'
+    assert gaze.experiment.eyetracker.vendor == 'EyeLink'
+    assert gaze.experiment.eyetracker.mount == 'Desktop'
+
+
+@pytest.mark.parametrize(
+    ('experiment_kwargs', 'issues'),
+    [
+        pytest.param(
+            {
+                'screen_width_px': 1920,
+                'screen_height_px': 1080,
+                'sampling_rate': 1000,
+            },
+            ['Screen resolution: (1920, 1080) vs. (1280, 1024)'],
+            id='screen_resolution',
+        ),
+        pytest.param(
+            {
+                'eyetracker': pm.EyeTracker(sampling_rate=500),
+            },
+            ['Sampling rate: 500 vs. 1000.0'],
+            id='eyetracker_sampling_rate',
+        ),
+        pytest.param(
+            {
+                'eyetracker': pm.EyeTracker(
+                    left=False,
+                    right=True,
+                    sampling_rate=1000,
+                    mount='Desktop',
+                ),
+            },
+            [
+                'Left eye tracked: False vs. True',
+                'Right eye tracked: True vs. False',
+            ],
+            id='eyetracker_tracked_eye',
+        ),
+        pytest.param(
+            {
+                'eyetracker': pm.EyeTracker(
+                    vendor='Tobii',
+                    model='Tobii Pro Spectrum',
+                    version='1.0',
+                    sampling_rate=1000,
+                    left=True,
+                    right=False,
+                ),
+            },
+            [
+                'Eye tracker vendor: Tobii vs. EyeLink',
+                'Eye tracker model: Tobii Pro Spectrum vs. EyeLink Portable Duo',
+                'Eye tracker software version: 1.0 vs. 6.12',
+            ],
+            id='eyetracker_vendor_model_version',
+        ),
+        pytest.param(
+            {
+                'eyetracker': pm.EyeTracker(
+                    mount='Remote',
+                    sampling_rate=1000,
+                    vendor='EyeLink',
+                    model='EyeLink Portable Duo',
+                    version='6.12',
+                ),
+            },
+            ['Mount configuration: Remote vs. Desktop'],
+            id='eyetracker_mount',
+        ),
+    ],
+)
+def test_from_asc_detects_mismatches_in_experiment_metadata(experiment_kwargs, issues):
+    with pytest.raises(ValueError) as excinfo:
+        pm.gaze.from_asc(
+            'tests/files/eyelink_monocular_example.asc',
+            experiment=pm.Experiment(**experiment_kwargs),
+        )
+
+    msg, = excinfo.value.args
+    expected_msg = 'Experiment metadata does not match the metadata in the ASC file:\n'
+    expected_msg += '\n'.join(f'- {issue}' for issue in issues)
+    assert msg == expected_msg

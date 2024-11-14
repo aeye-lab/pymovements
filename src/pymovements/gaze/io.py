@@ -25,7 +25,8 @@ from typing import Any
 
 import polars as pl
 
-from pymovements.gaze import Experiment  # pylint: disable=cyclic-import
+from pymovements.gaze.experiment import Experiment
+from pymovements.gaze.eyetracker import EyeTracker
 from pymovements.gaze.gaze_dataframe import GazeDataFrame  # pylint: disable=cyclic-import
 from pymovements.utils.parsing import parse_eyelink
 
@@ -277,7 +278,7 @@ def from_asc(
         experiment: Experiment | None = None,
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, Any] | None = None,
-) -> tuple[GazeDataFrame, dict[str, Any]]:
+) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
 
     Parameters
@@ -303,8 +304,8 @@ def from_asc(
 
     Returns
     -------
-    tuple[GazeDataFrame, dict[str, Any]]
-        The gaze data frame and a metadata dictionary read from the asc file.
+    GazeDataFrame
+        The gaze data frame read from the asc file.
 
     Examples
     --------
@@ -312,7 +313,7 @@ def from_asc(
     We can then load the data into a ``GazeDataFrame``:
 
     >>> from pymovements.gaze.io import from_asc
-    >>> gaze, metadata = from_asc(file='tests/files/eyelink_monocular_example.asc')
+    >>> gaze = from_asc(file='tests/files/eyelink_monocular_example.asc')
     >>> gaze.frame
     shape: (16, 3)
     ┌─────────┬───────┬────────────────┐
@@ -332,7 +333,7 @@ def from_asc(
     │ 2339290 ┆ 618.0 ┆ [637.6, 531.4] │
     │ 2339291 ┆ 618.0 ┆ [637.3, 531.2] │
     └─────────┴───────┴────────────────┘
-    >>> metadata['sampling_rate']
+    >>> gaze.experiment.eyetracker.sampling_rate
     1000.0
     """
     if isinstance(patterns, str):
@@ -360,6 +361,75 @@ def from_asc(
             for fileinfo_key, fileinfo_dtype in column_schema_overrides.items()
         ])
 
+    if experiment is None:
+        experiment = Experiment(sampling_rate=metadata['sampling_rate'])
+    if experiment.eyetracker is None:
+        experiment.eyetracker = EyeTracker()
+
+    # Compare metadata from experiment definition with metadata from ASC file.
+    # Fill in missing metadata in experiment definition and raise an error if there are conflicts
+    issues = []
+
+    # Screen resolution (assuming that width and height will always be missing or set together)
+    experiment_resolution = (experiment.screen.width_px, experiment.screen.height_px)
+    if experiment_resolution == (None, None):
+        experiment.screen.width_px, experiment.screen.height_px = metadata['resolution']
+    elif experiment_resolution != metadata['resolution']:
+        issues.append(f"Screen resolution: {experiment_resolution} vs. {metadata['resolution']}")
+
+    # Sampling rate
+    if experiment.eyetracker.sampling_rate is None:
+        experiment.eyetracker.sampling_rate = metadata['sampling_rate']
+    elif experiment.eyetracker.sampling_rate != metadata['sampling_rate']:
+        issues.append(
+            f"Sampling rate: {experiment.eyetracker.sampling_rate} vs. {metadata['sampling_rate']}",
+        )
+
+    # Tracked eye
+    asc_left_eye = 'L' in metadata['tracked_eye']
+    asc_right_eye = 'R' in metadata['tracked_eye']
+    if experiment.eyetracker.left is None:
+        experiment.eyetracker.left = asc_left_eye
+    elif experiment.eyetracker.left != asc_left_eye:
+        issues.append(f"Left eye tracked: {experiment.eyetracker.left} vs. {asc_left_eye}")
+    if experiment.eyetracker.right is None:
+        experiment.eyetracker.right = asc_right_eye
+    elif experiment.eyetracker.right != asc_right_eye:
+        issues.append(f"Right eye tracked: {experiment.eyetracker.right} vs. {asc_right_eye}")
+
+    # Mount configuration
+    if experiment.eyetracker.mount is None:
+        experiment.eyetracker.mount = metadata['mount_configuration']['mount_type']
+    elif experiment.eyetracker.mount != metadata['mount_configuration']['mount_type']:
+        issues.append(f"Mount configuration: {experiment.eyetracker.mount} vs. "
+                      f"{metadata['mount_configuration']['mount_type']}")
+
+    # Eye tracker vendor
+    asc_vendor = 'EyeLink' if 'EyeLink' in metadata['model'] else None
+    if experiment.eyetracker.vendor is None:
+        experiment.eyetracker.vendor = asc_vendor
+    elif experiment.eyetracker.vendor != asc_vendor:
+        issues.append(f"Eye tracker vendor: {experiment.eyetracker.vendor} vs. {asc_vendor}")
+
+    # Eye tracker model
+    if experiment.eyetracker.model is None:
+        experiment.eyetracker.model = metadata['model']
+    elif experiment.eyetracker.model != metadata['model']:
+        issues.append(f"Eye tracker model: {experiment.eyetracker.model} vs. {metadata['model']}")
+
+    # Eye tracker software version
+    if experiment.eyetracker.version is None:
+        experiment.eyetracker.version = metadata['version_number']
+    elif experiment.eyetracker.version != metadata['version_number']:
+        issues.append(f"Eye tracker software version: {experiment.eyetracker.version} vs. "
+                      f"{metadata['version_number']}")
+
+    if issues:
+        raise ValueError(
+            'Experiment metadata does not match the metadata in the ASC file:\n'
+            + '\n'.join(f'- {issue}' for issue in issues),
+        )
+
     # Create gaze data frame.
     gaze_df = GazeDataFrame(
         gaze_data,
@@ -368,7 +438,8 @@ def from_asc(
         time_unit='ms',
         pixel_columns=['x_pix', 'y_pix'],
     )
-    return gaze_df, metadata
+    gaze_df._metadata = metadata  # pylint: disable=protected-access
+    return gaze_df
 
 
 def from_ipc(

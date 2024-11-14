@@ -207,6 +207,42 @@ def test_parse_eyelink(tmp_path):
 
 
 @pytest.mark.parametrize(
+    ('kwargs', 'expected_metadata'),
+    [
+        pytest.param(
+            {
+                'filepath': 'tests/files/eyelink_monocular_example.asc',
+                'metadata_patterns': [
+                    {'pattern': r'!V TRIAL_VAR SUBJECT_ID (?P<subject_id>-?\d+)'},
+                    r'!V TRIAL_VAR STIMULUS_COMBINATION_ID (?P<stimulus_combination_id>.+)',
+                ],
+            },
+            {
+                'subject_id': '-1',
+                'stimulus_combination_id': 'start',
+            },
+            id='eyelink_asc_metadata_patterns',
+        ),
+        pytest.param(
+            {
+                'filepath': 'tests/files/eyelink_monocular_example.asc',
+                'metadata_patterns': [r'inexistent pattern (?P<value>-?\d+)'],
+            },
+            {
+                'value': None,
+            },
+            id='eyelink_asc_metadata_pattern_not_found',
+        ),
+    ],
+)
+def test_from_asc_metadata_patterns(kwargs, expected_metadata):
+    _, metadata = pm.utils.parsing.parse_eyelink(**kwargs)
+
+    for key, value in expected_metadata.items():
+        assert metadata[key] == value
+
+
+@pytest.mark.parametrize(
     'patterns',
     [
         [1],

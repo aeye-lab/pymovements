@@ -71,7 +71,7 @@ def fixture_gaze_init_kwargs(request):
         },
         'eyelink_monocular': {
             'file': 'tests/files/eyelink_monocular_example.asc',
-            'experiment': pm.datasets.ToyDatasetEyeLink().experiment,
+            'experiment': pm.Experiment(1280, 1024, 38, 30, 60, 'upper left', 1000),
         },
         'didec': {
             'file': 'tests/files/didec_example.txt',
@@ -157,7 +157,7 @@ def test_gaze_file_processing(gaze_from_kwargs):
     elif file_extension in {'.feather', '.ipc'}:
         gaze = pm.gaze.from_ipc(**gaze_from_kwargs)
     elif file_extension == '.asc':
-        gaze, _ = pm.gaze.from_asc(**gaze_from_kwargs)
+        gaze = pm.gaze.from_asc(**gaze_from_kwargs)
 
     assert gaze is not None
 
