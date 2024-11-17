@@ -235,35 +235,27 @@ class Dataset:
             self,
             by: list[str] | str,
     ) -> None:
-        """Split gaze data into seperated GazeDataFrame's.
+        """Split gaze data into separated GazeDataFrame's.
 
         Parameters
         ----------
         by: list[str] | str
-            Column's to split dataframe by.
+            Column(s) to split dataframe by.
         """
-        if isinstance(by, str):
-            by = [by]
-        new_data = [
-            (
-                GazeDataFrame(
-                    new_frame,
-                    experiment=_frame.experiment,
-                    trial_columns=self.definition.trial_columns,
-                    time_column=self.definition.time_column,
-                    time_unit=self.definition.time_unit,
-                    position_columns=self.definition.position_columns,
-                    velocity_columns=self.definition.velocity_columns,
-                    acceleration_columns=self.definition.acceleration_columns,
-                    distance_column=self.definition.distance_column,
-                ),
-                fileinfo_row,
-            )
-            for (_frame, fileinfo_row) in zip(self.gaze, self.fileinfo['gaze'].to_dicts())
-            for new_frame in _frame.frame.partition_by(by=by)
-        ]
-        self.gaze = [data[0] for data in new_data]
-        self.fileinfo['gaze'] = pl.concat([pl.from_dict(data[1]) for data in new_data])
+        by = [by] if isinstance(by, str) else by
+
+        fileinfo_dicts = self.fileinfo['gaze'].to_dicts()
+
+        all_gaze_frames = []
+        all_fileinfo_rows = []
+
+        for frame, fileinfo_row in zip(self.gaze, fileinfo_dicts):
+            split_frames = frame.split(by=by)
+            all_gaze_frames.extend(split_frames)
+            all_fileinfo_rows.extend([fileinfo_row] * len(split_frames))
+
+        self.gaze = all_gaze_frames
+        self.fileinfo['gaze'] = pl.concat([pl.from_dict(row) for row in all_fileinfo_rows])
 
     def split_precomputed_events(
             self,
