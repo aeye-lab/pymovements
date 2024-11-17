@@ -286,13 +286,6 @@ class GazeDataFrame:
         # Remove this attribute once #893 is fixed
         self._metadata: dict[str, Any] | None = None
         self.auto_column_detect = auto_column_detect
-        self.time_column = time_column
-        self.time_unit = time_unit
-        self.pixel_columns = pixel_columns
-        self.position_columns = position_columns
-        self.velocity_columns = velocity_columns
-        self.acceleration_columns = acceleration_columns
-        self.distance_column = distance_column
 
     def apply(
             self,
@@ -331,19 +324,13 @@ class GazeDataFrame:
             A list of new GazeDataFrame instances, each containing a partition of the
             original data with all metadata and configurations preserved.
         """
-        by = [by] if isinstance(by, str) else by
         return [
             GazeDataFrame(
                 new_frame,
                 experiment=self.experiment,
-                auto_column_detect=self.auto_column_detect,
                 trial_columns=self.trial_columns,
-                time_column=self.time_column,
-                time_unit=self.time_unit,
-                position_columns=self.position_columns,
-                velocity_columns=self.velocity_columns,
-                acceleration_columns=self.acceleration_columns,
-                distance_column=self.distance_column,
+                time_column='time',
+                distance_column='distance',
             )
             for new_frame in self.frame.partition_by(by=by)
         ]

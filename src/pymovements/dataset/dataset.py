@@ -231,7 +231,7 @@ class Dataset:
             self.paths,
         )
 
-    def _split_gaze_data(
+    def split_gaze_data(
             self,
             by: list[str] | str,
     ) -> None:
@@ -242,8 +242,6 @@ class Dataset:
         by: list[str] | str
             Column(s) to split dataframe by.
         """
-        by = [by] if isinstance(by, str) else by
-
         fileinfo_dicts = self.fileinfo['gaze'].to_dicts()
 
         all_gaze_frames = []
