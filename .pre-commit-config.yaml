@@ -35,7 +35,7 @@ repos:
     -   id: databooks-meta
         args: [--cell-fields-keep=id]
 -   repo: https://github.com/pappasam/toml-sort
-    rev: v0.23.1
+    rev: v0.24.1
     hooks:
     -   id: toml-sort-fix
 -   repo: https://github.com/dannysepler/rm_unneeded_f_str
@@ -43,7 +43,7 @@ repos:
     hooks:
     -   id: rm-unneeded-f-str
 -   repo: https://github.com/kynan/nbstripout
-    rev: 0.8.0
+    rev: 0.8.1
     hooks:
     -   id: nbstripout
 -   repo: https://github.com/Lucas-C/pre-commit-hooks
