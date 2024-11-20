@@ -454,9 +454,12 @@ def _check_sampling_rate(recording_config: list[dict[str, Any]]) -> float | None
     else:
         sampling_rates = {d.get('sampling_rate') for d in recording_config}
         if len(sampling_rates) != 1:
-            print('Warning: Inconsistent sampling rates found. The first recorded sampling '
-                  'rate is used to calculate the dataloss.')
-        sampling_rate = float(sampling_rates.pop())
+            print(
+                'Warning: Inconsistent sampling rates found. The first recorded sampling '
+                'rate is used to calculate the dataloss.',
+            )
+        sampling_rate = sampling_rates.pop()
+        sampling_rate = float(sampling_rate)
     return sampling_rate
 
 
