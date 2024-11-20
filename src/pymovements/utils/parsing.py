@@ -445,7 +445,7 @@ def _check_sampling_rate(recording_config: list[dict[str, Any]]) -> float | None
     -------
     float | None
         The sampling rate of the first entry as a float if available, otherwise None.
-        Raises a warning if no recording configuration is found or
+        prints a warning if no recording configuration is found or
         if the sampling rate is inconsistent.
     """
     if not recording_config:
@@ -458,8 +458,7 @@ def _check_sampling_rate(recording_config: list[dict[str, Any]]) -> float | None
                 'Warning: Inconsistent sampling rates found. The first recorded sampling '
                 'rate is used to calculate the dataloss.',
             )
-        sampling_rate = sampling_rates.pop()
-        sampling_rate = float(sampling_rate)
+        sampling_rate = float(recording_config[0]['sampling_rate'])
     return sampling_rate
 
 
