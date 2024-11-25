@@ -35,7 +35,7 @@ repos:
     -   id: databooks-meta
         args: [--cell-fields-keep=id]
 -   repo: https://github.com/pappasam/toml-sort
-    rev: v0.24.1
+    rev: v0.24.2
     hooks:
     -   id: toml-sort-fix
 -   repo: https://github.com/dannysepler/rm_unneeded_f_str
