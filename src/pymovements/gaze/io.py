@@ -35,7 +35,7 @@ def from_csv(
         file: str | Path,
         experiment: Experiment | None = None,
         *,
-        trial_columns: list[str] | None = None,
+        trial_columns: str | list[str] | None = None,
         time_column: str | None = None,
         time_unit: str | None = 'ms',
         pixel_columns: list[str] | None = None,
@@ -56,7 +56,7 @@ def from_csv(
         Path of gaze file.
     experiment : Experiment | None
         The experiment definition. (default: None)
-    trial_columns: list[str] | None
+    trial_columns: str | list[str] | None
         The name of the trial columns in the input data frame. If the list is empty or None,
         the input data frame is assumed to contain only one trial. If the list is not empty,
         the input data frame is assumed to contain multiple trials and the transformation
@@ -276,6 +276,7 @@ def from_asc(
         metadata_patterns: list[dict[str, Any] | str] | None = None,
         schema: dict[str, Any] | None = None,
         experiment: Experiment | None = None,
+        trial_columns: str | list[str] | None = None,
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, Any] | None = None,
 ) -> GazeDataFrame:
@@ -295,6 +296,11 @@ def from_asc(
         Dictionary to optionally specify types of columns parsed by patterns. (default: None)
     experiment: Experiment | None
         The experiment definition. (default: None)
+    trial_columns: str | list[str] | None
+        The names of the columns (extracted by patterns) to use as trial columns.
+        If the list is empty or None, the asc file is assumed to contain only one trial.
+        If the list is not empty, the asc file is assumed to contain multiple trials and
+        the transformation methods will be applied to each trial separately. (default: None)
     add_columns: dict[str, str] | None
         Dictionary containing columns to add to loaded data frame.
         (default: None)
@@ -434,6 +440,7 @@ def from_asc(
     gaze_df = GazeDataFrame(
         gaze_data,
         experiment=experiment,
+        trial_columns=trial_columns,
         time_column='time',
         time_unit='ms',
         pixel_columns=['x_pix', 'y_pix'],
