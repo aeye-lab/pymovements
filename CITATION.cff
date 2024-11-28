@@ -21,6 +21,7 @@ authors:
   given-names: "Lena A."
 title: "pymovements: A Python Package for Processing Eye Movement Data"
 version: 0.18.0
+type: conference-paper
 doi: 10.1145/3588015.3590134
 url: "https://doi.org/10.1145/3588015.3590134"
 year: 2023
