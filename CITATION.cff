@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Krakowczyk"
+  given-names: "Daniel G."
+- family-names: "Reich"
+  given-names: "David R."
+- family-names: "Chwastek"
+  given-names: "Jakob"
+- family-names: "Jakobi"
+  given-names: "Deboah N."
+- family-names "Prasse"
+  given-names: "Paul"
+- family-names "Süss"
+  given-names: "Assunta"
+- family-names: "Turuta"
+  given-names "Oleksii"
+- family-names: "Kasprowski"
+  given-names: "Paweł"
+- family-names: "Jäger"
+  given-names: "Lena A."
+title: "pymovements: A Python Package for Processing Eye Movement Data"
+version: 0.18.0
+doi: 10.1145/3588015.3590134
+date-released: 2017-12-18
+url: "https://doi.org/10.1145/3588015.3590134"
+year: 2023
+collection-type: proceedings
+collection-title: "2023 Symposium on Eye Tracking Research and Applications"
+collection-location: "Tubingen, Germany"
+collection-series: "ETRA '23"
+publisher:
+  name: "Association for Computing Machinery"
+  address: New York, NY, USA
+isbn: "979-8-4007-0150-4/23/05"
