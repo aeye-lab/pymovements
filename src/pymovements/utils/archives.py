@@ -138,6 +138,7 @@ def _extract_tar(
         source_path: Path,
         destination_path: Path,
         compression: str | None,
+        skip: bool = True,
 ) -> None:
     """Extract a tar archive.
 
@@ -149,13 +150,16 @@ def _extract_tar(
         Path to the directory the file will be extracted to.
     compression: str | None
         Compression filename suffix.
+    skip: bool
+        Skip already extracted files. (default: True)
     """
     with tarfile.open(source_path, f'r:{compression[1:]}' if compression else 'r') as archive:
         for member in archive.getnames():
             if (
                     os.path.exists(os.path.join(destination_path, member)) and
                     member[-4:] not in _ARCHIVE_EXTRACTORS and
-                    tarfile.TarInfo(os.path.join(destination_path, member)).size > 0
+                    tarfile.TarInfo(os.path.join(destination_path, member)).size > 0 and
+                    skip
             ):
                 continue
             if sys.version_info < (3, 12):  # pragma: <3.12 cover
