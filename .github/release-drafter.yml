@@ -15,6 +15,8 @@ categories:
     labels: deprecation
   - title: ✨ Enhancements
     labels: enhancement
+  - title: 📀 Datasets
+    labels: dataset
   - title: 🐞 Bug Fixes
     labels: fix
   - title: 🛠️ Maintenance
@@ -34,20 +36,23 @@ change-template: '- $TITLE (#$NUMBER)'
 change-title-escapes: '\<*_&'
 replacers:
   # Remove conventional commits from titles
-  - search: '/- (build|chore|ci|depr|docs|feat|fix|perf|refactor|release|test)(\(.*\))?(\!)?\: /g'
+  - search: '/- (build|chore|ci|dataset|depr|docs|feat|fix|perf|refactor|release|test)(\(.*\))?(\!)?\: /g'
     replace: '- '
 
 autolabeler:
   - label: breaking
     title:
       # Example: feat!: ...
-      - '/^(build|chore|ci|depr|docs|feat|fix|perf|refactor|release|test)(\(.*\))?\!\: /'
+      - '/^(build|chore|ci|dataset|depr|docs|feat|fix|perf|refactor|release|test)(\(.*\))?\!\: /'
   - label: build
     title:
       - '/^build/'
   - label: internal
     title:
       - '/^(chore|ci|perf|refactor|test)/'
+  - label: dataset
+    title:
+      - '/^dataset/'
   - label: deprecation
     title:
       - '/^depr/'
