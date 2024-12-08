@@ -297,7 +297,7 @@ Make sure:
   - to use Markdown for formatting.
 
 
-# Releasing
+# Publishing Releases
 
 Before releasing a new pymovements version make sure that all integration tests pass via `tox -e integration`.
 
