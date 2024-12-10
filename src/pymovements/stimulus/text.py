@@ -80,6 +80,24 @@ class TextStimulus:
         self.end_y_column = end_y_column
         self.page_column = page_column
 
+    def split(
+            self,
+            by: str,
+    ) -> list[TextStimulus]:
+        """Split the AOI df.
+
+        Parameters
+        ----------
+        by: str
+            Splitting criteria.
+
+        Returns
+        -------
+        list[TextStimulus]
+            A list of TextStimulus objects.
+        """
+        return self.aois.partition_by(by=by, as_dict=False)
+
 
 def from_file(
         aoi_path: str | Path,
