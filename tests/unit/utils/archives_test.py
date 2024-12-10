@@ -500,18 +500,21 @@ def test_decompress_unknown_compression_suffix():
 
 
 @pytest.mark.parametrize(
-    ('recursive', 'remove_top_level', 'expected_files'),
+    ('recursive', 'remove_top_level', 'expected_files', 'resume'),
     [
         pytest.param(
-            False, False,
+            False,
+            False,
             (
                 'toplevel',
                 os.path.join('toplevel', 'recursive.zip'),
             ),
+            True,
             id='recursive_false_remove_finished_false',
         ),
         pytest.param(
-            True, False,
+            True,
+            False,
             (
                 'toplevel',
                 os.path.join('toplevel', 'recursive.zip'),
@@ -519,12 +522,13 @@ def test_decompress_unknown_compression_suffix():
                 os.path.join('toplevel', 'recursive', 'singlechild'),
                 os.path.join('toplevel', 'recursive', 'singlechild', 'test.file'),
             ),
+            False,
             id='recursive_true_remove_finished_false',
         ),
     ],
 )
 def test_extract_archive_destination_path_not_None_no_remove_top_level_no_remove_finished_twice(
-        recursive, remove_top_level, archive, tmp_path, expected_files,
+        recursive, remove_top_level, archive, tmp_path, expected_files, resume,
 ):
     destination_path = tmp_path / pathlib.Path('tmpfoo')
     extract_archive(
@@ -533,6 +537,7 @@ def test_extract_archive_destination_path_not_None_no_remove_top_level_no_remove
         recursive=recursive,
         remove_finished=False,
         remove_top_level=remove_top_level,
+        resume=resume,
     )
     extract_archive(
         source_path=archive,
@@ -540,6 +545,7 @@ def test_extract_archive_destination_path_not_None_no_remove_top_level_no_remove
         recursive=recursive,
         remove_finished=False,
         remove_top_level=remove_top_level,
+        resume=resume,
     )
 
     if destination_path.is_file():

@@ -42,6 +42,7 @@ def extract_archive(
         remove_finished: bool = False,
         remove_top_level: bool = True,
         verbose: int = 1,
+        resume: bool = False,
 ) -> Path:
     """Extract an archive.
 
@@ -65,6 +66,8 @@ def extract_archive(
         Verbosity levels: (1) Print messages for extracting each dataset resource without printing
         messages for recursive archives. (2) Print additional messages for each recursive archive
         extract. (default: 1)
+    resume: bool
+        Resume previous extraction. (default: True)
 
     Returns
     -------
@@ -90,7 +93,7 @@ def extract_archive(
         print(f'Extracting {source_path.name} to {destination_path}')
 
     # Extract file and remove archive if desired.
-    extractor(source_path, destination_path, compression_type)
+    extractor(source_path, destination_path, compression_type, resume)
     if remove_finished:
         source_path.unlink()
 
@@ -129,6 +132,7 @@ def extract_archive(
                 remove_finished=remove_finished,
                 remove_top_level=remove_top_level,
                 verbose=0 if verbose < 2 else 2,
+                resume=resume,
             )
 
     return destination_path
@@ -138,7 +142,7 @@ def _extract_tar(
         source_path: Path,
         destination_path: Path,
         compression: str | None,
-        skip: bool = True,
+        resume: bool = True,
 ) -> None:
     """Extract a tar archive.
 
@@ -150,28 +154,32 @@ def _extract_tar(
         Path to the directory the file will be extracted to.
     compression: str | None
         Compression filename suffix.
-    skip: bool
-        Skip already extracted files. (default: True)
+    resume: bool
+        Resume previous extraction. (default: True)
     """
     with tarfile.open(source_path, f'r:{compression[1:]}' if compression else 'r') as archive:
-        for member in archive.getnames():
-            if (
-                    os.path.exists(os.path.join(destination_path, member)) and
-                    member[-4:] not in _ARCHIVE_EXTRACTORS and
-                    tarfile.TarInfo(os.path.join(destination_path, member)).size > 0 and
-                    skip
-            ):
-                continue
+        for member in archive.getmembers():
+            member_name = member.name
+            member_size = member.size
+            member_dest_path = os.path.join(destination_path, member_name)
+            if resume:
+                if (
+                        os.path.exists(member_dest_path) and
+                        member_name[-4:] not in _ARCHIVE_EXTRACTORS and
+                        member_size == os.path.getsize(member_dest_path)
+                ):
+                    continue
             if sys.version_info < (3, 12):  # pragma: <3.12 cover
-                archive.extract(member, destination_path)
+                archive.extract(member_name, destination_path)
             else:  # pragma: >=3.12 cover
-                archive.extract(member, destination_path, filter='tar')
+                archive.extract(member_name, destination_path, filter='tar')
 
 
 def _extract_zip(
         source_path: Path,
         destination_path: Path,
         compression: str | None,
+        resume: bool,
 ) -> None:
     """Extract a zip archive.
 
@@ -186,13 +194,21 @@ def _extract_zip(
     """
     compression_id = _ZIP_COMPRESSION_MAP[compression] if compression else zipfile.ZIP_STORED
     with zipfile.ZipFile(source_path, 'r', compression=compression_id) as archive:
-        for member in archive.namelist():
-            if (
-                os.path.exists(os.path.join(destination_path, member)) and
-                member[-4:] not in _ARCHIVE_EXTRACTORS
-            ):
-                continue
-            archive.extract(member, destination_path)
+        for member in archive.filelist:
+            member_filename = member.filename
+            member_dest_path = os.path.join(destination_path, member_filename)
+            if resume:
+                member_size = member.file_size
+                if (
+                    os.path.exists(member_dest_path) and
+                    member_filename[-4:] not in _ARCHIVE_EXTRACTORS and
+                    member_size == os.path.getsize(member_dest_path)
+                ):
+                    continue
+                else:
+                    archive.extract(member_filename, destination_path)
+            else:
+                archive.extract(member_filename, destination_path)
 
 
 _ARCHIVE_EXTRACTORS: dict[str, Callable[[Path, Path, str | None], None]] = {
