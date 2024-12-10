@@ -35,7 +35,6 @@ from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events.frame import EventDataFrame
 from pymovements.events.precomputed import PrecomputedEventDataFrame
-from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import GazeDataFrame
 from pymovements.reading_measures.frame import ReadingMeasures
 
@@ -713,7 +712,7 @@ class Dataset:
         name: str | None
             Process only events that match the name. (default: None)
         verbose : bool
-            If ``True``, show progress bar. (default: True)
+            If ``True``, show more info. (default: True)
 
         Raises
         ------
@@ -728,22 +727,9 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
-        processor = EventGazeProcessor(event_properties)
-
-        identifier_columns = [
-            column
-            for column in self.fileinfo['gaze'].columns
-            if column != 'filepath'
-        ]
-
         disable_progressbar = not verbose
-        for events, gaze in tqdm(zip(self.events, self.gaze), disable=disable_progressbar):
-            new_properties = processor.process(
-                events, gaze, identifiers=identifier_columns, name=name,
-            )
-            join_on = identifier_columns + ['name', 'onset', 'offset']
-            events.add_event_properties(new_properties, join_on=join_on)
-
+        for gaze in tqdm(self.gaze, disable=disable_progressbar):
+            gaze.compute_event_properties(event_properties, name=name, verbose=verbose)
         return self
 
     def compute_properties(

@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import inspect
+import logging
 import warnings
 from collections.abc import Callable
 from copy import deepcopy
@@ -30,10 +31,14 @@ import numpy as np
 import polars as pl
 
 import pymovements as pm  # pylint: disable=cyclic-import
+from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
 from pymovements.utils import checks
 from pymovements.utils.aois import get_aoi
+
+
+logger = logging.getLogger(__name__)
 
 
 class GazeDataFrame:
@@ -550,6 +555,7 @@ class GazeDataFrame:
             pixel_origin: str = 'upper left',
             position_column: str = 'position',
             pixel_column: str = 'pixel',
+            verbose: bool = False,
     ) -> None:
         """Compute gaze positions in pixel position coordinates from degrees of visual angle.
 
@@ -885,6 +891,54 @@ class GazeDataFrame:
                 [self.events.frame, *new_events_grouped],
                 how='diagonal',
             )
+
+    def compute_event_properties(
+            self,
+            event_properties: str | tuple[str, dict[str, Any]]
+            | list[str | tuple[str, dict[str, Any]]],
+            name: str | None = None,
+            verbose: bool = True,
+    ) -> None:
+        """Calculate an event property for and add it as a column to the event dataframe.
+
+        Parameters
+        ----------
+        event_properties: str | tuple[str, dict[str, Any]] | list[str | tuple[str, dict[str, Any]]]
+            The event properties to compute.
+        name: str | None
+            Process only events that match the name. (default: None)
+        verbose: bool
+            If ``True``, print information about the progress. (default: True)
+        Raises
+        ------
+        InvalidProperty
+            If ``property_name`` is not a valid property. See
+            :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
+        RuntimeError
+            If specified event name ``name`` is missing from ``events``.
+            If no events are available to compute event properties. Consider calling detect before.
+
+        Returns
+        -------
+        pm.EventDataFrame
+            Returns self, useful for method cascading.
+        """
+        if self.events is None:
+            raise RuntimeError(
+                'No events available to compute event properties. '
+                'Consider calling detect before.',
+            )
+
+        if verbose is True:
+            logger.debug(f'Processing events {event_properties} matching {name} \
+for \n{self.events.frame.head()}')
+
+        processor = EventGazeProcessor(event_properties)
+        new_properties = processor.process(
+            self.events, self, identifiers=self.trial_columns, name=name,
+        )
+        join_on = self.trial_columns + ['name', 'onset', 'offset']
+        self.events.add_event_properties(new_properties, join_on=join_on)
 
     def measure_samples(
             self,

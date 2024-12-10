@@ -137,7 +137,7 @@ class EventGazeProcessor:
         events: EventDataFrame
             Event data to process event properties from.
         gaze: pm.GazeDataFrame
-            Gaze data to process event properties from.
+            Raw gaze data to process event properties from.
         identifiers: str | list[str]
             Column names to join on events and gaze dataframes.
         name: str | None
