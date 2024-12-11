@@ -253,7 +253,8 @@ def pix2deg(
     position_column: str
         The output position column name. (default: 'position')
     center_offset: tuple[float, float]
-        Offset of the eye from the center in centimeters. (default: (0, 0))
+        Offset of the eye from the center in centimeters.
+        A positive value moves the origin to the left or down. (default: (0, 0))
 
     Returns
     -------
