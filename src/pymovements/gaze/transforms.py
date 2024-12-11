@@ -133,7 +133,8 @@ def center_origin(
     output_column: str | None
         Name of the output column with centered pixel data. (default: None)
     center_offset: tuple[float, float]
-        Offset of the eye from the center in centimeters. (default: (0, 0))
+        Offset of the eye from the center in centimeters.
+        A positive value moves the origin to the left or down. (default: (0, 0))
 
     Returns
     -------
