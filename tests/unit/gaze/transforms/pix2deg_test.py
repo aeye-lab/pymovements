@@ -499,6 +499,37 @@ def test_pix2deg_raises_error(kwargs, series, exception, msg_substrings):
             pl.Series('position', [[45, 63.4349]], pl.List(pl.Float64)),
             id='screen_size_different_values',
         ),
+        pytest.param(
+            {
+                'screen_resolution': (100, 100),
+                'screen_size': (100, 100),
+                'distance': 100,
+                'origin': 'center',
+                'pixel_column': 'pixel',
+                'position_column': 'position',
+                'n_components': 2,
+                'center_offset': (10, 10),
+            },
+            pl.Series('pixel', [[10, 10]], pl.List(pl.Float64)),
+            pl.Series('position', [[0, 0]], pl.List(pl.Float64)),
+            id='center_offset_center_origin',
+        ),
+        pytest.param(
+            {
+                'screen_resolution': (100, 100),
+                'screen_size': (100, 100),
+                'distance': 50,
+                'origin': 'upper left',
+                'pixel_column': 'pixel',
+                'position_column': 'position',
+                'n_components': 2,
+                'center_offset': (10, 10),
+
+            },
+            pl.Series('pixel', [[0 + 10, 100 - 0.5 + 10]], pl.List(pl.Float64)),
+            pl.Series('position', [[-44.7120, 45]], pl.List(pl.Float64)),
+            id='isosceles_triangle_origin_lowerleft_returns_45_offset',
+        ),
     ],
 )
 @pytest.mark.parametrize(
