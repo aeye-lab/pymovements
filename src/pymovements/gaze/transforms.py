@@ -20,10 +20,7 @@
 """Module for py:func:`pymovements.gaze.transforms."""
 from __future__ import annotations
 
-try:
-    from collections.abc import Callable  # noqa
-except ImportError:
-    from collections import Callable  # noqa
+from collections.abc import Callable
 from functools import partial
 from typing import Any
 from typing import TypeVar
