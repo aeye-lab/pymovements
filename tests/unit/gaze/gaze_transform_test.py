@@ -791,6 +791,82 @@ def fixture_experiment():
             id='clip',
         ),
 
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1000, 1000],
+                        'x_pix': [(100 - 1) / 2 + 10, (100 - 1) / 2 + 10],
+                        'y_pix': [10.0, 10.0],
+                        'distance': [1000, 1000],
+                    },
+                ),
+                'experiment': pm.Experiment(
+                    sampling_rate=1000,
+                    screen_width_px=100,
+                    screen_height_px=100,
+                    screen_width_cm=100,
+                    screen_height_cm=100,
+                    distance_cm=None,
+                    origin='center',
+                ),
+                'pixel_columns': ['x_pix', 'y_pix'],
+                'distance_column': 'distance',
+            },
+            'pix2deg', {'center_offset': (10, 10)},
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'time': [1000, 1000],
+                        'x_pix': [59.5, 59.5],
+                        'y_pix': [10.0, 10.0],
+                        'x_dva': [26.3354, 26.3354],
+                        'y_dva': [0.0, 0.0],
+                        'distance': [1000, 1000],
+                    },
+                ),
+                pixel_columns=['x_pix', 'y_pix'],
+                position_columns=['x_dva', 'y_dva'],
+            ),
+            id='pix2deg_center_offset_center_origin',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1000],
+                        'x_pix': [(100 - 1) / 2 + 10],
+                        'y_pix': [10.0],
+                    },
+                ),
+                'experiment': pm.Experiment(
+                    sampling_rate=1000,
+                    screen_width_px=100,
+                    screen_height_px=100,
+                    screen_width_cm=100,
+                    screen_height_cm=100,
+                    distance_cm=100,
+                    origin='upper left',
+                ),
+                'pixel_columns': ['x_pix', 'y_pix'],
+            },
+            'pix2deg', {'center_offset': (10, 10)},
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'time': [1000],
+                        'x_pix': [59.5],
+                        'y_pix': [10.0],
+                        'x_dva': [0.0],
+                        'y_dva': [-26.3354],
+                    },
+                ),
+                pixel_columns=['x_pix', 'y_pix'],
+                position_columns=['x_dva', 'y_dva'],
+            ),
+            id='pix2deg_center_offset_upper_left_origin',
+        ),
     ],
 )
 def test_gaze_transform_expected_frame(

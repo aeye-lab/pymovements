@@ -114,6 +114,7 @@ def center_origin(
         n_components: int,
         pixel_column: str = 'pixel',
         output_column: str | None = None,
+        center_offset: tuple[float, float] = (0, 0),
 ) -> pl.Expr:
     """Center pixel data.
 
@@ -131,6 +132,8 @@ def center_origin(
         Name of the input column with pixel data. (default: 'pixel')
     output_column: str | None
         Name of the output column with centered pixel data. (default: None)
+    center_offset: tuple[float, float]
+        Offset of the eye from the center in centimeters. (default: (0, 0))
 
     Returns
     -------
@@ -157,7 +160,8 @@ def center_origin(
 
     centered_pixels = pl.concat_list(
         [
-            pl.col(pixel_column).list.get(component) - origin_offset[component % 2]
+            pl.col(pixel_column).list.get(component) -
+            origin_offset[component % 2] - center_offset[component % 2]
             for component in range(n_components)
         ],
     ).alias(output_column)
@@ -224,6 +228,7 @@ def pix2deg(
         n_components: int,
         pixel_column: str = 'pixel',
         position_column: str = 'position',
+        center_offset: tuple[float, float] = (0, 0),
 ) -> pl.Expr:
     """Convert pixel screen coordinates to degrees of visual angle.
 
@@ -246,6 +251,8 @@ def pix2deg(
         The input pixel column name. (default: 'pixel')
     position_column: str
         The output position column name. (default: 'position')
+    center_offset: tuple[float, float]
+        Offset of the eye from the center in centimeters. (default: (0, 0))
 
     Returns
     -------
@@ -260,6 +267,7 @@ def pix2deg(
         origin=origin,
         n_components=n_components,
         pixel_column=pixel_column,
+        center_offset=center_offset,
     )
 
     if isinstance(distance, (float, int)):
