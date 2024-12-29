@@ -96,7 +96,20 @@ class TextStimulus:
         list[TextStimulus]
             A list of TextStimulus objects.
         """
-        return self.aois.partition_by(by=by, as_dict=False)
+        return [
+            TextStimulus(
+                aois=df,
+                aoi_column=self.aoi_column,
+                width_column=self.width_column,
+                height_column=self.height_column,
+                start_x_column=self.start_x_column,
+                start_y_column=self.start_y_column,
+                end_x_column=self.end_x_column,
+                end_y_column=self.end_y_column,
+                page_column=self.page_column,
+            )
+            for df in self.aois.partition_by(by=by, as_dict=False)
+        ]
 
 
 def from_file(

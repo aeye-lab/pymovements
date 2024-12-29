@@ -287,7 +287,7 @@ def test_text_stimulus_splitting_unique_within(aoi_file, custom_read_kwargs):
     )
 
     aois_df = aois_df.split(by='line_idx')
-    assert all(df.n_unique(subset=['line_idx']) == 1 for df in aois_df)
+    assert all(df.aois.n_unique(subset=['line_idx']) == 1 for df in aois_df)
 
 
 @pytest.mark.parametrize(
@@ -320,7 +320,7 @@ def test_text_stimulus_splitting_different_between(aoi_file, custom_read_kwargs)
     aois_df = aois_df.split(by='line_idx')
     unique_values = []
     for df in aois_df:
-        unique_value = df.unique(subset=['line_idx'])['line_idx'].to_list()
+        unique_value = df.aois.unique(subset=['line_idx'])['line_idx'].to_list()
         unique_values.extend(unique_value)
 
     assert len(unique_values) == len(set(unique_values))
