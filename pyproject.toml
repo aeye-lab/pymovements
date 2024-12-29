@@ -1,7 +1,7 @@
 [build-system]
 requires = [
   "setuptools>=61.0.0",
-  "setuptools-git-versioning<2",
+  "setuptools-git-versioning<3",
   "versioneer[toml]>=0.29,<1.0",
   "wheel"
 ]
@@ -28,6 +28,7 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Topic :: Scientific/Engineering",
   "Typing :: Typed"
 ]
@@ -48,7 +49,7 @@ dynamic = ["version"]
 docs = [
   "ipykernel>=6.13.0",
   "nbconvert>=7.0.0,<7.17",
-  "nbsphinx>=0.8.8,<0.9.5",
+  "nbsphinx>=0.8.8,<0.9.6",
   "pandoc",
   "pybtex",
   "pydata-sphinx-theme>=0.12",
@@ -116,6 +117,7 @@ check_untyped_defs = true
 disallow_incomplete_defs = true
 disallow_untyped_defs = true
 warn_redundant_casts = true
+disable_error_code = ["override"]
 
 [[tool.mypy.overrides]]
 module = "scipy.*"
