@@ -205,3 +205,25 @@ def test_gaze_dataframe_copy_no_experiment():
 
     # We want to have separate experiment instances but the same values.
     assert gaze.experiment is gaze_copy.experiment
+
+
+def test_gaze_dataframe_split():
+    gaze = pm.GazeDataFrame(
+        pl.DataFrame(
+            {
+                'x': [0, 1, 2, 3],
+                'y': [1, 1, 0, 0],
+                'trial_id': [0, 1, 1, 2],
+            },
+            schema={'x': pl.Float64, 'y': pl.Float64, 'trial_id': pl.Int8},
+        ),
+        experiment=None,
+        position_columns=['x', 'y'],
+    )
+
+    split_gaze = gaze.split('trial_id')
+    assert all(gaze_df.frame.n_unique('trial_id') == 1 for gaze_df in split_gaze)
+    assert len(split_gaze) == 3
+    assert_frame_equal(gaze.frame.filter(pl.col('trial_id') == 0), split_gaze[0].frame)
+    assert_frame_equal(gaze.frame.filter(pl.col('trial_id') == 1), split_gaze[1].frame)
+    assert_frame_equal(gaze.frame.filter(pl.col('trial_id') == 2), split_gaze[2].frame)

@@ -285,6 +285,7 @@ class GazeDataFrame:
 
         # Remove this attribute once #893 is fixed
         self._metadata: dict[str, Any] | None = None
+        self.auto_column_detect = auto_column_detect
 
     def apply(
             self,
@@ -306,6 +307,33 @@ class GazeDataFrame:
             self.detect(function, **kwargs)
         else:
             raise ValueError(f"unsupported method '{function}'")
+
+    def split(self, by: list[str] | str) -> list[GazeDataFrame]:
+        """Split the GazeDataFrame into multiple frames based on specified column(s).
+
+        Parameters
+        ----------
+        by: list[str] | str
+            Column name(s) to split the DataFrame by. If a single string is provided,
+            it will be used as a single column name. If a list is provided, the DataFrame
+            will be split by unique combinations of values in all specified columns.
+
+        Returns
+        -------
+        list[GazeDataFrame]
+            A list of new GazeDataFrame instances, each containing a partition of the
+            original data with all metadata and configurations preserved.
+        """
+        return [
+            GazeDataFrame(
+                new_frame,
+                experiment=self.experiment,
+                trial_columns=self.trial_columns,
+                time_column='time',
+                distance_column='distance',
+            )
+            for new_frame in self.frame.partition_by(by=by)
+        ]
 
     def transform(
             self,
