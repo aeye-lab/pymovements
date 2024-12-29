@@ -18,6 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Provides top-level access to submodules."""
+import logging
+import os
+
 from pymovements import _version
 from pymovements import datasets
 from pymovements import events
@@ -44,7 +47,6 @@ from pymovements.gaze import Screen
 from pymovements.measure import register_sample_measure
 from pymovements.measure import SampleMeasureLibrary
 from pymovements.stimulus import text
-
 
 __all__ = [
     'Dataset',
@@ -81,3 +83,7 @@ __all__ = [
 ]
 
 __version__ = _version.get_versions()['version']
+
+LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
+LOG_CONFIG = '[%(levelname)s] %(asctime)s %(name)s:%(lineno)d - %(message)s'
+logging.basicConfig(level=LOG_LEVEL, format=LOG_CONFIG)
