@@ -117,6 +117,7 @@ check_untyped_defs = true
 disallow_incomplete_defs = true
 disallow_untyped_defs = true
 warn_redundant_casts = true
+disable_error_code = ["override"]
 
 [[tool.mypy.overrides]]
 module = "scipy.*"

@@ -248,7 +248,7 @@ def pos2acc(
                 mode=mode,
                 cval=cval,
             )
-    acc = acc * sampling_rate
+    acc *= sampling_rate
 
     return acc
 
@@ -374,7 +374,7 @@ def pos2vel(
                 v[:, channel_id] = savgol_filter(
                     x=arr[:, channel_id], deriv=1, **kwargs,
                 )
-        v = v * sampling_rate
+        v *= sampling_rate
 
     else:
         raise ValueError(
