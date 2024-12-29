@@ -1977,5 +1977,5 @@ def test_load_split_precomputed_events(precomputed_dataset_configuration, by, ex
 def test_load_split_gaze(gaze_dataset_configuration, by, expected_len):
     dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
-    dataset._split_gaze_data(by)
+    dataset.split_gaze_data(by)
     assert len(dataset.gaze) == expected_len
