@@ -109,6 +109,24 @@ def test_center_origin_init_raises_error(kwargs, exception, msg_substrings):
             pl.Series('pixel', [[-49.5, 0]], pl.List(pl.Float64)),
             id='origin_lowerleft',
         ),
+        pytest.param(
+            {
+                'screen_resolution': (100, 100), 'origin': 'center', 'pixel_column': 'pixel',
+                'n_components': 2, 'center_offset': (10, 10),
+            },
+            pl.Series('pixel', [[0, (100 - 1) / 2]], pl.List(pl.Float64)),
+            pl.Series('pixel', [[-10, 39.5]], pl.List(pl.Float64)),
+            id='origin_center_with_offset',
+        ),
+        pytest.param(
+            {
+                'screen_resolution': (100, 100), 'origin': 'upper left', 'pixel_column': 'pixel',
+                'n_components': 2, 'center_offset': (10, 10),
+            },
+            pl.Series('pixel', [[0, (100 - 1) / 2]], pl.List(pl.Float64)),
+            pl.Series('pixel', [[-59.5, -10]], pl.List(pl.Float64)),
+            id='origin_upper_left_with_offset',
+        ),
     ],
 )
 def test_center_origin_returns(kwargs, series, expected_df):
