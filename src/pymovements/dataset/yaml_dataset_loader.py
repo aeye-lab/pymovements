@@ -27,6 +27,7 @@ import yaml
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.gaze.experiment import Experiment
+from pymovements.gaze.eyetracker import EyeTracker
 
 
 # generalized constructor for !* tags
@@ -121,7 +122,12 @@ class YAMLDatasetLoader:
 
         # Convert experiment dict to Experiment object if present
         if 'experiment' in data:
-            data['experiment'] = Experiment(**data['experiment'])
+            if 'eyetracker' in data['experiment']:
+                # eyetracker = EyeTracker(**data['experiment']['eyetracker'])
+                eyetracker = EyeTracker(**data['experiment'].pop('eyetracker'))
+            else:
+                eyetracker = None
+            data['experiment'] = Experiment(**data['experiment'], eyetracker=eyetracker)
 
         # Initialize DatasetDefinition with YAML data
         return DatasetDefinition(**data)
