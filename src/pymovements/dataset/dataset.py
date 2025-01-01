@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 The pymovements Project Authors
+# Copyright (c) 2022-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,7 @@ from pymovements.dataset import dataset_files
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_paths import DatasetPaths
+from pymovements.dataset.yaml_dataset_loader import YAMLDatasetLoader
 from pymovements.events.frame import EventDataFrame
 from pymovements.events.precomputed import PrecomputedEventDataFrame
 from pymovements.events.processing import EventGazeProcessor
@@ -47,17 +48,17 @@ class Dataset:
 
     Parameters
     ----------
-    definition: str | DatasetDefinition | type[DatasetDefinition]
+    definition: str | DatasetDefinition | Path
         Dataset definition to initialize dataset with.
-    path : str | Path | DatasetPaths
-        Path to the dataset directory. You can set up a custom directory structure by passing a
-        :py:class:`~pymovements.DatasetPaths` instance.
+    path: str | Path | DatasetPaths
+        Path to the dataset directory. You can set up a custom directory structure
+        by passing a :py:class:`~pymovements.DatasetPaths` instance.
     """
 
     def __init__(
-            self,
-            definition: str | DatasetDefinition | type[DatasetDefinition],
-            path: str | Path | DatasetPaths,
+        self,
+        definition: str | DatasetDefinition | Path,
+        path: str | Path | DatasetPaths,
     ):
         self.fileinfo: pl.DataFrame = pl.DataFrame()
         self.gaze: list[GazeDataFrame] = []
@@ -65,17 +66,24 @@ class Dataset:
         self.precomputed_events: list[PrecomputedEventDataFrame] = []
         self.precomputed_reading_measures: list[ReadingMeasures] = []
 
-        if isinstance(definition, str):
-            definition = DatasetLibrary.get(definition)()
-        if isinstance(definition, type):
-            definition = definition()
-        self.definition = deepcopy(definition)
+        # Handle different definition input types
+        if isinstance(definition, (str, Path)):
+            # Check if it's a path to a YAML file
+            if isinstance(definition, Path) or str(definition).endswith('.yaml'):
+                self.definition = YAMLDatasetLoader.load_dataset_definition(definition)
+            else:
+                # Try to load from registered datasets
+                self.definition = DatasetLibrary.get(definition)
+        else:
+            self.definition = deepcopy(definition)
 
+        # Handle path setup
         if isinstance(path, (str, Path)):
             self.paths = DatasetPaths(root=path, dataset='.')
         else:
             self.paths = deepcopy(path)
-        # Fill dataset directory name with dataset definition name if specified.
+
+        # Fill dataset directory name with dataset definition name if specified
         self.paths.fill_name(self.definition.name)
 
     def load(
