@@ -79,11 +79,8 @@ class DatasetLibrary:
         """
         if name not in cls.definitions:
             raise KeyError(
-                f"Dataset '{name}' not found in library. Available datasets: {
-                    list(
-                        cls.definitions.keys()
-                    )
-                }",
+                f"Dataset '{name}' not found in library. "
+                f"Available datasets: {list(cls.definitions.keys())}",
             )
         return cls.definitions[name]
 
