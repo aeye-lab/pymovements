@@ -132,6 +132,7 @@ class SBSAT(DatasetDefinition):
             'gaze': True,
             'precomputed_events': True,
             'precomputed_reading_measures': False,
+            'precomputed_aois': True,
         },
     )
     mirrors: dict[str, tuple[str, ...]] = field(
@@ -141,6 +142,9 @@ class SBSAT(DatasetDefinition):
                     'https://osf.io/download/',
                 ),
                 'precomputed_events': (
+                    'https://raw.githubusercontent.com/ahnchive/SB-SAT/master/fixation/',
+                ),
+                'precomputed_aois': (
                     'https://raw.githubusercontent.com/ahnchive/SB-SAT/master/fixation/',
                 ),
             },
