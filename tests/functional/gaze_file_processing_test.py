@@ -80,7 +80,7 @@ def fixture_gaze_init_kwargs(request):
             'experiment': pm.Experiment(
                 1280, 1024, 38, 30.2, 68, 'upper left',
                 eyetracker=pm.EyeTracker(
-                    sampling_rate=2000.0, left=False, right=True,
+                    sampling_rate=2000.0, left=True, right=False,
                     model='EyeLink Portable Duo', vendor='EyeLink',
                 ),
             ),
@@ -90,7 +90,7 @@ def fixture_gaze_init_kwargs(request):
             'experiment': pm.Experiment(
                 1280, 1024, 38, 30.2, 68, 'upper left',
                 eyetracker=pm.EyeTracker(
-                    sampling_rate=1000.0, left=False, right=True,
+                    sampling_rate=1000.0, left=True, right=False,
                     model='EyeLink Portable Duo', vendor='EyeLink',
                 ),
             ),
