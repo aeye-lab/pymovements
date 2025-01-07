@@ -192,7 +192,10 @@ def test_from_asc_raises_exception(kwargs, exception, message):
     ('file', 'sampling_rate'),
     [
         pytest.param('tests/files/eyelink_monocular_example.asc', 1000.0, id='1khz'),
-        pytest.param('tests/files/eyelink_monocular_no_dummy_example.asc', 1000.0, id='1khz_no_dummy'),
+        pytest.param(
+            'tests/files/eyelink_monocular_no_dummy_example.asc',
+            1000.0,
+            id='1khz_no_dummy'),
         pytest.param('tests/files/eyelink_monocular_2khz_example.asc', 2000.0, id='2khz'),
     ],
 )
