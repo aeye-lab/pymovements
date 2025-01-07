@@ -79,7 +79,7 @@ def fixture_gaze_init_kwargs(request):
             'file': 'tests/files/eyelink_monocular_2khz_example.asc',
             'experiment': pm.Experiment(
                 1280, 1024, 38, 30.2, 68, 'upper left',
-                eyetracker=EyeTracker(
+                eyetracker=pm.EyeTracker(
                     sampling_rate=2000.0, left=False, right=True,
                     model='EyeLink Portable Duo', vendor='EyeLink',
                 ),
@@ -89,7 +89,7 @@ def fixture_gaze_init_kwargs(request):
             'file': 'tests/files/eyelink_monocular_no_dummy_example.asc',
             'experiment': pm.Experiment(
                 1280, 1024, 38, 30.2, 68, 'upper left',
-                eyetracker=EyeTracker(
+                eyetracker=pm.EyeTracker(
                     sampling_rate=1000.0, left=False, right=True,
                     model='EyeLink Portable Duo', vendor='EyeLink',
                 ),
