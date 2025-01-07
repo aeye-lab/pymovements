@@ -128,6 +128,36 @@ import pymovements as pm
             ),
             id='eyelink_asc_mono_2khz_pattern_eyelink',
         ),
+        pytest.param(
+            {
+                'file': 'tests/files/eyelink_monocular_no_dummy_example.asc',
+                'patterns': 'eyelink',
+            },
+            pl.from_dict(
+                data={
+                    'time': [
+                        2154556, 2154557, 2154560, 2154564, 2154596, 2154598, 2154599, 2154695,
+                        2154696, 2339227, 2339245, 2339246, 2339271, 2339272, 2339290, 2339291,
+                    ],
+                    'pupil': [
+                        778.0, 778.0, 777.0, 778.0, 784.0, 784.0, 784.0, 798.0,
+                        799.0, 619.0, 621.0, 622.0, 617.0, 617.0, 618.0, 618.0,
+                    ],
+                    'pixel': [
+                        [138.1, 132.8], [138.2, 132.7], [137.9, 131.6], [138.1, 131.0],
+                        [139.6, 132.1], [139.5, 131.9], [139.5, 131.8], [147.2, 134.4],
+                        [147.3, 134.1], [673.2, 523.8], [629.0, 531.4], [629.9, 531.9],
+                        [639.4, 531.9], [639.0, 531.9], [637.6, 531.4], [637.3, 531.2],
+                    ],
+                },
+                schema={
+                    'time': pl.Int64,
+                    'pupil': pl.Float64,
+                    'pixel': pl.List(pl.Float64),
+                },
+            ),
+            id='eyelink_asc_mono_no_dummy_pattern_eyelink',
+        ),
     ],
 )
 def test_from_asc_has_shape_and_schema(kwargs, expected_frame):
@@ -162,6 +192,7 @@ def test_from_asc_raises_exception(kwargs, exception, message):
     ('file', 'sampling_rate'),
     [
         pytest.param('tests/files/eyelink_monocular_example.asc', 1000.0, id='1khz'),
+        pytest.param('tests/files/eyelink_monocular_no_dummy_example.asc', 1000.0, id='1khz_no_dummy'),
         pytest.param('tests/files/eyelink_monocular_2khz_example.asc', 2000.0, id='2khz'),
     ],
 )
