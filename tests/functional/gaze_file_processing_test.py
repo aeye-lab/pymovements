@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2025 The pymovements Project Authors
+# Copyright (c) 2023-2024 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,8 @@ import pymovements as pm
         'ipc_monocular',
         'ipc_binocular',
         'eyelink_monocular',
+        'eyelink_monocular_2khz',
+        'eyelink_monocular_no_dummy',
         'didec',
         'emtec',
         'hbn',
@@ -71,7 +73,27 @@ def fixture_gaze_init_kwargs(request):
         },
         'eyelink_monocular': {
             'file': 'tests/files/eyelink_monocular_example.asc',
-            'experiment': pm.Experiment(1280, 1024, 38, 30, 60, 'upper left', 1000),
+            'experiment': pm.datasets.ToyDatasetEyeLink().experiment,
+        },
+        'eyelink_monocular_2khz': {
+            'file': 'tests/files/eyelink_monocular_2khz_example.asc',
+            'experiment': pm.Experiment(
+                1280, 1024, 38, 30.2, 68, 'upper left',
+                eyetracker=EyeTracker(
+                    sampling_rate=2000.0, left=False, right=True,
+                    model='EyeLink Portable Duo', vendor='EyeLink',
+                ),
+            ),
+        },
+        'eyelink_monocular_no_dummy': {
+            'file': 'tests/files/eyelink_monocular_no_dummy_example.asc',
+            'experiment': pm.Experiment(
+                1280, 1024, 38, 30.2, 68, 'upper left',
+                eyetracker=EyeTracker(
+                    sampling_rate=1000.0, left=False, right=True,
+                    model='EyeLink Portable Duo', vendor='EyeLink',
+                ),
+            ),
         },
         'didec': {
             'file': 'tests/files/didec_example.txt',
