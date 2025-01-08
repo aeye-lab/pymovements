@@ -20,7 +20,7 @@
 """Module for the TextDataFrame."""
 from __future__ import annotations
 
-from collections.abc import Collection
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
@@ -83,13 +83,13 @@ class TextStimulus:
 
     def split(
             self,
-            by: str | Collection[str],
+            by: str | Sequence[str],
     ) -> list[TextStimulus]:
         """Split the AOI df.
 
         Parameters
         ----------
-        by: str | Collection[str]
+        by: str | Sequence[str]
             Splitting criteria.
 
         Returns
