@@ -88,10 +88,10 @@ def fixture_gaze_init_kwargs(request):
         'eyelink_monocular_no_dummy': {
             'file': 'tests/files/eyelink_monocular_no_dummy_example.asc',
             'experiment': pm.Experiment(
-                1280, 1024, 38, 30.2, 68, 'upper left',
+                1920, 1080, 38, 30.2, 68, 'upper left',
                 eyetracker=pm.EyeTracker(
-                    sampling_rate=1000.0, left=True, right=False,
-                    model='EyeLink Portable Duo', vendor='EyeLink',
+                    sampling_rate=500.0, left=True, right=False,
+                    model='EyeLink 1000 Plus', vendor='EyeLink',
                 ),
             ),
         },
