@@ -189,28 +189,66 @@ def test_from_asc_raises_exception(kwargs, exception, message):
 
 
 @pytest.mark.parametrize(
-    ('file', 'sampling_rate'),
+    ('file', 'metadata'),
     [
-        pytest.param('tests/files/eyelink_monocular_example.asc', 1000.0, id='1khz'),
+        pytest.param(
+            'tests/files/eyelink_monocular_example.asc',
+            {
+                'width_px': 1280,
+                'height_px': 1024,
+                'sampling_rate': 1000.0,
+                'left': True,
+                'right': False,
+                'model': 'EyeLink Portable Duo',
+                'version': '6.12',
+                'vendor': 'EyeLink',
+                'mount': 'Desktop',
+            },
+            id='1khz',
+        ),
+        pytest.param(
+            'tests/files/eyelink_monocular_2khz_example.asc',
+            {
+                'width_px': 1280,
+                'height_px': 1024,
+                'sampling_rate': 2000.0,
+                'left': True,
+                'right': False,
+                'model': 'EyeLink Portable Duo',
+                'version': '6.12',
+                'vendor': 'EyeLink',
+                'mount': 'Desktop',
+            },
+            id='2khz',
+        ),
         pytest.param(
             'tests/files/eyelink_monocular_no_dummy_example.asc',
-            1000.0,
-            id='1khz_no_dummy',
+            {
+                'width_px': 1920,
+                'height_px': 1080,
+                'sampling_rate': 500.0,
+                'left': True,
+                'right': False,
+                'model': 'EyeLink 1000 Plus',
+                'version': '5.50',
+                'vendor': 'EyeLink',
+                'mount': 'Desktop',
+            },
+            id='500hz_no_dummy',
         ),
-        pytest.param('tests/files/eyelink_monocular_2khz_example.asc', 2000.0, id='2khz'),
     ],
 )
-def test_from_asc_fills_in_experiment_metadata(file, sampling_rate):
+def test_from_asc_fills_in_experiment_metadata(file, metadata):
     gaze = pm.gaze.from_asc(file, experiment=None)
-    assert gaze.experiment.screen.width_px == 1280
-    assert gaze.experiment.screen.height_px == 1024
-    assert gaze.experiment.eyetracker.sampling_rate == sampling_rate
-    assert gaze.experiment.eyetracker.left is True
-    assert gaze.experiment.eyetracker.right is False
-    assert gaze.experiment.eyetracker.model == 'EyeLink Portable Duo'
-    assert gaze.experiment.eyetracker.version == '6.12'
-    assert gaze.experiment.eyetracker.vendor == 'EyeLink'
-    assert gaze.experiment.eyetracker.mount == 'Desktop'
+    assert gaze.experiment.screen.width_px == metadata['width_px']
+    assert gaze.experiment.screen.height_px == metadata['height_px']
+    assert gaze.experiment.eyetracker.sampling_rate == metadata['sampling_rate']
+    assert gaze.experiment.eyetracker.left is metadata['left']
+    assert gaze.experiment.eyetracker.right is metadata['right']
+    assert gaze.experiment.eyetracker.model == metadata['model']
+    assert gaze.experiment.eyetracker.version == metadata['version']
+    assert gaze.experiment.eyetracker.vendor == metadata['vendor']
+    assert gaze.experiment.eyetracker.mount == metadata['mount']
 
 
 @pytest.mark.parametrize(
