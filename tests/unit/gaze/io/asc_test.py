@@ -177,7 +177,7 @@ def test_from_asc_has_frame_equal(kwargs, expected_frame):
             },
             (16, 3),
             {
-                'time': pl.Int64,
+                'time': pl.Float64,
                 'pupil': pl.Float64,
                 'pixel': pl.List(pl.Float64),
             },
