@@ -198,10 +198,11 @@ def test_from_asc_has_frame_equal(kwargs, expected_frame):
         ),
     ],
 )
-def test_from_asc_has_shape_and_schema(kwargs, expected_frame):
+def test_from_asc_has_shape_and_schema(kwargs, shape, schema):
     gaze = pm.gaze.from_asc(**kwargs)
 
-    assert_frame_equal(gaze.frame, expected_frame, check_column_order=False)
+    assert gaze.frame.shape == shape
+    assert gaze.frame.schema == schema
 
 
 @pytest.mark.parametrize(
