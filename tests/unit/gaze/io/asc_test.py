@@ -89,9 +89,9 @@ import pymovements as pm
                     'time': pl.Int64,
                     'pupil': pl.Float64,
                     'task': pl.Utf8,
-                    'trial_id': pl.Int64,
-                    'point_id': pl.Int64,
                     'screen_id': pl.Int64,
+                    'point_id': pl.Int64,
+                    'trial_id': pl.Int64,
                     'pixel': pl.List(pl.Float64),
                 },
             ),
@@ -163,9 +163,9 @@ def test_from_asc_has_frame_equal(kwargs, expected_frame):
                 'time': pl.Int64,
                 'pupil': pl.Float64,
                 'task': pl.Utf8,
-                'trial_id': pl.Int64,
-                'point_id': pl.Int64,
                 'screen_id': pl.Int64,
+                'point_id': pl.Int64,
+                'trial_id': pl.Int64,
                 'pixel': pl.List(pl.Float64),
             },
             id='eyelink_asc_mono_pattern_list',
@@ -202,8 +202,6 @@ def test_from_asc_has_shape_and_schema(kwargs, shape, schema):
     gaze = pm.gaze.from_asc(**kwargs)
 
     assert gaze.frame.shape == shape
-    print(schema)
-    print(gaze.frame.schema)
     assert gaze.frame.schema == schema
 
 
