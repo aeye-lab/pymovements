@@ -187,7 +187,7 @@ EXPECTED_DF = polars.DataFrame(
             Path('tests/files/toy_text_1_1_aoi.csv'),
             {'separator': ','},
             EXPECTED_DF,
-            id='toy_text_1_1_aoi',
+            id='toy_text_1_1_aoi_sep',
         ),
     ],
 )
@@ -239,7 +239,7 @@ def test_text_stimulus_unsupported_format():
         pytest.param(
             Path('tests/files/toy_text_1_1_aoi.csv'),
             {'separator': ','},
-            id='toy_text_1_1_aoi',
+            id='toy_text_1_1_aoi_sep',
         ),
     ],
 )
@@ -270,7 +270,7 @@ def test_text_stimulus_splitting(aoi_file, custom_read_kwargs):
         pytest.param(
             Path('tests/files/toy_text_1_1_aoi.csv'),
             {'separator': ','},
-            id='toy_text_1_1_aoi',
+            id='toy_text_1_1_aoi_sep',
         ),
     ],
 )
@@ -301,7 +301,7 @@ def test_text_stimulus_splitting_unique_within(aoi_file, custom_read_kwargs):
         pytest.param(
             Path('tests/files/toy_text_1_1_aoi.csv'),
             {'separator': ','},
-            id='toy_text_1_1_aoi',
+            id='toy_text_1_1_aoi_sep',
         ),
     ],
 )
