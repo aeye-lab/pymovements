@@ -202,7 +202,7 @@ def test_from_asc_has_shape_and_schema(kwargs, shape, schema):
     gaze = pm.gaze.from_asc(**kwargs)
 
     assert gaze.frame.shape == shape
-    assert gaze.frame.schema == schema
+    assert dict(gaze.frame.schema) == schema
 
 
 @pytest.mark.parametrize(
