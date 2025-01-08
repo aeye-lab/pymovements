@@ -144,7 +144,7 @@ def test_from_asc_has_frame_equal(kwargs, expected_frame):
                 'file': 'tests/files/eyelink_monocular_example.asc',
                 'patterns': 'eyelink',
             },
-            (18, 3),
+            (16, 3),
             {
                 'time': pl.Int64,
                 'pupil': pl.Float64,
@@ -158,7 +158,7 @@ def test_from_asc_has_frame_equal(kwargs, expected_frame):
                 'patterns': pm.datasets.ToyDatasetEyeLink().custom_read_kwargs['gaze']['patterns'],
                 'schema': pm.datasets.ToyDatasetEyeLink().custom_read_kwargs['gaze']['schema'],
             },
-            (18, 7),
+            (16, 7),
             {
                 'time': pl.Int64,
                 'pupil': pl.Float64,
@@ -175,7 +175,7 @@ def test_from_asc_has_frame_equal(kwargs, expected_frame):
                 'file': 'tests/files/eyelink_monocular_2khz_example.asc',
                 'patterns': 'eyelink',
             },
-            (18, 3),
+            (16, 3),
             {
                 'time': pl.Int64,
                 'pupil': pl.Float64,
