@@ -397,18 +397,18 @@ def from_asc(
     if experiment.eyetracker.left is None:
         experiment.eyetracker.left = asc_left_eye
     elif experiment.eyetracker.left != asc_left_eye:
-        issues.append(f"Left eye tracked: {experiment.eyetracker.left} vs. {asc_left_eye}")
+        issues.append(f'Left eye tracked: {experiment.eyetracker.left} vs. {asc_left_eye}')
     if experiment.eyetracker.right is None:
         experiment.eyetracker.right = asc_right_eye
     elif experiment.eyetracker.right != asc_right_eye:
-        issues.append(f"Right eye tracked: {experiment.eyetracker.right} vs. {asc_right_eye}")
+        issues.append(f'Right eye tracked: {experiment.eyetracker.right} vs. {asc_right_eye}')
 
     # Mount configuration
     if experiment.eyetracker.mount is None:
         experiment.eyetracker.mount = metadata['mount_configuration']['mount_type']
     elif experiment.eyetracker.mount != metadata['mount_configuration']['mount_type']:
         issues.append(
-            f"Mount configuration: {experiment.eyetracker.mount} vs. "
+            f'Mount configuration: {experiment.eyetracker.mount} vs. '
             f"{metadata['mount_configuration']['mount_type']}",
         )
 
@@ -417,7 +417,7 @@ def from_asc(
     if experiment.eyetracker.vendor is None:
         experiment.eyetracker.vendor = asc_vendor
     elif experiment.eyetracker.vendor != asc_vendor:
-        issues.append(f"Eye tracker vendor: {experiment.eyetracker.vendor} vs. {asc_vendor}")
+        issues.append(f'Eye tracker vendor: {experiment.eyetracker.vendor} vs. {asc_vendor}')
 
     # Eye tracker model
     if experiment.eyetracker.model is None:
@@ -430,7 +430,7 @@ def from_asc(
         experiment.eyetracker.version = metadata['version_number']
     elif experiment.eyetracker.version != metadata['version_number']:
         issues.append(
-            f"Eye tracker software version: {experiment.eyetracker.version} vs. "
+            f'Eye tracker software version: {experiment.eyetracker.version} vs. '
             f"{metadata['version_number']}",
         )
 
