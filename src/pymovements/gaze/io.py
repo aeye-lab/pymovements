@@ -407,8 +407,10 @@ def from_asc(
     if experiment.eyetracker.mount is None:
         experiment.eyetracker.mount = metadata['mount_configuration']['mount_type']
     elif experiment.eyetracker.mount != metadata['mount_configuration']['mount_type']:
-        issues.append(f"Mount configuration: {experiment.eyetracker.mount} vs. "
-                      f"{metadata['mount_configuration']['mount_type']}")
+        issues.append(
+            f"Mount configuration: {experiment.eyetracker.mount} vs. "
+            f"{metadata['mount_configuration']['mount_type']}",
+        )
 
     # Eye tracker vendor
     asc_vendor = 'EyeLink' if 'EyeLink' in metadata['model'] else None
@@ -427,8 +429,10 @@ def from_asc(
     if experiment.eyetracker.version is None:
         experiment.eyetracker.version = metadata['version_number']
     elif experiment.eyetracker.version != metadata['version_number']:
-        issues.append(f"Eye tracker software version: {experiment.eyetracker.version} vs. "
-                      f"{metadata['version_number']}")
+        issues.append(
+            f"Eye tracker software version: {experiment.eyetracker.version} vs. "
+            f"{metadata['version_number']}",
+        )
 
     if issues:
         raise ValueError(
