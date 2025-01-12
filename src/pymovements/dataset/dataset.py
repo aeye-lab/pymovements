@@ -701,7 +701,7 @@ class Dataset:
             event_properties: str | tuple[str, dict[str, Any]]
             | list[str | tuple[str, dict[str, Any]]],
             name: str | None = None,
-            progress_bar: bool = True,
+            verbose: bool = True,
     ) -> Dataset:
         """Calculate an event property for and add it as a column to the event dataframe.
 
@@ -711,7 +711,7 @@ class Dataset:
             The event properties to compute.
         name: str | None
             Process only events that match the name. (default: None)
-        progress_bar : bool
+        verbose : bool
             If ``True``, show progress bar info. (default: True)
 
         Raises
@@ -727,7 +727,7 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
-        for gaze in tqdm(self.gaze, disable=not progress_bar):
+        for gaze in tqdm(self.gaze, disable=not verbose):
             gaze.compute_event_properties(event_properties, name=name)
         return self
 
@@ -736,7 +736,7 @@ class Dataset:
             event_properties: str | tuple[str, dict[str, Any]]
             | list[str | tuple[str, dict[str, Any]]],
             name: str | None = None,
-            progress_bar: bool = True,
+            verbose: bool = True,
     ) -> Dataset:
         """Calculate an event property for and add it as a column to the event dataframe.
 
@@ -748,7 +748,7 @@ class Dataset:
             The event properties to compute.
         name: str | None
             Process only events that match the name. (default: None)
-        progress_bar: bool
+        verbose: bool
             If ``True``, show progress bar. (default: True)
 
         Returns
@@ -765,7 +765,7 @@ class Dataset:
         return self.compute_event_properties(
             event_properties=event_properties,
             name=name,
-            progress_bar=progress_bar,
+            verbose=verbose,
         )
 
     def clear_events(self) -> Dataset:
