@@ -133,8 +133,8 @@ class Dataset:
         self.fileinfo = dataset_files.take_subset(fileinfo=self.fileinfo, subset=subset)
         columns = self.fileinfo['gaze'].columns if 'gaze' in self.fileinfo else []
         self.trial_columns = [
-                column for column in columns if column != 'filepath'
-            ]
+            column for column in columns if column != 'filepath'
+        ]
 
         if self.definition.has_files['gaze']:
             self.load_gaze_files(
