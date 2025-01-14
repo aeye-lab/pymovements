@@ -86,6 +86,7 @@ class Dataset:
             events_dirname: str | None = None,
             preprocessed_dirname: str | None = None,
             extension: str = 'feather',
+            set_trial_columns: bool = False,
     ) -> Dataset:
         """Parse file information and load all gaze files.
 
@@ -124,12 +125,18 @@ class Dataset:
         """
         self.scan()
         self.fileinfo = dataset_files.take_subset(fileinfo=self.fileinfo, subset=subset)
+        self.trial_columns = [
+            column
+            for column in self.fileinfo['gaze'].columns
+            if column != 'filepath'
+        ]
 
         if self.definition.has_files['gaze']:
             self.load_gaze_files(
                 preprocessed=preprocessed,
                 preprocessed_dirname=preprocessed_dirname,
                 extension=extension,
+                set_trial_columns=set_trial_columns,
             )
 
         # Event files precomuted by authors of the dataset
@@ -146,6 +153,8 @@ class Dataset:
                 events_dirname=events_dirname,
                 extension=extension,
             )
+            for loaded_gaze_df, loaded_events_df in zip(self.gaze, self.events):
+                loaded_gaze_df.events = loaded_events_df
 
         return self
 
@@ -172,6 +181,7 @@ class Dataset:
             preprocessed: bool = False,
             preprocessed_dirname: str | None = None,
             extension: str = 'feather',
+            set_trial_columns: bool = False,
     ) -> Dataset:
         """Load all available gaze data files.
 
@@ -188,6 +198,11 @@ class Dataset:
         extension: str
             Specifies the file format for loading data. Valid options are: `csv`, `feather`.
             (default: 'feather')
+        set_trial_columns: bool
+            If ``True``, sets the trial columns for each GazeDataFrame with the columns
+            that are not 'fileinfo' defined at the dataset level. (default: False)
+            Useful when preprocessed feather files do not have trial columns
+            defined at the dataframe level.
 
         Returns
         -------
@@ -210,6 +225,10 @@ class Dataset:
             preprocessed_dirname=preprocessed_dirname,
             extension=extension,
         )
+        if set_trial_columns:
+            for gaze_df in self.gaze:
+                gaze_df.trial_columns = self.trial_columns
+
         return self
 
     def load_precomputed_events(self) -> None:
