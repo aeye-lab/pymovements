@@ -120,7 +120,7 @@ class Dataset:
             (default: 'feather')
         set_trial_columns: bool
             If ``True``, sets the trial columns for each GazeDataFrame with the columns
-            that are not 'fileinfo' defined at the dataset level. (default: False)
+            that are not `fileinfo` defined at the dataset level. (default: False)
             Useful when preprocessed feather files do not have trial columns
             defined at the dataframe level.
 
