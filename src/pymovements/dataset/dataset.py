@@ -117,6 +117,11 @@ class Dataset:
         extension: str
             Specifies the file format for loading data. Valid options are: `csv`, `feather`.
             (default: 'feather')
+        set_trial_columns: bool
+            If ``True``, sets the trial columns for each GazeDataFrame with the columns
+            that are not 'fileinfo' defined at the dataset level. (default: False)
+            Useful when preprocessed feather files do not have trial columns
+            defined at the dataframe level.
 
         Returns
         -------

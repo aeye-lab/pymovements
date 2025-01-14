@@ -1569,10 +1569,10 @@ def test_event_dataframe_add_property_raises_exceptions(
     dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True, set_trial_columns=True)
     identifier_columns = [
-            column
-            for column in dataset.fileinfo['gaze'].columns
-            if column != 'filepath'
-        ]
+        column
+        for column in dataset.fileinfo['gaze'].columns
+        if column != 'filepath'
+    ]
     for gaze, events in zip(dataset.gaze, dataset.events):
         gaze.events = events
         gaze.trial_columns = identifier_columns
@@ -1597,14 +1597,14 @@ def test_event_dataframe_add_property_has_expected_height(
 ):
     dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True, set_trial_columns=True)
-    #identifier_columns = [
+    # identifier_columns = [
     #        column
     #        for column in dataset.fileinfo['gaze'].columns
     #        if column != 'filepath'
     #    ]
-    #for gaze, events in zip(dataset.gaze, dataset.events):
-        #gaze.events = events
-        #gaze.trial_columns = identifier_columns
+    # for gaze, events in zip(dataset.gaze, dataset.events):
+    # gaze.events = events
+    # gaze.trial_columns = identifier_columns
 
     expected_heights = [len(event_df) for event_df in dataset.events]
 
@@ -1647,10 +1647,10 @@ def test_event_dataframe_add_property_has_expected_schema(
     dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True, set_trial_columns=True)
     identifier_columns = [
-            column
-            for column in dataset.fileinfo['gaze'].columns
-            if column != 'filepath'
-        ]
+        column
+        for column in dataset.fileinfo['gaze'].columns
+        if column != 'filepath'
+    ]
     for gaze, events in zip(dataset.gaze, dataset.events):
         gaze.events = events
         gaze.trial_columns = identifier_columns
@@ -1694,10 +1694,10 @@ def test_event_dataframe_add_property_effect_property_columns(
     dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True, set_trial_columns=True)
     identifier_columns = [
-            column
-            for column in dataset.fileinfo['gaze'].columns
-            if column != 'filepath'
-        ]
+        column
+        for column in dataset.fileinfo['gaze'].columns
+        if column != 'filepath'
+    ]
     for gaze, events in zip(dataset.gaze, dataset.events):
         gaze.events = events
         gaze.trial_columns = identifier_columns
@@ -1727,10 +1727,10 @@ def test_event_dataframe_add_property_raises_exception(
     dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True, set_trial_columns=True)
     identifier_columns = [
-            column
-            for column in dataset.fileinfo['gaze'].columns
-            if column != 'filepath'
-        ]
+        column
+        for column in dataset.fileinfo['gaze'].columns
+        if column != 'filepath'
+    ]
     for gaze, events in zip(dataset.gaze, dataset.events):
         gaze.events = events
         gaze.trial_columns = identifier_columns
@@ -1766,10 +1766,10 @@ def test_event_dataframe_add_property_does_not_change_length(
     dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True, set_trial_columns=True)
     identifier_columns = [
-            column
-            for column in dataset.fileinfo['gaze'].columns
-            if column != 'filepath'
-        ]
+        column
+        for column in dataset.fileinfo['gaze'].columns
+        if column != 'filepath'
+    ]
     for gaze, events in zip(dataset.gaze, dataset.events):
         gaze.events = events
         gaze.trial_columns = identifier_columns
@@ -1798,10 +1798,10 @@ def test_compute_event_properties_alias(gaze_dataset_configuration, property_kwa
     dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True, set_trial_columns=True)
     identifier_columns = [
-            column
-            for column in dataset.fileinfo['gaze'].columns
-            if column != 'filepath'
-        ]
+        column
+        for column in dataset.fileinfo['gaze'].columns
+        if column != 'filepath'
+    ]
     for gaze, events in zip(dataset.gaze, dataset.events):
         gaze.events = events
         gaze.trial_columns = identifier_columns
