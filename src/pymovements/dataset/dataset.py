@@ -63,6 +63,7 @@ class Dataset:
         self.events: list[EventDataFrame] = []
         self.precomputed_events: list[PrecomputedEventDataFrame] = []
         self.precomputed_reading_measures: list[ReadingMeasures] = []
+        self.trial_columns: list[str] = []
 
         if isinstance(definition, str):
             definition = DatasetLibrary.get(definition)()
