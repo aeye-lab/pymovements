@@ -308,14 +308,15 @@ def load_gaze_file(
         [column for column in fileinfo_row.keys() if column != 'filepath']
     }
 
-    if definition.trial_columns:
-        trial_columns = definition.trial_columns
+    if not definition.trial_columns and not add_columns:
+        trial_columns = None
     else:
-        trial_columns = []
-    # expand trial columns with added fileinfo columns
-    trial_columns = list(add_columns) + trial_columns
-    if not trial_columns:
-        trial_columns = None  # trial_columns == None if list is empty
+        if not definition.trial_columns:
+            trial_columns = []
+        else:
+            trial_columns = definition.trial_columns
+        # expand trial columns with added fileinfo columns
+        trial_columns = list(add_columns) + trial_columns
 
     if filepath.suffix in {'.csv', '.txt', '.tsv'}:
         if preprocessed:
