@@ -313,7 +313,7 @@ def load_gaze_file(
     else:
         trial_columns = []
     # expand trial columns with added fileinfo columns
-    trial_columns = [column for column in add_columns] + trial_columns
+    trial_columns = list(add_columns) + trial_columns
 
     if filepath.suffix in {'.csv', '.txt', '.tsv'}:
         if preprocessed:
