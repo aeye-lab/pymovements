@@ -304,9 +304,16 @@ def load_gaze_file(
         custom_read_kwargs = {}
 
     add_columns = {
-        key: fileinfo_row[key] for key in
-        [key for key in fileinfo_row.keys() if key != 'filepath']
+        column: fileinfo_row[column] for column in
+        [column for column in fileinfo_row.keys() if column != 'filepath']
     }
+
+    if definition.trial_columns:
+        trial_columns = definition.trial_columns
+    else:
+        trial_columns = []
+    # expand trial columns with added fileinfo columns
+    trial_columns = [column for column in add_columns] + trial_columns
 
     if filepath.suffix in {'.csv', '.txt', '.tsv'}:
         if preprocessed:
@@ -315,7 +322,7 @@ def load_gaze_file(
 
             gaze_df = from_csv(
                 filepath,
-                trial_columns=definition.trial_columns,
+                trial_columns=trial_columns,
                 time_unit=time_unit,
                 add_columns=add_columns,
                 column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
@@ -363,7 +370,7 @@ def load_gaze_file(
                 position_columns=definition.position_columns,
                 velocity_columns=definition.velocity_columns,
                 acceleration_columns=definition.acceleration_columns,
-                trial_columns=definition.trial_columns,
+                trial_columns=trial_columns,
                 column_map=definition.column_map,
                 add_columns=add_columns,
                 column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
@@ -373,6 +380,7 @@ def load_gaze_file(
         gaze_df = from_ipc(
             filepath,
             experiment=definition.experiment,
+            trial_columns=trial_columns,
             add_columns=add_columns,
             column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
         )
@@ -380,6 +388,7 @@ def load_gaze_file(
         gaze_df = from_asc(
             filepath,
             experiment=definition.experiment,
+            trial_columns=trial_columns,
             add_columns=add_columns,
             column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
             **custom_read_kwargs,

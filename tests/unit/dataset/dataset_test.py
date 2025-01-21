@@ -409,6 +409,7 @@ def mock_toy(
         'event_dfs': event_dfs,
         'precomputed_rm_dfs': precomputed_rm_dfs,
         'eyes': eyes,
+        'trial_columns': ['subject_id'],
     }
 
 
@@ -487,6 +488,15 @@ def test_load_correct_preprocessed_gaze_dfs(gaze_dataset_configuration):
             expected_gaze_df.frame,
             check_column_order=False,
         )
+
+
+def test_load_correct_trial_columns(gaze_dataset_configuration):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset.load()
+
+    expected_trial_columns = gaze_dataset_configuration['trial_columns']
+    for result_gaze_df in dataset.gaze:
+        assert result_gaze_df.trial_columns == expected_trial_columns
 
 
 def test_load_correct_event_dfs(gaze_dataset_configuration):
