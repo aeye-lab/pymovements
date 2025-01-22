@@ -1530,6 +1530,38 @@ def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_tr
                 'data': pl.DataFrame(
                     schema={
                         'x': pl.Float64, 'y': pl.Float64,
+                        'trial': pl.Int64, 'time': pl.Float64,
+                    },
+                ),
+                'pixel_columns': ['x', 'y'],
+                'trial_columns': ['trial', 'trial'],
+            },
+            ValueError,
+            'duplicates in trial_columns: trial',
+            id='duplicate_trial_columns',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.DataFrame(
+                    schema={
+                        'x': pl.Float64, 'y': pl.Float64,
+                        'time': pl.Float64, 'bar': pl.Int64,
+                    },
+                ),
+                'pixel_columns': ['x', 'y'],
+                'trial_columns': ['foo', 'bar'],
+            },
+            KeyError,
+            'trial_columns missing in data: foo',
+            id='trial_columns_not_in_data',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.DataFrame(
+                    schema={
+                        'x': pl.Float64, 'y': pl.Float64,
                         'time': pl.Float64,
                     },
                 ),

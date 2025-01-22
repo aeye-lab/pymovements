@@ -202,7 +202,10 @@ class GazeDataFrame:
         # Set nan values to null.
         self.frame = self.frame.fill_nan(None)
 
-        self.trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
+        trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
+        _check_trial_columns(trial_columns, data)
+
+        self.trial_columns = trial_columns
         self.experiment = experiment
 
         # In case the 'time' column is already present we don't need to do anything.
@@ -1451,3 +1454,24 @@ class GazeDataFrame:
     def __repr__(self: Any) -> str:
         """Return string representation of GazeDataFrame."""
         return self.__str__()
+
+
+def _check_trial_columns(trial_columns: list[str] | None, data: pl.DataFrame) -> None:
+    if trial_columns:
+        # Make sure there are no duplicates in trial_columns, else polars raises DuplicateError.
+        if len(set(trial_columns)) != len(trial_columns):
+            seen = set()
+            dupes = []
+            for column in trial_columns:
+                if column in seen:
+                    dupes.append(column)
+                else:
+                    seen.add(column)
+
+            raise ValueError(f'duplicates in trial_columns: {", ".join(dupes)}')
+
+        # Make sure all trial_columns exist in data.
+        if len(set(trial_columns).intersection(data.columns)) != len(trial_columns):
+            missing = set(trial_columns) - set(data.columns)
+            raise KeyError(f'trial_columns missing in data: {", ".join(missing)}')
+

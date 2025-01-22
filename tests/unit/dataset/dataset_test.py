@@ -499,6 +499,25 @@ def test_load_correct_trial_columns(gaze_dataset_configuration):
         assert result_gaze_df.trial_columns == expected_trial_columns
 
 
+@pytest.mark.parametrize(
+    'gaze_dataset_configuration',
+    ['ToyMono'],
+    indirect=['gaze_dataset_configuration'],
+)
+def test_load_fileinfo_column_in_trial_columns_warns(gaze_dataset_configuration):
+    # add fileinfo column as trial column
+    gaze_dataset_configuration['init_kwargs']['definition'].trial_columns = ['subject_id']
+
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+
+    with pytest.warns(UserWarning) as record:
+        dataset.load()
+
+    expected_msg = 'removed duplicated fileinfo columns from trial_columns: subject_id'
+    assert record[0].message.args[0] == expected_msg
+
+
+
 def test_load_correct_event_dfs(gaze_dataset_configuration):
     dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(events=True)
