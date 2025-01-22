@@ -309,9 +309,10 @@ def load_gaze_file(
         [column for column in fileinfo_row.keys() if column != 'filepath']
     }
 
+    # check if we have any trial or fileinfo columns specified.
     if not definition.trial_columns and not fileinfo_columns:
         trial_columns = None
-    else:
+    else:  # at least one element exists, check for duplicates and merge columns
         if not definition.trial_columns:
             trial_columns = []
         else:
