@@ -45,7 +45,7 @@ from pymovements.measure import register_sample_measure
 from pymovements.measure import SampleMeasureLibrary
 from pymovements.stimulus import text
 
- 
+
 __all__ = [
     'Dataset',
     'DatasetDefinition',
