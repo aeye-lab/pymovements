@@ -203,7 +203,7 @@ class GazeDataFrame:
         self.frame = self.frame.fill_nan(None)
 
         trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
-        if len(trial_columns) == 0:
+        if trial_columns is not None and len(trial_columns) == 0:
             trial_columns = None
         _check_trial_columns(trial_columns, data)
 
