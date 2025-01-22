@@ -187,9 +187,7 @@ class PoTeC(DatasetDefinition):
         },
     )
 
-    trial_columns: list[str] = field(
-        default_factory=lambda: ['subject_id', 'text_id'],
-    )
+    trial_columns: list[str] = field(default_factory=lambda: [])
 
     time_column: str = 'time'
 

@@ -189,9 +189,7 @@ class GazeBase(DatasetDefinition):
         },
     )
 
-    trial_columns: list[str] = field(
-        default_factory=lambda: ['round_id', 'subject_id', 'session_id', 'task_name'],
-    )
+    trial_columns: list[str] = field(default_factory=lambda: [])
 
     time_column: str = 'n'
 
