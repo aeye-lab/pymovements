@@ -1457,6 +1457,13 @@ class GazeDataFrame:
 
 
 def _check_trial_columns(trial_columns: list[str] | None, data: pl.DataFrame) -> None:
+    """Checks trial_columns for integrity.
+
+    Parameters
+    ----------
+    trial_columns: The name of the trial columns in the input data frame.
+    data: The dataframe which holds the columns.
+    """
     if trial_columns:
         # Make sure there are no duplicates in trial_columns, else polars raises DuplicateError.
         if len(set(trial_columns)) != len(trial_columns):
