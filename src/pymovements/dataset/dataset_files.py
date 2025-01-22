@@ -313,10 +313,7 @@ def load_gaze_file(
     if not definition.trial_columns:
         trial_columns = list(fileinfo_columns)
     else:  # check for duplicates and merge.
-        if not definition.trial_columns:
-            trial_columns = []
-        else:
-            trial_columns = definition.trial_columns
+        trial_columns = definition.trial_columns
 
         # Make sure fileinfo row is not duplicated as a trial_column:
         if set(trial_columns).intersection(list(fileinfo_columns)):
