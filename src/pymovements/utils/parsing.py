@@ -35,7 +35,7 @@ EYE_TRACKING_SAMPLE = re.compile(
     r'(?P<x_pix>[-]?\d*[.]\d*)\s+'
     r'(?P<y_pix>[-]?\d*[.]\d*)\s+'
     r'(?P<pupil>\d*[.]\d*)\s+'
-    r'(?P<dummy>\d*[.]\d*)\s+'
+    r'((?P<dummy>\d*[.]\d*)\s+)?'  # optional dummy column
     r'(?P<dots>[A-Za-z.]{3,5})?\s*',
 )
 
