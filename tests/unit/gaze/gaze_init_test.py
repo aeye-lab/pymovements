@@ -1009,6 +1009,18 @@ def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, exp
                     data={'trial': [1]},
                     schema={'trial': pl.Int64},
                 ),
+                'trial_columns': [],
+            },
+            None,
+            id='df_empty_trial_columns',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    data={'trial': [1]},
+                    schema={'trial': pl.Int64},
+                ),
                 'trial_columns': 'trial',
             },
             ['trial'],
@@ -1523,6 +1535,38 @@ def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_tr
             ValueError,
             "experiment with sampling rate must be specified if time_unit is 'step'",
             id='time_unit_step_no_experiment',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.DataFrame(
+                    schema={
+                        'x': pl.Float64, 'y': pl.Float64,
+                        'trial': pl.Int64, 'time': pl.Float64,
+                    },
+                ),
+                'pixel_columns': ['x', 'y'],
+                'trial_columns': ['trial', 'trial'],
+            },
+            ValueError,
+            'duplicates in trial_columns: trial',
+            id='duplicate_trial_columns',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.DataFrame(
+                    schema={
+                        'x': pl.Float64, 'y': pl.Float64,
+                        'time': pl.Float64, 'bar': pl.Int64,
+                    },
+                ),
+                'pixel_columns': ['x', 'y'],
+                'trial_columns': ['foo', 'bar'],
+            },
+            KeyError,
+            'trial_columns missing in data: foo',
+            id='trial_columns_not_in_data',
         ),
 
         pytest.param(
