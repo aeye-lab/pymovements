@@ -318,7 +318,7 @@ def load_gaze_file(
             trial_columns = definition.trial_columns
 
         # Make sure fileinfo row is not duplicated as a trial_column:
-        if set(trial_columns).union(list(fileinfo_columns)):
+        if set(trial_columns).intersection(list(fileinfo_columns)):
             dupes = set(trial_columns).intersection(list(fileinfo_columns))
             warnings.warn(
                 f'removed duplicated fileinfo columns from trial_columns: {", ".join(dupes)}',
