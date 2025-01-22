@@ -517,7 +517,6 @@ def test_load_fileinfo_column_in_trial_columns_warns(gaze_dataset_configuration)
     assert record[0].message.args[0] == expected_msg
 
 
-
 def test_load_correct_event_dfs(gaze_dataset_configuration):
     dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(events=True)

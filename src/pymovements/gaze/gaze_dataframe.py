@@ -1474,4 +1474,3 @@ def _check_trial_columns(trial_columns: list[str] | None, data: pl.DataFrame) ->
         if len(set(trial_columns).intersection(data.columns)) != len(trial_columns):
             missing = set(trial_columns) - set(data.columns)
             raise KeyError(f'trial_columns missing in data: {", ".join(missing)}')
-
