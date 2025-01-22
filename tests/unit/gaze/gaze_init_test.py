@@ -1009,6 +1009,18 @@ def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, exp
                     data={'trial': [1]},
                     schema={'trial': pl.Int64},
                 ),
+                'trial_columns': [],
+            },
+            None,
+            id='df_empty_trial_columns',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    data={'trial': [1]},
+                    schema={'trial': pl.Int64},
+                ),
                 'trial_columns': 'trial',
             },
             ['trial'],

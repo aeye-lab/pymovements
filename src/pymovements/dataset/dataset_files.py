@@ -328,9 +328,6 @@ def load_gaze_file(
         # expand trial columns with added fileinfo columns
         trial_columns = list(fileinfo_columns) + trial_columns
 
-        if len(trial_columns) == 0:
-            trial_columns = None
-
     if filepath.suffix in {'.csv', '.txt', '.tsv'}:
         if preprocessed:
             # Time unit is always milliseconds for preprocessed data if a time column is present.
