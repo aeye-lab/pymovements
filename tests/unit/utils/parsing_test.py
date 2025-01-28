@@ -506,6 +506,35 @@ def test_parse_val_cal_eyelink_monocular_file():
         ),
         pytest.param(
             '** DATE: Wed Mar  8 09:25:20 2023\n'
+            'EVENTS	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2\n'
+            'SBLINK R 10000018\n'
+            '10000019	   .	   .	    0.0	...\n'
+            '10000020	   .	   .	    0.0	...\n'
+            'EBLINK R 10000018	10000020	2\n'
+            'SBLINK R 10000021\n'
+            '10000021	   .	   .	    0.0	...\n'
+            '10000022	   .	   .	    0.0 ...\n'
+            '10000023	   .	   .	    0.0	...\n'
+            '10000024	   .	   .	    0.0	...\n'
+            'EBLINK R 10000021	10000024	4\n',
+            [
+                {
+                    'duration_ms': 2,
+                    'num_samples': 2,
+                    'start_timestamp': 10000018,
+                    'stop_timestamp': 10000020,
+                },
+                {
+                    'duration_ms': 4,
+                    'num_samples': 4,
+                    'start_timestamp': 10000021,
+                    'stop_timestamp': 10000024,
+                },
+            ],
+            id='multiple_blinks_no_dummy',
+        ),
+        pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
             'SBLINK R 10000018\n'
             '10000019	   .	   .	    0.0	    0.0	...\n'
             '10000020	   .	   .	    0.0	    0.0	...\n'
@@ -528,7 +557,6 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
 
     assert parsed_metadata['blinks'] == expected_blinks
 
-
 @pytest.mark.parametrize(
     ('metadata', 'expected_blink_ratio', 'expected_overall_ratio'),
     [
@@ -543,6 +571,18 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
             1,
             1,
             id='only_blinks',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
+            'SBLINK R 10000018\n'
+            '10000019	   .	   .	    0.0	...\n'
+            '10000020	   .	   .	    0.0	...\n'
+            'EBLINK R 10000018	10000020	2\n'
+            'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            1,
+            1,
+            id='only_blinks_no_dummy',
         ),
         pytest.param(
             '** DATE: Wed Mar  8 09:25:20 2023\n'
@@ -654,6 +694,7 @@ def test_parse_eyelink_data_loss_ratio(
 
     assert parsed_metadata['data_loss_ratio_blinks'] == expected_blink_ratio
     assert parsed_metadata['data_loss_ratio'] == expected_overall_ratio
+
 
 
 def test_parse_eyelink_datetime(tmp_path):
