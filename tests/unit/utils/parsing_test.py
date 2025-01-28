@@ -557,6 +557,7 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
 
     assert parsed_metadata['blinks'] == expected_blinks
 
+
 @pytest.mark.parametrize(
     ('metadata', 'expected_blink_ratio', 'expected_overall_ratio'),
     [
@@ -694,7 +695,6 @@ def test_parse_eyelink_data_loss_ratio(
 
     assert parsed_metadata['data_loss_ratio_blinks'] == expected_blink_ratio
     assert parsed_metadata['data_loss_ratio'] == expected_overall_ratio
-
 
 
 def test_parse_eyelink_datetime(tmp_path):
