@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -452,6 +452,8 @@ def from_asc(
 def from_ipc(
         file: str | Path,
         experiment: Experiment | None = None,
+        *,
+        trial_columns: str | list[str] | None = None,
         column_map: dict[str, str] | None = None,
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, type] | None = None,
@@ -466,6 +468,11 @@ def from_ipc(
     experiment : Experiment | None
         The experiment definition.
         (default: None)
+    trial_columns: str | list[str] | None
+        The name of the trial columns in the input data frame. If the list is empty or None,
+        the input data frame is assumed to contain only one trial. If the list is not empty,
+        the input data frame is assumed to contain multiple trials and the transformation
+        methods will be applied to each trial separately. (default: None)
     column_map: dict[str, str] | None
         The keys are the columns to read, the values are the names to which they should be renamed.
         (default: None)
@@ -539,5 +546,6 @@ def from_ipc(
     gaze_df = GazeDataFrame(
         gaze_data,
         experiment=experiment,
+        trial_columns=trial_columns,
     )
     return gaze_df
