@@ -988,7 +988,7 @@ def smooth(
                 .ewm_mean(
                     span=window_length,
                     adjust=False,
-                    min_periods=window_length,
+                    min_samples=window_length,
                 ).shift(n=pad_kwargs['pad_width'])
                 .slice(pad_kwargs['pad_width'] * 2)
                 for component in range(n_components)
