@@ -368,3 +368,60 @@ def test_from_asc_detects_mismatches_in_experiment_metadata(experiment_kwargs, i
     expected_msg = 'Experiment metadata does not match the metadata in the ASC file:\n'
     expected_msg += '\n'.join(f'- {issue}' for issue in issues)
     assert msg == expected_msg
+
+
+# 939
+# only testing lines MOVIESTART and SyncPulseReceived
+FILE_ASCII = r"""\
+MSG	220960 DISPLAY_COORDS 0 0 1919 1079
+MSG	524873 TRIALID TRIAL 0 MOVIESTART
+MSG	524874 SyncPulseReceived
+MSG	524874 !CAL
+>>>>>>> CALIBRATION (HV5,P-CR) FOR LEFT: <<<<<<<<<
+MSG	524874 !CAL Calibration points:
+MSG	524874 !CAL -21.9, -59.4        -0,     82
+MSG	524874 !CAL -23.3, -78.6        -0,  -1935
+MSG	524874 !CAL -19.5, -38.9        -0,   2048
+MSG	524874 !CAL -68.1, -56.4     -3749,     82
+MSG	524874 !CAL  20.1, -57.1      3749,     82
+MSG	524874 !CAL  0.0,  0.0         0,      0
+MSG	524874 !CAL eye check box: (L,R,T,B)
+MSG	524874 !CAL href cal range: (L,R,T,B)
+MSG	524875 !CAL Cal coeff:(X=a+bx+cy+dxx+eyy,Y=f+gx+goaly+ixx+jyy)
+MSG	524875 !CAL Prenormalize: offx, offy = -21.866 -59.363
+MSG	524875 !CAL Gains: cx:89.763 lx:79.157 rx:102.395
+MSG	524875 !CAL Gains: cy:67.472 ty:103.044 by:63.912
+MSG	524875 !CAL Resolution (upd) at screen center: X=2.9, Y=3.9
+MSG	524875 !CAL Gain Change Proportion: X: 0.294 Y: 0.612
+MSG	524875 !CAL Gain Ratio (Gy/Gx) = 0.752
+MSG	524875 !CAL Bad Y/X gain ratio: 0.752
+MSG	524875 !CAL PCR gain ratio(x,y) = 2.214, 1.927
+MSG	524875 !CAL CR gain match(x,y) = 1.010, 1.010
+MSG	524875 !CAL Slip rotation correction OFF
+MSG	524875 !CAL CALIBRATION HV5 L LEFT    GOOD
+MSG	542011 !CAL VALIDATION HV5 L LEFT  GOOD ERROR 0.27 avg. 0.37 max  OFFSET 0.15 deg. 7.8,4.8 pix.
+MSG	542011 VALIDATE L POINT 0  LEFT  at 960,540  OFFSET 0.28 deg.  13.4,10.0 pix.
+MSG	542011 VALIDATE L POINT 1  LEFT  at 960,92  OFFSET 0.33 deg.  -2.4,-19.3 pix.
+MSG	542011 VALIDATE L POINT 2  LEFT  at 960,987  OFFSET 0.18 deg.  -9.0,6.1 pix.
+MSG	542011 VALIDATE L POINT 3  LEFT  at 115,540  OFFSET 0.12 deg.  5.4,-5.1 pix.
+MSG	542011 VALIDATE L POINT 4  LEFT  at 1804,540  OFFSET 0.37 deg.  15.0,16.3 pix.
+MSG	642433 RECCFG CR 500 2 1 L
+MSG	642433 ELCLCFG MTABLER
+"""
+
+
+def test_extract_timestamp_for_metadata(tmp_path):
+    directory = tmp_path / 'test'
+    directory.mkdir()
+    file_path = directory / 'test_939.asc'
+    file_path.write_text(FILE_ASCII)
+    data = pm.gaze.from_asc(
+        file=file_path,
+        metadata_patterns=[
+            {'pattern': r'(?P<sync_pulse>\d+)\s+SyncPulseReceived'},
+            {'pattern': r'(?P<movie_start>\d+).*?(?P<movie_id>\d+)\s+MOVIESTART'},
+        ],
+    )
+    assert data._metadata['movie_start'] == '524873'
+    assert data._metadata['movie_id'] == '0'
+    assert data._metadata['sync_pulse'] == '524874'

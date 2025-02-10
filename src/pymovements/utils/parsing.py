@@ -128,7 +128,7 @@ def compile_patterns(patterns: list[dict[str, Any] | str]) -> list[dict[str, Any
     list[dict[str, Any]]
         Returns from string compiled regex patterns.
     """
-    msg_prefix = r'MSG\s+\d+[.]?\d*\s+'
+    msg_prefix = r'MSG\s+(?:\d+?[.]?\d*\s+)?'
 
     compiled_patterns = []
 
