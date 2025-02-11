@@ -350,7 +350,7 @@ def from_asc(
             raise ValueError(f"unknown pattern key '{patterns}'. Supported keys are: eyelink")
 
     # Read data.
-    gaze_data, metadata = parse_eyelink(
+    gaze_data, metadata, blink_df = parse_eyelink(
         file, patterns=patterns, schema=schema, metadata_patterns=metadata_patterns,
     )
 
@@ -444,6 +444,7 @@ def from_asc(
         time_column='time',
         time_unit='ms',
         pixel_columns=['x_pix', 'y_pix'],
+        blinks=blink_df,
     )
     gaze_df._metadata = metadata  # pylint: disable=protected-access
     return gaze_df

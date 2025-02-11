@@ -50,6 +50,8 @@ class GazeDataFrame:
         The experiment definition. (default: None)
     events: pm.EventDataFrame | None
         A dataframe of events in the gaze signal. (default: None)
+    blinks: pm.EventDataFrame | None
+        A dataframe of detected blink events. If None, an empty EventDataFrame is created. (default: None)
     auto_column_detect: bool
         Flag indicating if the column names should be inferred automatically. (default: False)
     trial_columns: str | list[str] | None
@@ -182,6 +184,7 @@ class GazeDataFrame:
             data: pl.DataFrame | None = None,
             experiment: Experiment | None = None,
             events: pm.EventDataFrame | None = None,
+            blinks: pm.EventDataFrame | None = None,
             *,
             auto_column_detect: bool = False,
             trial_columns: str | list[str] | None = None,
@@ -290,6 +293,19 @@ class GazeDataFrame:
 
         # Remove this attribute once #893 is fixed
         self._metadata: dict[str, Any] | None = None
+        
+        if blinks is None:
+            if self.trial_columns is None:
+                self.blinks = pm.EventDataFrame()
+            else:  
+                self.blinks = pm.EventDataFrame(
+                    data=pl.DataFrame(
+                        schema={column: self.frame.schema[column] for column in self.trial_columns},
+                    ),
+                    trial_columns=self.trial_columns,
+                )
+        else:
+            self.blinks = blinks.clone()
 
     def apply(
             self,

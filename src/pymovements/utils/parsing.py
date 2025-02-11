@@ -367,11 +367,17 @@ def parse_eyelink(
     # is not yet pre-processed but should be
     pre_processed_metadata['calibrations'] = calibrations
     pre_processed_metadata['validations'] = validations
-    pre_processed_metadata['blinks'] = blinks
     pre_processed_metadata['data_loss_ratio'] = data_loss_ratio
     pre_processed_metadata['data_loss_ratio_blinks'] = data_loss_ratio_blinks
     pre_processed_metadata['total_recording_duration_ms'] = total_recording_duration
 
+    blink_df = pl.DataFrame(blinks) if blinks else pl.DataFrame(schema={
+        'start_timestamp': pl.Float64,
+        'stop_timestamp': pl.Float64,
+        'duration_ms': pl.Float64,
+        'num_samples': pl.Int64,
+    })
+    
     schema_overrides = {
         'time': pl.Float64,
         'x_pix': pl.Float64,
@@ -383,7 +389,7 @@ def parse_eyelink(
 
     df = pl.from_dict(data=samples).cast(schema_overrides)
 
-    return df, pre_processed_metadata
+    return df, pre_processed_metadata, blink_df
 
 
 def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:
