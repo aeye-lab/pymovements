@@ -371,13 +371,15 @@ def parse_eyelink(
     pre_processed_metadata['data_loss_ratio_blinks'] = data_loss_ratio_blinks
     pre_processed_metadata['total_recording_duration_ms'] = total_recording_duration
 
-    blink_df = pl.DataFrame(blinks) if blinks else pl.DataFrame(schema={
-        'start_timestamp': pl.Float64,
-        'stop_timestamp': pl.Float64,
-        'duration_ms': pl.Float64,
-        'num_samples': pl.Int64,
-    })
-    
+    blink_df = pl.DataFrame(blinks) if blinks else pl.DataFrame(
+        schema={
+            'start_timestamp': pl.Float64,
+            'stop_timestamp': pl.Float64,
+            'duration_ms': pl.Float64,
+            'num_samples': pl.Int64,
+        },
+    )
+
     schema_overrides = {
         'time': pl.Float64,
         'x_pix': pl.Float64,

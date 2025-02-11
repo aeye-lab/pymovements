@@ -293,11 +293,11 @@ class GazeDataFrame:
 
         # Remove this attribute once #893 is fixed
         self._metadata: dict[str, Any] | None = None
-        
+
         if blinks is None:
             if self.trial_columns is None:
                 self.blinks = pm.EventDataFrame()
-            else:  
+            else:
                 self.blinks = pm.EventDataFrame(
                     data=pl.DataFrame(
                         schema={column: self.frame.schema[column] for column in self.trial_columns},
