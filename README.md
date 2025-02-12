@@ -31,6 +31,7 @@ and render plots to visually analyze your results.
 - **Bug reports:** https://github.com/aeye-lab/pymovements/issues
 - **PyPI package:** https://pypi.org/project/pymovements
 - **Conda package:** https://anaconda.org/conda-forge/pymovements
+- **Discord:** https://discord.gg/Z7VMSbDm
 
 
 ## Getting Started
