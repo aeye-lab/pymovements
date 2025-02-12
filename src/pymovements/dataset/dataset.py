@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from collections.abc import Sequence
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
@@ -238,6 +239,30 @@ class Dataset:
             self.fileinfo['precomputed_reading_measures'],
             self.paths,
         )
+
+    def split_gaze_data(
+            self,
+            by: Sequence[str],
+    ) -> None:
+        """Split gaze data into separated GazeDataFrame's.
+
+        Parameters
+        ----------
+        by: Sequence[str]
+            Column(s) to split dataframe by.
+        """
+        fileinfo_dicts = self.fileinfo['gaze'].to_dicts()
+
+        all_gaze_frames = []
+        all_fileinfo_rows = []
+
+        for frame, fileinfo_row in zip(self.gaze, fileinfo_dicts):
+            split_frames = frame.split(by=by)
+            all_gaze_frames.extend(split_frames)
+            all_fileinfo_rows.extend([fileinfo_row] * len(split_frames))
+
+        self.gaze = all_gaze_frames
+        self.fileinfo['gaze'] = pl.concat([pl.from_dict(row) for row in all_fileinfo_rows])
 
     def split_precomputed_events(
             self,
