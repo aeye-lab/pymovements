@@ -34,6 +34,7 @@ def download_dataset(
         paths: DatasetPaths,
         extract: bool = True,
         remove_finished: bool = False,
+        resume: bool = False,
         verbose: bool = True,
 ) -> None:
     """Download dataset resources.
@@ -59,6 +60,9 @@ def download_dataset(
         Extract dataset archive files. (default: True)
     remove_finished: bool
         Remove archive files after extraction. (default: False)
+    resume: bool
+        Resume previous extraction by skipping existing files.
+        Checks for correct size of existing files but not integrity. (default: False)
     verbose: bool
         If True, show progress of download and print status messages for integrity checking and
         file extraction. (default: True)
@@ -209,6 +213,7 @@ def download_dataset(
             definition=definition,
             paths=paths,
             remove_finished=remove_finished,
+            resume=resume,
             verbose=verbose,
         )
 
@@ -218,6 +223,7 @@ def extract_dataset(
         paths: DatasetPaths,
         remove_finished: bool = False,
         remove_top_level: bool = True,
+        resume: bool = False,
         verbose: int = 1,
 ) -> None:
     """Extract downloaded dataset archive files.
@@ -232,6 +238,9 @@ def extract_dataset(
         Remove archive files after extraction. (default: False)
     remove_top_level: bool
         If ``True``, remove the top-level directory if it has only one child. (default: True)
+    resume: bool
+        Resume previous extraction by skipping existing files.
+        Checks for correct size of existing files but not integrity. (default: False)
     verbose: int
         Verbosity levels: (1) Print messages for extracting each dataset resource without printing
         messages for recursive archives. (2) Print messages for extracting each dataset resource and
@@ -249,6 +258,7 @@ def extract_dataset(
                 recursive=True,
                 remove_finished=remove_finished,
                 remove_top_level=remove_top_level,
+                resume=resume,
                 verbose=verbose,
             )
 
@@ -265,6 +275,7 @@ def extract_dataset(
                     recursive=True,
                     remove_finished=remove_finished,
                     remove_top_level=remove_top_level,
+                    resume=resume,
                     verbose=verbose,
                 )
             else:
@@ -283,6 +294,7 @@ def extract_dataset(
                     recursive=True,
                     remove_finished=remove_finished,
                     remove_top_level=remove_top_level,
+                    resume=resume,
                     verbose=verbose,
                 )
             else:
