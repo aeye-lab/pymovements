@@ -43,8 +43,8 @@ def extract_archive(
         recursive: bool = True,
         remove_finished: bool = False,
         remove_top_level: bool = True,
-        verbose: int = 1,
         resume: bool = False,
+        verbose: int = 1,
 ) -> Path:
     """Extract an archive.
 
@@ -64,12 +64,13 @@ def extract_archive(
         If ``True``, remove the file after the extraction. (default: False)
     remove_top_level: bool
         If ``True``, remove the top-level directory if it has only one child. (default: True)
+    resume: bool
+        Resume previous extraction by skipping existing files.
+        Checks for correct size of existing files but not integrity. (default: True)
     verbose: int
         Verbosity levels: (1) Print messages for extracting each dataset resource without printing
         messages for recursive archives. (2) Print additional messages for each recursive archive
         extract. (default: 1)
-    resume: bool
-        Resume previous extraction. (default: True)
 
     Returns
     -------
@@ -164,22 +165,20 @@ def _extract_tar(
     """
     with tarfile.open(source_path, f'r:{compression[1:]}' if compression else 'r') as archive:
         for member in tqdm(archive.getmembers()):
-            member_name = member.name
-            member_size = member.size
-            member_dest_path = os.path.join(destination_path, member_name)
             if resume:
+                member_dest_path = os.path.join(destination_path, member.name)
                 if (
                         os.path.exists(member_dest_path) and
-                        member_name[-4:] in _ARCHIVE_EXTRACTORS and
-                        member_size == os.path.getsize(member_dest_path)
+                        member.name[-4:] in _ARCHIVE_EXTRACTORS and
+                        member.size == os.path.getsize(member_dest_path)
                 ):
                     if verbose:
-                        print(f'Skipping {member_name} due to previous extraction')
+                        print(f'Skipping {member.name} due to previous extraction')
                     continue
             if sys.version_info < (3, 12):  # pragma: <3.12 cover
-                archive.extract(member_name, destination_path)
+                archive.extract(member.name, destination_path)
             else:  # pragma: >=3.12 cover
-                archive.extract(member_name, destination_path, filter='tar')
+                archive.extract(member.name, destination_path, filter='tar')
 
 
 def _extract_zip(
@@ -207,21 +206,17 @@ def _extract_zip(
     compression_id = _ZIP_COMPRESSION_MAP[compression] if compression else zipfile.ZIP_STORED
     with zipfile.ZipFile(source_path, 'r', compression=compression_id) as archive:
         for member in tqdm(archive.filelist):
-            member_filename = member.filename
-            member_dest_path = os.path.join(destination_path, member_filename)
             if resume:
-                member_size = member.file_size
+                member_dest_path = os.path.join(destination_path, member.filename)
                 if (
                     os.path.exists(member_dest_path) and
-                    member_filename[-4:] in _ARCHIVE_EXTRACTORS and
-                    member_size == os.path.getsize(member_dest_path)
+                    member.filename[-4:] in _ARCHIVE_EXTRACTORS and
+                    member.file_size == os.path.getsize(member_dest_path)
                 ):
                     if verbose:
-                        print(f'Skipping {member_filename} due to previous extraction')
+                        print(f'Skipping {member.filename} due to previous extraction')
                     continue
-                archive.extract(member_filename, destination_path)
-            else:
-                archive.extract(member_filename, destination_path)
+            archive.extract(member.filename, destination_path)
 
 
 _ARCHIVE_EXTRACTORS: dict[str, Callable[[Path, Path, str | None, bool, int], None]] = {
