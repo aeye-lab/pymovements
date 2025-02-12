@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from collections.abc import Sequence
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
@@ -233,13 +234,13 @@ class Dataset:
 
     def split_gaze_data(
             self,
-            by: list[str] | str,
+            by: Sequence[str],
     ) -> None:
         """Split gaze data into separated GazeDataFrame's.
 
         Parameters
         ----------
-        by: list[str] | str
+        by: Sequence[str]
             Column(s) to split dataframe by.
         """
         fileinfo_dicts = self.fileinfo['gaze'].to_dicts()
