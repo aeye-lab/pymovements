@@ -184,7 +184,7 @@ class GazeOnFaces(DatasetDefinition):
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: ['sub_id', 'trial_id'])
+    trial_columns: list[str] = field(default_factory=lambda: [])
 
     time_column: Any = None
 
