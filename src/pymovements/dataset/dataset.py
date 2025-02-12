@@ -929,6 +929,7 @@ class Dataset:
             *,
             extract: bool = True,
             remove_finished: bool = False,
+            resume: bool = False,
             verbose: int = 1,
     ) -> Dataset:
         """Download dataset resources.
@@ -950,6 +951,9 @@ class Dataset:
             Extract dataset archive files. (default: True)
         remove_finished: bool
             Remove archive files after extraction. (default: False)
+        resume: bool
+            Resume previous extraction by skipping existing files.
+            Checks for correct size of existing files but not integrity. (default: False)
         verbose: int
             Verbosity levels: (1) Show download progress bar and print info messages on downloading
             and extracting archive files without printing messages for recursive archive extraction.
@@ -972,6 +976,7 @@ class Dataset:
             paths=self.paths,
             extract=extract,
             remove_finished=remove_finished,
+            resume=resume,
             verbose=bool(verbose),
         )
         return self
@@ -980,6 +985,7 @@ class Dataset:
             self,
             remove_finished: bool = False,
             remove_top_level: bool = True,
+            resume: bool = False,
             verbose: int = 1,
     ) -> Dataset:
         """Extract downloaded dataset archive files.
@@ -990,6 +996,9 @@ class Dataset:
             Remove archive files after extraction. (default: False)
         remove_top_level: bool
             If ``True``, remove the top-level directory if it has only one child. (default: True)
+        resume: bool
+            Resume previous extraction by skipping existing files.
+            Checks for correct size of existing files but not integrity. (default: False)
         verbose: int
             Verbosity levels: (1) Print messages for extracting each dataset resource without
             printing messages for recursive archives. (2) Print additional messages for each
@@ -1005,6 +1014,7 @@ class Dataset:
             paths=self.paths,
             remove_finished=remove_finished,
             remove_top_level=remove_top_level,
+            resume=resume,
             verbose=verbose,
         )
         return self
