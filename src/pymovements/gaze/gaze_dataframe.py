@@ -291,7 +291,6 @@ class GazeDataFrame:
 
         # Remove this attribute once #893 is fixed
         self._metadata: dict[str, Any] | None = None
-        self.auto_column_detect = auto_column_detect
 
     def apply(
             self,
