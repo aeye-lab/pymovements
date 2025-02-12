@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ EYE_TRACKING_SAMPLE = re.compile(
     r'(?P<x_pix>[-]?\d*[.]\d*)\s+'
     r'(?P<y_pix>[-]?\d*[.]\d*)\s+'
     r'(?P<pupil>\d*[.]\d*)\s+'
-    r'(?P<dummy>\d*[.]\d*)\s+'
+    r'((?P<dummy>\d*[.]\d*)\s+)?'  # optional dummy column
     r'(?P<dots>[A-Za-z.]{3,5})?\s*',
 )
 
@@ -47,7 +47,7 @@ EYELINK_META_REGEXES = [
             r'\s+(?P<day>\d\d?)\s+(?P<time>\d\d:\d\d:\d\d)\s+(?P<year>\d{4})\s*'
         ),
         r'\*\*\s+(?P<version_2>EYELINK.*)',
-        r'MSG\s+\d+[.]?\d*\s+DISPLAY_COORDS\s+(?P<resolution>.*)',
+        r'MSG\s+\d+[.]?\d*\s+DISPLAY_COORDS\s*=?\s*(?P<resolution>.*)',
         r'PUPIL\s+(?P<pupil_data_type>(AREA|DIAMETER))\s*',
         r'MSG\s+\d+[.]?\d*\s+ELCLCFG\s+(?P<mount_configuration>.*)',
     )
@@ -68,7 +68,7 @@ BLINK_STOP_REGEX = re.compile(
     r'(?P<timestamp_end>(\d+[.]?\d*))\s+(?P<duration_ms>(\d+[.]?\d*))\s*',
 )
 INVALID_SAMPLE_REGEX = re.compile(
-    r'(?P<timestamp>(\d+[.]?\d*))\s+\.\s+\.\s+0\.0\s+0\.0\s+\.\.\.\s*',
+    r'(?P<timestamp>(\d+[.]?\d*))\s+\.\s+\.\s+(?P<dummy>0\.0)?\s+0\.0\s+\.\.\.\s*',
 )
 
 CALIBRATION_TIMESTAMP_REGEX = re.compile(r'MSG\s+(?P<timestamp>\d+[.]?\d*)\s+!CAL\s*\n')

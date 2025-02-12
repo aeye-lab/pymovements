@@ -1,4 +1,4 @@
-# Copyright (c) 2024 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -238,6 +238,42 @@ def test_parse_eyelink(tmp_path):
 
     assert_frame_equal(df, EXPECTED_DF, check_column_order=False)
     assert metadata == EXPECTED_METADATA
+
+
+@pytest.mark.parametrize(
+    ('kwargs', 'expected_metadata'),
+    [
+        pytest.param(
+            {
+                'filepath': 'tests/files/eyelink_monocular_example.asc',
+                'metadata_patterns': [
+                    {'pattern': r'!V TRIAL_VAR SUBJECT_ID (?P<subject_id>-?\d+)'},
+                    r'!V TRIAL_VAR STIMULUS_COMBINATION_ID (?P<stimulus_combination_id>.+)',
+                ],
+            },
+            {
+                'subject_id': '-1',
+                'stimulus_combination_id': 'start',
+            },
+            id='eyelink_asc_metadata_patterns',
+        ),
+        pytest.param(
+            {
+                'filepath': 'tests/files/eyelink_monocular_example.asc',
+                'metadata_patterns': [r'inexistent pattern (?P<value>-?\d+)'],
+            },
+            {
+                'value': None,
+            },
+            id='eyelink_asc_metadata_pattern_not_found',
+        ),
+    ],
+)
+def test_from_asc_metadata_patterns(kwargs, expected_metadata):
+    _, metadata = pm.utils.parsing.parse_eyelink(**kwargs)
+
+    for key, value in expected_metadata.items():
+        assert metadata[key] == value
 
 
 @pytest.mark.parametrize(
@@ -506,6 +542,35 @@ def test_parse_val_cal_eyelink_monocular_file():
         ),
         pytest.param(
             '** DATE: Wed Mar  8 09:25:20 2023\n'
+            'EVENTS	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2\n'
+            'SBLINK R 10000018\n'
+            '10000019	   .	   .	    0.0	...\n'
+            '10000020	   .	   .	    0.0	...\n'
+            'EBLINK R 10000018	10000020	2\n'
+            'SBLINK R 10000021\n'
+            '10000021	   .	   .	    0.0	...\n'
+            '10000022	   .	   .	    0.0 ...\n'
+            '10000023	   .	   .	    0.0	...\n'
+            '10000024	   .	   .	    0.0	...\n'
+            'EBLINK R 10000021	10000024	4\n',
+            [
+                {
+                    'duration_ms': 2,
+                    'num_samples': 2,
+                    'start_timestamp': 10000018,
+                    'stop_timestamp': 10000020,
+                },
+                {
+                    'duration_ms': 4,
+                    'num_samples': 4,
+                    'start_timestamp': 10000021,
+                    'stop_timestamp': 10000024,
+                },
+            ],
+            id='multiple_blinks_no_dummy',
+        ),
+        pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n'
             'SBLINK R 10000018\n'
             '10000019	   .	   .	    0.0	    0.0	...\n'
             '10000020	   .	   .	    0.0	    0.0	...\n'
@@ -545,6 +610,18 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
             1,  # expected_blink_ratio
             1,  # expected_overall_ratio
             id='only_blinks',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
+            'SBLINK R 10000018\n'
+            '10000019	   .	   .	    0.0	...\n'
+            '10000020	   .	   .	    0.0	...\n'
+            'EBLINK R 10000018	10000020	2\n'
+            'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            1,
+            1,
+            id='only_blinks_no_dummy',
         ),
         pytest.param(
             '** DATE: Wed Mar  8 09:25:20 2023\n'

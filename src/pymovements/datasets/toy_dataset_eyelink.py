@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -166,8 +166,8 @@ class ToyDatasetEyeLink(DatasetDefinition):
         origin='upper left',
         eyetracker=EyeTracker(
             sampling_rate=1000.0,
-            left=False,
-            right=True,
+            left=True,
+            right=False,
             model='EyeLink Portable Duo',
             vendor='EyeLink',
         ),
@@ -188,7 +188,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: ['subject_id', 'session_id'])
+    trial_columns: list[str] = field(default_factory=lambda: [])
 
     time_column: str = 'time'
 

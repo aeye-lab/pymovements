@@ -24,6 +24,7 @@ jobs:
           - py310
           - py311
           - py312
+          - py313
         exclude:
             - os: macos-latest
               tox_env: py39
@@ -33,6 +34,8 @@ jobs:
               tox_env: py311
             - os: macos-13
               tox_env: py312
+            - os: macos-13
+              tox_env: py313
         include:
           - tox_env: py39
             python: "3.9"
@@ -42,6 +45,8 @@ jobs:
             python: "3.11"
           - tox_env: py312
             python: "3.12"
+          - tox_env: py313
+            python: "3.13"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -58,7 +63,7 @@ jobs:
         run: tox --skip-pkg-install -e ${{ matrix.tox_env }}
       - name: Upload coverage reports to Codecov
         if: success() || failure()
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -128,7 +133,7 @@ jobs:
       - name: Run test
         run: tox --skip-pkg-install -e docs
       - name: Upload documentation
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: html-docs-${{ matrix.os }}
           path: docs/build/
