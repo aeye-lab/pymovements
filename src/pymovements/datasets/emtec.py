@@ -191,12 +191,7 @@ class EMTeC(DatasetDefinition):
             },
     )
 
-    trial_columns: list[str] = field(
-        default_factory=lambda: [
-            'subject_id',
-            'item_id',
-        ],
-    )
+    trial_columns: list[str] = field(default_factory=lambda: ['item_id'])
 
     time_column: str = 'time'
 

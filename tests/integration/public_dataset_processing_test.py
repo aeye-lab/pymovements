@@ -49,5 +49,6 @@ def test_public_dataset_processing(dataset_name, tmp_path):
             assert 'position' in gaze.columns
             assert 'velocity' in gaze.columns
             assert 'acceleration' in gaze.columns
+            assert len(set(gaze.trial_columns)) == len(gaze.trial_columns)
 
         shutil.rmtree(dataset_path, ignore_errors=True)

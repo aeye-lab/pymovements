@@ -188,7 +188,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: ['subject_id', 'session_id'])
+    trial_columns: list[str] = field(default_factory=lambda: [])
 
     time_column: str = 'time'
 
