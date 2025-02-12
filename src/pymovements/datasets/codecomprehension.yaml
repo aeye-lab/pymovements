@@ -1,0 +1,51 @@
+name: CodeComprehension
+
+has_files:
+  gaze: false
+  precomputed_events: true
+  precomputed_reading_measures: false
+
+mirrors:
+  precomputed_events:
+    - https://zenodo.org/
+
+resources:
+  precomputed_events:
+    - resource: "records/11123101/files/Predicting%20Code%20Comprehension%20Package.zip?download=1"
+      filename: "data.zip"
+      md5: "3a3c6fb96550bc2c2ddcf5d458fb12a2"
+
+extract:
+  precomputed_events: true
+
+experiment:
+  screen_width_px: null
+  screen_height_px: null
+  screen_width_cm: null
+  screen_height_cm: null
+  distance_cm: null
+  origin: null
+  sampling_rate: 2000
+
+filename_format:
+  precomputed_events: 'fix_report_P{subject_id:s}.txt'
+
+filename_format_schema_overrides:
+  precomputed_events:
+    subject_id: !polars.Utf8
+
+trial_columns: []
+
+time_column: ""
+
+time_unit: ""
+
+pixel_columns: []
+
+column_map: {}
+
+custom_read_kwargs:
+  precomputed_events:
+    separator: "\t"
+    null_values: "."
+    quote_char: '"'
