@@ -1617,7 +1617,7 @@ def test_event_dataframe_add_property_raises_exceptions(
         msg_substrings,
 ):
     dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
-    dataset.load(preprocessed=True, events=True)
+    dataset.load(preprocessed=True, events=True, set_trial_columns=True)
 
     with pytest.raises(exception) as excinfo:
         dataset.compute_event_properties(**property_kwargs)
@@ -1638,7 +1638,7 @@ def test_event_dataframe_add_property_has_expected_height(
         property_kwargs,
 ):
     dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
-    dataset.load(preprocessed=True, events=True)
+    dataset.load(preprocessed=True, events=True, set_trial_columns=True)
 
     expected_heights = [len(event_df) for event_df in dataset.events]
 
@@ -1679,7 +1679,7 @@ def test_event_dataframe_add_property_has_expected_schema(
         expected_schema,
 ):
     dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
-    dataset.load(preprocessed=True, events=True)
+    dataset.load(preprocessed=True, events=True, set_trial_columns=True)
 
     dataset.compute_event_properties(**property_kwargs)
 
@@ -1718,7 +1718,7 @@ def test_event_dataframe_add_property_effect_property_columns(
         expected_property_columns,
 ):
     dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
-    dataset.load(preprocessed=True, events=True)
+    dataset.load(preprocessed=True, events=True, set_trial_columns=True)
 
     dataset.compute_event_properties(**property_kwargs)
 
@@ -1743,7 +1743,7 @@ def test_event_dataframe_add_property_raises_exception(
         exception_msg,
 ):
     dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
-    dataset.load(preprocessed=True, events=True)
+    dataset.load(preprocessed=True, events=True, set_trial_columns=True)
 
     with pytest.raises(exception) as excinfo:
         dataset.compute_event_properties(**property_kwargs)
@@ -1774,7 +1774,7 @@ def test_event_dataframe_add_property_does_not_change_length(
         property_kwargs,
 ):
     dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
-    dataset.load(preprocessed=True, events=True)
+    dataset.load(preprocessed=True, events=True, set_trial_columns=True)
 
     lengths_pre = [len(events_df.frame) for events_df in dataset.events]
     dataset.compute_event_properties(**property_kwargs)
@@ -1798,7 +1798,7 @@ def test_event_dataframe_add_property_does_not_change_length(
 )
 def test_compute_event_properties_alias(gaze_dataset_configuration, property_kwargs, monkeypatch):
     dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
-    dataset.load(preprocessed=True, events=True)
+    dataset.load(preprocessed=True, events=True, set_trial_columns=True)
 
     mock = Mock()
     monkeypatch.setattr(dataset, 'compute_event_properties', mock)
