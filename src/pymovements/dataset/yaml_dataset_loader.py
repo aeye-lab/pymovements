@@ -122,16 +122,11 @@ class YAMLDatasetLoader:
 
         # Convert experiment dict to Experiment object if present
         if 'experiment' in data:
-<<<<<<< HEAD
             if 'eyetracker' in data['experiment']:
-                # eyetracker = EyeTracker(**data['experiment']['eyetracker'])
                 eyetracker = EyeTracker(**data['experiment'].pop('eyetracker'))
             else:
                 eyetracker = None
             data['experiment'] = Experiment(**data['experiment'], eyetracker=eyetracker)
-=======
-            data['experiment'] = Experiment(**data['experiment'])
->>>>>>> f8fd88a (construct yaml loader and new dataset registry and library)
 
         # Initialize DatasetDefinition with YAML data
         return DatasetDefinition(**data)
