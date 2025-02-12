@@ -69,11 +69,26 @@ VALIDATION_REGEX = re.compile(
     r'(?P<validation_score_max>\d.\d\d)\s+max',
 )
 
+# TODO: support all EFIX/ESACC/EBLINK formats (optional angular position)
+FIXATION_STOP_REGEX = re.compile(
+    r'EFIX\s+(R|L)\s+(?P<timestamp_start>(\d+[.]?\d*))\s+'
+    r'(?P<timestamp_end>(\d+[.]?\d*))\s+(?P<duration_ms>(\d+[.]?\d*))\s+'
+    r'(?P<avg_x_pix>(\d+[.]?\d*))\s+(?P<avg_y_pix>(\d+[.]?\d*))\s+(?P<avg_pupil>(\d+[.]?\d*))\s*',
+)
+SACCADE_STOP_REGEX = re.compile(
+    r'ESACC\s+(R|L)\s+(?P<timestamp_start>(\d+[.]?\d*))\s+'
+    r'(?P<timestamp_end>(\d+[.]?\d*))\s+(?P<duration_ms>(\d+[.]?\d*))\s+'
+    r'(?P<start_x_pix>(\d+[.]?\d*))\s+(?P<start_y_pix>(\d+[.]?\d*))\s+'
+    r'(?P<end_x_pix>(\d+[.]?\d*))\s+(?P<end_y_pix>(\d+[.]?\d*))\s+'
+    r'(?P<amplitude>(\d+[.]?\d*))\s+(?P<peak_velocity>(\d+[.]?\d*))\s*',
+)
+# TODO: remove SBLINK parsing (optional and redundant in ASC)
 BLINK_START_REGEX = re.compile(r'SBLINK\s+(R|L)\s+(?P<timestamp>(\d+[.]?\d*))\s*')
 BLINK_STOP_REGEX = re.compile(
     r'EBLINK\s+(R|L)\s+(?P<timestamp_start>(\d+[.]?\d*))\s+'
     r'(?P<timestamp_end>(\d+[.]?\d*))\s+(?P<duration_ms>(\d+[.]?\d*))\s*',
 )
+
 INVALID_SAMPLE_REGEX = re.compile(
     r'(?P<timestamp>(\d+[.]?\d*))\s+\.\s+\.\s+0\.0\s+0\.0\s+\.\.\.\s*',
 )
@@ -180,7 +195,7 @@ def parse_eyelink(
         patterns: list[dict[str, Any] | str] | None = None,
         schema: dict[str, Any] | None = None,
         metadata_patterns: list[dict[str, Any] | str] | None = None,
-) -> tuple[pl.DataFrame, dict[str, Any]]:
+) -> tuple[pl.DataFrame, pl.DataFrame, dict[str, Any]]:
     """Process EyeLink asc file.
 
     Parameters
@@ -196,8 +211,8 @@ def parse_eyelink(
 
     Returns
     -------
-    tuple[pl.DataFrame, dict[str, Any]]
-        A tuple containing the parsed sample data and the metadata in a dictionary.
+    tuple[pl.DataFrame, pl.DataFrame, dict[str, Any]]
+        A tuple containing the parsed gaze sample data, the parsed event data, and the metadata.
 
     Raises
     ------
@@ -213,9 +228,6 @@ def parse_eyelink(
     compiled_metadata_patterns = compile_patterns(metadata_patterns)
 
     additional_columns = get_pattern_keys(compiled_patterns, 'column')
-    additional: dict[str, list[Any]] = {
-        additional_column: [] for additional_column in additional_columns
-    }
     current_additional = {
         additional_column: None for additional_column in additional_columns
     }
@@ -225,7 +237,13 @@ def parse_eyelink(
         'x_pix': [],
         'y_pix': [],
         'pupil': [],
-        **additional,
+        **{additional_column: [] for additional_column in additional_columns},
+    }
+    events: dict[str, list[Any]] = {
+        'name': [],
+        'onset': [],
+        'offset': [],
+        **{additional_column: [] for additional_column in additional_columns},
     }
 
     with open(filepath, encoding='ascii') as asc_file:
@@ -245,6 +263,7 @@ def parse_eyelink(
 
     validations = []
     calibrations = []
+    # TODO: remove blink metadata
     blinks = []
     invalid_samples = []
 
@@ -284,6 +303,24 @@ def parse_eyelink(
         elif BLINK_START_REGEX.match(line):
             blink = True
 
+        elif match := FIXATION_STOP_REGEX.match(line):
+            events['name'].append('fixation_eyelink')
+            events['onset'].append(float(match.group('timestamp_start')))
+            events['offset'].append(float(match.group('timestamp_end')))
+
+            # TODO: additional columns should correspond to event onset, not offset
+            for additional_column in additional_columns:
+                events[additional_column].append(current_additional[additional_column])
+
+        elif match := SACCADE_STOP_REGEX.match(line):
+            events['name'].append('saccade_eyelink')
+            events['onset'].append(float(match.group('timestamp_start')))
+            events['offset'].append(float(match.group('timestamp_end')))
+
+            # TODO: additional columns should correspond to event onset, not offset
+            for additional_column in additional_columns:
+                events[additional_column].append(current_additional[additional_column])
+
         elif match := BLINK_STOP_REGEX.match(line):
             blink = False
             parsed_blink = match.groupdict()
@@ -295,6 +332,14 @@ def parse_eyelink(
             }
             num_blink_samples = 0
             blinks.append(blink_info)
+
+            events['name'].append('blink_eyelink')
+            events['onset'].append(float(match.group('timestamp_start')))
+            events['offset'].append(float(match.group('timestamp_end')))
+
+            # TODO: additional columns should correspond to event onset, not offset
+            for additional_column in additional_columns:
+                events[additional_column].append(current_additional[additional_column])
 
         elif match := START_RECORDING_REGEX.match(line):
             start_recording_timestamp = match.groupdict()['timestamp']
@@ -372,18 +417,27 @@ def parse_eyelink(
     pre_processed_metadata['data_loss_ratio_blinks'] = data_loss_ratio_blinks
     pre_processed_metadata['total_recording_duration_ms'] = total_recording_duration
 
-    schema_overrides = {
+    gaze_schema_overrides = {
         'time': pl.Float64,
         'x_pix': pl.Float64,
         'y_pix': pl.Float64,
         'pupil': pl.Float64,
     }
     if schema is not None:
-        schema_overrides.update(schema)
+        gaze_schema_overrides.update(schema)
 
-    df = pl.from_dict(data=samples).cast(schema_overrides)
+    event_schema_overrides = {
+        'name': pl.String,
+        'onset': pl.Float64,
+        'offset': pl.Float64,
+    }
+    if schema is not None:
+        event_schema_overrides.update(schema)
 
-    return df, pre_processed_metadata
+    gaze_df = pl.from_dict(data=samples).cast(gaze_schema_overrides)
+    event_df = pl.from_dict(data=events).cast(event_schema_overrides)
+
+    return gaze_df, event_df, pre_processed_metadata
 
 
 def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:

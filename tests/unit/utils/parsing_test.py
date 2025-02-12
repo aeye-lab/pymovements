@@ -53,6 +53,7 @@ EVENTS	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2
 SAMPLES	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2	INPUT
 the next line has all additional trial columns set to None
 START	10000000 	RIGHT	SAMPLES	EVENTS
+SFIX	R	10000000
 10000000	  850.7	  717.5	  714.0	    0.0	...
 END	10000001 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000001 START_A
@@ -75,11 +76,13 @@ MSG 10000007 START_TRIAL_1
 the next line now should have the trial column set to 1
 START	10000008 	RIGHT	SAMPLES	EVENTS
 10000008	  850.7	  717.5	  714.0	    0.0	...
+EFIX	R	10000000	10000008	10	850.7	717.5	714.0
 END	10000009 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000009 STOP_TRIAL_1
 MSG 10000010 START_TRIAL_2
 the next line now should have the trial column set to 2
 START	10000011 	RIGHT	SAMPLES	EVENTS
+SSACC	R	10000011
 10000011	  850.7	  717.5	  714.0	    0.0	...
 END	10000012 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000012 STOP_TRIAL_2
@@ -95,12 +98,14 @@ MSG 10000016 STOP_B
 task and trial should be set to None again
 MSG 10000017 METADATA_3
 START	10000017 	RIGHT	SAMPLES	EVENTS
-10000017	  850.7	  717.5	  .	    0.0	...
-SBLINK R 10000018
-10000019	   .	   .	    0.0	    0.0	...
+10000017	  850.7	  717.5	  714.0	    0.0	...
+10000019	  850.7	  717.5	  .	    0.0	...
+SBLINK R 10000020
 10000020	   .	   .	    0.0	    0.0	...
-EBLINK R 10000018	10000020	2
 10000021	   .	   .	    0.0	    0.0	...
+10000022	   .	   .	    0.0	    0.0	...
+EBLINK R 10000020	10000022	4
+ESACC	R	10000011	10000022	13	850.7	717.5	850.7	717.5	19.00	590
 END	10000022 	SAMPLES	EVENTS	RES	  38.54	  31.12
 """
 
@@ -136,18 +141,28 @@ METADATA_PATTERNS = [
     {'pattern': r'METADATA_4', 'key': 'metadata_4', 'value': True},
 ]
 
-EXPECTED_DF = pl.from_dict(
+EXPECTED_GAZE_DF = pl.from_dict(
     {
         'time': [
             10000000.0, 10000002.0, 10000004.0, 10000006.0, 10000008.0, 10000011.0, 10000014.0,
-            10000017.0, 10000019.0, 10000020.0, 10000021.0,
+            10000017.0, 10000019.0, 10000020.0, 10000021.0, 10000022.0,
         ],
-        'x_pix': [850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, np.nan, np.nan, np.nan],
-        'y_pix': [717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, np.nan, np.nan, np.nan],
-        'pupil': [714.0, 714.0, 714.0, 714.0, 714.0, 714.0, 714.0, np.nan, 0.0, 0.0, 0.0],
-        'task': [None, 'A', None, 'B', 'B', 'B', 'B', None, None, None, None],
-        'trial_id': [None, None, None, None, '1', '2', '3', None, None, None, None],
+        'x_pix': [850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, np.nan, np.nan, np.nan],
+        'y_pix': [717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, np.nan, np.nan, np.nan],
+        'pupil': [714.0, 714.0, 714.0, 714.0, 714.0, 714.0, 714.0, 714.0, np.nan, 0.0, 0.0, 0.0],
+        'task': [None, 'A', None, 'B', 'B', 'B', 'B', None, None, None, None, None],
+        'trial_id': [None, None, None, None, '1', '2', '3', None, None, None, None, None],
     },
+)
+
+EXPECTED_EVENT_DF = pl.from_dict(
+    {
+        'name': ["fixation_eyelink", "blink_eyelink", "saccade_eyelink"],
+        'onset': [10000000.0, 10000020.0, 10000011.0],
+        'offset': [10000008.0, 10000022.0, 10000022.0],
+        'task': [None, None, 'B'],
+        'trial_id': [None, None, '2'],
+    }
 )
 
 EXPECTED_METADATA = {
@@ -196,13 +211,14 @@ def test_parse_eyelink(tmp_path):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(ASC_TEXT)
 
-    df, metadata = pm.utils.parsing.parse_eyelink(
+    gaze_df, event_df, metadata = pm.utils.parsing.parse_eyelink(
         filepath,
         patterns=PATTERNS,
         metadata_patterns=METADATA_PATTERNS,
     )
 
-    assert_frame_equal(df, EXPECTED_DF, check_column_order=False)
+    assert_frame_equal(gaze_df, EXPECTED_GAZE_DF, check_column_order=False)
+    assert_frame_equal(event_df, EXPECTED_EVENT_DF, check_column_order=False)
     assert metadata == EXPECTED_METADATA
 
 
@@ -236,7 +252,7 @@ def test_parse_eyelink(tmp_path):
     ],
 )
 def test_from_asc_metadata_patterns(kwargs, expected_metadata):
-    _, metadata = pm.utils.parsing.parse_eyelink(**kwargs)
+    _, _, metadata = pm.utils.parsing.parse_eyelink(**kwargs)
 
     for key, value in expected_metadata.items():
         assert metadata[key] == value
@@ -344,7 +360,7 @@ def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_mo
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, metadata = pm.utils.parsing.parse_eyelink(
+    _, _, metadata = pm.utils.parsing.parse_eyelink(
         filepath,
     )
 
@@ -367,7 +383,7 @@ def test_no_metadata_warning(tmp_path, metadata, expected_msg):
     filepath.write_text(metadata)
 
     with pytest.raises(Warning) as info:
-        _, metadata = pm.utils.parsing.parse_eyelink(
+        _, _, metadata = pm.utils.parsing.parse_eyelink(
             filepath,
         )
 
@@ -429,7 +445,7 @@ def test_val_cal_eyelink(tmp_path, metadata, expected_validation, expected_calib
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
+    _, _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
 
     assert parsed_metadata['calibrations'] == expected_calibration
     assert parsed_metadata['validations'] == expected_validation
@@ -439,7 +455,7 @@ def test_parse_val_cal_eyelink_monocular_file():
     example_asc_monocular_path = Path(__file__).parent.parent.parent / \
         'files/eyelink_monocular_example.asc'
 
-    _, metadata = pm.utils.parsing.parse_eyelink(example_asc_monocular_path)
+    _, _, metadata = pm.utils.parsing.parse_eyelink(example_asc_monocular_path)
 
     expected_validation = [{
         'error': 'GOOD ERROR',
@@ -524,7 +540,7 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
+    _, _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
 
     assert parsed_metadata['blinks'] == expected_blinks
 
@@ -650,7 +666,7 @@ def test_parse_eyelink_data_loss_ratio(
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
+    _, _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
 
     assert parsed_metadata['data_loss_ratio_blinks'] == expected_blink_ratio
     assert parsed_metadata['data_loss_ratio'] == expected_overall_ratio
@@ -663,7 +679,7 @@ def test_parse_eyelink_datetime(tmp_path):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
+    _, _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
 
     assert parsed_metadata['datetime'] == expected_datetime
 
@@ -845,6 +861,6 @@ def test_parse_eyelink_mount_config(tmp_path, metadata, expected_mount_config):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
+    _, _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
 
     assert parsed_metadata['mount_configuration'] == expected_mount_config
