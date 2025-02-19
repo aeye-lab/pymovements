@@ -60,7 +60,7 @@ MSG 10000001 START_A
 START	10000002 	RIGHT	SAMPLES	EVENTS
 the next line now should have the task column set to A
 10000002	  850.7	  717.5	  714.0	    0.0	...
-END	10000002 	SAMPLES	EVENTS	RES	  38.54	  31.12
+END	10000003 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000003 STOP_A
 the task should be set to None again
 START	10000004 	RIGHT	SAMPLES	EVENTS
@@ -103,7 +103,6 @@ START	10000017 	RIGHT	SAMPLES	EVENTS
 SBLINK R 10000020
 10000020	   .	   .	    0.0	    0.0	...
 10000021	   .	   .	    0.0	    0.0	...
-10000022	   .	   .	    0.0	    0.0	...
 EBLINK R 10000020	10000022	4
 ESACC	R	10000011	10000022	13	850.7	717.5	850.7	717.5	19.00	590
 END	10000022 	SAMPLES	EVENTS	RES	  38.54	  31.12
@@ -145,17 +144,17 @@ EXPECTED_GAZE_DF = pl.from_dict(
     {
         'time': [
             10000000.0, 10000002.0, 10000004.0, 10000006.0, 10000008.0, 10000011.0, 10000014.0,
-            10000017.0, 10000019.0, 10000020.0, 10000021.0, 10000022.0,
+            10000017.0, 10000019.0, 10000020.0, 10000021.0,
         ],
         'x_pix': [
-            850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, np.nan, np.nan, np.nan,
+            850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, np.nan, np.nan,
         ],
         'y_pix': [
-            717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, np.nan, np.nan, np.nan,
+            717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, np.nan, np.nan,
         ],
-        'pupil': [714.0, 714.0, 714.0, 714.0, 714.0, 714.0, 714.0, 714.0, np.nan, 0.0, 0.0, 0.0],
-        'task': [None, 'A', None, 'B', 'B', 'B', 'B', None, None, None, None, None],
-        'trial_id': [None, None, None, None, '1', '2', '3', None, None, None, None, None],
+        'pupil': [714.0, 714.0, 714.0, 714.0, 714.0, 714.0, 714.0, 714.0, np.nan, 0.0, 0.0],
+        'task': [None, 'A', None, 'B', 'B', 'B', 'B', None, None, None, None],
+        'trial_id': [None, None, None, None, '1', '2', '3', None, None, None, None],
     },
 )
 
@@ -188,15 +187,15 @@ EXPECTED_METADATA = {
     'calibrations': [],
     'validations': [],
     'resolution': (1280, 1024),
-    'data_loss_ratio_blinks': 0.18181818181818182,
-    'data_loss_ratio': 0.2727272727272727,
-    'total_recording_duration_ms': 11,
+    'data_loss_ratio_blinks': 0.16666666666666666,
+    'data_loss_ratio': 0.25,
+    'total_recording_duration_ms': 12.0,
     'datetime': datetime.datetime(2023, 3, 8, 9, 25, 20),
     'blinks': [{
-        'duration_ms': 2,
+        'duration_ms': 4.0,
         'num_samples': 2,
-        'start_timestamp': 10000018,
-        'stop_timestamp': 10000020,
+        'start_timestamp': 10000020.0,
+        'stop_timestamp': 10000022.0,
     }],
     'mount_configuration': {
         'mount_type': 'Desktop',
