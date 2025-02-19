@@ -25,6 +25,7 @@ from dataclasses import field
 from typing import Any
 
 import polars as pl
+
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import register_dataset
 from pymovements.gaze.experiment import Experiment
@@ -37,10 +38,10 @@ class Provo(DatasetDefinition):
 
     The Provo Corpus, a corpus of eye-tracking data with accompanying predictability norms.
     The predictability norms for the Provo Corpus differ from those of other corpora.
-    In addition to traditional cloze scores that estimate the predictability of the full orthographic
-    form of each word, the Provo Corpus also includes measures of the predictability of the
-    morpho-syntactic and semantic information for each word. This makes the Provo Corpus ideal for
-    studying predictive processes in reading.
+    In addition to traditional cloze scores that estimate the predictability of the full
+    orthographic form of each word, the Provo Corpus also includes measures of the
+    predictability of the morpho-syntactic and semantic information for each word.
+    This makes the Provo Corpus ideal for studying predictive processes in reading.
 
     Check the respective paper for details :cite:p:`Provo`.
 
@@ -168,7 +169,8 @@ class Provo(DatasetDefinition):
     filename_format: dict[str, str] = field(
         default_factory=lambda:
             {
-                'precomputed_events': 'Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv',
+                'precomputed_events':
+                'Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv',
             },
     )
 
