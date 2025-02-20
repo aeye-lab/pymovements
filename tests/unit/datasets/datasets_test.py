@@ -44,6 +44,7 @@ import pymovements as pm
         pytest.param(pm.datasets.InteRead, 'InteRead', id='InteRead'),
         pytest.param(pm.datasets.JuDo1000, 'JuDo1000', id='JuDo1000'),
         pytest.param(pm.datasets.PoTeC, 'PoTeC', id='PoTeC'),
+        pytest.param(pm.datasets.Provo, 'Provo', id='Provo'),
         pytest.param(pm.datasets.SBSAT, 'SBSAT', id='SBSAT'),
         pytest.param(pm.datasets.ToyDataset, 'ToyDataset', id='ToyDataset'),
         pytest.param(pm.datasets.ToyDatasetEyeLink, 'ToyDatasetEyeLink', id='ToyDatasetEyeLink'),
