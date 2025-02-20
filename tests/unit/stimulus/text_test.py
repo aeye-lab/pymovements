@@ -1,4 +1,4 @@
-# Copyright (c) 2024 The pymovements Project Authors
+# Copyright (c) 2024-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -187,7 +187,7 @@ EXPECTED_DF = polars.DataFrame(
             Path('tests/files/toy_text_1_1_aoi.csv'),
             {'separator': ','},
             EXPECTED_DF,
-            id='toy_text_1_1_aoi',
+            id='toy_text_1_1_aoi_sep',
         ),
     ],
 )
@@ -226,3 +226,101 @@ def test_text_stimulus_unsupported_format():
     expected = 'unsupported file format ".pickle".Supported formats are: '\
         '[\'.csv\', \'.ias\', \'.tsv\', \'.txt\']'
     assert msg == expected
+
+
+@pytest.mark.parametrize(
+    ('aoi_file', 'custom_read_kwargs'),
+    [
+        pytest.param(
+            'tests/files/toy_text_1_1_aoi.csv',
+            None,
+            id='toy_text_1_1_aoi',
+        ),
+        pytest.param(
+            Path('tests/files/toy_text_1_1_aoi.csv'),
+            {'separator': ','},
+            id='toy_text_1_1_aoi_sep',
+        ),
+    ],
+)
+def test_text_stimulus_splitting(aoi_file, custom_read_kwargs):
+    aois_df = pm.stimulus.text.from_file(
+        aoi_file,
+        aoi_column='char',
+        start_x_column='top_left_x',
+        start_y_column='top_left_y',
+        width_column='width',
+        height_column='height',
+        page_column='page',
+        custom_read_kwargs=custom_read_kwargs,
+    )
+
+    aois_df = aois_df.split(by='line_idx')
+    assert len(aois_df) == 2
+
+
+@pytest.mark.parametrize(
+    ('aoi_file', 'custom_read_kwargs'),
+    [
+        pytest.param(
+            'tests/files/toy_text_1_1_aoi.csv',
+            None,
+            id='toy_text_1_1_aoi',
+        ),
+        pytest.param(
+            Path('tests/files/toy_text_1_1_aoi.csv'),
+            {'separator': ','},
+            id='toy_text_1_1_aoi_sep',
+        ),
+    ],
+)
+def test_text_stimulus_splitting_unique_within(aoi_file, custom_read_kwargs):
+    aois_df = pm.stimulus.text.from_file(
+        aoi_file,
+        aoi_column='char',
+        start_x_column='top_left_x',
+        start_y_column='top_left_y',
+        width_column='width',
+        height_column='height',
+        page_column='page',
+        custom_read_kwargs=custom_read_kwargs,
+    )
+
+    aois_df = aois_df.split(by='line_idx')
+    assert all(df.aois.n_unique(subset=['line_idx']) == 1 for df in aois_df)
+
+
+@pytest.mark.parametrize(
+    ('aoi_file', 'custom_read_kwargs'),
+    [
+        pytest.param(
+            'tests/files/toy_text_1_1_aoi.csv',
+            None,
+            id='toy_text_1_1_aoi',
+        ),
+        pytest.param(
+            Path('tests/files/toy_text_1_1_aoi.csv'),
+            {'separator': ','},
+            id='toy_text_1_1_aoi_sep',
+        ),
+    ],
+)
+def test_text_stimulus_splitting_different_between(aoi_file, custom_read_kwargs):
+    aois_df = pm.stimulus.text.from_file(
+        aoi_file,
+        aoi_column='char',
+        start_x_column='top_left_x',
+        start_y_column='top_left_y',
+        width_column='width',
+        height_column='height',
+        page_column='page',
+        custom_read_kwargs=custom_read_kwargs,
+    )
+
+    aois_df = aois_df.split(by='line_idx')
+    unique_values = []
+    for df in aois_df:
+        unique_value = df.aois.unique(subset=['line_idx'])['line_idx'].to_list()
+        unique_values.extend(unique_value)
+
+    assert len(unique_values) == len(set(unique_values))

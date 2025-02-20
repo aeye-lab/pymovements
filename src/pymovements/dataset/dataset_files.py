@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
 """Functionality to scan, load and save dataset files."""
 from __future__ import annotations
 
+import warnings
 from pathlib import Path
 from typing import Any
 
@@ -303,10 +304,27 @@ def load_gaze_file(
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
 
-    add_columns = {
-        key: fileinfo_row[key] for key in
-        [key for key in fileinfo_row.keys() if key != 'filepath']
+    fileinfo_columns = {
+        column: fileinfo_row[column] for column in
+        [column for column in fileinfo_row.keys() if column != 'filepath']
     }
+
+    # check if we have any trial columns specified.
+    if not definition.trial_columns:
+        trial_columns = list(fileinfo_columns)
+    else:  # check for duplicates and merge.
+        trial_columns = definition.trial_columns
+
+        # Make sure fileinfo row is not duplicated as a trial_column:
+        if set(trial_columns).intersection(list(fileinfo_columns)):
+            dupes = set(trial_columns).intersection(list(fileinfo_columns))
+            warnings.warn(
+                f'removed duplicated fileinfo columns from trial_columns: {", ".join(dupes)}',
+            )
+            trial_columns = list(set(trial_columns).difference(list(fileinfo_columns)))
+
+        # expand trial columns with added fileinfo columns
+        trial_columns = list(fileinfo_columns) + trial_columns
 
     if filepath.suffix in {'.csv', '.txt', '.tsv'}:
         if preprocessed:
@@ -315,9 +333,9 @@ def load_gaze_file(
 
             gaze_df = from_csv(
                 filepath,
-                trial_columns=definition.trial_columns,
+                trial_columns=trial_columns,
                 time_unit=time_unit,
-                add_columns=add_columns,
+                add_columns=fileinfo_columns,
                 column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
             )
 
@@ -363,9 +381,9 @@ def load_gaze_file(
                 position_columns=definition.position_columns,
                 velocity_columns=definition.velocity_columns,
                 acceleration_columns=definition.acceleration_columns,
-                trial_columns=definition.trial_columns,
+                trial_columns=trial_columns,
                 column_map=definition.column_map,
-                add_columns=add_columns,
+                add_columns=fileinfo_columns,
                 column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
                 **custom_read_kwargs,
             )
@@ -373,14 +391,16 @@ def load_gaze_file(
         gaze_df = from_ipc(
             filepath,
             experiment=definition.experiment,
-            add_columns=add_columns,
+            trial_columns=trial_columns,
+            add_columns=fileinfo_columns,
             column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
         )
     elif filepath.suffix == '.asc':
         gaze_df = from_asc(
             filepath,
             experiment=definition.experiment,
-            add_columns=add_columns,
+            trial_columns=trial_columns,
+            add_columns=fileinfo_columns,
             column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
             **custom_read_kwargs,
         )

@@ -63,7 +63,7 @@ jobs:
         run: tox --skip-pkg-install -e ${{ matrix.tox_env }}
       - name: Upload coverage reports to Codecov
         if: success() || failure()
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -133,7 +133,7 @@ jobs:
       - name: Run test
         run: tox --skip-pkg-install -e docs
       - name: Upload documentation
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: html-docs-${{ matrix.os }}
           path: docs/build/
