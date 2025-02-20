@@ -111,13 +111,16 @@ class RaCCooNS(DatasetDefinition):
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
-            'gaze': False,
+            'gaze': True,
             'precomputed_events': True,
             'precomputed_reading_measures': True,
         },
     )
     mirrors: dict[str, tuple[str, ...]] = field(
         default_factory=lambda: {
+            'gaze': (
+                'https://data.ru.nl/api/collectionfiles/ru/id/ru_395469/files/',
+            ),
             'precomputed_events': (
                 'https://data.ru.nl/api/collectionfiles/ru/id/ru_395469/files/',
             ),
@@ -128,6 +131,13 @@ class RaCCooNS(DatasetDefinition):
     )
     resources: dict[str, tuple[dict[str, str | None], ...]] = field(
         default_factory=lambda: {
+            'gaze': (
+                {
+                    'resource': 'download/eyetracking%2FET_raw_data.zip',
+                    'filename': 'ET_raw_data.zip',
+                    'md5': None,  # type: ignore
+                },
+            ),
             'precomputed_events': (
                 {
                     'resource': 'download/eyetracking%2FET_fix_data.tsv',
@@ -147,6 +157,7 @@ class RaCCooNS(DatasetDefinition):
 
     extract: dict[str, bool] = field(
         default_factory=lambda: {
+            'gaze': True,
             'precomputed_events': False,
             'precomputed_reading_measures': False,
         },
@@ -154,6 +165,7 @@ class RaCCooNS(DatasetDefinition):
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
+            'gaze': r'{participant_id:s}.asc',
             'precomputed_events': r'ET_fix_data.tsv',
             'precomputed_reading_measures': r'ET_word_data.tsv',
         },
@@ -161,6 +173,7 @@ class RaCCooNS(DatasetDefinition):
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
+            'gaze': {'participant_id': str},
             'precomputed_events': {},
             'precomputed_reading_measures': {},
         },
@@ -172,6 +185,7 @@ class RaCCooNS(DatasetDefinition):
 
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
+            'gaze': {},
             'precomputed_events': {'separator': '\t'},
             'precomputed_reading_measures': {'separator': '\t'},
         },
