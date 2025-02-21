@@ -30,7 +30,6 @@
     pymovements.datasets.CopCo
     pymovements.datasets.DIDEC
     pymovements.datasets.EMTeC
-    pymovements.datasets.FrankNovelSentences
     pymovements.datasets.GazeBase
     pymovements.datasets.GazeBaseVR
     pymovements.datasets.GazeGraph
@@ -40,6 +39,7 @@
     pymovements.datasets.JuDo1000
     pymovements.datasets.PoTeC
     pymovements.datasets.SBSAT
+    pymovements.datasets.UCL
 
 
 .. rubric:: Example Datasets
@@ -57,7 +57,6 @@ from pymovements.datasets.copco import CopCo
 from pymovements.datasets.didec import DIDEC
 from pymovements.datasets.emtec import EMTeC
 from pymovements.datasets.fakenews import FakeNewsPerception
-from pymovements.datasets.franknovelsentences import FrankNovelSentences
 from pymovements.datasets.gaze_graph import GazeGraph
 from pymovements.datasets.gaze_on_faces import GazeOnFaces
 from pymovements.datasets.gazebase import GazeBase
@@ -69,6 +68,7 @@ from pymovements.datasets.potec import PoTeC
 from pymovements.datasets.sb_sat import SBSAT
 from pymovements.datasets.toy_dataset import ToyDataset
 from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
+from pymovements.datasets.ucl import UCL
 
 
 __all__ = [
@@ -78,7 +78,6 @@ __all__ = [
     'DIDEC',
     'EMTeC',
     'FakeNewsPerception',
-    'FrankNovelSentences',
     'GazeBase',
     'GazeBaseVR',
     'GazeGraph',
@@ -90,4 +89,5 @@ __all__ = [
     'SBSAT',
     'ToyDataset',
     'ToyDatasetEyeLink',
+    'UCL',
 ]
