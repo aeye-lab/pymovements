@@ -30,6 +30,7 @@
     pymovements.datasets.CopCo
     pymovements.datasets.DIDEC
     pymovements.datasets.EMTeC
+    pymovements.datasets.FrankNovelSentences
     pymovements.datasets.GazeBase
     pymovements.datasets.GazeBaseVR
     pymovements.datasets.GazeGraph
@@ -56,6 +57,7 @@ from pymovements.datasets.copco import CopCo
 from pymovements.datasets.didec import DIDEC
 from pymovements.datasets.emtec import EMTeC
 from pymovements.datasets.fakenews import FakeNewsPerception
+from pymovements.datasets.franknovelsentences import FrankNovelSentences
 from pymovements.datasets.gaze_graph import GazeGraph
 from pymovements.datasets.gaze_on_faces import GazeOnFaces
 from pymovements.datasets.gazebase import GazeBase
@@ -76,6 +78,7 @@ __all__ = [
     'DIDEC',
     'EMTeC',
     'FakeNewsPerception',
+    'FrankNovelSentences',
     'GazeBase',
     'GazeBaseVR',
     'GazeGraph',
