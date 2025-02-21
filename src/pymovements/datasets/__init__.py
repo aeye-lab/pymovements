@@ -30,6 +30,7 @@
     pymovements.datasets.CopCo
     pymovements.datasets.DIDEC
     pymovements.datasets.EMTeC
+    pymovements.datasets.FakeNewsPerception
     pymovements.datasets.GazeBase
     pymovements.datasets.GazeBaseVR
     pymovements.datasets.GazeGraph
