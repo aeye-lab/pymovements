@@ -39,6 +39,7 @@
     pymovements.datasets.JuDo1000
     pymovements.datasets.PoTeC
     pymovements.datasets.SBSAT
+    pymovements.datasets.UCL
 
 
 .. rubric:: Example Datasets
@@ -67,6 +68,7 @@ from pymovements.datasets.potec import PoTeC
 from pymovements.datasets.sb_sat import SBSAT
 from pymovements.datasets.toy_dataset import ToyDataset
 from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
+from pymovements.datasets.ucl import UCL
 
 
 __all__ = [
@@ -87,4 +89,5 @@ __all__ = [
     'SBSAT',
     'ToyDataset',
     'ToyDatasetEyeLink',
+    'UCL',
 ]
