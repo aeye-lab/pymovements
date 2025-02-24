@@ -1152,7 +1152,7 @@ def test_dataset_download_no_precomputed_event_resources_raises_exception(tmp_pa
 
     msg, = excinfo.value.args
 
-    expected_substrings = ['number', 'precomputed_event_resources', 'zero', 'download']
+    expected_substrings = ['number', '`precomputed_events` resources', 'zero', 'download']
     for substring in expected_substrings:
         assert substring in msg
 
@@ -1286,6 +1286,6 @@ def test_dataset_download_no_precomputed_rm_resources_raises_exception(tmp_path)
 
     msg, = excinfo.value.args
 
-    expected_substrings = ['number', 'precomputed_reading_measures resources', 'zero', 'download']
+    expected_substrings = ['number', '`precomputed_reading_measures` resources', 'zero', 'download']
     for substring in expected_substrings:
         assert substring in msg
