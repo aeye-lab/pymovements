@@ -116,7 +116,7 @@ class Dataset:
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`. (default: None)
         extension: str
-            Specifies the file format for loading data. Valid options are: `csv`, `feather`.
+            Specifies the file format for loading data. Valid options are: `csv`, `feather`, `tsv`, `txt`, `asc`.
             (default: 'feather')
 
         Returns
