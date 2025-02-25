@@ -27,7 +27,6 @@ import polars as pl
 from tqdm import tqdm
 
 from pymovements.stimulus import text
-from pymovements import Dataset
 
 
 class ReadingMeasures:
