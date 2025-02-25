@@ -41,6 +41,7 @@
     pymovements.datasets.PoTeC
     pymovements.datasets.Provo
     pymovements.datasets.SBSAT
+    pymovements.datasets.UCL
 
 
 .. rubric:: Example Datasets
@@ -71,6 +72,7 @@ from pymovements.datasets.provo import Provo
 from pymovements.datasets.sb_sat import SBSAT
 from pymovements.datasets.toy_dataset import ToyDataset
 from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
+from pymovements.datasets.ucl import UCL
 
 
 __all__ = [
@@ -93,4 +95,5 @@ __all__ = [
     'SBSAT',
     'ToyDataset',
     'ToyDatasetEyeLink',
+    'UCL',
 ]
