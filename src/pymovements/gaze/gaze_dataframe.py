@@ -29,6 +29,7 @@ from typing import Any
 
 import numpy as np
 import polars as pl
+from tqdm import tqdm
 
 import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.gaze import transforms
