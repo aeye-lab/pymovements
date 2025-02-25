@@ -50,6 +50,7 @@ import pymovements as pm
         pytest.param(pm.datasets.SBSAT, 'SBSAT', id='SBSAT'),
         pytest.param(pm.datasets.ToyDataset, 'ToyDataset', id='ToyDataset'),
         pytest.param(pm.datasets.ToyDatasetEyeLink, 'ToyDatasetEyeLink', id='ToyDatasetEyeLink'),
+        pytest.param(pm.datasets.UCL, 'UCL', id='UCL'),
     ],
 )
 @pytest.mark.parametrize(
