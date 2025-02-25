@@ -26,6 +26,7 @@
    :template: class.rst
 
     pymovements.datasets.BSC
+    pymovements.datasets.BSCII
     pymovements.datasets.CodeComprehension
     pymovements.datasets.CopCo
     pymovements.datasets.DIDEC
@@ -52,6 +53,7 @@
     pymovements.datasets.ToyDatasetEyeLink
 """
 from pymovements.datasets.bsc import BSC
+from pymovements.datasets.bsc2 import BSCII
 from pymovements.datasets.codecomprehension import CodeComprehension
 from pymovements.datasets.copco import CopCo
 from pymovements.datasets.didec import DIDEC
@@ -73,6 +75,7 @@ from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
 
 __all__ = [
     'BSC',
+    'BSCII',
     'CodeComprehension',
     'CopCo',
     'DIDEC',
