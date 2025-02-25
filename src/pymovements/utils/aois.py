@@ -82,7 +82,7 @@ def get_aoi(
         if aoi.is_empty():
             aoi.extend(pl.from_dict({col: None for col in aoi.columns}))
         return aoi
-    elif aoi_dataframe.end_x_column is not None:
+    if aoi_dataframe.end_x_column is not None:
         checks.check_is_none_is_mutual(
             end_x_column=aoi_dataframe.end_x_column,
             end_y_column=aoi_dataframe.end_y_column,
@@ -100,7 +100,6 @@ def get_aoi(
             aoi.extend(pl.from_dict({col: None for col in aoi.columns}))
 
         return aoi
-    else:
-        raise ValueError(
-            'either aoi_dataframe.width or aoi_dataframe.end_x_column have to be not None',
-        )
+    raise ValueError(
+        'either aoi_dataframe.width or aoi_dataframe.end_x_column have to be not None',
+    )
