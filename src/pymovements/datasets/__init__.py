@@ -29,8 +29,10 @@
     pymovements.datasets.BSCII
     pymovements.datasets.CodeComprehension
     pymovements.datasets.CopCo
+    pymovements.datasets.DAEMONS
     pymovements.datasets.DIDEC
     pymovements.datasets.EMTeC
+    pymovements.datasets.FakeNewsPerception
     pymovements.datasets.GazeBase
     pymovements.datasets.GazeBaseVR
     pymovements.datasets.GazeGraph
@@ -57,6 +59,7 @@ from pymovements.datasets.bsc import BSC
 from pymovements.datasets.bsc2 import BSCII
 from pymovements.datasets.codecomprehension import CodeComprehension
 from pymovements.datasets.copco import CopCo
+from pymovements.datasets.daemons import DAEMONS
 from pymovements.datasets.didec import DIDEC
 from pymovements.datasets.emtec import EMTeC
 from pymovements.datasets.fakenews import FakeNewsPerception
@@ -80,6 +83,7 @@ __all__ = [
     'BSCII',
     'CodeComprehension',
     'CopCo',
+    'DAEMONS',
     'DIDEC',
     'EMTeC',
     'FakeNewsPerception',

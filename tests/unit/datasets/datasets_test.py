@@ -35,6 +35,7 @@ import pymovements as pm
         pytest.param(pm.datasets.BSCII, 'BSCII', id='BSCII'),
         pytest.param(pm.datasets.CodeComprehension, 'CodeComprehension', id='CodeComprehension'),
         pytest.param(pm.datasets.CopCo, 'CopCo', id='CopCo'),
+        pytest.param(pm.datasets.DAEMONS, 'DAEMONS', id='DAEMONS'),
         pytest.param(pm.datasets.DIDEC, 'DIDEC', id='DIDEC'),
         pytest.param(pm.datasets.EMTeC, 'EMTeC', id='EMTeC'),
         pytest.param(pm.datasets.FakeNewsPerception, 'FakeNewsPerception', id='FakeNewsPerception'),
