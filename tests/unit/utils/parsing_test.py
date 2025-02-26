@@ -26,7 +26,7 @@ from polars.testing import assert_frame_equal
 import pymovements as pm
 
 
-@pytest.mark.filterwarnings
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
 def test_parse_eyelink_equal_gaze():
     filepath = 'tests/files/eyelink_monocular_example.asc'
 
