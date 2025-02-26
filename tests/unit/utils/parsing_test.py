@@ -21,21 +21,29 @@
 import re
 
 import pytest
+from polars.testing import assert_frame_equal
 
 import pymovements as pm
 
 
-def test_is_parsing_deprecated():
+@pytest.mark.filterwarnings
+def test_parse_eyelink_equal_gaze():
+    filepath = 'tests/files/eyelink_monocular_example.asc'
+
+    gaze, _ = pm.gaze._utils.parsing.parse_eyelink(filepath)
+    gaze_depr, _ = pm.utils.parsing.parse_eyelink(filepath)
+
+    assert_frame_equal(gaze, gaze_depr)
+
+
+def test_parse_eyelink_deprecated():
     filepath = 'tests/files/eyelink_monocular_example.asc'
 
     with pytest.raises(DeprecationWarning):
-        gaze, metadata = pm.utils.parsing.parse_eyelink(filepath)
-
-    assert gaze is not None
-    assert metadata is not None
+        _ = pm.utils.parsing.parse_eyelink(filepath)
 
 
-def test_is_parsing_removed():
+def test_parse_eyelink_removed():
     filepath = 'tests/files/eyelink_monocular_example.asc'
 
     with pytest.raises(DeprecationWarning) as info:
