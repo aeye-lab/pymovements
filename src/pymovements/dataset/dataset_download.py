@@ -111,6 +111,52 @@ def download_dataset(
                     f"downloading resource {resource['resource']} failed for all mirrors.",
                 )
 
+    if definition.has_files['stimulus']:
+        if len(definition.mirrors['stimulus']) == 0:
+            raise AttributeError(
+                'number of stimulus mirrors must not be zero to download dataset',
+            )
+
+        if len(definition.resources['stimulus']) == 0:
+            raise AttributeError(
+                'number of stimulus resources must not be zero to download dataset',
+            )
+
+        paths.stimulus.mkdir(parents=True, exist_ok=True)
+
+        for resource in definition.resources['stimulus']:
+            success = False
+
+            for mirror_idx, mirror in enumerate(definition.mirrors['stimulus']):
+
+                url = f'{mirror}{resource["resource"]}'
+
+                try:
+                    download_file(
+                        url=url,
+                        dirpath=paths.downloads,
+                        filename=resource['filename'],
+                        md5=resource['md5'],
+                        verbose=verbose,
+                    )
+                    success = True
+
+                # pylint: disable=overlapping-except
+                except (URLError, OSError, RuntimeError) as error:
+                    # Error downloading the resource, try next mirror
+                    if mirror_idx < len(definition.mirrors['stimulus']) - 1:
+                        print(f'Failed to download:\n{error}\nTrying next mirror.')
+                    continue
+
+                # downloading the resource was successful, we don't need to try another mirror
+                break
+
+            if not success:
+                raise RuntimeError(
+                    f"downloading resource {resource['resource']} "
+                    'failed for all mirrors.',
+                )
+
     if definition.has_files['precomputed_events']:
         if len(definition.mirrors['precomputed_events']) == 0:
             raise AttributeError(
@@ -251,6 +297,24 @@ def extract_dataset(
                 remove_top_level=remove_top_level,
                 verbose=verbose,
             )
+
+    if definition.has_files['stimulus']:
+        paths.stimulus.mkdir(parents=True, exist_ok=True)
+        for resource in definition.resources['stimulus']:
+            source_path = paths.downloads / resource['filename']
+            destination_path = paths.stimulus
+
+            if definition.extract['stimulus']:
+                extract_archive(
+                    source_path=source_path,
+                    destination_path=destination_path,
+                    recursive=True,
+                    remove_finished=remove_finished,
+                    remove_top_level=remove_top_level,
+                    verbose=verbose,
+                )
+            else:
+                shutil.copy(source_path, destination_path / resource['filename'])
 
     if definition.has_files['precomputed_events']:
         paths.precomputed_events.mkdir(parents=True, exist_ok=True)
