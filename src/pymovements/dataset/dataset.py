@@ -138,6 +138,9 @@ class Dataset:
         if self.definition.has_files['precomputed_events']:
             self.load_precomputed_events()
 
+        if self.definition.has_files['precomputed_aois']:
+            self.load_precomputed_aois()
+
         # Reading measures files precomuted by authors of the dataset
         if self.definition.has_files['precomputed_reading_measures']:
             self.load_precomputed_reading_measures()
@@ -213,6 +216,15 @@ class Dataset:
             extension=extension,
         )
         return self
+
+    def load_precomputed_aois(self) -> None:
+        """Load precomputed aois."""
+        self._check_fileinfo()
+        self.precomputed_events = dataset_files.load_precomputed_event_files(
+            self.definition,
+            self.fileinfo['precomputed_aois'],
+            self.paths,
+        )
 
     def load_precomputed_events(self) -> None:
         """Load precomputed events."""
