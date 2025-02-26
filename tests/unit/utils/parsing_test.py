@@ -29,7 +29,10 @@ def test_is_parsing_deprecated():
     filepath = 'tests/files/eyelink_monocular_example.asc'
 
     with pytest.raises(DeprecationWarning):
-        _ = pm.utils.parsing.parse_eyelink(filepath)
+        gaze, metadata = pm.utils.parsing.parse_eyelink(filepath)
+
+    assert gaze is not None
+    assert metadata is not None
 
 
 def test_is_parsing_removed():
