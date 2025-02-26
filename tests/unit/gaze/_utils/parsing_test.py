@@ -196,7 +196,7 @@ def test_parse_eyelink(tmp_path):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(ASC_TEXT)
 
-    df, metadata = pm.utils.parsing.parse_eyelink(
+    df, metadata = pm.gaze._utils.parsing.parse_eyelink(
         filepath,
         patterns=PATTERNS,
         metadata_patterns=METADATA_PATTERNS,
@@ -236,7 +236,7 @@ def test_parse_eyelink(tmp_path):
     ],
 )
 def test_from_asc_metadata_patterns(kwargs, expected_metadata):
-    _, metadata = pm.utils.parsing.parse_eyelink(**kwargs)
+    _, metadata = pm.gaze._utils.parsing.parse_eyelink(**kwargs)
 
     for key, value in expected_metadata.items():
         assert metadata[key] == value
@@ -254,7 +254,7 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
     filepath.write_text(ASC_TEXT)
 
     with pytest.raises(ValueError) as excinfo:
-        pm.utils.parsing.parse_eyelink(
+        pm.gaze._utils.parsing.parse_eyelink(
             filepath,
             patterns=patterns,
         )
@@ -344,7 +344,7 @@ def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_mo
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, metadata = pm.utils.parsing.parse_eyelink(
+    _, metadata = pm.gaze._utils.parsing.parse_eyelink(
         filepath,
     )
 
@@ -367,7 +367,7 @@ def test_no_metadata_warning(tmp_path, metadata, expected_msg):
     filepath.write_text(metadata)
 
     with pytest.raises(Warning) as info:
-        _, metadata = pm.utils.parsing.parse_eyelink(
+        _, metadata = pm.gaze._utils.parsing.parse_eyelink(
             filepath,
         )
 
@@ -429,17 +429,16 @@ def test_val_cal_eyelink(tmp_path, metadata, expected_validation, expected_calib
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
+    _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
 
     assert parsed_metadata['calibrations'] == expected_calibration
     assert parsed_metadata['validations'] == expected_validation
 
 
 def test_parse_val_cal_eyelink_monocular_file():
-    example_asc_monocular_path = Path(__file__).parent.parent.parent / \
-        'files/eyelink_monocular_example.asc'
+    example_asc_monocular_path = Path('tests/files/eyelink_monocular_example.asc')
 
-    _, metadata = pm.utils.parsing.parse_eyelink(example_asc_monocular_path)
+    _, metadata = pm.gaze._utils.parsing.parse_eyelink(example_asc_monocular_path)
 
     expected_validation = [{
         'error': 'GOOD ERROR',
@@ -553,7 +552,7 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
+    _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
 
     assert parsed_metadata['blinks'] == expected_blinks
 
@@ -691,7 +690,7 @@ def test_parse_eyelink_data_loss_ratio(
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
+    _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
 
     assert parsed_metadata['data_loss_ratio_blinks'] == expected_blink_ratio
     assert parsed_metadata['data_loss_ratio'] == expected_overall_ratio
@@ -704,7 +703,7 @@ def test_parse_eyelink_datetime(tmp_path):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
+    _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
 
     assert parsed_metadata['datetime'] == expected_datetime
 
@@ -886,6 +885,6 @@ def test_parse_eyelink_mount_config(tmp_path, metadata, expected_mount_config):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, parsed_metadata = pm.utils.parsing.parse_eyelink(filepath)
+    _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
 
     assert parsed_metadata['mount_configuration'] == expected_mount_config
