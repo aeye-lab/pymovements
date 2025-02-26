@@ -144,6 +144,9 @@ class SBSAT(DatasetDefinition):
                 'precomputed_events': (
                     'https://raw.githubusercontent.com/ahnchive/SB-SAT/master/fixation/',
                 ),
+                'precomputed_aois': (
+                    'https://raw.githubusercontent.com/ahnchive/SB-SAT/master/fixation/',
+                ),
             },
     )
     resources: dict[str, tuple[dict[str, str], ...]] = field(

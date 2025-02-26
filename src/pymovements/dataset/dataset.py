@@ -226,7 +226,6 @@ class Dataset:
         self.stimulus = dataset_files.load_stimulus(
             self.definition,
             self.fileinfo['stimulus'],
-            self.paths,
         )
 
     def load_precomputed_events(self) -> None:
