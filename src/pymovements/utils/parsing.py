@@ -19,7 +19,7 @@
 # SOFTWARE.
 """Module for parsing input data.
 
-.. deprecated:: 0.21.0
+.. deprecated:: v0.21.0
    Please use gaze.from_asc() instead of utils.parsing.
    This module will be removed in v0.26.0.
 """
