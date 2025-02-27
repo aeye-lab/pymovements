@@ -32,15 +32,19 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import IO
 
+from tqdm import tqdm
+
 from pymovements.utils.paths import get_filepaths
 
 
 def extract_archive(
         source_path: Path,
         destination_path: Path | None = None,
+        *,
         recursive: bool = True,
         remove_finished: bool = False,
         remove_top_level: bool = True,
+        resume: bool = False,
         verbose: int = 1,
 ) -> Path:
     """Extract an archive.
@@ -61,6 +65,9 @@ def extract_archive(
         If ``True``, remove the file after the extraction. (default: False)
     remove_top_level: bool
         If ``True``, remove the top-level directory if it has only one child. (default: True)
+    resume: bool
+        Resume previous extraction by skipping existing files.
+        Checks for correct size of existing files but not integrity. (default: False)
     verbose: int
         Verbosity levels: (1) Print messages for extracting each dataset resource without printing
         messages for recursive archives. (2) Print additional messages for each recursive archive
@@ -90,7 +97,13 @@ def extract_archive(
         print(f'Extracting {source_path.name} to {destination_path}')
 
     # Extract file and remove archive if desired.
-    extractor(source_path, destination_path, compression_type)
+    extractor(
+        source_path,
+        destination_path,
+        compression_type,
+        resume=resume,
+        verbose=verbose,
+    )
     if remove_finished:
         source_path.unlink()
 
@@ -129,6 +142,7 @@ def extract_archive(
                 remove_finished=remove_finished,
                 remove_top_level=remove_top_level,
                 verbose=0 if verbose < 2 else 2,
+                resume=resume,
             )
 
     return destination_path
@@ -138,6 +152,9 @@ def _extract_tar(
         source_path: Path,
         destination_path: Path,
         compression: str | None,
+        *,
+        resume: bool,
+        verbose: int,
 ) -> None:
     """Extract a tar archive.
 
@@ -149,18 +166,36 @@ def _extract_tar(
         Path to the directory the file will be extracted to.
     compression: str | None
         Compression filename suffix.
+    resume: bool
+        Resume if archive was already previous extracted.
+    verbose: int
+        Print messages for resuming each dataset resource.
     """
     with tarfile.open(source_path, f'r:{compression[1:]}' if compression else 'r') as archive:
-        if sys.version_info < (3, 12):  # pragma: <3.12 cover
-            archive.extractall(destination_path)
-        else:  # pragma: >=3.12 cover
-            archive.extractall(destination_path, filter='tar')
+        for member in tqdm(archive.getmembers()):
+            if resume:
+                member_dest_path = os.path.join(destination_path, member.name)
+                if (
+                        os.path.exists(member_dest_path) and
+                        member.name[-4:] in _ARCHIVE_EXTRACTORS and
+                        member.size == os.path.getsize(member_dest_path)
+                ):
+                    if verbose:
+                        print(f'Skipping {member.name} due to previous extraction')
+                    continue
+            if sys.version_info < (3, 12):  # pragma: <3.12 cover
+                archive.extract(member.name, destination_path)
+            else:  # pragma: >=3.12 cover
+                archive.extract(member.name, destination_path, filter='tar')
 
 
 def _extract_zip(
         source_path: Path,
         destination_path: Path,
         compression: str | None,
+        *,
+        resume: bool,
+        verbose: int,
 ) -> None:
     """Extract a zip archive.
 
@@ -172,18 +207,33 @@ def _extract_zip(
         Path to the directory the file will be extracted to.
     compression: str | None
         Compression filename suffix.
+    resume: bool
+        Resume if archive was already previous extracted.
+    verbose: int
+        Print messages for resuming each dataset resource.
     """
     compression_id = _ZIP_COMPRESSION_MAP[compression] if compression else zipfile.ZIP_STORED
     with zipfile.ZipFile(source_path, 'r', compression=compression_id) as archive:
-        archive.extractall(destination_path)
+        for member in tqdm(archive.filelist):
+            if resume:
+                member_dest_path = os.path.join(destination_path, member.filename)
+                if (
+                    os.path.exists(member_dest_path) and
+                    member.filename[-4:] in _ARCHIVE_EXTRACTORS and
+                    member.file_size == os.path.getsize(member_dest_path)
+                ):
+                    if verbose:
+                        print(f'Skipping {member.filename} due to previous extraction')
+                    continue
+            archive.extract(member.filename, destination_path)
 
 
-_ARCHIVE_EXTRACTORS: dict[str, Callable[[Path, Path, str | None], None]] = {
+_ARCHIVE_EXTRACTORS = {
     '.tar': _extract_tar,
     '.zip': _extract_zip,
 }
 
-_ARCHIVE_TYPE_ALIASES: dict[str, tuple[str, str]] = {
+_ARCHIVE_TYPE_ALIASES = {
     '.tbz': ('.tar', '.bz2'),
     '.tbz2': ('.tar', '.bz2'),
     '.tgz': ('.tar', '.gz'),
@@ -195,7 +245,7 @@ _COMPRESSED_FILE_OPENERS: dict[str, Callable[..., IO]] = {
     '.xz': lzma.open,
 }
 
-_ZIP_COMPRESSION_MAP: dict[str, int] = {
+_ZIP_COMPRESSION_MAP = {
     '.bz2': zipfile.ZIP_BZIP2,
     '.xz': zipfile.ZIP_LZMA,
 }
