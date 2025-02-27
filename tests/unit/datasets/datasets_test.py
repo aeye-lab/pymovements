@@ -48,6 +48,7 @@ import pymovements as pm
         pytest.param('SBSAT', id='SBSAT'),
         pytest.param('ToyDataset', id='ToyDataset'),
         pytest.param('ToyDatasetEyeLink', id='ToyDatasetEyeLink'),
+        pytest.param('UCL', id='UCL'),
     ],
 )
 def test_public_dataset_registered(dataset_name):
