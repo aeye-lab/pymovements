@@ -40,6 +40,7 @@ from pymovements.utils.paths import get_filepaths
 def extract_archive(
         source_path: Path,
         destination_path: Path | None = None,
+        *,
         recursive: bool = True,
         remove_finished: bool = False,
         remove_top_level: bool = True,
@@ -96,7 +97,13 @@ def extract_archive(
         print(f'Extracting {source_path.name} to {destination_path}')
 
     # Extract file and remove archive if desired.
-    extractor(source_path, destination_path, compression_type, resume, verbose)
+    extractor(
+        source_path,
+        destination_path,
+        compression_type,
+        resume=resume,
+        verbose=verbose,
+    )
     if remove_finished:
         source_path.unlink()
 
@@ -145,6 +152,7 @@ def _extract_tar(
         source_path: Path,
         destination_path: Path,
         compression: str | None,
+        *,
         resume: bool,
         verbose: int,
 ) -> None:
@@ -185,6 +193,7 @@ def _extract_zip(
         source_path: Path,
         destination_path: Path,
         compression: str | None,
+        *,
         resume: bool,
         verbose: int,
 ) -> None:
@@ -219,12 +228,12 @@ def _extract_zip(
             archive.extract(member.filename, destination_path)
 
 
-_ARCHIVE_EXTRACTORS: dict[str, Callable[[Path, Path, str | None, bool, int], None]] = {
+_ARCHIVE_EXTRACTORS = {
     '.tar': _extract_tar,
     '.zip': _extract_zip,
 }
 
-_ARCHIVE_TYPE_ALIASES: dict[str, tuple[str, str]] = {
+_ARCHIVE_TYPE_ALIASES = {
     '.tbz': ('.tar', '.bz2'),
     '.tbz2': ('.tar', '.bz2'),
     '.tgz': ('.tar', '.gz'),

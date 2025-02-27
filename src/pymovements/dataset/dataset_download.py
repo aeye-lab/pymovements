@@ -32,6 +32,7 @@ from pymovements.utils.downloads import download_file
 def download_dataset(
         definition: DatasetDefinition,
         paths: DatasetPaths,
+        *,
         extract: bool = True,
         remove_finished: bool = False,
         resume: bool = False,
@@ -221,6 +222,7 @@ def download_dataset(
 def extract_dataset(
         definition: DatasetDefinition,
         paths: DatasetPaths,
+        *,
         remove_finished: bool = False,
         remove_top_level: bool = True,
         resume: bool = False,
