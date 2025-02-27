@@ -30,6 +30,7 @@ import pymovements as pm
     # please add datasets in alphabetical order
     [
         pytest.param('BSC', id='BSC'),
+        pytest.param('BSCII', id='BSCII'),
         pytest.param('CodeComprehension', id='CodeComprehension'),
         pytest.param('CopCo', id='CopCo'),
         pytest.param('DIDEC', id='DIDEC'),
