@@ -22,4 +22,5 @@ from pathlib import Path
 
 from pymovements.dataset.dataset_library import DatasetLibrary
 
+
 DatasetLibrary.register_yaml_directory(Path(__file__).parent)
