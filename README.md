@@ -30,7 +30,7 @@ and render plots to visually analyze your results.
 - **Conda package:** https://anaconda.org/conda-forge/pymovements
 - **Bug reports:** https://github.com/aeye-lab/pymovements/issues
 - **Contributing:** https://github.com/aeye-lab/pymovements/blob/main/CONTRIBUTING.md
-- **Mailing list:** pymovements@python.org
+- **Mailing list:** pymovements@python.org ([subscribe](https://mail.python.org/mailman3/lists/pymovements.python.org/))
 - **Discord:** https://discord.gg/Z7VMSbDm
 
 
