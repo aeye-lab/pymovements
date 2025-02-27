@@ -245,7 +245,7 @@ _COMPRESSED_FILE_OPENERS: dict[str, Callable[..., IO]] = {
     '.xz': lzma.open,
 }
 
-_ZIP_COMPRESSION_MAP: dict[str, int] = {
+_ZIP_COMPRESSION_MAP = {
     '.bz2': zipfile.ZIP_BZIP2,
     '.xz': zipfile.ZIP_LZMA,
 }
