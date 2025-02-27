@@ -33,6 +33,7 @@ import pymovements as pm
         pytest.param('BSCII', id='BSCII'),
         pytest.param('CodeComprehension', id='CodeComprehension'),
         pytest.param('CopCo', id='CopCo'),
+        pytest.param('DAEMONS', id='DAEMONS'),
         pytest.param('DIDEC', id='DIDEC'),
         pytest.param('EMTeC', id='EMTeC'),
         pytest.param('FakeNewsPerception', id='FakeNewsPerception'),
