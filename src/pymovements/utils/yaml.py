@@ -20,7 +20,12 @@
 """Yaml utilities."""
 from __future__ import annotations
 
+from importlib import resources
+from pathlib import PosixPath
+
 import yaml
+
+from pymovements import datasets
 
 
 # generalized constructor for !* tags
@@ -88,3 +93,20 @@ def type_constructor(
 
     except AttributeError as exc:
         raise ValueError(f"Unknown type: {type_name}") from exc
+
+
+def write_dataset_definitions_yaml() -> None:
+    """Automatically write `datasets.yaml` file for registering datasets."""
+    dataset_definition_files = resources.files(datasets)
+    datasets_list = []
+
+    for yaml_file in dataset_definition_files.iterdir():
+        if isinstance(yaml_file, PosixPath):
+            if yaml_file.suffix == '.yaml':
+                yaml_filename = yaml_file.parts[-1]
+                if yaml_filename == 'datasets.yaml':
+                    continue
+                datasets_list.append(yaml_filename.split('.')[0])
+
+    with open('src/pymovements/datasets/datasets.yaml', 'w', encoding='utf-8') as f:
+        yaml.safe_dump(sorted(datasets_list), f)

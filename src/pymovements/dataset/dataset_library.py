@@ -20,8 +20,13 @@
 """DatasetLibrary module."""
 from __future__ import annotations
 
+from importlib import resources
 from pathlib import Path
+from pathlib import PosixPath
 
+import yaml
+
+from pymovements import datasets
 from pymovements.dataset.dataset_definition import DatasetDefinition
 
 
@@ -100,6 +105,8 @@ class DatasetLibrary:
         """
         directory = Path(directory)
         for yaml_file in directory.glob('*.yaml'):
+            if yaml_file.parts[-1] == 'datasets.yaml':
+                continue
             cls.add(yaml_file)
 
 
@@ -118,3 +125,21 @@ def register_dataset(cls: DatasetDefinition) -> DatasetDefinition:
     """
     DatasetLibrary.add(cls)
     return cls
+
+
+def _add_shipped_datasets() -> None:
+    """Add available public datasets via `src/pymovements/datasets/datasets.yaml`."""
+    dataset_definition_files = resources.files(datasets)
+
+    datasets_list_yaml = dataset_definition_files / 'datasets.yaml'
+    assert isinstance(datasets_list_yaml, PosixPath)
+    with open(datasets_list_yaml, encoding='utf-8') as f:
+        datasets_list = yaml.safe_load(f)
+
+    for definition_basename in datasets_list:
+        yaml_file_name = dataset_definition_files / f'{definition_basename}.yaml'
+        assert isinstance(yaml_file_name, PosixPath)
+        DatasetLibrary.add(yaml_file_name)
+
+
+_add_shipped_datasets()
