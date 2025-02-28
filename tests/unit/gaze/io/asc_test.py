@@ -61,12 +61,12 @@ import pymovements as pm
         pytest.param(
             {
                 'file': 'tests/files/eyelink_monocular_example.asc',
-                'patterns': pm.Dataset(
-                    'ToyDatasetEyeLink', '',
-                ).definition.custom_read_kwargs['gaze']['patterns'],
-                'schema': pm.Dataset(
-                    'ToyDatasetEyeLink', '',
-                ).definition.custom_read_kwargs['gaze']['schema'],
+                'patterns': pm.DatasetLibrary.get(
+                    'ToyDatasetEyeLink',
+                ).custom_read_kwargs['gaze']['patterns'],
+                'schema': pm.DatasetLibrary.get(
+                    'ToyDatasetEyeLink',
+                ).custom_read_kwargs['gaze']['schema'],
             },
             pl.DataFrame(
                 data={
@@ -159,12 +159,12 @@ def test_from_asc_has_frame_equal(kwargs, expected_frame):
         pytest.param(
             {
                 'file': 'tests/files/eyelink_monocular_example.asc',
-                'patterns': pm.Dataset(
-                    'ToyDatasetEyeLink', '',
-                ).definition.custom_read_kwargs['gaze']['patterns'],
-                'schema': pm.Dataset(
-                    'ToyDatasetEyeLink', '',
-                ).definition.custom_read_kwargs['gaze']['schema'],
+                'patterns': pm.DatasetLibrary.get(
+                    'ToyDatasetEyeLink',
+                ).custom_read_kwargs['gaze']['patterns'],
+                'schema': pm.DatasetLibrary.get(
+                    'ToyDatasetEyeLink',
+                ).custom_read_kwargs['gaze']['schema'],
             },
             (16, 7),
             {
