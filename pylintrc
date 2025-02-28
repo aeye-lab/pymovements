@@ -103,6 +103,8 @@ disable=
     too-many-arguments,
     too-many-instance-attributes,
     too-many-locals,
+    # https://pylint.readthedocs.io/en/v3.3.3/user_guide/messages/refactor/
+    # too-many-positional-arguments.html
     too-many-arguments,
     too-many-public-methods,
 
