@@ -49,7 +49,7 @@ class Dataset:
 
     Parameters
     ----------
-    definition: str | DatasetDefinition | Path
+    definition: str | Path | DatasetDefinition | type[DatasetDefinition]
         Dataset definition to initialize dataset with.
     path: str | Path | DatasetPaths
         Path to the dataset directory. You can set up a custom directory structure
@@ -57,9 +57,9 @@ class Dataset:
     """
 
     def __init__(
-        self,
-        definition: str | DatasetDefinition | Path,
-        path: str | Path | DatasetPaths,
+            self,
+            definition: str | Path | DatasetDefinition | type[DatasetDefinition],
+            path: str | Path | DatasetPaths,
     ):
         self.fileinfo: pl.DataFrame = pl.DataFrame()
         self.gaze: list[GazeDataFrame] = []
@@ -75,6 +75,9 @@ class Dataset:
             else:
                 # Try to load from registered datasets
                 self.definition = DatasetLibrary.get(definition)
+
+        elif isinstance(definition, type):
+            definition = definition()
         else:
             self.definition = deepcopy(definition)
 
