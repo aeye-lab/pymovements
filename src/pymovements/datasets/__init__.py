@@ -18,8 +18,3 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Public datasets."""
-from pathlib import Path
-
-from pymovements.dataset.dataset_library import DatasetLibrary
-
-DatasetLibrary.register_yaml_directory(Path(__file__).parent)
