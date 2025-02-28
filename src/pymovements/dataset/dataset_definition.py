@@ -30,6 +30,10 @@ import yaml
 
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
+from pymovements.utils.yaml import type_constructor
+
+
+yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
 
 
 @dataclass
@@ -207,73 +211,3 @@ class DatasetDefinition:
 
         with open(yaml_path, 'w', encoding='utf-8') as f:
             yaml.dump(data, f, sort_keys=False)
-
-
-# generalized constructor for !* tags
-def type_constructor(
-        loader: yaml.SafeLoader,
-        prefix: str,
-        node: yaml.Node,
-) -> type:
-    """Resolve a YAML tag to a corresponding Python type.
-
-    This function is used to handle custom YAML tags (e.g., `!pl.Int64`)
-    by mapping the tag to a Python type or class name. The type name is
-    extracted from the YAML tag and evaluated to return the corresponding
-    Python object. If the type cannot be resolved, an error is raised.
-
-    Parameters
-    ----------
-    loader: yaml.SafeLoader
-        The YAML loader being used to parse the YAML document.
-    prefix: str
-        A string prefix for the custom tag (e.g., '!').
-    node: yaml.Node
-        The YAML node containing the tag and associated value.
-
-    Returns
-    -------
-    type
-        The Python type or class corresponding to the YAML tag.
-
-    Raises
-    ------
-    ValueError: If the specified type name in the tag cannot be resolved
-                to a valid Python object.
-
-    Example:
-        # Example YAML document:
-        # !pl.Int64
-        #
-        # Resolves to the Python type `pl.Int64` (assuming `pl` is a valid module).
-
-    """
-    # pylint: disable=unused-argument
-    # extract the type name (e.g., from !pl.Int64 to pl.Int64)
-    type_name = node.tag[1:]
-
-    built_in_types = {
-        'int': int,
-        'float': float,
-        'str': str,
-        'bool': bool,
-        'list': list,
-        'dict': dict,
-        'set': set,
-        'tuple': tuple,
-    }
-
-    # check for built-in types first
-    if type_name in built_in_types:
-        return built_in_types[type_name]
-
-    try:
-        module_name, type_attr = type_name.rsplit('.', 1)
-        module = __import__(module_name)
-        return getattr(module, type_attr)
-
-    except AttributeError as exc:
-        raise ValueError(f"Unknown type: {type_name}") from exc
-
-
-yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
