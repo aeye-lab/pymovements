@@ -59,7 +59,7 @@ class DatasetLibrary:
             yaml_def = DatasetDefinition.from_yaml(definition)
             cls.definitions[yaml_def.name] = yaml_def
         else:
-            # DatasetDefinition instance (from YAML)
+            # DatasetDefinition instance
             cls.definitions[definition.name] = definition
 
     @classmethod
@@ -101,3 +101,20 @@ class DatasetLibrary:
         directory = Path(directory)
         for yaml_file in directory.glob('*.yaml'):
             cls.add(yaml_file)
+
+
+def register_dataset(cls: DatasetDefinition) -> DatasetDefinition:
+    """Register a public dataset definition.
+
+    Parameters
+    ----------
+    cls: DatasetDefinition
+        The :py:class:`~pymovements.DatasetDefinition` to register.
+
+    Returns
+    -------
+    DatasetDefinition
+        The :py:class:`~pymovements.DatasetDefinition` to register.
+    """
+    DatasetLibrary.add(cls)
+    return cls
