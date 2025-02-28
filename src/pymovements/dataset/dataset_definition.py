@@ -193,19 +193,16 @@ class DatasetDefinition:
         # Initialize DatasetDefinition with YAML data
         return DatasetDefinition(**data)
 
-    @staticmethod
-    def to_yaml(definition: DatasetDefinition, yaml_path: str | Path) -> None:
+    def to_yaml(self, yaml_path: str | Path) -> None:
         """Save a dataset definition to a YAML file.
 
         Parameters
         ----------
-        definition : DatasetDefinition
-            Dataset definition to save
         yaml_path : str | Path
             Path where to save the YAML file
         """
         # Convert to dict and handle experiment object
-        data = asdict(definition)
+        data = asdict(self)
         if data['experiment']:
             data['experiment'] = asdict(data['experiment'])
 

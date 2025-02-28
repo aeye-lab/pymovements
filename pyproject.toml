@@ -149,6 +149,12 @@ filterwarnings = [
 ]
 testpaths = ['tests', 'src']
 
+[tool.setuptools.package-data]
+pymovements = ["datasets/*.yaml"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [tool.setuptools-git-versioning]
 enabled = true
 

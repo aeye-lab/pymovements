@@ -94,21 +94,6 @@ class DatasetLibrary:
             )
         return cls.definitions[name]
 
-    @classmethod
-    def register_yaml_directory(cls, directory: str | Path) -> None:
-        """Register all YAML dataset definitions in a directory.
-
-        Parameters
-        ----------
-        directory: str | Path
-            Directory containing YAML dataset definitions
-        """
-        directory = Path(directory)
-        for yaml_file in directory.glob('*.yaml'):
-            if yaml_file.parts[-1] == 'datasets.yaml':
-                continue
-            cls.add(yaml_file)
-
 
 def register_dataset(cls: DatasetDefinition) -> DatasetDefinition:
     """Register a public dataset definition.
