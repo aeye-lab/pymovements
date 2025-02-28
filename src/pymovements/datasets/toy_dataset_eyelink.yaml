@@ -63,27 +63,18 @@ custom_read_kwargs:
       - pattern: 'SYNCTIME_JUDO'
         column: "task"
         value: "judo"
-      - pattern: 'READING[.]STOP'
+      - pattern: !!python/tuple ["READING[.]STOP", "JUDO[.]STOP"]
         column: "task"
         value: null
-      - pattern: 'JUDO[.]STOP'
-        column: "task"
-        value: null
-      - pattern: 'TRIALID (?P<trial_id>\d+)'
-        column: "trial_id"
-        value: null
+      - 'TRIALID (?P<trial_id>\d+)'
       - pattern: 'TRIAL_RESULT'
         column: "trial_id"
         value: null
-      - pattern: 'SYNCTIME_READING_SCREEN_(?P<screen_id>\d+)'
-        column: "screen_id"
-        value: null
+      - 'SYNCTIME_READING_SCREEN_(?P<screen_id>\d+)'
       - pattern: 'READING[.]STOP'
         column: "screen_id"
         value: null
-      - pattern: 'SYNCTIME.P(?P<point_id>\d+)'
-        column: "point_id"
-        value: null
+      - 'SYNCTIME.P(?P<point_id>\d+)'
       - pattern: 'P\d[.]STOP'
         column: "point_id"
         value: null
