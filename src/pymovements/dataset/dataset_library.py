@@ -132,12 +132,14 @@ def _add_shipped_datasets() -> None:
     dataset_definition_files = resources.files(datasets)
 
     datasets_list_yaml = dataset_definition_files / 'datasets.yaml'
+    # https://github.com/aeye-lab/pymovements/pull/952#issuecomment-2690742187
     assert isinstance(datasets_list_yaml, PosixPath)
     with open(datasets_list_yaml, encoding='utf-8') as f:
         datasets_list = yaml.safe_load(f)
 
     for definition_basename in datasets_list:
         yaml_file_name = dataset_definition_files / f'{definition_basename}.yaml'
+        # https://github.com/aeye-lab/pymovements/pull/952#issuecomment-2690742187
         assert isinstance(yaml_file_name, PosixPath)
         DatasetLibrary.add(yaml_file_name)
 

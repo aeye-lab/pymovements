@@ -114,6 +114,7 @@ def write_dataset_definitions_yaml(
     datasets_list = []
 
     for yaml_file in dataset_definition_files.iterdir():
+        # https://github.com/aeye-lab/pymovements/pull/952#issuecomment-2690742187
         assert isinstance(yaml_file, PosixPath)
         if yaml_file.suffix == '.yaml':
             yaml_filename = yaml_file.parts[-1]
