@@ -30,7 +30,7 @@ import yaml
 
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
-from pymovements.utils.yaml import type_constructor
+from pymovements.utils.datasets_yaml import type_constructor
 
 
 yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)

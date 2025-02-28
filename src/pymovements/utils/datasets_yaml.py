@@ -91,22 +91,35 @@ def type_constructor(
         module = __import__(module_name)
         return getattr(module, type_attr)
 
+    # module does not have this file type
     except AttributeError as exc:
-        raise ValueError(f"Unknown type: {type_name}") from exc
+        raise ValueError(
+            f"Unknown type: {type_attr} for module {module_name}",
+        ) from exc
 
 
-def write_dataset_definitions_yaml() -> None:
-    """Automatically write `datasets.yaml` file for registering datasets."""
+def write_dataset_definitions_yaml(
+        datasets_yaml_path: str = 'src/pymovements/datasets/datasets.yaml',
+) -> None:
+    """Automatically write `datasets.yaml` file for registering datasets.
+
+    Parameters
+    ----------
+    datasets_yaml_path: str
+        Where to write the datasets definition.
+        (default: src/pymovements/datasets/datasets.yaml)
+
+    """
     dataset_definition_files = resources.files(datasets)
     datasets_list = []
 
     for yaml_file in dataset_definition_files.iterdir():
-        if isinstance(yaml_file, PosixPath):
-            if yaml_file.suffix == '.yaml':
-                yaml_filename = yaml_file.parts[-1]
-                if yaml_filename == 'datasets.yaml':
-                    continue
-                datasets_list.append(yaml_filename.split('.')[0])
+        assert isinstance(yaml_file, PosixPath)
+        if yaml_file.suffix == '.yaml':
+            yaml_filename = yaml_file.parts[-1]
+            if yaml_filename == 'datasets.yaml':
+                continue
+            datasets_list.append(yaml_filename.split('.')[0])
 
-    with open('src/pymovements/datasets/datasets.yaml', 'w', encoding='utf-8') as f:
-        yaml.safe_dump(sorted(datasets_list), f)
+    with open(datasets_yaml_path, 'w', encoding='utf-8') as f:
+        yaml.dump(sorted(datasets_list), f)
