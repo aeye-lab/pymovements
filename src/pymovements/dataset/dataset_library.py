@@ -32,7 +32,8 @@ class DatasetLibrary:
     Attributes
     ----------
     definitions: dict[str, DatasetDefinition]
-        Dictionary of dataset definitions, either as classes or instances
+        Dictionary of :py:class:`~pymovements.DatasetDefinition`,
+        either as classes or instances.
     """
 
     definitions: dict[str, DatasetDefinition] = {}
@@ -44,11 +45,15 @@ class DatasetLibrary:
         Parameters
         ----------
         definition: DatasetDefinition | Path | str
-            The dataset definition to add. Can be:
-            - A DatasetDefinition class (legacy)
-            - A DatasetDefinition instance (from YAML)
-            - A Path to a YAML file
-            - A string path to a YAML file
+            The :py:class:`~pymovements.DatasetDefinition` to add.
+
+        Notes
+        -----
+        Definition can be:
+            * A DatasetDefinition class (legacy)
+            * A DatasetDefinition instance (from YAML)
+            * A Path to a YAML file
+            * A string path to a YAML file
         """
         if isinstance(definition, (str, Path)):
             # Load from YAML file
@@ -70,7 +75,8 @@ class DatasetLibrary:
         Returns
         -------
         DatasetDefinition
-            The dataset definition. Could be either a class (legacy) or instance (YAML).
+            The :py:class:`~pymovements.DatasetDefinition`.
+            Could be either a class (legacy) or instance (YAML).
 
         Raises
         ------
