@@ -20,11 +20,20 @@
 """DatasetDefinition module."""
 from __future__ import annotations
 
+from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
+from pathlib import Path
 from typing import Any
 
+import yaml
+
 from pymovements.gaze.experiment import Experiment
+from pymovements.gaze.eyetracker import EyeTracker
+from pymovements.utils.datasets_yaml import type_constructor
+
+
+yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
 
 
 @dataclass
@@ -155,3 +164,47 @@ class DatasetDefinition:
     velocity_columns: list[str] | None = None
     acceleration_columns: list[str] | None = None
     distance_column: str | None = None
+
+    @staticmethod
+    def from_yaml(yaml_path: str | Path) -> DatasetDefinition:
+        """Load a dataset definition from a YAML file.
+
+        Parameters
+        ----------
+        yaml_path : str | Path
+            Path to the YAML definition file
+
+        Returns
+        -------
+        DatasetDefinition
+            Initialized dataset definition
+        """
+        with open(yaml_path, encoding='utf-8') as f:
+            data = yaml.safe_load(f)
+
+        # Convert experiment dict to Experiment object if present
+        if 'experiment' in data:
+            if 'eyetracker' in data['experiment']:
+                eyetracker = EyeTracker(**data['experiment'].pop('eyetracker'))
+            else:
+                eyetracker = None
+            data['experiment'] = Experiment(**data['experiment'], eyetracker=eyetracker)
+
+        # Initialize DatasetDefinition with YAML data
+        return DatasetDefinition(**data)
+
+    def to_yaml(self, yaml_path: str | Path) -> None:
+        """Save a dataset definition to a YAML file.
+
+        Parameters
+        ----------
+        yaml_path : str | Path
+            Path where to save the YAML file
+        """
+        # Convert to dict and handle experiment object
+        data = asdict(self)
+        if data['experiment']:
+            data['experiment'] = asdict(data['experiment'])
+
+        with open(yaml_path, 'w', encoding='utf-8') as f:
+            yaml.dump(data, f, sort_keys=False)

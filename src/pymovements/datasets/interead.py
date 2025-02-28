@@ -25,12 +25,10 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.dataset_library import register_dataset
 from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
-@register_dataset
 class InteRead(DatasetDefinition):
     """InteRead dataset :cite:p:`InteRead`.
 

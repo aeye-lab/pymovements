@@ -1,0 +1,100 @@
+# Copyright (c) 2023-2025 The pymovements Project Authors
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+"""Test pymovements paths."""
+import pytest
+import yaml
+
+from pymovements.utils.datasets_yaml import type_constructor
+from pymovements.utils.datasets_yaml import write_dataset_definitions_yaml
+
+
+def test_type_constructor_assertion_error(tmp_path):
+    """Test type constructor raises attribute error."""
+    yaml_content = """\
+    !test
+    """
+    yaml.add_multi_constructor('!', type_constructor, yaml.SafeLoader)
+    yaml_file = tmp_path / 'test_yaml_file'
+    yaml_file.write_text(yaml_content)
+    with pytest.raises(ValueError) as excinfo:
+        with open(yaml_file, encoding='utf-8') as f:
+            yaml.safe_load(f)
+    msg, = excinfo.value.args
+    assert msg == 'not enough values to unpack (expected 2, got 1)'
+
+
+def test_module_not_found_error(tmp_path):
+    """Test type constructor raises attribute error."""
+    yaml_content = """\
+    !pm.notexisting
+    """
+    yaml.add_multi_constructor('!', type_constructor, yaml.SafeLoader)
+    yaml_file = tmp_path / 'test_yaml_file'
+    yaml_file.write_text(yaml_content)
+    with pytest.raises(ModuleNotFoundError) as excinfo:
+        with open(yaml_file, encoding='utf-8') as f:
+            yaml.safe_load(f)
+    msg, = excinfo.value.args
+    assert msg == "No module named 'pm'"
+
+
+def test_unknown_attribute_error(tmp_path):
+    """Test type constructor raises attribute error."""
+    yaml_content = """\
+    !yaml.notexisting
+    """
+    yaml.add_multi_constructor('!', type_constructor, yaml.SafeLoader)
+    yaml_file = tmp_path / 'test_yaml_file'
+    yaml_file.write_text(yaml_content)
+    with pytest.raises(ValueError) as excinfo:
+        with open(yaml_file, encoding='utf-8') as f:
+            yaml.safe_load(f)
+    msg, = excinfo.value.args
+    assert msg == 'Unknown type: notexisting for module yaml'
+
+
+def test_write_dataset_definitions_yaml(tmp_path):
+    write_file = tmp_path / 'test.yaml'
+    write_dataset_definitions_yaml(write_file)
+    with open(write_file, encoding='utf-8') as f:
+        datasets_list = yaml.safe_load(f)
+    assert datasets_list == [
+        'bsc',
+        'bsc2',
+        'codecomprehension',
+        'copco',
+        'daemons',
+        'didec',
+        'emtec',
+        'fakenews',
+        'gaze_graph',
+        'gaze_on_faces',
+        'gazebase',
+        'gazebasevr',
+        'hbn',
+        'interead',
+        'judo1000',
+        'potec',
+        'provo',
+        'sb_sat',
+        'toy_dataset',
+        'toy_dataset_eyelink',
+        'ucl',
+    ]

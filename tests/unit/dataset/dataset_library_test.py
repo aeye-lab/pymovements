@@ -18,6 +18,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test dataset library."""
+from dataclasses import asdict
+from unittest import mock
+
+import pytest
+import yaml
+
 import pymovements as pm
 
 
@@ -46,3 +52,32 @@ def test_add_two_defintions():
 
     assert definition1 == CustomDatasetDefinition1
     assert definition2 == CustomDatasetDefinition2
+
+
+def test_raise_value_error_get_non_existent_dataset():
+    with pytest.raises(KeyError) as exc_info:
+        pm.DatasetLibrary.get('NonExistent')
+
+    msg, = exc_info.value.args
+    error_msg_snippets = [
+        'NonExistent',
+        'not found in library',
+        'Available datasets',
+    ]
+    for snippet in error_msg_snippets:
+        assert snippet in msg
+
+
+def test__add_shipped_datasets():
+    with mock.patch('pymovements.dataset.dataset_library._add_shipped_datasets') as mock_add:
+        pm.dataset.dataset_library._add_shipped_datasets()
+        mock_add.assert_called_once()
+
+
+def test_write_yaml_already_existing(tmp_path):
+    tmp_file = tmp_path / 'tmp.yaml'
+    dataset = pm.DatasetLibrary.get('BSC')
+    dataset.to_yaml(tmp_file)
+    with open(tmp_file, encoding='utf-8') as f:
+        written_file = yaml.safe_load(f)
+    assert written_file == asdict(dataset)
