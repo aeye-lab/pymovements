@@ -59,7 +59,9 @@ custom_read_kwargs:
       - pattern: 'SYNCTIME_JUDO'
         column: "task"
         value: "judo"
-      - pattern: !!python/tuple ["READING[.]STOP", "JUDO[.]STOP"]
+      - pattern:
+        - "READING[.]STOP"
+        - "JUDO[.]STOP"
         column: "task"
         value: null
       - 'TRIALID (?P<trial_id>\d+)'

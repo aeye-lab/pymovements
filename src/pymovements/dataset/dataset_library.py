@@ -23,7 +23,6 @@ from __future__ import annotations
 from pathlib import Path
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.yaml_dataset_loader import YAMLDatasetLoader
 
 
 class DatasetLibrary:
@@ -57,7 +56,7 @@ class DatasetLibrary:
         """
         if isinstance(definition, (str, Path)):
             # Load from YAML file
-            yaml_def = YAMLDatasetLoader.load_dataset_definition(definition)
+            yaml_def = DatasetDefinition.from_yaml(definition)
             cls.definitions[yaml_def.name] = yaml_def
         else:
             # DatasetDefinition instance (from YAML)

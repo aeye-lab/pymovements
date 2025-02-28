@@ -34,7 +34,6 @@ from pymovements.dataset import dataset_files
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_paths import DatasetPaths
-from pymovements.dataset.yaml_dataset_loader import YAMLDatasetLoader
 from pymovements.events import EventDataFrame
 from pymovements.events.precomputed import PrecomputedEventDataFrame
 from pymovements.events.processing import EventGazeProcessor
@@ -71,7 +70,7 @@ class Dataset:
         if isinstance(definition, (str, Path)):
             # Check if it's a path to a YAML file
             if isinstance(definition, Path) or str(definition).endswith('.yaml'):
-                self.definition = YAMLDatasetLoader.load_dataset_definition(definition)
+                self.definition = DatasetDefinition.from_yaml(definition)
             else:
                 # Try to load from registered datasets
                 self.definition = DatasetLibrary.get(definition)

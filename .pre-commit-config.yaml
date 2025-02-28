@@ -82,6 +82,7 @@ repos:
     -   id: check-toml
     -   id: check-xml
     -   id: check-yaml
+        args: ["--unsafe"]
     -   id: debug-statements
     -   id: double-quote-string-fixer
     -   id: end-of-file-fixer
