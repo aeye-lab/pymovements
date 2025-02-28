@@ -76,7 +76,7 @@ class Dataset:
                 self.definition = DatasetLibrary.get(definition)
 
         elif isinstance(definition, type):
-            definition = definition()
+            self.definition = definition()
         else:
             self.definition = deepcopy(definition)
 
