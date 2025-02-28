@@ -96,8 +96,3 @@ class DatasetLibrary:
         directory = Path(directory)
         for yaml_file in directory.glob('*.yaml'):
             cls.add(yaml_file)
-
-    @classmethod
-    def clear(cls) -> None:
-        """Clear all registered datasets."""
-        cls.definitions.clear()
