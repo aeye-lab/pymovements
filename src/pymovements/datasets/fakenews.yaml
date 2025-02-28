@@ -36,16 +36,6 @@ filename_format_schema_overrides:
     session_id: !int
     truth_value: !str
 
-trial_columns: []
-
-time_column: "starttime"
-
-time_unit: "milliseconds"
-
-pixel_columns: []
-
-column_map: {}
-
 custom_read_kwargs:
   precomputed_events:
     null_values: "NA"

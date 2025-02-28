@@ -33,12 +33,6 @@ filename_format_schema_overrides:
   precomputed_events: {}
   precomputed_reading_measures: {}
 
-trial_columns: []
-
-pixel_columns: []
-
-column_map: {}
-
 custom_read_kwargs:
   precomputed_events:
     separator: "\t"

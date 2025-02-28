@@ -35,10 +35,7 @@ filename_format_schema_overrides:
     subject_id: !int
     task: !str
 
-trial_columns:
-  - "subject_id"
-  - "task"
-
+# TODO
 time_column: null
 
 time_unit: null

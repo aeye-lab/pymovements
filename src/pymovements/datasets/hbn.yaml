@@ -35,10 +35,6 @@ filename_format_schema_overrides:
     subject_id: !str
     video_id: !str
 
-trial_columns:
-  - "subject_id"
-  - "video_id"
-
 time_column: "time"
 
 time_unit: "step"

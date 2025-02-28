@@ -36,8 +36,6 @@ filename_format_schema_overrides:
     session_id: !int
 
 trial_columns:
-  - "subject_id"
-  - "session_id"
   - "trial_id"
 
 time_column: "time"

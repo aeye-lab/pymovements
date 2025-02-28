@@ -36,12 +36,6 @@ filename_format_schema_overrides:
     subject_id: !int
     session_id: !int
 
-trial_columns:
-  - "round_id"
-  - "subject_id"
-  - "session_id"
-  - "task_name"
-
 time_column: "n"
 
 time_unit: "ms"

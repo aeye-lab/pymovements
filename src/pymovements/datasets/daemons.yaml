@@ -25,12 +25,6 @@ filename_format_schema_overrides:
   precomputed_events:
     data_split: !str
 
-trial_columns: []
-
-pixel_columns: []
-
-column_map: {}
-
 custom_read_kwargs:
   precomputed_events:
     null_values:

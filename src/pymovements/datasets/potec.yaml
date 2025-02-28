@@ -35,10 +35,6 @@ filename_format_schema_overrides:
     subject_id: !int
     text_id: !str
 
-trial_columns:
-  - "subject_id"
-  - "text_id"
-
 time_column: "time"
 
 time_unit: "ms"

@@ -35,10 +35,7 @@ filename_format_schema_overrides:
     sub_id: !int
     trial_id: !int
 
-trial_columns:
-  - "sub_id"
-  - "trial_id"
-
+# TODO
 time_column: null
 
 time_unit: null

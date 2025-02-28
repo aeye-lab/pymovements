@@ -18,31 +18,12 @@ resources:
 extract:
   precomputed_events: true
 
-experiment:
-  screen_width_px: null
-  screen_height_px: null
-  screen_width_cm: null
-  screen_height_cm: null
-  distance_cm: null
-  origin: null
-  sampling_rate: 2000
-
 filename_format:
   precomputed_events: 'fix_report_P{subject_id:s}.txt'
 
 filename_format_schema_overrides:
   precomputed_events:
     subject_id: !polars.Utf8
-
-trial_columns: []
-
-time_column: ""
-
-time_unit: ""
-
-pixel_columns: []
-
-column_map: {}
 
 custom_read_kwargs:
   precomputed_events:
