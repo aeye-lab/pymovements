@@ -26,6 +26,7 @@ import pandas as pd
 import polars as pl
 from tqdm import tqdm
 
+from pymovements import Dataset
 from pymovements.stimulus import text
 
 
