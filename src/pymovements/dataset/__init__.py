@@ -29,6 +29,14 @@
     DatasetDefinition
     DatasetLibrary
     DatasetPaths
+
+.. rubric:: Decorators
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+    register_dataset
 """
 from pymovements.dataset.dataset import Dataset
 from pymovements.dataset.dataset_definition import DatasetDefinition
