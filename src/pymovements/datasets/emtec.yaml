@@ -35,8 +35,8 @@ experiment:
   sampling_rate: 2000
 
 filename_format:
-  gaze: r"ET_{subject_id:d}.csv"
-  precomputed_events: r"fixations.csv"
+  gaze: 'ET_{subject_id:d}.csv'
+  precomputed_events: "fixations.csv"
 
 filename_format_schema_overrides:
   gaze:
@@ -44,7 +44,6 @@ filename_format_schema_overrides:
   precomputed_events: {}
 
 trial_columns:
-  - "subject_id"
   - "item_id"
 
 time_column: "time"

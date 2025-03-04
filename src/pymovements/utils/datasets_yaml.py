@@ -36,7 +36,7 @@ def type_constructor(
 ) -> type:
     """Resolve a YAML tag to a corresponding Python type.
 
-    This function is used to handle custom YAML tags (e.g., `!pl.Int64`)
+    This function is used to handle custom YAML tags (e.g., `!polars.Int64`)
     by mapping the tag to a Python type or class name. The type name is
     extracted from the YAML tag and evaluated to return the corresponding
     Python object. If the type cannot be resolved, an error is raised.
@@ -62,13 +62,13 @@ def type_constructor(
 
     Example:
         # Example YAML document:
-        # !pl.Int64
+        # !polars.Int64
         #
         # Resolves to the Python type `pl.Int64` (assuming `pl` is a valid module).
 
     """
     # pylint: disable=unused-argument
-    # extract the type name (e.g., from !pl.Int64 to pl.Int64)
+    # extract the type name (e.g., from !polars.Int64 to polars.Int64)
     type_name = node.tag[1:]
 
     built_in_types = {

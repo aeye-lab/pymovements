@@ -20,6 +20,7 @@
 """Provides the Experiment class."""
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
@@ -30,6 +31,7 @@ from pymovements.gaze.screen import Screen
 from pymovements.utils import checks
 
 
+@dataclass
 class Experiment:
     """Experiment class for holding experiment properties.
 
@@ -203,3 +205,15 @@ class Experiment:
                 attributes += ', ' + f'{key}={shorten(value)}'
 
         return f'{type(self).__name__}(sampling_rate={shorten(self.sampling_rate)}{attributes})'
+
+#     def as_dict(self: Any) -> dict[str, str]:
+#         return {
+#             'screen_width_px': screen_width_px,
+#             'screen_height_px': screen_height_px,
+#             'screen_width_cm': screen_width_cm,
+#             'screen_height_cm': screen_height_cm,
+#             'distance_cm': distance_cm,
+#             'origin': origin,
+#             'sampling_rate': sampling_rate,
+#             'eyetracker': eyetracker,
+#         }
