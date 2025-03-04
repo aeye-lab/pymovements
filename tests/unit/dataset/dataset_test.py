@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -146,6 +146,8 @@ def mock_toy(
                     'y_left_pix': np.zeros(1000),
                     'x_right_pix': np.zeros(1000),
                     'y_right_pix': np.zeros(1000),
+                    'trial_id_1': np.concatenate([np.zeros(500), np.ones(500)]),
+                    'trial_id_2': ['a'] * 200 + ['b'] * 200 + ['c'] * 600,
                 },
                 schema={
                     'subject_id': pl.Int64,
@@ -154,6 +156,8 @@ def mock_toy(
                     'y_left_pix': pl.Float64,
                     'x_right_pix': pl.Float64,
                     'y_right_pix': pl.Float64,
+                    'trial_id_1': pl.Float64,
+                    'trial_id_2': pl.Utf8,
                 },
             )
             pixel_columns = ['x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix']
@@ -169,6 +173,8 @@ def mock_toy(
                     'y_right_pix': np.zeros(1000),
                     'x_avg_pix': np.zeros(1000),
                     'y_avg_pix': np.zeros(1000),
+                    'trial_id_1': np.concatenate([np.zeros(500), np.ones(500)]),
+                    'trial_id_2': ['a'] * 200 + ['b'] * 200 + ['c'] * 600,
                 },
                 schema={
                     'subject_id': pl.Int64,
@@ -179,6 +185,8 @@ def mock_toy(
                     'y_right_pix': pl.Float64,
                     'x_avg_pix': pl.Float64,
                     'y_avg_pix': pl.Float64,
+                    'trial_id_1': pl.Float64,
+                    'trial_id_2': pl.Utf8,
                 },
             )
             pixel_columns = [
@@ -192,12 +200,16 @@ def mock_toy(
                     'time': np.arange(1000),
                     'x_left_pix': np.zeros(1000),
                     'y_left_pix': np.zeros(1000),
+                    'trial_id_1': np.concatenate([np.zeros(500), np.ones(500)]),
+                    'trial_id_2': ['a'] * 200 + ['b'] * 200 + ['c'] * 600,
                 },
                 schema={
                     'subject_id': pl.Int64,
                     'time': pl.Int64,
                     'x_left_pix': pl.Float64,
                     'y_left_pix': pl.Float64,
+                    'trial_id_1': pl.Float64,
+                    'trial_id_2': pl.Utf8,
                 },
             )
             pixel_columns = ['x_left_pix', 'y_left_pix']
@@ -208,12 +220,16 @@ def mock_toy(
                     'time': np.arange(1000),
                     'x_right_pix': np.zeros(1000),
                     'y_right_pix': np.zeros(1000),
+                    'trial_id_1': np.concatenate([np.zeros(500), np.ones(500)]),
+                    'trial_id_2': ['a'] * 200 + ['b'] * 200 + ['c'] * 600,
                 },
                 schema={
                     'subject_id': pl.Int64,
                     'time': pl.Int64,
                     'x_right_pix': pl.Float64,
                     'y_right_pix': pl.Float64,
+                    'trial_id_1': pl.Float64,
+                    'trial_id_2': pl.Utf8,
                 },
             )
             pixel_columns = ['x_right_pix', 'y_right_pix']
@@ -224,12 +240,16 @@ def mock_toy(
                     'time': np.arange(1000),
                     'x_pix': np.zeros(1000),
                     'y_pix': np.zeros(1000),
+                    'trial_id_1': np.concatenate([np.zeros(500), np.ones(500)]),
+                    'trial_id_2': ['a'] * 200 + ['b'] * 200 + ['c'] * 600,
                 },
                 schema={
                     'subject_id': pl.Int64,
                     'time': pl.Int64,
                     'x_pix': pl.Float64,
                     'y_pix': pl.Float64,
+                    'trial_id_1': pl.Float64,
+                    'trial_id_2': pl.Utf8,
                 },
             )
             pixel_columns = ['x_pix', 'y_pix']
@@ -409,6 +429,7 @@ def mock_toy(
         'event_dfs': event_dfs,
         'precomputed_rm_dfs': precomputed_rm_dfs,
         'eyes': eyes,
+        'trial_columns': ['subject_id'],
     }
 
 
@@ -487,6 +508,33 @@ def test_load_correct_preprocessed_gaze_dfs(gaze_dataset_configuration):
             expected_gaze_df.frame,
             check_column_order=False,
         )
+
+
+def test_load_correct_trial_columns(gaze_dataset_configuration):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset.load()
+
+    expected_trial_columns = gaze_dataset_configuration['trial_columns']
+    for result_gaze_df in dataset.gaze:
+        assert result_gaze_df.trial_columns == expected_trial_columns
+
+
+@pytest.mark.parametrize(
+    'gaze_dataset_configuration',
+    ['ToyMono'],
+    indirect=['gaze_dataset_configuration'],
+)
+def test_load_fileinfo_column_in_trial_columns_warns(gaze_dataset_configuration):
+    # add fileinfo column as trial column
+    gaze_dataset_configuration['init_kwargs']['definition'].trial_columns = ['subject_id']
+
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+
+    with pytest.warns(UserWarning) as record:
+        dataset.load()
+
+    expected_msg = 'removed duplicated fileinfo columns from trial_columns: subject_id'
+    assert record[0].message.args[0] == expected_msg
 
 
 def test_load_correct_event_dfs(gaze_dataset_configuration):
@@ -1000,7 +1048,8 @@ def test_detect_events_attribute_error(gaze_dataset_configuration):
             },
             (
                 "Column 'position' not found. Available columns are: "
-                "['time', 'subject_id', 'pixel', 'custom_position', 'velocity']"
+                "['time', 'trial_id_1', 'trial_id_2', 'subject_id', "
+                "'pixel', 'custom_position', 'velocity']"
             ),
             id='no_position',
         ),
@@ -1012,7 +1061,8 @@ def test_detect_events_attribute_error(gaze_dataset_configuration):
             },
             (
                 "Column 'velocity' not found. Available columns are: "
-                "['time', 'subject_id', 'pixel', 'position', 'custom_velocity']"
+                "['time', 'trial_id_1', 'trial_id_2', 'subject_id', "
+                "'pixel', 'position', 'custom_velocity']"
             ),
             id='no_velocity',
         ),
@@ -1930,3 +1980,30 @@ def test_load_split_precomputed_events(precomputed_dataset_configuration, by, ex
     dataset.load()
     dataset.split_precomputed_events(by)
     assert len(dataset.precomputed_events) == expected_len
+
+
+@pytest.mark.parametrize(
+    ('by', 'expected_len'),
+    [
+        pytest.param(
+            'trial_id_1',
+            40,
+            id='subset_int',
+        ),
+        pytest.param(
+            'trial_id_2',
+            60,
+            id='subset_int',
+        ),
+        pytest.param(
+            ['trial_id_1', 'trial_id_2'],
+            80,
+            id='subset_int',
+        ),
+    ],
+)
+def test_load_split_gaze(gaze_dataset_configuration, by, expected_len):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.split_gaze_data(by)
+    assert len(dataset.gaze) == expected_len

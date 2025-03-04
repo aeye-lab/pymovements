@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@ from __future__ import annotations
 import inspect
 import warnings
 from collections.abc import Callable
+from collections.abc import Sequence
 from copy import deepcopy
 from typing import Any
 
@@ -202,7 +203,12 @@ class GazeDataFrame:
         # Set nan values to null.
         self.frame = self.frame.fill_nan(None)
 
-        self.trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
+        trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
+        if trial_columns is not None and len(trial_columns) == 0:
+            trial_columns = None
+        _check_trial_columns(trial_columns, data)
+
+        self.trial_columns = trial_columns
         self.experiment = experiment
 
         # In case the 'time' column is already present we don't need to do anything.
@@ -283,6 +289,9 @@ class GazeDataFrame:
         else:
             self.events = events.copy()
 
+        # Remove this attribute once #893 is fixed
+        self._metadata: dict[str, Any] | None = None
+
     def apply(
             self,
             function: str,
@@ -303,6 +312,33 @@ class GazeDataFrame:
             self.detect(function, **kwargs)
         else:
             raise ValueError(f"unsupported method '{function}'")
+
+    def split(self, by: Sequence[str]) -> list[GazeDataFrame]:
+        """Split the GazeDataFrame into multiple frames based on specified column(s).
+
+        Parameters
+        ----------
+        by: Sequence[str]
+            Column name(s) to split the DataFrame by. If a single string is provided,
+            it will be used as a single column name. If a list is provided, the DataFrame
+            will be split by unique combinations of values in all specified columns.
+
+        Returns
+        -------
+        list[GazeDataFrame]
+            A list of new GazeDataFrame instances, each containing a partition of the
+            original data with all metadata and configurations preserved.
+        """
+        return [
+            GazeDataFrame(
+                new_frame,
+                experiment=self.experiment,
+                trial_columns=self.trial_columns,
+                time_column='time',
+                distance_column='distance',
+            )
+            for new_frame in self.frame.partition_by(by=by)
+        ]
 
     def transform(
             self,
@@ -1448,3 +1484,32 @@ class GazeDataFrame:
     def __repr__(self: Any) -> str:
         """Return string representation of GazeDataFrame."""
         return self.__str__()
+
+
+def _check_trial_columns(trial_columns: list[str] | None, data: pl.DataFrame) -> None:
+    """Check trial_columns for integrity.
+
+    Parameters
+    ----------
+    trial_columns: list[str] | None
+        The name of the trial columns in the input data frame.
+    data: pl.DataFrame
+        The dataframe which holds the columns.
+    """
+    if trial_columns:
+        # Make sure there are no duplicates in trial_columns, else polars raises DuplicateError.
+        if len(set(trial_columns)) != len(trial_columns):
+            seen = set()
+            dupes = []
+            for column in trial_columns:
+                if column in seen:
+                    dupes.append(column)
+                else:
+                    seen.add(column)
+
+            raise ValueError(f'duplicates in trial_columns: {", ".join(dupes)}')
+
+        # Make sure all trial_columns exist in data.
+        if len(set(trial_columns).intersection(data.columns)) != len(trial_columns):
+            missing = set(trial_columns) - set(data.columns)
+            raise KeyError(f'trial_columns missing in data: {", ".join(missing)}')

@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 The pymovements Project Authors
+# Copyright (c) 2022-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -988,7 +988,7 @@ def smooth(
                 .ewm_mean(
                     span=window_length,
                     adjust=False,
-                    min_periods=window_length,
+                    min_samples=window_length,
                 ).shift(n=pad_kwargs['pad_width'])
                 .slice(pad_kwargs['pad_width'] * 2)
                 for component in range(n_components)

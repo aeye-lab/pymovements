@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the BSC dataset."""
+"""Provides a definition for the UCL dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -26,21 +26,20 @@ from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import register_dataset
-from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
 @register_dataset
-class BSC(DatasetDefinition):
-    """BSC dataset :cite:p:`BSC`.
+class UCL(DatasetDefinition):
+    """UCL dataset :cite:p:`UCL`.
 
-    This dataset includes monocular eye tracking data from a single participant in a single
-    session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
-    eye tracker and precomputed events on aoi level are reported.
+    UCL is a dataset of word-by-word reading times collected through
+    self-paced reading and eye-tracking experiments to evaluate
+    computational psycholinguistic models of English sentence comprehension.
+    361 sentences from narrative sources, ensuring they were understandable without context,
+    and recorded reading times from participants using both methods.
 
-    The participant is instructed to read texts and answer questions.
-
-    Check the respective paper for details :cite:p:`BSC`.
+    For more details check out the original paper :cite:p:`UCL`.
 
     Attributes
     ----------
@@ -64,9 +63,6 @@ class BSC(DatasetDefinition):
     extract: dict[str, bool]
         Decide whether to extract the data.
 
-    experiment: Experiment
-        The experiment definition.
-
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
@@ -81,16 +77,6 @@ class BSC(DatasetDefinition):
             the input data frame is assumed to contain multiple trials and the transformation
             methods will be applied to each trial separately.
 
-    time_column: str
-        The name of the timestamp column in the input data frame. This column will be renamed to
-        ``time``.
-
-    time_unit: str
-        The unit of the timestamps in the timestamp column in the input data frame. Supported
-        units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
-        'step' the experiment definition must be specified. All timestamps will be converted to
-        milliseconds.
-
     pixel_columns: list[str]
         The name of the pixel position columns in the input data frame. These columns will be
         nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
@@ -99,17 +85,17 @@ class BSC(DatasetDefinition):
     column_map: dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
 
-    custom_read_kwargs: dict[str, dict[str, Any]]
+    custom_read_kwargs: dict[str, Any]
         If specified, these keyword arguments will be passed to the file reading function.
 
     Examples
     --------
     Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.SBSAT` definition:
+    :py:class:`~pymovements.UCL` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("SBSAT", path='data/SBSAT')
+    >>> dataset = pm.Dataset("UCL", path='data/UCL')
 
     Download the dataset resources:
 
@@ -123,78 +109,79 @@ class BSC(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'BSC'
+    name: str = 'UCL'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': False,
             'precomputed_events': True,
-            'precomputed_reading_measures': False,
+            'precomputed_reading_measures': True,
         },
     )
     mirrors: dict[str, tuple[str, ...]] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': (
-                    'https://osf.io/download/',
-                ),
-            },
+        default_factory=lambda: {
+            'precomputed_events': (
+                'https://static-content.springer.com/esm/'
+                'art%3A10.3758%2Fs13428-012-0313-y/MediaObjects/',
+            ),
+            'precomputed_reading_measures': (
+                'https://static-content.springer.com/esm/'
+                'art%3A10.3758%2Fs13428-012-0313-y/MediaObjects/',
+            ),
+        },
     )
     resources: dict[str, tuple[dict[str, str], ...]] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': (
-                    {
-                        'resource': 'xfe4s/',
-                        'filename': 'BSC.EMD.zip',
-                        'md5': 'c7118bfe48c91264d69c45d347f11416',
-                    },
-                ),
-            },
-    )
-    extract: dict[str, bool] = field(
         default_factory=lambda: {
-            'precomputed_events': True,
+            'precomputed_events': (
+                {
+                    'resource': '13428_2012_313_MOESM1_ESM.zip',
+                    'filename': '13428_2012_313_MOESM1_ESM.zip',
+                    'md5': '77e3c0cacccb0a074a55d23aa8531ca5',
+                },
+            ),
+            'precomputed_reading_measures': (
+                {
+                    'resource': '13428_2012_313_MOESM1_ESM.zip',
+                    'filename': '13428_2012_313_MOESM1_ESM.zip',
+                    'md5': '77e3c0cacccb0a074a55d23aa8531ca5',
+                },
+            ),
         },
     )
 
-    experiment: Experiment = Experiment(
-        screen_width_px=None, screen_height_px=None, screen_width_cm=None,
-        screen_height_cm=None, distance_cm=None, origin=None, sampling_rate=1,
+    extract: dict[str, bool] = field(
+        default_factory=lambda: {
+            'precomputed_events': True,
+            'precomputed_reading_measures': True,
+        },
     )
 
     filename_format: dict[str, str] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': 'BSC.EMD.txt',
-            },
+        default_factory=lambda: {
+            'precomputed_events': r'eyetracking.fix',
+            'precomputed_reading_measures': r'eyetracking.RT',
+        },
     )
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': {},
-            },
+        default_factory=lambda: {
+            'precomputed_events': {},
+            'precomputed_reading_measures': {},
+        },
     )
 
-    trial_columns: list[str] = field(
-        default_factory=lambda: [
-            'book_name',
-            'screen_id',
-        ],
-    )
-
-    time_column: str = 'time'
-
-    time_unit: str = 'ms'
+    trial_columns: list[str] = field(default_factory=lambda: [])
 
     pixel_columns: list[str] = field(default_factory=lambda: [])
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 
-    custom_read_kwargs: dict[str, dict[str, Any]] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': {'separator': '\t'},
+    custom_read_kwargs: dict[str, Any] = field(
+        default_factory=lambda: {
+            'precomputed_events': {
+                'separator': '\t',
+                'null_values': ['NaN'],
             },
+            'precomputed_reading_measures': {'separator': '\t'},
+        },
     )

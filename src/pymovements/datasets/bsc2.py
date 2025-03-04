@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the BSC dataset."""
+"""Provides a definition for the BSCII dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -31,16 +31,17 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 @register_dataset
-class BSC(DatasetDefinition):
-    """BSC dataset :cite:p:`BSC`.
+class BSCII(DatasetDefinition):
+    """BSCII dataset :cite:p:`BSCII`.
 
     This dataset includes monocular eye tracking data from a single participant in a single
     session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
     eye tracker and precomputed events on aoi level are reported.
 
-    The participant is instructed to read texts and answer questions.
+    The participant is instructed to read texts and answer questions. The original purpose was to
+    look into the differences in processing when reading simplified and traditional Chinese.
 
-    Check the respective paper for details :cite:p:`BSC`.
+    Check the respective paper for details :cite:p:`BSCII`.
 
     Attributes
     ----------
@@ -123,7 +124,7 @@ class BSC(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'BSC'
+    name: str = 'BSCII'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
@@ -145,9 +146,9 @@ class BSC(DatasetDefinition):
             {
                 'precomputed_events': (
                     {
-                        'resource': 'xfe4s/',
-                        'filename': 'BSC.EMD.zip',
-                        'md5': 'c7118bfe48c91264d69c45d347f11416',
+                        'resource': '2cuys/',
+                        'filename': 'BSCII.EMD.rev.zip',
+                        'md5': '4daad0fa922785d8c681a883b1197e1e',
                     },
                 ),
             },
@@ -166,7 +167,7 @@ class BSC(DatasetDefinition):
     filename_format: dict[str, str] = field(
         default_factory=lambda:
             {
-                'precomputed_events': 'BSC.EMD.txt',
+                'precomputed_events': 'BSCII.EMD.rev.txt',
             },
     )
 
@@ -195,6 +196,9 @@ class BSC(DatasetDefinition):
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda:
             {
-                'precomputed_events': {'separator': '\t'},
+                'precomputed_events': {
+                    'separator': '\t',
+                    'null_values': ['NA'],
+                },
             },
     )

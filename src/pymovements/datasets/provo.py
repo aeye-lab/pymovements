@@ -17,12 +17,14 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the BSC dataset."""
+"""Provides a definition for the Provo dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
+
+import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import register_dataset
@@ -31,16 +33,17 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 @register_dataset
-class BSC(DatasetDefinition):
-    """BSC dataset :cite:p:`BSC`.
+class Provo(DatasetDefinition):
+    """Provo dataset :cite:p:`Provo`.
 
-    This dataset includes monocular eye tracking data from a single participant in a single
-    session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
-    eye tracker and precomputed events on aoi level are reported.
+    The Provo Corpus, a corpus of eye-tracking data with accompanying predictability norms.
+    The predictability norms for the Provo Corpus differ from those of other corpora.
+    In addition to traditional cloze scores that estimate the predictability of the full
+    orthographic form of each word, the Provo Corpus also includes measures of the
+    predictability of the morpho-syntactic and semantic information for each word.
+    This makes the Provo Corpus ideal for studying predictive processes in reading.
 
-    The participant is instructed to read texts and answer questions.
-
-    Check the respective paper for details :cite:p:`BSC`.
+    Check the respective paper for details :cite:p:`Provo`.
 
     Attributes
     ----------
@@ -123,7 +126,7 @@ class BSC(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'BSC'
+    name: str = 'Provo'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
@@ -145,16 +148,16 @@ class BSC(DatasetDefinition):
             {
                 'precomputed_events': (
                     {
-                        'resource': 'xfe4s/',
-                        'filename': 'BSC.EMD.zip',
-                        'md5': 'c7118bfe48c91264d69c45d347f11416',
+                        'resource': 'z3eh6/',
+                        'filename': 'Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv',
+                        'md5': '7aa239e51e5d78528e2430f84a23da3f',
                     },
                 ),
             },
     )
     extract: dict[str, bool] = field(
         default_factory=lambda: {
-            'precomputed_events': True,
+            'precomputed_events': False,
         },
     )
 
@@ -166,7 +169,8 @@ class BSC(DatasetDefinition):
     filename_format: dict[str, str] = field(
         default_factory=lambda:
             {
-                'precomputed_events': 'BSC.EMD.txt',
+                'precomputed_events':
+                'Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv',
             },
     )
 
@@ -177,16 +181,11 @@ class BSC(DatasetDefinition):
             },
     )
 
-    trial_columns: list[str] = field(
-        default_factory=lambda: [
-            'book_name',
-            'screen_id',
-        ],
-    )
+    trial_columns: list[str] = field(default_factory=lambda: [])
 
-    time_column: str = 'time'
+    time_column: str = ''
 
-    time_unit: str = 'ms'
+    time_unit: str = ''
 
     pixel_columns: list[str] = field(default_factory=lambda: [])
 
@@ -194,7 +193,11 @@ class BSC(DatasetDefinition):
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda:
-            {
-                'precomputed_events': {'separator': '\t'},
+        {
+            'precomputed_events': {
+                'schema_overrides': {'RECORDING_SESSION_LABEL': pl.Utf8},
+                'encoding': 'macroman',
+                'null_values': ['.'],
             },
+        },
     )

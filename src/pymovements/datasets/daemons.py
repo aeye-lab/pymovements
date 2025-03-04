@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the BSC dataset."""
+"""Provides a definition for the DAEMONS dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -31,16 +31,21 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 @register_dataset
-class BSC(DatasetDefinition):
-    """BSC dataset :cite:p:`BSC`.
+class DAEMONS(DatasetDefinition):
+    """DAEMONS dataset :cite:p:`BSC`.
 
-    This dataset includes monocular eye tracking data from a single participant in a single
-    session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
-    eye tracker and precomputed events on aoi level are reported.
+    The DAEMONS paper presents the Potsdam dataset of eye movements on natural scenes,
+    aimed at advancing research in visual cognition and machine learning.
+    It introduces a large-scale dataset with 2,400 images and eye-tracking data
+    from 250 participants, ensuring high-quality data collection using
+    state-of-the-art equipment. The study focuses on both fixation distributions
+    and scan paths, making the dataset valuable for various modeling approaches,
+    including saliency prediction and cognitive modeling.
 
-    The participant is instructed to read texts and answer questions.
+    The dataset is split into train (precomputed_events[0]) and
+    validation (precomputed_events[1]).
 
-    Check the respective paper for details :cite:p:`BSC`.
+    Check the respective paper for details :cite:p:`DAEMONS`.
 
     Attributes
     ----------
@@ -81,16 +86,6 @@ class BSC(DatasetDefinition):
             the input data frame is assumed to contain multiple trials and the transformation
             methods will be applied to each trial separately.
 
-    time_column: str
-        The name of the timestamp column in the input data frame. This column will be renamed to
-        ``time``.
-
-    time_unit: str
-        The unit of the timestamps in the timestamp column in the input data frame. Supported
-        units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
-        'step' the experiment definition must be specified. All timestamps will be converted to
-        milliseconds.
-
     pixel_columns: list[str]
         The name of the pixel position columns in the input data frame. These columns will be
         nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
@@ -123,7 +118,7 @@ class BSC(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'BSC'
+    name: str = 'DAEMONS'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
@@ -145,9 +140,9 @@ class BSC(DatasetDefinition):
             {
                 'precomputed_events': (
                     {
-                        'resource': 'xfe4s/',
-                        'filename': 'BSC.EMD.zip',
-                        'md5': 'c7118bfe48c91264d69c45d347f11416',
+                        'resource': 'ztgna/',
+                        'filename': 'eye_movement.zip',
+                        'md5': '2779b4c140a0b1e3c9976488994f08f3',
                     },
                 ),
             },
@@ -166,27 +161,18 @@ class BSC(DatasetDefinition):
     filename_format: dict[str, str] = field(
         default_factory=lambda:
             {
-                'precomputed_events': 'BSC.EMD.txt',
+                'precomputed_events': r'SAC_{data_split:s}.csv',
             },
     )
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda:
             {
-                'precomputed_events': {},
+                'precomputed_events': {'data_split': str},
             },
     )
 
-    trial_columns: list[str] = field(
-        default_factory=lambda: [
-            'book_name',
-            'screen_id',
-        ],
-    )
-
-    time_column: str = 'time'
-
-    time_unit: str = 'ms'
+    trial_columns: list[str] = field(default_factory=lambda: [])
 
     pixel_columns: list[str] = field(default_factory=lambda: [])
 
@@ -195,6 +181,6 @@ class BSC(DatasetDefinition):
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda:
             {
-                'precomputed_events': {'separator': '\t'},
+                'precomputed_events': {'null_values': ['NA']},
             },
     )

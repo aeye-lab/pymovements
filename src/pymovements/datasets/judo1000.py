@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 The pymovements Project Authors
+# Copyright (c) 2022-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -181,9 +181,7 @@ class JuDo1000(DatasetDefinition):
         },
     )
 
-    trial_columns: list[str] = field(
-        default_factory=lambda: ['subject_id', 'session_id', 'trial_id'],
-    )
+    trial_columns: list[str] = field(default_factory=lambda: ['trial_id'])
 
     time_column: str = 'time'
 
