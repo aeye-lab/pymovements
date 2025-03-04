@@ -744,7 +744,7 @@ class Dataset:
         ------
         InvalidProperty
             If ``property_name`` is not a valid property. See
-            :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
+            :py:mod:`pymovements.events` for an overview of supported properties.
         RuntimeError
             If specified event name ``name`` is missing from ``events``.
 
@@ -800,7 +800,7 @@ class Dataset:
         ------
         InvalidProperty
             If ``property_name`` is not a valid property. See
-            :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
+            :py:mod:`pymovements.events` for an overview of supported properties.
         """
         return self.compute_event_properties(
             event_properties=event_properties,
