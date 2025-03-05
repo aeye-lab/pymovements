@@ -9,5 +9,5 @@
 
 .. csv-table:: Example Datasets
    :file: example_datasets.csv
-   :widths: 20, 20, 20, 20, 20
+   :widths: 40, 20, 20, 20
    :header-rows: 1
