@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +55,7 @@ def from_numpy(
         acceleration_columns: list[str] | None = None,
         distance_column: str | None = None,
 ) -> GazeDataFrame:
-    """Get a :py:class:`~pymovements.gaze.gaze_dataframe.GazeDataFrame` from a numpy array.
+    """Get a :py:class:`~pymovements.gaze.GazeDataFrame` from a numpy array.
 
     There are two mutually exclusive ways of conversion.
 
@@ -325,7 +325,7 @@ def from_pandas(
         acceleration_columns: list[str] | None = None,
         distance_column: str | None = None,
 ) -> GazeDataFrame:
-    """Get a :py:class:`~pymovements.gaze.gaze_dataframe.GazeDataFrame` from a pandas DataFrame.
+    """Get a :py:class:`~pymovements.gaze.GazeDataFrame` from a pandas DataFrame.
 
     Parameters
     ----------

@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 The pymovements Project Authors
+# Copyright (c) 2022-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from collections.abc import Sequence
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
@@ -33,11 +34,11 @@ from pymovements.dataset import dataset_files
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_paths import DatasetPaths
-from pymovements.events.frame import EventDataFrame
+from pymovements.events import EventDataFrame
 from pymovements.events.precomputed import PrecomputedEventDataFrame
 from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import GazeDataFrame
-from pymovements.reading_measures.frame import ReadingMeasures
+from pymovements.reading_measures import ReadingMeasures
 
 
 class Dataset:
@@ -51,7 +52,7 @@ class Dataset:
         Dataset definition to initialize dataset with.
     path : str | Path | DatasetPaths
         Path to the dataset directory. You can set up a custom directory structure by passing a
-        :py:class:`~pymovements.DatasetPaths` instance.
+        :py:class:`~pymovements.dataset.DatasetPaths` instance.
     """
 
     def __init__(
@@ -230,6 +231,30 @@ class Dataset:
             self.fileinfo['precomputed_reading_measures'],
             self.paths,
         )
+
+    def split_gaze_data(
+            self,
+            by: Sequence[str],
+    ) -> None:
+        """Split gaze data into separated GazeDataFrame's.
+
+        Parameters
+        ----------
+        by: Sequence[str]
+            Column(s) to split dataframe by.
+        """
+        fileinfo_dicts = self.fileinfo['gaze'].to_dicts()
+
+        all_gaze_frames = []
+        all_fileinfo_rows = []
+
+        for frame, fileinfo_row in zip(self.gaze, fileinfo_dicts):
+            split_frames = frame.split(by=by)
+            all_gaze_frames.extend(split_frames)
+            all_fileinfo_rows.extend([fileinfo_row] * len(split_frames))
+
+        self.gaze = all_gaze_frames
+        self.fileinfo['gaze'] = pl.concat([pl.from_dict(row) for row in all_fileinfo_rows])
 
     def split_precomputed_events(
             self,
@@ -719,7 +744,7 @@ class Dataset:
         ------
         InvalidProperty
             If ``property_name`` is not a valid property. See
-            :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
+            :py:mod:`pymovements.events` for an overview of supported properties.
         RuntimeError
             If specified event name ``name`` is missing from ``events``.
 
@@ -775,7 +800,7 @@ class Dataset:
         ------
         InvalidProperty
             If ``property_name`` is not a valid property. See
-            :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
+            :py:mod:`pymovements.events` for an overview of supported properties.
         """
         return self.compute_event_properties(
             event_properties=event_properties,
@@ -1033,7 +1058,7 @@ class Dataset:
         Path('/path/to/your/dataset')
 
         If you just want to specify the root directory path which holds all your local datasets, you
-        can create pass a :py:class:`~pymovements.DatasetPaths` object and set the `root`:
+        can create pass a :py:class:`~pymovements.dataset.DatasetPaths` object and set the `root`:
         >>> paths = pm.DatasetPaths(root='/path/to/your/common/root/')
         >>> dataset = pm.Dataset("ToyDataset", path=paths)
         >>> dataset.path# doctest: +SKIP

@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -72,7 +72,7 @@ class EventProcessor:
         ------
         InvalidProperty
             If ``property_name`` is not a valid property. See
-            :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
+            :py:mod:`pymovements.events` for an overview of supported properties.
         """
         property_expressions: dict[str, Callable[[], pl.Expr]] = {
             property_name: EVENT_PROPERTIES[property_name]
@@ -155,7 +155,7 @@ class EventGazeProcessor:
             If list of identifiers is empty.
         InvalidProperty
             If ``property_name`` is not a valid property. See
-            :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
+            :py:mod:`pymovements.events` for an overview of supported properties.
         RuntimeError
             If specified event name ``name`` is missing from ``events``.
         """

@@ -17,14 +17,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the GazeBase dataset."""
+"""Provides a definition for the DAEMONS dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
-
-import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import register_dataset
@@ -33,23 +31,21 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 @register_dataset
-class GazeBaseVR(DatasetDefinition):
-    """GazeBaseVR dataset :cite:p:`GazeBaseVR`.
+class DAEMONS(DatasetDefinition):
+    """DAEMONS dataset :cite:p:`BSC`.
 
-    This dataset includes binocular plus an additional cyclopian eye tracking data from 407
-    participants captured over a 26-month period. Participants attended up to 3 rounds during this
-    time frame, with each round consisting of two contiguous sessions.
+    The DAEMONS paper presents the Potsdam dataset of eye movements on natural scenes,
+    aimed at advancing research in visual cognition and machine learning.
+    It introduces a large-scale dataset with 2,400 images and eye-tracking data
+    from 250 participants, ensuring high-quality data collection using
+    state-of-the-art equipment. The study focuses on both fixation distributions
+    and scan paths, making the dataset valuable for various modeling approaches,
+    including saliency prediction and cognitive modeling.
 
-    Eye movements are recorded at a sampling frequency of 250 Hz a using SensoMotoric
-    Instrument’s (SMI’s) tethered ET VR head-mounted display based on the
-    HTC Vive (hereon called the ET-HMD) eye tracker and are provided as
-    positional data in degrees of visual angle.
+    The dataset is split into train (precomputed_events[0]) and
+    validation (precomputed_events[1]).
 
-    In each of the two sessions per round, participants are instructed to complete a series of
-    tasks, a vergence task (VRG), a smooth pursuit task (PUR), a video viewing task (VID),
-    a reading task (TEX), and a random saccade task (RAN).
-
-    Check the respective paper for details :cite:p:`GazeBaseVR`.
+    Check the respective paper for details :cite:p:`DAEMONS`.
 
     Attributes
     ----------
@@ -90,20 +86,10 @@ class GazeBaseVR(DatasetDefinition):
             the input data frame is assumed to contain multiple trials and the transformation
             methods will be applied to each trial separately.
 
-    time_column: str
-        The name of the timestamp column in the input data frame. This column will be renamed to
-        ``time``.
-
-    time_unit: str
-        The unit of the timestamps in the timestamp column in the input data frame. Supported
-        units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
-        'step' the experiment definition must be specified. All timestamps will be converted to
-        milliseconds.
-
-    position_columns: list[str]
-        The name of the dva position columns in the input data frame. These columns will be
-        nested into the column ``position``. If the list is empty or None, the nested
-        ``position`` column will not be created.
+    pixel_columns: list[str]
+        The name of the pixel position columns in the input data frame. These columns will be
+        nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
+        column will not be created.
 
     column_map: dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
@@ -111,15 +97,14 @@ class GazeBaseVR(DatasetDefinition):
     custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function.
 
-
     Examples
     --------
     Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
-    :py:class:`~pymovements.datasets.GazeBaseVR` definition:
+    :py:class:`~pymovements.datasets.SBSAT` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("GazeBaseVR", path='data/GazeBaseVR')
+    >>> dataset = pm.Dataset("SBSAT", path='data/SBSAT')
 
     Download the dataset resources:
 
@@ -133,105 +118,69 @@ class GazeBaseVR(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'GazeBaseVR'
+    name: str = 'DAEMONS'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': False,
+            'gaze': False,
+            'precomputed_events': True,
             'precomputed_reading_measures': False,
         },
     )
     mirrors: dict[str, tuple[str, ...]] = field(
-        default_factory=lambda: {
-            'gaze': (
-                'https://figshare.com/ndownloader/files/',
-            ),
-        },
+        default_factory=lambda:
+            {
+                'precomputed_events': (
+                    'https://osf.io/download/',
+                ),
+            },
     )
-
     resources: dict[str, tuple[dict[str, str], ...]] = field(
+        default_factory=lambda:
+            {
+                'precomputed_events': (
+                    {
+                        'resource': 'ztgna/',
+                        'filename': 'eye_movement.zip',
+                        'md5': '2779b4c140a0b1e3c9976488994f08f3',
+                    },
+                ),
+            },
+    )
+    extract: dict[str, bool] = field(
         default_factory=lambda: {
-            'gaze': (
-                {
-                    'resource': '38844024',
-                    'filename': 'gazebasevr.zip',
-                    'md5': '048c04b00fd64347375cc8d37b451a22',
-                },
-            ),
+            'precomputed_events': True,
         },
     )
-
-    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     experiment: Experiment = Experiment(
-        screen_width_px=1680,
-        screen_height_px=1050,
-        screen_width_cm=47.4,
-        screen_height_cm=29.7,
-        distance_cm=55,
-        origin='center',
-        sampling_rate=250,
+        screen_width_px=None, screen_height_px=None, screen_width_cm=None,
+        screen_height_cm=None, distance_cm=None, origin=None, sampling_rate=1,
     )
 
     filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze': (
-                r'S_{round_id:1d}{subject_id:d}'
-                r'_S{session_id:d}'
-                r'_{task_name}.csv'
-            ),
-        },
+        default_factory=lambda:
+            {
+                'precomputed_events': r'SAC_{data_split:s}.csv',
+            },
     )
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'round_id': int,
-                'subject_id': int,
-                'session_id': int,
+        default_factory=lambda:
+            {
+                'precomputed_events': {'data_split': str},
             },
-        },
     )
 
-    trial_columns: list[str] = field(
-        default_factory=lambda: [],
-    )
+    trial_columns: list[str] = field(default_factory=lambda: [])
 
-    time_column: str = 'n'
+    pixel_columns: list[str] = field(default_factory=lambda: [])
 
-    time_unit: str = 'ms'
-
-    position_columns: list[str] = field(default_factory=lambda: ['lx', 'ly', 'rx', 'ry', 'x', 'y'])
-
-    column_map: dict[str, str] = field(
-        default_factory=lambda: {
-            'xT': 'x_target_pos',
-            'yT': 'y_target_pos',
-        },
-    )
+    column_map: dict[str, str] = field(default_factory=lambda: {})
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'schema_overrides': {
-                    'n': pl.Float32,
-                    'x': pl.Float32,
-                    'y': pl.Float32,
-                    'lx': pl.Float32,
-                    'ly': pl.Float32,
-                    'rx': pl.Float32,
-                    'ry': pl.Float32,
-                    'xT': pl.Float32,
-                    'yT': pl.Float32,
-                    'zT': pl.Float32,
-                    'clx': pl.Float32,
-                    'cly': pl.Float32,
-                    'clz': pl.Float32,
-                    'crx': pl.Float32,
-                    'cry': pl.Float32,
-                    'crz': pl.Float32,
-                },
+        default_factory=lambda:
+            {
+                'precomputed_events': {'null_values': ['NA']},
             },
-        },
     )

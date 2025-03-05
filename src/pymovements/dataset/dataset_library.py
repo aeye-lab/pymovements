@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,40 +26,40 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 
 
 class DatasetLibrary:
-    """Provides access by name to :py:class:`~pymovements.DatasetDefinition`.
+    """Provides access by name to :py:class:`~pymovements.dataset.DatasetDefinition`.
 
     Attributes
     ----------
     definitions: dict[str, type[DatasetDefinition]]
-        Dictionary of :py:class:`~pymovements.DatasetDefinition`.
+        Dictionary of :py:class:`~pymovements.dataset.DatasetDefinition`.
     """
 
     definitions: dict[str, type[DatasetDefinition]] = {}
 
     @classmethod
     def add(cls, definition: type[DatasetDefinition]) -> None:
-        """Add :py:class:`~pymovements.DatasetDefinition` to library.
+        """Add :py:class:`~pymovements.dataset.DatasetDefinition` to library.
 
         Parameters
         ----------
         definition: type[DatasetDefinition]
-            The :py:class:`~pymovements.DatasetDefinition` to add to the library.
+            The :py:class:`~pymovements.dataset.DatasetDefinition` to add to the library.
         """
         cls.definitions[definition.name] = definition
 
     @classmethod
     def get(cls, name: str) -> type[DatasetDefinition]:
-        """Get :py:class:`~pymovements.DatasetDefinition` py name.
+        """Get :py:class:`~pymovements.dataset.DatasetDefinition` py name.
 
         Parameters
         ----------
         name: str
-            Name of the :py:class:`~pymovements.DatasetDefinition` in the library.
+            Name of the :py:class:`~pymovements.dataset.DatasetDefinition` in the library.
 
         Returns
         -------
         type[DatasetDefinition]
-            The :py:class:`~pymovements.DatasetDefinition` in the library.
+            The :py:class:`~pymovements.dataset.DatasetDefinition` in the library.
         """
         return cls.definitions[name]
 
@@ -73,12 +73,12 @@ def register_dataset(cls: DatsetDefinitionClass) -> DatsetDefinitionClass:
     Parameters
     ----------
     cls: DatsetDefinitionClass
-        The :py:class:`~pymovements.DatasetDefinition` to register.
+        The :py:class:`~pymovements.dataset.DatasetDefinition` to register.
 
     Returns
     -------
     DatsetDefinitionClass
-        The :py:class:`~pymovements.DatasetDefinition` to register.
+        The :py:class:`~pymovements.dataset.DatasetDefinition` to register.
     """
     DatasetLibrary.add(cls)
     return cls

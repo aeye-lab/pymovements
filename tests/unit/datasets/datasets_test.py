@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -32,8 +32,10 @@ import pymovements as pm
     # please add datasets in alphabetical order
     [
         pytest.param(pm.datasets.BSC, 'BSC', id='BSC'),
+        pytest.param(pm.datasets.BSCII, 'BSCII', id='BSCII'),
         pytest.param(pm.datasets.CodeComprehension, 'CodeComprehension', id='CodeComprehension'),
         pytest.param(pm.datasets.CopCo, 'CopCo', id='CopCo'),
+        pytest.param(pm.datasets.DAEMONS, 'DAEMONS', id='DAEMONS'),
         pytest.param(pm.datasets.DIDEC, 'DIDEC', id='DIDEC'),
         pytest.param(pm.datasets.EMTeC, 'EMTeC', id='EMTeC'),
         pytest.param(pm.datasets.FakeNewsPerception, 'FakeNewsPerception', id='FakeNewsPerception'),
@@ -44,9 +46,11 @@ import pymovements as pm
         pytest.param(pm.datasets.InteRead, 'InteRead', id='InteRead'),
         pytest.param(pm.datasets.JuDo1000, 'JuDo1000', id='JuDo1000'),
         pytest.param(pm.datasets.PoTeC, 'PoTeC', id='PoTeC'),
+        pytest.param(pm.datasets.Provo, 'Provo', id='Provo'),
         pytest.param(pm.datasets.SBSAT, 'SBSAT', id='SBSAT'),
         pytest.param(pm.datasets.ToyDataset, 'ToyDataset', id='ToyDataset'),
         pytest.param(pm.datasets.ToyDatasetEyeLink, 'ToyDatasetEyeLink', id='ToyDatasetEyeLink'),
+        pytest.param(pm.datasets.UCL, 'UCL', id='UCL'),
     ],
 )
 @pytest.mark.parametrize(

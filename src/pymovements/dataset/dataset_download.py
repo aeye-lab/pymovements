@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -75,7 +75,7 @@ def download_dataset(
             raise AttributeError('number of mirrors must not be zero to download dataset')
 
         if len(definition.resources['gaze']) == 0:
-            raise AttributeError('number of gaze_resources must not be zero to download dataset')
+            raise AttributeError('number of `gaze` resources must not be zero to download dataset')
 
         paths.raw.mkdir(parents=True, exist_ok=True)
 
@@ -119,7 +119,7 @@ def download_dataset(
 
         if len(definition.resources['precomputed_events']) == 0:
             raise AttributeError(
-                'number of precomputed_event_resources must not be zero to download dataset',
+                'number of `precomputed_events` resources must not be zero to download dataset',
             )
 
         paths.precomputed_events.mkdir(parents=True, exist_ok=True)
@@ -160,12 +160,13 @@ def download_dataset(
     if definition.has_files['precomputed_reading_measures']:
         if len(definition.mirrors['precomputed_reading_measures']) == 0:
             raise AttributeError(
-                'number of precomputed mirrors must not be zero to download dataset',
+                'number of `precomputed_reading_measures` mirrors must in datasets definition'
+                'not be zero to download dataset',
             )
 
         if len(definition.resources['precomputed_reading_measures']) == 0:
             raise AttributeError(
-                'number of precomputed_reading_measures resources '
+                'number of `precomputed_reading_measures` resources in datasets definition'
                 'must not be zero to download dataset',
             )
 

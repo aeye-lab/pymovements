@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 The pymovements Project Authors
+# Copyright (c) 2022-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +38,7 @@ from pymovements.events import EventDataFrame
 from pymovements.events import EventGazeProcessor
 from pymovements.events import EventProcessor
 from pymovements.gaze import Experiment
+from pymovements.gaze import EyeTracker
 from pymovements.gaze import GazeDataFrame
 from pymovements.gaze import Screen
 from pymovements.measure import register_sample_measure
@@ -60,6 +61,7 @@ __all__ = [
 
     'gaze',
     'Experiment',
+    'EyeTracker',
     'Screen',
     'GazeDataFrame',
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,54 +25,54 @@
    :toctree:
    :template: class.rst
 
-    pymovements.gaze.Experiment
-    pymovements.gaze.EyeTracker
-    pymovements.gaze.Screen
-    pymovements.gaze.GazeDataFrame
+    Experiment
+    EyeTracker
+    Screen
+    GazeDataFrame
 
 .. rubric:: Transformations
 
 .. autosummary::
    :toctree:
 
-   pymovements.gaze.transforms.center_origin
-   pymovements.gaze.transforms.downsample
-   pymovements.gaze.transforms.norm
-   pymovements.gaze.transforms.pix2deg
-   pymovements.gaze.transforms.deg2pix
-   pymovements.gaze.transforms.pos2acc
-   pymovements.gaze.transforms.pos2vel
-   pymovements.gaze.transforms.savitzky_golay
+   transforms.center_origin
+   transforms.downsample
+   transforms.norm
+   transforms.pix2deg
+   transforms.deg2pix
+   transforms.pos2acc
+   transforms.pos2vel
+   transforms.savitzky_golay
 
 .. rubric:: Input / Output
 
 .. autosummary::
     :toctree:
 
-    pymovements.gaze.from_asc
-    pymovements.gaze.from_csv
-    pymovements.gaze.from_ipc
+    from_asc
+    from_csv
+    from_ipc
 
 .. rubric:: Integration
 
 .. autosummary::
     :toctree:
 
-    pymovements.gaze.from_numpy
-    pymovements.gaze.from_pandas
+    from_numpy
+    from_pandas
 
 .. rubric:: Numpy Transformations
 
 .. autosummary::
    :toctree:
 
-   pymovements.gaze.transforms_numpy.pix2deg
-   pymovements.gaze.transforms_numpy.pos2acc
-   pymovements.gaze.transforms_numpy.pos2vel
-   pymovements.gaze.transforms_numpy.norm
-   pymovements.gaze.transforms_numpy.split
-   pymovements.gaze.transforms_numpy.downsample
-   pymovements.gaze.transforms_numpy.consecutive
+   transforms_numpy.pix2deg
+   transforms_numpy.pos2acc
+   transforms_numpy.pos2vel
+   transforms_numpy.norm
+   transforms_numpy.split
+   transforms_numpy.downsample
+   transforms_numpy.consecutive
 
 """
 from pymovements.gaze import transforms

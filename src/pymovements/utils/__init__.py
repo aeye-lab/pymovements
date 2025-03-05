@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 The pymovements Project Authors
+# Copyright (c) 2022-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,13 +25,12 @@
    :toctree:
    :template: module.rst
 
-    pymovements.utils.archives
-    pymovements.utils.checks
-    pymovements.utils.decorators
-    pymovements.utils.downloads
-    pymovements.utils.filters
-    pymovements.utils.parsing
-    pymovements.utils.paths
+    archives
+    checks
+    decorators
+    downloads
+    parsing
+    paths
 """
 from pymovements.utils import aois
 from pymovements.utils import archives

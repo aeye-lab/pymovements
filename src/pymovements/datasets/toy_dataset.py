@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -104,8 +104,8 @@ class ToyDataset(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.ToyDataset` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.ToyDataset` definition:
 
     >>> import pymovements as pm
     >>>
@@ -175,7 +175,7 @@ class ToyDataset(DatasetDefinition):
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: ['text_id', 'page_id'])
+    trial_columns: list[str] = field(default_factory=lambda: [])
 
     time_column: str = 'timestamp'
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -49,5 +49,6 @@ def test_public_dataset_processing(dataset_name, tmp_path):
             assert 'position' in gaze.columns
             assert 'velocity' in gaze.columns
             assert 'acceleration' in gaze.columns
+            assert len(set(gaze.trial_columns)) == len(gaze.trial_columns)
 
         shutil.rmtree(dataset_path, ignore_errors=True)
