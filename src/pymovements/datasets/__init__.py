@@ -25,26 +25,26 @@
    :toctree:
    :template: class.rst
 
-    pymovements.datasets.BSC
-    pymovements.datasets.BSCII
-    pymovements.datasets.CodeComprehension
-    pymovements.datasets.CopCo
-    pymovements.datasets.DAEMONS
-    pymovements.datasets.DIDEC
-    pymovements.datasets.EMTeC
-    pymovements.datasets.FakeNewsPerception
-    pymovements.datasets.GazeBase
-    pymovements.datasets.GazeBaseVR
-    pymovements.datasets.GazeGraph
-    pymovements.datasets.GazeOnFaces
-    pymovements.datasets.HBN
-    pymovements.datasets.InteRead
-    pymovements.datasets.JuDo1000
-    pymovements.datasets.PoTeC
-    pymovements.datasets.Provo
-    pymovements.datasets.RaCCooNS
-    pymovements.datasets.SBSAT
-    pymovements.datasets.UCL
+    BSC
+    BSCII
+    CodeComprehension
+    CopCo
+    DAEMONS
+    DIDEC
+    EMTeC
+    FakeNewsPerception
+    GazeBase
+    GazeBaseVR
+    GazeGraph
+    GazeOnFaces
+    HBN
+    InteRead
+    JuDo1000
+    PoTeC
+    Provo
+    RaCCooNS
+    SBSAT
+    UCL
 
 
 .. rubric:: Example Datasets
@@ -53,8 +53,8 @@
    :toctree:
    :template: class.rst
 
-    pymovements.datasets.ToyDataset
-    pymovements.datasets.ToyDatasetEyeLink
+    ToyDataset
+    ToyDatasetEyeLink
 """
 from pymovements.datasets.bsc import BSC
 from pymovements.datasets.bsc2 import BSCII
