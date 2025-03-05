@@ -34,7 +34,7 @@ from pymovements.gaze.experiment import Experiment
 @dataclass
 @register_dataset
 class PoTeC(DatasetDefinition):
-    """PoTeC dataset :cite:p:`potec`.
+    """PoTeC dataset :cite:p:`PoTeC`.
 
     The Potsdam Textbook Corpus (PoTeC) is a naturalistic eye-tracking-while-reading
     corpus containing data from 75 participants reading 12 scientific texts.
