@@ -20,10 +20,10 @@ Download your dataset and load it into memory with these few lines of code:
 
 .. csv-table:: Public Datasets
    :file: public_datasets.csv
-   :widths: 20, 20, 20, 20, 20
+   :widths: 30, 40, 10, 10, 10
    :header-rows: 1
 
 .. csv-table:: Example Datasets
    :file: example_datasets.csv
-   :widths: 40, 20, 20, 20
+   :widths: 70, 10, 10, 10
    :header-rows: 1
