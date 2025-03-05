@@ -24,7 +24,7 @@
 .. autosummary::
    :toctree:
 
-    pymovements.synthetic.step_function
+    step_function
 
 """
 from pymovements.synthetic.step_function import step_function

@@ -32,7 +32,7 @@ from pymovements.gaze.experiment import Experiment
 @dataclass
 @register_dataset
 class DAEMONS(DatasetDefinition):
-    """DAEMONS dataset :cite:p:`BSC`.
+    """DAEMONS dataset :cite:p:`DAEMONS`.
 
     The DAEMONS paper presents the Potsdam dataset of eye movements on natural scenes,
     aimed at advancing research in visual cognition and machine learning.
@@ -99,8 +99,8 @@ class DAEMONS(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.SBSAT` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.SBSAT` definition:
 
     >>> import pymovements as pm
     >>>

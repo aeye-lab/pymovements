@@ -113,8 +113,8 @@ class GazeBase(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.GazeBase` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.GazeBase` definition:
 
     >>> import pymovements as pm
     >>>

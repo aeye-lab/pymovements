@@ -25,7 +25,7 @@
    :toctree:
    :template: class.rst
 
-    pymovements.reading_measures.ReadingMeasures
+    ReadingMeasures
 """
 from pymovements.reading_measures.frame import ReadingMeasures
 

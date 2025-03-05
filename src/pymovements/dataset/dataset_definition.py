@@ -29,7 +29,7 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 class DatasetDefinition:
-    """Definition to initialize a :py:class:`~pymovements.Dataset`.
+    """Definition to initialize a :py:class:`~pymovements.dataset.Dataset`.
 
     Attributes
     ----------

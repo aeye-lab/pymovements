@@ -25,7 +25,8 @@
    :toctree:
    :template: class.rst
 
-    pymovements.stimulus.TextStimulus
+    ImageStimulus
+    TextStimulus
 """
 from pymovements.stimulus.image import ImageStimulus
 from pymovements.stimulus.text import TextStimulus

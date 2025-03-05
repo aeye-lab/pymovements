@@ -25,10 +25,10 @@
    :toctree:
    :recursive:
 
-    pymovements.plotting.heatmap
-    pymovements.plotting.main_sequence_plot
-    pymovements.plotting.traceplot
-    pymovements.plotting.tsplot
+    heatmap
+    main_sequence_plot
+    traceplot
+    tsplot
 """
 from pymovements.plotting.heatmap import heatmap
 from pymovements.plotting.main_sequence_plot import main_sequence_plot
