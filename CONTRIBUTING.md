@@ -24,7 +24,7 @@ https://github.com/aeye-lab/pymovements/issues/new/choose) or write us at
   - [Pull Requests](#pull-requests)
   - [Continuous Integration](#continuous-integration)
 - [Core Developer Guidelines](#core-developer-guidelines)
-- [Releasing](#releasing)
+- [Publishing Releases](#Publishing Releases)
 - [License](#license)
 - [Questions](#questions)
 
