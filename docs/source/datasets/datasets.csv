@@ -1,4 +1,0 @@
-Dataset,Citation,Samples,Events,Reading Measures
-:py:class:`~pymovements.datasets.BSC`,:cite:p:`BSC`,,X,
-:py:class:`~pymovements.datasets.BSC2`,:cite:p:`BSCII`,,X,
-:py:class:`~pymovements.datasets.GazeBase`,:cite:p:`GazeBase`,X,,
