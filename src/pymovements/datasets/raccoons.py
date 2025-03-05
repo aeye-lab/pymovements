@@ -185,7 +185,13 @@ class RaCCooNS(DatasetDefinition):
 
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
-            'gaze': {},
+            'gaze': {
+                'patterns': [
+                    r'TRIALID (?P<trial_index0>\d+)',
+                    {'pattern': r'TRIAL_RESULT', 'column': 'trial_index0', 'value': None},
+                ],
+                'encoding': 'latin-1',
+            },
             'precomputed_events': {'separator': '\t', 'encoding': 'latin-1'},
             'precomputed_reading_measures': {'separator': '\t', 'encoding': 'latin-1'},
         },
