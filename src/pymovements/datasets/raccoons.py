@@ -186,7 +186,7 @@ class RaCCooNS(DatasetDefinition):
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
             'gaze': {},
-            'precomputed_events': {'separator': '\t'},
-            'precomputed_reading_measures': {'separator': '\t'},
+            'precomputed_events': {'separator': '\t', 'encoding': 'latin-1'},
+            'precomputed_reading_measures': {'separator': '\t', 'encoding': 'latin-1'},
         },
     )
