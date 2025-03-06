@@ -19,6 +19,7 @@
 # SOFTWARE.
 """Provides top-level access to submodules."""
 from pymovements import _version
+from pymovements import datasets
 from pymovements import events
 from pymovements import exceptions
 from pymovements import gaze
@@ -47,6 +48,7 @@ from pymovements.stimulus import text
 
 __all__ = [
     'Dataset',
+    'datasets',
     'DatasetDefinition',
     'DatasetLibrary',
     'DatasetPaths',

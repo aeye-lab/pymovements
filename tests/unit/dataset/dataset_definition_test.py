@@ -38,6 +38,17 @@ def test_write_yaml_already_existing(tmp_path):
         assert key in written_file
 
 
+def test_write_yaml_already_existing_no_experiment(tmp_path):
+    tmp_file = tmp_path / 'tmp.yaml'
+    dataset = pm.DatasetLibrary.get('EMTeC')
+    dataset.to_yaml(tmp_file)
+    with open(tmp_file, encoding='utf-8') as f:
+        written_file = yaml.safe_load(f)
+
+    for key in asdict(dataset).keys():
+        assert key in written_file
+
+
 @pytest.mark.xfail(reason='#991')
 def test_write_yaml_already_existing_with_values(tmp_path):
     tmp_file = tmp_path / 'tmp.yaml'
