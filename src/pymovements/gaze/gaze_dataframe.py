@@ -29,6 +29,7 @@ from typing import Any
 
 import numpy as np
 import polars as pl
+from tqdm import tqdm
 
 import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.gaze import transforms
@@ -1060,14 +1061,12 @@ class GazeDataFrame:
         else:
             raise ValueError('neither position nor pixel in gaze dataframe, one needed for mapping')
 
-        self.frame = self.frame.with_columns(
-            area_of_interest=pl.Series(
-                get_aoi(
-                    aoi_dataframe, row, x_eye, y_eye,
-                )
-                for row in self.frame.iter_rows(named=True)
-            ),
-        )
+        aois = [
+            get_aoi(aoi_dataframe, row, x_eye, y_eye)
+            for row in tqdm(self.frame.iter_rows(named=True))
+        ]
+        aoi_df = pl.concat(aois)
+        self.frame = pl.concat([self.frame, aoi_df], how='horizontal')
 
     def nest(
             self,
