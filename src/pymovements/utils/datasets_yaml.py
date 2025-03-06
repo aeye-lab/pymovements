@@ -25,6 +25,8 @@ from pathlib import PosixPath
 
 import yaml
 
+from pymovements import datasets
+
 
 # generalized constructor for !* tags
 def type_constructor(
@@ -108,7 +110,6 @@ def write_dataset_definitions_yaml(
         (default: src/pymovements/datasets/datasets.yaml)
 
     """
-    from pymovements import datasets  # pylint: disable=import-outside-toplevel
     dataset_definition_files = resources.files(datasets)
     datasets_list = []
 
