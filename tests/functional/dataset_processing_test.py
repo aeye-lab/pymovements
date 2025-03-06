@@ -18,13 +18,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test basic preprocessing on various datasets."""
+from pathlib import Path
+from typing import Any
+
 import pytest
 
 import pymovements as pm
 
 
 @pytest.fixture(
-    name='datasets',
+    name='dataset',
     params=[
         'csv_monocular',
         'csv_binocular',
@@ -227,8 +230,7 @@ def fixture_dataset_init_kwargs(request):
     )
 
 
-def test_dataset_save_load_preprocessed(datasets):
-    dataset = datasets
+def test_dataset_save_load_preprocessed(dataset):
     dataset.load()
 
     if 'pixel' in dataset.gaze[0].frame.columns:
@@ -238,3 +240,20 @@ def test_dataset_save_load_preprocessed(datasets):
     dataset.resample(resampling_rate=2000)
     dataset.save()
     dataset.load(preprocessed=True)
+
+
+def test_dataset_apply_pipeline_per_file(dataset):
+    dataset.scan()
+
+    def pipeline(gaze: pm.GazeDataFrame, fileinfo: dict[str, Any]) -> None:
+        if 'pixel' in gaze.frame.columns:
+            gaze.pix2deg()
+        assert 'position' in gaze.frame.columns
+
+        gaze.pos2vel()
+        assert 'velocity' in gaze.frame.columns
+
+        gaze.resample(resampling_rate=2000)
+        assert gaze.experiment.sampling_rate == 2000
+
+    dataset.apply_pipeline(pipeline)
