@@ -888,3 +888,33 @@ def test_parse_eyelink_mount_config(tmp_path, metadata, expected_mount_config):
     _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
 
     assert parsed_metadata['mount_configuration'] == expected_mount_config
+
+
+@pytest.mark.parametrize(
+    ('bytestring', 'encoding', 'expected_text'),
+    [
+        pytest.param(
+            b'MSG	2154555 H\xe4user\n',
+            'latin1',
+            'Häuser',
+            id='latin1',
+        ),
+        pytest.param(
+            b'MSG	2154555 H\xc3\xa4user\n',
+            'utf-8',
+            'Häuser',
+            id='utf-8',
+        ),
+    ],
+)
+def test_parse_eyelink_encoding(tmp_path, bytestring, encoding, expected_text):
+    filepath = tmp_path / 'sub.asc'
+    filepath.write_bytes(bytestring)
+
+    _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(
+        filepath,
+        metadata_patterns=[r'(?P<text>.+)'],
+        encoding=encoding,
+    )
+
+    assert parsed_metadata['text'] == expected_text

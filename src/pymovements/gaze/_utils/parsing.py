@@ -180,6 +180,7 @@ def parse_eyelink(
         patterns: list[dict[str, Any] | str] | None = None,
         schema: dict[str, Any] | None = None,
         metadata_patterns: list[dict[str, Any] | str] | None = None,
+        encoding: str = 'ascii',
 ) -> tuple[pl.DataFrame, dict[str, Any]]:
     """Parse EyeLink asc file.
 
@@ -193,6 +194,8 @@ def parse_eyelink(
         Dictionary to optionally specify types of columns parsed by patterns. (default: None)
     metadata_patterns: list[dict[str, Any] | str] | None
         list of patterns to match for additional metadata. (default: None)
+    encoding: str
+        Text encoding of the file. (default: 'ascii')
 
     Returns
     -------
@@ -228,7 +231,7 @@ def parse_eyelink(
         **additional,
     }
 
-    with open(filepath, encoding='ascii') as asc_file:
+    with open(filepath, encoding=encoding) as asc_file:
         lines = asc_file.readlines()
 
     # will return an empty string if the key does not exist
