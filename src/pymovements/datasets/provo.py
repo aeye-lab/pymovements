@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the GazeBase dataset."""
+"""Provides a definition for the Provo dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -33,23 +33,17 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 @register_dataset
-class GazeBaseVR(DatasetDefinition):
-    """GazeBaseVR dataset :cite:p:`GazeBaseVR`.
+class Provo(DatasetDefinition):
+    """Provo dataset :cite:p:`Provo`.
 
-    This dataset includes binocular plus an additional cyclopian eye tracking data from 407
-    participants captured over a 26-month period. Participants attended up to 3 rounds during this
-    time frame, with each round consisting of two contiguous sessions.
+    The Provo Corpus, a corpus of eye-tracking data with accompanying predictability norms.
+    The predictability norms for the Provo Corpus differ from those of other corpora.
+    In addition to traditional cloze scores that estimate the predictability of the full
+    orthographic form of each word, the Provo Corpus also includes measures of the
+    predictability of the morpho-syntactic and semantic information for each word.
+    This makes the Provo Corpus ideal for studying predictive processes in reading.
 
-    Eye movements are recorded at a sampling frequency of 250 Hz a using SensoMotoric
-    Instrument’s (SMI’s) tethered ET VR head-mounted display based on the
-    HTC Vive (hereon called the ET-HMD) eye tracker and are provided as
-    positional data in degrees of visual angle.
-
-    In each of the two sessions per round, participants are instructed to complete a series of
-    tasks, a vergence task (VRG), a smooth pursuit task (PUR), a video viewing task (VID),
-    a reading task (TEX), and a random saccade task (RAN).
-
-    Check the respective paper for details :cite:p:`GazeBaseVR`.
+    Check the respective paper for details :cite:p:`Provo`.
 
     Attributes
     ----------
@@ -100,10 +94,10 @@ class GazeBaseVR(DatasetDefinition):
         'step' the experiment definition must be specified. All timestamps will be converted to
         milliseconds.
 
-    position_columns: list[str]
-        The name of the dva position columns in the input data frame. These columns will be
-        nested into the column ``position``. If the list is empty or None, the nested
-        ``position`` column will not be created.
+    pixel_columns: list[str]
+        The name of the pixel position columns in the input data frame. These columns will be
+        nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
+        column will not be created.
 
     column_map: dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
@@ -111,15 +105,14 @@ class GazeBaseVR(DatasetDefinition):
     custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function.
 
-
     Examples
     --------
     Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
-    :py:class:`~pymovements.datasets.GazeBaseVR` definition:
+    :py:class:`~pymovements.datasets.SBSAT` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("GazeBaseVR", path='data/GazeBaseVR')
+    >>> dataset = pm.Dataset("SBSAT", path='data/SBSAT')
 
     Download the dataset resources:
 
@@ -133,105 +126,78 @@ class GazeBaseVR(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'GazeBaseVR'
+    name: str = 'Provo'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': False,
+            'gaze': False,
+            'precomputed_events': True,
             'precomputed_reading_measures': False,
         },
     )
     mirrors: dict[str, tuple[str, ...]] = field(
-        default_factory=lambda: {
-            'gaze': (
-                'https://figshare.com/ndownloader/files/',
-            ),
-        },
+        default_factory=lambda:
+            {
+                'precomputed_events': (
+                    'https://osf.io/download/',
+                ),
+            },
     )
-
     resources: dict[str, tuple[dict[str, str], ...]] = field(
+        default_factory=lambda:
+            {
+                'precomputed_events': (
+                    {
+                        'resource': 'z3eh6/',
+                        'filename': 'Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv',
+                        'md5': '7aa239e51e5d78528e2430f84a23da3f',
+                    },
+                ),
+            },
+    )
+    extract: dict[str, bool] = field(
         default_factory=lambda: {
-            'gaze': (
-                {
-                    'resource': '38844024',
-                    'filename': 'gazebasevr.zip',
-                    'md5': '048c04b00fd64347375cc8d37b451a22',
-                },
-            ),
+            'precomputed_events': False,
         },
     )
-
-    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     experiment: Experiment = Experiment(
-        screen_width_px=1680,
-        screen_height_px=1050,
-        screen_width_cm=47.4,
-        screen_height_cm=29.7,
-        distance_cm=55,
-        origin='center',
-        sampling_rate=250,
+        screen_width_px=None, screen_height_px=None, screen_width_cm=None,
+        screen_height_cm=None, distance_cm=None, origin=None, sampling_rate=1,
     )
 
     filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze': (
-                r'S_{round_id:1d}{subject_id:d}'
-                r'_S{session_id:d}'
-                r'_{task_name}.csv'
-            ),
-        },
+        default_factory=lambda:
+            {
+                'precomputed_events':
+                'Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv',
+            },
     )
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'round_id': int,
-                'subject_id': int,
-                'session_id': int,
+        default_factory=lambda:
+            {
+                'precomputed_events': {},
             },
-        },
     )
 
-    trial_columns: list[str] = field(
-        default_factory=lambda: [],
-    )
+    trial_columns: list[str] = field(default_factory=lambda: [])
 
-    time_column: str = 'n'
+    time_column: str = ''
 
-    time_unit: str = 'ms'
+    time_unit: str = ''
 
-    position_columns: list[str] = field(default_factory=lambda: ['lx', 'ly', 'rx', 'ry', 'x', 'y'])
+    pixel_columns: list[str] = field(default_factory=lambda: [])
 
-    column_map: dict[str, str] = field(
-        default_factory=lambda: {
-            'xT': 'x_target_pos',
-            'yT': 'y_target_pos',
-        },
-    )
+    column_map: dict[str, str] = field(default_factory=lambda: {})
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'schema_overrides': {
-                    'n': pl.Float32,
-                    'x': pl.Float32,
-                    'y': pl.Float32,
-                    'lx': pl.Float32,
-                    'ly': pl.Float32,
-                    'rx': pl.Float32,
-                    'ry': pl.Float32,
-                    'xT': pl.Float32,
-                    'yT': pl.Float32,
-                    'zT': pl.Float32,
-                    'clx': pl.Float32,
-                    'cly': pl.Float32,
-                    'clz': pl.Float32,
-                    'crx': pl.Float32,
-                    'cry': pl.Float32,
-                    'crz': pl.Float32,
-                },
+        default_factory=lambda:
+        {
+            'precomputed_events': {
+                'schema_overrides': {'RECORDING_SESSION_LABEL': pl.Utf8},
+                'encoding': 'macroman',
+                'null_values': ['.'],
             },
         },
     )

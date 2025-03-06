@@ -107,8 +107,8 @@ class JuDo1000(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.JuDo1000` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.JuDo1000` definition:
 
     >>> import pymovements as pm
     >>>
