@@ -106,8 +106,8 @@ class GazeOnFaces(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.GazeOnFaces` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.GazeOnFaces` definition:
 
     >>> import pymovements as pm
     >>>

@@ -103,8 +103,8 @@ class InteRead(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.InteRead` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.InteRead` definition:
 
     >>> import pymovements as pm
     >>>

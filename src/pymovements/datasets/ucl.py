@@ -88,8 +88,8 @@ class UCL(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.UCL` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.UCL` definition:
 
     >>> import pymovements as pm
     >>>

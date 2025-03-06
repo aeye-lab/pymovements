@@ -108,8 +108,8 @@ class GazeGraph(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.GazeGraph` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.GazeGraph` definition:
 
     >>> import pymovements as pm
     >>>

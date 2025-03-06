@@ -105,8 +105,8 @@ class CopCo(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.CopCo` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.CopCo` definition:
 
     >>> import pymovements as pm
     >>>
