@@ -27,9 +27,6 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from polars import Float32
-from polars import Int64
-from polars import String
 
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
@@ -201,31 +198,26 @@ class DatasetDefinition:
 
         Parameters
         ----------
-        yaml_path : str | Path
-            Path where to save the YAML file
+        yaml_path: str | Path
+            Path where to save the YAML file to.
         """
         data = asdict(self)
 
-        def check_types(d):
-            polar_types = (Int64, Float32, String)
-            builtin_types = (int, float, str, bool, list, dict, tuple, type(None))
+        def substitute_types(d: Any) -> Any:
             if isinstance(d, dict):
-                for k, v in d.items():
-                    check_types(v)
-            elif isinstance(d, list):
-                for item in d:
-                    check_types(item)
-            elif isinstance(d, tuple):
-                for item in d:
-                    check_types(item)
-            else:
-                if isinstance(d, polar_types):
-                    yield f"Polar: {d} ({type(d)})"
-                if isinstance(d, type):
-                    yield f"Class Type: {d} ({type(d)})"
+                return {k: substitute_types(v) for k, v in d.items()}
+            if isinstance(d, list):
+                return [substitute_types(v) for v in d]
+            if isinstance(d, type):
+                if d.__module__ == 'builtins':
+                    return f'!{d.__name__}'
+                return f'!{d.__module__}.{d.__name__}'
+            return d
 
         if data['experiment']:
-            data['experiment'] = asdict(data['experiment'])
+            data['experiment'] = data['experiment'].to_dict()
+
+        data = substitute_types(data)
 
         with open(yaml_path, 'w', encoding='utf-8') as f:
             yaml.dump(data, f, sort_keys=False)

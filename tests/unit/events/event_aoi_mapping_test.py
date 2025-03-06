@@ -211,7 +211,7 @@ EXPECTED_DF = {
 
 @pytest.fixture(name='dataset')
 def dataset_fixture():
-    dataset = pm.Dataset('ToyDataset', 'toy_dataset')
+    dataset = pm.Dataset('ToyDataset', 'toydataset')
     dataset.download()
     dataset.load()
     dataset.pix2deg()

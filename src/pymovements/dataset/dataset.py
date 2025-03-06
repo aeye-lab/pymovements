@@ -352,7 +352,7 @@ class Dataset:
         Let's load in our dataset first,
         >>> import pymovements as pm
         >>>
-        >>> dataset = pm.Dataset("ToyDataset", path='toy_dataset')
+        >>> dataset = pm.Dataset("ToyDatasetEyeLink", path='toy_dataset')
         >>> dataset.download()# doctest:+ELLIPSIS
         Downloading ... to toy_dataset...downloads...
         Checking integrity of ...
@@ -1097,3 +1097,13 @@ class Dataset:
             raise AttributeError('gaze files were not loaded yet. please run load() beforehand')
         if len(self.gaze) == 0:
             raise AttributeError('no files present in gaze attribute')
+
+    def to_yaml(self, yaml_path: str | Path) -> None:
+        """Write the dataset definition to a YAML file.
+
+        Parameters
+        ----------
+        yaml_path: str | Path
+            Path where to save the YAML file to.
+        """
+        self.definition.to_yaml(yaml_path)

@@ -18,11 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test dataset library."""
-from dataclasses import asdict
 from unittest import mock
 
 import pytest
-import yaml
 
 import pymovements as pm
 
@@ -72,31 +70,3 @@ def test__add_shipped_datasets():
     with mock.patch('pymovements.dataset.dataset_library._add_shipped_datasets') as mock_add:
         pm.dataset.dataset_library._add_shipped_datasets()
         mock_add.assert_called_once()
-
-
-def test_write_yaml_already_existing(tmp_path):
-    tmp_file = tmp_path / 'tmp.yaml'
-    dataset = pm.DatasetLibrary.get('EMTeC')
-    dataset.to_yaml(tmp_file)
-    with open(tmp_file, encoding='utf-8') as f:
-        written_file = yaml.safe_load(f)
-    assert written_file == asdict(dataset)
-
-
-def test_write_yaml_new(tmp_path):
-    tmp_file = tmp_path / 'tmp.yaml'
-    yaml_encoding = """\
-    name: Example
-
-    has_files:
-      gaze: false
-      precomputed_events: false
-      precomputed_reading_measures: false
-
-    """
-    with open(tmp_file, 'w', encoding='utf-8') as f:
-        written_file = yaml.safe_dump(yaml_encoding, f)
-    dataset = pm.DatasetDefinition().from_yaml(tmp_file)
-    dataset.to_yaml(tmp_file)
-    assert written_file == asdict(dataset)
-    assert tmp_file.is_file()
