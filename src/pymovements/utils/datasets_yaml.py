@@ -25,7 +25,7 @@ from pathlib import PosixPath
 
 import yaml
 
-from pymovements import datasets
+import pymovements as pm
 
 
 # generalized constructor for !* tags
@@ -110,7 +110,7 @@ def write_dataset_definitions_yaml(
         (default: src/pymovements/datasets/datasets.yaml)
 
     """
-    dataset_definition_files = resources.files(datasets)
+    dataset_definition_files = resources.files(pm.datasets)
     datasets_list = []
 
     for yaml_file in dataset_definition_files.iterdir():
