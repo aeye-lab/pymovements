@@ -37,7 +37,7 @@ def from_csv(
         *,
         trial_columns: str | list[str] | None = None,
         time_column: str | None = None,
-        time_unit: str | None = 'ms',
+        time_unit: str | None = None,
         pixel_columns: list[str] | None = None,
         position_columns: list[str] | None = None,
         velocity_columns: list[str] | None = None,

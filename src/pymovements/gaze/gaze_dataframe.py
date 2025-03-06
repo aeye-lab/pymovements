@@ -187,7 +187,7 @@ class GazeDataFrame:
             auto_column_detect: bool = False,
             trial_columns: str | list[str] | None = None,
             time_column: str | None = None,
-            time_unit: str | None = 'ms',
+            time_unit: str | None = None,
             pixel_columns: list[str] | None = None,
             position_columns: list[str] | None = None,
             velocity_columns: list[str] | None = None,
@@ -222,6 +222,10 @@ class GazeDataFrame:
 
                 time_column = 'time'
                 time_unit = 'step'
+
+        # If no time_unit specified, assume milliseconds.
+        if time_unit is None:
+            time_unit = 'ms'
 
         if time_column is not None:
             self.frame = self.frame.rename({time_column: 'time'})
