@@ -107,7 +107,7 @@ def write_dataset_definitions_yaml(
         (default: src/pymovements/datasets/datasets.yaml)
 
     """
-    dataset_definition_files = Path('src/pymovements/datasests/')
+    dataset_definition_files = Path('src/pymovements/datasets/')
     datasets_list = []
 
     for yaml_file in dataset_definition_files.iterdir():

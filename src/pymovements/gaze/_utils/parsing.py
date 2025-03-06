@@ -146,7 +146,7 @@ def compile_patterns(patterns: list[dict[str, Any] | str]) -> list[dict[str, Any
                 })
                 continue
 
-            if isinstance(pattern['pattern'], tuple):
+            if isinstance(pattern['pattern'], list):
                 for single_pattern in pattern['pattern']:
                     compiled_patterns.append({
                         **pattern,
