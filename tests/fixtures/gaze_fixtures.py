@@ -18,10 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Fixtures for datasets."""
-import pytest
-
 import numpy as np
 import polars as pl
+import pytest
 
 import pymovements as pm
 
@@ -67,7 +66,7 @@ def fixture_gaze(request):
                 custom_read_kwargs={'gaze': {}},
             ),
             'filepath': 'tests/files/monocular_example.csv',
-            },
+        },
         'csv_binocular': {
             'definition': pm.dataset.DatasetDefinition(
                 has_files={
@@ -283,12 +282,12 @@ def fixture_gaze(request):
                     'trial_id': np.concatenate(
                         [
                             # stimulus A
-                            np.zeros(100), np.ones(100), np.ones(100)*2,
-                            np.ones(100)*3, np.ones(100)*4,
+                            np.zeros(100), np.ones(100), np.ones(100) * 2,
+                            np.ones(100) * 3, np.ones(100) * 4,
                             # stimulus B
                             np.zeros(100), np.ones(100), np.ones(100) * 2,
                             np.ones(100) * 3, np.ones(100) * 4,
-                        ]
+                        ],
                     ),
                 },
                 schema={
@@ -298,9 +297,9 @@ def fixture_gaze(request):
                     'stimulus_id': pl.Utf8,
                     'trial_id': pl.Float64,
                 },
-            )
+            ),
 
-        }
+        },
     }
 
     init_params = init_param_dict[request.param]
