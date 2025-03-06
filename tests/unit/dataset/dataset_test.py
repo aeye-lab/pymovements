@@ -95,7 +95,7 @@ def create_precomputed_rm_files_from_fileinfo(precomputed_rm_df, fileinfo, rootp
 
         for key in fileinfo_row.keys():
             if key in _precomputed_rm_df.columns:
-                _precomputed_rm_df = precomputed_rm_df.drop(key)
+                _precomputed_rm_df = _precomputed_rm_df.drop(key)
 
         _precomputed_rm_df.write_csv(rootpath / filepath)
 
