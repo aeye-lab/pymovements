@@ -25,10 +25,10 @@ from typing import Any
 
 import polars as pl
 
+from pymovements.gaze._utils.parsing import parse_eyelink
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
 from pymovements.gaze.gaze_dataframe import GazeDataFrame  # pylint: disable=cyclic-import
-from pymovements.utils.parsing import parse_eyelink
 
 
 def from_csv(
