@@ -51,6 +51,8 @@ class GazeDataFrame:
         The experiment definition. (default: None)
     events: pm.EventDataFrame | None
         A dataframe of events in the gaze signal. (default: None)
+    definition: pm.DatasetDefinition | None
+        A dataset definition. Takes precedence over arguments below. (default: None)
     auto_column_detect: bool
         Flag indicating if the column names should be inferred automatically. (default: False)
     trial_columns: str | list[str] | None
@@ -184,6 +186,7 @@ class GazeDataFrame:
             experiment: Experiment | None = None,
             events: pm.EventDataFrame | None = None,
             *,
+            definition: pm.DatasetDefinition | None = None,
             auto_column_detect: bool = False,
             trial_columns: str | list[str] | None = None,
             time_column: str | None = None,
@@ -203,12 +206,23 @@ class GazeDataFrame:
         # Set nan values to null.
         self.frame = self.frame.fill_nan(None)
 
+        # definition takes precedence over explicit arguments.
+        if definition is not None:
+            trial_columns = definition.trial_columns
+            time_column = definition.time_column
+            time_unit = definition.time_unit
+            pixel_columns = definition.pixel_columns
+            position_columns = definition.position_columns
+            velocity_columns = definition.velocity_columns
+            acceleration_columns = definition.acceleration_columns
+            distance_column = definition.distance_column
+
         trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
         if trial_columns is not None and len(trial_columns) == 0:
             trial_columns = None
         _check_trial_columns(trial_columns, data)
-
         self.trial_columns = trial_columns
+
         self.experiment = experiment
 
         # In case the 'time' column is already present we don't need to do anything.
