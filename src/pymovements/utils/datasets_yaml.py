@@ -20,12 +20,10 @@
 """Yaml utilities."""
 from __future__ import annotations
 
-from importlib import resources
+from pathlib import Path
 from pathlib import PosixPath
 
 import yaml
-
-from pymovements import datasets
 
 
 # generalized constructor for !* tags
@@ -110,7 +108,7 @@ def write_dataset_definitions_yaml(
         (default: src/pymovements/datasets/datasets.yaml)
 
     """
-    dataset_definition_files = resources.files(datasets)
+    dataset_definition_files = Path('src/pymovements/datasests/')
     datasets_list = []
 
     for yaml_file in dataset_definition_files.iterdir():
