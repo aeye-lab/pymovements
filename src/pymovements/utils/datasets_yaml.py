@@ -21,7 +21,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from pathlib import PosixPath
 
 import yaml
 
@@ -113,7 +112,7 @@ def write_dataset_definitions_yaml(
 
     for yaml_file in dataset_definition_files.iterdir():
         # https://github.com/aeye-lab/pymovements/pull/952#issuecomment-2690742187
-        assert isinstance(yaml_file, PosixPath)
+        assert isinstance(yaml_file, Path)
         if yaml_file.suffix == '.yaml':
             yaml_filename = yaml_file.parts[-1]
             if yaml_filename == 'datasets.yaml':
