@@ -352,7 +352,7 @@ class Dataset:
         Let's load in our dataset first,
         >>> import pymovements as pm
         >>>
-        >>> dataset = pm.Dataset("ToyDatasetEyeLink", path='toy_dataset')
+        >>> dataset = pm.Dataset("ToyDataset", path='toy_dataset')
         >>> dataset.download()# doctest:+ELLIPSIS
         Downloading ... to toy_dataset...downloads...
         Checking integrity of ...
