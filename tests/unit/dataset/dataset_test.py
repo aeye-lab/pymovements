@@ -797,7 +797,6 @@ def test_clip(gaze_dataset_configuration):
 def test_dataset_apply_pipeline():
 
 
-
 @pytest.mark.parametrize(
     'detect_event_kwargs',
     [

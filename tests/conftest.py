@@ -18,10 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Fixtures for datasets."""
-import pytest
-
-import pytest
 
 pytest_plugins = [
-    "tests.fixtures.dataset_fixtures",
+    'tests.fixtures.dataset_fixtures',
 ]
