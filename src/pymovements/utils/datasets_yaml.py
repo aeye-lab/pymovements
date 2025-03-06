@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -76,7 +77,6 @@ def type_constructor(
         'list': list,
         'dict': dict,
         'set': set,
-        'tuple': tuple,
     }
 
     # check for built-in types first
@@ -93,6 +93,37 @@ def type_constructor(
         raise ValueError(
             f"Unknown type: {type_attr} for module {module_name}",
         ) from exc
+
+
+def tuple_constructor(loader: yaml.SafeLoader, node: yaml.Node) -> Any:
+    """Construct a Python tuple from a YAML sequence node.
+
+    This function is used as a custom constructor for PyYAML to convert a YAML
+    sequence (e.g., a list-like structure) into a Python tuple. It can be registered
+    with a YAML loader to handle custom tags like '!tuple'.
+
+    Parameters
+    ----------
+    loader: yaml.SafeLoader
+        The PyYAML loader instance being used to parse the YAML.
+    node: yaml.Node
+        The YAML node representing the sequence to be converted into a tuple.
+
+    Returns
+    -------
+    Any
+        A Python tuple containing the elements of the YAML sequence.
+
+    Example
+    -------
+        pixel_columns: !tuple
+        - x
+        - y
+    """
+    if not isinstance(node, yaml.SequenceNode):
+        raise yaml.YAMLError(f'Expected a SequenceNode, got {type(node)}')
+
+    return tuple(loader.construct_sequence(node))
 
 
 def write_dataset_definitions_yaml(
