@@ -40,6 +40,21 @@ def test_type_constructor_assertion_error(tmp_path):
     assert msg == 'not enough values to unpack (expected 2, got 1)'
 
 
+def test_tuple_constructor_raises_error(tmp_path):
+    """Test type constructor raises attribute error."""
+    yaml_content = """\
+    pixel_columns: !tuple str
+    """
+    yaml.add_multi_constructor('!', type_constructor, yaml.SafeLoader)
+    yaml_file = tmp_path / 'test_yaml_file'
+    yaml_file.write_text(yaml_content)
+    with pytest.raises(yaml.YAMLError) as excinfo:
+        with open(yaml_file, encoding='utf-8') as f:
+            yaml.safe_load(f)
+    msg, = excinfo.value.args
+    assert msg == "Expected a SequenceNode, got <class 'yaml.nodes.ScalarNode'>"
+
+
 def test_module_not_found_error(tmp_path):
     """Test type constructor raises attribute error."""
     yaml_content = """\
