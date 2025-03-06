@@ -48,10 +48,10 @@ from pymovements.stimulus import text
 
 __all__ = [
     'Dataset',
-    'datasets',
     'DatasetDefinition',
     'DatasetLibrary',
     'DatasetPaths',
+    'datasets',
     'register_dataset',
 
     'events',
