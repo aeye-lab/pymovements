@@ -29,7 +29,7 @@ from tqdm.auto import tqdm
 
 from pymovements.utils.archives import extract_archive
 
-USER_AGENT: str = 'aeye-lab/pymovements'
+USER_AGENT: str = 'pymovements'
 
 
 def download_and_extract_archive(
