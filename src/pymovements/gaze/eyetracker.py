@@ -21,7 +21,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from dataclasses import field
 
+from dataclasses_json import config
+
+from pymovements.gaze._utils.dataclasses import ExcludeIfNone
 from pymovements.utils import checks
 
 
@@ -63,13 +67,13 @@ class EyeTracker:
         version='1.5.3', vendor='EyeLink', mount='Arm Mount / Monocular / Remote')
     """
 
-    sampling_rate: float | None = None
-    left: bool | None = None
-    right: bool | None = None
-    model: str | None = None
-    version: str | None = None
-    vendor: str | None = None
-    mount: str | None = None
+    sampling_rate: float | None = field(metadata=config(exclude=ExcludeIfNone), default=None)
+    left: bool | None = field(metadata=config(exclude=ExcludeIfNone), default=None)
+    right: bool | None = field(metadata=config(exclude=ExcludeIfNone), default=None)
+    model: str | None = field(metadata=config(exclude=ExcludeIfNone), default=None)
+    version: str | None = field(metadata=config(exclude=ExcludeIfNone), default=None)
+    vendor: str | None = field(metadata=config(exclude=ExcludeIfNone), default=None)
+    mount: str | None = field(metadata=config(exclude=ExcludeIfNone), default=None)
 
     def __post_init__(self) -> None:
         """Check that the sampling rate is a positive number."""
