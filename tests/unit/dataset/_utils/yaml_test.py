@@ -135,4 +135,4 @@ def test_write_dataset_definitions_yaml(tmp_path):
         'toy_dataset',
         'toy_dataset_eyelink',
         'ucl',
-    ]
+    ], 'please run pymovements.dataset._utils._yaml.write_dataset_definitions_yaml()'
