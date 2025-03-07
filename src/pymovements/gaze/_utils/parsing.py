@@ -646,6 +646,7 @@ def _parse_eyelink_mount_config(mount_config: str) -> dict[str, str]:
         'short_name': mount_config,
     }
 
+
 def parse_begaze(
         filepath: Path | str,
         patterns: list[dict[str, Any] | str] | None = None,
@@ -677,10 +678,10 @@ def parse_begaze(
 
     if patterns is None:
         patterns = []
-    compiled_patterns = compile_patterns(patterns, msg_prefix)
+    compile_patterns(patterns, msg_prefix)
 
     if metadata_patterns is None:
         metadata_patterns = []
-    compiled_metadata_patterns = compile_patterns(metadata_patterns, msg_prefix)
+    compile_patterns(metadata_patterns, msg_prefix)
 
     # TODO
