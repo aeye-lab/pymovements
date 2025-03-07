@@ -106,9 +106,10 @@ class Experiment:
         checks.check_is_mutual_exclusive(distance_cm=distance_cm, screen=screen)
         checks.check_is_mutual_exclusive(sampling_rate=sampling_rate, eyetracker=eyetracker)
 
-        # the origin default value needs special care.
-        if origin != 'upper left' or (screen is not None and screen.origin != origin):
-            checks.check_is_mutual_exclusive(origin=origin, screen=screen)
+        # the origin default value needs special care to not mess with a passed screen.
+        if origin == 'upper left' and screen is not None:
+            origin = None  # set origin to None to pass mutual exclusivity check
+        checks.check_is_mutual_exclusive(origin=origin, screen=screen)
 
         if screen is None:
             screen = Screen(
