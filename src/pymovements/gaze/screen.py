@@ -32,8 +32,6 @@ from pymovements.utils import checks
 class Screen:
     """Screen class for holding screen properties.
 
-    Also transforms pixel coordinates to degrees of visual angle.
-
     Attributes
     ----------
     width_px: int | None
