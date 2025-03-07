@@ -28,7 +28,6 @@ import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import register_dataset
-from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
@@ -147,7 +146,7 @@ class MouseCursor(DatasetDefinition):
                 {
                     'resource': '1-s2.0-S2352340921000160-mmc1.zip',
                     'filename': 'mousecursor.zip',
-                    'md5': None,
+                    'md5': '7885e8fd44f14f02f60e9f62431aea63',
                 },
             ),
         },
