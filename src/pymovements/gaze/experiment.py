@@ -68,8 +68,9 @@ class Experiment:
     ...     sampling_rate=1000.0,
     ... )
     >>> print(experiment)
-    Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38.0, heiight_cm=30.0,
-     distance_cm=68.0, origin='upper left'), eyetracker=Eyetracker(sampling_rate=1000.00))
+    Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38.0, height_cm=30.0,
+     distance_cm=68.0, origin='upper left'), eyetracker=EyeTracker(sampling_rate=1000.0, left=None,
+      right=None, model=None, version=None, vendor=None, mount=None))
 
     We can also access the screen boundaries in degrees of visual angle via the
     :py:attr:`~pymovements.gaze.Screen` object. This only works if the
@@ -92,7 +93,7 @@ class Experiment:
             screen_width_cm: float | None = None,
             screen_height_cm: float | None = None,
             distance_cm: float | None = None,
-            origin: str | None = None,
+            origin: str | None = 'upper left',
             sampling_rate: float | None = None,
             *,
             screen: Screen | None = None,
@@ -103,8 +104,11 @@ class Experiment:
         checks.check_is_mutual_exclusive(screen_width_cm=screen_width_cm, screen=screen)
         checks.check_is_mutual_exclusive(screen_height_cm=screen_height_cm, screen=screen)
         checks.check_is_mutual_exclusive(distance_cm=distance_cm, screen=screen)
-        checks.check_is_mutual_exclusive(origin=origin, screen=screen)
         checks.check_is_mutual_exclusive(sampling_rate=sampling_rate, eyetracker=eyetracker)
+
+        # the origin default value needs special care.
+        if origin != 'upper left' or (screen is not None and screen.origin != origin):
+            checks.check_is_mutual_exclusive(origin=origin, screen=screen)
 
         if screen is None:
             screen = Screen(
@@ -195,6 +199,8 @@ class Experiment:
 
     def __eq__(self: Experiment, other: Experiment) -> bool:
         """Compare equality to other Experiment."""
+        print(self.screen, other.screen, self.screen == other.screen)
+        print(self.eyetracker, other.eyetracker, self.eyetracker == other.eyetracker)
         return self.screen == other.screen and self.eyetracker == other.eyetracker
 
     def __str__(self: Experiment) -> str:

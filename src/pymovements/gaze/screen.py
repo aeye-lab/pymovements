@@ -21,13 +21,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from dataclasses import field
 
 import numpy as np
-from dataclasses_json import config
 
 from pymovements.gaze import transforms_numpy
-from pymovements.gaze._utils.dataclasses import ExcludeIfNone
 from pymovements.utils import checks
 
 
@@ -83,12 +80,12 @@ class Screen:
 
     """
 
-    width_px: int | None = field(metadata=config(exclude=ExcludeIfNone), default=None)
-    height_px: int | None = field(metadata=config(exclude=ExcludeIfNone), default=None)
-    width_cm: float | None = field(metadata=config(exclude=ExcludeIfNone), default=None)
-    height_cm: float | None = field(metadata=config(exclude=ExcludeIfNone), default=None)
-    distance_cm: float | None = field(metadata=config(exclude=ExcludeIfNone), default=None)
-    origin: str | None = field(metadata=config(exclude=ExcludeIfNone), default='upper left')
+    width_px: int | None = None
+    height_px: int | None = None
+    width_cm: float | None = None
+    height_cm: float | None = None
+    distance_cm: float | None = None
+    origin: str | None = 'upper left'
 
     def __post_init__(self) -> None:
         """Check fields for validity."""

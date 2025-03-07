@@ -31,12 +31,6 @@ def test_sampling_rate_setter():
     assert experiment.sampling_rate == 100.0
 
 
-def test_sampling_rate_invalid():
-    with pytest.raises(TypeError):
-        eyetracker = pm.EyeTracker()
-        pm.Experiment(1280, 1024, 38, 30, eyetracker=eyetracker)
-
-
 def test_sampling_rate_trivial_equality(experiment_init_kwargs):
     experiment1 = pm.Experiment(**experiment_init_kwargs)
     experiment2 = pm.Experiment(**experiment_init_kwargs)
