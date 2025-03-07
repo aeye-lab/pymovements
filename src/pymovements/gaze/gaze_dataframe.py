@@ -29,6 +29,7 @@ from typing import Any
 
 import numpy as np
 import polars as pl
+from tqdm import tqdm
 
 import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.gaze import transforms
@@ -144,9 +145,9 @@ class GazeDataFrame:
     │ 1002 ┆ [0.3, 0.3] │
     └──────┴────────────┘
 
-    In case your data has no time column available, you can pass an :py:class:``Experiment`` to
-    create a time column with the correct sampling rate during initialization. The time column will
-    be represented in millisecond units.
+    In case your data has no time column available, you can pass an
+    :py:class:`~pymovements.gaze.Experiment` to create a time column with the correct sampling rate
+    during initialization. The time column will be represented in millisecond units.
 
     >>> df_no_time = df.select(pl.exclude('t'))
     >>> df_no_time
@@ -1056,14 +1057,12 @@ class GazeDataFrame:
         else:
             raise ValueError('neither position nor pixel in gaze dataframe, one needed for mapping')
 
-        self.frame = self.frame.with_columns(
-            area_of_interest=pl.Series(
-                get_aoi(
-                    aoi_dataframe, row, x_eye, y_eye,
-                )
-                for row in self.frame.iter_rows(named=True)
-            ),
-        )
+        aois = [
+            get_aoi(aoi_dataframe, row, x_eye, y_eye)
+            for row in tqdm(self.frame.iter_rows(named=True))
+        ]
+        aoi_df = pl.concat(aois)
+        self.frame = pl.concat([self.frame, aoi_df], how='horizontal')
 
     def nest(
             self,

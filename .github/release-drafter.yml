@@ -23,7 +23,8 @@ categories:
     labels:
       - build
       - internal
-      - docs
+  - title: 🔖 Documentation
+    labels: documentation
 
 exclude-labels:
   - skip changelog

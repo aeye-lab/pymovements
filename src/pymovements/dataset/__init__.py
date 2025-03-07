@@ -25,10 +25,18 @@
    :toctree:
    :template: class.rst
 
-    pymovements.dataset.Dataset
-    pymovements.dataset.DatasetDefinition
-    pymovements.dataset.DatasetLibrary
-    pymovements.dataset.DatasetPaths
+    Dataset
+    DatasetDefinition
+    DatasetLibrary
+    DatasetPaths
+
+.. rubric:: Decorators
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+    register_dataset
 """
 from pymovements.dataset.dataset import Dataset
 from pymovements.dataset.dataset_definition import DatasetDefinition
