@@ -26,7 +26,6 @@ from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import register_dataset
-from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
@@ -64,9 +63,6 @@ class BSCII(DatasetDefinition):
 
     extract: dict[str, bool]
         Decide whether to extract the data.
-
-    experiment: Experiment
-        The experiment definition.
 
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
@@ -157,10 +153,6 @@ class BSCII(DatasetDefinition):
         default_factory=lambda: {
             'precomputed_events': True,
         },
-    )
-
-    experiment: Experiment = field(
-        default_factory=lambda: Experiment(sampling_rate=1),
     )
 
     filename_format: dict[str, str] = field(
