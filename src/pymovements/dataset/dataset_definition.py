@@ -28,14 +28,16 @@ from typing import Any
 
 import yaml
 
+from pymovements.dataset._utils._yaml import tuple_constructor
+from pymovements.dataset._utils._yaml import tuple_representer
+from pymovements.dataset._utils._yaml import type_constructor
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
-from pymovements.utils.datasets_yaml import tuple_constructor
-from pymovements.utils.datasets_yaml import type_constructor
 
 
-yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
 yaml.add_constructor('!tuple', tuple_constructor, Loader=yaml.SafeLoader)
+yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
+yaml.add_representer(tuple, tuple_representer)
 
 
 @dataclass

@@ -91,8 +91,10 @@ def type_constructor(
     # module does not have this file type
     except AttributeError as exc:
         raise ValueError(
-            f"Unknown type: {type_attr} for module {module_name}",
+            f'Unknown type: {type_attr} for module {module_name}',
         ) from exc
+    except ValueError as exc:
+        raise ValueError(f'Unknown {node=}') from exc
 
 
 def tuple_constructor(loader: yaml.SafeLoader, node: yaml.Node) -> Any:
@@ -124,6 +126,37 @@ def tuple_constructor(loader: yaml.SafeLoader, node: yaml.Node) -> Any:
         raise yaml.YAMLError(f'Expected a SequenceNode, got {type(node)}')
 
     return tuple(loader.construct_sequence(node))
+
+
+def tuple_representer(dumper: yaml.Dumper, node: tuple[Any, ...]) -> yaml.Node:
+    """Represent a Python tuple as a YAML sequence with a custom '!tuple' tag.
+
+    This function is used as a custom representer for PyYAML to serialize a Python
+    tuple into a YAML sequence with the '!tuple' tag. It can be registered with a
+    YAML dumper to ensure tuples are represented distinctly from lists.
+
+    Parameters
+    ----------
+    dumper: yaml.Dumper
+        The PyYAML dumper instance being used to serialize the data.
+    node: tuple[Any, ...]
+        The Python tuple to be represented in YAML.
+
+    Returns
+    -------
+    yaml.Node
+        A YAML sequence node tagged with '!tuple' containing the tuple's elements.
+
+    Example
+    -------
+        {'pixel_columns': ('x', 'y')}
+        pixel_columns: !tuple [x, y]
+        OR
+        pixel_columns: !tuple
+        - x
+        - y
+    """
+    return dumper.represent_sequence('!tuple', node)
 
 
 def write_dataset_definitions_yaml(

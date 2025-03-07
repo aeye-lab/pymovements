@@ -21,12 +21,12 @@
 import pytest
 import yaml
 
-from pymovements.utils.datasets_yaml import type_constructor
-from pymovements.utils.datasets_yaml import write_dataset_definitions_yaml
+from pymovements.dataset._utils._yaml import tuple_representer
+from pymovements.dataset._utils._yaml import type_constructor
+from pymovements.dataset._utils._yaml import write_dataset_definitions_yaml
 
 
 def test_type_constructor_assertion_error(tmp_path):
-    """Test type constructor raises attribute error."""
     yaml_content = """\
     !test
     """
@@ -37,11 +37,10 @@ def test_type_constructor_assertion_error(tmp_path):
         with open(yaml_file, encoding='utf-8') as f:
             yaml.safe_load(f)
     msg, = excinfo.value.args
-    assert msg == 'not enough values to unpack (expected 2, got 1)'
+    assert msg == "Unknown node=ScalarNode(tag='!test', value='')"
 
 
 def test_tuple_constructor_raises_error(tmp_path):
-    """Test type constructor raises attribute error."""
     yaml_content = """\
     pixel_columns: !tuple str
     """
@@ -55,8 +54,33 @@ def test_tuple_constructor_raises_error(tmp_path):
     assert msg == "Expected a SequenceNode, got <class 'yaml.nodes.ScalarNode'>"
 
 
-def test_module_not_found_error(tmp_path):
-    """Test type constructor raises attribute error."""
+def test_tuple_representer_list(tmp_path):
+    yaml_content = """\
+    pixel_column: !tuple
+    - x
+    - y
+    """
+    yaml.add_representer(tuple, tuple_representer)
+    yaml_file = tmp_path / 'test_yaml_file'
+    yaml_file.write_text(yaml_content)
+    with open(yaml_file, encoding='ascii') as f:
+        yaml_file_loading = yaml.safe_load(f)
+    assert yaml_file_loading == {'pixel_column': ('x', 'y')}
+
+
+def test_tuple_representer_inline_list(tmp_path):
+    yaml_content = """\
+    pixel_column: !tuple [x, y]
+    """
+    yaml.add_representer(tuple, tuple_representer)
+    yaml_file = tmp_path / 'test_yaml_file'
+    yaml_file.write_text(yaml_content)
+    with open(yaml_file, encoding='ascii') as f:
+        yaml_file_loading = yaml.safe_load(f)
+    assert yaml_file_loading == {'pixel_column': ('x', 'y')}
+
+
+def test_module_name_not_found_error(tmp_path):
     yaml_content = """\
     !pm.notexisting
     """
@@ -71,7 +95,6 @@ def test_module_not_found_error(tmp_path):
 
 
 def test_unknown_attribute_error(tmp_path):
-    """Test type constructor raises attribute error."""
     yaml_content = """\
     !yaml.notexisting
     """
