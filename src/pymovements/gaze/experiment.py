@@ -47,7 +47,7 @@ class Experiment:
         distance for each sample in millimeters. (default: None)
     origin: str | None
         Specifies the screen location of the origin of the pixel coordinate system.
-        (default: 'upper left')
+        (default: None)
     sampling_rate: float | None
         Sampling rate in Hz. (default: None)
     screen : Screen | None
@@ -92,7 +92,7 @@ class Experiment:
             screen_width_cm: float | None = None,
             screen_height_cm: float | None = None,
             distance_cm: float | None = None,
-            origin: str | None = 'upper left',
+            origin: str | None = None,
             sampling_rate: float | None = None,
             *,
             screen: Screen | None = None,
