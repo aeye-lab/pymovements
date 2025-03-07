@@ -31,6 +31,28 @@ def test_sampling_rate_setter():
     assert experiment.sampling_rate == 100.0
 
 
+@pytest.mark.parametrize(
+    'experiment_init_kwargs',
+    [
+        pytest.param(
+            {},
+            id='empty',
+        ),
+        pytest.param(
+            {'sampling_rate': 1000},
+            id='only_sampling_rate',
+        ),
+        pytest.param(
+            {'screen': pm.Screen(1024, 768)},
+            id='only_screen',
+        ),
+        pytest.param(
+            {'screen': pm.Screen(1024, 768), 'eyetracker': pm.EyeTracker(sampling_rate=1000)},
+            id='screen_and_eyetracker',
+        ),
+
+    ],
+)
 def test_sampling_rate_trivial_equality(experiment_init_kwargs):
     experiment1 = pm.Experiment(**experiment_init_kwargs)
     experiment2 = pm.Experiment(**experiment_init_kwargs)
