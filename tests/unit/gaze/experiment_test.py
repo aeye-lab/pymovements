@@ -20,12 +20,11 @@
 """Test for Experiment class."""
 import pytest
 
-from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.eyetracker import EyeTracker
+import pymovements as pm
 
 
 def test_sampling_rate_setter():
-    experiment = Experiment(1280, 1024, 38, 30, sampling_rate=1000.0)
+    experiment = pm.Experiment(1280, 1024, 38, 30, sampling_rate=1000.0)
     assert experiment.sampling_rate == 1000.0
 
     experiment.sampling_rate = 100.0
@@ -34,5 +33,30 @@ def test_sampling_rate_setter():
 
 def test_sampling_rate_invalid():
     with pytest.raises(TypeError):
-        eyetracker = EyeTracker()
-        Experiment(1280, 1024, 38, 30, eyetracker=eyetracker)
+        eyetracker = pm.EyeTracker()
+        pm.Experiment(1280, 1024, 38, 30, eyetracker=eyetracker)
+
+
+def test_sampling_rate_trivial_equality(experiment_init_kwargs):
+    experiment1 = pm.Experiment(**experiment_init_kwargs)
+    experiment2 = pm.Experiment(**experiment_init_kwargs)
+    assert experiment1 == experiment2
+
+
+@pytest.mark.parametrize(
+    ('experiment1', 'experiment2'),
+    [
+        pytest.param(
+            pm.Experiment(sampling_rate=1000),
+            pm.Experiment(eyetracker=pm.EyeTracker(sampling_rate=1000)),
+            id='explicit_sampling_rate_and_eyetracker',
+        ),
+        pytest.param(
+            pm.Experiment(1024, 768),
+            pm.Experiment(screen=pm.Screen(1024, 768)),
+            id='explicit_screen_size_and_screen',
+        ),
+    ],
+)
+def test_sampling_rate_equality(experiment1, experiment2):
+    assert experiment1 == experiment2
