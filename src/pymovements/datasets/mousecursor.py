@@ -67,9 +67,6 @@ class MouseCursor(DatasetDefinition):
     extract: dict[str, bool]
         Decide whether to extract the data.
 
-    experiment: Experiment
-        The experiment definition.
-
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
@@ -156,17 +153,6 @@ class MouseCursor(DatasetDefinition):
         },
     )
     extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
-
-    # TODO
-    experiment: Experiment = Experiment(
-        screen_width_px=1280,
-        screen_height_px=1024,
-        screen_width_cm=38,
-        screen_height_cm=30.2,
-        distance_cm=68,
-        origin='upper left',
-        sampling_rate=1000,
-    )
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
