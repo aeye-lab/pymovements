@@ -14,6 +14,7 @@ Dataset,Citation,Samples,Events,Reading Measures
 :py:class:`~pymovements.datasets.HBN`,:cite:p:`HBN`,X,,
 :py:class:`~pymovements.datasets.InteRead`,:cite:p:`InteRead`,X,,
 :py:class:`~pymovements.datasets.JuDo1000`,:cite:p:`JuDo1000`,X,,
+:py:class:`~pymovements.datasets.MouseCursor`,:cite:p:`MouseCursor`,X,,
 :py:class:`~pymovements.datasets.PoTeC`,:cite:p:`PoTeC`,X,,
 :py:class:`~pymovements.datasets.Provo`,:cite:p:`Provo`,X,,
 :py:class:`~pymovements.datasets.SBSAT`,:cite:p:`SB-SAT`,X,,
