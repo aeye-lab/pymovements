@@ -20,11 +20,13 @@
 """Test for Experiment class."""
 import pytest
 
-import pymovements as pm
+from pymovements import Experiment
+from pymovements import EyeTracker
+from pymovements import Screen
 
 
 def test_sampling_rate_setter():
-    experiment = pm.Experiment(1280, 1024, 38, 30, sampling_rate=1000.0)
+    experiment = Experiment(1280, 1024, 38, 30, sampling_rate=1000.0)
     assert experiment.sampling_rate == 1000.0
 
     experiment.sampling_rate = 100.0
@@ -43,19 +45,19 @@ def test_sampling_rate_setter():
             id='only_sampling_rate',
         ),
         pytest.param(
-            {'screen': pm.Screen(1024, 768)},
+            {'screen': Screen(1024, 768)},
             id='only_screen',
         ),
         pytest.param(
-            {'screen': pm.Screen(1024, 768), 'eyetracker': pm.EyeTracker(sampling_rate=1000)},
+            {'screen': Screen(1024, 768), 'eyetracker': EyeTracker(sampling_rate=1000)},
             id='screen_and_eyetracker',
         ),
 
     ],
 )
 def test_sampling_rate_trivial_equality(experiment_init_kwargs):
-    experiment1 = pm.Experiment(**experiment_init_kwargs)
-    experiment2 = pm.Experiment(**experiment_init_kwargs)
+    experiment1 = Experiment(**experiment_init_kwargs)
+    experiment2 = Experiment(**experiment_init_kwargs)
     assert experiment1 == experiment2
 
 
@@ -64,12 +66,12 @@ def test_sampling_rate_trivial_equality(experiment_init_kwargs):
     [
         pytest.param(
             pm.Experiment(sampling_rate=1000),
-            pm.Experiment(eyetracker=pm.EyeTracker(sampling_rate=1000)),
+            pm.Experiment(eyetracker=EyeTracker(sampling_rate=1000)),
             id='explicit_sampling_rate_and_eyetracker',
         ),
         pytest.param(
             pm.Experiment(1024, 768),
-            pm.Experiment(screen=pm.Screen(1024, 768)),
+            pm.Experiment(screen=Screen(1024, 768)),
             id='explicit_screen_size_and_screen',
         ),
     ],
