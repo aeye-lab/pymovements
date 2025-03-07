@@ -65,13 +65,13 @@ def test_sampling_rate_trivial_equality(experiment_init_kwargs):
     ('experiment1', 'experiment2'),
     [
         pytest.param(
-            pm.Experiment(sampling_rate=1000),
-            pm.Experiment(eyetracker=EyeTracker(sampling_rate=1000)),
+            Experiment(sampling_rate=1000),
+            Experiment(eyetracker=EyeTracker(sampling_rate=1000)),
             id='explicit_sampling_rate_and_eyetracker',
         ),
         pytest.param(
-            pm.Experiment(1024, 768),
-            pm.Experiment(screen=Screen(1024, 768)),
+            Experiment(1024, 768),
+            Experiment(screen=Screen(1024, 768)),
             id='explicit_screen_size_and_screen',
         ),
     ],
