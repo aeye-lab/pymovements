@@ -161,9 +161,8 @@ class Provo(DatasetDefinition):
         },
     )
 
-    experiment: Experiment = Experiment(
-        screen_width_px=None, screen_height_px=None, screen_width_cm=None,
-        screen_height_cm=None, distance_cm=None, origin=None, sampling_rate=1,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(sampling_rate=1),
     )
 
     filename_format: dict[str, str] = field(
