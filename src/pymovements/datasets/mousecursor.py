@@ -104,8 +104,8 @@ class MouseCursor(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.MouseCursor` definition:
+    Initialize your :py:class:`~pymovements.datasets.Dataset` object with the
+    :py:class:`~pymovements.datasets.MouseCursor` definition:
 
     >>> import pymovements as pm
     >>>
@@ -121,7 +121,7 @@ class MouseCursor(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # All DatasetDefinition classes potentially share large code chunks.
 
     name: str = 'MouseCursor'
 
