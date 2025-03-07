@@ -115,21 +115,21 @@ def check_nan(sample_location: str) -> float:
     return ret
 
 
-def compile_patterns(patterns: list[dict[str, Any] | str]) -> list[dict[str, Any]]:
+def compile_patterns(patterns: list[dict[str, Any] | str], msg_prefix: str) -> list[dict[str, Any]]:
     """Compile patterns from strings.
 
     Parameters
     ----------
     patterns: list[dict[str, Any] | str]
         The list of patterns to compile.
+    msg_prefix: str
+        The message prefix to prepend to the regex patterns.
 
     Returns
     -------
     list[dict[str, Any]]
         Returns from string compiled regex patterns.
     """
-    msg_prefix = r'MSG\s+\d+[.]?\d*\s+'
-
     compiled_patterns = []
 
     for pattern in patterns:
@@ -207,13 +207,15 @@ def parse_eyelink(
     Warning
         If no metadata is found in the file.
     """
+    msg_prefix = r'MSG\s+\d+[.]?\d*\s+'
+
     if patterns is None:
         patterns = []
-    compiled_patterns = compile_patterns(patterns)
+    compiled_patterns = compile_patterns(patterns, msg_prefix)
 
     if metadata_patterns is None:
         metadata_patterns = []
-    compiled_metadata_patterns = compile_patterns(metadata_patterns)
+    compiled_metadata_patterns = compile_patterns(metadata_patterns, msg_prefix)
 
     additional_columns = get_pattern_keys(compiled_patterns, 'column')
     additional: dict[str, list[Any]] = {
@@ -643,3 +645,42 @@ def _parse_eyelink_mount_config(mount_config: str) -> dict[str, str]:
         'camera_position': 'unknown',
         'short_name': mount_config,
     }
+
+def parse_begaze(
+        filepath: Path | str,
+        patterns: list[dict[str, Any] | str] | None = None,
+        schema: dict[str, Any] | None = None,
+        metadata_patterns: list[dict[str, Any] | str] | None = None,
+        encoding: str = 'ascii',
+) -> tuple[pl.DataFrame, dict[str, Any]]:
+    """Parse BeGaze raw data export file.
+
+    Parameters
+    ----------
+    filepath: Path | str
+        file name of file to convert.
+    patterns: list[dict[str, Any] | str] | None
+        List of patterns to match for additional columns. (default: None)
+    schema: dict[str, Any] | None
+        Dictionary to optionally specify types of columns parsed by patterns. (default: None)
+    metadata_patterns: list[dict[str, Any] | str] | None
+        list of patterns to match for additional metadata. (default: None)
+    encoding: str
+        Text encoding of the file. (default: 'ascii')
+
+    Returns
+    -------
+    tuple[pl.DataFrame, dict[str, Any]]
+        A tuple containing the parsed sample data and the metadata in a dictionary.
+    """
+    msg_prefix = r'\d+\tMSG\t\d+\t# Message:\s+'
+
+    if patterns is None:
+        patterns = []
+    compiled_patterns = compile_patterns(patterns, msg_prefix)
+
+    if metadata_patterns is None:
+        metadata_patterns = []
+    compiled_metadata_patterns = compile_patterns(metadata_patterns, msg_prefix)
+
+    # TODO
