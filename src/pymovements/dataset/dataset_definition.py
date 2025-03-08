@@ -20,11 +20,24 @@
 """DatasetDefinition module."""
 from __future__ import annotations
 
+from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
+from pathlib import Path
 from typing import Any
 
+import yaml
+
+from pymovements.dataset._utils._yaml import tuple_constructor
+from pymovements.dataset._utils._yaml import tuple_representer
+from pymovements.dataset._utils._yaml import type_constructor
 from pymovements.gaze.experiment import Experiment
+from pymovements.gaze.eyetracker import EyeTracker
+
+
+yaml.add_constructor('!tuple', tuple_constructor, Loader=yaml.SafeLoader)
+yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
+yaml.add_representer(tuple, tuple_representer)
 
 
 @dataclass
@@ -155,3 +168,60 @@ class DatasetDefinition:
     velocity_columns: list[str] | None = None
     acceleration_columns: list[str] | None = None
     distance_column: str | None = None
+
+    @staticmethod
+    def from_yaml(yaml_path: str | Path) -> DatasetDefinition:
+        """Load a dataset definition from a YAML file.
+
+        Parameters
+        ----------
+        yaml_path : str | Path
+            Path to the YAML definition file
+
+        Returns
+        -------
+        DatasetDefinition
+            Initialized dataset definition
+        """
+        with open(yaml_path, encoding='utf-8') as f:
+            data = yaml.safe_load(f)
+
+        # Convert experiment dict to Experiment object if present
+        if 'experiment' in data:
+            if 'eyetracker' in data['experiment']:
+                eyetracker = EyeTracker(**data['experiment'].pop('eyetracker'))
+            else:
+                eyetracker = None
+            data['experiment'] = Experiment(**data['experiment'], eyetracker=eyetracker)
+
+        # Initialize DatasetDefinition with YAML data
+        return DatasetDefinition(**data)
+
+    def to_yaml(self, yaml_path: str | Path) -> None:
+        """Save a dataset definition to a YAML file.
+
+        Parameters
+        ----------
+        yaml_path: str | Path
+            Path where to save the YAML file to.
+        """
+        data = asdict(self)
+
+        def substitute_types(d: Any) -> Any:
+            if isinstance(d, dict):
+                return {k: substitute_types(v) for k, v in d.items()}
+            if isinstance(d, list):
+                return [substitute_types(v) for v in d]
+            if isinstance(d, type):
+                if d.__module__ == 'builtins':
+                    return f'!{d.__name__}'
+                return f'!{d.__module__}.{d.__name__}'
+            return d
+
+        if data['experiment']:
+            data['experiment'] = data['experiment'].to_dict()
+
+        data = substitute_types(data)
+
+        with open(yaml_path, 'w', encoding='utf-8') as f:
+            yaml.dump(data, f, sort_keys=False)

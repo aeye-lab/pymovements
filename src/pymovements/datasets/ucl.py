@@ -25,11 +25,9 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.dataset_library import register_dataset
 
 
 @dataclass
-@register_dataset
 class UCL(DatasetDefinition):
     """UCL dataset :cite:p:`UCL`.
 
