@@ -20,8 +20,6 @@
 """Provides the Experiment class."""
 from __future__ import annotations
 
-from typing import Any
-
 import numpy as np
 
 from pymovements.gaze import transforms_numpy
@@ -49,11 +47,14 @@ class Experiment:
         distance for each sample in millimeters. (default: None)
     origin: str | None
         Specifies the screen location of the origin of the pixel coordinate system.
-        (default: 'upper left')
+        (default: None)
     sampling_rate: float | None
         Sampling rate in Hz. (default: None)
+    screen : Screen | None
+        Scree object for experiment. Mutually exclusive with explicit screen arguments.
+        (default: None)
     eyetracker : EyeTracker | None
-        EyeTracker object for experiment. (default: None)
+        EyeTracker object for experiment. Mutually exclusive with sampling_rate. (default: None)
 
     Examples
     --------
@@ -67,8 +68,9 @@ class Experiment:
     ...     sampling_rate=1000.0,
     ... )
     >>> print(experiment)
-    Experiment(sampling_rate=1000.00, screen=Screen(width_px=1280, height_px=1024, width_cm=38.0,
-    height_cm=30.0, distance_cm=68.0, origin='upper left'), eyetracker=None)
+    Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38.0, height_cm=30.0,
+     distance_cm=68.0, origin='upper left'), eyetracker=EyeTracker(sampling_rate=1000.0, left=None,
+      right=None, model=None, version=None, vendor=None, mount=None))
 
     We can also access the screen boundaries in degrees of visual angle via the
     :py:attr:`~pymovements.gaze.Screen` object. This only works if the
@@ -93,42 +95,49 @@ class Experiment:
             distance_cm: float | None = None,
             origin: str | None = 'upper left',
             sampling_rate: float | None = None,
+            *,
+            screen: Screen | None = None,
             eyetracker: EyeTracker | None = None,
     ):
-        self.screen = Screen(
-            width_px=screen_width_px,
-            height_px=screen_height_px,
-            width_cm=screen_width_cm,
-            height_cm=screen_height_cm,
-            distance_cm=distance_cm,
-            origin=origin,
-        )
-
+        checks.check_is_mutual_exclusive(screen_width_px=screen_width_px, screen=screen)
+        checks.check_is_mutual_exclusive(screen_height_px=screen_height_px, screen=screen)
+        checks.check_is_mutual_exclusive(screen_width_cm=screen_width_cm, screen=screen)
+        checks.check_is_mutual_exclusive(screen_height_cm=screen_height_cm, screen=screen)
+        checks.check_is_mutual_exclusive(distance_cm=distance_cm, screen=screen)
         checks.check_is_mutual_exclusive(sampling_rate=sampling_rate, eyetracker=eyetracker)
 
+        # the origin default value needs special care to not mess with a passed screen.
+        if origin == 'upper left' and screen is not None:
+            origin = None  # set origin to None to pass mutual exclusivity check
+        checks.check_is_mutual_exclusive(origin=origin, screen=screen)
+
+        if screen is None:
+            screen = Screen(
+                width_px=screen_width_px,
+                height_px=screen_height_px,
+                width_cm=screen_width_cm,
+                height_cm=screen_height_cm,
+                distance_cm=distance_cm,
+                origin=origin,
+            )
+        self.screen = screen
+
+        if eyetracker is None:
+            eyetracker = EyeTracker(sampling_rate=sampling_rate)
         self.eyetracker = eyetracker
 
-        self._sampling_rate = sampling_rate
-
-        checks.check_is_not_none(sampling_rate=self.sampling_rate)
-        assert self.sampling_rate is not None
-
-        checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
+        if self.sampling_rate is not None:
+            checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
 
     @property
     def sampling_rate(self) -> float | None:
         """Get sampling rate of experiment."""
-        if self._sampling_rate is not None:
-            return self._sampling_rate
-
-        assert self.eyetracker is not None
-
         return self.eyetracker.sampling_rate
 
     @sampling_rate.setter
     def sampling_rate(self, sampling_rate: float | None = None) -> None:
         """Set sampling rate of experiment."""
-        self._sampling_rate = sampling_rate
+        self.eyetracker.sampling_rate = sampling_rate
 
     def pos2vel(
             self,
@@ -189,17 +198,12 @@ class Experiment:
             arr=arr, sampling_rate=self.sampling_rate, method=method, **kwargs,
         )
 
-    def __str__(self: Any) -> str:
-        """Print experiment."""
+    def __eq__(self: Experiment, other: Experiment) -> bool:
+        """Compare equality to other Experiment."""
+        print(self.screen, other.screen, self.screen == other.screen)
+        print(self.eyetracker, other.eyetracker, self.eyetracker == other.eyetracker)
+        return self.screen == other.screen and self.eyetracker == other.eyetracker
 
-        def shorten(value: Any) -> str:
-            if isinstance(value, float):
-                value = f'{value:.2f}'
-            return value
-
-        attributes = ''
-        for key, value in vars(self).items():
-            if not key.startswith('_'):
-                attributes += ', ' + f'{key}={shorten(value)}'
-
-        return f'{type(self).__name__}(sampling_rate={shorten(self.sampling_rate)}{attributes})'
+    def __str__(self: Experiment) -> str:
+        """Return Experiment string."""
+        return f'{type(self).__name__}(screen={self.screen}, eyetracker={self.eyetracker})'

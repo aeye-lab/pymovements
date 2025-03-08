@@ -136,7 +136,8 @@ class DatasetDefinition:
 
     resources: dict[str, tuple[dict[str, str], ...]] = field(default_factory=dict)
 
-    experiment: Experiment | None = None
+    experiment: Experiment | None = field(default_factory=Experiment)
+
     extract: dict[str, bool] = field(default_factory=dict)
 
     filename_format: dict[str, str] = field(default_factory=dict)
