@@ -205,8 +205,9 @@ def parse_eyelink_event_start(line: str) -> str | None:
 def parse_eyelink_event_end(line: str) -> tuple[str, float, float] | None:
     """Check if the line contains the start of an event and return the event name and times."""
     if match := FIXATION_STOP_REGEX.match(line):
-        return 'fixation', float(match.group('timestamp_start')
-                                 ), float(match.group('timestamp_end'))
+        return 'fixation', float(
+            match.group('timestamp_start'),
+        ), float(match.group('timestamp_end'))
     if match := SACCADE_STOP_REGEX.match(line):
         return 'saccade', float(match.group('timestamp_start')), float(match.group('timestamp_end'))
     if match := BLINK_STOP_REGEX.match(line):
