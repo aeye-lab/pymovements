@@ -28,7 +28,6 @@ import polars as pl
 from pymovements.events.frame import EventDataFrame
 from pymovements.gaze._utils.parsing import parse_eyelink
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.eyetracker import EyeTracker
 from pymovements.gaze.gaze_dataframe import GazeDataFrame  # pylint: disable=cyclic-import
 
 
@@ -377,8 +376,6 @@ def from_asc(
 
     if experiment is None:
         experiment = Experiment(sampling_rate=metadata['sampling_rate'])
-    if experiment.eyetracker is None:
-        experiment.eyetracker = EyeTracker()
 
     # Compare metadata from experiment definition with metadata from ASC file.
     # Fill in missing metadata in experiment definition and raise an error if there are conflicts
@@ -392,9 +389,7 @@ def from_asc(
         issues.append(f"Screen resolution: {experiment_resolution} vs. {metadata['resolution']}")
 
     # Sampling rate
-    if experiment.eyetracker.sampling_rate is None:
-        experiment.eyetracker.sampling_rate = metadata['sampling_rate']
-    elif experiment.eyetracker.sampling_rate != metadata['sampling_rate']:
+    if experiment.eyetracker.sampling_rate != metadata['sampling_rate']:
         issues.append(
             f"Sampling rate: {experiment.eyetracker.sampling_rate} vs. {metadata['sampling_rate']}",
         )

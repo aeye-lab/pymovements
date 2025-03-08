@@ -157,19 +157,21 @@ class ToyDatasetEyeLink(DatasetDefinition):
 
     extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
-    experiment: Experiment = Experiment(
-        screen_width_px=1280,
-        screen_height_px=1024,
-        screen_width_cm=38,
-        screen_height_cm=30.2,
-        distance_cm=68,
-        origin='upper left',
-        eyetracker=EyeTracker(
-            sampling_rate=1000.0,
-            left=True,
-            right=False,
-            model='EyeLink Portable Duo',
-            vendor='EyeLink',
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=1280,
+            screen_height_px=1024,
+            screen_width_cm=38,
+            screen_height_cm=30.2,
+            distance_cm=68,
+            origin='upper left',
+            eyetracker=EyeTracker(
+                sampling_rate=1000.0,
+                left=True,
+                right=False,
+                model='EyeLink Portable Duo',
+                vendor='EyeLink',
+            ),
         ),
     )
 
