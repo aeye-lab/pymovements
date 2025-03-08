@@ -42,6 +42,7 @@
     JuDo1000
     PoTeC
     Provo
+    RaCCooNS
     SBSAT
     UCL
 
@@ -72,6 +73,7 @@ from pymovements.datasets.interead import InteRead
 from pymovements.datasets.judo1000 import JuDo1000
 from pymovements.datasets.potec import PoTeC
 from pymovements.datasets.provo import Provo
+from pymovements.datasets.raccoons import RaCCooNS
 from pymovements.datasets.sb_sat import SBSAT
 from pymovements.datasets.toy_dataset import ToyDataset
 from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
@@ -96,6 +98,7 @@ __all__ = [
     'JuDo1000',
     'PoTeC',
     'Provo',
+    'RaCCooNS',
     'SBSAT',
     'ToyDataset',
     'ToyDatasetEyeLink',
