@@ -191,6 +191,29 @@ def get_pattern_keys(compiled_patterns: list[dict[str, Any]], pattern_key: str) 
     return keys
 
 
+def parse_eyelink_event_start(line: str) -> str | None:
+    """Check if the line contains the start of an event and return the event name."""
+    if FIXATION_START_REGEX.match(line):
+        return 'fixation'
+    if SACCADE_START_REGEX.match(line):
+        return 'saccade'
+    if BLINK_START_REGEX.match(line):
+        return 'blink'
+    return None
+
+
+def parse_eyelink_event_end(line: str) -> tuple[str, float, float] | None:
+    """Check if the line contains the start of an event and return the event name and times."""
+    if match := FIXATION_STOP_REGEX.match(line):
+        return 'fixation', float(match.group('timestamp_start')
+                                 ), float(match.group('timestamp_end'))
+    if match := SACCADE_STOP_REGEX.match(line):
+        return 'saccade', float(match.group('timestamp_start')), float(match.group('timestamp_end'))
+    if match := BLINK_STOP_REGEX.match(line):
+        return 'blink', float(match.group('timestamp_start')), float(match.group('timestamp_end'))
+    return None
+
+
 def parse_eyelink(
         filepath: Path | str,
         patterns: list[dict[str, Any] | str] | None = None,
@@ -235,9 +258,9 @@ def parse_eyelink(
     current_additional = {
         additional_column: None for additional_column in additional_columns
     }
-    current_fixation_additional = {}
-    current_saccade_additional = {}
-    current_blink_additional = {}
+    current_event_additional: dict[str, dict[str, Any]] = {
+        'fixation': {}, 'saccade': {}, 'blink': {},
+    }
 
     samples: dict[str, list[Any]] = {
         'time': [],
@@ -307,55 +330,37 @@ def parse_eyelink(
             )
             cal_timestamp = ''
 
-        elif FIXATION_START_REGEX.match(line):
-            current_fixation_additional = {**current_additional}
+        elif event_name := parse_eyelink_event_start(line):
+            current_event_additional[event_name] = {**current_additional}
+            # TODO: remove
+            if BLINK_START_REGEX.match(line):
+                blink = True
 
-        elif match := FIXATION_STOP_REGEX.match(line):
-            events['name'].append('fixation_eyelink')
-            events['onset'].append(float(match.group('timestamp_start')))
-            events['offset'].append(float(match.group('timestamp_end')))
-
-            for additional_column in additional_columns:
-                events[additional_column].append(current_fixation_additional[additional_column])
-            current_fixation_additional = {}
-
-        elif SACCADE_START_REGEX.match(line):
-            current_saccade_additional = {**current_additional}
-
-        elif match := SACCADE_STOP_REGEX.match(line):
-            events['name'].append('saccade_eyelink')
-            events['onset'].append(float(match.group('timestamp_start')))
-            events['offset'].append(float(match.group('timestamp_end')))
+        elif event := parse_eyelink_event_end(line):
+            event_name, event_onset, event_offset = event
+            events['name'].append(f'{event_name}_eyelink')
+            events['onset'].append(event_onset)
+            events['offset'].append(event_offset)
 
             for additional_column in additional_columns:
-                events[additional_column].append(current_saccade_additional[additional_column])
-            current_saccade_additional = {}
-
-        elif BLINK_START_REGEX.match(line):
-            current_blink_additional = {**current_additional}
+                events[additional_column].append(
+                    current_event_additional[event_name][additional_column],
+                )
+            current_event_additional[event_name] = {}
 
             # TODO: remove
-            blink = True
-
-        elif match := BLINK_STOP_REGEX.match(line):
-            blink = False
-            parsed_blink = match.groupdict()
-            blink_info = {
-                'start_timestamp': float(parsed_blink['timestamp_start']),
-                'stop_timestamp': float(parsed_blink['timestamp_end']),
-                'duration_ms': float(parsed_blink['duration_ms']),
-                'num_samples': num_blink_samples,
-            }
-            num_blink_samples = 0
-            blinks.append(blink_info)
-
-            events['name'].append('blink_eyelink')
-            events['onset'].append(float(match.group('timestamp_start')))
-            events['offset'].append(float(match.group('timestamp_end')))
-
-            for additional_column in additional_columns:
-                events[additional_column].append(current_blink_additional[additional_column])
-            current_blink_additional = {}
+            if event_name == 'blink':
+                blink = False
+                blink_info = {
+                    'start_timestamp': event_onset,
+                    'stop_timestamp': event_offset,
+                    # TODO: https://www.sr-research.com/support/thread-9411.html
+                    # 'duration_ms': float(parsed_blink['duration_ms']),
+                    'duration_ms': float(event_offset - event_onset),
+                    'num_samples': num_blink_samples,
+                }
+                num_blink_samples = 0
+                blinks.append(blink_info)
 
         elif match := START_RECORDING_REGEX.match(line):
             start_recording_timestamp = match.groupdict()['timestamp']
