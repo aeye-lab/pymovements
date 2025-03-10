@@ -28,16 +28,12 @@ from typing import Any
 
 import yaml
 
-from pymovements.dataset._utils._yaml import tuple_constructor
-from pymovements.dataset._utils._yaml import tuple_representer
 from pymovements.dataset._utils._yaml import type_constructor
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
 
 
-yaml.add_constructor('!tuple', tuple_constructor, Loader=yaml.SafeLoader)
 yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
-yaml.add_representer(tuple, tuple_representer)
 
 
 @dataclass
@@ -51,11 +47,11 @@ class DatasetDefinition:
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-    mirrors: dict[str, tuple[str, ...]]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
+    mirrors: dict[str, list[str]]
+        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
         (default: field(default_factory=dict))
-    resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
+    resources: dict[str, list[dict[str, str]]]
+        A list of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
@@ -145,9 +141,9 @@ class DatasetDefinition:
     name: str = '.'
     has_files: dict[str, bool] = field(default_factory=dict)
 
-    mirrors: dict[str, tuple[str, ...]] = field(default_factory=dict)
+    mirrors: dict[str, list[str]] = field(default_factory=dict)
 
-    resources: dict[str, tuple[dict[str, str], ...]] = field(default_factory=dict)
+    resources: dict[str, list[dict[str, str]]] = field(default_factory=dict)
 
     experiment: Experiment | None = None
     extract: dict[str, bool] = field(default_factory=dict)

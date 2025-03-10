@@ -20,8 +20,10 @@
 """DatasetLibrary module."""
 from __future__ import annotations
 
+from copy import deepcopy
 from importlib import resources
 from pathlib import Path
+from typing import TypeVar
 
 import yaml
 
@@ -42,19 +44,19 @@ class DatasetLibrary:
     definitions: dict[str, DatasetDefinition] = {}
 
     @classmethod
-    def add(cls, definition: DatasetDefinition | Path | str) -> None:
+    def add(cls, definition: type[DatasetDefinition] | DatasetDefinition | Path | str) -> None:
         """Add :py:class:`~pymovements.dataset.DatasetDefinition` to library.
 
         Parameters
         ----------
-        definition: DatasetDefinition | Path | str
+        definition: type[DatasetDefinition] | DatasetDefinition | Path | str
             The :py:class:`~pymovements.dataset.DatasetDefinition` to add to the library.
 
         Notes
         -----
         Definition can be:
-            * A DatasetDefinition class (legacy)
-            * A DatasetDefinition instance (from YAML)
+            * A DatasetDefinition class
+            * A DatasetDefinition instance
             * A Path to a YAML file
             * A string path to a YAML file
         """
@@ -62,6 +64,8 @@ class DatasetLibrary:
             # Load from YAML file
             yaml_def = DatasetDefinition.from_yaml(definition)
             cls.definitions[yaml_def.name] = yaml_def
+        elif isinstance(definition, type):
+            cls.definitions[definition.name] = definition()
         else:
             # DatasetDefinition instance
             cls.definitions[definition.name] = definition
@@ -88,23 +92,37 @@ class DatasetLibrary:
         """
         if name not in cls.definitions:
             raise KeyError(
-                f"Dataset '{name}' not found in library. "
+                f"Dataset '{name}' not found in DatasetLibrary. "
                 f"Available datasets: {sorted(cls.definitions.keys())}",
             )
-        return cls.definitions[name]
+        return deepcopy(cls.definitions[name])
+
+    @classmethod
+    def available_datasets(cls) -> list[str]:
+        """Return datasets available in :py:class:`~pymovements.dataset.DatasetLibrary`.
+
+        Returns
+        -------
+        list[str]
+            Datasets available in :py:class:`~pymovements.dataset.DatasetLibrary`.
+        """
+        return list(cls.definitions.keys())
 
 
-def register_dataset(cls: DatasetDefinition) -> DatasetDefinition:
+DatasetDefinitionClass = TypeVar('DatasetDefinitionClass', bound=type[DatasetDefinition])
+
+
+def register_dataset(cls: DatasetDefinitionClass) -> DatasetDefinitionClass:
     """Register a public dataset definition.
 
     Parameters
     ----------
-    cls: DatasetDefinition
+    cls: DatasetDefinitionClass
         The :py:class:`~pymovements.dataset.DatasetDefinition` to register.
 
     Returns
     -------
-    DatasetDefinition
+    DatasetDefinitionClass
         The :py:class:`~pymovements.dataset.DatasetDefinition` to register.
     """
     DatasetLibrary.add(cls)

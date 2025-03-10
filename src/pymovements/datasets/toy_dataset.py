@@ -49,11 +49,11 @@ class ToyDataset(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, tuple[str, ...]]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
+    mirrors: dict[str, list[str]]
+        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+    resources: dict[str, list[dict[str, str]]]
+        A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -72,12 +72,6 @@ class ToyDataset(DatasetDefinition):
     filename_format_schema_overrides: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
-
-    trial_columns: list[str]
-            The name of the trial columns in the input data frame. If the list is empty or None,
-            the input data frame is assumed to contain only one trial. If the list is not empty,
-            the input data frame is assumed to contain multiple trials and the transformation
-            methods will be applied to each trial separately.
 
     time_column: str
         The name of the timestamp column in the input data frame. This column will be renamed to
@@ -131,21 +125,21 @@ class ToyDataset(DatasetDefinition):
         },
     )
 
-    mirrors: dict[str, tuple[str, ...]] = field(
+    mirrors: dict[str, list[str]] = field(
         default_factory=lambda: {
-            'gaze': ('http://github.com/aeye-lab/pymovements-toy-dataset/zipball/',),
+            'gaze': ['http://github.com/aeye-lab/pymovements-toy-dataset/zipball/'],
         },
     )
 
-    resources: dict[str, tuple[dict[str, str], ...]] = field(
+    resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
-            'gaze': (
+            'gaze': [
                 {
                     'resource': '6cb5d663317bf418cec0c9abe1dde5085a8a8ebd/',
                     'filename': 'pymovements-toy-dataset.zip',
                     'md5': '4da622457637a8181d86601fe17f3aa8',
                 },
-            ),
+            ],
         },
     )
     extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
@@ -172,8 +166,6 @@ class ToyDataset(DatasetDefinition):
             },
         },
     )
-
-    trial_columns: list[str] = field(default_factory=lambda: [])
 
     time_column: str = 'timestamp'
 

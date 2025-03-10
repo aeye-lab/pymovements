@@ -22,12 +22,12 @@ from __future__ import annotations
 
 import polars as pl
 
-from pymovements import stimulus
+from pymovements.stimulus import TextStimulus
 from pymovements.utils import checks
 
 
 def get_aoi(
-        aoi_dataframe: stimulus.TextStimulus,
+        aoi_dataframe: TextStimulus,
         row: pl.DataFrame.row,
         x_eye: str,
         y_eye: str,
@@ -40,7 +40,7 @@ def get_aoi(
 
     Parameters
     ----------
-    aoi_dataframe: stimulus.TextStimulus
+    aoi_dataframe: TextStimulus
         Text dataframe to containing area of interests.
     row: pl.DataFrame.row
         Eye movement row.

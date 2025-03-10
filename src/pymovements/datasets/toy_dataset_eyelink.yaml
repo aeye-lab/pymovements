@@ -59,7 +59,7 @@ custom_read_kwargs:
       - pattern: 'SYNCTIME_JUDO'
         column: "task"
         value: "judo"
-      - pattern: !tuple
+      - pattern:
         - "READING[.]STOP"
         - "JUDO[.]STOP"
         column: "task"

@@ -21,6 +21,8 @@
 import os
 import shutil
 from dataclasses import asdict
+from dataclasses import dataclass
+from dataclasses import field
 from pathlib import Path
 from unittest.mock import Mock
 
@@ -31,6 +33,7 @@ import yaml
 from polars.testing import assert_frame_equal
 
 import pymovements as pm
+from pymovements import DatasetDefinition
 
 
 def create_raw_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):
@@ -337,7 +340,7 @@ def mock_toy(
 
     create_event_files_from_fileinfo(event_dfs, fileinfo, rootpath / 'events')
 
-    dataset_definition = pm.DatasetDefinition(
+    dataset_definition = DatasetDefinition(
         experiment=pm.Experiment(
             screen_width_px=1280,
             screen_height_px=1024,
@@ -2013,23 +2016,27 @@ def test_load_split_gaze(gaze_dataset_configuration, by, expected_len):
 
 def test_write_yaml_dataset(tmp_path):
     tmp_file = tmp_path / 'tmp.yaml'
-    yaml_encoding = {
-        'name': 'Example',
-        'has_files': {
-            'gaze': 'false',
-            'precomputed_events': 'false',
-            'precomputed_reading_measures': 'false',
-        },
-    }
 
-    with open(tmp_file, 'w', encoding='utf-8') as f:
-        yaml.safe_dump(yaml_encoding, f)
-    dataset = pm.Dataset(tmp_file, '')
+    @dataclass
+    class TestDatasetDefinition(DatasetDefinition):
+        name: str = 'Example'
+        has_files: dict[str, bool] = field(
+            default_factory=lambda: {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+        )
+
+    dataset = TestDatasetDefinition()
     dataset.to_yaml(tmp_file)
+
+    with open(tmp_file, encoding='ascii') as f:
+        yaml_load = yaml.safe_load(f)
 
     # test initial dictionary definition is subset of written dictionary definition
     # (default values) ommited
     assert all(
-        (item in asdict(dataset.definition).items() or not item)
-        for item in yaml_encoding.items()
+        (key, value) in asdict(dataset).items()
+        for key, value in yaml_load.items()
     )

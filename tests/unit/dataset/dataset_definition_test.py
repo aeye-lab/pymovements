@@ -19,40 +19,65 @@
 # SOFTWARE.
 """Test dataset definition."""
 from dataclasses import asdict
+from dataclasses import dataclass
+from dataclasses import field
 
 import pytest
 import yaml
 
-import pymovements as pm
+from pymovements import DatasetDefinition
+from pymovements import DatasetLibrary
+from pymovements import Experiment
 
 
-# can be removed when `test_write_yaml_already_existing_with_values` passes
-def test_write_yaml_already_existing(tmp_path):
+def test_dataset_definition_to_yaml_w_experiment(tmp_path):
     tmp_file = tmp_path / 'tmp.yaml'
-    dataset = pm.DatasetLibrary.get('ToyDatasetEyeLink')
+
+    @dataclass
+    class TestDatasetDefinition(DatasetDefinition):
+        name: str = 'Example'
+        has_files: dict[str, bool] = field(
+            default_factory=lambda: {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+        )
+        experiment: Experiment = Experiment(
+            screen_width_px=1280,
+            screen_height_px=1024,
+            screen_width_cm=38.2,
+            screen_height_cm=30.2,
+            distance_cm=60,
+            origin='center',
+            sampling_rate=2000,
+        )
+
+    dataset = TestDatasetDefinition()
     dataset.to_yaml(tmp_file)
+
     with open(tmp_file, encoding='utf-8') as f:
-        written_file = yaml.safe_load(f)
+        yaml_dict = yaml.safe_load(f)
 
-    for key in asdict(dataset).keys():
-        assert key in written_file
+    # hack until #919 resolved
+    dataset_dict = asdict(dataset)
+    dataset_experiment_dict = dataset_dict.pop('experiment').__dict__
+    yaml_experiment = yaml_dict.pop('experiment')
+    dataset_screen_dict = dataset_experiment_dict.pop('screen').__dict__
+    assert dataset_dict == yaml_dict
+    for key in yaml_experiment:
+        if key.startswith('screen_'):
+            key = key.strip('screen_')
+        if key == 'sampling_rate':
+            key = f'_{key}'
 
-
-def test_write_yaml_already_existing_no_experiment(tmp_path):
-    tmp_file = tmp_path / 'tmp.yaml'
-    dataset = pm.DatasetLibrary.get('EMTeC')
-    dataset.to_yaml(tmp_file)
-    with open(tmp_file, encoding='utf-8') as f:
-        written_file = yaml.safe_load(f)
-
-    for key in asdict(dataset).keys():
-        assert key in written_file
+        assert key in (dataset_experiment_dict | dataset_screen_dict)
 
 
 @pytest.mark.xfail(reason='#991')
-def test_write_yaml_already_existing_with_values(tmp_path):
+def test_write_yaml_already_existing_dataset_definition_w_tuple(tmp_path):
     tmp_file = tmp_path / 'tmp.yaml'
-    dataset = pm.DatasetLibrary.get('ToyDatasetEyeLink')
+    dataset = DatasetLibrary.get('ToyDatasetEyeLink')
     dataset.to_yaml(tmp_file)
     assert tmp_file.is_file()
     with open(tmp_file, encoding='utf-8') as f:
@@ -60,25 +85,35 @@ def test_write_yaml_already_existing_with_values(tmp_path):
     assert written_file == asdict(dataset)
 
 
-def test_write_yaml_new(tmp_path):
-    tmp_file = tmp_path / 'tmp.yaml'
+def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path):
+    dictionary_tmp_file = tmp_path / 'dictionary.yaml'
     yaml_encoding = {
         'name': 'Example',
         'has_files': {
-            'gaze': 'false',
-            'precomputed_events': 'false',
-            'precomputed_reading_measures': 'false',
+            'gaze': False,
+            'precomputed_events': False,
+            'precomputed_reading_measures': False,
         },
     }
 
-    with open(tmp_file, 'w', encoding='utf-8') as f:
+    with open(dictionary_tmp_file, 'w', encoding='utf-8') as f:
         yaml.safe_dump(yaml_encoding, f)
-    dataset = pm.DatasetDefinition().from_yaml(tmp_file)
-    dataset.to_yaml(tmp_file)
 
-    # test initial dictionary definition is subset of written dictionary definition
-    # (default values) ommited
-    assert all(
-        (item in asdict(dataset).items() or not item)
-        for item in yaml_encoding.items()
-    )
+    yaml_dataset = DatasetDefinition().from_yaml(dictionary_tmp_file)
+
+    @dataclass
+    class TestDatasetDefinition(DatasetDefinition):
+        name: str = 'Example'
+        has_files: dict[str, bool] = field(
+            default_factory=lambda: {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+        )
+
+    dataset = TestDatasetDefinition()
+
+    # hack to compare the dataset definitions
+    # change to dataset == yaml_dataset after #919 is resolved
+    assert dataset.__dict__ == yaml_dataset.__dict__

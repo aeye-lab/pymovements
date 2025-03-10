@@ -23,34 +23,73 @@ from __future__ import annotations
 import pytest
 
 import pymovements as pm
+from pymovements import DatasetLibrary
 
 
 @pytest.mark.parametrize(
-    ('dataset_name'),
+    ('dataset', 'dataset_name'),
     # please add datasets in alphabetical order
     [
-        pytest.param('BSC', id='BSC'),
-        pytest.param('BSCII', id='BSCII'),
-        pytest.param('CodeComprehension', id='CodeComprehension'),
-        pytest.param('CopCo', id='CopCo'),
-        pytest.param('DAEMONS', id='DAEMONS'),
-        pytest.param('DIDEC', id='DIDEC'),
-        pytest.param('EMTeC', id='EMTeC'),
-        pytest.param('FakeNewsPerception', id='FakeNewsPerception'),
-        pytest.param('GazeBase', id='GazeBase'),
-        pytest.param('GazeBaseVR', id='GazeBaseVR'),
-        pytest.param('GazeOnFaces', id='GazeOnFaces'),
-        pytest.param('HBN', id='HBN'),
-        pytest.param('InteRead', id='InteRead'),
-        pytest.param('JuDo1000', id='JuDo1000'),
-        pytest.param('PoTeC', id='PoTeC'),
-        pytest.param('Provo', id='Provo'),
-        pytest.param('SBSAT', id='SBSAT'),
-        pytest.param('ToyDataset', id='ToyDataset'),
-        pytest.param('ToyDatasetEyeLink', id='ToyDatasetEyeLink'),
-        pytest.param('UCL', id='UCL'),
+        pytest.param(pm.datasets.BSC, 'BSC', id='BSC'),
+        pytest.param(pm.datasets.BSCII, 'BSCII', id='BSCII'),
+        pytest.param(pm.datasets.CodeComprehension, 'CodeComprehension', id='CodeComprehension'),
+        pytest.param(pm.datasets.CopCo, 'CopCo', id='CopCo'),
+        pytest.param(pm.datasets.DAEMONS, 'DAEMONS', id='DAEMONS'),
+        pytest.param(pm.datasets.DIDEC, 'DIDEC', id='DIDEC'),
+        pytest.param(pm.datasets.EMTeC, 'EMTeC', id='EMTeC'),
+        pytest.param(pm.datasets.FakeNewsPerception, 'FakeNewsPerception', id='FakeNewsPerception'),
+        pytest.param(pm.datasets.GazeBase, 'GazeBase', id='GazeBase'),
+        pytest.param(pm.datasets.GazeBaseVR, 'GazeBaseVR', id='GazeBaseVR'),
+        pytest.param(pm.datasets.GazeOnFaces, 'GazeOnFaces', id='GazeOnFaces'),
+        pytest.param(pm.datasets.HBN, 'HBN', id='HBN'),
+        pytest.param(pm.datasets.InteRead, 'InteRead', id='InteRead'),
+        pytest.param(pm.datasets.JuDo1000, 'JuDo1000', id='JuDo1000'),
+        pytest.param(pm.datasets.PoTeC, 'PoTeC', id='PoTeC'),
+        pytest.param(pm.datasets.Provo, 'Provo', id='Provo'),
+        pytest.param(pm.datasets.SBSAT, 'SBSAT', id='SBSAT'),
+        pytest.param(pm.datasets.ToyDataset, 'ToyDataset', id='ToyDataset'),
+        pytest.param(pm.datasets.ToyDatasetEyeLink, 'ToyDatasetEyeLink', id='ToyDatasetEyeLink'),
+        pytest.param(pm.datasets.UCL, 'UCL', id='UCL'),
     ],
 )
-def test_public_dataset_registered(dataset_name):
-    assert dataset_name in pm.DatasetLibrary.definitions
-    assert pm.DatasetLibrary.get(dataset_name).name == dataset_name
+def test_public_dataset_registered(dataset, dataset_name):
+    assert dataset_name in DatasetLibrary.available_datasets()
+    dataset_from_library = DatasetLibrary.get(dataset_name).__dict__
+    python_dataset = dataset().__dict__
+    assert dataset_from_library == python_dataset
+
+
+# merge with test above
+@pytest.mark.xfail(reason='#919')
+@pytest.mark.parametrize(
+    ('dataset', 'dataset_name'),
+    # please add datasets in alphabetical order
+    [
+        pytest.param(pm.datasets.BSC, 'BSC', id='BSC'),
+        pytest.param(pm.datasets.BSCII, 'BSCII', id='BSCII'),
+        pytest.param(pm.datasets.CodeComprehension, 'CodeComprehension', id='CodeComprehension'),
+        pytest.param(pm.datasets.CopCo, 'CopCo', id='CopCo'),
+        pytest.param(pm.datasets.DAEMONS, 'DAEMONS', id='DAEMONS'),
+        pytest.param(pm.datasets.DIDEC, 'DIDEC', id='DIDEC'),
+        pytest.param(pm.datasets.EMTeC, 'EMTeC', id='EMTeC'),
+        pytest.param(pm.datasets.FakeNewsPerception, 'FakeNewsPerception', id='FakeNewsPerception'),
+        pytest.param(pm.datasets.GazeBase, 'GazeBase', id='GazeBase'),
+        pytest.param(pm.datasets.GazeBaseVR, 'GazeBaseVR', id='GazeBaseVR'),
+        pytest.param(pm.datasets.GazeOnFaces, 'GazeOnFaces', id='GazeOnFaces'),
+        pytest.param(pm.datasets.HBN, 'HBN', id='HBN'),
+        pytest.param(pm.datasets.InteRead, 'InteRead', id='InteRead'),
+        pytest.param(pm.datasets.JuDo1000, 'JuDo1000', id='JuDo1000'),
+        pytest.param(pm.datasets.PoTeC, 'PoTeC', id='PoTeC'),
+        pytest.param(pm.datasets.Provo, 'Provo', id='Provo'),
+        pytest.param(pm.datasets.SBSAT, 'SBSAT', id='SBSAT'),
+        pytest.param(pm.datasets.ToyDataset, 'ToyDataset', id='ToyDataset'),
+        pytest.param(pm.datasets.ToyDatasetEyeLink, 'ToyDatasetEyeLink', id='ToyDatasetEyeLink'),
+        pytest.param(pm.datasets.UCL, 'UCL', id='UCL'),
+    ],
+)
+def test_public_dataset_registered_experiment(dataset, dataset_name):
+    dataset_from_library = DatasetLibrary.get(dataset_name).__dict__
+    dataset_from_lib_exp = dataset_from_library.pop('experiment')
+    python_dataset = dataset().__dict__
+    python_dataset_exp = python_dataset.pop('experiment')
+    assert python_dataset_exp == dataset_from_lib_exp

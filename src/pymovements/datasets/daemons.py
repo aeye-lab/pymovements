@@ -54,11 +54,11 @@ class DAEMONS(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, tuple[str, ...]]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
+    mirrors: dict[str, list[str]]
+        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+    resources: dict[str, list[dict[str, str]]]
+        A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -77,17 +77,6 @@ class DAEMONS(DatasetDefinition):
     filename_format_schema_overrides: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
-
-    trial_columns: list[str]
-            The name of the trial columns in the input data frame. If the list is empty or None,
-            the input data frame is assumed to contain only one trial. If the list is not empty,
-            the input data frame is assumed to contain multiple trials and the transformation
-            methods will be applied to each trial separately.
-
-    pixel_columns: list[str]
-        The name of the pixel position columns in the input data frame. These columns will be
-        nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
-        column will not be created.
 
     column_map: dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
@@ -125,24 +114,22 @@ class DAEMONS(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-    mirrors: dict[str, tuple[str, ...]] = field(
+    mirrors: dict[str, list[str]] = field(
         default_factory=lambda:
             {
-                'precomputed_events': (
-                    'https://osf.io/download/',
-                ),
+                'precomputed_events': ['https://osf.io/download/'],
             },
     )
-    resources: dict[str, tuple[dict[str, str], ...]] = field(
+    resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda:
             {
-                'precomputed_events': (
+                'precomputed_events': [
                     {
                         'resource': 'ztgna/',
                         'filename': 'eye_movement.zip',
                         'md5': '2779b4c140a0b1e3c9976488994f08f3',
                     },
-                ),
+                ],
             },
     )
     extract: dict[str, bool] = field(
@@ -169,10 +156,6 @@ class DAEMONS(DatasetDefinition):
                 'precomputed_events': {'data_split': str},
             },
     )
-
-    trial_columns: list[str] = field(default_factory=lambda: [])
-
-    pixel_columns: list[str] = field(default_factory=lambda: [])
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 

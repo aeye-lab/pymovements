@@ -21,7 +21,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 import yaml
 
@@ -97,68 +96,6 @@ def type_constructor(
         raise ValueError(f'Unknown {node=}') from exc
 
 
-def tuple_constructor(loader: yaml.SafeLoader, node: yaml.Node) -> Any:
-    """Construct a Python tuple from a YAML sequence node.
-
-    This function is used as a custom constructor for PyYAML to convert a YAML
-    sequence (e.g., a list-like structure) into a Python tuple. It can be registered
-    with a YAML loader to handle custom tags like '!tuple'.
-
-    Parameters
-    ----------
-    loader: yaml.SafeLoader
-        The PyYAML loader instance being used to parse the YAML.
-    node: yaml.Node
-        The YAML node representing the sequence to be converted into a tuple.
-
-    Returns
-    -------
-    Any
-        A Python tuple containing the elements of the YAML sequence.
-
-    Example
-    -------
-        pixel_columns: !tuple
-        - x
-        - y
-    """
-    if not isinstance(node, yaml.SequenceNode):
-        raise yaml.YAMLError(f'Expected a SequenceNode, got {type(node)}')
-
-    return tuple(loader.construct_sequence(node))
-
-
-def tuple_representer(dumper: yaml.Dumper, node: tuple[Any, ...]) -> yaml.Node:
-    """Represent a Python tuple as a YAML sequence with a custom '!tuple' tag.
-
-    This function is used as a custom representer for PyYAML to serialize a Python
-    tuple into a YAML sequence with the '!tuple' tag. It can be registered with a
-    YAML dumper to ensure tuples are represented distinctly from lists.
-
-    Parameters
-    ----------
-    dumper: yaml.Dumper
-        The PyYAML dumper instance being used to serialize the data.
-    node: tuple[Any, ...]
-        The Python tuple to be represented in YAML.
-
-    Returns
-    -------
-    yaml.Node
-        A YAML sequence node tagged with '!tuple' containing the tuple's elements.
-
-    Example
-    -------
-        {'pixel_columns': ('x', 'y')}
-        pixel_columns: !tuple [x, y]
-        OR
-        pixel_columns: !tuple
-        - x
-        - y
-    """
-    return dumper.represent_sequence('!tuple', node)
-
-
 def write_dataset_definitions_yaml(
         datasets_yaml_path: str = 'src/pymovements/datasets/datasets.yaml',
 ) -> None:
@@ -178,10 +115,9 @@ def write_dataset_definitions_yaml(
         # https://github.com/aeye-lab/pymovements/pull/952#issuecomment-2690742187
         assert isinstance(yaml_file, Path)
         if yaml_file.suffix == '.yaml':
-            yaml_filename = yaml_file.parts[-1]
-            if yaml_filename == 'datasets.yaml':
+            if yaml_file.name == 'datasets.yaml':
                 continue
-            datasets_list.append(yaml_filename.split('.')[0])
+            datasets_list.append(yaml_file.stem)
 
     with open(datasets_yaml_path, 'w', encoding='utf-8') as f:
         yaml.dump(sorted(datasets_list), f)

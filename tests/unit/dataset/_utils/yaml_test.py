@@ -21,7 +21,6 @@
 import pytest
 import yaml
 
-from pymovements.dataset._utils._yaml import tuple_representer
 from pymovements.dataset._utils._yaml import type_constructor
 from pymovements.dataset._utils._yaml import write_dataset_definitions_yaml
 
@@ -38,46 +37,6 @@ def test_type_constructor_assertion_error(tmp_path):
             yaml.safe_load(f)
     msg, = excinfo.value.args
     assert msg == "Unknown node=ScalarNode(tag='!test', value='')"
-
-
-def test_tuple_constructor_raises_error(tmp_path):
-    yaml_content = """\
-    pixel_columns: !tuple str
-    """
-    yaml.add_multi_constructor('!', type_constructor, yaml.SafeLoader)
-    yaml_file = tmp_path / 'test_yaml_file'
-    yaml_file.write_text(yaml_content)
-    with pytest.raises(yaml.YAMLError) as excinfo:
-        with open(yaml_file, encoding='utf-8') as f:
-            yaml.safe_load(f)
-    msg, = excinfo.value.args
-    assert msg == "Expected a SequenceNode, got <class 'yaml.nodes.ScalarNode'>"
-
-
-def test_tuple_representer_list(tmp_path):
-    yaml_content = """\
-    pixel_column: !tuple
-    - x
-    - y
-    """
-    yaml.add_representer(tuple, tuple_representer)
-    yaml_file = tmp_path / 'test_yaml_file'
-    yaml_file.write_text(yaml_content)
-    with open(yaml_file, encoding='ascii') as f:
-        yaml_file_loading = yaml.safe_load(f)
-    assert yaml_file_loading == {'pixel_column': ('x', 'y')}
-
-
-def test_tuple_representer_inline_list(tmp_path):
-    yaml_content = """\
-    pixel_column: !tuple [x, y]
-    """
-    yaml.add_representer(tuple, tuple_representer)
-    yaml_file = tmp_path / 'test_yaml_file'
-    yaml_file.write_text(yaml_content)
-    with open(yaml_file, encoding='ascii') as f:
-        yaml_file_loading = yaml.safe_load(f)
-    assert yaml_file_loading == {'pixel_column': ('x', 'y')}
 
 
 def test_module_name_not_found_error(tmp_path):

@@ -49,11 +49,11 @@ class InteRead(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, tuple[str, ...]]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
+    mirrors: dict[str, list[str]]
+        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+    resources: dict[str, list[dict[str, str]]]
+        A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -131,33 +131,29 @@ class InteRead(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-    mirrors: dict[str, tuple[str, ...]] = field(
+    mirrors: dict[str, list[str]] = field(
         default_factory=lambda: {
-            'gaze': (
-                'https://osf.io/download/',
-            ),
-            'precomputed_events': (
-                'https://osf.io/download/',
-            ),
+            'gaze': ['https://osf.io/download/'],
+            'precomputed_events': ['https://osf.io/download/'],
         },
     )
 
-    resources: dict[str, tuple[dict[str, str], ...]] = field(
+    resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
-            'gaze': (
+            'gaze': [
                 {
                     'resource': '6ju3x/',
                     'filename': 'resampled_gaze.csv.zip',
                     'md5': '06b2cdff1827086fa125a703ee9d4324',
                 },
-            ),
-            'precomputed_events': (
+            ],
+            'precomputed_events': [
                 {
                     'resource': '85ckh/',
                     'filename': 'resumption_fixation.csv',
                     'md5': '44edb7c58318ad76af1fa6f1bc1f1ceb',
                 },
-            ),
+            ],
         },
     )
     extract: dict[str, bool] = field(
