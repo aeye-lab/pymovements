@@ -31,6 +31,7 @@ def step_function(
         values: list[float | tuple[float, ...]],
         start_value: float | tuple[float, ...] = 0,
         noise: float = 0,
+        dtype: np.dtype = np.float32,
 ) -> np.ndarray:
     """Create a synthetic eye gaze by using a simple step function.
 
@@ -47,6 +48,8 @@ def step_function(
     noise: float
         If greater than zero, gaussian noise is scaled according to value and superimposed on the
         output array. (default: 0)
+    dtype: np.dtype
+        The desired data type of the output array. (default: np.float32)
 
     Returns
     -------
@@ -134,7 +137,7 @@ def step_function(
         arr = np.tile(start_value, (length, 1))
 
     # change type of elements to float32, to allow np.nan
-    arr = np.array(arr, dtype=np.float32)
+    arr = np.array(arr, dtype=dtype)
 
     # Iterate through all steps except the last.
     for begin, end, value in zip(steps[:-1], steps[1:], values[:-1]):
