@@ -104,8 +104,8 @@ class CodeComprehension(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.CodeComprehension` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.CodeComprehension` definition:
 
     >>> import pymovements as pm
     >>>
@@ -155,14 +155,16 @@ class CodeComprehension(DatasetDefinition):
 
     extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': True})
 
-    experiment: Experiment = Experiment(
-        screen_width_px=None,
-        screen_height_px=None,
-        screen_width_cm=None,
-        screen_height_cm=None,
-        distance_cm=None,
-        origin=None,
-        sampling_rate=2000,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=None,
+            screen_height_px=None,
+            screen_width_cm=None,
+            screen_height_cm=None,
+            distance_cm=None,
+            origin=None,
+            sampling_rate=2000,
+        ),
     )
 
     filename_format: dict[str, str] = field(

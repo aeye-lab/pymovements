@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the DIDEC dataset."""
+"""Provides a definition for the DAEMONS dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -26,21 +26,25 @@ from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import register_dataset
-from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
 @register_dataset
-class DIDEC(DatasetDefinition):
-    """DIDEC dataset :cite:p:`DIDEC`.
+class DAEMONS(DatasetDefinition):
+    """DAEMONS dataset :cite:p:`DAEMONS`.
 
-    The DIDEC eye-tracking data has two different data collections, (1) for the
-    description viewing task is more coherent than for the free-viewing task;
-    (2) variation in image descriptions. The data was collected using BeGaze eye-tracker
-    with a sampling rate of 250 Hz. The data collection contains 112 Dutch students,
-    54 students completed the free viewing task, while 58 completed the image description task.
+    The DAEMONS paper presents the Potsdam dataset of eye movements on natural scenes,
+    aimed at advancing research in visual cognition and machine learning.
+    It introduces a large-scale dataset with 2,400 images and eye-tracking data
+    from 250 participants, ensuring high-quality data collection using
+    state-of-the-art equipment. The study focuses on both fixation distributions
+    and scan paths, making the dataset valuable for various modeling approaches,
+    including saliency prediction and cognitive modeling.
 
-    Check the respective paper for details :cite:p:`DIDEC`.
+    The dataset is split into train (precomputed_events[0]) and
+    validation (precomputed_events[1]).
+
+    Check the respective paper for details :cite:p:`DAEMONS`.
 
     Attributes
     ----------
@@ -55,13 +59,11 @@ class DIDEC(DatasetDefinition):
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
+        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+        keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
-
-    experiment: Experiment
-        The experiment definition.
 
     extract: dict[str, bool]
         Decide whether to extract the data.
@@ -80,16 +82,6 @@ class DIDEC(DatasetDefinition):
             the input data frame is assumed to contain multiple trials and the transformation
             methods will be applied to each trial separately.
 
-    time_column: str
-        The name of the timestamp column in the input data frame. This column will be renamed to
-        ``time``.
-
-    time_unit: str
-        The unit of the timestamps in the timestamp column in the input data frame. Supported
-        units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
-        'step' the experiment definition must be specified. All timestamps will be converted to
-        milliseconds.
-
     pixel_columns: list[str]
         The name of the pixel position columns in the input data frame. These columns will be
         nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
@@ -104,11 +96,11 @@ class DIDEC(DatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
-    :py:class:`~pymovements.datasets.DIDEC` definition:
+    :py:class:`~pymovements.datasets.SBSAT` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("DIDEC", path='data/DIDEC')
+    >>> dataset = pm.Dataset("SBSAT", path='data/SBSAT')
 
     Download the dataset resources:
 
@@ -122,115 +114,64 @@ class DIDEC(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'DIDEC'
+    name: str = 'DAEMONS'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': False,
+            'gaze': False,
+            'precomputed_events': True,
             'precomputed_reading_measures': False,
         },
     )
-
     mirrors: dict[str, tuple[str, ...]] = field(
-        default_factory=lambda: {
-            'gaze': ('https://didec.uvt.nl/corpus/',),
-        },
+        default_factory=lambda:
+            {
+                'precomputed_events': (
+                    'https://osf.io/download/',
+                ),
+            },
     )
-
     resources: dict[str, tuple[dict[str, str], ...]] = field(
+        default_factory=lambda:
+            {
+                'precomputed_events': (
+                    {
+                        'resource': 'ztgna/',
+                        'filename': 'eye_movement.zip',
+                        'md5': '2779b4c140a0b1e3c9976488994f08f3',
+                    },
+                ),
+            },
+    )
+    extract: dict[str, bool] = field(
         default_factory=lambda: {
-            'gaze': (
-                {
-                    'resource': 'DIDEC_only_the_eyetracking_data.zip',
-                    'filename': 'DIDEC_only_the_eyetracking_data.zip',
-                    'md5': 'd572b0b41828986ca48a2fcf6966728a',
-                },
-            ),
+            'precomputed_events': True,
         },
     )
-
-    experiment: Experiment = field(
-        default_factory=lambda: Experiment(
-            screen_width_px=1680,
-            screen_height_px=1050,
-            screen_width_cm=47.4,
-            screen_height_cm=29.7,
-            distance_cm=70,
-            origin='upper left',
-            sampling_rate=1000,
-        ),
-    )
-
-    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze':
-                (
-                    r'Ruud_exp{experiment:d}_'
-                    r'list{list:d}_v{version:d}_'
-                    r'ppn{participant:d}_{session:d}_'
-                    r'Trial{trial:d} Samples.txt'
-                ),
-        },
+        default_factory=lambda:
+            {
+                'precomputed_events': r'SAC_{data_split:s}.csv',
+            },
     )
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'experiment': int,
-                'list': int,
-                'version': int,
-                'participant': int,
-                'session': int,
-                'trial': int,
+        default_factory=lambda:
+            {
+                'precomputed_events': {'data_split': str},
             },
-        },
     )
 
-    trial_columns: list[str] = field(
-        default_factory=lambda: ['Stimulus'],
-    )
+    trial_columns: list[str] = field(default_factory=lambda: [])
 
-    time_column: str = 'Time'
-
-    time_unit: str = 'ms'
-
-    pixel_columns: list[str] = field(
-        default_factory=lambda: [
-            'L POR X [px]',
-            'L POR Y [px]',
-            'R POR X [px]',
-            'R POR Y [px]',
-        ],
-    )
+    pixel_columns: list[str] = field(default_factory=lambda: [])
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'separator': '\t',
-                # skip begaze tracker data
-                'skip_rows': 43,
-                'has_header': False,
-                'new_columns': [
-                    'Time',
-                    'Type',
-                    'Trial',
-                    'L POR X [px]',
-                    'L POR Y [px]',
-                    'R POR X [px]',
-                    'R POR Y [px]',
-                    'Timing',
-                    'Pupil Confidence',
-                    'L Plane',
-                    'R Plane',
-                    'L Event Info',
-                    'R Event Info',
-                    'Stimulus',
-                ],
+        default_factory=lambda:
+            {
+                'precomputed_events': {'null_values': ['NA']},
             },
-        },
     )

@@ -26,7 +26,7 @@
    :recursive:
    :template: class.rst
 
-    pymovements.events.EventDataFrame
+    EventDataFrame
 
 .. rubric:: Processing
 
@@ -34,8 +34,8 @@
    :toctree:
    :recursive:
 
-    pymovements.events.EventProcessor
-    pymovements.events.EventGazeProcessor
+    EventProcessor
+    EventGazeProcessor
 
 .. rubric:: Detection Methods
 
@@ -43,10 +43,10 @@
    :toctree:
    :recursive:
 
-    pymovements.events.idt
-    pymovements.events.ivt
-    pymovements.events.microsaccades
-    pymovements.events.fill
+    idt
+    ivt
+    microsaccades
+    fill
 
 .. rubric:: Event Properties
 
@@ -54,12 +54,12 @@
     :toctree:
     :recursive:
 
-    pymovements.events.amplitude
-    pymovements.events.duration
-    pymovements.events.dispersion
-    pymovements.events.disposition
-    pymovements.events.peak_velocity
-    pymovements.events.location
+    amplitude
+    duration
+    dispersion
+    disposition
+    peak_velocity
+    location
 """
 from pymovements.events.detection import fill
 from pymovements.events.detection import idt

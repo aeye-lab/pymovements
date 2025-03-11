@@ -29,7 +29,7 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 class DatasetDefinition:
-    """Definition to initialize a :py:class:`~pymovements.Dataset`.
+    """Definition to initialize a :py:class:`~pymovements.dataset.Dataset`.
 
     Attributes
     ----------
@@ -136,7 +136,8 @@ class DatasetDefinition:
 
     resources: dict[str, tuple[dict[str, str], ...]] = field(default_factory=dict)
 
-    experiment: Experiment | None = None
+    experiment: Experiment | None = field(default_factory=Experiment)
+
     extract: dict[str, bool] = field(default_factory=dict)
 
     filename_format: dict[str, str] = field(default_factory=dict)

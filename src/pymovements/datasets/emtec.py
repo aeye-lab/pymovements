@@ -101,8 +101,8 @@ class EMTeC(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.EMTeC` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.EMTeC` definition:
 
     >>> import pymovements as pm
     >>>
@@ -165,14 +165,16 @@ class EMTeC(DatasetDefinition):
         },
     )
 
-    experiment: Experiment = Experiment(
-        screen_width_px=1280,
-        screen_height_px=1024,
-        screen_width_cm=38.2,
-        screen_height_cm=30.2,
-        distance_cm=60,
-        origin='center',
-        sampling_rate=2000,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=1280,
+            screen_height_px=1024,
+            screen_width_cm=38.2,
+            screen_height_cm=30.2,
+            distance_cm=60,
+            origin='center',
+            sampling_rate=2000,
+        ),
     )
 
     filename_format: dict[str, str] = field(

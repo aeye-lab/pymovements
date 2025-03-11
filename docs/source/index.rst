@@ -10,5 +10,6 @@ Welcome to the pymovements documentation!
 
    getting-started
    tutorials/index
+   datasets/index
    reference/index
    bibliography

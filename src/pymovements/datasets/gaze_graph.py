@@ -110,8 +110,8 @@ class GazeGraph(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.GazeGraph` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.GazeGraph` definition:
 
     >>> import pymovements as pm
     >>>
@@ -158,14 +158,16 @@ class GazeGraph(DatasetDefinition):
     )
 
     # no information about the resolution and screen size given. only 34-inch monitor
-    experiment: Experiment = Experiment(
-        screen_width_px=3440,
-        screen_height_px=1440,
-        screen_width_cm=79.375,
-        screen_height_cm=34.0106,
-        distance_cm=50,
-        origin='center',
-        sampling_rate=30,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=3440,
+            screen_height_px=1440,
+            screen_width_cm=79.375,
+            screen_height_cm=34.0106,
+            distance_cm=50,
+            origin='center',
+            sampling_rate=30,
+        ),
     )
 
     extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})

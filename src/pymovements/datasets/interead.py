@@ -105,8 +105,8 @@ class InteRead(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.InteRead` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.InteRead` definition:
 
     >>> import pymovements as pm
     >>>
@@ -169,14 +169,16 @@ class InteRead(DatasetDefinition):
         },
     )
 
-    experiment: Experiment = Experiment(
-        screen_width_px=1920,
-        screen_height_px=1080,
-        screen_width_cm=52.8,
-        screen_height_cm=29.7,
-        distance_cm=57,
-        origin='center',
-        sampling_rate=1200,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=1920,
+            screen_height_px=1080,
+            screen_width_cm=52.8,
+            screen_height_cm=29.7,
+            distance_cm=57,
+            origin='center',
+            sampling_rate=1200,
+        ),
     )
 
     filename_format: dict[str, str] = field(

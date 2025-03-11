@@ -32,8 +32,10 @@ from pymovements.utils.downloads import download_file
 def download_dataset(
         definition: DatasetDefinition,
         paths: DatasetPaths,
+        *,
         extract: bool = True,
         remove_finished: bool = False,
+        resume: bool = False,
         verbose: bool = True,
 ) -> None:
     """Download dataset resources.
@@ -59,6 +61,9 @@ def download_dataset(
         Extract dataset archive files. (default: True)
     remove_finished: bool
         Remove archive files after extraction. (default: False)
+    resume: bool
+        Resume previous extraction by skipping existing files.
+        Checks for correct size of existing files but not integrity. (default: False)
     verbose: bool
         If True, show progress of download and print status messages for integrity checking and
         file extraction. (default: True)
@@ -75,7 +80,7 @@ def download_dataset(
             raise AttributeError('number of mirrors must not be zero to download dataset')
 
         if len(definition.resources['gaze']) == 0:
-            raise AttributeError('number of gaze_resources must not be zero to download dataset')
+            raise AttributeError('number of `gaze` resources must not be zero to download dataset')
 
         paths.raw.mkdir(parents=True, exist_ok=True)
 
@@ -119,7 +124,7 @@ def download_dataset(
 
         if len(definition.resources['precomputed_events']) == 0:
             raise AttributeError(
-                'number of precomputed_event_resources must not be zero to download dataset',
+                'number of `precomputed_events` resources must not be zero to download dataset',
             )
 
         paths.precomputed_events.mkdir(parents=True, exist_ok=True)
@@ -160,12 +165,13 @@ def download_dataset(
     if definition.has_files['precomputed_reading_measures']:
         if len(definition.mirrors['precomputed_reading_measures']) == 0:
             raise AttributeError(
-                'number of precomputed mirrors must not be zero to download dataset',
+                'number of `precomputed_reading_measures` mirrors must in datasets definition'
+                'not be zero to download dataset',
             )
 
         if len(definition.resources['precomputed_reading_measures']) == 0:
             raise AttributeError(
-                'number of precomputed_reading_measures resources '
+                'number of `precomputed_reading_measures` resources in datasets definition'
                 'must not be zero to download dataset',
             )
 
@@ -209,6 +215,7 @@ def download_dataset(
             definition=definition,
             paths=paths,
             remove_finished=remove_finished,
+            resume=resume,
             verbose=verbose,
         )
 
@@ -216,8 +223,10 @@ def download_dataset(
 def extract_dataset(
         definition: DatasetDefinition,
         paths: DatasetPaths,
+        *,
         remove_finished: bool = False,
         remove_top_level: bool = True,
+        resume: bool = False,
         verbose: int = 1,
 ) -> None:
     """Extract downloaded dataset archive files.
@@ -232,6 +241,9 @@ def extract_dataset(
         Remove archive files after extraction. (default: False)
     remove_top_level: bool
         If ``True``, remove the top-level directory if it has only one child. (default: True)
+    resume: bool
+        Resume previous extraction by skipping existing files.
+        Checks for correct size of existing files but not integrity. (default: False)
     verbose: int
         Verbosity levels: (1) Print messages for extracting each dataset resource without printing
         messages for recursive archives. (2) Print messages for extracting each dataset resource and
@@ -249,6 +261,7 @@ def extract_dataset(
                 recursive=True,
                 remove_finished=remove_finished,
                 remove_top_level=remove_top_level,
+                resume=resume,
                 verbose=verbose,
             )
 
@@ -265,6 +278,7 @@ def extract_dataset(
                     recursive=True,
                     remove_finished=remove_finished,
                     remove_top_level=remove_top_level,
+                    resume=resume,
                     verbose=verbose,
                 )
             else:
@@ -283,6 +297,7 @@ def extract_dataset(
                     recursive=True,
                     remove_finished=remove_finished,
                     remove_top_level=remove_top_level,
+                    resume=resume,
                     verbose=verbose,
                 )
             else:

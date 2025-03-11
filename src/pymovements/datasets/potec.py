@@ -34,7 +34,7 @@ from pymovements.gaze.experiment import Experiment
 @dataclass
 @register_dataset
 class PoTeC(DatasetDefinition):
-    """PoTeC dataset :cite:p:`potec`.
+    """PoTeC dataset :cite:p:`PoTeC`.
 
     The Potsdam Textbook Corpus (PoTeC) is a naturalistic eye-tracking-while-reading
     corpus containing data from 75 participants reading 12 scientific texts.
@@ -113,8 +113,8 @@ class PoTeC(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.PoTeC` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.PoTeC` definition:
 
     >>> import pymovements as pm
     >>>
@@ -162,14 +162,16 @@ class PoTeC(DatasetDefinition):
 
     extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
-    experiment: Experiment = Experiment(
-        screen_width_px=1680,
-        screen_height_px=1050,
-        screen_width_cm=47.5,
-        screen_height_cm=30,
-        distance_cm=65,
-        origin='upper left',
-        sampling_rate=1000,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=1680,
+            screen_height_px=1050,
+            screen_width_cm=47.5,
+            screen_height_cm=30,
+            distance_cm=65,
+            origin='upper left',
+            sampling_rate=1000,
+        ),
     )
 
     filename_format: dict[str, str] = field(

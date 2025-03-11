@@ -25,23 +25,25 @@
    :toctree:
    :template: class.rst
 
-    pymovements.datasets.BSC
-    pymovements.datasets.BSCII
-    pymovements.datasets.CodeComprehension
-    pymovements.datasets.CopCo
-    pymovements.datasets.DIDEC
-    pymovements.datasets.EMTeC
-    pymovements.datasets.GazeBase
-    pymovements.datasets.GazeBaseVR
-    pymovements.datasets.GazeGraph
-    pymovements.datasets.GazeOnFaces
-    pymovements.datasets.HBN
-    pymovements.datasets.InteRead
-    pymovements.datasets.JuDo1000
-    pymovements.datasets.PoTeC
-    pymovements.datasets.Provo
-    pymovements.datasets.SBSAT
-    pymovements.datasets.UCL
+    BSC
+    BSCII
+    CodeComprehension
+    CopCo
+    DAEMONS
+    DIDEC
+    EMTeC
+    FakeNewsPerception
+    GazeBase
+    GazeBaseVR
+    GazeGraph
+    GazeOnFaces
+    HBN
+    InteRead
+    JuDo1000
+    PoTeC
+    Provo
+    SBSAT
+    UCL
 
 
 .. rubric:: Example Datasets
@@ -50,13 +52,14 @@
    :toctree:
    :template: class.rst
 
-    pymovements.datasets.ToyDataset
-    pymovements.datasets.ToyDatasetEyeLink
+    ToyDataset
+    ToyDatasetEyeLink
 """
 from pymovements.datasets.bsc import BSC
 from pymovements.datasets.bsc2 import BSCII
 from pymovements.datasets.codecomprehension import CodeComprehension
 from pymovements.datasets.copco import CopCo
+from pymovements.datasets.daemons import DAEMONS
 from pymovements.datasets.didec import DIDEC
 from pymovements.datasets.emtec import EMTeC
 from pymovements.datasets.fakenews import FakeNewsPerception
@@ -80,6 +83,7 @@ __all__ = [
     'BSCII',
     'CodeComprehension',
     'CopCo',
+    'DAEMONS',
     'DIDEC',
     'EMTeC',
     'FakeNewsPerception',

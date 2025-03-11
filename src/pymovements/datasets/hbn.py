@@ -107,8 +107,8 @@ class HBN(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.HBN` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.HBN` definition:
 
     >>> import pymovements as pm
     >>>
@@ -157,14 +157,16 @@ class HBN(DatasetDefinition):
 
     extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
-    experiment: Experiment = Experiment(
-        screen_width_px=800,
-        screen_height_px=600,
-        screen_width_cm=33.8,
-        screen_height_cm=27.0,
-        distance_cm=63.5,
-        origin='center',
-        sampling_rate=120,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=800,
+            screen_height_px=600,
+            screen_width_cm=33.8,
+            screen_height_cm=27.0,
+            distance_cm=63.5,
+            origin='center',
+            sampling_rate=120,
+        ),
     )
 
     filename_format: dict[str, str] = field(

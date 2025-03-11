@@ -29,6 +29,7 @@ from typing import Any
 
 import numpy as np
 import polars as pl
+from tqdm import tqdm
 
 import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.gaze import transforms
@@ -144,9 +145,9 @@ class GazeDataFrame:
     │ 1002 ┆ [0.3, 0.3] │
     └──────┴────────────┘
 
-    In case your data has no time column available, you can pass an :py:class:``Experiment`` to
-    create a time column with the correct sampling rate during initialization. The time column will
-    be represented in millisecond units.
+    In case your data has no time column available, you can pass an
+    :py:class:`~pymovements.gaze.Experiment` to create a time column with the correct sampling rate
+    during initialization. The time column will be represented in millisecond units.
 
     >>> df_no_time = df.select(pl.exclude('t'))
     >>> df_no_time
@@ -164,8 +165,9 @@ class GazeDataFrame:
     >>> experiment = Experiment(1024, 768, 38, 30, 60, 'center', sampling_rate=100)
     >>> gaze = GazeDataFrame(data=df_no_time, experiment=experiment, pixel_columns=['x', 'y'])
     >>> gaze
-    Experiment(sampling_rate=100, screen=Screen(width_px=1024, height_px=768, width_cm=38,
-    height_cm=30, distance_cm=60, origin=center), eyetracker=None)
+    Experiment(screen=Screen(width_px=1024, height_px=768, width_cm=38, height_cm=30,
+     distance_cm=60, origin='center'), eyetracker=EyeTracker(sampling_rate=100, left=None,
+      right=None, model=None, version=None, vendor=None, mount=None))
     shape: (3, 2)
     ┌──────┬────────────┐
     │ time ┆ pixel      │
@@ -1056,14 +1058,12 @@ class GazeDataFrame:
         else:
             raise ValueError('neither position nor pixel in gaze dataframe, one needed for mapping')
 
-        self.frame = self.frame.with_columns(
-            area_of_interest=pl.Series(
-                get_aoi(
-                    aoi_dataframe, row, x_eye, y_eye,
-                )
-                for row in self.frame.iter_rows(named=True)
-            ),
-        )
+        aois = [
+            get_aoi(aoi_dataframe, row, x_eye, y_eye)
+            for row in tqdm(self.frame.iter_rows(named=True))
+        ]
+        aoi_df = pl.concat(aois)
+        self.frame = pl.concat([self.frame, aoi_df], how='horizontal')
 
     def nest(
             self,

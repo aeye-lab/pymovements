@@ -107,8 +107,8 @@ class CopCo(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.CopCo` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.CopCo` definition:
 
     >>> import pymovements as pm
     >>>
@@ -170,14 +170,16 @@ class CopCo(DatasetDefinition):
         },
     )
 
-    experiment: Experiment = Experiment(
-        screen_width_px=1920,
-        screen_height_px=1080,
-        screen_width_cm=59.,
-        screen_height_cm=33.5,
-        distance_cm=85,
-        origin='center',
-        sampling_rate=1000,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=1920,
+            screen_height_px=1080,
+            screen_width_cm=59.,
+            screen_height_cm=33.5,
+            distance_cm=85,
+            origin='center',
+            sampling_rate=1000,
+        ),
     )
 
     extract: dict[str, bool] = field(
