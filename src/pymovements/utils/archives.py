@@ -152,7 +152,7 @@ def extract_archive(
 def _extract_tar(
         source_path: Path,
         destination_path: Path,
-        compression: str | None,
+        compression: Literal['.gz', '.bz2', '.xz'] | None,
         *,
         resume: bool,
         verbose: int,
