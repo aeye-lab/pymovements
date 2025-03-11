@@ -31,6 +31,7 @@ import zipfile
 from collections.abc import Callable
 from pathlib import Path
 from typing import IO
+from typing import Literal
 
 from tqdm import tqdm
 
@@ -171,7 +172,7 @@ def _extract_tar(
     verbose: int
         Print messages for resuming each dataset resource.
     """
-    mode = f'r:{compression[1:]}' if compression else 'r'
+    mode: Literal['r', 'r:gz', 'r:bz2', 'r:xz'] = f'r:{compression[1:]}' if compression else 'r'
 
     # make sure mode string is Literal['r', 'r:gz', 'r:bz2', 'r:xz']
     # or else mypy complains: https://github.com/python/typeshed/pull/12181
