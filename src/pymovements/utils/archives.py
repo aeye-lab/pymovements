@@ -175,7 +175,7 @@ def _extract_tar(
 
     # make sure mode string is Literal['r', 'r:gz', 'r:bz2', 'r:xz']
     # or else mypy complains: https://github.com/python/typeshed/pull/12181
-    assert compression[1:] in {'r', 'r:gz', 'r:bz2', 'r:xz'}
+    assert mode in {'r', 'r:gz', 'r:bz2', 'r:xz'}
 
     with tarfile.open(source_path, mode) as archive:
         for member in tqdm(archive.getmembers()):
