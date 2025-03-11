@@ -31,7 +31,6 @@ import zipfile
 from collections.abc import Callable
 from pathlib import Path
 from typing import IO
-from typing import Literal
 
 from tqdm import tqdm
 
@@ -152,7 +151,7 @@ def extract_archive(
 def _extract_tar(
         source_path: Path,
         destination_path: Path,
-        compression: Literal['.gz', '.bz2', '.xz'] | None,
+        compression: str | None,
         *,
         resume: bool,
         verbose: int,
@@ -172,13 +171,10 @@ def _extract_tar(
     verbose: int
         Print messages for resuming each dataset resource.
     """
-    mode: Literal['r', 'r:gz', 'r:bz2', 'r:xz'] = f'r:{compression[1:]}' if compression else 'r'
+    mode = f'r:{compression[1:]}' if compression else 'r'
 
-    # make sure mode string is Literal['r', 'r:gz', 'r:bz2', 'r:xz']
-    # or else mypy complains: https://github.com/python/typeshed/pull/12181
-    assert mode in {'r', 'r:gz', 'r:bz2', 'r:xz'}
-
-    with tarfile.open(source_path, mode) as archive:
+    # ignore mypy error for now, see issue #1020
+    with tarfile.open(source_path, mode) as archive:  # type: ignore[call-overload]
         for member in tqdm(archive.getmembers()):
             if resume:
                 member_dest_path = os.path.join(destination_path, member.name)
