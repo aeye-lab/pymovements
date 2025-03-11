@@ -171,7 +171,13 @@ def _extract_tar(
     verbose: int
         Print messages for resuming each dataset resource.
     """
-    with tarfile.open(source_path, f'r:{compression[1:]}' if compression else 'r') as archive:
+    mode = f'r:{compression[1:]}' if compression else 'r'
+
+    # make sure mode string is Literal['r', 'r:gz', 'r:bz2', 'r:xz']
+    # or else mypy complains: https://github.com/python/typeshed/pull/12181
+    assert compression[1:] in ['r', 'r:gz', 'r:bz2', 'r:xz']
+
+    with tarfile.open(source_path, mode) as archive:
         for member in tqdm(archive.getmembers()):
             if resume:
                 member_dest_path = os.path.join(destination_path, member.name)
