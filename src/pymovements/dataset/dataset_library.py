@@ -63,6 +63,17 @@ class DatasetLibrary:
         """
         return cls.definitions[name]
 
+    @classmethod
+    def list(cls) -> list[str]:
+        """Get list of names of all added datasets in library.
+
+        Returns
+        -------
+        list[str]
+            List of dataset names that are included in the dataset library.
+        """
+        return list(cls.definitions.keys())
+
 
 DatsetDefinitionClass = TypeVar('DatsetDefinitionClass', bound=type[DatasetDefinition])
 
