@@ -21,7 +21,7 @@
 import pymovements as pm
 
 
-def test_add_single_defintion():
+def test_add_single_definition():
     class CustomDatasetDefinition(pm.DatasetDefinition):
         name: str = 'CustomDatasetDefinition'
 
@@ -31,7 +31,7 @@ def test_add_single_defintion():
     assert definition == CustomDatasetDefinition
 
 
-def test_add_two_defintions():
+def test_add_two_definitions():
     class CustomDatasetDefinition1(pm.DatasetDefinition):
         name: str = 'CustomDatasetDefinition1'
 
@@ -46,3 +46,25 @@ def test_add_two_defintions():
 
     assert definition1 == CustomDatasetDefinition1
     assert definition2 == CustomDatasetDefinition2
+
+
+def test_library_not_empty():
+    assert len(pm.DatasetLibrary.definitions) >= 0
+
+
+def test_list_names_is_list_of_str():
+    names = pm.DatasetLibrary.list()
+
+    assert isinstance(names, list)
+
+    for name in names:
+        assert isinstance(name, str)
+
+
+def test_returned_definition_is_copy():
+    name = list(pm.DatasetLibrary.definitions.keys())[0]
+
+    internal_definition = pm.DatasetLibrary.definitions[name]
+    output_definition = pm.DatasetLibrary.get(name)
+
+    assert internal_definition is not output_definition

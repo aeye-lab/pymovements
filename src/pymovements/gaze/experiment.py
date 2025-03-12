@@ -200,8 +200,6 @@ class Experiment:
 
     def __eq__(self: Experiment, other: Experiment) -> bool:
         """Compare equality to other Experiment."""
-        print(self.screen, other.screen, self.screen == other.screen)
-        print(self.eyetracker, other.eyetracker, self.eyetracker == other.eyetracker)
         return self.screen == other.screen and self.eyetracker == other.eyetracker
 
     def __str__(self: Experiment) -> str:
