@@ -72,7 +72,7 @@ class DatasetLibrary:
         list[str]
             List of dataset names that are included in the dataset library.
         """
-        return list(cls.definitions.keys())
+        return sorted(list(cls.definitions.keys()))
 
 
 DatsetDefinitionClass = TypeVar('DatsetDefinitionClass', bound=type[DatasetDefinition])
