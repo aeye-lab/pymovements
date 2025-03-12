@@ -20,6 +20,7 @@
 """DatasetLibrary module."""
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import TypeVar
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
@@ -49,7 +50,7 @@ class DatasetLibrary:
 
     @classmethod
     def get(cls, name: str) -> type[DatasetDefinition]:
-        """Get :py:class:`~pymovements.dataset.DatasetDefinition` py name.
+        """Get copy of :py:class:`~pymovements.dataset.DatasetDefinition` py name.
 
         Parameters
         ----------
@@ -61,7 +62,7 @@ class DatasetLibrary:
         type[DatasetDefinition]
             The :py:class:`~pymovements.dataset.DatasetDefinition` in the library.
         """
-        return cls.definitions[name]
+        return deepcopy(cls.definitions[name])
 
     @classmethod
     def list(cls) -> list[str]:
