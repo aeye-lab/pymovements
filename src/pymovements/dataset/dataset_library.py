@@ -20,6 +20,8 @@
 """DatasetLibrary module."""
 from __future__ import annotations
 
+from collections.abc import Callable
+from typing import Any
 from typing import TypeVar
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
@@ -27,12 +29,14 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 
 class classproperty:
     """Decorator for combining classmethod and property."""
-    def __init__(self, func):
+
+    def __init__(self, property_getter: Callable):
         """Initialize property method."""
-        self.fget = func
-    def __get__(self, instance, owner):
+        self.property_getter = property_getter
+
+    def __get__(self, instance: None, owner: type[object]) -> Any:
         """Property getter."""
-        return self.fget(owner)
+        return self.property_getter(owner)
 
 
 class DatasetLibrary:
