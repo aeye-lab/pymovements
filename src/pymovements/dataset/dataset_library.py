@@ -30,11 +30,12 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 class classproperty(property):
     """Decorator for combining classmethod and property."""
 
-    def __init__(self, getter: Callable):
+    def __init__(self, getter: Callable[[Any], Any] | None):
         self.fget = getter
 
-    def __get__(self, owner_self: None, owner_cls: type[object]) -> Any:
+    def __get__(self, owner_self: object, owner_cls: type[object]) -> Any:
         """Property getter."""
+        assert self.fget is not None
         return self.fget(owner_cls)
 
 
@@ -76,8 +77,9 @@ class DatasetLibrary:
         """
         return cls.definitions[name]
 
+    @classmethod
     @classproperty
-    def names(cls) -> list[str]:
+    def names(cls) -> list[str]:  # pylint: disable=no-self-argument
         """Get list of names of all added datasets that are included in the library.
 
         Returns
