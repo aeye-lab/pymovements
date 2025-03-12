@@ -27,15 +27,12 @@ from typing import TypeVar
 from pymovements.dataset.dataset_definition import DatasetDefinition
 
 
-class classproperty:
+class classproperty(property):
     """Decorator for combining classmethod and property."""
 
-    def __init__(self, property_getter: Callable):
-        self.property_getter = property_getter
-
-    def __get__(self, instance: None, owner: type[object]) -> Any:
+    def __get__(self, owner_self: None, owner_cls: type[object]) -> Any:
         """Property getter."""
-        return self.property_getter(owner)
+        return self.fget(owner_cls)
 
 
 class DatasetLibrary:
