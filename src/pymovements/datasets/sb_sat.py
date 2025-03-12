@@ -166,14 +166,16 @@ class SBSAT(DatasetDefinition):
         },
     )
 
-    experiment: Experiment = Experiment(
-        screen_width_px=1024,
-        screen_height_px=768,
-        screen_width_cm=44.5,
-        screen_height_cm=42.4,
-        distance_cm=70,
-        origin='center',
-        sampling_rate=1000,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=1024,
+            screen_height_px=768,
+            screen_width_cm=44.5,
+            screen_height_cm=42.4,
+            distance_cm=70,
+            origin='center',
+            sampling_rate=1000,
+        ),
     )
 
     filename_format: dict[str, str] = field(

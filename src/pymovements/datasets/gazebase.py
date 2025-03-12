@@ -154,14 +154,16 @@ class GazeBase(DatasetDefinition):
 
     extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
-    experiment: Experiment = Experiment(
-        screen_width_px=1680,
-        screen_height_px=1050,
-        screen_width_cm=47.4,
-        screen_height_cm=29.7,
-        distance_cm=55,
-        origin='upper left',
-        sampling_rate=1000,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=1680,
+            screen_height_px=1050,
+            screen_width_cm=47.4,
+            screen_height_cm=29.7,
+            distance_cm=55,
+            origin='upper left',
+            sampling_rate=1000,
+        ),
     )
 
     filename_format: dict[str, str] = field(

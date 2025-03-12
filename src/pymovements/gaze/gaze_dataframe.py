@@ -165,8 +165,9 @@ class GazeDataFrame:
     >>> experiment = Experiment(1024, 768, 38, 30, 60, 'center', sampling_rate=100)
     >>> gaze = GazeDataFrame(data=df_no_time, experiment=experiment, pixel_columns=['x', 'y'])
     >>> gaze
-    Experiment(sampling_rate=100, screen=Screen(width_px=1024, height_px=768, width_cm=38,
-    height_cm=30, distance_cm=60, origin=center), eyetracker=None)
+    Experiment(screen=Screen(width_px=1024, height_px=768, width_cm=38, height_cm=30,
+     distance_cm=60, origin='center'), eyetracker=EyeTracker(sampling_rate=100, left=None,
+      right=None, model=None, version=None, vendor=None, mount=None))
     shape: (3, 2)
     ┌──────┬────────────┐
     │ time ┆ pixel      │

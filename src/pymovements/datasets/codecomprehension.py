@@ -127,7 +127,7 @@ class CodeComprehension(DatasetDefinition):
     )
 
     extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': True})
-
+    
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
             'precomputed_events': r'fix_report_P{subject_id:s}.txt',
