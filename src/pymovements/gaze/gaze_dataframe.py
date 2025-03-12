@@ -226,7 +226,7 @@ class GazeDataFrame:
                 time_unit = 'step'
 
         # If no time_unit specified, assume milliseconds.
-        if time_unit is None:
+        if self.frame is not None and time_unit is None:
             time_unit = 'ms'
 
         if time_column is not None:
