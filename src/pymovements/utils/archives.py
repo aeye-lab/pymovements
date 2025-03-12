@@ -171,7 +171,10 @@ def _extract_tar(
     verbose: int
         Print messages for resuming each dataset resource.
     """
-    with tarfile.open(source_path, f'r:{compression[1:]}' if compression else 'r') as archive:
+    mode = f'r:{compression[1:]}' if compression else 'r'
+
+    # ignore mypy error for now, see issue #1020
+    with tarfile.open(source_path, mode) as archive:  # type: ignore[call-overload]
         for member in tqdm(archive.getmembers()):
             if resume:
                 member_dest_path = os.path.join(destination_path, member.name)
