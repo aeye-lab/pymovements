@@ -79,7 +79,7 @@ class DatasetLibrary:
 
     @classmethod
     @classproperty
-    def names(cls) -> list[str]:  # pylint: disable=no-self-argument
+    def names(cls) -> list[str]:
         """Get list of names of all added datasets that are included in the library.
 
         Returns
