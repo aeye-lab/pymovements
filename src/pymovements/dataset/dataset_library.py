@@ -64,8 +64,8 @@ class DatasetLibrary:
         return cls.definitions[name]
 
     @classmethod
-    def list(cls) -> list[str]:
-        """Get list of names of all added datasets in library.
+    def names(cls) -> list[str]:
+        """Get list of names of all added datasets that are included in the library.
 
         Returns
         -------
