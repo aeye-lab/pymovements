@@ -31,7 +31,6 @@ class classproperty:
     """Decorator for combining classmethod and property."""
 
     def __init__(self, property_getter: Callable):
-        """Initialize property method."""
         self.property_getter = property_getter
 
     def __get__(self, instance: None, owner: type[object]) -> Any:
