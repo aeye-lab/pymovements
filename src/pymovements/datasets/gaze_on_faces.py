@@ -159,14 +159,16 @@ class GazeOnFaces(DatasetDefinition):
 
     extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
-    experiment: Experiment = Experiment(
-        screen_width_px=1280,
-        screen_height_px=1024,
-        screen_width_cm=38,
-        screen_height_cm=30,
-        distance_cm=57,
-        origin='center',
-        sampling_rate=60,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=1280,
+            screen_height_px=1024,
+            screen_width_cm=38,
+            screen_height_cm=30,
+            distance_cm=57,
+            origin='center',
+            sampling_rate=60,
+        ),
     )
 
     filename_format: dict[str, str] = field(
