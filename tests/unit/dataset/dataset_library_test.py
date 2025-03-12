@@ -79,7 +79,7 @@ def test_dataset_library_contains_all_public_datasets_files():
             dataset_file = yaml.safe_load(f)
         dataset_name = dataset_file['name']
         assert dataset_name in library, f'please add {dataset_file} to `datasets.yaml`'\
-        ' or run `write_dataset_definitions_yaml`.'
+            ' or run `write_dataset_definitions_yaml`.'
 
 
 def test__add_shipped_datasets():

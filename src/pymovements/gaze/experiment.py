@@ -22,6 +22,7 @@ from __future__ import annotations
 
 from dataclasses import asdict
 from typing import Any
+
 import numpy as np
 
 from pymovements.gaze import transforms_numpy
@@ -226,7 +227,7 @@ class Experiment:
         if self.eyetracker is not None:
             _dict['eyetracker'] = asdict(self.eyetracker)
         return _dict
-    
+
     def __str__(self: Experiment) -> str:
         """Return Experiment string."""
         return f'{type(self).__name__}(screen={self.screen}, eyetracker={self.eyetracker})'
