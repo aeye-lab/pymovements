@@ -25,6 +25,16 @@ from typing import TypeVar
 from pymovements.dataset.dataset_definition import DatasetDefinition
 
 
+class classproperty:
+    """Decorator for combining classmethod and property."""
+    def __init__(self, func):
+        """Initialize property method."""
+        self.fget = func
+    def __get__(self, instance, owner):
+        """Property getter."""
+        return self.fget(owner)
+
+
 class DatasetLibrary:
     """Provides access by name to :py:class:`~pymovements.dataset.DatasetDefinition`.
 
@@ -63,7 +73,7 @@ class DatasetLibrary:
         """
         return cls.definitions[name]
 
-    @classmethod
+    @classproperty
     def names(cls) -> list[str]:
         """Get list of names of all added datasets that are included in the library.
 

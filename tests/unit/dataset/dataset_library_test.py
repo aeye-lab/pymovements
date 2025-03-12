@@ -53,7 +53,7 @@ def test_library_not_empty():
 
 
 def test_list_names_is_list_of_str():
-    names = pm.DatasetLibrary.names()
+    names = pm.DatasetLibrary.names
 
     assert isinstance(names, list)
 
