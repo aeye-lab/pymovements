@@ -44,7 +44,7 @@ def extract_archive(
         recursive: bool = True,
         remove_finished: bool = False,
         remove_top_level: bool = True,
-        resume: bool = False,
+        resume: bool = True,
         verbose: int = 1,
 ) -> Path:
     """Extract an archive.
