@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Tests deprecated utils.parsing."""
+"""Tests deprecated utils.archives."""
 import gzip
 import re
 
@@ -64,6 +64,6 @@ def test_archive_extract_removed(compressed_file):
     remove_version = regex.match(msg).groupdict()['version']
     current_version = __version__.split('+')[0]
     assert current_version < remove_version, (
-        f'utils/archivbes.py was planned to be removed in v{remove_version}. '
+        f'utils/archives.py was planned to be removed in v{remove_version}. '
         f'Current version is v{current_version}.'
     )

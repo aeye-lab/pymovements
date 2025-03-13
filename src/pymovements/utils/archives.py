@@ -34,7 +34,7 @@ from pymovements.dataset._utils._archives import extract_archive as _extract_arc
 
 @deprecated(
     reason='Please use Dataset.extract() instead. '
-           'This module will be removed in v0.26.0.',
+           'This function will be removed in v0.26.0.',
     version='v0.21.0',
 )
 def extract_archive(
