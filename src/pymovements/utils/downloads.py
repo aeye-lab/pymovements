@@ -29,7 +29,8 @@ from pathlib import Path
 
 from deprecated.sphinx import deprecated
 
-from pymovements.dataset._utils._downloads import download_and_extract_archive as _download_and_extract_archive
+from pymovements.dataset._utils._downloads import download_and_extract_archive \
+    as _download_and_extract_archive
 from pymovements.dataset._utils._downloads import download_file as _download_file
 
 
@@ -85,15 +86,15 @@ def download_and_extract_archive(
         specified MD5 checksum which doesn't match the checksum of the downloaded file.
     """
     return _download_and_extract_archive(
-            url=url,
-            download_dirpath=download_dirpath,
-            download_filename=download_filename,
-            extract_dirpath=extract_dirpath,
-            md5=md5,
-            recursive=recursive,
-            remove_finished=remove_finished,
-            remove_top_level=remove_top_level,
-            verbose=verbose,
+        url=url,
+        download_dirpath=download_dirpath,
+        download_filename=download_filename,
+        extract_dirpath=extract_dirpath,
+        md5=md5,
+        recursive=recursive,
+        remove_finished=remove_finished,
+        remove_top_level=remove_top_level,
+        verbose=verbose,
     )
 
 
