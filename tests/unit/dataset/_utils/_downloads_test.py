@@ -86,7 +86,7 @@ def test_download_file_https_failure(tmp_path, verbose):
     md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
 
     with mock.patch(
-        'pymovements.utils.downloads._download_url',
+        'pymovements.dataset._utils._downloads._download_url',
         side_effect=OSError(),
     ):
         with pytest.raises(OSError):
@@ -99,7 +99,7 @@ def test_download_file_http_failure(tmp_path):
     md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
 
     with mock.patch(
-        'pymovements.utils.downloads._download_url',
+        'pymovements.dataset._utils._downloads._download_url',
         side_effect=OSError(),
     ):
         with pytest.raises(OSError):
