@@ -24,10 +24,10 @@ from unittest import mock
 
 import pytest
 
-from pymovements.utils.downloads import _DownloadProgressBar
-from pymovements.utils.downloads import _get_redirected_url
-from pymovements.utils.downloads import download_and_extract_archive
-from pymovements.utils.downloads import download_file
+from pymovements.dataset._utils._downloads import _DownloadProgressBar
+from pymovements.dataset._utils._downloads import _get_redirected_url
+from pymovements.dataset._utils._downloads import download_and_extract_archive
+from pymovements.dataset._utils._downloads import download_file
 
 
 @pytest.mark.parametrize(
