@@ -33,7 +33,7 @@ from pymovements.events._utils._filters import filter_candidates_remove_nans \
 
 
 @deprecated(
-    reason='This module will be removed in v0.26.0.',
+    reason='This function will be removed in v0.26.0.',
     version='v0.21.0',
 )
 def filter_candidates_remove_nans(
@@ -67,7 +67,7 @@ def filter_candidates_remove_nans(
 
 
 @deprecated(
-    reason='This module will be removed in v0.26.0.',
+    reason='This function will be removed in v0.26.0.',
     version='v0.21.0',
 )
 def events_split_nans(
