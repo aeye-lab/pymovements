@@ -36,7 +36,7 @@ from pymovements.dataset._utils._downloads import download_file as _download_fil
 
 @deprecated(
     reason='Please use Dataset.download() instead. '
-           'This module will be removed in v0.26.0.',
+           'This function will be removed in v0.26.0.',
     version='v0.21.0',
 )
 def download_and_extract_archive(
@@ -100,7 +100,7 @@ def download_and_extract_archive(
 
 @deprecated(
     reason='Please use Dataset.download() instead. '
-           'This module will be removed in v0.26.0.',
+           'This function will be removed in v0.26.0.',
     version='v0.21.0',
 )
 def download_file(
