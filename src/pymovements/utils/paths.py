@@ -34,7 +34,7 @@ from pymovements._utils._paths import match_filepaths as _match_filepaths
 
 
 @deprecated(
-    reason='This module will be removed in v0.26.0.',
+    reason='This function will be removed in v0.26.0.',
     version='v0.21.0',
 )
 def get_filepaths(
@@ -75,7 +75,7 @@ def get_filepaths(
 
 
 @deprecated(
-    reason='This module will be removed in v0.26.0.',
+    reason='This function will be removed in v0.26.0.',
     version='v0.21.0',
 )
 def match_filepaths(
