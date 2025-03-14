@@ -53,14 +53,12 @@ from pymovements import DatasetLibrary
     ],
 )
 def test_public_dataset_registered(dataset, dataset_name):
-    assert dataset_name in DatasetLibrary.available_datasets()
+    assert dataset_name in DatasetLibrary.names()
     dataset_from_library = DatasetLibrary.get(dataset_name).__dict__
     python_dataset = dataset().__dict__
     assert dataset_from_library == python_dataset
 
 
-# merge with test above
-@pytest.mark.xfail(reason='#919')
 @pytest.mark.parametrize(
     ('dataset', 'dataset_name'),
     # please add datasets in alphabetical order
