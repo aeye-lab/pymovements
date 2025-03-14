@@ -34,7 +34,7 @@ from pymovements.gaze.experiment import Experiment
 @dataclass
 @register_dataset
 class PotsdamBingeRemotePVT(DatasetDefinition):
-    """PotsdamBingeRemotePVT dataset :cite:p:`PotsdamBingeRemotePVT`.
+    """PotsdamBingeRemotePVT dataset :cite:p:`PotsdamBingePVT`.
 
     This dataset includes binocular eye tracking data from 150 participants in four sessions with an
     interval of at least one week between two sessions. Eye movements are recorded at a sampling

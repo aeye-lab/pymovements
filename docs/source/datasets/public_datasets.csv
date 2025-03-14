@@ -15,6 +15,8 @@ Dataset,Citation,Samples,Events,Reading Measures
 :py:class:`~pymovements.datasets.InteRead`,:cite:p:`InteRead`,X,,
 :py:class:`~pymovements.datasets.JuDo1000`,:cite:p:`JuDo1000`,X,,
 :py:class:`~pymovements.datasets.PoTeC`,:cite:p:`PoTeC`,X,,
+:py:class:`~pymovements.datasets.PotsdamBingeRemotePVT`,:cite:p:`PotsdamBingePVT`,X,,
+:py:class:`~pymovements.datasets.PotsdamBingeWearablePVT`,:cite:p:`PotsdamBingePVT`,X,,
 :py:class:`~pymovements.datasets.Provo`,:cite:p:`Provo`,X,,
 :py:class:`~pymovements.datasets.SBSAT`,:cite:p:`SB-SAT`,X,,
 :py:class:`~pymovements.datasets.UCL`,:cite:p:`UCL`,X,,
