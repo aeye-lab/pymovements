@@ -99,14 +99,16 @@ class FakeNewsPerception(DatasetDefinition):
         },
     )
 
-    experiment: Experiment = Experiment(
-        screen_width_px=1920,
-        screen_height_px=1080,
-        screen_width_cm=52.7,
-        screen_height_cm=29.6,
-        distance_cm=None,
-        origin=None,
-        sampling_rate=600,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=1920,
+            screen_height_px=1080,
+            screen_width_cm=52.7,
+            screen_height_cm=29.6,
+            distance_cm=None,
+            origin=None,
+            sampling_rate=600,
+        ),
     )
 
     extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': True})

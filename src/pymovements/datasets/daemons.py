@@ -25,7 +25,6 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
@@ -66,9 +65,6 @@ class DAEMONS(DatasetDefinition):
 
     extract: dict[str, bool]
         Decide whether to extract the data.
-
-    experiment: Experiment
-        The experiment definition.
 
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
@@ -136,11 +132,6 @@ class DAEMONS(DatasetDefinition):
         default_factory=lambda: {
             'precomputed_events': True,
         },
-    )
-
-    experiment: Experiment = Experiment(
-        screen_width_px=None, screen_height_px=None, screen_width_cm=None,
-        screen_height_cm=None, distance_cm=None, origin=None, sampling_rate=1,
     )
 
     filename_format: dict[str, str] = field(
