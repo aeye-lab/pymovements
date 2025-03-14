@@ -1983,6 +1983,16 @@ def test_load_split_precomputed_events(precomputed_dataset_configuration, by, ex
     assert len(dataset.precomputed_events) == expected_len
 
 
+def test_dataset_definition_from_yaml(tmp_path):
+    tmp_file = tmp_path / 'tmp.yaml'
+
+    dataset_def = pm.DatasetLibrary.get('ToyDataset')
+    dataset_def.to_yaml(tmp_file)
+
+    dataset_from_yaml = pm.Dataset(tmp_file, '.')
+    assert dataset_from_yaml.definition == dataset_def
+
+
 @pytest.mark.parametrize(
     ('by', 'expected_len'),
     [
