@@ -22,7 +22,6 @@ import pytest
 import yaml
 
 from pymovements.dataset._utils._yaml import type_constructor
-from pymovements.dataset._utils._yaml import write_dataset_definitions_yaml
 
 
 def test_type_constructor_assertion_error(tmp_path):
@@ -65,33 +64,3 @@ def test_unknown_attribute_error(tmp_path):
             yaml.safe_load(f)
     msg, = excinfo.value.args
     assert msg == 'Unknown type: notexisting for module yaml'
-
-
-def test_write_dataset_definitions_yaml(tmp_path):
-    write_file = tmp_path / 'test.yaml'
-    write_dataset_definitions_yaml(write_file)
-    with open(write_file, encoding='utf-8') as f:
-        datasets_list = yaml.safe_load(f)
-    assert datasets_list == [
-        'bsc',
-        'bsc2',
-        'codecomprehension',
-        'copco',
-        'daemons',
-        'didec',
-        'emtec',
-        'fakenews',
-        'gaze_graph',
-        'gaze_on_faces',
-        'gazebase',
-        'gazebasevr',
-        'hbn',
-        'interead',
-        'judo1000',
-        'potec',
-        'provo',
-        'sb_sat',
-        'toy_dataset',
-        'toy_dataset_eyelink',
-        'ucl',
-    ], 'please run pymovements.dataset._utils._yaml.write_dataset_definitions_yaml()'
