@@ -20,6 +20,7 @@
 """DatasetDefinition module."""
 from __future__ import annotations
 
+import builtins
 import importlib
 from dataclasses import asdict
 from dataclasses import dataclass
@@ -214,8 +215,7 @@ class DatasetDefinition:
                     module_name, class_name = type_name.rsplit('.', 1)
                     module = importlib.import_module(module_name)
                     return getattr(module, class_name)
-                builtins_dict = vars(__builtins__)
-                return builtins_dict.get(type_name, d)
+                return getattr(builtins, type_name)
             return d
 
         data = reverse_substitute_types(data)
