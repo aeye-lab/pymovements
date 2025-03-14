@@ -731,7 +731,7 @@ class Dataset:
             name: str | None = None,
             verbose: bool = True,
     ) -> Dataset:
-        """Calculate an event property for and add it as a column to the event dataframe.
+        """Calculate an event property and add it as a column to the event dataframe.
 
         Parameters
         ----------
@@ -749,6 +749,8 @@ class Dataset:
             :py:mod:`pymovements.events` for an overview of supported properties.
         RuntimeError
             If specified event name ``name`` is missing from ``events``.
+        ValueError
+            If the computed property already exists in the event dataframe.
 
         Returns
         -------
@@ -763,6 +765,12 @@ class Dataset:
             if column != 'filepath'
         ]
 
+        existing_columns = set(self.events[0].columns) & set(event_properties)
+        if existing_columns:
+            raise ValueError(
+                f"The following event properties already exist and cannot be recomputed: "
+                f"{existing_columns}. Please remove them first."
+            )
         disable_progressbar = not verbose
         for events, gaze in tqdm(zip(self.events, self.gaze), disable=disable_progressbar):
             new_properties = processor.process(
