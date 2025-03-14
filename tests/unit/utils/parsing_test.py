@@ -733,6 +733,7 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
 def test_parse_eyelink_data_loss_ratio(
         tmp_path, metadata, expected_blink_ratio, expected_overall_ratio,
 ):
+    #Todo adapt tests to waring message about recording config
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
