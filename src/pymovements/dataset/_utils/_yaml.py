@@ -20,8 +20,6 @@
 """Yaml utilities."""
 from __future__ import annotations
 
-from pathlib import Path
-
 import yaml
 
 
@@ -94,28 +92,3 @@ def type_constructor(
         ) from exc
     except ValueError as exc:
         raise ValueError(f'Unknown {node=}') from exc
-
-
-def write_dataset_definitions_yaml(
-        datasets_yaml_path: str = 'src/pymovements/datasets/datasets.yaml',
-) -> None:
-    """Automatically write `datasets.yaml` file for registering datasets.
-
-    Parameters
-    ----------
-    datasets_yaml_path: str
-        Where to write the datasets definition.
-        (default: src/pymovements/datasets/datasets.yaml)
-
-    """
-    dataset_definition_files = Path('src/pymovements/datasets/')
-    datasets_list = []
-
-    for yaml_file in dataset_definition_files.iterdir():
-        if yaml_file.suffix == '.yaml':
-            if yaml_file.name == 'datasets.yaml':
-                continue
-            datasets_list.append(yaml_file.stem)
-
-    with open(datasets_yaml_path, 'w', encoding='utf-8') as f:
-        yaml.dump(sorted(datasets_list), f)
