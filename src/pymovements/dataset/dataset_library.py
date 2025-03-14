@@ -44,12 +44,12 @@ class DatasetLibrary:
     definitions: dict[str, DatasetDefinition] = {}
 
     @classmethod
-    def add(cls, definition: type[DatasetDefinition] | DatasetDefinition | Path | str) -> None:
+    def add(cls, definition: type[DatasetDefinition] | Path | str) -> None:
         """Add :py:class:`~pymovements.dataset.DatasetDefinition` to library.
 
         Parameters
         ----------
-        definition: type[DatasetDefinition] | DatasetDefinition | Path | str
+        definition: type[DatasetDefinition] | Path | str
             The :py:class:`~pymovements.dataset.DatasetDefinition` to add to the library.
 
         Notes
@@ -64,11 +64,8 @@ class DatasetLibrary:
             # Load from YAML file
             yaml_def = DatasetDefinition.from_yaml(definition)
             cls.definitions[yaml_def.name] = yaml_def
-        elif isinstance(definition, type):
-            cls.definitions[definition.name] = definition()
         else:
-            # DatasetDefinition instance
-            cls.definitions[definition.name] = definition
+            cls.definitions[definition.name] = definition()
 
     @classmethod
     def get(cls, name: str) -> DatasetDefinition:
@@ -98,7 +95,7 @@ class DatasetLibrary:
         return deepcopy(cls.definitions[name])
 
     @classmethod
-    def available_datasets(cls) -> list[str]:
+    def names(cls) -> list[str]:
         """Return datasets available in :py:class:`~pymovements.dataset.DatasetLibrary`.
 
         Returns
@@ -106,7 +103,7 @@ class DatasetLibrary:
         list[str]
             Datasets available in :py:class:`~pymovements.dataset.DatasetLibrary`.
         """
-        return list(cls.definitions.keys())
+        return sorted(list(cls.definitions.keys()))
 
 
 DatasetDefinitionClass = TypeVar('DatasetDefinitionClass', bound=type[DatasetDefinition])
