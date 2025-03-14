@@ -207,18 +207,6 @@ class Experiment:
         print(self.eyetracker, other.eyetracker, self.eyetracker == other.eyetracker)
         return self.screen == other.screen and self.eyetracker == other.eyetracker
 
-        def shorten(value: Any) -> str:
-            if isinstance(value, float):
-                value = f'{value:.2f}'
-            return value
-
-        attributes = ''
-        for key, value in vars(self).items():
-            if not key.startswith('_'):
-                attributes += ', ' + f'{key}={shorten(value)}'
-
-        return f'{type(self).__name__}(sampling_rate={shorten(self.sampling_rate)}{attributes})'
-
     def to_dict(self) -> dict[str, Any | dict[str, str | float | None]]:
         """Convert the experiment instance into a dictionary.
 
@@ -227,17 +215,9 @@ class Experiment:
         dict[str, Any | dict[str, str | float | None]]
             Experiment as dictionary.
         """
-        _dict: dict[str, Any | dict[str, str | float | None]] = {
-            'screen_width_px': self.screen.width_px,
-            'screen_height_px': self.screen.height_px,
-            'screen_width_cm': self.screen.width_cm,
-            'screen_height_cm': self.screen.height_cm,
-            'distance_cm': self.screen.distance_cm,
-            'origin': self.screen.origin,
-            'sampling_rate': self.sampling_rate,
-        }
-        if self.eyetracker is not None:
-            _dict['eyetracker'] = asdict(self.eyetracker)
+        _dict: dict[str, dict[str, str | float | None]] = {}
+        _dict['screen'] = asdict(self.screen)
+        _dict['eyetracker'] = asdict(self.eyetracker)
         return _dict
 
     def __str__(self: Experiment) -> str:
