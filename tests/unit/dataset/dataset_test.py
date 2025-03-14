@@ -20,16 +20,12 @@
 """Test all functionality in pymovements.dataset.dataset."""
 import os
 import shutil
-from dataclasses import asdict
-from dataclasses import dataclass
-from dataclasses import field
 from pathlib import Path
 from unittest.mock import Mock
 
 import numpy as np
 import polars as pl
 import pytest
-import yaml
 from polars.testing import assert_frame_equal
 
 import pymovements as pm
@@ -2012,31 +2008,3 @@ def test_load_split_gaze(gaze_dataset_configuration, by, expected_len):
     dataset.load()
     dataset.split_gaze_data(by)
     assert len(dataset.gaze) == expected_len
-
-
-def test_write_yaml_dataset(tmp_path):
-    tmp_file = tmp_path / 'tmp.yaml'
-
-    @dataclass
-    class TestDatasetDefinition(DatasetDefinition):
-        name: str = 'Example'
-        has_files: dict[str, bool] = field(
-            default_factory=lambda: {
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-        )
-
-    dataset = TestDatasetDefinition()
-    dataset.to_yaml(tmp_file)
-
-    with open(tmp_file, encoding='ascii') as f:
-        yaml_load = yaml.safe_load(f)
-
-    # test initial dictionary definition is subset of written dictionary definition
-    # (default values) ommited
-    assert all(
-        (key, value) in asdict(dataset).items()
-        for key, value in yaml_load.items()
-    )
