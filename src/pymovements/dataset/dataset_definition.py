@@ -20,6 +20,7 @@
 """DatasetDefinition module."""
 from __future__ import annotations
 
+import importlib
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
@@ -31,6 +32,7 @@ import yaml
 from pymovements.dataset._utils._yaml import type_constructor
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
+from pymovements.gaze.screen import Screen
 
 
 yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
@@ -169,12 +171,12 @@ class DatasetDefinition:
     distance_column: str | None = None
 
     @staticmethod
-    def from_yaml(yaml_path: str | Path) -> DatasetDefinition:
+    def from_yaml(path: str | Path) -> DatasetDefinition:
         """Load a dataset definition from a YAML file.
 
         Parameters
         ----------
-        yaml_path : str | Path
+        path: str | Path
             Path to the YAML definition file
 
         Returns
@@ -182,7 +184,7 @@ class DatasetDefinition:
         DatasetDefinition
             Initialized dataset definition
         """
-        with open(yaml_path, encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             data = yaml.safe_load(f)
 
         # Convert experiment dict to Experiment object if present
@@ -191,17 +193,41 @@ class DatasetDefinition:
                 eyetracker = EyeTracker(**data['experiment'].pop('eyetracker'))
             else:
                 eyetracker = None
-            data['experiment'] = Experiment(**data['experiment'], eyetracker=eyetracker)
+            if 'screen' in data['experiment']:
+                screen = Screen(**data['experiment'].pop('screen'))
+            else:
+                screen = None
+            data['experiment'] = Experiment(
+                **data['experiment'],
+                screen=screen,
+                eyetracker=eyetracker,
+            )
 
+        def reverse_substitute_types(d: Any) -> Any:
+            if isinstance(d, dict):
+                return {k: reverse_substitute_types(v) for k, v in d.items()}
+            if isinstance(d, list):
+                return [reverse_substitute_types(v) for v in d]
+            if isinstance(d, str) and d.startswith('!'):
+                type_name = d[1:]
+                if '.' in type_name:
+                    module_name, class_name = type_name.rsplit('.', 1)
+                    module = importlib.import_module(module_name)
+                    return getattr(module, class_name)
+                builtins_dict = vars(__builtins__)
+                return builtins_dict.get(type_name, d)
+            return d
+
+        data = reverse_substitute_types(data)
         # Initialize DatasetDefinition with YAML data
         return DatasetDefinition(**data)
 
-    def to_yaml(self, yaml_path: str | Path) -> None:
+    def to_yaml(self, path: str | Path) -> None:
         """Save a dataset definition to a YAML file.
 
         Parameters
         ----------
-        yaml_path: str | Path
+        path: str | Path
             Path where to save the YAML file to.
         """
         data = asdict(self)
@@ -217,10 +243,9 @@ class DatasetDefinition:
                 return f'!{d.__module__}.{d.__name__}'
             return d
 
-        if data['experiment']:
-            data['experiment'] = data['experiment'].to_dict()
+        data['experiment'] = data['experiment'].to_dict()
 
         data = substitute_types(data)
 
-        with open(yaml_path, 'w', encoding='utf-8') as f:
+        with open(path, 'w', encoding='utf-8') as f:
             yaml.dump(data, f, sort_keys=False)
