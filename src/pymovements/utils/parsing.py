@@ -23,6 +23,7 @@ from __future__ import annotations
 import calendar
 import datetime
 import re
+import warnings
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
@@ -351,21 +352,21 @@ def parse_eyelink(
 
                     # each metadata pattern should only match once
                     compiled_metadata_patterns.remove(pattern_dict)
-
+    if not metadata:
+        raise Warning('No metadata found. Please check the file for errors.')
     # if the sampling rate is not found, we cannot calculate the data loss
     actual_number_of_samples = len(samples['time'])
     # if we don't have any recording config, we cannot calculate the data loss
-    sampling_rate = _check_sampling_rate(recording_config)
+    metadata["sampling_rate"] = _check_sampling_rate(recording_config)
 
     data_loss_ratio, data_loss_ratio_blinks = _calculate_data_loss(
         blinks=blinks,
         invalid_samples=invalid_samples,
         actual_num_samples=actual_number_of_samples,
         total_rec_duration=total_recording_duration,
-        sampling_rate=sampling_rate,
+        sampling_rate=metadata["sampling_rate"]
     )
-    if not metadata:
-        raise Warning('No metadata found. Please check the file for errors.')
+
 
     pre_processed_metadata: dict[str, Any] = _pre_process_metadata(metadata)
     # is not yet pre-processed but should be
@@ -450,12 +451,12 @@ def _check_sampling_rate(recording_config: list[dict[str, Any]]) -> float | None
     """
     if not recording_config:
         sampling_rate = None
-        print('Warning: No recording configuration found. Cannot calculate data loss.')
+        warnings.warn('No recording configuration found. Cannot calculate data loss.')
     else:
         sampling_rates = {d.get('sampling_rate') for d in recording_config}
         if len(sampling_rates) != 1:
-            print(
-                'Warning: Inconsistent sampling rates found. The first recorded sampling '
+            warnings.warn(
+                'Inconsistent sampling rates found. The first recorded sampling '
                 'rate is used to calculate the dataloss.',
             )
         sampling_rate = float(recording_config[0]['sampling_rate'])
