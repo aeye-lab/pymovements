@@ -93,6 +93,10 @@ class PotsdamBingeRemotePVT(DatasetDefinition):
         'step' the experiment definition must be specified. All timestamps will be converted to
         milliseconds.
 
+    distance_column: str
+        The name of the distance column in the input data frame. These column will be
+        used to convert pixel coordinates into degrees of visual angle.
+
     pixel_columns: list[str]
         The name of the pixel position columns in the input data frame. These columns will be
         nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
@@ -180,15 +184,16 @@ class PotsdamBingeRemotePVT(DatasetDefinition):
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
-             'gaze': r'{subject_id:d}_{session_id:d}_{condition:s}_{trial_id:d}_{block_id:d}.csv',
+            'gaze': r'{subject_id:d}_{session_id:d}_{condition:s}_{trial_id:d}_{block_id:d}.csv',
         },
     )
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
-            'gaze': {'subject_id': int,
-                    'trial_id': int,
-                    },
+            'gaze': {
+                'subject_id': int,
+                'trial_id': int,
+            },
         },
     )
 
@@ -197,7 +202,7 @@ class PotsdamBingeRemotePVT(DatasetDefinition):
     time_column: str = 'eyelink_timestamp'
 
     time_unit: str = 'ms'
-    
+
     distance_column: str = 'target_distance'
 
     pixel_columns: list[str] = field(
@@ -218,7 +223,7 @@ class PotsdamBingeRemotePVT(DatasetDefinition):
                     'trial_id': pl.Float32,
                     'block_id': pl.Float32,
                     'x_pix_eyelink': pl.Float32,
-                    'y_pix_eyelink': pl.Float32,                    
+                    'y_pix_eyelink': pl.Float32,
                     'eyelink_timestamp': pl.Int64,
                     'x_pix_pupilcore_interpolated': pl.Float32,
                     'y_pix_pupilcore_interpolated': pl.Float32,
@@ -229,7 +234,7 @@ class PotsdamBingeRemotePVT(DatasetDefinition):
                     'time_to_prev_bac': pl.Float32,
                     'time_to_next_bac': pl.Float32,
                     'prev_bac': pl.Float32,
-                    'next_bac': pl.Float32,                    
+                    'next_bac': pl.Float32,
                 },
                 'separator': ',',
             },
