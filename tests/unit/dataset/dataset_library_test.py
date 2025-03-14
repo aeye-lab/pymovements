@@ -35,7 +35,7 @@ def test_add_single_defintion():
     pm.DatasetLibrary.add(CustomDatasetDefinition)
     definition = pm.DatasetLibrary.get('CustomDatasetDefinition')
 
-    assert definition == CustomDatasetDefinition
+    assert definition == CustomDatasetDefinition()
 
 
 def test_add_two_defintions():
@@ -51,8 +51,8 @@ def test_add_two_defintions():
     definition1 = pm.DatasetLibrary.get('CustomDatasetDefinition1')
     definition2 = pm.DatasetLibrary.get('CustomDatasetDefinition2')
 
-    assert definition1 == CustomDatasetDefinition1
-    assert definition2 == CustomDatasetDefinition2
+    assert definition1 == CustomDatasetDefinition1()
+    assert definition2 == CustomDatasetDefinition2()
 
 
 def test_raise_value_error_get_non_existent_dataset():
@@ -70,7 +70,7 @@ def test_raise_value_error_get_non_existent_dataset():
 
 
 def test_dataset_library_contains_all_public_datasets_files():
-    library = pm.DatasetLibrary.available_datasets()
+    library = pm.DatasetLibrary.names()
     for filename in glob.glob('src/pymovements/datasets/*.yaml'):
         dataset_path = Path(filename)
         if dataset_path.name == 'datasets.yaml':
@@ -79,7 +79,7 @@ def test_dataset_library_contains_all_public_datasets_files():
             dataset_file = yaml.safe_load(f)
         dataset_name = dataset_file['name']
         assert dataset_name in library, f'please add {dataset_file} to `datasets.yaml`'\
-        ' or run `write_dataset_definitions_yaml`.'
+            ' or run `write_dataset_definitions_yaml`.'
 
 
 def test__add_shipped_datasets():
