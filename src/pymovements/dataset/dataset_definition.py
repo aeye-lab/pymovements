@@ -47,10 +47,10 @@ class DatasetDefinition:
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-    mirrors: dict[str, list[str]]
+    mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]]
         A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
         (default: field(default_factory=dict))
-    resources: dict[str, list[dict[str, str]]]
+    resources: dict[str, list[dict[str, str]]] | dict[str, tuple[dict[str, str], ...]]
         A list of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -141,9 +141,11 @@ class DatasetDefinition:
     name: str = '.'
     has_files: dict[str, bool] = field(default_factory=dict)
 
-    mirrors: dict[str, list[str]] = field(default_factory=dict)
+    mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] = field(default_factory=dict)
 
-    resources: dict[str, list[dict[str, str]]] = field(default_factory=dict)
+    resources: dict[str, list[dict[str, str]]] | dict[str, tuple[dict[str, str], ...]] = field(
+        default_factory=dict,
+    )
 
     experiment: Experiment | None = field(default_factory=Experiment)
 
