@@ -40,6 +40,8 @@ import pymovements as pm
         'gazegraph',
         'judo1000',
         'potec',
+        'potsdam_binge_remote_pvt',
+        'potsdam_binge_wearable_pvt',
     ],
 )
 def fixture_dataset_init_kwargs(request):
@@ -212,6 +214,30 @@ def fixture_dataset_init_kwargs(request):
             filename_format={'gaze': 'potec_example.tsv'},
             time_column=pm.datasets.PoTeC().time_column,
             time_unit=pm.datasets.PoTeC().time_unit,
+            filename_format_schema_overrides={'gaze': {}},
+            trial_columns=None,
+        ),
+        'potsdam_binge_remote_pvt': pm.datasets.PotsdamBingeRemotePVT(
+            has_files={
+                'gaze': True,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            filename_format={'gaze': 'potsdam_binge_pvt_example.csv'},
+            time_column=pm.datasets.PotsdamBingeRemotePVT().time_column,
+            time_unit=pm.datasets.PotsdamBingeRemotePVT().time_unit,
+            filename_format_schema_overrides={'gaze': {}},
+            trial_columns=None,
+        ),
+        'potsdam_binge_wearable_pvt': pm.datasets.PotsdamBingeWearablePVT(
+            has_files={
+                'gaze': True,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            filename_format={'gaze': 'potsdam_binge_pvt_example.csv'},
+            time_column=pm.datasets.PotsdamBingeWearablePVT().time_column,
+            time_unit=pm.datasets.PotsdamBingeWearablePVT().time_unit,
             filename_format_schema_overrides={'gaze': {}},
             trial_columns=None,
         ),
