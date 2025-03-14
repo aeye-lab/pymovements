@@ -769,7 +769,7 @@ class Dataset:
         if existing_columns:
             raise ValueError(
                 f"The following event properties already exist and cannot be recomputed: "
-                f"{existing_columns}. Please remove them first."
+                f"{existing_columns}. Please remove them first.",
             )
         disable_progressbar = not verbose
         for events, gaze in tqdm(zip(self.events, self.gaze), disable=disable_progressbar):
