@@ -27,7 +27,7 @@ from pymovements import DatasetLibrary
 
 
 @pytest.mark.parametrize(
-    ('dataset', 'dataset_name'),
+    ('definition', 'dataset_name'),
     # please add datasets in alphabetical order
     [
         pytest.param(pm.datasets.BSC, 'BSC', id='BSC'),
@@ -52,15 +52,15 @@ from pymovements import DatasetLibrary
         pytest.param(pm.datasets.UCL, 'UCL', id='UCL'),
     ],
 )
-def test_public_dataset_registered(dataset, dataset_name):
+def test_public_dataset_registered(definition, dataset_name):
     assert dataset_name in DatasetLibrary.names()
-    dataset_from_library = DatasetLibrary.get(dataset_name).__dict__
-    python_dataset = dataset().__dict__
-    assert dataset_from_library == python_dataset
+    definition_from_library = DatasetLibrary.get(dataset_name).__dict__
+    python_definition = definition().__dict__
+    assert definition_from_library == python_definition
 
 
 @pytest.mark.parametrize(
-    ('dataset', 'dataset_name'),
+    ('definition', 'dataset_name'),
     # please add datasets in alphabetical order
     [
         pytest.param(pm.datasets.BSC, 'BSC', id='BSC'),
@@ -85,9 +85,9 @@ def test_public_dataset_registered(dataset, dataset_name):
         pytest.param(pm.datasets.UCL, 'UCL', id='UCL'),
     ],
 )
-def test_public_dataset_registered_experiment(dataset, dataset_name):
-    dataset_from_library = DatasetLibrary.get(dataset_name).__dict__
-    dataset_from_lib_exp = dataset_from_library.pop('experiment')
-    python_dataset = dataset().__dict__
-    python_dataset_exp = python_dataset.pop('experiment')
-    assert python_dataset_exp == dataset_from_lib_exp
+def test_public_dataset_registered_experiment(definition, dataset_name):
+    definition_from_library = DatasetLibrary.get(dataset_name).__dict__
+    definition_from_lib_exp = dataset_from_library.pop('experiment')
+    python_definition = definition().__dict__
+    python_definition_exp = python_definition.pop('experiment')
+    assert python_definition_exp == definition_from_lib_exp
