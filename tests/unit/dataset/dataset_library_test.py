@@ -46,3 +46,16 @@ def test_add_two_defintions():
 
     assert definition1 == CustomDatasetDefinition1
     assert definition2 == CustomDatasetDefinition2
+
+
+def test_library_not_empty():
+    assert len(pm.DatasetLibrary.definitions) >= 0
+
+
+def test_list_names_is_list_of_str():
+    names = pm.DatasetLibrary.names()
+
+    assert isinstance(names, list)
+
+    for name in names:
+        assert isinstance(name, str)
