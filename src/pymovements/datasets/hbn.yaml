@@ -1,0 +1,58 @@
+name: "HBN"
+
+has_files:
+  gaze: true
+  precomputed_events: false
+  precomputed_reading_measures: false
+
+mirrors:
+  gaze:
+    - "https://files.osf.io/v1/resources/qknuv/providers/osfstorage/"
+
+resources:
+  gaze:
+    - resource: "651190031e76a453918a9971"
+      filename: "data.zip"
+      md5: "2c523e911022ffc0eab700e34e9f7f30"
+
+extract:
+  gaze: true
+
+experiment:
+  screen_width_px: 800
+  screen_height_px: 600
+  screen_width_cm: 33.8
+  screen_height_cm: 27.0
+  distance_cm: 63.5
+  origin: "center"
+  sampling_rate: 120
+
+filename_format:
+  gaze: '{subject_id:12}_{video_id}.csv'
+
+filename_format_schema_overrides:
+  gaze:
+    subject_id: !str
+    video_id: !str
+
+time_column: "time"
+
+time_unit: "step"
+
+pixel_columns:
+  - "x_pix"
+  - "y_pix"
+
+column_map: {}
+
+custom_read_kwargs:
+  gaze:
+    separator: ","
+    columns:
+      - "time"
+      - "x_pix"
+      - "y_pix"
+    schema_overrides:
+      time: !polars.Int64
+      x_pix: !polars.Float32
+      y_pix: !polars.Float32
