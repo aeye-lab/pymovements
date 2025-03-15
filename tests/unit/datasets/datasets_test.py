@@ -86,8 +86,8 @@ def test_public_dataset_registered(definition, dataset_name):
     ],
 )
 def test_public_dataset_registered_experiment(definition, dataset_name):
-    DatasetLibrary.get(dataset_name).__dict__
-    definition_from_lib_exp = dataset_from_library.pop('experiment')
+    definition_from_library = DatasetLibrary.get(dataset_name).__dict__
+    definition_from_lib_exp = definition_from_library.pop('experiment')
     python_definition = definition().__dict__
     python_definition_exp = python_definition.pop('experiment')
     assert python_definition_exp == definition_from_lib_exp
