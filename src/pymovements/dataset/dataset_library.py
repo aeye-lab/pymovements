@@ -80,7 +80,6 @@ class DatasetLibrary:
         -------
         DatasetDefinition
             The :py:class:`~pymovements.dataset.DatasetDefinition`.
-            Could be either a class (legacy) or instance (YAML).
 
         Raises
         ------
@@ -96,23 +95,13 @@ class DatasetLibrary:
 
     @classmethod
     def names(cls) -> list[str]:
-        """Return datasets available in :py:class:`~pymovements.dataset.DatasetLibrary`.
+        """Return available datasets in :py:class:`~pymovements.dataset.DatasetLibrary`.
 
         Returns
         -------
         list[str]
-            Datasets available in :py:class:`~pymovements.dataset.DatasetLibrary`.
-        """
-        return sorted(list(cls.definitions.keys()))
-
-    @classmethod
-    def names(cls) -> list[str]:
-        """Get list of names of all added datasets that are included in the library.
-
-        Returns
-        -------
-        list[str]
-            List of dataset names that are included in the dataset library.
+            List of dataset names that are available in
+            :py:class:`~pymovements.dataset.DatasetLibrary`.
         """
         return sorted(list(cls.definitions.keys()))
 
