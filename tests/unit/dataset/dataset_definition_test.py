@@ -98,7 +98,7 @@ def test_write_yaml_already_existing_dataset_definition_w_tuple_screen(tmp_path)
     with open(tmp_file, encoding='utf-8') as f:
         yaml.safe_load(f)
 
-    assert DatasetDefinition.from_yaml(tmp_file).__dict__ == definition.__dict__
+    assert DatasetDefinition.from_yaml(tmp_file) == definition
 
 
 def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path):
@@ -115,7 +115,7 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
     with open(dictionary_tmp_file, 'w', encoding='utf-8') as f:
         yaml.safe_dump(yaml_encoding, f)
 
-    yaml_definition = DatasetDefinition().from_yaml(dictionary_tmp_file)
+    yaml_definition = DatasetDefinition.from_yaml(dictionary_tmp_file)
 
     @dataclass
     class TestDatasetDefinition(DatasetDefinition):
@@ -130,6 +130,4 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
 
     definition = TestDatasetDefinition()
 
-    # hack to compare the dataset definitions
-    # change to definition == yaml_definition after #919 is resolved
-    assert definition.__dict__ == yaml_definition.__dict__
+    assert definition == yaml_definition
