@@ -81,7 +81,7 @@ def test_list_names_is_list_of_str():
     for name in names:
         assert isinstance(name, str)
 
-        
+
 def test_dataset_library_contains_all_public_datasets_files():
     library = pm.DatasetLibrary.names()
     for filename in glob.glob('src/pymovements/datasets/*.yaml'):
