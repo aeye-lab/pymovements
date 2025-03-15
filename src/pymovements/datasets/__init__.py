@@ -41,6 +41,8 @@
     InteRead
     JuDo1000
     PoTeC
+    PotsdamBingeRemotePVT
+    PotsdamBingeWearablePVT
     Provo
     SBSAT
     UCL
@@ -71,6 +73,8 @@ from pymovements.datasets.hbn import HBN
 from pymovements.datasets.interead import InteRead
 from pymovements.datasets.judo1000 import JuDo1000
 from pymovements.datasets.potec import PoTeC
+from pymovements.datasets.potsdam_binge_remote_pvt import PotsdamBingeRemotePVT
+from pymovements.datasets.potsdam_binge_wearable_pvt import PotsdamBingeWearablePVT
 from pymovements.datasets.provo import Provo
 from pymovements.datasets.sb_sat import SBSAT
 from pymovements.datasets.toy_dataset import ToyDataset
@@ -95,6 +99,8 @@ __all__ = [
     'InteRead',
     'JuDo1000',
     'PoTeC',
+    'PotsdamBingeRemotePVT',
+    'PotsdamBingeWearablePVT',
     'Provo',
     'SBSAT',
     'ToyDataset',
