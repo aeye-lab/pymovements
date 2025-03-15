@@ -43,15 +43,15 @@ def test_dataset_definition_to_yaml_equal_dicts_no_exp(tmp_path):
             },
         )
 
-    dataset = TestDatasetDefinition()
-    dataset.to_yaml(tmp_file)
+    definition = TestDatasetDefinition()
+    definition.to_yaml(tmp_file)
 
     with open(tmp_file, encoding='utf-8') as f:
         yaml_dict = yaml.safe_load(f)
 
-    dataset_dict = asdict(dataset)
-    dataset_dict['experiment'] = dataset_dict['experiment'].to_dict()
-    assert dataset_dict == yaml_dict
+    definition_dict = asdict(definition)
+    definition_dict['experiment'] = definition_dict['experiment'].to_dict()
+    assert definition_dict == yaml_dict
 
 
 def test_dataset_definition_to_yaml_equal_dicts(tmp_path):
@@ -79,26 +79,26 @@ def test_dataset_definition_to_yaml_equal_dicts(tmp_path):
             ),
         )
 
-    dataset = TestDatasetDefinition()
-    dataset.to_yaml(tmp_file)
+    definition = TestDatasetDefinition()
+    definition.to_yaml(tmp_file)
 
     with open(tmp_file, encoding='utf-8') as f:
         yaml_dict = yaml.safe_load(f)
 
-    dataset_dict = asdict(dataset)
-    dataset_dict['experiment'] = dataset_dict['experiment'].to_dict()
-    assert dataset_dict == yaml_dict
+    definition_dict = asdict(definition)
+    definition_dict['experiment'] = definition_dict['experiment'].to_dict()
+    assert definition_dict == yaml_dict
 
 
 def test_write_yaml_already_existing_dataset_definition_w_tuple_screen(tmp_path):
     tmp_file = tmp_path / 'tmp.yaml'
-    dataset = DatasetLibrary.get('ToyDatasetEyeLink')
-    dataset.to_yaml(tmp_file)
+    definition = DatasetLibrary.get('ToyDatasetEyeLink')
+    definition.to_yaml(tmp_file)
 
     with open(tmp_file, encoding='utf-8') as f:
         yaml.safe_load(f)
 
-    assert DatasetDefinition.from_yaml(tmp_file).__dict__ == dataset.__dict__
+    assert DatasetDefinition.from_yaml(tmp_file).__dict__ == definition.__dict__
 
 
 def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path):
@@ -115,7 +115,7 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
     with open(dictionary_tmp_file, 'w', encoding='utf-8') as f:
         yaml.safe_dump(yaml_encoding, f)
 
-    yaml_dataset = DatasetDefinition().from_yaml(dictionary_tmp_file)
+    yaml_definition = DatasetDefinition().from_yaml(dictionary_tmp_file)
 
     @dataclass
     class TestDatasetDefinition(DatasetDefinition):
@@ -128,8 +128,8 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
             },
         )
 
-    dataset = TestDatasetDefinition()
+    definition = TestDatasetDefinition()
 
     # hack to compare the dataset definitions
-    # change to dataset == yaml_dataset after #919 is resolved
-    assert dataset.__dict__ == yaml_dataset.__dict__
+    # change to definition == yaml_definition after #919 is resolved
+    assert definition.__dict__ == yaml_definition.__dict__
