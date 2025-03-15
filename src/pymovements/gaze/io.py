@@ -25,6 +25,7 @@ from typing import Any
 
 import polars as pl
 
+from pymovements.events.frame import EventDataFrame
 from pymovements.gaze._utils.parsing import parse_eyelink
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze_dataframe import GazeDataFrame  # pylint: disable=cyclic-import
@@ -352,7 +353,7 @@ def from_asc(
             raise ValueError(f"unknown pattern key '{patterns}'. Supported keys are: eyelink")
 
     # Read data.
-    gaze_data, metadata = parse_eyelink(
+    gaze_data, event_data, metadata = parse_eyelink(
         file,
         patterns=patterns,
         schema=schema,
@@ -438,10 +439,12 @@ def from_asc(
             + '\n'.join(f'- {issue}' for issue in issues),
         )
 
-    # Create gaze data frame.
+    # Create gaze and event data frames.
+    event_df = EventDataFrame(event_data)
     gaze_df = GazeDataFrame(
         gaze_data,
         experiment=experiment,
+        events=event_df,
         trial_columns=trial_columns,
         time_column='time',
         time_unit='ms',
