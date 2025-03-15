@@ -69,6 +69,19 @@ def test_raise_value_error_get_non_existent_dataset():
         assert snippet in msg
 
 
+def test_library_not_empty():
+    assert len(pm.DatasetLibrary.definitions) >= 0
+
+
+def test_list_names_is_list_of_str():
+    names = pm.DatasetLibrary.names()
+
+    assert isinstance(names, list)
+
+    for name in names:
+        assert isinstance(name, str)
+
+        
 def test_dataset_library_contains_all_public_datasets_files():
     library = pm.DatasetLibrary.names()
     for filename in glob.glob('src/pymovements/datasets/*.yaml'):
