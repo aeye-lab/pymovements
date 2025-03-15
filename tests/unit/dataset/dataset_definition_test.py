@@ -130,4 +130,4 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
 
     definition = TestDatasetDefinition()
 
-    assert definition == yaml_definition
+    assert definition.__dict__ == yaml_definition.__dict__
