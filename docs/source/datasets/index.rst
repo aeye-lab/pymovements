@@ -25,5 +25,5 @@ Download your dataset and load it into memory with these few lines of code:
 
 .. csv-table:: Example Datasets
    :file: example_datasets.csv
-   :widths: 30, 35, 5, 5, 5, 5, 5, 5, 5
+   :widths: 65, 5, 5, 5, 5, 5, 5, 5
    :header-rows: 1
