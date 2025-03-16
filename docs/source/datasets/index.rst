@@ -2,6 +2,8 @@
  Datasets
 ==========
 
+**Please cite the respective paper for every dataset that you use in your research.**
+
 Download your dataset and load it into memory with these few lines of code:
 
 .. code-block:: python
