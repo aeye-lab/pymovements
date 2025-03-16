@@ -29,6 +29,7 @@ import pytest
 from polars.testing import assert_frame_equal
 
 import pymovements as pm
+from pymovements import DatasetDefinition
 
 
 def create_raw_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):
@@ -88,14 +89,14 @@ def create_precomputed_files_from_fileinfo(precomputed_dfs, fileinfo, rootpath):
 def create_precomputed_rm_files_from_fileinfo(precomputed_rm_df, fileinfo, rootpath):
     rootpath.mkdir(parents=True, exist_ok=True)
 
-    for precomputed_rm_df, fileinfo_row in zip(precomputed_rm_df, fileinfo.to_dicts()):
+    for _precomputed_rm_df, fileinfo_row in zip(precomputed_rm_df, fileinfo.to_dicts()):
         filepath = fileinfo_row['filepath']
 
         for key in fileinfo_row.keys():
-            if key in precomputed_rm_df.columns:
-                precomputed_rm_df = precomputed_rm_df.drop(key)
+            if key in _precomputed_rm_df.columns:
+                _precomputed_rm_df = _precomputed_rm_df.drop(key)
 
-        precomputed_rm_df.write_csv(rootpath / filepath)
+        _precomputed_rm_df.write_csv(rootpath / filepath)
 
 
 def mock_toy(
@@ -136,7 +137,7 @@ def mock_toy(
     fileinfo = fileinfo.sort(by='filepath')
 
     gaze_dfs = []
-    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
+    for fileinfo_row in fileinfo.to_dicts():
         if eyes == 'both':
             gaze_df = pl.from_dict(
                 {
@@ -146,6 +147,8 @@ def mock_toy(
                     'y_left_pix': np.zeros(1000),
                     'x_right_pix': np.zeros(1000),
                     'y_right_pix': np.zeros(1000),
+                    'trial_id_1': np.concatenate([np.zeros(500), np.ones(500)]),
+                    'trial_id_2': ['a'] * 200 + ['b'] * 200 + ['c'] * 600,
                 },
                 schema={
                     'subject_id': pl.Int64,
@@ -154,6 +157,8 @@ def mock_toy(
                     'y_left_pix': pl.Float64,
                     'x_right_pix': pl.Float64,
                     'y_right_pix': pl.Float64,
+                    'trial_id_1': pl.Float64,
+                    'trial_id_2': pl.Utf8,
                 },
             )
             pixel_columns = ['x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix']
@@ -169,6 +174,8 @@ def mock_toy(
                     'y_right_pix': np.zeros(1000),
                     'x_avg_pix': np.zeros(1000),
                     'y_avg_pix': np.zeros(1000),
+                    'trial_id_1': np.concatenate([np.zeros(500), np.ones(500)]),
+                    'trial_id_2': ['a'] * 200 + ['b'] * 200 + ['c'] * 600,
                 },
                 schema={
                     'subject_id': pl.Int64,
@@ -179,6 +186,8 @@ def mock_toy(
                     'y_right_pix': pl.Float64,
                     'x_avg_pix': pl.Float64,
                     'y_avg_pix': pl.Float64,
+                    'trial_id_1': pl.Float64,
+                    'trial_id_2': pl.Utf8,
                 },
             )
             pixel_columns = [
@@ -192,12 +201,16 @@ def mock_toy(
                     'time': np.arange(1000),
                     'x_left_pix': np.zeros(1000),
                     'y_left_pix': np.zeros(1000),
+                    'trial_id_1': np.concatenate([np.zeros(500), np.ones(500)]),
+                    'trial_id_2': ['a'] * 200 + ['b'] * 200 + ['c'] * 600,
                 },
                 schema={
                     'subject_id': pl.Int64,
                     'time': pl.Int64,
                     'x_left_pix': pl.Float64,
                     'y_left_pix': pl.Float64,
+                    'trial_id_1': pl.Float64,
+                    'trial_id_2': pl.Utf8,
                 },
             )
             pixel_columns = ['x_left_pix', 'y_left_pix']
@@ -208,12 +221,16 @@ def mock_toy(
                     'time': np.arange(1000),
                     'x_right_pix': np.zeros(1000),
                     'y_right_pix': np.zeros(1000),
+                    'trial_id_1': np.concatenate([np.zeros(500), np.ones(500)]),
+                    'trial_id_2': ['a'] * 200 + ['b'] * 200 + ['c'] * 600,
                 },
                 schema={
                     'subject_id': pl.Int64,
                     'time': pl.Int64,
                     'x_right_pix': pl.Float64,
                     'y_right_pix': pl.Float64,
+                    'trial_id_1': pl.Float64,
+                    'trial_id_2': pl.Utf8,
                 },
             )
             pixel_columns = ['x_right_pix', 'y_right_pix']
@@ -224,12 +241,16 @@ def mock_toy(
                     'time': np.arange(1000),
                     'x_pix': np.zeros(1000),
                     'y_pix': np.zeros(1000),
+                    'trial_id_1': np.concatenate([np.zeros(500), np.ones(500)]),
+                    'trial_id_2': ['a'] * 200 + ['b'] * 200 + ['c'] * 600,
                 },
                 schema={
                     'subject_id': pl.Int64,
                     'time': pl.Int64,
                     'x_pix': pl.Float64,
                     'y_pix': pl.Float64,
+                    'trial_id_1': pl.Float64,
+                    'trial_id_2': pl.Utf8,
                 },
             )
             pixel_columns = ['x_pix', 'y_pix']
@@ -258,7 +279,7 @@ def mock_toy(
     ]
 
     preprocessed_gaze_dfs = []
-    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
+    for fileinfo_row in fileinfo.to_dicts():
         position_columns = [pixel_column.replace('pix', 'pos') for pixel_column in pixel_columns]
         velocity_columns = [pixel_column.replace('pix', 'vel') for pixel_column in pixel_columns]
         acceleration_columns = [
@@ -294,7 +315,7 @@ def mock_toy(
     )
 
     event_dfs = []
-    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
+    for fileinfo_row in fileinfo.to_dicts():
         event_df = pl.from_dict(
             {
                 'subject_id': fileinfo_row['subject_id'],
@@ -315,7 +336,7 @@ def mock_toy(
 
     create_event_files_from_fileinfo(event_dfs, fileinfo, rootpath / 'events')
 
-    dataset_definition = pm.DatasetDefinition(
+    dataset_definition = DatasetDefinition(
         experiment=pm.Experiment(
             screen_width_px=1280,
             screen_height_px=1024,
@@ -345,7 +366,7 @@ def mock_toy(
     )
 
     precomputed_dfs = []
-    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
+    for fileinfo_row in fileinfo.to_dicts():
         precomputed_event_df = pl.from_dict(
             {
                 'subject_id': fileinfo_row['subject_id'],
@@ -373,7 +394,7 @@ def mock_toy(
     )
 
     precomputed_rm_dfs = []
-    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
+    for fileinfo_row in fileinfo.to_dicts():
         precomputed_rm_df = pl.from_dict(
             {
                 'subject_id': fileinfo_row['subject_id'],
@@ -1028,7 +1049,8 @@ def test_detect_events_attribute_error(gaze_dataset_configuration):
             },
             (
                 "Column 'position' not found. Available columns are: "
-                "['time', 'subject_id', 'pixel', 'custom_position', 'velocity']"
+                "['time', 'trial_id_1', 'trial_id_2', 'subject_id', "
+                "'pixel', 'custom_position', 'velocity']"
             ),
             id='no_position',
         ),
@@ -1040,7 +1062,8 @@ def test_detect_events_attribute_error(gaze_dataset_configuration):
             },
             (
                 "Column 'velocity' not found. Available columns are: "
-                "['time', 'subject_id', 'pixel', 'position', 'custom_velocity']"
+                "['time', 'trial_id_1', 'trial_id_2', 'subject_id', "
+                "'pixel', 'position', 'custom_velocity']"
             ),
             id='no_velocity',
         ),
@@ -1958,3 +1981,40 @@ def test_load_split_precomputed_events(precomputed_dataset_configuration, by, ex
     dataset.load()
     dataset.split_precomputed_events(by)
     assert len(dataset.precomputed_events) == expected_len
+
+
+def test_dataset_definition_from_yaml(tmp_path):
+    tmp_file = tmp_path / 'tmp.yaml'
+
+    dataset_def = pm.DatasetLibrary.get('ToyDataset')
+    dataset_def.to_yaml(tmp_file)
+
+    dataset_from_yaml = pm.Dataset(tmp_file, '.')
+    assert dataset_from_yaml.definition == dataset_def
+
+
+@pytest.mark.parametrize(
+    ('by', 'expected_len'),
+    [
+        pytest.param(
+            'trial_id_1',
+            40,
+            id='subset_int',
+        ),
+        pytest.param(
+            'trial_id_2',
+            60,
+            id='subset_int',
+        ),
+        pytest.param(
+            ['trial_id_1', 'trial_id_2'],
+            80,
+            id='subset_int',
+        ),
+    ],
+)
+def test_load_split_gaze(gaze_dataset_configuration, by, expected_len):
+    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.split_gaze_data(by)
+    assert len(dataset.gaze) == expected_len

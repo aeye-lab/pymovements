@@ -25,10 +25,9 @@ from typing import Any
 
 import polars as pl
 
+from pymovements.gaze._utils.parsing import parse_eyelink
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.eyetracker import EyeTracker
 from pymovements.gaze.gaze_dataframe import GazeDataFrame  # pylint: disable=cyclic-import
-from pymovements.utils.parsing import parse_eyelink
 
 
 def from_csv(
@@ -48,7 +47,7 @@ def from_csv(
         column_schema_overrides: dict[str, type] | None = None,
         **read_csv_kwargs: Any,
 ) -> GazeDataFrame:
-    """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
+    """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
 
     Parameters
     ----------
@@ -279,8 +278,9 @@ def from_asc(
         trial_columns: str | list[str] | None = None,
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, Any] | None = None,
+        encoding: str = 'ascii',
 ) -> GazeDataFrame:
-    """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
+    """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
 
     Parameters
     ----------
@@ -307,6 +307,8 @@ def from_asc(
     column_schema_overrides: dict[str, Any] | None
         Dictionary containing types for columns.
         (default: None)
+    encoding: str
+        Text encoding of the file. (default: 'ascii')
 
     Returns
     -------
@@ -351,7 +353,11 @@ def from_asc(
 
     # Read data.
     gaze_data, metadata = parse_eyelink(
-        file, patterns=patterns, schema=schema, metadata_patterns=metadata_patterns,
+        file,
+        patterns=patterns,
+        schema=schema,
+        metadata_patterns=metadata_patterns,
+        encoding=encoding,
     )
 
     if add_columns is not None:
@@ -369,8 +375,6 @@ def from_asc(
 
     if experiment is None:
         experiment = Experiment(sampling_rate=metadata['sampling_rate'])
-    if experiment.eyetracker is None:
-        experiment.eyetracker = EyeTracker()
 
     # Compare metadata from experiment definition with metadata from ASC file.
     # Fill in missing metadata in experiment definition and raise an error if there are conflicts
@@ -384,9 +388,7 @@ def from_asc(
         issues.append(f"Screen resolution: {experiment_resolution} vs. {metadata['resolution']}")
 
     # Sampling rate
-    if experiment.eyetracker.sampling_rate is None:
-        experiment.eyetracker.sampling_rate = metadata['sampling_rate']
-    elif experiment.eyetracker.sampling_rate != metadata['sampling_rate']:
+    if experiment.eyetracker.sampling_rate != metadata['sampling_rate']:
         issues.append(
             f"Sampling rate: {experiment.eyetracker.sampling_rate} vs. {metadata['sampling_rate']}",
         )
@@ -459,7 +461,7 @@ def from_ipc(
         column_schema_overrides: dict[str, type] | None = None,
         **read_ipc_kwargs: Any,
 ) -> GazeDataFrame:
-    """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
+    """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
 
     Parameters
     ----------

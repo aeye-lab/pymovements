@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2025 The pymovements Project Authors
+# Copyright (c) 2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,26 +17,3 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides utils for developers and is not part of the user API."""
-from __future__ import annotations
-
-from typing import Any
-from typing import TypeVar
-
-ClassT = TypeVar('ClassT')
-
-
-def auto_str(cls: type[ClassT]) -> type[ClassT]:
-    """Automatically generate __str__() to include all arguments. Can be used as a decorator."""
-    def shorten(value: Any) -> str:
-        if isinstance(value, float):
-            value = f'{value:.2f}'
-        return value
-
-    def __str__(self: Any) -> str:
-        attributes = ', '.join(f'{key}={shorten(value)}' for key, value in vars(self).items())
-        return f'{type(self).__name__}({attributes})'
-
-    # for type ignore see: https://github.com/python/mypy/issues/3951#issuecomment-329183108
-    cls.__str__ = __str__  # type: ignore
-    return cls
