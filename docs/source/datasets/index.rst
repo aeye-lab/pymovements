@@ -39,6 +39,6 @@ Download your dataset and load it into memory with these few lines of code:
    :header-rows: 1
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 4
 
     Datasets
