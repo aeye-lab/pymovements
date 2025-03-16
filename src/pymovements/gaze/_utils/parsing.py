@@ -23,6 +23,7 @@ from __future__ import annotations
 import calendar
 import datetime
 import re
+import warnings
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
@@ -48,13 +49,6 @@ EYELINK_META_REGEXES = [
         ),
         r'\*\*\s+(?P<version_2>EYELINK.*)',
         r'MSG\s+\d+[.]?\d*\s+DISPLAY_COORDS\s*=?\s*(?P<resolution>.*)',
-        (
-            r'MSG\s+\d+[.]?\d*\s+RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+'
-            r'(?P<sampling_rate>\d+)\s+'
-            r'(?P<file_sample_filter>(0|1|2))\s+'
-            r'(?P<link_sample_filter>(0|1|2))\s+'
-            r'(?P<tracked_eye>(L|R|LR))\s*'
-        ),
         r'PUPIL\s+(?P<pupil_data_type>(AREA|DIAMETER))\s*',
         r'MSG\s+\d+[.]?\d*\s+ELCLCFG\s+(?P<mount_configuration>.*)',
     )
@@ -92,6 +86,14 @@ START_RECORDING_REGEX = re.compile(
 STOP_RECORDING_REGEX = re.compile(
     r'END\s+(?P<timestamp>(\d+[.]?\d*))\s+\s+(?P<types>.*)\s+RES\s+'
     r'(?P<xres>[\d\.]*)\s+(?P<yres>[\d\.]*)\s*',
+)
+RECORDING_CONFIG = re.compile(
+    r'MSG\s+(?P<timestamp>\d+[.]?\d*)\s+'
+    r'RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+'
+    r'(?P<sampling_rate>\d+)\s+'
+    r'(?P<file_sample_filter>0|1|2)\s+'
+    r'(?P<link_sample_filter>0|1|2)\s+'
+    r'(?P<tracked_eye>LR|[LR])\s*',
 )
 
 
@@ -250,7 +252,7 @@ def parse_eyelink(
     calibrations = []
     blinks = []
     invalid_samples = []
-
+    recording_config = []
     blink = False
 
     start_recording_timestamp = ''
@@ -258,7 +260,6 @@ def parse_eyelink(
     num_blink_samples = 0
 
     for line in lines:
-
         for pattern_dict in compiled_patterns:
 
             if match := pattern_dict['pattern'].match(line):
@@ -298,6 +299,9 @@ def parse_eyelink(
             }
             num_blink_samples = 0
             blinks.append(blink_info)
+
+        elif eye_side_match := RECORDING_CONFIG.match(line):
+            recording_config.append(eye_side_match.groupdict())
 
         elif match := START_RECORDING_REGEX.match(line):
             start_recording_timestamp = match.groupdict()['timestamp']
@@ -351,20 +355,21 @@ def parse_eyelink(
 
                     # each metadata pattern should only match once
                     compiled_metadata_patterns.remove(pattern_dict)
-
     if not metadata:
         raise Warning('No metadata found. Please check the file for errors.')
-
     # if the sampling rate is not found, we cannot calculate the data loss
     actual_number_of_samples = len(samples['time'])
+    # if we don't have any recording config, we cannot calculate the data loss
+    metadata["sampling_rate"] = _check_sampling_rate(recording_config)
 
     data_loss_ratio, data_loss_ratio_blinks = _calculate_data_loss(
         blinks=blinks,
         invalid_samples=invalid_samples,
         actual_num_samples=actual_number_of_samples,
         total_rec_duration=total_recording_duration,
-        sampling_rate=metadata['sampling_rate'],
+        sampling_rate=metadata["sampling_rate"]
     )
+
 
     pre_processed_metadata: dict[str, Any] = _pre_process_metadata(metadata)
     # is not yet pre-processed but should be
@@ -374,6 +379,7 @@ def parse_eyelink(
     pre_processed_metadata['data_loss_ratio'] = data_loss_ratio
     pre_processed_metadata['data_loss_ratio_blinks'] = data_loss_ratio_blinks
     pre_processed_metadata['total_recording_duration_ms'] = total_recording_duration
+    pre_processed_metadata['recording_config'] = recording_config
 
     schema_overrides = {
         'time': pl.Float64,
@@ -412,11 +418,6 @@ def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:
         resolution = (coordinates[2] - coordinates[0] + 1, coordinates[3] - coordinates[1] + 1)
         metadata['resolution'] = resolution
 
-    if metadata['sampling_rate']:
-        metadata['sampling_rate'] = float(metadata['sampling_rate'])
-    else:
-        metadata['sampling_rate'] = 'unknown'
-
     # if the date has been parsed fully, convert the date to a datetime object
     if 'day' in metadata and 'year' in metadata and 'month' in metadata and 'time' in metadata:
         metadata['day'] = int(metadata['day'])
@@ -436,12 +437,41 @@ def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:
     return return_metadata
 
 
+def _check_sampling_rate(recording_config: list[dict[str, Any]]) -> float | None:
+    """Check if the sampling rate is available in the recording config.
+
+    Parameters
+    ----------
+    recording_config : list[dict[str, Any]]
+        List of dictionaries containing recording configuration details.
+
+    Returns
+    -------
+    float | None
+        The sampling rate of the first entry as a float if available, otherwise None.
+        prints a warning if no recording configuration is found or
+        if the sampling rate is inconsistent.
+    """
+    if not recording_config:
+        sampling_rate = None
+        warnings.warn('No recording configuration found. Cannot calculate data loss.')
+    else:
+        sampling_rates = {d.get('sampling_rate') for d in recording_config}
+        if len(sampling_rates) != 1:
+            warnings.warn(
+                'Inconsistent sampling rates found. The first recorded sampling '
+                'rate is used to calculate the dataloss.',
+            )
+        sampling_rate = float(recording_config[0]['sampling_rate'])
+    return sampling_rate
+
+
 def _calculate_data_loss(
         blinks: list[dict[str, Any]],
         invalid_samples: list[str],
         actual_num_samples: int,
-        total_rec_duration: float,
-        sampling_rate: float,
+        total_rec_duration: float | None = None,
+        sampling_rate: float | None = None,
 ) -> tuple[float | str, float | str]:
     """Calculate data loss and blink loss.
 
@@ -453,9 +483,9 @@ def _calculate_data_loss(
         List of invalid samples.
     actual_num_samples: int
         Number of actual samples recorded.
-    total_rec_duration: float
+    total_rec_duration: float | None
         Total duration of the recording.
-    sampling_rate: float
+    sampling_rate: float | None
         Sampling rate of the eye tracker.
 
     Returns
