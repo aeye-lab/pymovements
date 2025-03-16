@@ -37,3 +37,8 @@ Download your dataset and load it into memory with these few lines of code:
    :file: example_datasets.csv
    :widths: 65, 5, 5, 5, 5, 5, 5, 5
    :header-rows: 1
+
+.. toctree::
+    :maxdepth: 2
+
+    Datasets
