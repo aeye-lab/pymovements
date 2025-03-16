@@ -9,8 +9,8 @@ Dataset,Citation,Samples,Events,Reading Measures,# Subjects,# Sessions per Subje
 :py:class:`~pymovements.datasets.FakeNewsPerception`,:cite:p:`FakeNewsPerception`,,X,,25,1,600 Hz,"Text (documents), Image"
 :py:class:`~pymovements.datasets.GazeGraph`,:cite:p:`GazeGraph`,X,,,8,1,30 Hz,Various
 :py:class:`~pymovements.datasets.GazeOnFaces`,:cite:p:`GazeOnFaces`,X,,,405,1,250 Hz,Video
-:py:class:`~pymovements.datasets.GazeBase`,:cite:p:`GazeBase`,X,,,322,1-9,1000 Hz,"Random Dots, Text (documents), Video, Game)"
-:py:class:`~pymovements.datasets.GazeBaseVR`,:cite:p:`GazeBaseVR`,X,,,407,1-6,250 Hz,"Random Dots, Text (documents), Video, Game)"
+:py:class:`~pymovements.datasets.GazeBase`,:cite:p:`GazeBase`,X,,,322,1-9,1000 Hz,"Random Dots, Text (documents), Video, Game"
+:py:class:`~pymovements.datasets.GazeBaseVR`,:cite:p:`GazeBaseVR`,X,,,407,1-6,250 Hz,"Random Dots, Text (documents), Video, Game"
 :py:class:`~pymovements.datasets.HBN`,:cite:p:`HBN`,X,,,1246,1,120 Hz,Video
 :py:class:`~pymovements.datasets.InteRead`,:cite:p:`InteRead`,X,X,,50,1,1200 Hz,Text (documents)
 :py:class:`~pymovements.datasets.JuDo1000`,:cite:p:`JuDo1000`,X,,,150,4,1000 Hz,Random Dots
