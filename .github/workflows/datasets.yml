@@ -1,5 +1,5 @@
 env:
-  DATASETS: '[BSC, BSCII]'
+  DATASETS: '["BSC", "BSCII"]'
 
 name: datasets
 on:  # TODO: change to tagged commits only
