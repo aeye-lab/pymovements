@@ -1,6 +1,3 @@
-env:
-  DATASETS: '- "BSC"'
-
 name: datasets
 on:  # TODO: change to tagged commits only
   push:
@@ -25,17 +22,9 @@ jobs:
           python-version: "3.13"
       - name: Install pymovements
         run: python -m pip install -e ${{ github.workspace }}
-#      - name: get list of datasets
-#        run: python
-#      - name: read-yaml-file
-#        uses: pietrobolcato/action-read-yaml@1.0.0
-#        id: read_action_js
-#        with:
-#          config: ${{ github.workspace }}/.github/workflows/dataset_names.yml
       - name: Create matrix variable for all datasets
         id: create-matrix
         run:  python -c "import pymovements as pm; print(f'matrix={pm.DatasetLibrary.names()}')" >> $GITHUB_OUTPUT
-#        run: echo "matrix=${{env.DATASETS}}" >> $GITHUB_OUTPUT
 
   test:
     name: test dataset ${{ matrix.dataset }}
@@ -45,7 +34,7 @@ jobs:
       fail-fast: true
       #max-parallel: 2
       matrix:
-        dataset: ${{ needs.prepare-matrix.outputs.all_datasets }}
+        dataset: ${{ fromJSON(needs.prepare-matrix.outputs.all_datasets) }}
     steps:
       - uses: actions/checkout@v4
         with:
