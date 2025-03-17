@@ -24,10 +24,9 @@ jobs:
       - name: Create matrix for all datasets
         id: create-matrix
         run: >
-          python -c "
-            from pymovements import DatasetLibrary;
-            print(f'matrix={DatasetLibrary.names()}')
-          " >> $GITHUB_OUTPUT
+          python -c
+            "from pymovements import DatasetLibrary; print(f'matrix={DatasetLibrary.names()}')"
+            >> $GITHUB_OUTPUT
 
   test:
     name: test ${{ matrix.dataset }}
