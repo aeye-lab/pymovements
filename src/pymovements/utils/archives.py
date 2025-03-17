@@ -19,9 +19,9 @@
 # SOFTWARE.
 """Utils module for extracting archives and decompressing files.
 
-.. deprecated:: v0.22.0
+.. deprecated:: v0.21.1
    Please use :py:meth:`~pymovements.Dataset.extract()` instead.
-   This module will be removed in v0.27.0.
+   This module will be removed in v0.26.0.
 """
 from __future__ import annotations
 
@@ -34,8 +34,8 @@ from pymovements.dataset._utils._archives import extract_archive as _extract_arc
 
 @deprecated(
     reason='Please use Dataset.extract() instead. '
-           'This function will be removed in v0.27.0.',
-    version='v0.22.0',
+           'This function will be removed in v0.26.0.',
+    version='v0.21.1',
 )
 def extract_archive(
         source_path: Path,
@@ -52,9 +52,9 @@ def extract_archive(
     The archive type and a possible compression is automatically detected from the file name.
     If the file is compressed but not an archive the call is dispatched to :func:`_decompress`.
 
-    .. deprecated:: v0.22.0
+    .. deprecated:: v0.21.1
        Please use :py:meth:`~pymovements.Dataset.extract()` instead.
-       This module will be removed in v0.27.0.
+       This module will be removed in v0.26.0.
 
     Parameters
     ----------
