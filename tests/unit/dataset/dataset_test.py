@@ -29,6 +29,7 @@ import pytest
 from polars.testing import assert_frame_equal
 
 import pymovements as pm
+from pymovements import DatasetDefinition
 
 
 def create_raw_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):
@@ -88,14 +89,14 @@ def create_precomputed_files_from_fileinfo(precomputed_dfs, fileinfo, rootpath):
 def create_precomputed_rm_files_from_fileinfo(precomputed_rm_df, fileinfo, rootpath):
     rootpath.mkdir(parents=True, exist_ok=True)
 
-    for precomputed_rm_df, fileinfo_row in zip(precomputed_rm_df, fileinfo.to_dicts()):
+    for _precomputed_rm_df, fileinfo_row in zip(precomputed_rm_df, fileinfo.to_dicts()):
         filepath = fileinfo_row['filepath']
 
         for key in fileinfo_row.keys():
-            if key in precomputed_rm_df.columns:
-                precomputed_rm_df = precomputed_rm_df.drop(key)
+            if key in _precomputed_rm_df.columns:
+                _precomputed_rm_df = _precomputed_rm_df.drop(key)
 
-        precomputed_rm_df.write_csv(rootpath / filepath)
+        _precomputed_rm_df.write_csv(rootpath / filepath)
 
 
 def mock_toy(
@@ -136,7 +137,7 @@ def mock_toy(
     fileinfo = fileinfo.sort(by='filepath')
 
     gaze_dfs = []
-    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
+    for fileinfo_row in fileinfo.to_dicts():
         if eyes == 'both':
             gaze_df = pl.from_dict(
                 {
@@ -278,7 +279,7 @@ def mock_toy(
     ]
 
     preprocessed_gaze_dfs = []
-    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
+    for fileinfo_row in fileinfo.to_dicts():
         position_columns = [pixel_column.replace('pix', 'pos') for pixel_column in pixel_columns]
         velocity_columns = [pixel_column.replace('pix', 'vel') for pixel_column in pixel_columns]
         acceleration_columns = [
@@ -314,7 +315,7 @@ def mock_toy(
     )
 
     event_dfs = []
-    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
+    for fileinfo_row in fileinfo.to_dicts():
         event_df = pl.from_dict(
             {
                 'subject_id': fileinfo_row['subject_id'],
@@ -335,7 +336,7 @@ def mock_toy(
 
     create_event_files_from_fileinfo(event_dfs, fileinfo, rootpath / 'events')
 
-    dataset_definition = pm.DatasetDefinition(
+    dataset_definition = DatasetDefinition(
         experiment=pm.Experiment(
             screen_width_px=1280,
             screen_height_px=1024,
@@ -365,7 +366,7 @@ def mock_toy(
     )
 
     precomputed_dfs = []
-    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
+    for fileinfo_row in fileinfo.to_dicts():
         precomputed_event_df = pl.from_dict(
             {
                 'subject_id': fileinfo_row['subject_id'],
@@ -393,7 +394,7 @@ def mock_toy(
     )
 
     precomputed_rm_dfs = []
-    for fileinfo_row in fileinfo.to_dicts():  # pylint: disable=not-an-iterable
+    for fileinfo_row in fileinfo.to_dicts():
         precomputed_rm_df = pl.from_dict(
             {
                 'subject_id': fileinfo_row['subject_id'],
@@ -1980,6 +1981,16 @@ def test_load_split_precomputed_events(precomputed_dataset_configuration, by, ex
     dataset.load()
     dataset.split_precomputed_events(by)
     assert len(dataset.precomputed_events) == expected_len
+
+
+def test_dataset_definition_from_yaml(tmp_path):
+    tmp_file = tmp_path / 'tmp.yaml'
+
+    dataset_def = pm.DatasetLibrary.get('ToyDataset')
+    dataset_def.to_yaml(tmp_file)
+
+    dataset_from_yaml = pm.Dataset(tmp_file, '.')
+    assert dataset_from_yaml.definition == dataset_def
 
 
 @pytest.mark.parametrize(
