@@ -33,7 +33,7 @@ def test_download_and_scan(dataset_name, tmp_path):
     dataset = pm.Dataset(dataset_name, path=dataset_path)
 
     # Download and load in dataset.
-    dataset.download()
+    dataset.download(remove_finished=True)
     dataset.scan()
 
     assert len(dataset.fileinfo) > 0
