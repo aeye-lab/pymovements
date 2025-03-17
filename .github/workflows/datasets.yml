@@ -27,6 +27,8 @@ jobs:
         run: ls -lah ${{ github.workspace }}
       - name: install pymovements
         run: python -m pip install -e ${{ github.workspace }}
+#      - name: get list of datasets
+#        run: python
 #      - name: read-yaml-file
 #        uses: pietrobolcato/action-read-yaml@1.0.0
 #        id: read_action_js
@@ -34,7 +36,7 @@ jobs:
 #          config: ${{ github.workspace }}/.github/workflows/dataset_names.yml
       - name: create matrix variable for all datasets
         id: create-matrix
-        run: echo "matrix=${{env.DATASETS}}" >> $GITHUB_OUTPUT
+        run:  python -c "import pymovements as pm; print(pm.DatasetLibrary.names())" >> $GITHUB_OUTPUT
 #        run: echo "matrix=${{env.DATASETS}}" >> $GITHUB_OUTPUT
 
   test:
