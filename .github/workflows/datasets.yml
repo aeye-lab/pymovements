@@ -15,17 +15,15 @@ jobs:
     outputs:
       all_datasets: ${{ steps.create-matrix.outputs.matrix }}
     steps:
-      - name: checkout pymovements repository
+      - name: Checkout pymovements repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: setup python
+      - name: Setup python
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
-      - name: ls workspace
-        run: ls -lah ${{ github.workspace }}
-      - name: install pymovements
+      - name: Install pymovements
         run: python -m pip install -e ${{ github.workspace }}
 #      - name: get list of datasets
 #        run: python
@@ -34,9 +32,9 @@ jobs:
 #        id: read_action_js
 #        with:
 #          config: ${{ github.workspace }}/.github/workflows/dataset_names.yml
-      - name: create matrix variable for all datasets
+      - name: Create matrix variable for all datasets
         id: create-matrix
-        run:  python -c "import pymovements as pm; print(pm.DatasetLibrary.names())" >> $GITHUB_OUTPUT
+        run:  python -c "import pymovements as pm; print(f'matrix={pm.DatasetLibrary.names()}')" >> $GITHUB_OUTPUT
 #        run: echo "matrix=${{env.DATASETS}}" >> $GITHUB_OUTPUT
 
   test:
