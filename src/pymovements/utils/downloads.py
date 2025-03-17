@@ -19,9 +19,9 @@
 # SOFTWARE.
 """Utils module for downloading files.
 
-.. deprecated:: v0.22.0
+.. deprecated:: v0.21.1
    Please use :py:meth:`~pymovements.Dataset.download()` instead.
-   This module will be removed in v0.27.0.
+   This module will be removed in v0.26.0.
 """
 from __future__ import annotations
 
@@ -36,8 +36,8 @@ from pymovements.dataset._utils._downloads import download_file as _download_fil
 
 @deprecated(
     reason='Please use Dataset.download() instead. '
-           'This function will be removed in v0.27.0.',
-    version='v0.22.0',
+           'This function will be removed in v0.26.0.',
+    version='v0.21.1',
 )
 def download_and_extract_archive(
         url: str,
@@ -52,9 +52,9 @@ def download_and_extract_archive(
 ) -> None:
     """Download and extract archive file.
 
-    .. deprecated:: v0.22.0
+    .. deprecated:: v0.21.1
        Please use :py:meth:`~pymovements.Dataset.download()` instead.
-       This module will be removed in v0.27.0.
+       This module will be removed in v0.26.0.
 
     Parameters
     ----------
@@ -100,8 +100,8 @@ def download_and_extract_archive(
 
 @deprecated(
     reason='Please use Dataset.download() instead. '
-           'This function will be removed in v0.27.0.',
-    version='v0.22.0',
+           'This function will be removed in v0.26.0.',
+    version='v0.21.1',
 )
 def download_file(
         url: str,
@@ -113,9 +113,9 @@ def download_file(
 ) -> Path:
     """Download a file from a URL and place it in root.
 
-    .. deprecated:: v0.22.0
+    .. deprecated:: v0.21.1
        Please use :py:meth:`~pymovements.Dataset.download()` instead.
-       This module will be removed in v0.27.0.
+       This module will be removed in v0.26.0.
 
     Parameters
     ----------
