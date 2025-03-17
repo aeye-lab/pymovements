@@ -24,10 +24,10 @@ from pymovements import DatasetLibrary
 
 
 @pytest.mark.parametrize('dataset_name', DatasetLibrary.names()))
-def test_download_and_scan(dataset_name, tmp_path):
+    def test_download_and_scan(dataset_name, tmp_path):
     # Initialize dataset.
-    dataset_path = tmp_path / dataset_name
-    dataset = pm.Dataset(dataset_name, path=dataset_path)
+    dataset_path= tmp_path / dataset_name
+    dataset= pm.Dataset(dataset_name, path=dataset_path)
 
     # Download and load in dataset.
     dataset.download(remove_finished=True)
