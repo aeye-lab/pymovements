@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 The pymovements Project Authors
+# Copyright (c) 2022-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@ from typing import Any
 
 import numpy as np
 import polars as pl
+from tqdm import tqdm
 
 from pymovements.events.properties import duration
 from pymovements.stimulus.text import TextStimulus
@@ -323,14 +324,12 @@ class EventDataFrame:
             Text dataframe to map fixation to.
         """
         self.unnest()
-        self.frame = self.frame.with_columns(
-            area_of_interest=pl.Series(
-                get_aoi(
-                    aoi_dataframe, row, 'location_x', 'location_y',
-                )
-                for row in self.frame.iter_rows(named=True)
-            ),
-        )
+        aois = [
+            get_aoi(aoi_dataframe, row, 'location_x', 'location_y')
+            for row in tqdm(self.frame.iter_rows(named=True))
+        ]
+        aoi_df = pl.concat(aois)
+        self.frame = pl.concat([self.frame, aoi_df], how='horizontal')
 
     def __str__(self: Any) -> str:
         """Return string representation of event dataframe."""

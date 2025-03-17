@@ -1,4 +1,4 @@
-# Copyright (c) 2024 The pymovements Project Authors
+# Copyright (c) 2024-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -64,42 +64,42 @@ def get_aoi(
             height_column=aoi_dataframe.width_column,
             width_column=aoi_dataframe.height_column,
         )
-        try:
-            aoi = aoi_dataframe.aois.filter(
-                (aoi_dataframe.aois[aoi_dataframe.start_x_column] <= row[x_eye]) &
-                (
-                    row[x_eye] <
-                    aoi_dataframe.aois[aoi_dataframe.start_x_column] +
-                    aoi_dataframe.aois[aoi_dataframe.width_column]
-                ) &
-                (aoi_dataframe.aois[aoi_dataframe.start_y_column] <= row[y_eye]) &
-                (
-                    row[y_eye] <
-                    aoi_dataframe.aois[aoi_dataframe.start_y_column] +
-                    aoi_dataframe.aois[aoi_dataframe.height_column]
-                ),
-            )[aoi_dataframe.aoi_column].item()
-            return aoi
-        except ValueError:
-            return ''
-    elif aoi_dataframe.end_x_column is not None:
+        aoi = aoi_dataframe.aois.filter(
+            (aoi_dataframe.aois[aoi_dataframe.start_x_column] <= row[x_eye]) &
+            (
+                row[x_eye] <
+                aoi_dataframe.aois[aoi_dataframe.start_x_column] +
+                aoi_dataframe.aois[aoi_dataframe.width_column]
+            ) &
+            (aoi_dataframe.aois[aoi_dataframe.start_y_column] <= row[y_eye]) &
+            (
+                row[y_eye] <
+                aoi_dataframe.aois[aoi_dataframe.start_y_column] +
+                aoi_dataframe.aois[aoi_dataframe.height_column]
+            ),
+        )
+
+        if aoi.is_empty():
+            aoi.extend(pl.from_dict({col: None for col in aoi.columns}))
+        return aoi
+    if aoi_dataframe.end_x_column is not None:
         checks.check_is_none_is_mutual(
             end_x_column=aoi_dataframe.end_x_column,
             end_y_column=aoi_dataframe.end_y_column,
         )
-        try:
-            aoi = aoi_dataframe.aois.filter(
-                # x-coordinate: within bounding box
-                (aoi_dataframe.aois[aoi_dataframe.start_x_column] <= row[x_eye]) &
-                (row[x_eye] < aoi_dataframe.aois[aoi_dataframe.end_x_column]) &
-                # y-coordinate: within bounding box
-                (aoi_dataframe.aois[aoi_dataframe.start_y_column] <= row[y_eye]) &
-                (row[y_eye] < aoi_dataframe.aois[aoi_dataframe.end_y_column]),
-            )[aoi_dataframe.aoi_column].item()
-            return aoi
-        except ValueError:
-            return ''
-    else:
-        raise ValueError(
-            'either aoi_dataframe.width or aoi_dataframe.end_x_column have to be not None',
+        aoi = aoi_dataframe.aois.filter(
+            # x-coordinate: within bounding box
+            (aoi_dataframe.aois[aoi_dataframe.start_x_column] <= row[x_eye]) &
+            (row[x_eye] < aoi_dataframe.aois[aoi_dataframe.end_x_column]) &
+            # y-coordinate: within bounding box
+            (aoi_dataframe.aois[aoi_dataframe.start_y_column] <= row[y_eye]) &
+            (row[y_eye] < aoi_dataframe.aois[aoi_dataframe.end_y_column]),
         )
+
+        if aoi.is_empty():
+            aoi.extend(pl.from_dict({col: None for col in aoi.columns}))
+
+        return aoi
+    raise ValueError(
+        'either aoi_dataframe.width or aoi_dataframe.end_x_column have to be not None',
+    )

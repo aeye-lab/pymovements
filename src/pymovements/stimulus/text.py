@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
 """Module for the TextDataFrame."""
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
@@ -80,6 +81,37 @@ class TextStimulus:
         self.end_y_column = end_y_column
         self.page_column = page_column
 
+    def split(
+            self,
+            by: str | Sequence[str],
+    ) -> list[TextStimulus]:
+        """Split the AOI df.
+
+        Parameters
+        ----------
+        by: str | Sequence[str]
+            Splitting criteria.
+
+        Returns
+        -------
+        list[TextStimulus]
+            A list of TextStimulus objects.
+        """
+        return [
+            TextStimulus(
+                aois=df,
+                aoi_column=self.aoi_column,
+                width_column=self.width_column,
+                height_column=self.height_column,
+                start_x_column=self.start_x_column,
+                start_y_column=self.start_y_column,
+                end_x_column=self.end_x_column,
+                end_y_column=self.end_y_column,
+                page_column=self.page_column,
+            )
+            for df in self.aois.partition_by(by=by, as_dict=False)
+        ]
+
 
 def from_file(
         aoi_path: str | Path,
@@ -135,7 +167,7 @@ def from_file(
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
 
-    valid_extensions = {'.csv', '.tsv', '.txt'}
+    valid_extensions = {'.csv', '.tsv', '.txt', '.ias'}
     if aoi_path.suffix in valid_extensions:
         stimulus_df = pl.read_csv(
             aoi_path,

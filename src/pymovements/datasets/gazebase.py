@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 The pymovements Project Authors
+# Copyright (c) 2022-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,12 +27,10 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.dataset_library import register_dataset
 from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
-@register_dataset
 class GazeBase(DatasetDefinition):
     """GazeBase dataset :cite:p:`GazeBase`.
 
@@ -59,11 +57,11 @@ class GazeBase(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, tuple[str, ...]]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
+    mirrors: dict[str, list[str]]
+        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+    resources: dict[str, list[dict[str, str]]]
+        A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -82,12 +80,6 @@ class GazeBase(DatasetDefinition):
     filename_format_schema_overrides: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
-
-    trial_columns: list[str]
-            The name of the trial columns in the input data frame. If the list is empty or None,
-            the input data frame is assumed to contain only one trial. If the list is not empty,
-            the input data frame is assumed to contain multiple trials and the transformation
-            methods will be applied to each trial separately.
 
     time_column: str
         The name of the timestamp column in the input data frame. This column will be renamed to
@@ -113,8 +105,8 @@ class GazeBase(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.GazeBase` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.GazeBase` definition:
 
     >>> import pymovements as pm
     >>>
@@ -142,34 +134,36 @@ class GazeBase(DatasetDefinition):
         },
     )
 
-    mirrors: dict[str, tuple[str, ...]] = field(
+    mirrors: dict[str, list[str]] = field(
         default_factory=lambda: {
-            'gaze': ('https://figshare.com/ndownloader/files/',),
+            'gaze': ['https://figshare.com/ndownloader/files/'],
         },
     )
 
-    resources: dict[str, tuple[dict[str, str], ...]] = field(
+    resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
-            'gaze': (
+            'gaze': [
                 {
                     'resource': '27039812',
                     'filename': 'GazeBase_v2_0.zip',
                     'md5': 'cb7eb895fb48f8661decf038ab998c9a',
                 },
-            ),
+            ],
         },
     )
 
     extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
-    experiment: Experiment = Experiment(
-        screen_width_px=1680,
-        screen_height_px=1050,
-        screen_width_cm=47.4,
-        screen_height_cm=29.7,
-        distance_cm=55,
-        origin='upper left',
-        sampling_rate=1000,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=1680,
+            screen_height_px=1050,
+            screen_width_cm=47.4,
+            screen_height_cm=29.7,
+            distance_cm=55,
+            origin='upper left',
+            sampling_rate=1000,
+        ),
     )
 
     filename_format: dict[str, str] = field(
@@ -187,10 +181,6 @@ class GazeBase(DatasetDefinition):
         default_factory=lambda: {
             'gaze': {'round_id': int, 'subject_id': int, 'session_id': int},
         },
-    )
-
-    trial_columns: list[str] = field(
-        default_factory=lambda: ['round_id', 'subject_id', 'session_id', 'task_name'],
     )
 
     time_column: str = 'n'

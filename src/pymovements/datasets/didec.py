@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 The pymovements Project Authors
+# Copyright (c) 2022-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,12 +25,10 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.dataset_library import register_dataset
 from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
-@register_dataset
 class DIDEC(DatasetDefinition):
     """DIDEC dataset :cite:p:`DIDEC`.
 
@@ -51,11 +49,11 @@ class DIDEC(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, tuple[str, ...]]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
+    mirrors: dict[str, list[str]]
+        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
+    resources: dict[str, list[dict[str, str]]]
+        A list of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
@@ -103,8 +101,8 @@ class DIDEC(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.DIDEC` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.DIDEC` definition:
 
     >>> import pymovements as pm
     >>>
@@ -132,32 +130,34 @@ class DIDEC(DatasetDefinition):
         },
     )
 
-    mirrors: dict[str, tuple[str, ...]] = field(
+    mirrors: dict[str, list[str]] = field(
         default_factory=lambda: {
-            'gaze': ('https://didec.uvt.nl/corpus/',),
+            'gaze': ['https://didec.uvt.nl/corpus/'],
         },
     )
 
-    resources: dict[str, tuple[dict[str, str], ...]] = field(
+    resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
-            'gaze': (
+            'gaze': [
                 {
                     'resource': 'DIDEC_only_the_eyetracking_data.zip',
                     'filename': 'DIDEC_only_the_eyetracking_data.zip',
                     'md5': 'd572b0b41828986ca48a2fcf6966728a',
                 },
-            ),
+            ],
         },
     )
 
-    experiment: Experiment = Experiment(
-        screen_width_px=1680,
-        screen_height_px=1050,
-        screen_width_cm=47.4,
-        screen_height_cm=29.7,
-        distance_cm=70,
-        origin='upper left',
-        sampling_rate=1000,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=1680,
+            screen_height_px=1050,
+            screen_width_cm=47.4,
+            screen_height_cm=29.7,
+            distance_cm=70,
+            origin='upper left',
+            sampling_rate=1000,
+        ),
     )
 
     extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})

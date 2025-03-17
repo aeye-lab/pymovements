@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 The pymovements Project Authors
+# Copyright (c) 2022-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,20 +20,19 @@
 """Provides the Screen class."""
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import numpy as np
 
 from pymovements.gaze import transforms_numpy
 from pymovements.utils import checks
-from pymovements.utils import decorators
 
 
-@decorators.auto_str
+@dataclass
 class Screen:
     """Screen class for holding screen properties.
 
-     Also transforms pixel coordinates to degrees of visual angle.
-
-    Parameters
+    Attributes
     ----------
     width_px: int | None
         Screen width in pixels. (default: None)
@@ -62,8 +61,8 @@ class Screen:
     ...     origin='upper left',
     ... )
     >>> print(screen)
-    Screen(width_px=1280, height_px=1024, width_cm=38.00,
-    height_cm=30.00, distance_cm=68.00, origin=upper left)
+    Screen(width_px=1280, height_px=1024, width_cm=38.0,
+    height_cm=30.0, distance_cm=68.0, origin='upper left')
 
     We can also access the screen boundaries in degrees of visual angle. This only works if the
     `distance_cm` attribute is specified.
@@ -79,36 +78,29 @@ class Screen:
 
     """
 
-    def __init__(
-            self,
-            width_px: int | None = None,
-            height_px: int | None = None,
-            width_cm: float | None = None,
-            height_cm: float | None = None,
-            distance_cm: float | None = None,
-            origin: str | None = 'upper left',
-    ):
-        if width_px is not None:
-            checks.check_is_greater_than_zero(width_px=width_px)
-        self.width_px = width_px
+    width_px: int | None = None
+    height_px: int | None = None
+    width_cm: float | None = None
+    height_cm: float | None = None
+    distance_cm: float | None = None
+    origin: str | None = 'upper left'
 
-        if height_px is not None:
-            checks.check_is_greater_than_zero(height_px=height_px)
-        self.height_px = height_px
+    def __post_init__(self) -> None:
+        """Check fields for validity."""
+        if self.width_px is not None:
+            checks.check_is_greater_than_zero(width_px=self.width_px)
 
-        if width_cm is not None:
-            checks.check_is_greater_than_zero(width_cm=width_cm)
-        self.width_cm = width_cm
+        if self.height_px is not None:
+            checks.check_is_greater_than_zero(height_px=self.height_px)
 
-        if height_cm is not None:
-            checks.check_is_greater_than_zero(height_cm=height_cm)
-        self.height_cm = height_cm
+        if self.width_cm is not None:
+            checks.check_is_greater_than_zero(width_cm=self.width_cm)
 
-        if distance_cm is not None:
-            checks.check_is_greater_than_zero(distance_cm=distance_cm)
-        self.distance_cm = distance_cm
+        if self.height_cm is not None:
+            checks.check_is_greater_than_zero(height_cm=self.height_cm)
 
-        self.origin = origin
+        if self.distance_cm is not None:
+            checks.check_is_greater_than_zero(distance_cm=self.distance_cm)
 
     @property
     def x_max_dva(self) -> float:

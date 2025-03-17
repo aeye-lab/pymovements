@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -206,7 +206,7 @@ def test_load_eyelink_file(tmp_path, read_kwargs):
         filepath,
         fileinfo_row={},
         definition=DatasetDefinition(
-            experiment=pm.Experiment(1024, 768, 38, 30, None, 'center', 100),
+            experiment=pm.Experiment(1280, 1024, 38, 30, None, 'center', 1000),
             filename_format_schema_overrides={'gaze': {}, 'precomputed_events': {}},
         ),
         custom_read_kwargs=read_kwargs,

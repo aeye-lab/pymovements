@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 The pymovements Project Authors
+# Copyright (c) 2022-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ from tqdm.auto import tqdm
 
 from pymovements.utils.archives import extract_archive
 
-USER_AGENT: str = 'aeye-lab/pymovements'
+USER_AGENT: str = 'pymovements'
 
 
 def download_and_extract_archive(

@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 The pymovements Project Authors
+# Copyright (c) 2022-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,12 +27,10 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.dataset_library import register_dataset
 from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
-@register_dataset
 class EMTeC(DatasetDefinition):
     """EMTeC dataset :cite:p:`EMTeC`.
 
@@ -51,11 +49,11 @@ class EMTeC(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, tuple[str, ...]]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
+    mirrors: dict[str, list[str]]
+        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+    resources: dict[str, list[dict[str, str]]]
+        A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -101,8 +99,8 @@ class EMTeC(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.EMTeC` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.EMTeC` definition:
 
     >>> import pymovements as pm
     >>>
@@ -129,33 +127,29 @@ class EMTeC(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-    mirrors: dict[str, tuple[str, ...]] = field(
+    mirrors: dict[str, list[str]] = field(
         default_factory=lambda:
             {
-                'gaze': (
-                    'https://osf.io/download/',
-                ),
-                'precomputed_events': (
-                    'https://osf.io/download/',
-                ),
+                'gaze': ['https://osf.io/download/'],
+                'precomputed_events': ['https://osf.io/download/'],
             },
     )
-    resources: dict[str, tuple[dict[str, str], ...]] = field(
+    resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
-            'gaze': (
+            'gaze': [
                 {
                     'resource': '374sk/',
                     'filename': 'subject_level_data.zip',
                     'md5': 'dca99e47ef43f3696acec4fd70967750',
                 },
-            ),
-            'precomputed_events': (
+            ],
+            'precomputed_events': [
                 {
                     'resource': '2hs8p/',
                     'filename': 'fixations.csv',
                     'md5': '5e05a364a1d8a044d8b36506aa91437e',
                 },
-            ),
+            ],
         },
     )
     extract: dict[str, bool] = field(
@@ -165,14 +159,16 @@ class EMTeC(DatasetDefinition):
         },
     )
 
-    experiment: Experiment = Experiment(
-        screen_width_px=1280,
-        screen_height_px=1024,
-        screen_width_cm=38.2,
-        screen_height_cm=30.2,
-        distance_cm=60,
-        origin='center',
-        sampling_rate=2000,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=1280,
+            screen_height_px=1024,
+            screen_width_cm=38.2,
+            screen_height_cm=30.2,
+            distance_cm=60,
+            origin='center',
+            sampling_rate=2000,
+        ),
     )
 
     filename_format: dict[str, str] = field(
@@ -191,12 +187,7 @@ class EMTeC(DatasetDefinition):
             },
     )
 
-    trial_columns: list[str] = field(
-        default_factory=lambda: [
-            'subject_id',
-            'item_id',
-        ],
-    )
+    trial_columns: list[str] = field(default_factory=lambda: ['item_id'])
 
     time_column: str = 'time'
 

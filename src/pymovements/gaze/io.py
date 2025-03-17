@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,16 +25,16 @@ from typing import Any
 
 import polars as pl
 
-from pymovements.gaze import Experiment  # pylint: disable=cyclic-import
+from pymovements.gaze._utils.parsing import parse_eyelink
+from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze_dataframe import GazeDataFrame  # pylint: disable=cyclic-import
-from pymovements.utils.parsing import parse_eyelink
 
 
 def from_csv(
         file: str | Path,
         experiment: Experiment | None = None,
         *,
-        trial_columns: list[str] | None = None,
+        trial_columns: str | list[str] | None = None,
         time_column: str | None = None,
         time_unit: str | None = 'ms',
         pixel_columns: list[str] | None = None,
@@ -47,7 +47,7 @@ def from_csv(
         column_schema_overrides: dict[str, type] | None = None,
         **read_csv_kwargs: Any,
 ) -> GazeDataFrame:
-    """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
+    """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
 
     Parameters
     ----------
@@ -55,7 +55,7 @@ def from_csv(
         Path of gaze file.
     experiment : Experiment | None
         The experiment definition. (default: None)
-    trial_columns: list[str] | None
+    trial_columns: str | list[str] | None
         The name of the trial columns in the input data frame. If the list is empty or None,
         the input data frame is assumed to contain only one trial. If the list is not empty,
         the input data frame is assumed to contain multiple trials and the transformation
@@ -275,10 +275,12 @@ def from_asc(
         metadata_patterns: list[dict[str, Any] | str] | None = None,
         schema: dict[str, Any] | None = None,
         experiment: Experiment | None = None,
+        trial_columns: str | list[str] | None = None,
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, Any] | None = None,
-) -> tuple[GazeDataFrame, dict[str, Any]]:
-    """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
+        encoding: str = 'ascii',
+) -> GazeDataFrame:
+    """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
 
     Parameters
     ----------
@@ -294,17 +296,24 @@ def from_asc(
         Dictionary to optionally specify types of columns parsed by patterns. (default: None)
     experiment: Experiment | None
         The experiment definition. (default: None)
+    trial_columns: str | list[str] | None
+        The names of the columns (extracted by patterns) to use as trial columns.
+        If the list is empty or None, the asc file is assumed to contain only one trial.
+        If the list is not empty, the asc file is assumed to contain multiple trials and
+        the transformation methods will be applied to each trial separately. (default: None)
     add_columns: dict[str, str] | None
         Dictionary containing columns to add to loaded data frame.
         (default: None)
     column_schema_overrides: dict[str, Any] | None
         Dictionary containing types for columns.
         (default: None)
+    encoding: str
+        Text encoding of the file. (default: 'ascii')
 
     Returns
     -------
-    tuple[GazeDataFrame, dict[str, Any]]
-        The gaze data frame and a metadata dictionary read from the asc file.
+    GazeDataFrame
+        The gaze data frame read from the asc file.
 
     Examples
     --------
@@ -312,7 +321,7 @@ def from_asc(
     We can then load the data into a ``GazeDataFrame``:
 
     >>> from pymovements.gaze.io import from_asc
-    >>> gaze, metadata = from_asc(file='tests/files/eyelink_monocular_example.asc')
+    >>> gaze = from_asc(file='tests/files/eyelink_monocular_example.asc')
     >>> gaze.frame
     shape: (16, 3)
     ┌─────────┬───────┬────────────────┐
@@ -332,7 +341,7 @@ def from_asc(
     │ 2339290 ┆ 618.0 ┆ [637.6, 531.4] │
     │ 2339291 ┆ 618.0 ┆ [637.3, 531.2] │
     └─────────┴───────┴────────────────┘
-    >>> metadata['sampling_rate']
+    >>> gaze.experiment.eyetracker.sampling_rate
     1000.0
     """
     if isinstance(patterns, str):
@@ -344,7 +353,11 @@ def from_asc(
 
     # Read data.
     gaze_data, metadata = parse_eyelink(
-        file, patterns=patterns, schema=schema, metadata_patterns=metadata_patterns,
+        file,
+        patterns=patterns,
+        schema=schema,
+        metadata_patterns=metadata_patterns,
+        encoding=encoding,
     )
 
     if add_columns is not None:
@@ -360,26 +373,95 @@ def from_asc(
             for fileinfo_key, fileinfo_dtype in column_schema_overrides.items()
         ])
 
+    if experiment is None:
+        experiment = Experiment(sampling_rate=metadata['sampling_rate'])
+
+    # Compare metadata from experiment definition with metadata from ASC file.
+    # Fill in missing metadata in experiment definition and raise an error if there are conflicts
+    issues = []
+
+    # Screen resolution (assuming that width and height will always be missing or set together)
+    experiment_resolution = (experiment.screen.width_px, experiment.screen.height_px)
+    if experiment_resolution == (None, None):
+        experiment.screen.width_px, experiment.screen.height_px = metadata['resolution']
+    elif experiment_resolution != metadata['resolution']:
+        issues.append(f"Screen resolution: {experiment_resolution} vs. {metadata['resolution']}")
+
+    # Sampling rate
+    if experiment.eyetracker.sampling_rate != metadata['sampling_rate']:
+        issues.append(
+            f"Sampling rate: {experiment.eyetracker.sampling_rate} vs. {metadata['sampling_rate']}",
+        )
+
+    # Tracked eye
+    asc_left_eye = 'L' in metadata['tracked_eye']
+    asc_right_eye = 'R' in metadata['tracked_eye']
+    if experiment.eyetracker.left is None:
+        experiment.eyetracker.left = asc_left_eye
+    elif experiment.eyetracker.left != asc_left_eye:
+        issues.append(f"Left eye tracked: {experiment.eyetracker.left} vs. {asc_left_eye}")
+    if experiment.eyetracker.right is None:
+        experiment.eyetracker.right = asc_right_eye
+    elif experiment.eyetracker.right != asc_right_eye:
+        issues.append(f"Right eye tracked: {experiment.eyetracker.right} vs. {asc_right_eye}")
+
+    # Mount configuration
+    if experiment.eyetracker.mount is None:
+        experiment.eyetracker.mount = metadata['mount_configuration']['mount_type']
+    elif experiment.eyetracker.mount != metadata['mount_configuration']['mount_type']:
+        issues.append(f"Mount configuration: {experiment.eyetracker.mount} vs. "
+                      f"{metadata['mount_configuration']['mount_type']}")
+
+    # Eye tracker vendor
+    asc_vendor = 'EyeLink' if 'EyeLink' in metadata['model'] else None
+    if experiment.eyetracker.vendor is None:
+        experiment.eyetracker.vendor = asc_vendor
+    elif experiment.eyetracker.vendor != asc_vendor:
+        issues.append(f"Eye tracker vendor: {experiment.eyetracker.vendor} vs. {asc_vendor}")
+
+    # Eye tracker model
+    if experiment.eyetracker.model is None:
+        experiment.eyetracker.model = metadata['model']
+    elif experiment.eyetracker.model != metadata['model']:
+        issues.append(f"Eye tracker model: {experiment.eyetracker.model} vs. {metadata['model']}")
+
+    # Eye tracker software version
+    if experiment.eyetracker.version is None:
+        experiment.eyetracker.version = metadata['version_number']
+    elif experiment.eyetracker.version != metadata['version_number']:
+        issues.append(f"Eye tracker software version: {experiment.eyetracker.version} vs. "
+                      f"{metadata['version_number']}")
+
+    if issues:
+        raise ValueError(
+            'Experiment metadata does not match the metadata in the ASC file:\n'
+            + '\n'.join(f'- {issue}' for issue in issues),
+        )
+
     # Create gaze data frame.
     gaze_df = GazeDataFrame(
         gaze_data,
         experiment=experiment,
+        trial_columns=trial_columns,
         time_column='time',
         time_unit='ms',
         pixel_columns=['x_pix', 'y_pix'],
     )
-    return gaze_df, metadata
+    gaze_df._metadata = metadata  # pylint: disable=protected-access
+    return gaze_df
 
 
 def from_ipc(
         file: str | Path,
         experiment: Experiment | None = None,
+        *,
+        trial_columns: str | list[str] | None = None,
         column_map: dict[str, str] | None = None,
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, type] | None = None,
         **read_ipc_kwargs: Any,
 ) -> GazeDataFrame:
-    """Initialize a :py:class:`pymovements.gaze.gaze_dataframe.GazeDataFrame`.
+    """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
 
     Parameters
     ----------
@@ -388,6 +470,11 @@ def from_ipc(
     experiment : Experiment | None
         The experiment definition.
         (default: None)
+    trial_columns: str | list[str] | None
+        The name of the trial columns in the input data frame. If the list is empty or None,
+        the input data frame is assumed to contain only one trial. If the list is not empty,
+        the input data frame is assumed to contain multiple trials and the transformation
+        methods will be applied to each trial separately. (default: None)
     column_map: dict[str, str] | None
         The keys are the columns to read, the values are the names to which they should be renamed.
         (default: None)
@@ -461,5 +548,6 @@ def from_ipc(
     gaze_df = GazeDataFrame(
         gaze_data,
         experiment=experiment,
+        trial_columns=trial_columns,
     )
     return gaze_df

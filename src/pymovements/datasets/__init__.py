@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,18 +25,25 @@
    :toctree:
    :template: class.rst
 
-    pymovements.datasets.CodeComprehension
-    pymovements.datasets.CopCo
-    pymovements.datasets.DIDEC
-    pymovements.datasets.EMTeC
-    pymovements.datasets.GazeBase
-    pymovements.datasets.GazeBaseVR
-    pymovements.datasets.GazeGraph
-    pymovements.datasets.GazeOnFaces
-    pymovements.datasets.HBN
-    pymovements.datasets.JuDo1000
-    pymovements.datasets.PoTeC
-    pymovements.datasets.SBSAT
+    BSC
+    BSCII
+    CodeComprehension
+    CopCo
+    DAEMONS
+    DIDEC
+    EMTeC
+    FakeNewsPerception
+    GazeBase
+    GazeBaseVR
+    GazeGraph
+    GazeOnFaces
+    HBN
+    InteRead
+    JuDo1000
+    PoTeC
+    Provo
+    SBSAT
+    UCL
 
 
 .. rubric:: Example Datasets
@@ -45,11 +52,14 @@
    :toctree:
    :template: class.rst
 
-    pymovements.datasets.ToyDataset
-    pymovements.datasets.ToyDatasetEyeLink
+    ToyDataset
+    ToyDatasetEyeLink
 """
+from pymovements.datasets.bsc import BSC
+from pymovements.datasets.bsc2 import BSCII
 from pymovements.datasets.codecomprehension import CodeComprehension
 from pymovements.datasets.copco import CopCo
+from pymovements.datasets.daemons import DAEMONS
 from pymovements.datasets.didec import DIDEC
 from pymovements.datasets.emtec import EMTeC
 from pymovements.datasets.fakenews import FakeNewsPerception
@@ -58,16 +68,22 @@ from pymovements.datasets.gaze_on_faces import GazeOnFaces
 from pymovements.datasets.gazebase import GazeBase
 from pymovements.datasets.gazebasevr import GazeBaseVR
 from pymovements.datasets.hbn import HBN
+from pymovements.datasets.interead import InteRead
 from pymovements.datasets.judo1000 import JuDo1000
 from pymovements.datasets.potec import PoTeC
+from pymovements.datasets.provo import Provo
 from pymovements.datasets.sb_sat import SBSAT
 from pymovements.datasets.toy_dataset import ToyDataset
 from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
+from pymovements.datasets.ucl import UCL
 
 
 __all__ = [
+    'BSC',
+    'BSCII',
     'CodeComprehension',
     'CopCo',
+    'DAEMONS',
     'DIDEC',
     'EMTeC',
     'FakeNewsPerception',
@@ -76,9 +92,12 @@ __all__ = [
     'GazeGraph',
     'GazeOnFaces',
     'HBN',
+    'InteRead',
     'JuDo1000',
     'PoTeC',
+    'Provo',
     'SBSAT',
     'ToyDataset',
     'ToyDatasetEyeLink',
+    'UCL',
 ]
