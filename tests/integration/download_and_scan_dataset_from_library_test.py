@@ -17,17 +17,17 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test basic preprocessing on all registered public datasets."""
+"""Test downloading and scanning all items in DatasetLibrary."""
 import pytest
 
 from pymovements import DatasetLibrary
 
 
-@pytest.mark.parametrize('dataset_name', DatasetLibrary.names()))
-    def test_download_and_scan(dataset_name, tmp_path):
+@pytest.mark.parametrize('dataset_name', DatasetLibrary.names())
+def test_download_and_scan(dataset_name, tmp_path):
     # Initialize dataset.
-    dataset_path= tmp_path / dataset_name
-    dataset= pm.Dataset(dataset_name, path=dataset_path)
+    dataset_path = tmp_path / dataset_name
+    dataset = pm.Dataset(dataset_name, path=dataset_path)
 
     # Download and load in dataset.
     dataset.download(remove_finished=True)
