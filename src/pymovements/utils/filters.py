@@ -19,8 +19,8 @@
 # SOFTWARE.
 """Provides filter specific funtions.
 
-.. deprecated:: v0.22.0
-   This module will be removed in v0.27.0.
+.. deprecated:: v0.21.1
+   This module will be removed in v0.26.0.
 """
 from __future__ import annotations
 
@@ -33,8 +33,8 @@ from pymovements.events._utils._filters import filter_candidates_remove_nans \
 
 
 @deprecated(
-    reason='This function will be removed in v0.27.0.',
-    version='v0.22.0',
+    reason='This function will be removed in v0.26.0.',
+    version='v0.21.1',
 )
 def filter_candidates_remove_nans(
         candidates: list[np.ndarray],
@@ -44,8 +44,8 @@ def filter_candidates_remove_nans(
 
     Removes leading and ending np.nans for all candidates in candidates
 
-    .. deprecated:: v0.22.0
-       This module will be removed in v0.27.0.
+    .. deprecated:: v0.21.1
+       This module will be removed in v0.26.0.
 
     Parameters
     ----------
@@ -67,8 +67,8 @@ def filter_candidates_remove_nans(
 
 
 @deprecated(
-    reason='This function will be removed in v0.27.0.',
-    version='v0.22.0',
+    reason='This function will be removed in v0.26.0.',
+    version='v0.21.1',
 )
 def events_split_nans(
         candidates: list[np.ndarray],
@@ -78,8 +78,8 @@ def events_split_nans(
 
     Splits events if np.nans are within an event
 
-    .. deprecated:: v0.22.0
-       This module will be removed in v0.27.0.
+    .. deprecated:: v0.21.1
+       This module will be removed in v0.26.0.
 
     Parameters
     ----------

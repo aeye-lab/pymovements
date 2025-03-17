@@ -19,9 +19,9 @@
 # SOFTWARE.
 """Module for parsing input data.
 
-.. deprecated:: v0.22.0
+.. deprecated:: v0.21.1
    Please use gaze.from_asc() instead of utils.parsing.
-   This module will be removed in v0.27.0.
+   This module will be removed in v0.26.0.
 """
 from __future__ import annotations
 
@@ -36,8 +36,8 @@ from pymovements.gaze._utils.parsing import parse_eyelink as _parse_eyelink
 
 @deprecated(
     reason='Please use gaze.from_asc() instead of utils.parsing. '
-           'This module will be removed in v0.27.0.',
-    version='v0.22.0',
+           'This module will be removed in v0.26.0.',
+    version='v0.21.1',
 )
 def parse_eyelink(
         filepath: Path | str,
