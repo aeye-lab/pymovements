@@ -1,6 +1,8 @@
 name: datasets
-on:  # TODO: change to tagged commits only
+on:
   push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
     branches: [main]
   pull_request:
     branches: [main]
@@ -24,10 +26,10 @@ jobs:
         run: python -m pip install -e ${{ github.workspace }}
       - name: Create matrix for all datasets
         id: create-matrix
-        run:  python -c "import pymovements as pm; print(f'matrix={pm.DatasetLibrary.names()}')" >> $GITHUB_OUTPUT
+        run:  python -c "from pymovements import DatasetLibrary; print(f'matrix={DatasetLibrary.names()}')" >> $GITHUB_OUTPUT
 
   test:
-    name: test dataset ${{ matrix.dataset }}
+    name: test ${{ matrix.dataset }}
     runs-on: ubuntu-latest
     needs: [prepare-matrix]
     strategy:
