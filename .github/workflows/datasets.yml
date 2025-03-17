@@ -36,10 +36,8 @@ jobs:
       matrix:
         dataset: ${{ fromJSON(needs.prepare-matrix.outputs.all_datasets) }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/checkout@v4
+      - name: Checkout pymovements repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Setup python
@@ -52,5 +50,3 @@ jobs:
         run: tox -vv --notest -e integration
       - name: Run dataset integration test
         run: tox --skip-pkg-install -e integration -- tests/integration/download_and_scan_dataset_from_library_test.py::test_download_and_scan[${{ matrix.dataset }}]
-
-
