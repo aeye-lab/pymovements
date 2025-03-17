@@ -20,6 +20,9 @@
 """Provides the Experiment class."""
 from __future__ import annotations
 
+from dataclasses import asdict
+from typing import Any
+
 import numpy as np
 
 from pymovements.gaze import transforms_numpy
@@ -201,6 +204,19 @@ class Experiment:
     def __eq__(self: Experiment, other: Experiment) -> bool:
         """Compare equality to other Experiment."""
         return self.screen == other.screen and self.eyetracker == other.eyetracker
+
+    def to_dict(self) -> dict[str, Any | dict[str, str | float | None]]:
+        """Convert the experiment instance into a dictionary.
+
+        Returns
+        -------
+        dict[str, Any | dict[str, str | float | None]]
+            Experiment as dictionary.
+        """
+        _dict: dict[str, dict[str, str | float | None]] = {}
+        _dict['screen'] = asdict(self.screen)
+        _dict['eyetracker'] = asdict(self.eyetracker)
+        return _dict
 
     def __str__(self: Experiment) -> str:
         """Return Experiment string."""

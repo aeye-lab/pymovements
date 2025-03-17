@@ -2,6 +2,8 @@
  Datasets
 ==========
 
+**Please cite the respective paper for every dataset that you use in your research.**
+
 Download your dataset and load it into memory with these few lines of code:
 
 .. code-block:: python
@@ -18,12 +20,20 @@ Download your dataset and load it into memory with these few lines of code:
     # Load the dataset into memory for processing
     dataset.load()
 
-.. csv-table:: Public Datasets
+-----------------
+ Public Datasets
+-----------------
+
+.. csv-table::
    :file: public_datasets.csv
-   :widths: 30, 40, 10, 10, 10
+   :widths: 30, 35, 5, 5, 5, 5, 5, 5, 5
    :header-rows: 1
 
-.. csv-table:: Example Datasets
+------------------
+ Example Datasets
+------------------
+
+.. csv-table::
    :file: example_datasets.csv
-   :widths: 70, 10, 10, 10
+   :widths: 65, 5, 5, 5, 5, 5, 5, 5
    :header-rows: 1

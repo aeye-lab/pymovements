@@ -48,7 +48,7 @@ class Dataset:
 
     Parameters
     ----------
-    definition: str | DatasetDefinition | type[DatasetDefinition]
+    definition: str | Path | DatasetDefinition | type[DatasetDefinition]
         Dataset definition to initialize dataset with.
     path : str | Path | DatasetPaths
         Path to the dataset directory. You can set up a custom directory structure by passing a
@@ -57,7 +57,7 @@ class Dataset:
 
     def __init__(
             self,
-            definition: str | DatasetDefinition | type[DatasetDefinition],
+            definition: str | Path | DatasetDefinition | type[DatasetDefinition],
             path: str | Path | DatasetPaths,
     ):
         self.fileinfo: pl.DataFrame = pl.DataFrame()
@@ -66,17 +66,27 @@ class Dataset:
         self.precomputed_events: list[PrecomputedEventDataFrame] = []
         self.precomputed_reading_measures: list[ReadingMeasures] = []
 
-        if isinstance(definition, str):
-            definition = DatasetLibrary.get(definition)()
-        if isinstance(definition, type):
-            definition = definition()
-        self.definition = deepcopy(definition)
+        # Handle different definition input types
+        if isinstance(definition, (str, Path)):
+            # Check if it's a path to a YAML file
+            if isinstance(definition, Path) or str(definition).endswith('.yaml'):
+                self.definition = DatasetDefinition.from_yaml(definition)
+            else:
+                # Try to load from registered datasets
+                self.definition = DatasetLibrary.get(definition)
 
+        elif isinstance(definition, type):
+            self.definition = definition()
+        else:
+            self.definition = deepcopy(definition)
+
+        # Handle path setup
         if isinstance(path, (str, Path)):
             self.paths = DatasetPaths(root=path, dataset='.')
         else:
             self.paths = deepcopy(path)
-        # Fill dataset directory name with dataset definition name if specified.
+
+        # Fill dataset directory name with dataset definition name if specified
         self.paths.fill_name(self.definition.name)
 
     def load(
@@ -116,7 +126,8 @@ class Dataset:
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`. (default: None)
         extension: str
-            Specifies the file format for loading data. Valid options are: `csv`, `feather`.
+            Specifies the file format for loading data. Valid options are: `csv`, `feather`,
+            `tsv`, `txt`, `asc`.
             (default: 'feather')
 
         Returns
@@ -188,7 +199,8 @@ class Dataset:
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`. (default: None)
         extension: str
-            Specifies the file format for loading data. Valid options are: `csv`, `feather`.
+            Specifies the file format for loading data. Valid options are: `csv`, `feather`,
+            `tsv`, `txt`, `asc`.
             (default: 'feather')
 
         Returns
