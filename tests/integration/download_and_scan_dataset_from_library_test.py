@@ -20,13 +20,10 @@
 """Test basic preprocessing on all registered public datasets."""
 import pytest
 
-import pymovements as pm
+from pymovements import DatasetLibrary
 
 
-@pytest.mark.parametrize(
-    'dataset_name',
-    list(pm.dataset.DatasetLibrary.definitions.keys()),
-)
+@pytest.mark.parametrize('dataset_name', DatasetLibrary.names()))
 def test_download_and_scan(dataset_name, tmp_path):
     # Initialize dataset.
     dataset_path = tmp_path / dataset_name
