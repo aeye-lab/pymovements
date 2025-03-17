@@ -20,6 +20,7 @@
 """Test downloading and scanning all items in DatasetLibrary."""
 import pytest
 
+from pymovements import Dataset
 from pymovements import DatasetLibrary
 
 
@@ -27,9 +28,9 @@ from pymovements import DatasetLibrary
 def test_download_and_scan(dataset_name, tmp_path):
     # Initialize dataset.
     dataset_path = tmp_path / dataset_name
-    dataset = pm.Dataset(dataset_name, path=dataset_path)
+    dataset = Dataset(dataset_name, path=dataset_path)
 
-    # Download and load in dataset.
+    # Download and scan dataset.
     dataset.download(remove_finished=True)
     dataset.scan()
 
