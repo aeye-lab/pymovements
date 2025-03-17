@@ -7,7 +7,7 @@ on:  # TODO: change to tagged commits only
 
 jobs:
   prepare-matrix:
-    name: prepare matrix output
+    name: prepare dataset matrix
     runs-on: ubuntu-latest
     outputs:
       all_datasets: ${{ steps.create-matrix.outputs.matrix }}
@@ -22,7 +22,7 @@ jobs:
           python-version: "3.13"
       - name: Install pymovements
         run: python -m pip install -e ${{ github.workspace }}
-      - name: Create matrix variable for all datasets
+      - name: Create matrix for all datasets
         id: create-matrix
         run:  python -c "import pymovements as pm; print(f'matrix={pm.DatasetLibrary.names()}')" >> $GITHUB_OUTPUT
 
@@ -41,117 +41,3 @@ jobs:
           fetch-depth: 0
       - name: Test
         run: echo ${{ matrix.dataset }}
-
-#    steps:
-#      ...(several steps to complete job)....
-#      matrix:
-#        dataset:
-#          - BSC
-#          - BSCII
-#        os:
-#          - ubuntu-latest
-#        tox_env:
-#          - py39
-#          - py310
-#          - py311
-#          - py312
-#          - py313
-#        exclude:
-#            - os: macos-latest
-#              tox_env: py39
-#            - os: macos-13
-#              tox_env: py310
-#            - os: macos-13
-#              tox_env: py311
-#            - os: macos-13
-#              tox_env: py312
-#            - os: macos-13
-#              tox_env: py313
-#        include:
-#          - tox_env: py39
-#            python: "3.9"
-#          - tox_env: py310
-#            python: "3.10"
-#          - tox_env: py311
-#            python: "3.11"
-#          - tox_env: py312
-#            python: "3.12"
-#          - tox_env: py313
-#            python: "3.13"
-#    steps:
-#      - uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 0
-#      - name: read-yaml-file
-#        uses: pietrobolcato/action-read-yaml@1.0.0
-#        id: read_action_js
-#        with:
-#          config: ${{ github.workspace }}/examples/config_example.yaml
-
-#      - name: Test
-#        run: echo ${{ matrix.dataset }}
-#      - name: Setup python
-#        uses: actions/setup-python@v5
-#        with:
-#          python-version: ${{ matrix.python }}
-#      - name: Install tox
-#        run: python -m pip install tox
-#      - name: Setup test environment
-#        run: tox -vv --notest -e ${{ matrix.tox_env }}
-#      - name: Run test
-#        run: tox --skip-pkg-install -e ${{ matrix.tox_env }}
-#      - name: Upload coverage reports to Codecov
-#        if: success() || failure()
-#        uses: codecov/codecov-action@v5
-#        with:
-#          token: ${{ secrets.CODECOV_TOKEN }}
-
-#on:
-#  push:
-#  workflow_dispatch:
-
-#jobs:
-#  read-yaml:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: checkout
-#        uses: actions/checkout@v3
-
-#      - name: read-yaml-file
-#        uses: pietrobolcato/action-read-yaml@1.0.0
-#        id: read_action_js
-#        with:
-#          config: ${{ github.workspace }}/examples/config_example.yaml
-
-#      - name: use-yaml-file
-#        run: |
-#          echo namespace: ${{ steps.read_action_js.outputs['namespace'] }}
-#          echo location: ${{ steps.read_action_js.outputs['location'] }}
-#          echo environment: ${{ steps.read_action_js.outputs['environment'] }}
-#          echo resource_group_name: ${{ steps.read_action_js.outputs['resource_group_name'] }}
-
-
-#env:
-#  VERSIONS: '[9.0.0, 11.0.0]'
-
-#jobs:
-#  prepare-matrix:
-#    name: Prepare Matrix Output
-#    runs-on: ubuntu-latest
-#    outputs:
-#      all_versions: ${{ steps.step1.outputs.matrix }}
-#    steps:
-#      - name: Create Matrix Variable
-#        id: step1
-#        run: echo "matrix=${{env.VERSIONS}}" >> $GITHUB_OUTPUT
-
-#  deploy-gke:
-#    name: Deploy to GKE
-#    runs-on: ubuntu-latest
-#    needs: [prepare-matrix]
-#    strategy:
-#      max-parallel: 2
-#      matrix:
-#        version: ${{ fromJSON(needs.prepare-matrix.outputs.all_versions) }}
-#    steps:
-#      ...(several steps to complete job)....
