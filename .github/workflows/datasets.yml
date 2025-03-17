@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
-      max-parallel: 2
+      #max-parallel: 2
       matrix: 
         version: ${{ fromJSON(needs.prepare-matrix.outputs.all_datasets) }}
     steps:
