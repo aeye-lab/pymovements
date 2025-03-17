@@ -19,8 +19,8 @@
 # SOFTWARE.
 """Provides string specific funtions.
 
-.. deprecated:: v0.21.0
-   This module will be removed in v0.26.0.
+.. deprecated:: v0.22.0
+   This module will be removed in v0.27.0.
 """
 from __future__ import annotations
 
@@ -32,8 +32,8 @@ from pymovements._utils._strings import curly_to_regex as _curly_to_regex
 
 
 @deprecated(
-    reason='This module will be removed in v0.26.0.',
-    version='v0.21.0',
+    reason='This module will be removed in v0.27.0.',
+    version='v0.22.0',
 )
 def curly_to_regex(s: str) -> re.Pattern:
     """Return regex pattern converted from provided python formatting style pattern.
@@ -45,8 +45,8 @@ def curly_to_regex(s: str) -> re.Pattern:
                 r'{subject_id:d}_{session_name}.csv'
     converts to r'(?P<subject_id>[0-9]+)_(?P<session_name>.+).csv'
 
-    .. deprecated:: v0.21.0
-       This module will be removed in v0.26.0.
+    .. deprecated:: v0.22.0
+       This module will be removed in v0.27.0.
 
     Parameters
     ----------
