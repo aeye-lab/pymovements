@@ -3,9 +3,6 @@ on:
   push:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+*'
-    branches: [main]
-  pull_request:
-    branches: [main]
 
 jobs:
   prepare-matrix:
@@ -33,8 +30,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [prepare-matrix]
     strategy:
-      fail-fast: true
-      #max-parallel: 2
       matrix:
         dataset: ${{ fromJSON(needs.prepare-matrix.outputs.all_datasets) }}
     steps:
