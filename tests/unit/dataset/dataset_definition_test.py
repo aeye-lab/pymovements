@@ -18,12 +18,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test dataset definition."""
-import yaml
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
 
 import pytest
+import yaml
 
 from pymovements import DatasetDefinition
 from pymovements import DatasetLibrary
