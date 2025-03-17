@@ -23,10 +23,7 @@ jobs:
         run: python -m pip install -e ${{ github.workspace }}
       - name: Create matrix for all datasets
         id: create-matrix
-        run: >
-          python -c
-            "from pymovements import DatasetLibrary; print(f'matrix={DatasetLibrary.names()}')"
-            >> $GITHUB_OUTPUT
+        run: python -c "from pymovements import DatasetLibrary; print(f'matrix={DatasetLibrary.names()}')" >> $GITHUB_OUTPUT
 
   test:
     name: test ${{ matrix.dataset }}
@@ -49,6 +46,4 @@ jobs:
       - name: Setup test environment
         run: tox -vv --notest -e integration
       - name: Run dataset integration test
-        run: >
-          tox --skip-pkg-install -e integration --
-          tests/integration/download_and_scan_dataset_from_library_test.py::test_download_and_scan[${{ matrix.dataset }}]
+        run: tox --skip-pkg-install -e integration -- tests/integration/download_and_scan_dataset_from_library_test.py::test_download_and_scan[${{ matrix.dataset }}]
