@@ -379,7 +379,7 @@ class Dataset:
 
         Use apply for upsampling, downsampling or making the sampling rate constant
         using resample:
-        >>> dataset.apply('resample', resampling_rate=5000)# doctest:+ELLIPSIS
+        >>> dataset.apply('resample', resampling_rate=1000)# doctest:+ELLIPSIS
         <pymovements.dataset.dataset.Dataset object at ...>
         """
         self._check_gaze_dataframe()
