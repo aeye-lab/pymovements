@@ -47,25 +47,41 @@ class EventProcessor:
                 event_properties = [event_properties]
             elif isinstance(event_properties, tuple):
                 if len(event_properties) != 2:
-                    raise ValueError("Tuple must have a length of 2.")
+                    raise ValueError('Tuple must have a length of 2.')
                 if not isinstance(event_properties[0], str):
-                    raise TypeError(f"First item of tuple must be a string, but received {type(event_properties[0])}.")
+                    raise TypeError(
+                        f"First item of tuple must be a string, but received {
+                            type(
+                                event_properties[0])}.")
                 if not isinstance(event_properties[1], dict):
-                    raise TypeError(f"Second item of tuple must be a dictionary, but received {type(event_properties[1])}.")
+                    raise TypeError(
+                        f"Second item of tuple must be a dictionary, but received {
+                            type(
+                                event_properties[1])}.")
                 event_properties = [event_properties]
             elif isinstance(event_properties, list):
                 for event_property in event_properties:
                     if not isinstance(event_property, (str, tuple)):
-                        raise TypeError(f"Each item in the list must be either a string or a tuple, but received {type(event_property)}.")
+                        raise TypeError(
+                            f"Each item in the list must be either a string or a tuple, but received {
+                                type(event_property)}.")
                     if isinstance(event_property, tuple):
                         if len(event_property) != 2:
-                            raise ValueError("Tuple must have a length of 2.")
+                            raise ValueError('Tuple must have a length of 2.')
                         if not isinstance(event_property[0], str):
-                            raise TypeError(f"First item of tuple must be a string, but received {type(event_property[0])}.")
+                            raise TypeError(
+                                f"First item of tuple must be a string, but received {
+                                    type(
+                                        event_property[0])}.")
                         if not isinstance(event_property[1], dict):
-                            raise TypeError(f"Second item of tuple must be a dictionary, but received {type(event_property[1])}.")
+                            raise TypeError(
+                                f"Second item of tuple must be a dictionary, but received {
+                                    type(
+                                        event_property[1])}.")
             else:
-                raise TypeError(f"event_properties must be of type str, tuple, or list, but received {type(event_properties)}")
+                raise TypeError(
+                    f"event_properties must be of type str, tuple, or list, but received {
+                        type(event_properties)}")
 
         for property_name in event_properties:
             if property_name not in EVENT_PROPERTIES:
