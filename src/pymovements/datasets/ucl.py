@@ -122,14 +122,14 @@ class UCL(DatasetDefinition):
             'precomputed_events': [
                 {
                     'resource': '13428_2012_313_MOESM1_ESM.zip',
-                    'filename': 'UCL.zip',
+                    'filename': 'UCL_events.zip',
                     'md5': '77e3c0cacccb0a074a55d23aa8531ca5',
                 },
             ],
             'precomputed_reading_measures': [
                 {
                     'resource': '13428_2012_313_MOESM1_ESM.zip',
-                    'filename': 'UCL.zip',
+                    'filename': 'UCL_measures.zip',
                     'md5': '77e3c0cacccb0a074a55d23aa8531ca5',
                 },
             ],
