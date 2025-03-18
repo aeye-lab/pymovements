@@ -770,7 +770,9 @@ class Dataset:
         elif isinstance(event_properties, dict):
             event_property_names = (event_properties.keys())
         else:
-            raise TypeError(f'event_properties must be of type str or dict, but is {type(event_properties)}')
+            raise TypeError(
+                f'event_properties must be of type str or dict, but is {
+                    type(event_properties)}')
 
         existing_columns = set(self.events[0].columns) & set(event_property_names)
         if existing_columns:
