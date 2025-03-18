@@ -757,6 +757,10 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
+        if not isinstance(event_properties, (str, tuple, list, dict)):
+            raise TypeError(
+                f"event_properties must be of type str, tuple, or list, but received {type(event_properties)}"
+        )
         processor = EventGazeProcessor(event_properties)
 
         identifier_columns = [
@@ -765,12 +769,16 @@ class Dataset:
             if column != 'filepath'
         ]
 
-        if isinstance(event_properties, list):
+        if isinstance(event_properties, str):
+            event_property_names = [event_properties]
+        elif isinstance(event_properties, list):
             event_property_names = event_properties
         elif isinstance(event_properties, dict):
-            event_property_names = (event_properties.keys())
+            event_property_names = event_properties.keys()
+        elif isinstance(event_properties, tuple):
+            event_property_names = event_properties[1].keys()
         else:
-            raise TypeError(f'event_properties must be of type str or dict, but is {type(event_properties)}')
+            raise TypeError(f"'event_properties' must be of type str, dict, or list, but received {type(event_properties)}")
 
         existing_columns = set(self.events[0].columns) & set(event_property_names)
         if existing_columns:
