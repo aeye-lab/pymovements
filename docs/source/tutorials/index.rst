@@ -16,6 +16,7 @@ These How-Tos provide detailed guides to implement the most important use cases 
     saving-loading-preprocessed
     detecting-events
     event-properties
+    eyetracking_measures
     saving-loading-events
     plot-main-sequence
     heatmap
