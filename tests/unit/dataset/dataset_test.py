@@ -1613,7 +1613,7 @@ def test_velocity_columns(gaze_dataset_configuration):
             TypeError,
             ('event_properties', 'must be', 'str', 'tuple', 'list'),
             id='type_error_property',
-        )
+        ),
     ],
 )
 def test_event_dataframe_add_property_raises_exceptions(

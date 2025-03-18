@@ -759,8 +759,9 @@ class Dataset:
         """
         if not isinstance(event_properties, (str, tuple, list, dict)):
             raise TypeError(
-                f"event_properties must be of type str, tuple, or list, but received {type(event_properties)}"
-        )
+                f"event_properties must be of type str, tuple, or list, but received {
+                    type(event_properties)}",
+            )
         processor = EventGazeProcessor(event_properties)
 
         identifier_columns = [
@@ -778,7 +779,9 @@ class Dataset:
         elif isinstance(event_properties, tuple):
             event_property_names = event_properties[1].keys()
         else:
-            raise TypeError(f"'event_properties' must be of type str, dict, or list, but received {type(event_properties)}")
+            raise TypeError(
+                f"'event_properties' must be of type str, dict, or list, but received {
+                    type(event_properties)}")
 
         existing_columns = set(self.events[0].columns) & set(event_property_names)
         if existing_columns:
