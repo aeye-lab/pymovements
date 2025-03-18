@@ -765,7 +765,14 @@ class Dataset:
             if column != 'filepath'
         ]
 
-        existing_columns = set(self.events[0].columns) & set(event_properties)
+        if isinstance(event_properties, list):
+            event_property_names = event_properties
+        elif isinstance(event_properties, dict):
+            event_property_names = list(event_properties.keys())
+        else:
+            raise TypeError(f'event_properties must be of type str or dict, but is {type(event_properties)}')
+
+        existing_columns = set(self.events[0].columns) & set(event_property_names)
         if existing_columns:
             raise ValueError(
                 f"The following event properties already exist and cannot be recomputed: "
