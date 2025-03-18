@@ -768,7 +768,7 @@ class Dataset:
         if isinstance(event_properties, list):
             event_property_names = event_properties
         elif isinstance(event_properties, dict):
-            event_property_names = list(event_properties.keys())
+            event_property_names = (event_properties.keys())
         else:
             raise TypeError(f'event_properties must be of type str or dict, but is {type(event_properties)}')
 
