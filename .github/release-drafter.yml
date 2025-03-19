@@ -23,7 +23,7 @@ categories:
     labels:
       - build
       - internal
-  - title: 🔖 Documentation
+  - title: 📖 Documentation
     labels: documentation
 
 exclude-labels:
