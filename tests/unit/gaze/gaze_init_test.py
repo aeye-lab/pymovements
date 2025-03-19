@@ -992,6 +992,59 @@ import pymovements as pm
             2,
             id='df_auto_columns_acceleration',
         ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'definition': pm.DatasetDefinition(
+                    pixel_columns=['x', 'y'],
+                ),
+            },
+            pl.from_dict(
+                {'pixel': [[1.23, 4.56]]},
+                schema={'pixel': pl.List(pl.Float64)},
+            ),
+            2,
+            id='df_single_row_two_pixel_columns_dataset_definition',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {'abc': [1], 'x': [1.23], 'y': [4.56]},
+                    schema={'abc': pl.Int64, 'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'definition': pm.DatasetDefinition(
+                    pixel_columns=['x', 'y'],
+                ),
+            },
+            pl.from_dict(
+                {'abc': [1], 'pixel': [[1.23, 4.56]]},
+                schema={'abc': pl.Int64, 'pixel': pl.List(pl.Float64)},
+            ),
+            2,
+            id='df_single_row_three_columns_two_pixel_columns_dataset_definition',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {'xl': [1.2], 'yl': [3.4], 'xr': [5.6], 'yr': [7.8]},
+                    schema={'xl': pl.Float64, 'yl': pl.Float64, 'xr': pl.Float64, 'yr': pl.Float64},
+                ),
+                'definition': pm.DatasetDefinition(
+                    pixel_columns=['xl', 'yl', 'xr', 'yr'],
+                ),
+            },
+            pl.from_dict(
+                {'pixel': [[1.2, 3.4, 5.6, 7.8]]},
+                schema={'pixel': pl.List(pl.Float64)},
+            ),
+            4,
+            id='df_single_row_four_pixel_columns_dataset_definition',
+        ),
     ],
 )
 def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, expected_n_components):
