@@ -34,7 +34,7 @@ from typing import IO
 
 from tqdm import tqdm
 
-from pymovements.utils.paths import get_filepaths
+from pymovements._utils._paths import get_filepaths
 
 
 def extract_archive(
