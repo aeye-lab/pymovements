@@ -52,10 +52,10 @@ class MouseCursor(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, tuple[str, ...]]
+    mirrors: dict[str, list[str]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources: dict[str, tuple[dict[str, str], ...]]
+    resources: dict[str, list[dict[str, str]]]
         A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -134,38 +134,40 @@ class MouseCursor(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-    mirrors: dict[str, tuple[str, ...]] = field(
+    mirrors: dict[str, list[str]] = field(
         default_factory=lambda: {
-            'gaze': (
+            'gaze': [
                 'https://ars.els-cdn.com/content/image/',
-            ),
+            ],
         },
     )
 
-    resources: dict[str, tuple[dict[str, str], ...]] = field(
+    resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
-            'gaze': (
+            'gaze': [
                 {
                     'resource': '1-s2.0-S2352340921000160-mmc1.zip',
                     'filename': 'mousecursor.zip',
                     'md5': '7885e8fd44f14f02f60e9f62431aea63',
                 },
-            ),
+            ],
         },
     )
     extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
-    experiment: Experiment = Experiment(
-        # page 4: middle of screen is 960/540 => 1920/1080
-        screen_width_px=1920,
-        screen_height_px=1080,
-        # page 5: calculation
-        screen_width_cm=52.99,
-        screen_height_cm=29.81,
-        distance_cm=50,
-        origin='upper left',
-        # page 5: 334 ms intervals of tracking gaze (PlayStation-Eye Camera)
-        sampling_rate=3,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            # page 4: middle of screen is 960/540 => 1920/1080
+            screen_width_px=1920,
+            screen_height_px=1080,
+            # page 5: calculation
+            screen_width_cm=52.99,
+            screen_height_cm=29.81,
+            distance_cm=50,
+            origin='upper left',
+            # page 5: 334 ms intervals of tracking gaze (PlayStation-Eye Camera)
+            sampling_rate=3,
+        ),
     )
 
     filename_format: dict[str, str] = field(
