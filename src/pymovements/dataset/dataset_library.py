@@ -25,8 +25,6 @@ from importlib import resources
 from pathlib import Path
 from typing import TypeVar
 
-import yaml
-
 from pymovements import datasets
 from pymovements.dataset.dataset_definition import DatasetDefinition
 
@@ -127,17 +125,22 @@ def register_dataset(cls: DatasetDefinitionClass) -> DatasetDefinitionClass:
 
 
 def _add_shipped_datasets() -> None:
-    """Add available public datasets via `src/pymovements/datasets/datasets.yaml`."""
+    """Add available public datasets via yaml files in `src/pymovements/datasets`."""
     dataset_definition_files = resources.files(datasets)
 
-    datasets_list_yaml = dataset_definition_files / 'datasets.yaml'
-    # https://github.com/aeye-lab/pymovements/pull/952#issuecomment-2690742187
-    assert isinstance(datasets_list_yaml, Path)
-    with open(datasets_list_yaml, encoding='utf-8') as f:
-        datasets_list = yaml.safe_load(f)
-
-    for definition_basename in datasets_list:
-        yaml_file_name = dataset_definition_files / f'{definition_basename}.yaml'
+    for filename in dataset_definition_files.iterdir():
+        # mypy... don't know how to make it smarter currently (type is Traversable)
+        assert isinstance(filename, Path)
+        dataset_path = Path(filename)
+        if (
+            dataset_path.name == 'datasets.yaml' or
+            dataset_path.suffix == '.py' or
+            dataset_path.is_dir()
+        ):
+            continue
+        # https://github.com/aeye-lab/pymovements/pull/952#issuecomment-2690742187
+        assert isinstance(dataset_definition_files, Path)
+        yaml_file_name = dataset_definition_files / filename
         # https://github.com/aeye-lab/pymovements/pull/952#issuecomment-2690742187
         assert isinstance(yaml_file_name, Path)
         DatasetLibrary.add(yaml_file_name)
