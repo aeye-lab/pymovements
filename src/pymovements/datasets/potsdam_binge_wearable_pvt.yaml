@@ -1,0 +1,77 @@
+name: "PotsdamBingeWearablePVT"
+
+has_files:
+  gaze: true
+  precomputed_events: false
+  precomputed_reading_measures: false
+
+mirrors:
+  gaze:
+    - "https://osf.io/download/"
+
+resources:
+  gaze:
+    - resource: "9vbs8/"
+      filename: "a.zip"
+      md5: "87c6c74a9a17cbd093b91f9415e8dd9d"
+    - resource: "yqukn/"
+      filename: "b.zip"
+      md5: "54038547b1a373253b38999a227dde63"
+    - resource: "yf2xa/"
+      filename: "e.zip"
+      md5: "a0d0203cbb273f6908c1b52a42750551"
+
+extract:
+  gaze: true
+
+experiment:
+  screen_width_px: 1920
+  screen_height_px: 1080
+  screen_width_cm: 59.76
+  screen_height_cm: 33.615
+  distance_cm: null
+  origin: "center"
+  sampling_rate: 1000
+
+filename_format:
+  gaze: '{subject_id:d}_{session_id:d}_{condition:s}_{trial_id:d}_{block_id:d}.csv'
+
+filename_format_schema_overrides:
+  gaze:
+    subject_id: !int
+    trial_id: !int
+
+trial_columns:
+  - "trial_id"
+
+time_column: "eyelink_timestamp"
+
+time_unit: "ms"
+
+distance_column: "target_distance"
+
+pixel_columns:
+  - "x_pix_pupilcore_interpolated"
+  - "y_pix_pupilcore_interpolated"
+
+column_map: {}
+
+custom_read_kwargs:
+  gaze:
+    schema_overrides:
+      trial_id: !pl.Float32
+      block_id: !pl.Float32
+      x_pix_eyelink: !pl.Float32
+      y_pix_eyelink: !pl.Float32
+      eyelink_timestamp: !pl.Int64
+      x_pix_pupilcore_interpolated': !pl.Float32
+      y_pix_pupilcore_interpolated: !pl.Float32,
+      pupil_size_eyelink: !pl.Float32
+      target_distance: !pl.Float32
+      pupil_size_pupilcore_interpolated: !pl.Float32,
+      pupil_confidence_interpolated: !pl.Float32
+      time_to_prev_bac: !pl.Float32
+      time_to_next_bac: !pl.Float32
+      prev_bac: !pl.Float32
+      next_bac: !pl.Float32
+    separator: ","
