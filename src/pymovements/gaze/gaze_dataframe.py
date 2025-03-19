@@ -66,7 +66,7 @@ class GazeDataFrame:
         The unit of the timestamps in the timestamp column in the input data frame. Supported
         units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
         'step' the experiment definition must be specified. All timestamps will be converted to
-        milliseconds. (default: 'ms')
+        milliseconds. If time_unit is None, milliseconds are assumed. (default: None)
     pixel_columns:list[str] | None
         The name of the pixel position columns in the input data frame. These columns will be
         nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
@@ -165,8 +165,9 @@ class GazeDataFrame:
     >>> experiment = Experiment(1024, 768, 38, 30, 60, 'center', sampling_rate=100)
     >>> gaze = GazeDataFrame(data=df_no_time, experiment=experiment, pixel_columns=['x', 'y'])
     >>> gaze
-    Experiment(sampling_rate=100, screen=Screen(width_px=1024, height_px=768, width_cm=38,
-    height_cm=30, distance_cm=60, origin=center), eyetracker=None)
+    Experiment(screen=Screen(width_px=1024, height_px=768, width_cm=38, height_cm=30,
+     distance_cm=60, origin='center'), eyetracker=EyeTracker(sampling_rate=100, left=None,
+      right=None, model=None, version=None, vendor=None, mount=None))
     shape: (3, 2)
     ┌──────┬────────────┐
     │ time ┆ pixel      │
@@ -188,7 +189,7 @@ class GazeDataFrame:
             auto_column_detect: bool = False,
             trial_columns: str | list[str] | None = None,
             time_column: str | None = None,
-            time_unit: str | None = 'ms',
+            time_unit: str | None = None,
             pixel_columns: list[str] | None = None,
             position_columns: list[str] | None = None,
             velocity_columns: list[str] | None = None,
@@ -223,6 +224,10 @@ class GazeDataFrame:
 
                 time_column = 'time'
                 time_unit = 'step'
+
+        # If no time_unit specified, assume milliseconds.
+        if self.frame is not None and time_unit is None:
+            time_unit = 'ms'
 
         if time_column is not None:
             self.frame = self.frame.rename({time_column: 'time'})

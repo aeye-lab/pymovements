@@ -181,13 +181,7 @@ def test_gaze_dataframe_copy_with_experiment():
 
     # We want to have separate experiment instances but the same values.
     assert gaze.experiment is not gaze_copy.experiment
-    assert gaze.experiment.screen.width_px == gaze_copy.experiment.screen.width_px
-    assert gaze.experiment.screen.height_px == gaze_copy.experiment.screen.height_px
-    assert gaze.experiment.screen.width_cm == gaze_copy.experiment.screen.width_cm
-    assert gaze.experiment.screen.height_cm == gaze_copy.experiment.screen.height_cm
-    assert gaze.experiment.screen.distance_cm == gaze_copy.experiment.screen.distance_cm
-    assert gaze.experiment.screen.origin == gaze_copy.experiment.screen.origin
-    assert gaze.experiment.sampling_rate == gaze_copy.experiment.sampling_rate
+    assert gaze.experiment == gaze_copy.experiment
 
 
 def test_gaze_dataframe_copy_no_experiment():

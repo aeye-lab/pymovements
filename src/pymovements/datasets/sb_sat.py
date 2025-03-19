@@ -27,12 +27,10 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.dataset_library import register_dataset
 from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
-@register_dataset
 class SBSAT(DatasetDefinition):
     """SB-SAT dataset :cite:p:`SB-SAT`.
 
@@ -53,11 +51,11 @@ class SBSAT(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, tuple[str, ...]]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
+    mirrors: dict[str, list[str]]
+        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+    resources: dict[str, list[dict[str, str]]]
+        A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -134,34 +132,32 @@ class SBSAT(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-    mirrors: dict[str, tuple[str, ...]] = field(
+    mirrors: dict[str, list[str]] = field(
         default_factory=lambda:
             {
-                'gaze': (
-                    'https://osf.io/download/',
-                ),
-                'precomputed_events': (
+                'gaze': ['https://osf.io/download/'],
+                'precomputed_events': [
                     'https://raw.githubusercontent.com/ahnchive/SB-SAT/master/fixation/',
-                ),
+                ],
             },
     )
-    resources: dict[str, tuple[dict[str, str], ...]] = field(
+    resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda:
             {
-                'gaze': (
+                'gaze': [
                     {
                         'resource': 'jgae7/',
                         'filename': 'sbsat_csvs.zip',
                         'md5': 'a6ef1fb0ecced683cdb489c3bd3e1a5c',
                     },
-                ),
-                'precomputed_events': (
+                ],
+                'precomputed_events': [
                     {
                         'resource': '18sat_fixfinal.csv',
                         'filename': '18sat_fixfinal.csv',
                         'md5': '4cf3212a71e6fc2fbe7041ce7c691927',
                     },
-                ),
+                ],
             },
     )
     extract: dict[str, bool] = field(
@@ -170,14 +166,16 @@ class SBSAT(DatasetDefinition):
         },
     )
 
-    experiment: Experiment = Experiment(
-        screen_width_px=1024,
-        screen_height_px=768,
-        screen_width_cm=44.5,
-        screen_height_cm=42.4,
-        distance_cm=70,
-        origin='center',
-        sampling_rate=1000,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=1024,
+            screen_height_px=768,
+            screen_width_cm=44.5,
+            screen_height_cm=42.4,
+            distance_cm=70,
+            origin='center',
+            sampling_rate=1000,
+        ),
     )
 
     filename_format: dict[str, str] = field(
