@@ -27,11 +27,10 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.dataset_library import register_dataset
+from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
-@register_dataset
 class MouseCursor(DatasetDefinition):
     """MouseCursor dataset :cite:p:`MouseCursor`.
 
@@ -65,6 +64,9 @@ class MouseCursor(DatasetDefinition):
 
     extract: dict[str, bool]
         Decide whether to extract the data.
+
+    experiment: Experiment
+        The experiment definition.
 
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
@@ -152,6 +154,19 @@ class MouseCursor(DatasetDefinition):
         },
     )
     extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
+
+    experiment: Experiment = Experiment(
+        # page 4: middle of screen is 960/540 => 1920/1080
+        screen_width_px=1920,
+        screen_height_px=1080,
+        # page 5: calculation
+        screen_width_cm=52.99,
+        screen_height_cm=29.81,
+        distance_cm=50,
+        origin='upper left',
+        # page 5: 334 ms intervals of tracking gaze (PlayStation-Eye Camera)
+        sampling_rate=3,
+    )
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
