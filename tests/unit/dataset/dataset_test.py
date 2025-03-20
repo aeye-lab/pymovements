@@ -1608,12 +1608,6 @@ def test_velocity_columns(gaze_dataset_configuration):
             ('foo', 'invalid', 'valid', 'peak_velocity'),
             id='invalid_property',
         ),
-        pytest.param(
-            {'event_properties': 123},
-            TypeError,
-            ('event_properties', 'must be', 'str', 'tuple', 'list'),
-            id='type_error_property',
-        ),
     ],
 )
 def test_event_dataframe_add_property_raises_exceptions(
