@@ -48,11 +48,13 @@ from pymovements import DatasetLibrary
         pytest.param(
             pm.datasets.PotsdamBingeRemotePVT,
             'PotsdamBingeRemotePVT',
-            id='PotsdamBingeRemotePVT'),
+            id='PotsdamBingeRemotePVT',
+        ),
         pytest.param(
             pm.datasets.PotsdamBingeWearablePVT,
             'PotsdamBingeWearablePVT',
-            id='PotsdamBingeWearablePVT'),
+            id='PotsdamBingeWearablePVT',
+        ),
         pytest.param(pm.datasets.Provo, 'Provo', id='Provo'),
         pytest.param(pm.datasets.SBSAT, 'SBSAT', id='SBSAT'),
         pytest.param(pm.datasets.ToyDataset, 'ToyDataset', id='ToyDataset'),
@@ -89,11 +91,13 @@ def test_public_dataset_registered(definition, dataset_name):
         pytest.param(
             pm.datasets.PotsdamBingeRemotePVT,
             'PotsdamBingeRemotePVT',
-            id='PotsdamBingeRemotePVT'),
+            id='PotsdamBingeRemotePVT',
+        ),
         pytest.param(
             pm.datasets.PotsdamBingeWearablePVT,
             'PotsdamBingeWearablePVT',
-            id='PotsdamBingeWearablePVT'),
+            id='PotsdamBingeWearablePVT',
+        ),
         pytest.param(pm.datasets.Provo, 'Provo', id='Provo'),
         pytest.param(pm.datasets.SBSAT, 'SBSAT', id='SBSAT'),
         pytest.param(pm.datasets.ToyDataset, 'ToyDataset', id='ToyDataset'),
