@@ -1,0 +1,76 @@
+name: "DIDEC"
+
+has_files:
+  gaze: true
+  precomputed_events: false
+  precomputed_reading_measures: false
+
+mirrors:
+  gaze:
+    - "https://didec.uvt.nl/corpus/"
+
+resources:
+  gaze:
+    - resource: "DIDEC_only_the_eyetracking_data.zip"
+      filename: "DIDEC_only_the_eyetracking_data.zip"
+      md5: "d572b0b41828986ca48a2fcf6966728a"
+
+experiment:
+  screen_width_px: 1680
+  screen_height_px: 1050
+  screen_width_cm: 47.4
+  screen_height_cm: 29.7
+  distance_cm: 70
+  origin: "upper left"
+  sampling_rate: 1000
+
+extract:
+  gaze: true
+
+filename_format:
+  gaze: 'Ruud_exp{experiment:d}_list{list:d}_v{version:d}_ppn{participant:d}_{session:d}_Trial{trial:d} Samples.txt'
+
+filename_format_schema_overrides:
+  gaze:
+    experiment: !int
+    list: !int
+    version: !int
+    participant: !int
+    session: !int
+    trial: !int
+
+trial_columns:
+  - "Stimulus"
+
+time_column: "Time"
+
+time_unit: "ms"
+
+pixel_columns:
+  - "L POR X [px]"
+  - "L POR Y [px]"
+  - "R POR X [px]"
+  - "R POR Y [px]"
+
+column_map: {}
+
+custom_read_kwargs:
+  gaze:
+    separator: "\t"
+    skip_rows: 43
+    has_header: false
+    new_columns:
+      - "Time"
+      - "Type"
+      - "Trial"
+      - "L POR X [px]"
+      - "L POR Y [px]"
+      - "R POR X [px]"
+      - "R POR Y [px]"
+      - "Timing"
+      - "Pupil Confidence"
+      - "L Plane"
+      - "R Plane"
+      - "L Event Info"
+      - "R Event Info"
+      - "Stimulus"
