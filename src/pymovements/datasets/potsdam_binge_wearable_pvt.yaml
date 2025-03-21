@@ -59,19 +59,18 @@ column_map: {}
 custom_read_kwargs:
   gaze:
     schema_overrides:
-      trial_id: !pl.Float32
-      block_id: !pl.Float32
-      x_pix_eyelink: !pl.Float32
-      y_pix_eyelink: !pl.Float32
-      eyelink_timestamp: !pl.Int64
-      x_pix_pupilcore_interpolated': !pl.Float32
-      y_pix_pupilcore_interpolated: !pl.Float32,
-      pupil_size_eyelink: !pl.Float32
-      target_distance: !pl.Float32
-      pupil_size_pupilcore_interpolated: !pl.Float32,
-      pupil_confidence_interpolated: !pl.Float32
-      time_to_prev_bac: !pl.Float32
-      time_to_next_bac: !pl.Float32
-      prev_bac: !pl.Float32
-      next_bac: !pl.Float32
-    separator: ","
+      trial_id: !polars.Float32
+      block_id: !polars.Float32
+      x_pix_eyelink: !polars.Float32
+      y_pix_eyelink: !polars.Float32
+      eyelink_timestamp: !polars.Int64
+      x_pix_pupilcore_interpolated: !polars.Float32
+      y_pix_pupilcore_interpolated: !polars.Float32
+      pupil_size_eyelink: !polars.Float32
+      target_distance: !polars.Float32
+      pupil_size_pupilcore_interpolated: !polars.Float32
+      pupil_confidence_interpolated: !polars.Float32
+      time_to_prev_bac: !polars.Float32
+      time_to_next_bac: !polars.Float32
+      prev_bac: !polars.Float32
+      next_bac: !polars.Float32
