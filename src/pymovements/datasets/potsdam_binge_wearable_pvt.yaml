@@ -74,3 +74,4 @@ custom_read_kwargs:
       time_to_next_bac: !polars.Float32
       prev_bac: !polars.Float32
       next_bac: !polars.Float32
+    separator: ","

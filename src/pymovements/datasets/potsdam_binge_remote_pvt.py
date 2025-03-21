@@ -139,15 +139,13 @@ class PotsdamBingeRemotePVT(DatasetDefinition):
     )
     mirrors: dict[str, tuple[str, ...]] = field(
         default_factory=lambda: {
-            'gaze': (
-                'https://osf.io/download/',
-            ),
+            'gaze': ['https://osf.io/download/'],
         },
     )
 
     resources: dict[str, tuple[dict[str, str], ...]] = field(
         default_factory=lambda: {
-            'gaze': (
+            'gaze': [
                 {
                     'resource': '9vbs8/',
                     'filename': 'a.zip',
@@ -163,7 +161,7 @@ class PotsdamBingeRemotePVT(DatasetDefinition):
                     'filename': 'e.zip',
                     'md5': 'a0d0203cbb273f6908c1b52a42750551',
                 },
-            ),
+            ],
         },
     )
     extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
