@@ -27,20 +27,24 @@
 
     BSC
     BSCII
+    ChineseReading
     CodeComprehension
     CoLAGaze
     CopCo
     DAEMONS
     DIDEC
     EMTeC
+    ETDD70
     FakeNewsPerception
     GazeBase
     GazeBaseVR
     GazeGraph
     GazeOnFaces
     HBN
+    IITBHGC
     InteRead
     JuDo1000
+    MECOL1W1
     MouseCursor
     OneStop
     PoTeC
@@ -49,7 +53,6 @@
     Provo
     SBSAT
     UCL
-
 
 .. rubric:: Example Datasets
 
@@ -62,26 +65,33 @@
 """
 from pymovements.datasets.bsc import BSC
 from pymovements.datasets.bsc2 import BSCII
+from pymovements.datasets.chinese_reading import ChineseReading
 from pymovements.datasets.codecomprehension import CodeComprehension
 from pymovements.datasets.colagaze import CoLAGaze
 from pymovements.datasets.copco import CopCo
 from pymovements.datasets.daemons import DAEMONS
 from pymovements.datasets.didec import DIDEC
 from pymovements.datasets.emtec import EMTeC
+from pymovements.datasets.etdd70 import ETDD70
 from pymovements.datasets.fakenews import FakeNewsPerception
 from pymovements.datasets.gaze_graph import GazeGraph
 from pymovements.datasets.gaze_on_faces import GazeOnFaces
 from pymovements.datasets.gazebase import GazeBase
 from pymovements.datasets.gazebasevr import GazeBaseVR
 from pymovements.datasets.hbn import HBN
+from pymovements.datasets.iitb_hgc import IITBHGC
 from pymovements.datasets.interead import InteRead
 from pymovements.datasets.judo1000 import JuDo1000
+from pymovements.datasets.mecol1w1 import MECOL1W1
+from pymovements.datasets.mecol2w1 import MECOL2W1
+from pymovements.datasets.mecol2w2 import MECOL2W2
 from pymovements.datasets.mousecursor import MouseCursor
 from pymovements.datasets.onestop import OneStop
 from pymovements.datasets.potec import PoTeC
 from pymovements.datasets.potsdam_binge_remote_pvt import PotsdamBingeRemotePVT
 from pymovements.datasets.potsdam_binge_wearable_pvt import PotsdamBingeWearablePVT
 from pymovements.datasets.provo import Provo
+from pymovements.datasets.raccoons import RaCCooNS
 from pymovements.datasets.sb_sat import SBSAT
 from pymovements.datasets.toy_dataset import ToyDataset
 from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
@@ -91,26 +101,33 @@ from pymovements.datasets.ucl import UCL
 __all__ = [
     'BSC',
     'BSCII',
+    'ChineseReading',
     'CodeComprehension',
     'CoLAGaze',
     'CopCo',
     'DAEMONS',
     'DIDEC',
     'EMTeC',
+    'ETDD70',
     'FakeNewsPerception',
     'GazeBase',
     'GazeBaseVR',
     'GazeGraph',
     'GazeOnFaces',
     'HBN',
+    'IITBHGC',
     'InteRead',
     'JuDo1000',
     'MouseCursor',
     'OneStop',
+    'MECOL1W1',
+    'MECOL2W1',
+    'MECOL2W2',
     'PoTeC',
     'PotsdamBingeRemotePVT',
     'PotsdamBingeWearablePVT',
     'Provo',
+    'RaCCooNS',
     'SBSAT',
     'ToyDataset',
     'ToyDatasetEyeLink',

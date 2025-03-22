@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the CoLAGaze dataset."""
+"""Provides a definition for the ChineseReading dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -25,30 +25,31 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
-class CoLAGaze(DatasetDefinition):
-    """CoLAGaze dataset :cite:p:`CoLAGaze`.
+class ChineseReading(DatasetDefinition):
+    """ChineseReading dataset :cite:p:`ChineseReading`.
 
-    This dataset includes eye-tracking data from native speakers of English reading
-    sentences from the CoLA dataset. Eye movements are recorded at a sampling frequency of 2,000 Hz
-    using an EyeLink 1000 eye tracker and are provided as pixel coordinates.
+    This dataset includes monocular eye tracking data from a single participant in a single
+    session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
+    eye tracker and precomputed events on aoi level are reported.
 
-    Check the respective paper for details :cite:p:`CoLAGaze`.
+    The participant is instructed to read texts and answer questions.
+
+    Check the respective paper for details :cite:p:`ChineseReading`.
 
     Attributes
     ----------
     name: str
         The name of the dataset.
 
-    long_name: str
-        The entire name of the dataset.
-
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
+
+    mirrors: dict[str, list[str]]
+        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
@@ -56,8 +57,9 @@ class CoLAGaze(DatasetDefinition):
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
-    experiment: Experiment
-        The experiment definition.
+
+    extract: dict[str, bool]
+        Decide whether to extract the data.
 
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
@@ -67,17 +69,26 @@ class CoLAGaze(DatasetDefinition):
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
+    trial_columns: list[str]
+            The name of the trial columns in the input data frame. If the list is empty or None,
+            the input data frame is assumed to contain only one trial. If the list is not empty,
+            the input data frame is assumed to contain multiple trials and the transformation
+            methods will be applied to each trial separately.
+
+    column_map: dict[str, str]
+        The keys are the columns to read, the values are the names to which they should be renamed.
+
     custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function.
 
     Examples
     --------
     Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
-    :py:class:`~pymovements.datasets.CoLAGaze` definition:
+    :py:class:`~pymovements.datasets.ChineseReading` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("CoLAGaze", path='data/CoLAGaze')
+    >>> dataset = pm.Dataset("ChineseReading", path='data/ChineseReading')
 
     Download the dataset resources:
 
@@ -91,82 +102,81 @@ class CoLAGaze(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'CoLAGaze'
-
-    long_name: str = 'Corpus of Eye Movements for Linguistic Acceptability'
+    name: str = 'ChineseReading'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
-            'gaze': True,
+            'gaze': False,
+            'precomputed_events': True,
+            'precomputed_reading_measures': True,
+        },
+    )
+    mirrors: dict[str, list[str]] = field(
+        default_factory=lambda:
+            {
+                'precomputed_events': [
+                    'https://files.de-1.osf.io/v1/resources/94wue/providers/osfstorage/',
+                ],
+                'precomputed_reading_measures': [
+                    'https://files.de-1.osf.io/v1/resources/94wue/providers/osfstorage/',
+                ],
+            },
+    )
+    resources: dict[str, list[dict[str, str]]] = field(
+        default_factory=lambda:
+            {
+                'precomputed_events': [
+                    {
+                        'resource': '?zip=',
+                        'filename': 'chinese_reading_events.zip',
+                        'md5': None,
+                    },
+                ],
+                'precomputed_reading_measures': [
+                    {
+                        'resource': '?zip=',
+                        'filename': 'chinese_reading_measures.zip',
+                        'md5': None,
+                    },
+                ],
+            },
+    )
+    extract: dict[str, bool] = field(
+        default_factory=lambda: {
             'precomputed_events': True,
             'precomputed_reading_measures': True,
         },
     )
 
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda: {
-            'gaze': [
-                {
-                    'resource':
-                    'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
-                    '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
-                    'filename': 'raw_data.zip',
-                    'md5': None,  # type: ignore
-                },
-            ],
-            'precomputed_events': [
-                {
-                    'resource':
-                    'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
-                    '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
-                    'filename': 'fixations.zip',
-                    'md5': None,  # type: ignore
-                },
-            ],
-            'precomputed_reading_measures': [
-                {
-                    'resource':
-                    'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
-                    '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
-                    'filename': 'measures.zip',
-                    'md5': None,  # type: ignore
-                },
-            ],
-        },
-    )
-
-    experiment: Experiment = field(
-        default_factory=lambda: Experiment(
-            screen_width_px=1280,
-            screen_height_px=1024,
-            screen_width_cm=54.37,
-            screen_height_cm=30.26,
-            distance_cm=60,
-            origin='bottom left',
-            sampling_rate=2000,
-        ),
-    )
-
     filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze': '{subject_id:d}.asc',
-            'precomputed_events': 'fixations_report_{subject_id:d}.csv',
-            'precomputed_reading_measures': 'raw_measures_for_features{subject_id:d}.csv',
-        },
+        default_factory=lambda:
+            {
+                'precomputed_events': 'Raw Data.txt',
+                'precomputed_reading_measures': r'{measure_type:s} Measures.xlsx',
+            },
     )
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {'subject_id': int},
-            'precomputed_events': {'subject_id': int},
-            'precomputed_reading_measures': {'subject_id': int},
-        },
+        default_factory=lambda:
+            {
+                'precomputed_events': {},
+                'precomputed_reading_measures': {},
+            },
     )
 
+    trial_columns: list[str] = field(
+        default_factory=lambda: [
+            'Subject',
+            'Sentence_ID',
+        ],
+    )
+
+    column_map: dict[str, str] = field(default_factory=lambda: {})
+
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
-        default_factory=lambda: {
-            'gaze': {},
-            'precomputed_events': {},
-            'precomputed_reading_measures': {},
-        },
+        default_factory=lambda:
+            {
+                'precomputed_events': {'separator': '\t'},
+                'precomputed_reading_measures': {'sheet_name': 'Sheet 1'},
+            },
     )

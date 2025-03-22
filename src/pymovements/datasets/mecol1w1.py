@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2025 The pymovements Project Authors
+# Copyright (c) 2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,26 +17,24 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the CoLAGaze dataset."""
-from __future__ import annotations
-
+"""Provides a definition for the MECOL1W1 dataset."""
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
-class CoLAGaze(DatasetDefinition):
-    """CoLAGaze dataset :cite:p:`CoLAGaze`.
+class MECOL1W1(DatasetDefinition):
+    """MECOL1W1 dataset :cite:p:`MECOL1W1`.
 
-    This dataset includes eye-tracking data from native speakers of English reading
-    sentences from the CoLA dataset. Eye movements are recorded at a sampling frequency of 2,000 Hz
-    using an EyeLink 1000 eye tracker and are provided as pixel coordinates.
+    This dataset includes eye tracking data from several participants in a single
+    session. The participants read several paragraphs of texts.
 
-    Check the respective paper for details :cite:p:`CoLAGaze`.
+    The participant is instructed to read texts and answer questions.
+
+    Check the respective paper for details :cite:p:`MECOL1W1`.
 
     Attributes
     ----------
@@ -56,8 +54,9 @@ class CoLAGaze(DatasetDefinition):
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
-    experiment: Experiment
-        The experiment definition.
+
+    extract: dict[str, bool]
+        Decide whether to extract the data.
 
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
@@ -67,17 +66,26 @@ class CoLAGaze(DatasetDefinition):
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
+    trial_columns: list[str]
+            The name of the trial columns in the input data frame. If the list is empty or None,
+            the input data frame is assumed to contain only one trial. If the list is not empty,
+            the input data frame is assumed to contain multiple trials and the transformation
+            methods will be applied to each trial separately.
+
+    column_map: dict[str, str]
+        The keys are the columns to read, the values are the names to which they should be renamed.
+
     custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function.
 
     Examples
     --------
     Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
-    :py:class:`~pymovements.datasets.CoLAGaze` definition:
+    :py:class:`~pymovements.datasets.MECOL1W1` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("CoLAGaze", path='data/CoLAGaze')
+    >>> dataset = pm.Dataset("MECOL1W1", path='data/MECOL1W1')
 
     Download the dataset resources:
 
@@ -89,15 +97,14 @@ class CoLAGaze(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'CoLAGaze'
+    name: str = 'MECOL1W1'
 
-    long_name: str = 'Corpus of Eye Movements for Linguistic Acceptability'
+    long_name: str = 'Multilingual Eye-tracking Corpus native reader first wave'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
-            'gaze': True,
+            'gaze': False,
             'precomputed_events': True,
             'precomputed_reading_measures': True,
         },
@@ -105,68 +112,56 @@ class CoLAGaze(DatasetDefinition):
 
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
-            'gaze': [
-                {
-                    'resource':
-                    'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
-                    '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
-                    'filename': 'raw_data.zip',
-                    'md5': None,  # type: ignore
-                },
-            ],
             'precomputed_events': [
                 {
-                    'resource':
-                    'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
-                    '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
-                    'filename': 'fixations.zip',
-                    'md5': None,  # type: ignore
+                    'resource': 'https://osf.io/download/67dc6027920cab9abae48b83/',
+                    'filename': 'joint_l1_fixation_version1.3.rda',
+                    'md5': '3c969a930a71cd62c67b936426dd079b',
                 },
             ],
             'precomputed_reading_measures': [
                 {
-                    'resource':
-                    'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
-                    '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
-                    'filename': 'measures.zip',
-                    'md5': None,  # type: ignore
+                    'resource': 'https://osf.io/download/n5pvh/',
+                    'filename': 'sentence_data_version1.3.csv',
+                    'md5': '609f82b6f45b7c98a0769c6ce14ee6e9',
                 },
             ],
         },
     )
 
-    experiment: Experiment = field(
-        default_factory=lambda: Experiment(
-            screen_width_px=1280,
-            screen_height_px=1024,
-            screen_width_cm=54.37,
-            screen_height_cm=30.26,
-            distance_cm=60,
-            origin='bottom left',
-            sampling_rate=2000,
-        ),
+    extract: dict[str, bool] = field(
+        default_factory=lambda: {
+            'precomputed_events': False,
+            'precomputed_reading_measures': False,
+        },
     )
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
-            'gaze': '{subject_id:d}.asc',
-            'precomputed_events': 'fixations_report_{subject_id:d}.csv',
-            'precomputed_reading_measures': 'raw_measures_for_features{subject_id:d}.csv',
+            'precomputed_events': 'joint_l1_fixation_version1.3.rda',
+            'precomputed_reading_measures': 'sentence_data_version1.3.csv',
         },
     )
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
-            'gaze': {'subject_id': int},
-            'precomputed_events': {'subject_id': int},
-            'precomputed_reading_measures': {'subject_id': int},
+            'precomputed_events': {},
+            'precomputed_reading_measures': {},
         },
     )
 
+    trial_columns: list[str] = field(
+        default_factory=lambda: [
+            'uniform_id',
+            'itemid',
+        ],
+    )
+
+    column_map: dict[str, str] = field(default_factory=lambda: {})
+
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
-            'gaze': {},
-            'precomputed_events': {},
+            'precomputed_events': {'r_dataframe_key': 'joint.fix'},
             'precomputed_reading_measures': {},
         },
     )
