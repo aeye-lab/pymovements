@@ -71,7 +71,7 @@ repos:
     rev: v1.15.0
     hooks:
     -   id: mypy
-        additional_dependencies: [pandas-stubs, types-tqdm]
+        additional_dependencies: [pandas-stubs, types-tqdm, types-PyYAML]
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
@@ -82,6 +82,7 @@ repos:
     -   id: check-toml
     -   id: check-xml
     -   id: check-yaml
+        args: ["--unsafe"]
     -   id: debug-statements
     -   id: double-quote-string-fixer
     -   id: end-of-file-fixer
