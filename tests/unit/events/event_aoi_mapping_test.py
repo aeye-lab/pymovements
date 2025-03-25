@@ -243,7 +243,7 @@ def dataset_fixture():
         'char',
     ],
 )
-def test_gaze_to_aoi_mapping_char_width_height(aoi_column, dataset):
+def test_event_to_aoi_mapping_char_width_height(aoi_column, dataset):
     aoi_df = pm.stimulus.text.from_file(
         'tests/files/toy_text_1_1_aoi.csv',
         aoi_column=aoi_column,
@@ -265,7 +265,7 @@ def test_gaze_to_aoi_mapping_char_width_height(aoi_column, dataset):
         'char',
     ],
 )
-def test_gaze_to_aoi_mapping_char_end(aoi_column, dataset):
+def test_event_to_aoi_mapping_char_end(aoi_column, dataset):
     aoi_df = pm.stimulus.text.from_file(
         'tests/files/toy_text_1_1_aoi.csv',
         aoi_column=aoi_column,

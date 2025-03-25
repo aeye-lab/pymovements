@@ -19,7 +19,7 @@
 # SOFTWARE.
 """Module for parsing input data.
 
-.. deprecated:: v0.21.1
+.. deprecated:: v0.21.0
    Please use :py:func:`~pymovements.gaze.from_asc()` instead.
    This module will be removed in v0.26.0.
 """
@@ -48,7 +48,7 @@ def parse_eyelink(
 ) -> tuple[pl.DataFrame, dict[str, Any]]:
     """Parse EyeLink asc file.
 
-    .. deprecated:: v0.21.1
+    .. deprecated:: v0.21.0
        Please use :py:func:`~pymovements.gaze.from_asc()` instead.
        This module will be removed in v0.26.0.
 
