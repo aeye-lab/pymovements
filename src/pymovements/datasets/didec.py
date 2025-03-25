@@ -45,6 +45,10 @@ class DIDEC(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    info: str
+        Information about the dataset including but not limited to original citation,
+        general information.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -121,6 +125,38 @@ class DIDEC(DatasetDefinition):
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'DIDEC'
+
+    info: str = """\
+DIDEC dataset :cite:p:`DIDEC`.
+
+The DIDEC eye-tracking data has two different data collections, (1) for the
+description viewing task is more coherent than for the free-viewing task;
+(2) variation in image descriptions. The data was collected using BeGaze eye-tracker
+with a sampling rate of 250 Hz. The data collection contains 112 Dutch students,
+54 students completed the free viewing task, while 58 completed the image description task.
+
+Check the respective paper for details :cite:p:`DIDEC`.
+
+If you use the dataset, please cite:
+
+@inproceedings{DIDEC,
+    title = "{DIDEC}: The {D}utch Image Description and Eye-tracking Corpus",
+    author = "van Miltenburg, Emiel  and
+      K{\\'a}d{\\'a}r, {\\'A}kos  and
+      Koolen, Ruud  and
+      Krahmer, Emiel",
+    editor = "Bender, Emily M.  and
+      Derczynski, Leon  and
+      Isabelle, Pierre",
+    booktitle = "Proceedings of the 27th International Conference on Computational Linguistics",
+    month = aug,
+    year = "2018",
+    address = "Santa Fe, New Mexico, USA",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/C18-1310",
+    pages = "3658--3669",
+}
+"""
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

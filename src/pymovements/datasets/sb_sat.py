@@ -47,6 +47,10 @@ class SBSAT(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    info: str
+        Information about the dataset including but not limited to original citation,
+        general information.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -125,6 +129,29 @@ class SBSAT(DatasetDefinition):
 
     name: str = 'SBSAT'
 
+    info: str = """\
+SB-SAT dataset :cite:p:`SB-SAT`.
+
+This dataset includes monocular eye tracking data from a single participants in a single
+session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
+eye tracker and are provided as pixel coordinates.
+
+The participant is instructed to read texts and answer questions.
+
+Check the respective paper for details :cite:p:`SB-SAT`.
+
+If you use the dataset, please cite:
+
+@inproceedings{SB-SAT,
+  title = {Towards predicting reading comprehension from gaze behavior},
+  year = {2020},
+  booktitle = {Proceedings of the ACM Symposium on Eye Tracking Research and Applications},
+  author = {Ahn, Seoyoung and Kelton, Conor and Balasubramanian, Aruna and Zelinsky, Greg},
+  pages = {1--5},
+  publisher = {Association for Computing Machinery},
+  address = "Stuttgart, Germany",
+}
+"""
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,

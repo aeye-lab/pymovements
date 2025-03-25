@@ -47,6 +47,10 @@ class Provo(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    info: str
+        Information about the dataset including but not limited to original citation,
+        general information.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -100,6 +104,36 @@ class Provo(DatasetDefinition):
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'Provo'
+
+    info: str = """\
+Provo dataset :cite:p:`Provo`.
+
+The Provo Corpus, a corpus of eye-tracking data with accompanying predictability norms.
+The predictability norms for the Provo Corpus differ from those of other corpora.
+In addition to traditional cloze scores that estimate the predictability of the full
+orthographic form of each word, the Provo Corpus also includes measures of the
+predictability of the morpho-syntactic and semantic information for each word.
+This makes the Provo Corpus ideal for studying predictive processes in reading.
+
+Check the respective paper for details :cite:p:`Provo`.
+
+If you use the dataset, please cite:
+
+@article{Provo,
+  author = {Luke, Steven G. and Christianson, Kiel},
+  address = {New York},
+  copyright = {Psychonomic Society, Inc. 2017},
+  issn = {1554-3528},
+  journal = {Behavior Research Methods},
+  language = {eng},
+  number = {2},
+  pages = {826-833},
+  publisher = {Springer US},
+  title = {The {P}rovo {C}orpus: A large eye-tracking corpus with predictability norms},
+  volume = {50},
+  year = {2018},
+}
+"""
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

@@ -49,6 +49,10 @@ class DAEMONS(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    info: str
+        Information about the dataset including but not limited to original citation,
+        general information.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -102,6 +106,36 @@ class DAEMONS(DatasetDefinition):
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'DAEMONS'
+
+    info: str = """\
+DAEMONS dataset :cite:p:`DAEMONS`.
+
+The DAEMONS paper presents the Potsdam dataset of eye movements on natural scenes,
+aimed at advancing research in visual cognition and machine learning.
+It introduces a large-scale dataset with 2,400 images and eye-tracking data
+from 250 participants, ensuring high-quality data collection using
+state-of-the-art equipment. The study focuses on both fixation distributions
+and scan paths, making the dataset valuable for various modeling approaches,
+including saliency prediction and cognitive modeling.
+
+The dataset is split into train (precomputed_events[0]) and
+validation (precomputed_events[1]).
+
+Check the respective paper for details :cite:p:`DAEMONS`.
+
+If you use the dataset, please cite:
+
+@ARTICLE{DAEMONS,
+  AUTHOR={Schwetlick, Lisa  and Kümmerer, Matthias  and Bethge, Matthias  and Engbert, Ralf},
+  TITLE={Potsdam data set of eye movement on natural scenes (DAEMONS)},
+  JOURNAL={Frontiers in Psychology},
+  VOLUME={15},
+  YEAR={2024},
+  URL={https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2024.1389609},
+  DOI={10.3389/fpsyg.2024.1389609},
+  ISSN={1664-1078},
+}
+"""
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

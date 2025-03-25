@@ -49,6 +49,10 @@ class GazeOnFaces(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    info: str
+        Information about the dataset including but not limited to original citation,
+        general information.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -120,6 +124,34 @@ class GazeOnFaces(DatasetDefinition):
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'GazeOnFaces'
+
+    info: str = """\
+GazeOnFaces dataset :cite:p:`GazeOnFaces`.
+
+This dataset includes monocular eye tracking data from single participants in a single
+session. Eye movements are recorded at a sampling frequency of 60 Hz
+using an EyeLink 1000 video-based eye tracker and are provided as pixel coordinates.
+
+Participants were sat 57 cm away from the screen (19inch LCD monitor,
+screen res=1280×1024, 60 Hz). Recordings of the eye movements of one eye in monocular
+pupil/corneal reflection tracking mode.
+
+Check the respective paper for details :cite:p:`GazeOnFaces`.
+
+If you use the dataset, please cite:
+
+@article{GazeOnFaces,
+  title={Face exploration dynamics differentiate men and women},
+  author={Coutrot, Antoine and Binetti, Nicola and
+  Harrison, Charlotte and Mareschal, Isabelle and Johnston, Alan},
+  journal={Journal of vision},
+  volume={16},
+  number={14},
+  pages={16--16},
+  year={2016},
+  publisher={The Association for Research in Vision and Ophthalmology},
+}
+"""
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

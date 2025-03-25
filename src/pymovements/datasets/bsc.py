@@ -44,6 +44,10 @@ class BSC(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    info: str
+        Information about the dataset including but not limited to original citation,
+        general information.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -103,6 +107,30 @@ class BSC(DatasetDefinition):
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'BSC'
+
+    info: str = """\
+BSC dataset :cite:p:`BSC`.
+
+This dataset includes monocular eye tracking data from several participants in a single
+session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
+eye tracker and precomputed events on aoi level are reported.
+
+The participant is instructed to read texts and answer questions.
+
+Check the respective paper for details :cite:p:`BSC`.
+
+If you use the dataset, please cite:
+
+@article{BSC,
+    author={Pan, Jinger and Yan, Ming and Richter, Eike M. and Shu, Hua and Kliegl, Reinhold},
+    title={The {B}eijing {S}entence {C}orpus: A {C}hinese sentence corpus
+    with eye movement data and predictability norms},
+    journal={Behavior Research Methods},
+    year={2022},
+    volume={54},
+    issue={4},
+}
+"""
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

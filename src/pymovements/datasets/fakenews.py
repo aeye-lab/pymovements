@@ -44,6 +44,10 @@ class FakeNewsPerception(DatasetDefinition):
     ----------
     name: str
         The name of the dataset.
+
+    info: str
+        Information about the dataset including but not limited to original citation,
+        general information.
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -72,6 +76,33 @@ class FakeNewsPerception(DatasetDefinition):
     """
 
     name: str = 'FakeNewsPerception'
+
+    info: str = """\
+FakeNewsPerception dataset :cite:p:`FakeNewsPerception`.
+
+FakeNewsPerception dataset consists of eye movements during reading,
+perceived believability scores, and questionnaires including Cognitive Reflection Test (CRT)
+and News-Find-Me (NFM) perception, collected from 25 participants with 60 news items.
+Eye movements are recorded to provide objective measures
+of information processing during news reading.
+
+For more details see :cite:p:`FakeNewsPerception`.
+
+If you use the dataset, please cite:
+
+@article{FakeNewsPerception,
+  author = {Sümer, Ömer and Bozkir, Efe and Kübler, Thomas and
+  Grüner, Sven and Utz, Sonja and Kasneci, Enkelejda},
+  year = {2021},
+  month = {03},
+  pages = {106909},
+  title = {FakeNewsPerception: An Eye Movement Dataset on the
+  Perceived Believability of News Stories},
+  volume = {35},
+  journal = {Data in Brief},
+  doi = {10.1016/j.dib.2021.106909,
+}
+"""
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
