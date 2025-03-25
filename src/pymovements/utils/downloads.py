@@ -54,7 +54,7 @@ def download_and_extract_archive(
 
     .. deprecated:: v0.21.1
        Please use :py:meth:`~pymovements.Dataset.download()` instead.
-       This module will be removed in v0.26.0.
+       This function will be removed in v0.26.0.
 
     Parameters
     ----------
@@ -115,7 +115,7 @@ def download_file(
 
     .. deprecated:: v0.21.1
        Please use :py:meth:`~pymovements.Dataset.download()` instead.
-       This module will be removed in v0.26.0.
+       This function will be removed in v0.26.0.
 
     Parameters
     ----------
