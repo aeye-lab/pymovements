@@ -31,7 +31,7 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 class BSC(DatasetDefinition):
     """BSC dataset :cite:p:`BSC`.
 
-    This dataset includes monocular eye tracking data from a single participant in a single
+    This dataset includes monocular eye tracking data from several participants in a single
     session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
     eye tracker and precomputed events on aoi level are reported.
 
@@ -88,11 +88,11 @@ class BSC(DatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
-    :py:class:`~pymovements.datasets.SBSAT` definition:
+    :py:class:`~pymovements.datasets.BSC` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("SBSAT", path='data/SBSAT')
+    >>> dataset = pm.Dataset("BSC", path='data/BSC')
 
     Download the dataset resources:
 

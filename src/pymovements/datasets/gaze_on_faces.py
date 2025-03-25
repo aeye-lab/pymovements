@@ -34,7 +34,7 @@ from pymovements.gaze.experiment import Experiment
 class GazeOnFaces(DatasetDefinition):
     """GazeOnFaces dataset :cite:p:`GazeOnFaces`.
 
-    This dataset includes monocular eye tracking data from single participants in a single
+    This dataset includes monocular eye tracking data from several participants in a single
     session. Eye movements are recorded at a sampling frequency of 60 Hz
     using an EyeLink 1000 video-based eye tracker and are provided as pixel coordinates.
 
@@ -128,7 +128,7 @@ class GazeOnFaces(DatasetDefinition):
     info: str = """\
 GazeOnFaces dataset :cite:p:`GazeOnFaces`.
 
-This dataset includes monocular eye tracking data from single participants in a single
+This dataset includes monocular eye tracking data from several participants in a single
 session. Eye movements are recorded at a sampling frequency of 60 Hz
 using an EyeLink 1000 video-based eye tracker and are provided as pixel coordinates.
 

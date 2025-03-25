@@ -31,7 +31,7 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 class BSCII(DatasetDefinition):
     """BSCII dataset :cite:p:`BSCII`.
 
-    This dataset includes monocular eye tracking data from a single participant in a single
+    This dataset includes monocular eye tracking data from several participants in a single
     session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
     eye tracker and precomputed events on aoi level are reported.
 
@@ -112,7 +112,7 @@ class BSCII(DatasetDefinition):
     info: str = """\
 BSCII dataset :cite:p:`BSCII`.
 
-This dataset includes monocular eye tracking data from a single participant in a single
+This dataset includes monocular eye tracking data from several participants in a single
 session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
 eye tracker and precomputed events on aoi level are reported.
 

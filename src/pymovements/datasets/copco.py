@@ -32,7 +32,7 @@ from pymovements.gaze.experiment import Experiment
 class CopCo(DatasetDefinition):
     """CopCo dataset :cite:p:`CopCoL1Hollenstein`.
 
-    This dataset includes monocular eye tracking data from a single participants in a single
+    This dataset includes monocular eye tracking data from 58 participants in a single
     session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
     eye tracker and are provided as pixel coordinates.
 
@@ -133,7 +133,7 @@ class CopCo(DatasetDefinition):
     info: str = """\
 CopCo dataset :cite:p:`CopCoL1Hollenstein`.
 
-This dataset includes monocular eye tracking data from a single participants in a single
+This dataset includes monocular eye tracking data from 58 participants in a single
 session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
 eye tracker and are provided as pixel coordinates.
 
