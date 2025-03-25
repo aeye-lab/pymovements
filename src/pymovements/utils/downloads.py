@@ -27,7 +27,7 @@ from typing import Any
 
 from tqdm.auto import tqdm
 
-from pymovements.utils.archives import extract_archive
+from pymovements.dataset._utils._archives import extract_archive
 
 USER_AGENT: str = 'pymovements'
 
