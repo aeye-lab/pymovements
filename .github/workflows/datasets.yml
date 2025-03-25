@@ -46,4 +46,4 @@ jobs:
       - name: Setup test environment
         run: tox -vv --notest -e integration
       - name: Run dataset integration test
-        run: tox --skip-pkg-install -e integration -- tests/integration/download_and_scan_dataset_from_library_test.py::test_download_and_scan[${{ matrix.dataset }}]
+        run: tox --skip-pkg-install -e integration -- tests/integration/download_dataset_test.py::test_download_dataset[${{ matrix.dataset }}]

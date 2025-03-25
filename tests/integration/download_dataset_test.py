@@ -25,13 +25,15 @@ from pymovements import DatasetLibrary
 
 
 @pytest.mark.parametrize('dataset_name', DatasetLibrary.names())
-def test_download_and_scan(dataset_name, tmp_path):
+def test_download_dataset(dataset_name, tmp_path):
     # Initialize dataset.
-    dataset_path = tmp_path / dataset_name
-    dataset = Dataset(dataset_name, path=dataset_path)
+    dataset = Dataset(dataset_name, path=tmp_path)
 
-    # Download and scan dataset.
-    dataset.download(remove_finished=True)
-    dataset.scan()
+    # Download dataset. This checks for integrity by matching the md5 checksum.
+    dataset.download(extract=False)
 
-    assert len(dataset.fileinfo) > 0
+    # Check that all resources are downloaded.
+    download_dir = dataset.paths.downloads
+    for resource_list in dataset.definition.resources.values():
+        for resource in resource_list:
+            assert download_dir / resource['filename'] in download_dir.iterdir()
