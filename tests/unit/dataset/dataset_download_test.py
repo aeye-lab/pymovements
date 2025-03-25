@@ -34,10 +34,15 @@ import pymovements as pm
     name='dataset_definition',
     params=[
         'CustomGazeAndPrecomputed',
+        'CustomGazeAndPrecomputedNoMirror',
         'CustomGazeOnly',
+        'CustomGazeOnlyNoMirror',
         'CustomPrecomputedOnly',
+        'CustomPrecomputedOnlyNoMirror',
         'CustomPrecomputedOnlyNoExtract',
+        'CustomPrecomputedOnlyNoExtractNoMirror',
         'CustomPrecomputedRMOnly',
+        'CustomPrecomputedRMOnlyNoMirror',
     ],
 )
 def dataset_definition_fixture(request):
@@ -54,6 +59,7 @@ def dataset_definition_fixture(request):
                     'precomputed_reading_measures': False,
                 },
             )
+
             mirrors: dict[str, tuple[str, ...]] = field(
                 default_factory=lambda: {
                     'gaze': (
@@ -66,6 +72,7 @@ def dataset_definition_fixture(request):
                     ),
                 },
             )
+
             resources: dict[str, tuple[dict[str, str], ...]] = field(
                 default_factory=lambda: {
                     'gaze': (
@@ -84,6 +91,7 @@ def dataset_definition_fixture(request):
                     ),
                 },
             )
+
             extract: dict[str, bool] = field(
                 default_factory=lambda: {
                     'gaze': True,
@@ -91,6 +99,48 @@ def dataset_definition_fixture(request):
                 },
             )
         return CustomPublicDataset()
+
+    if request.param == 'CustomGazeAndPrecomputedNoMirror':
+        @dataclass
+        @pm.register_dataset
+        class CustomPublicDataset(pm.DatasetDefinition):
+            name: str = 'CustomPublicDataset'
+
+            has_files: dict[str, bool] = field(
+                default_factory=lambda: {
+                    'gaze': True,
+                    'precomputed_events': True,
+                    'precomputed_reading_measures': False,
+                },
+            )
+
+            resources: dict[str, tuple[dict[str, str], ...]] = field(
+                default_factory=lambda: {
+                    'gaze': (
+                        {
+                            'resource': 'https://example.com/test.gz.tar',
+                            'filename': 'test.gz.tar',
+                            'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                        },
+                    ),
+                    'precomputed_events': (
+                        {
+                            'resource': 'https://example.com/test_pc.gz.tar',
+                            'filename': 'test_pc.gz.tar',
+                            'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                        },
+                    ),
+                },
+            )
+
+            extract: dict[str, bool] = field(
+                default_factory=lambda: {
+                    'gaze': True,
+                    'precomputed_events': True,
+                },
+            )
+        return CustomPublicDataset()
+
     if request.param == 'CustomGazeOnly':
         @dataclass
         @pm.register_dataset
@@ -104,6 +154,7 @@ def dataset_definition_fixture(request):
                     'precomputed_reading_measures': False,
                 },
             )
+
             mirrors: dict[str, [tuple[str, ...]]] = field(
                 default_factory=lambda: {
                     'gaze': (
@@ -124,9 +175,41 @@ def dataset_definition_fixture(request):
                     ),
                 },
             )
+
             extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
         return CustomPublicDataset()
+
+    if request.param == 'CustomGazeOnlyNoMirror':
+        @dataclass
+        @pm.register_dataset
+        class CustomPublicDataset(pm.DatasetDefinition):
+            name: str = 'CustomPublicDataset'
+
+            has_files: dict[str, bool] = field(
+                default_factory=lambda: {
+                    'gaze': True,
+                    'precomputed_events': False,
+                    'precomputed_reading_measures': False,
+                },
+            )
+
+            resources: dict[str, tuple[dict[str, str], ...]] = field(
+                default_factory=lambda: {
+                    'gaze': (
+                        {
+                            'resource': 'https://example.com/test.gz.tar',
+                            'filename': 'test.gz.tar',
+                            'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                        },
+                    ),
+                },
+            )
+
+            extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
+
+        return CustomPublicDataset()
+
     if request.param == 'CustomPrecomputedOnly':
         @dataclass
         @pm.register_dataset
@@ -140,7 +223,9 @@ def dataset_definition_fixture(request):
                     'precomputed_reading_measures': False,
                 },
             )
+
             extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': True})
+
             mirrors: dict[str, [tuple[str, ...]]] = field(
                 default_factory=lambda: {
                     'precomputed_events': (
@@ -163,6 +248,36 @@ def dataset_definition_fixture(request):
             )
 
         return CustomPublicDataset()
+
+    if request.param == 'CustomPrecomputedOnlyNoMirror':
+        @dataclass
+        @pm.register_dataset
+        class CustomPublicDataset(pm.DatasetDefinition):
+            name: str = 'CustomPublicDataset'
+
+            has_files: dict[str, bool] = field(
+                default_factory=lambda: {
+                    'gaze': False,
+                    'precomputed_events': True,
+                    'precomputed_reading_measures': False,
+                },
+            )
+            extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': True})
+
+            resources: dict[str, tuple[dict[str, str], ...]] = field(
+                default_factory=lambda: {
+                    'precomputed_events': (
+                        {
+                            'resource': 'https://example.com/test_pc.gz.tar',
+                            'filename': 'test_pc.gz.tar',
+                            'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                        },
+                    ),
+                },
+            )
+
+        return CustomPublicDataset()
+
     if request.param == 'CustomPrecomputedOnlyNoExtract':
         @dataclass
         @pm.register_dataset
@@ -176,7 +291,9 @@ def dataset_definition_fixture(request):
                     'precomputed_reading_measures': False,
                 },
             )
+
             extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': False})
+
             mirrors: dict[str, [tuple[str, ...]]] = field(
                 default_factory=lambda: {
                     'precomputed_events': (
@@ -199,6 +316,37 @@ def dataset_definition_fixture(request):
             )
 
         return CustomPublicDataset()
+
+    if request.param == 'CustomPrecomputedOnlyNoExtractNoMirror':
+        @dataclass
+        @pm.register_dataset
+        class CustomPublicDataset(pm.DatasetDefinition):
+            name: str = 'CustomPublicDataset'
+
+            has_files: dict[str, bool] = field(
+                default_factory=lambda: {
+                    'gaze': False,
+                    'precomputed_events': True,
+                    'precomputed_reading_measures': False,
+                },
+            )
+
+            extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': False})
+
+            resources: dict[str, tuple[dict[str, str], ...]] = field(
+                default_factory=lambda: {
+                    'precomputed_events': (
+                        {
+                            'resource': 'https://example.com/test_pc.gz.tar',
+                            'filename': 'test_pc.gz.tar',
+                            'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                        },
+                    ),
+                },
+            )
+
+        return CustomPublicDataset()
+
     if request.param == 'CustomPrecomputedRMOnly':
         @dataclass
         @pm.register_dataset
@@ -212,11 +360,13 @@ def dataset_definition_fixture(request):
                     'precomputed_reading_measures': True,
                 },
             )
+
             extract: dict[str, bool] = field(
                 default_factory=lambda: {
                     'precomputed_reading_measures': True,
                 },
             )
+
             mirrors: dict[str, [tuple[str, ...]]] = field(
                 default_factory=lambda: {
                     'precomputed_reading_measures': (
@@ -231,6 +381,40 @@ def dataset_definition_fixture(request):
                     'precomputed_reading_measures': (
                         {
                             'resource': 'test_rm.gz.tar',
+                            'filename': 'test_rm.gz.tar',
+                            'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                        },
+                    ),
+                },
+            )
+
+        return CustomPublicDataset()
+
+    if request.param == 'CustomPrecomputedRMOnlyNoMirror':
+        @dataclass
+        @pm.register_dataset
+        class CustomPublicDataset(pm.DatasetDefinition):
+            name: str = 'CustomPublicDataset'
+
+            has_files: dict[str, bool] = field(
+                default_factory=lambda: {
+                    'gaze': False,
+                    'precomputed_events': False,
+                    'precomputed_reading_measures': True,
+                },
+            )
+
+            extract: dict[str, bool] = field(
+                default_factory=lambda: {
+                    'precomputed_reading_measures': True,
+                },
+            )
+
+            resources: dict[str, tuple[dict[str, str], ...]] = field(
+                default_factory=lambda: {
+                    'precomputed_reading_measures': (
+                        {
+                            'resource': 'https://example.com/test_rm.gz.tar',
                             'filename': 'test_rm.gz.tar',
                             'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                         },
@@ -300,7 +484,11 @@ def test_paths(init_path, expected_paths, dataset_definition):
 
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
-@pytest.mark.parametrize('dataset_definition', ['CustomGazeOnly'], indirect=['dataset_definition'])
+@pytest.mark.parametrize(
+    'dataset_definition',
+    ['CustomGazeOnly', 'CustomGazeOnlyNoMirror'],
+    indirect=['dataset_definition'],
+)
 def test_dataset_download_both_mirrors_fail_gaze_only(
         mock_download_file,
         tmp_path,
@@ -338,7 +526,7 @@ def test_dataset_download_both_mirrors_fail_gaze_only(
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomPrecomputedOnly'],
+    ['CustomPrecomputedOnly', 'CustomPrecomputedOnlyNoMirror'],
     indirect=['dataset_definition'],
 )
 def test_dataset_download_both_precomputed_mirrors_fail(
@@ -378,7 +566,7 @@ def test_dataset_download_both_precomputed_mirrors_fail(
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomPrecomputedRMOnly'],
+    ['CustomPrecomputedRMOnly', 'CustomPrecomputedRMOnlyNoMirror'],
     indirect=['dataset_definition'],
 )
 def test_dataset_download_both_precomputed_mirrors_fail_rm(
@@ -418,7 +606,7 @@ def test_dataset_download_both_precomputed_mirrors_fail_rm(
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomGazeAndPrecomputed'],
+    ['CustomGazeAndPrecomputed', 'CustomGazeAndPrecomputedNoMirror'],
     indirect=['dataset_definition'],
 )
 def test_dataset_download_both_mirrors_fail_precomputed_and_gaze(
@@ -455,7 +643,11 @@ def test_dataset_download_both_mirrors_fail_precomputed_and_gaze(
 
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
-@pytest.mark.parametrize('dataset_definition', ['CustomGazeOnly'], indirect=['dataset_definition'])
+@pytest.mark.parametrize(
+    'dataset_definition',
+    ['CustomGazeOnly', 'CustomGazeOnlyNoMirror'],
+    indirect=['dataset_definition'],
+)
 def test_dataset_download_first_mirror_gaze_fails(mock_download_file, tmp_path, dataset_definition):
     mock_download_file.side_effect = [OSError(), None]
 
@@ -484,7 +676,8 @@ def test_dataset_download_first_mirror_gaze_fails(mock_download_file, tmp_path, 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomPrecomputedOnly'], indirect=['dataset_definition'],
+    ['CustomPrecomputedOnly', 'CustomPrecomputedOnlyNoMirror'],
+    indirect=['dataset_definition'],
 )
 def test_dataset_download_first_mirror_precomputed_fails(
         mock_download_file, tmp_path, dataset_definition,
@@ -515,7 +708,8 @@ def test_dataset_download_first_mirror_precomputed_fails(
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomPrecomputedRMOnly'], indirect=['dataset_definition'],
+    ['CustomPrecomputedRMOnly', 'CustomPrecomputedRMOnlyNoMirror'],
+    indirect=['dataset_definition'],
 )
 def test_dataset_download_first_mirror_precomputed_fails_rm(
         mock_download_file, tmp_path, dataset_definition,
@@ -546,7 +740,8 @@ def test_dataset_download_first_mirror_precomputed_fails_rm(
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomGazeAndPrecomputed'], indirect=['dataset_definition'],
+    ['CustomGazeAndPrecomputed', 'CustomGazeAndPrecomputedNoMirror'],
+    indirect=['dataset_definition'],
 )
 def test_dataset_download_first_mirror_fails(mock_download_file, tmp_path, dataset_definition):
     mock_download_file.side_effect = [OSError(), None, OSError(), None]
@@ -589,7 +784,10 @@ def test_dataset_download_first_mirror_fails(mock_download_file, tmp_path, datas
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomGazeOnly', 'CustomGazeAndPrecomputed'],
+    [
+        'CustomGazeOnly', 'CustomGazeOnlyNoMirror',
+        'CustomGazeAndPrecomputed', 'CustomGazeAndPrecomputedNoMirror',
+    ],
     indirect=['dataset_definition'],
 )
 def test_dataset_download_file_not_found(mock_download_file, tmp_path, dataset_definition):
@@ -615,7 +813,7 @@ def test_dataset_download_file_not_found(mock_download_file, tmp_path, dataset_d
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomPrecomputedOnly'],
+    ['CustomPrecomputedOnly', 'CustomPrecomputedOnlyNoMirror'],
     indirect=['dataset_definition'],
 )
 def test_dataset_download_file_precomputed_not_found(
@@ -643,7 +841,10 @@ def test_dataset_download_file_precomputed_not_found(
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomGazeOnly', 'CustomGazeAndPrecomputed'],
+    [
+        'CustomGazeOnly', 'CustomGazeOnlyNoMirror',
+        'CustomGazeAndPrecomputed', 'CustomGazeAndPrecomputedNoMirror',
+    ],
     indirect=['dataset_definition'],
 )
 def test_dataset_download_no_extract(mock_download_file, tmp_path, dataset_definition):
@@ -667,7 +868,8 @@ def test_dataset_download_no_extract(mock_download_file, tmp_path, dataset_defin
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomPrecomputedOnly'], indirect=['dataset_definition'],
+    ['CustomPrecomputedOnly', 'CustomPrecomputedOnlyNoMirror'],
+    indirect=['dataset_definition'],
 )
 def test_dataset_download_precomputed_no_extract(mock_download_file, tmp_path, dataset_definition):
     mock_download_file.return_value = 'path'
@@ -690,7 +892,8 @@ def test_dataset_download_precomputed_no_extract(mock_download_file, tmp_path, d
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomPrecomputedRMOnly'], indirect=['dataset_definition'],
+    ['CustomPrecomputedRMOnly', 'CustomPrecomputedRMOnlyNoMirror'],
+    indirect=['dataset_definition'],
 )
 def test_dataset_download_precomputed_no_extract_rm(
         mock_download_file, tmp_path, dataset_definition,
@@ -713,7 +916,10 @@ def test_dataset_download_precomputed_no_extract_rm(
 
 
 @mock.patch('pymovements.dataset.dataset_download.extract_archive')
-@pytest.mark.parametrize('dataset_definition', ['CustomGazeOnly'], indirect=['dataset_definition'])
+@pytest.mark.parametrize(
+    'dataset_definition',
+    ['CustomGazeOnly', 'CustomGazeOnlyNoMirror'],
+    indirect=['dataset_definition'])
 def test_dataset_extract_remove_finished_true_gaze(
         mock_extract_archive,
         tmp_path,
@@ -741,7 +947,7 @@ def test_dataset_extract_remove_finished_true_gaze(
 @mock.patch('pymovements.dataset.dataset_download.extract_archive')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomPrecomputedRMOnly'],
+    ['CustomPrecomputedRMOnly', 'CustomPrecomputedRMOnlyNoMirror'],
     indirect=['dataset_definition'],
 )
 def test_dataset_extract_rm(
@@ -771,7 +977,8 @@ def test_dataset_extract_rm(
 @mock.patch('pymovements.dataset.dataset_download.extract_archive')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomGazeAndPrecomputed'], indirect=['dataset_definition'],
+    ['CustomGazeAndPrecomputed', 'CustomGazeAndPrecomputedNoMirror'],
+    indirect=['dataset_definition'],
 )
 def test_dataset_extract_remove_finished_true_both(
         mock_extract_archive,
@@ -809,7 +1016,8 @@ def test_dataset_extract_remove_finished_true_both(
 @mock.patch('pymovements.dataset.dataset_download.extract_archive')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomPrecomputedOnly'], indirect=['dataset_definition'],
+    ['CustomPrecomputedOnly', 'CustomPrecomputedOnlyNoMirror'],
+    indirect=['dataset_definition'],
 )
 def test_dataset_extract_remove_finished_true_precomputed(
         mock_extract_archive,
@@ -838,7 +1046,8 @@ def test_dataset_extract_remove_finished_true_precomputed(
 @mock.patch('pymovements.dataset.dataset_download.extract_archive')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomGazeAndPrecomputed'], indirect=['dataset_definition'],
+    ['CustomGazeAndPrecomputed', 'CustomGazeAndPrecomputedNoMirror'],
+    indirect=['dataset_definition'],
 )
 def test_dataset_extract_remove_finished_false_both(
         mock_extract_archive,
@@ -874,7 +1083,10 @@ def test_dataset_extract_remove_finished_false_both(
 
 
 @mock.patch('pymovements.dataset.dataset_download.extract_archive')
-@pytest.mark.parametrize('dataset_definition', ['CustomGazeOnly'], indirect=['dataset_definition'])
+@pytest.mark.parametrize(
+    'dataset_definition',
+    ['CustomGazeOnly', 'CustomGazeOnlyNoMirror'],
+    indirect=['dataset_definition'])
 def test_dataset_extract_remove_finished_false_gaze(
         mock_extract_archive,
         tmp_path,
@@ -902,7 +1114,8 @@ def test_dataset_extract_remove_finished_false_gaze(
 @mock.patch('pymovements.dataset.dataset_download.extract_archive')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomPrecomputedOnly'], indirect=['dataset_definition'],
+    ['CustomPrecomputedOnly', 'CustomPrecomputedOnlyNoMirror'],
+    indirect=['dataset_definition'],
 )
 def test_dataset_extract_remove_finished_false_precomputed(
         mock_extract_archive,
@@ -932,7 +1145,8 @@ def test_dataset_extract_remove_finished_false_precomputed(
 @mock.patch('pymovements.dataset.dataset_download.extract_archive')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomGazeAndPrecomputed'], indirect=['dataset_definition'],
+    ['CustomGazeAndPrecomputed', 'CustomGazeAndPrecomputedNoMirror'],
+    indirect=['dataset_definition'],
 )
 def test_dataset_download_default_extract_both(
         mock_extract, mock_download, tmp_path, dataset_definition,
@@ -945,7 +1159,10 @@ def test_dataset_download_default_extract_both(
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @mock.patch('pymovements.dataset.dataset_download.extract_archive')
-@pytest.mark.parametrize('dataset_definition', ['CustomGazeOnly'], indirect=['dataset_definition'])
+@pytest.mark.parametrize(
+    'dataset_definition',
+    ['CustomGazeOnly', 'CustomGazeOnlyNoMirror'],
+    indirect=['dataset_definition'])
 def test_dataset_download_default_extract_gaze(
         mock_extract, mock_download, tmp_path, dataset_definition,
 ):
@@ -962,7 +1179,8 @@ def test_dataset_download_default_extract_gaze(
 @mock.patch('pymovements.dataset.dataset_download.extract_archive')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomPrecomputedOnly'], indirect=['dataset_definition'],
+    ['CustomPrecomputedOnly', 'CustomPrecomputedOnlyNoMirror'],
+    indirect=['dataset_definition'],
 )
 def test_dataset_download_default_extract_precomputed(
         mock_extract, mock_download, tmp_path, dataset_definition,
