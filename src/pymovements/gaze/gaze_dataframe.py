@@ -33,8 +33,8 @@ import polars as pl
 import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
-from pymovements.utils import checks
 from pymovements.utils.aois import get_aoi
+from pymovements.utils.checks import check_is_mutual_exclusive
 
 
 class GazeDataFrame:
@@ -52,7 +52,7 @@ class GazeDataFrame:
     events: pm.EventDataFrame | None
         A dataframe of events in the gaze signal. (default: None)
     definition: pm.DatasetDefinition | None
-        A dataset definition. Takes precedence over arguments below. (default: None)
+        A dataset definition. Mutually exclusive with explicit arguments below. (default: None)
     auto_column_detect: bool
         Flag indicating if the column names should be inferred automatically. (default: False)
     trial_columns: str | list[str] | None
@@ -206,8 +206,19 @@ class GazeDataFrame:
         # Set nan values to null.
         self.frame = self.frame.fill_nan(None)
 
-        # definition takes precedence over explicit arguments.
+        # definition and explicit arguments are mutually exclusive.
         if definition is not None:
+            check_is_mutual_exclusive(definition=definition, trial_columns=trial_columns)
+            check_is_mutual_exclusive(definition=definition, time_column=time_column)
+            check_is_mutual_exclusive(definition=definition, time_unit=time_unit)
+            check_is_mutual_exclusive(definition=definition, pixel_columns=pixel_columns)
+            check_is_mutual_exclusive(definition=definition, position_columns=position_columns)
+            check_is_mutual_exclusive(definition=definition, velocity_columns=velocity_columns)
+            check_is_mutual_exclusive(
+                definition=definition, acceleration_columns=acceleration_columns,
+            )
+            check_is_mutual_exclusive(definition=definition, distance_column=distance_column)
+
             trial_columns = definition.trial_columns
             time_column = definition.time_column
             time_unit = definition.time_unit
@@ -1158,7 +1169,7 @@ class GazeDataFrame:
                 'input column instead.',
             )
 
-        checks.check_is_mutual_exclusive(
+        check_is_mutual_exclusive(
             output_columns=output_columns,
             output_suffixes=output_suffixes,
         )
