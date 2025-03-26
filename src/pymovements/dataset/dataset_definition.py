@@ -249,3 +249,27 @@ class DatasetDefinition:
 
         with open(path, 'w', encoding='utf-8') as f:
             yaml.dump(data, f, sort_keys=False)
+
+    _has_resources = None
+
+    @property
+    def has_resources(self) -> HasResourcesIndex:
+        return self._has_resources
+
+    def __post_init__(self):
+        self._has_resources = HasResourcesIndex(self.resources)
+
+
+class HasResourcesIndex:
+    def __init__(self, resources):
+        self.resources = resources
+
+    def __getitem__(self, key) -> bool:
+        if not self.resources:
+            return False
+        elif key not in self.resources:
+            return False
+        elif not self.resources[key]:
+            return False
+        return True
+
