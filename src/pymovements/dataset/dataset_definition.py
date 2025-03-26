@@ -20,8 +20,6 @@
 """DatasetDefinition module."""
 from __future__ import annotations
 
-import builtins
-import importlib
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
@@ -30,6 +28,8 @@ from typing import Any
 
 import yaml
 
+from pymovements.dataset._utils._yaml import reverse_substitute_types
+from pymovements.dataset._utils._yaml import substitute_types
 from pymovements.dataset._utils._yaml import type_constructor
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
@@ -204,23 +204,23 @@ class DatasetDefinition:
                 eyetracker=eyetracker,
             )
 
-        def reverse_substitute_types(d: Any) -> Any:
-            if isinstance(d, dict):
-                return {k: reverse_substitute_types(v) for k, v in d.items()}
-            if isinstance(d, list):
-                return [reverse_substitute_types(v) for v in d]
-            if isinstance(d, str) and d.startswith('!'):
-                type_name = d[1:]
-                if '.' in type_name:
-                    module_name, class_name = type_name.rsplit('.', 1)
-                    module = importlib.import_module(module_name)
-                    return getattr(module, class_name)
-                return getattr(builtins, type_name)
-            return d
-
         data = reverse_substitute_types(data)
         # Initialize DatasetDefinition with YAML data
         return DatasetDefinition(**data)
+
+    def to_dict(self, hide_private: bool = True) -> dict[str, Any]:
+        """Return dictionary representation."""
+        data = asdict(self)
+
+        # Delete private fields from dictionary.
+        if hide_private:
+            for key in list(data.keys()):
+                if key.startswith('_'):
+                    del data[key]
+
+        data['experiment'] = data['experiment'].to_dict()
+
+        return data
 
     def to_yaml(self, path: str | Path) -> None:
         """Save a dataset definition to a YAML file.
@@ -230,20 +230,7 @@ class DatasetDefinition:
         path: str | Path
             Path where to save the YAML file to.
         """
-        data = asdict(self)
-
-        def substitute_types(d: Any) -> Any:
-            if isinstance(d, dict):
-                return {k: substitute_types(v) for k, v in d.items()}
-            if isinstance(d, list):
-                return [substitute_types(v) for v in d]
-            if isinstance(d, type):
-                if d.__module__ == 'builtins':
-                    return f'!{d.__name__}'
-                return f'!{d.__module__}.{d.__name__}'
-            return d
-
-        data['experiment'] = data['experiment'].to_dict()
+        data = self.to_dict()
 
         data = substitute_types(data)
 
