@@ -28,17 +28,17 @@ import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.gaze.experiment import Experiment
+from pymovements.gaze.eyetracker import EyeTracker
 
 
 @dataclass
 class PotsdamBingeRemotePVT(DatasetDefinition):
     """PotsdamBingeRemotePVT dataset :cite:p:`PotsdamBingePVT`.
 
-    This dataset includes binocular eye tracking data from 150 participants in four sessions with an
+    This dataset includes monocular eye tracking data from 57 participants in two sessions with an
     interval of at least one week between two sessions. Eye movements are recorded at a sampling
-    frequency of 1000 Hz using an EyeLink Portable Duo video-based eye tracker and are provided as
-    pixel coordinates. Participants are instructed to watch a random jumping dot on a computer
-    screen.
+    frequency of 1000 Hz using an EyeLink 1000 Plus video-based eye tracker and are provided as
+    pixel coordinates. Participants are instructed to perform a PVT trial.
 
     Check the respective `repository <https://osf.io/qf7e6/>`_ for details.
 
@@ -174,7 +174,15 @@ class PotsdamBingeRemotePVT(DatasetDefinition):
             screen_height_cm=33.615,
             distance_cm=None,
             origin='center',
-            sampling_rate=1000,
+            eyetracker=EyeTracker(
+                sampling_rate=1000,
+                left=False,
+                right=True,
+                model='EyeLink 1000 Plus',
+                version=None,
+                vendor='EyeLink',
+                mount='Remote',
+            ),
         ),
     )
 
@@ -189,11 +197,17 @@ class PotsdamBingeRemotePVT(DatasetDefinition):
             'gaze': {
                 'subject_id': int,
                 'trial_id': int,
+                'block_id': int,
             },
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: ['trial_id'])
+    trial_columns: list[str] = field(
+        default_factory=lambda: [
+            'trial_id',
+            'subject_id',
+        ],
+    )
 
     time_column: str = 'eyelink_timestamp'
 

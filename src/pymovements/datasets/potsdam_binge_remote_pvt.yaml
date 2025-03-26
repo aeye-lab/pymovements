@@ -31,7 +31,14 @@ experiment:
   screen_height_cm: 33.615
   distance_cm: null
   origin: "center"
-  sampling_rate: 1000
+  eyetracker:
+    sampling_rate: 1000
+    left: false
+    right: true
+    model: "EyeLink 1000 Plus"
+    version: null
+    vendor: "EyeLink"
+    mount: "Remote"
 
 filename_format:
   gaze: '{subject_id:d}_{session_id:d}_{condition:s}_{trial_id:d}_{block_id:d}.csv'
@@ -40,9 +47,11 @@ filename_format_schema_overrides:
   gaze:
     subject_id: !int
     trial_id: !int
+    block_id: !int
 
 trial_columns:
   - "trial_id"
+  - "subject_id"
 
 time_column: "eyelink_timestamp"
 
