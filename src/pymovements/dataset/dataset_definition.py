@@ -265,10 +265,16 @@ class HasResourcesIndex:
         self.resources = resources
 
     def __getitem__(self, key) -> bool:
-        if not self.resources:
-            return False
-        elif key not in self.resources:
-            return False
-        elif not self.resources[key]:
-            return False
-        return True
+        if key is not None:
+            if not self.resources:
+                return False
+            elif key not in self.resources:
+                return False
+            elif not self.resources[key]:
+                return False
+            return True
+        else:
+            if not self.resources:
+                return True
+            else:
+                return False

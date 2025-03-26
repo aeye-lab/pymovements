@@ -33,22 +33,52 @@ from pymovements import Experiment
     [
         pytest.param(
             {},
-            {'gaze': False, 'precomputed_events': False, 'precomputed_reading_measures': False},
-            id='no_resources',
+            {
+                None: True,
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='empty_resources_dict',
+        ),
+        pytest.param(
+            {'gaze': None},
+            {
+                None: True,
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='none_value_as_resources',
         ),
         pytest.param(
             {'gaze': [{'resource': 'foo'}]},
-            {'gaze': True, 'precomputed_events': False, 'precomputed_reading_measures': False},
+            {
+                None: False,
+                'gaze': True,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
             id='gaze_resources',
         ),
         pytest.param(
             {'precomputed_events': [{'resource': 'foo'}]},
-            {'gaze': False, 'precomputed_events': True, 'precomputed_reading_measures': False},
+            {
+                None: False,
+                'gaze': False,
+                'precomputed_events': True,
+                'precomputed_reading_measures': False,
+            },
             id='precomputed_event_resources',
         ),
         pytest.param(
             {'precomputed_reading_measures': [{'resource': 'foo'}]},
-            {'gaze': False, 'precomputed_events': False, 'precomputed_reading_measures': True},
+            {
+                None: False,
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': True,
+            },
             id='precomputed_reading_measures_resources',
         ),
         pytest.param(
