@@ -105,6 +105,7 @@ class EventGazeProcessor:
     ):
         _check_event_properties(event_properties)
 
+        event_properties_with_kwargs: list[tuple[str, dict[str, Any]]]
         if isinstance(event_properties, str):
             event_properties_with_kwargs = [(event_properties, {})]
         elif isinstance(event_properties, tuple):
@@ -216,7 +217,8 @@ class EventGazeProcessor:
 
 
 def _check_event_properties(
-        event_properties: str | tuple[str, dict[str, Any]] | list[str | tuple[str, dict[str, Any]]],
+        event_properties: str | tuple[str, dict[str, Any]] | list[str]
+        | list[str | tuple[str, dict[str, Any]]],
 ) -> None:
     """Validate event properties."""
     if isinstance(event_properties, str):
