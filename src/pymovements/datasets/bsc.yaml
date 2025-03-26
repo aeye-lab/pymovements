@@ -5,13 +5,9 @@ has_files:
   precomputed_events: true
   precomputed_reading_measures: false
 
-mirrors:
-  precomputed_events:
-    - https://osf.io/download/
-
 resources:
   precomputed_events:
-    - resource: xfe4s/
+    - resource: https://osf.io/download/xfe4s/
       filename: BSC.EMD.zip
       md5: c7118bfe48c91264d69c45d347f11416
 

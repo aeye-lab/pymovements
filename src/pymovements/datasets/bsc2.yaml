@@ -5,13 +5,9 @@ has_files:
   precomputed_events: true
   precomputed_reading_measures: false
 
-mirrors:
-  precomputed_events:
-    - "https://osf.io/download/"
-
 resources:
   precomputed_events:
-    - resource: "2cuys/"
+    - resource: "https://osf.io/download/2cuys/"
       filename: "BSCII.EMD.rev.zip"
       md5: "4daad0fa922785d8c681a883b1197e1e"
 

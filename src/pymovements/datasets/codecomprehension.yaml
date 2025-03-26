@@ -5,13 +5,9 @@ has_files:
   precomputed_events: true
   precomputed_reading_measures: false
 
-mirrors:
-  precomputed_events:
-    - https://zenodo.org/
-
 resources:
   precomputed_events:
-    - resource: "records/11123101/files/Predicting%20Code%20Comprehension%20Package.zip?download=1"
+    - resource: "https://zenodo.org/records/11123101/files/Predicting%20Code%20Comprehension%20Package.zip?download=1"
       filename: "data.zip"
       md5: "3a3c6fb96550bc2c2ddcf5d458fb12a2"
 
