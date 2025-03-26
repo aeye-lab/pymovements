@@ -73,7 +73,7 @@ def test_raise_value_error_get_non_existent_dataset():
         assert snippet in msg
 
 
-def test_register_defintion_class():
+def test_register_definition_class():
     @dataclass
     @register_dataset
     class CustomDatasetDefinition(DatasetDefinition):
