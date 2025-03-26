@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import shutil
+from pathlib import Path
 from urllib.error import URLError
 
 from pymovements.dataset._utils._archives import extract_archive
@@ -221,15 +222,27 @@ def extract_dataset(
                 shutil.move(source_path, destination_path / resource['filename'])
 
 
-def _download_resources(mirrors, resources, target_dirpath, verbose):
+def _download_resources(
+        mirrors: list[str] | tuple[str, ...] | None,
+        resources: list[dict[str, str]] | tuple[dict[str, str], ...],
+        target_dirpath: Path,
+        verbose: bool,
+) -> None:
+    """Download resources."""
     for resource in resources:
         if not mirrors:
             _download_resource_without_mirrors(resource, target_dirpath, verbose)
         else:
+            assert mirrors is not None
             _download_resource_with_mirrors(mirrors, resource, target_dirpath, verbose)
 
 
-def _download_resource_without_mirrors(resource, target_dirpath, verbose):
+def _download_resource_without_mirrors(
+        resource: dict[str, str],
+        target_dirpath: Path,
+        verbose: bool,
+) -> None:
+    """Download resouce without mirrors."""
     try:
         download_file(
             url=resource['resource'],
@@ -246,7 +259,13 @@ def _download_resource_without_mirrors(resource, target_dirpath, verbose):
         ) from error
 
 
-def _download_resource_with_mirrors(mirrors, resource, target_dirpath, verbose):
+def _download_resource_with_mirrors(
+        mirrors: list[str] | tuple[str, ...],
+        resource: dict[str, str],
+        target_dirpath: Path,
+        verbose: bool,
+) -> None:
+    """Download resource with mirrors."""
     success = False
 
     for mirror_idx, mirror in enumerate(mirrors):
