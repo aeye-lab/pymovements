@@ -27,9 +27,10 @@ from typing import Any
 
 from tqdm.auto import tqdm
 
+from pymovements import __version__
 from pymovements.dataset._utils._archives import extract_archive
 
-USER_AGENT: str = 'pymovements'
+USER_AGENT: str = f'pymovements/{__version__}'
 
 
 def download_and_extract_archive(
