@@ -23,6 +23,7 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 from urllib.error import URLError
+from warnings import warn
 
 from pymovements.dataset._utils._archives import extract_archive
 from pymovements.dataset.dataset_definition import DatasetDefinition
@@ -286,7 +287,7 @@ def _download_resource_with_mirrors(
         except (URLError, OSError, RuntimeError) as error:
             # Error downloading the resource, try next mirror
             if mirror_idx < len(mirrors) - 1:
-                warnings.warn(f'Failed to download:\n{error}\nTrying next mirror.')
+                warn(f'Failed to download:\n{error}\nTrying next mirror.')
             continue
 
         # downloading the resource was successful, we don't need to try another mirror
