@@ -484,11 +484,7 @@ def test_paths(init_path, expected_paths, dataset_definition):
 
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
-@pytest.mark.parametrize(
-    'dataset_definition',
-    ['CustomGazeOnly', 'CustomGazeOnlyNoMirror'],
-    indirect=['dataset_definition'],
-)
+@pytest.mark.parametrize('dataset_definition', ['CustomGazeOnly'], indirect=['dataset_definition'])
 def test_dataset_download_both_mirrors_fail_gaze_only(
         mock_download_file,
         tmp_path,
@@ -525,11 +521,40 @@ def test_dataset_download_both_mirrors_fail_gaze_only(
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @pytest.mark.parametrize(
-    'dataset_definition',
-    ['CustomPrecomputedOnly', 'CustomPrecomputedOnlyNoMirror'],
-    indirect=['dataset_definition'],
+    'dataset_definition', ['CustomGazeOnlyNoMirror'], indirect=['dataset_definition'],
 )
-def test_dataset_download_both_precomputed_mirrors_fail(
+def test_dataset_download_without_mirrors_fail_gaze_only(
+        mock_download_file,
+        tmp_path,
+        dataset_definition,
+):
+    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
+    dataset = pm.Dataset(dataset_definition, path=paths)
+
+    mock_download_file.side_effect = OSError
+
+    with pytest.raises(
+        RuntimeError,
+        match='downloading resource https://example.com/test.gz.tar failed.',
+    ):
+        dataset.download()
+
+    mock_download_file.assert_has_calls([
+        mock.call(
+            url='https://example.com/test.gz.tar',
+            dirpath=tmp_path / 'downloads',
+            filename='test.gz.tar',
+            md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+            verbose=True,
+        ),
+    ])
+
+
+@mock.patch('pymovements.dataset.dataset_download.download_file')
+@pytest.mark.parametrize(
+    'dataset_definition', ['CustomPrecomputedOnly'], indirect=['dataset_definition'],
+)
+def test_dataset_download_precomputed_events_both_mirrors_fail(
         mock_download_file,
         tmp_path,
         dataset_definition,
@@ -565,11 +590,40 @@ def test_dataset_download_both_precomputed_mirrors_fail(
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @pytest.mark.parametrize(
-    'dataset_definition',
-    ['CustomPrecomputedRMOnly', 'CustomPrecomputedRMOnlyNoMirror'],
-    indirect=['dataset_definition'],
+    'dataset_definition', ['CustomPrecomputedOnlyNoMirror'], indirect=['dataset_definition'],
 )
-def test_dataset_download_both_precomputed_mirrors_fail_rm(
+def test_dataset_download_precomputed_events_without_mirrors_fail(
+        mock_download_file,
+        tmp_path,
+        dataset_definition,
+):
+    mock_download_file.side_effect = OSError()
+
+    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
+    dataset = pm.Dataset(dataset_definition, path=paths)
+
+    with pytest.raises(
+        RuntimeError,
+        match='downloading resource https://example.com/test_pc.gz.tar failed.',
+    ):
+        dataset.download()
+
+    mock_download_file.assert_has_calls([
+        mock.call(
+            url='https://example.com/test_pc.gz.tar',
+            dirpath=tmp_path / 'downloads',
+            filename='test_pc.gz.tar',
+            md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+            verbose=True,
+        ),
+    ])
+
+
+@mock.patch('pymovements.dataset.dataset_download.download_file')
+@pytest.mark.parametrize(
+    'dataset_definition', ['CustomPrecomputedRMOnly'], indirect=['dataset_definition'],
+)
+def test_dataset_download_precomputed_reading_measures_both_mirrors_fail(
         mock_download_file,
         tmp_path,
         dataset_definition,
@@ -605,11 +659,40 @@ def test_dataset_download_both_precomputed_mirrors_fail_rm(
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @pytest.mark.parametrize(
-    'dataset_definition',
-    ['CustomGazeAndPrecomputed', 'CustomGazeAndPrecomputedNoMirror'],
-    indirect=['dataset_definition'],
+    'dataset_definition', ['CustomPrecomputedRMOnlyNoMirror'], indirect=['dataset_definition'],
 )
-def test_dataset_download_both_mirrors_fail_precomputed_and_gaze(
+def test_dataset_download_precomputed_reading_measures_withput_mirrors_fail(
+        mock_download_file,
+        tmp_path,
+        dataset_definition,
+):
+    mock_download_file.side_effect = OSError()
+
+    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
+    dataset = pm.Dataset(dataset_definition, path=paths)
+
+    with pytest.raises(
+        RuntimeError,
+        match='downloading resource https://example.com/test_rm.gz.tar failed.',
+    ):
+        dataset.download()
+
+    mock_download_file.assert_has_calls([
+        mock.call(
+            url='https://example.com/test_rm.gz.tar',
+            dirpath=tmp_path / 'downloads',
+            filename='test_rm.gz.tar',
+            md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+            verbose=True,
+        ),
+    ])
+
+
+@mock.patch('pymovements.dataset.dataset_download.download_file')
+@pytest.mark.parametrize(
+    'dataset_definition', ['CustomGazeAndPrecomputed'], indirect=['dataset_definition'],
+)
+def test_dataset_download_precomputed_and_gaze_both_mirrors_fail(
         mock_download_file,
         tmp_path,
         dataset_definition,
@@ -644,9 +727,37 @@ def test_dataset_download_both_mirrors_fail_precomputed_and_gaze(
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @pytest.mark.parametrize(
-    'dataset_definition',
-    ['CustomGazeOnly', 'CustomGazeOnlyNoMirror'],
-    indirect=['dataset_definition'],
+    'dataset_definition', ['CustomGazeAndPrecomputedNoMirror'], indirect=['dataset_definition'],
+)
+def test_dataset_download_precomputed_and_gaze_without_mirrors_fail(
+        mock_download_file,
+        tmp_path,
+        dataset_definition,
+):
+    mock_download_file.side_effect = OSError()
+
+    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
+    dataset = pm.Dataset(dataset_definition, path=paths)
+
+    with pytest.raises(
+        RuntimeError,
+        match='downloading resource https://example.com/test.gz.tar failed.',
+    ):
+        dataset.download()
+    mock_download_file.assert_has_calls([
+        mock.call(
+            url='https://example.com/test.gz.tar',
+            dirpath=tmp_path / 'downloads',
+            filename='test.gz.tar',
+            md5='52bbf03a7c50ee7152ccb9d357c2bb30',
+            verbose=True,
+        ),
+    ])
+
+
+@mock.patch('pymovements.dataset.dataset_download.download_file')
+@pytest.mark.parametrize(
+    'dataset_definition', ['CustomGazeOnly'], indirect=['dataset_definition'],
 )
 def test_dataset_download_first_mirror_gaze_fails(mock_download_file, tmp_path, dataset_definition):
     mock_download_file.side_effect = [OSError(), None]
@@ -675,9 +786,7 @@ def test_dataset_download_first_mirror_gaze_fails(mock_download_file, tmp_path, 
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @pytest.mark.parametrize(
-    'dataset_definition',
-    ['CustomPrecomputedOnly', 'CustomPrecomputedOnlyNoMirror'],
-    indirect=['dataset_definition'],
+    'dataset_definition', ['CustomPrecomputedOnly'], indirect=['dataset_definition'],
 )
 def test_dataset_download_first_mirror_precomputed_fails(
         mock_download_file, tmp_path, dataset_definition,
@@ -707,9 +816,7 @@ def test_dataset_download_first_mirror_precomputed_fails(
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @pytest.mark.parametrize(
-    'dataset_definition',
-    ['CustomPrecomputedRMOnly', 'CustomPrecomputedRMOnlyNoMirror'],
-    indirect=['dataset_definition'],
+    'dataset_definition', ['CustomPrecomputedRMOnly'], indirect=['dataset_definition'],
 )
 def test_dataset_download_first_mirror_precomputed_fails_rm(
         mock_download_file, tmp_path, dataset_definition,
@@ -739,9 +846,7 @@ def test_dataset_download_first_mirror_precomputed_fails_rm(
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
 @pytest.mark.parametrize(
-    'dataset_definition',
-    ['CustomGazeAndPrecomputed', 'CustomGazeAndPrecomputedNoMirror'],
-    indirect=['dataset_definition'],
+    'dataset_definition', ['CustomGazeAndPrecomputed'], indirect=['dataset_definition'],
 )
 def test_dataset_download_first_mirror_fails(mock_download_file, tmp_path, dataset_definition):
     mock_download_file.side_effect = [OSError(), None, OSError(), None]
@@ -1194,120 +1299,67 @@ def test_dataset_download_default_extract_precomputed(
     mock_extract.assert_called_once()
 
 
-def test_dataset_download_no_mirrors_raises_exception(tmp_path):
-    @dataclass
-    class NoGazeMirrorsDefinition(pm.DatasetDefinition):
-        name: str = 'CustomPublicDataset'
-
-        has_files: dict[str, bool] = field(
-            default_factory=lambda: {
+@pytest.mark.parametrize(
+    'dataset_definition',
+    [
+        pm.DatasetDefinition(
+            name='CustomPublicDataset',
+            has_files={
                 'gaze': True,
                 'precomputed_events': False,
                 'precomputed_reading_measures': False,
             },
-        )
-        mirrors: dict[str, tuple[str, ...]] = field(default_factory=lambda: {'gaze': ()})
-
-        resources: dict[str, tuple[dict[str, str], ...]] = field(
-            default_factory=lambda: {
-                'gaze': (
-                    {
-                        'resource': 'test.gz.tar',
-                        'filename': 'test.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
+            resources={
+                'gaze': {
+                    'resource': 'test.gz.tar',
+                    'filename': 'test.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
             },
-        )
-
-    with pytest.raises(AttributeError) as excinfo:
-        pm.Dataset(NoGazeMirrorsDefinition, path=tmp_path).download()
-
-    msg, = excinfo.value.args
-
-    expected_substrings = ['number', 'mirrors', 'zero', 'download']
-    for substring in expected_substrings:
-        assert substring in msg
-
-
-def test_dataset_download_no_mirrors_precomputed_raises_exception(tmp_path):
-    @dataclass
-    class NoPrecomputedMirrorsDefinition(pm.DatasetDefinition):
-        name: str = 'CustomPublicDataset'
-
-        has_files: dict[str, bool] = field(
-            default_factory=lambda: {
+        ),
+        pm.DatasetDefinition(
+            name='CustomPublicDataset',
+            has_files={
                 'gaze': False,
                 'precomputed_events': True,
                 'precomputed_reading_measures': False,
             },
-        )
-        mirrors: dict[str, tuple[str, ...]] = field(
-            default_factory=lambda: {
-                'precomputed_events': (),
+            resources={
+                'precomputed_events': {
+                    'resource': 'test.gz.tar',
+                    'filename': 'test.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
             },
-        )
-
-        resources: dict[str, tuple[dict[str, str], ...]] = field(
-            default_factory=lambda: {
-                'precomputed_events': (
-                    {
-                        'resource': 'test_pc.gz.tar',
-                        'filename': 'test_pc.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
-        )
-
-    with pytest.raises(AttributeError) as excinfo:
-        pm.Dataset(NoPrecomputedMirrorsDefinition, path=tmp_path).download()
-
-    msg, = excinfo.value.args
-
-    expected_substrings = ['number', 'mirrors', 'zero', 'download']
-    for substring in expected_substrings:
-        assert substring in msg
-
-
-def test_dataset_download_no_mirrors_precomputed_rm_raises_exception(tmp_path):
-    @dataclass
-    class NoPrecomputedMirrorsDefinition(pm.DatasetDefinition):
-        name: str = 'CustomPublicDataset'
-
-        has_files: dict[str, bool] = field(
-            default_factory=lambda: {
+        ),
+        pm.DatasetDefinition(
+            name='CustomPublicDataset',
+            has_files={
                 'gaze': False,
                 'precomputed_events': False,
                 'precomputed_reading_measures': True,
             },
-        )
-        mirrors: dict[str, tuple[str, ...]] = field(
-            default_factory=lambda: {
-                'precomputed_reading_measures': (),
+            resources={
+                'precomputed_reading_measures': {
+                    'resource': 'test.gz.tar',
+                    'filename': 'test.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
             },
-        )
-
-        resources: dict[str, tuple[dict[str, str], ...]] = field(
-            default_factory=lambda: {
-                'precomputed_reading_measures': (
-                    {
-                        'resource': 'test_rm.gz.tar',
-                        'filename': 'test_rm.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
-        )
-
-    with pytest.raises(AttributeError) as excinfo:
-        pm.Dataset(NoPrecomputedMirrorsDefinition, path=tmp_path).download()
+        ),
+    ],
+    indirect=['dataset_definition'],
+)
+def test_dataset_download_no_mirrors_no_http_resource_raises_exception(
+        dataset_definition, tmp_path,
+):
+    with pytest.raises(ValueError) as excinfo:
+        pm.Dataset(dataset_definition, path=tmp_path).download()
 
     msg, = excinfo.value.args
 
-    expected_substrings = ['number', 'mirrors', 'zero', 'download']
-    for substring in expected_substrings:
-        assert substring in msg
+    expected_msg_prefix = 'unknown url type: '
+    assert msg.startswith(expected_msg_prefix)
 
 
 def test_dataset_download_no_resources_raises_exception(tmp_path):
@@ -1342,9 +1394,8 @@ def test_dataset_download_no_resources_raises_exception(tmp_path):
 
     msg, = excinfo.value.args
 
-    expected_substrings = ['number', 'resources', 'zero', 'download']
-    for substring in expected_substrings:
-        assert substring in msg
+    expected_msg = "'gaze' resources must be specified to download dataset."
+    assert msg == expected_msg
 
 
 def test_dataset_download_no_precomputed_event_resources_raises_exception(tmp_path):
@@ -1379,9 +1430,8 @@ def test_dataset_download_no_precomputed_event_resources_raises_exception(tmp_pa
 
     msg, = excinfo.value.args
 
-    expected_substrings = ['number', '`precomputed_events` resources', 'zero', 'download']
-    for substring in expected_substrings:
-        assert substring in msg
+    expected_msg = "'precomputed_events' resources must be specified to download dataset."
+    assert msg == expected_msg
 
 
 def test_public_dataset_registered_correct_attributes(tmp_path, dataset_definition):
@@ -1513,6 +1563,5 @@ def test_dataset_download_no_precomputed_rm_resources_raises_exception(tmp_path)
 
     msg, = excinfo.value.args
 
-    expected_substrings = ['number', '`precomputed_reading_measures` resources', 'zero', 'download']
-    for substring in expected_substrings:
-        assert substring in msg
+    expected_msg = "'precomputed_reading_measures' resources must be specified to download dataset."
+    assert msg == expected_msg

@@ -83,7 +83,7 @@ def download_dataset(
             mirrors = definition.mirrors['gaze']
 
         if not definition.resources or not definition.resources['gaze']:
-            raise AttributeError('`gaze` resources must be specified to download dataset')
+            raise AttributeError("'gaze' resources must be specified to download dataset.")
 
         _download_resources(
             mirrors=mirrors,
@@ -100,7 +100,7 @@ def download_dataset(
 
         if not definition.resources or not definition.resources['precomputed_events']:
             raise AttributeError(
-                '`precomputed_events` resources must be specified to download dataset',
+                "'precomputed_events' resources must be specified to download dataset.",
             )
 
         _download_resources(
@@ -118,7 +118,7 @@ def download_dataset(
 
         if not definition.resources or not definition.resources['precomputed_reading_measures']:
             raise AttributeError(
-                '`precomputed_reading_measures` resources must be specified to download dataset',
+                "'precomputed_reading_measures' resources must be specified to download dataset.",
             )
 
         _download_resources(
