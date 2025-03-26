@@ -20,14 +20,16 @@
 """Test all download and extract functionality of pymovements.Dataset."""
 from __future__ import annotations
 
-from dataclasses import dataclass
-from dataclasses import field
+import shutil
 from pathlib import Path
 from unittest import mock
 
 import pytest
 
-import pymovements as pm
+from pymovements import Dataset
+from pymovements import DatasetDefinition
+from pymovements import DatasetPaths
+from pymovements.dataset.dataset_download import extract_dataset
 
 
 @pytest.fixture(
@@ -47,7 +49,7 @@ import pymovements as pm
 )
 def dataset_definition_fixture(request):
     if request.param == 'CustomGazeAndPrecomputed':
-        return pm.DatasetDefinition(
+        return DatasetDefinition(
             name='CustomPublicDataset',
             has_files={
                 'gaze': True,
@@ -87,7 +89,7 @@ def dataset_definition_fixture(request):
         )
 
     if request.param == 'CustomGazeAndPrecomputedNoMirror':
-        return pm.DatasetDefinition(
+        return DatasetDefinition(
             name='CustomPublicDataset',
             has_files={
                 'gaze': True,
@@ -117,7 +119,7 @@ def dataset_definition_fixture(request):
         )
 
     if request.param == 'CustomGazeOnly':
-        return pm.DatasetDefinition(
+        return DatasetDefinition(
             name='CustomPublicDataset',
             has_files={
                 'gaze': True,
@@ -145,7 +147,7 @@ def dataset_definition_fixture(request):
         )
 
     if request.param == 'CustomGazeOnlyNoMirror':
-        return pm.DatasetDefinition(
+        return DatasetDefinition(
             name='CustomPublicDataset',
             has_files={
                 'gaze': True,
@@ -167,7 +169,7 @@ def dataset_definition_fixture(request):
         )
 
     if request.param == 'CustomPrecomputedOnly':
-        return pm.DatasetDefinition(
+        return DatasetDefinition(
             name='CustomPublicDataset',
             has_files={
                 'gaze': False,
@@ -195,7 +197,7 @@ def dataset_definition_fixture(request):
         )
 
     if request.param == 'CustomPrecomputedOnlyNoMirror':
-        return pm.DatasetDefinition(
+        return DatasetDefinition(
             name='CustomPublicDataset',
             has_files={
                 'gaze': False,
@@ -217,7 +219,7 @@ def dataset_definition_fixture(request):
         )
 
     if request.param == 'CustomPrecomputedOnlyNoExtract':
-        return pm.DatasetDefinition(
+        return DatasetDefinition(
             name='CustomPublicDataset',
             has_files={
                 'gaze': False,
@@ -245,7 +247,7 @@ def dataset_definition_fixture(request):
         )
 
     if request.param == 'CustomPrecomputedOnlyNoExtractNoMirror':
-        return pm.DatasetDefinition(
+        return DatasetDefinition(
             name='CustomPublicDataset',
             has_files={
                 'gaze': False,
@@ -267,7 +269,7 @@ def dataset_definition_fixture(request):
         )
 
     if request.param == 'CustomPrecomputedRMOnly':
-        return pm.DatasetDefinition(
+        return DatasetDefinition(
             name='CustomPublicDataset',
             has_files={
                 'gaze': False,
@@ -295,7 +297,7 @@ def dataset_definition_fixture(request):
         )
 
     if request.param == 'CustomPrecomputedRMOnlyNoMirror':
-        return pm.DatasetDefinition(
+        return DatasetDefinition(
             name='CustomPublicDataset',
             has_files={
                 'gaze': False,
@@ -316,6 +318,8 @@ def dataset_definition_fixture(request):
             },
         )
 
+    assert False, f'unknown dataset_definition fixture {request.param}'
+
 
 @pytest.mark.parametrize(
     ('init_path', 'expected_paths'),
@@ -330,7 +334,7 @@ def dataset_definition_fixture(request):
             id='no_paths',
         ),
         pytest.param(
-            pm.DatasetPaths(root='/data/set/path'),
+            DatasetPaths(root='/data/set/path'),
             {
                 'root': Path('/data/set/path/'),
                 'dataset': Path('/data/set/path/CustomPublicDataset'),
@@ -339,7 +343,7 @@ def dataset_definition_fixture(request):
             id='no_paths',
         ),
         pytest.param(
-            pm.DatasetPaths(root='/data/set/path', dataset='.'),
+            DatasetPaths(root='/data/set/path', dataset='.'),
             {
                 'root': Path('/data/set/path/'),
                 'dataset': Path('/data/set/path/'),
@@ -348,7 +352,7 @@ def dataset_definition_fixture(request):
             id='dataset_dot',
         ),
         pytest.param(
-            pm.DatasetPaths(root='/data/set/path', dataset='dataset'),
+            DatasetPaths(root='/data/set/path', dataset='dataset'),
             {
                 'root': Path('/data/set/path/'),
                 'dataset': Path('/data/set/path/dataset'),
@@ -357,7 +361,7 @@ def dataset_definition_fixture(request):
             id='explicit_dataset_dirname',
         ),
         pytest.param(
-            pm.DatasetPaths(root='/data/set/path', downloads='custom_downloads'),
+            DatasetPaths(root='/data/set/path', downloads='custom_downloads'),
             {
                 'root': Path('/data/set/path/'),
                 'dataset': Path('/data/set/path/CustomPublicDataset'),
@@ -368,7 +372,7 @@ def dataset_definition_fixture(request):
     ],
 )
 def test_paths(init_path, expected_paths, dataset_definition):
-    dataset = pm.Dataset(dataset_definition, path=init_path)
+    dataset = Dataset(dataset_definition, path=init_path)
 
     assert dataset.paths.root == expected_paths['root']
     assert dataset.paths.dataset == expected_paths['dataset']
@@ -383,8 +387,8 @@ def test_dataset_download_both_mirrors_fail_gaze_only(
         tmp_path,
         dataset_definition,
 ):
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
 
     mock_download_file.side_effect = OSError
 
@@ -421,8 +425,8 @@ def test_dataset_download_without_mirrors_fail_gaze_only(
         tmp_path,
         dataset_definition,
 ):
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
 
     mock_download_file.side_effect = OSError
 
@@ -455,8 +459,8 @@ def test_dataset_download_precomputed_events_both_mirrors_fail(
 ):
     mock_download_file.side_effect = OSError()
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
 
     with pytest.raises(
         RuntimeError,
@@ -493,8 +497,8 @@ def test_dataset_download_precomputed_events_without_mirrors_fail(
 ):
     mock_download_file.side_effect = OSError()
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
 
     with pytest.raises(
         RuntimeError,
@@ -525,8 +529,8 @@ def test_dataset_download_precomputed_reading_measures_both_mirrors_fail(
 ):
     mock_download_file.side_effect = OSError()
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
 
     with pytest.raises(
         RuntimeError,
@@ -563,8 +567,8 @@ def test_dataset_download_precomputed_reading_measures_without_mirrors_fail(
 ):
     mock_download_file.side_effect = OSError()
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
 
     with pytest.raises(
         RuntimeError,
@@ -595,8 +599,8 @@ def test_dataset_download_precomputed_and_gaze_both_mirrors_fail(
 ):
     mock_download_file.side_effect = OSError()
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
 
     with pytest.raises(
         RuntimeError,
@@ -632,8 +636,8 @@ def test_dataset_download_precomputed_and_gaze_without_mirrors_fail(
 ):
     mock_download_file.side_effect = OSError()
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
 
     with pytest.raises(
         RuntimeError,
@@ -659,8 +663,8 @@ def test_dataset_download_precomputed_and_gaze_without_mirrors_fail(
 def test_dataset_download_first_mirror_gaze_fails(mock_download_file, tmp_path, dataset_definition):
     mock_download_file.side_effect = [OSError(), None]
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
     dataset.download(extract=False)
 
     mock_download_file.assert_has_calls([
@@ -691,8 +695,8 @@ def test_dataset_download_first_mirror_precomputed_fails(
 ):
     mock_download_file.side_effect = [OSError(), None]
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
     dataset.download(extract=False)
     mock_download_file.assert_has_calls([
         mock.call(
@@ -722,8 +726,8 @@ def test_dataset_download_first_mirror_precomputed_fails_rm(
 ):
     mock_download_file.side_effect = [OSError(), None]
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
     dataset.download(extract=False)
     mock_download_file.assert_has_calls([
         mock.call(
@@ -751,8 +755,8 @@ def test_dataset_download_first_mirror_precomputed_fails_rm(
 def test_dataset_download_first_mirror_fails(mock_download_file, tmp_path, dataset_definition):
     mock_download_file.side_effect = [OSError(), None, OSError(), None]
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
     dataset.download(extract=False)
     mock_download_file.assert_has_calls([
         mock.call(
@@ -799,8 +803,8 @@ def test_dataset_download_first_mirror_fails(mock_download_file, tmp_path, datas
 def test_dataset_download_file_not_found(mock_download_file, tmp_path, dataset_definition):
     mock_download_file.side_effect = RuntimeError()
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
 
     with pytest.raises(RuntimeError):
         dataset.download()
@@ -828,8 +832,8 @@ def test_dataset_download_file_precomputed_not_found(
 ):
     mock_download_file.side_effect = RuntimeError()
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
 
     with pytest.raises(RuntimeError):
         dataset.download()
@@ -857,8 +861,8 @@ def test_dataset_download_file_precomputed_not_found(
 def test_dataset_download_no_extract(mock_download_file, tmp_path, dataset_definition):
     mock_download_file.return_value = 'path'
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
     dataset.download(extract=False)
 
     mock_download_file.assert_has_calls([
@@ -881,8 +885,8 @@ def test_dataset_download_no_extract(mock_download_file, tmp_path, dataset_defin
 def test_dataset_download_precomputed_no_extract(mock_download_file, tmp_path, dataset_definition):
     mock_download_file.return_value = 'path'
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
     dataset.download(extract=False)
 
     mock_download_file.assert_has_calls([
@@ -907,8 +911,8 @@ def test_dataset_download_precomputed_no_extract_rm(
 ):
     mock_download_file.return_value = 'path'
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
     dataset.download(extract=False)
 
     mock_download_file.assert_has_calls([
@@ -935,8 +939,8 @@ def test_dataset_extract_remove_finished_true_gaze(
 ):
     mock_extract_archive.return_value = 'path'
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
     dataset.extract(remove_finished=True, remove_top_level=False, verbose=1)
 
     mock_extract_archive.assert_has_calls([
@@ -965,8 +969,8 @@ def test_dataset_extract_rm(
 ):
     mock_extract_archive.return_value = 'path'
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
     dataset.extract(verbose=1)
 
     mock_extract_archive.assert_has_calls([
@@ -995,8 +999,8 @@ def test_dataset_extract_remove_finished_true_both(
 ):
     mock_extract_archive.return_value = 'path'
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
     dataset.extract(remove_finished=True, remove_top_level=False, verbose=1)
 
     mock_extract_archive.assert_has_calls([
@@ -1034,8 +1038,8 @@ def test_dataset_extract_remove_finished_true_precomputed(
 ):
     mock_extract_archive.return_value = 'path'
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
     dataset.extract(remove_finished=True, remove_top_level=False, verbose=1)
 
     mock_extract_archive.assert_has_calls([
@@ -1064,8 +1068,8 @@ def test_dataset_extract_remove_finished_false_both(
 ):
     mock_extract_archive.return_value = 'path'
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
     dataset.extract()
 
     mock_extract_archive.assert_has_calls([
@@ -1103,8 +1107,8 @@ def test_dataset_extract_remove_finished_false_gaze(
 ):
     mock_extract_archive.return_value = 'path'
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
     dataset.extract()
 
     mock_extract_archive.assert_has_calls([
@@ -1133,8 +1137,8 @@ def test_dataset_extract_remove_finished_false_precomputed(
 ):
     mock_extract_archive.return_value = 'path'
 
-    paths = pm.DatasetPaths(root=tmp_path, dataset='.')
-    dataset = pm.Dataset(dataset_definition, path=paths)
+    paths = DatasetPaths(root=tmp_path, dataset='.')
+    dataset = Dataset(dataset_definition, path=paths)
     dataset.extract()
 
     mock_extract_archive.assert_has_calls([
@@ -1163,7 +1167,7 @@ def test_dataset_download_default_extract_both(
     mock_extract.return_value = None
     mock_download.return_value = None
 
-    pm.Dataset(dataset_definition, path=tmp_path).download()
+    Dataset(dataset_definition, path=tmp_path).download()
 
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
@@ -1179,7 +1183,7 @@ def test_dataset_download_default_extract_gaze(
     mock_extract.return_value = None
     mock_download.return_value = None
 
-    pm.Dataset(dataset_definition, path=tmp_path).download()
+    Dataset(dataset_definition, path=tmp_path).download()
 
     mock_download.assert_called_once()
     mock_extract.assert_called_once()
@@ -1198,7 +1202,7 @@ def test_dataset_download_default_extract_precomputed(
     mock_extract.return_value = None
     mock_download.return_value = None
 
-    pm.Dataset(dataset_definition, path=tmp_path).download()
+    Dataset(dataset_definition, path=tmp_path).download()
 
     mock_download.assert_called_once()
     mock_extract.assert_called_once()
@@ -1207,7 +1211,7 @@ def test_dataset_download_default_extract_precomputed(
 @pytest.mark.parametrize(
     'dataset_definition',
     [
-        pm.DatasetDefinition(
+        DatasetDefinition(
             name='CustomPublicDataset',
             has_files={
                 'gaze': True,
@@ -1222,7 +1226,7 @@ def test_dataset_download_default_extract_precomputed(
                 }],
             },
         ),
-        pm.DatasetDefinition(
+        DatasetDefinition(
             name='CustomPublicDataset',
             has_files={
                 'gaze': False,
@@ -1237,7 +1241,7 @@ def test_dataset_download_default_extract_precomputed(
                 }],
             },
         ),
-        pm.DatasetDefinition(
+        DatasetDefinition(
             name='CustomPublicDataset',
             has_files={
                 'gaze': False,
@@ -1258,7 +1262,7 @@ def test_dataset_download_no_mirrors_no_http_resource_raises_exception(
         dataset_definition, tmp_path,
 ):
     with pytest.raises(ValueError) as excinfo:
-        pm.Dataset(dataset_definition, path=tmp_path).download()
+        Dataset(dataset_definition, path=tmp_path).download()
 
     msg, = excinfo.value.args
 
@@ -1267,34 +1271,26 @@ def test_dataset_download_no_mirrors_no_http_resource_raises_exception(
 
 
 def test_dataset_download_no_resources_raises_exception(tmp_path):
-    @dataclass
-    class NoGazeResourcesDefinition(pm.DatasetDefinition):
-        name: str = 'CustomPublicDataset'
-
-        has_files: dict[str, bool] = field(
-            default_factory=lambda: {
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-        )
-        mirrors: dict[str, tuple[str, ...]] = field(
-            default_factory=lambda: {
-                'gaze': (
-                    'https://example.com/',
-                    'https://another_example.com/',
-                ),
-            },
-        )
-
-        resources: dict[str, tuple[dict[str, str], ...]] = field(
-            default_factory=lambda: {
-                'gaze': (),
-            },
-        )
+    definition = DatasetDefinition(
+        name='CustomPublicDataset',
+        has_files={
+            'gaze': True,
+            'precomputed_events': False,
+            'precomputed_reading_measures': False,
+        },
+        mirrors={
+            'gaze': (
+                'https://example.com/',
+                'https://another_example.com/',
+            ),
+        },
+        resources={
+            'gaze': (),
+        },
+    )
 
     with pytest.raises(AttributeError) as excinfo:
-        pm.Dataset(NoGazeResourcesDefinition, path=tmp_path).download()
+        Dataset(definition, path=tmp_path).download()
 
     msg, = excinfo.value.args
 
@@ -1303,34 +1299,26 @@ def test_dataset_download_no_resources_raises_exception(tmp_path):
 
 
 def test_dataset_download_no_precomputed_event_resources_raises_exception(tmp_path):
-    @dataclass
-    class NoPrecomputedResourcesDefinition(pm.DatasetDefinition):
-        name: str = 'CustomPublicDataset'
-
-        has_files: dict[str, bool] = field(
-            default_factory=lambda: {
-                'gaze': False,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
-        )
-        mirrors: dict[str, tuple[str, ...]] = field(
-            default_factory=lambda: {
-                'precomputed_events': (
-                    'https://example.com/',
-                    'https://another_example.com/',
-                ),
-            },
-        )
-
-        resources: dict[str, tuple[dict[str, str], ...]] = field(
-            default_factory=lambda: {
-                'precomputed_events': (),
-            },
-        )
+    definition = DatasetDefinition(
+        name='CustomPublicDataset',
+        has_files={
+            'gaze': False,
+            'precomputed_events': True,
+            'precomputed_reading_measures': False,
+        },
+        mirrors={
+            'precomputed_events': (
+                'https://example.com/',
+                'https://another_example.com/',
+            ),
+        },
+        resources={
+            'precomputed_events': (),
+        },
+    )
 
     with pytest.raises(AttributeError) as excinfo:
-        pm.Dataset(NoPrecomputedResourcesDefinition, path=tmp_path).download()
+        Dataset(definition, path=tmp_path).download()
 
     msg, = excinfo.value.args
 
@@ -1339,7 +1327,7 @@ def test_dataset_download_no_precomputed_event_resources_raises_exception(tmp_pa
 
 
 def test_public_dataset_registered_correct_attributes(tmp_path, dataset_definition):
-    dataset = pm.Dataset(dataset_definition, path=tmp_path)
+    dataset = Dataset(dataset_definition, path=tmp_path)
 
     assert dataset.definition.mirrors == dataset_definition.mirrors
     assert dataset.definition.resources == dataset_definition.resources
@@ -1349,121 +1337,104 @@ def test_public_dataset_registered_correct_attributes(tmp_path, dataset_definiti
     assert dataset.definition.has_files == dataset_definition.has_files
 
 
-def test_extract_dataset_precomputed_move_single_file():
-    @dataclass
-    @pm.register_dataset
-    class PrecomputedResourcesDefinition(pm.DatasetDefinition):
-        name: str = 'CustomPublicDataset'
-
-        has_files: dict[str, bool] = field(
-            default_factory=lambda: {
-                'gaze': False,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
-        )
-        mirrors: dict[str, tuple[str, ...]] = field(
-            default_factory=lambda: {
-                'precompued_events': (
-                    'https://example.com/',
-                    'https://another_example.com/',
-                ),
-            },
-        )
-
-        resources: dict[str, tuple[dict[str, str], ...]] = field(
-            default_factory=lambda: {
-                'precomputed_events': (
-                    {
-                        'resource': 'tests/files/',
-                        'filename': '18sat_fixfinal.csv',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
-        )
-        extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': False})
-
-    pm.dataset.dataset_download.extract_dataset(
-        PrecomputedResourcesDefinition(),
-        pm.DatasetPaths(root='tests/files/', downloads='.'),
+def test_extract_dataset_precomputed_move_single_file(tmp_path):
+    definition = DatasetDefinition(
+        name='CustomPublicDataset',
+        has_files={
+            'gaze': False,
+            'precomputed_events': True,
+            'precomputed_reading_measures': False,
+        },
+        mirrors={
+            'precompued_events': (
+                'https://example.com/',
+                'https://another_example.com/',
+            ),
+        },
+        resources={
+            'precomputed_events': (
+                {
+                    'resource': 'tests/files/',
+                    'filename': '18sat_fixfinal.csv',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ),
+        },
+        extract={
+            'precomputed_events': False,
+        },
     )
 
-
-def test_extract_dataset_precomputed_rm_move_single_file():
-    @dataclass
-    @pm.register_dataset
-    class PrecomputedResourcesDefinition(pm.DatasetDefinition):
-        name: str = 'CustomPublicDataset'
-
-        has_files: dict[str, bool] = field(
-            default_factory=lambda: {
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': True,
-            },
-        )
-        mirrors: dict[str, tuple[str, ...]] = field(
-            default_factory=lambda: {
-                'precomputed_reading_measures': (
-                    'https://example.com/',
-                    'https://another_example.com/',
-                ),
-            },
-        )
-
-        resources: dict[str, tuple[dict[str, str], ...]] = field(
-            default_factory=lambda: {
-                'precomputed_reading_measures': (
-                    {
-                        'resource': 'tests/files/',
-                        'filename': 'copco_rm_dummy.csv',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
-        )
-        extract: dict[str, bool] = field(
-            default_factory=lambda: {
-                'precomputed_reading_measures': False,
-            },
-        )
-
-    pm.dataset.dataset_download.extract_dataset(
-        PrecomputedResourcesDefinition(),
-        pm.DatasetPaths(root='tests/files/', downloads='.', precomputed_reading_measures='.'),
+    # Create directory and copy test file.
+    (tmp_path / 'downloads').mkdir(parents=True)
+    shutil.copyfile(
+        'tests/files/18sat_fixfinal.csv',
+        tmp_path / 'downloads' / '18sat_fixfinal.csv',
     )
+
+    extract_dataset(definition, DatasetPaths(root=tmp_path))
+
+
+def test_extract_dataset_precomputed_rm_move_single_file(tmp_path):
+    definition = DatasetDefinition(
+        name='CustomPublicDataset',
+        has_files={
+            'gaze': False,
+            'precomputed_events': False,
+            'precomputed_reading_measures': True,
+        },
+        mirrors={
+            'precomputed_reading_measures': (
+                'https://example.com/',
+                'https://another_example.com/',
+            ),
+        },
+        resources={
+            'precomputed_reading_measures': (
+                {
+                    'resource': 'tests/files/',
+                    'filename': 'copco_rm_dummy.csv',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ),
+        },
+        extract={
+            'precomputed_reading_measures': False,
+        },
+    )
+
+    # Create directory and copy test file.
+    (tmp_path / 'downloads').mkdir(parents=True)
+
+    shutil.copyfile(
+        'tests/files/copco_rm_dummy.csv',
+        tmp_path / 'downloads' / 'copco_rm_dummy.csv',
+    )
+
+    extract_dataset(definition, DatasetPaths(root=tmp_path))
 
 
 def test_dataset_download_no_precomputed_rm_resources_raises_exception(tmp_path):
-    @dataclass
-    class NoPrecomputedResourcesDefinition(pm.DatasetDefinition):
-        name: str = 'CustomPublicDataset'
-
-        has_files: dict[str, bool] = field(
-            default_factory=lambda: {
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': True,
-            },
-        )
-        mirrors: dict[str, tuple[str, ...]] = field(
-            default_factory=lambda: {
-                'precomputed_reading_measures': (
-                    'https://example.com/',
-                    'https://another_example.com/',
-                ),
-            },
-        )
-
-        resources: dict[str, tuple[dict[str, str], ...]] = field(
-            default_factory=lambda: {
-                'precomputed_reading_measures': (),
-            },
-        )
+    definition = DatasetDefinition(
+        name='CustomPublicDataset',
+        has_files={
+            'gaze': False,
+            'precomputed_events': False,
+            'precomputed_reading_measures': True,
+        },
+        mirrors={
+            'precomputed_reading_measures': (
+                'https://example.com/',
+                'https://another_example.com/',
+            ),
+        },
+        extract={
+            'precomputed_reading_measures': (),
+        },
+    )
 
     with pytest.raises(AttributeError) as excinfo:
-        pm.Dataset(NoPrecomputedResourcesDefinition, path=tmp_path).download()
+        Dataset(definition, path=tmp_path).download()
 
     msg, = excinfo.value.args
 
