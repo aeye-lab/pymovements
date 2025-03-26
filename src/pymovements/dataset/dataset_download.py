@@ -287,7 +287,11 @@ def _download_resource_with_mirrors(
         except (URLError, OSError, RuntimeError) as error:
             # Error downloading the resource, try next mirror
             if mirror_idx < len(mirrors) - 1:
-                warn(f'Failed to download:\n{error}\nTrying next mirror.')
+                warning = UserWarning(
+                    f'Failed to download from mirror {mirror}\nTrying next mirror.',
+                )
+                warning.__cause__ = error
+                warn(warning)
             continue
 
         # downloading the resource was successful, we don't need to try another mirror
