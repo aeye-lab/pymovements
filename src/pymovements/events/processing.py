@@ -42,7 +42,7 @@ class EventProcessor:
     """
 
     def __init__(self, event_properties: str | list[str]):
-        _check_event_properties_valid_format(event_properties)
+        _check_event_properties(event_properties)
 
         if isinstance(event_properties, str):
             event_properties = [event_properties]
