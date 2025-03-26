@@ -19,8 +19,6 @@
 # SOFTWARE.
 """Test dataset definition."""
 from dataclasses import asdict
-from dataclasses import dataclass
-from dataclasses import field
 
 import pytest
 import yaml
@@ -77,9 +75,9 @@ def test_dataset_definition_to_yaml_equal_dicts_no_exp(tmp_path):
     definition = DatasetDefinition(
         name='Example',
         has_files={
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
+            'gaze': False,
+            'precomputed_events': False,
+            'precomputed_reading_measures': False,
         },
     )
     definition.to_yaml(tmp_file)
@@ -98,9 +96,9 @@ def test_dataset_definition_to_yaml_equal_dicts(tmp_path):
     definition = DatasetDefinition(
         name='Example',
         has_files={
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
+            'gaze': False,
+            'precomputed_events': False,
+            'precomputed_reading_measures': False,
         },
         experiment=Experiment(
             screen_width_px=1280,
@@ -152,9 +150,9 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
     definition = DatasetDefinition(
         name='Example',
         has_files={
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
+            'gaze': False,
+            'precomputed_events': False,
+            'precomputed_reading_measures': False,
         },
     )
 

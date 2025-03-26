@@ -272,4 +272,3 @@ class HasResourcesIndex:
         elif not self.resources[key]:
             return False
         return True
-
