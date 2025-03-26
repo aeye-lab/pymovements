@@ -1310,11 +1310,11 @@ def test_dataset_download_default_extract_precomputed(
                 'precomputed_reading_measures': False,
             },
             resources={
-                'gaze': {
+                'gaze': [{
                     'resource': 'test.gz.tar',
                     'filename': 'test.gz.tar',
                     'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                },
+                }],
             },
         ),
         pm.DatasetDefinition(
@@ -1325,11 +1325,11 @@ def test_dataset_download_default_extract_precomputed(
                 'precomputed_reading_measures': False,
             },
             resources={
-                'precomputed_events': {
+                'precomputed_events': [{
                     'resource': 'test.gz.tar',
                     'filename': 'test.gz.tar',
                     'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                },
+                }],
             },
         ),
         pm.DatasetDefinition(
@@ -1340,15 +1340,14 @@ def test_dataset_download_default_extract_precomputed(
                 'precomputed_reading_measures': True,
             },
             resources={
-                'precomputed_reading_measures': {
+                'precomputed_reading_measures': [{
                     'resource': 'test.gz.tar',
                     'filename': 'test.gz.tar',
                     'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                },
+                }],
             },
         ),
     ],
-    indirect=['dataset_definition'],
 )
 def test_dataset_download_no_mirrors_no_http_resource_raises_exception(
         dataset_definition, tmp_path,
