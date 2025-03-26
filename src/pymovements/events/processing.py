@@ -97,6 +97,7 @@ class EventGazeProcessor:
     event_properties: str | tuple[str, dict[str, Any]] | list[str | tuple[str, dict[str, Any]]]
         List of event property names.
     """
+
     def __init__(
             self,
             event_properties: str | tuple[str, dict[str, Any]]
