@@ -17,35 +17,23 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Tests deprecated utils.strings."""
-import re
-
+"""Test downloading and scanning all items in DatasetLibrary."""
 import pytest
 
-from pymovements import __version__
-from pymovements.utils.strings import curly_to_regex
+from pymovements import Dataset
+from pymovements import DatasetLibrary
 
 
-@pytest.mark.filterwarnings('ignore::DeprecationWarning')
-def test_curly_to_regex():
-    curly_to_regex('foo')
+@pytest.mark.parametrize('dataset_name', DatasetLibrary.names())
+def test_download_dataset(dataset_name, tmp_path):
+    # Initialize dataset.
+    dataset = Dataset(dataset_name, path=tmp_path)
 
+    # Download dataset. This checks for integrity by matching the md5 checksum.
+    dataset.download(extract=False)
 
-def test_curly_to_regex_deprecated():
-    with pytest.raises(DeprecationWarning):
-        curly_to_regex('foo')
-
-
-def test_curly_to_regex_removed():
-    with pytest.raises(DeprecationWarning) as info:
-        curly_to_regex('foo')
-
-    regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
-
-    msg = info.value.args[0]
-    remove_version = regex.match(msg).groupdict()['version']
-    current_version = __version__.split('+')[0]
-    assert current_version < remove_version, (
-        f'utils/strings.py was planned to be removed in v{remove_version}. '
-        f'Current version is v{current_version}.'
-    )
+    # Check that all resources are downloaded.
+    download_dir = dataset.paths.downloads
+    for resource_list in dataset.definition.resources.values():
+        for resource in resource_list:
+            assert download_dir / resource['filename'] in download_dir.iterdir()

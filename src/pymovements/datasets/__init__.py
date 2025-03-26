@@ -40,6 +40,7 @@
     HBN
     InteRead
     JuDo1000
+    MouseCursor
     PoTeC
     PotsdamBingeRemotePVT
     PotsdamBingeWearablePVT
@@ -72,6 +73,7 @@ from pymovements.datasets.gazebasevr import GazeBaseVR
 from pymovements.datasets.hbn import HBN
 from pymovements.datasets.interead import InteRead
 from pymovements.datasets.judo1000 import JuDo1000
+from pymovements.datasets.mousecursor import MouseCursor
 from pymovements.datasets.potec import PoTeC
 from pymovements.datasets.potsdam_binge_remote_pvt import PotsdamBingeRemotePVT
 from pymovements.datasets.potsdam_binge_wearable_pvt import PotsdamBingeWearablePVT
@@ -98,6 +100,7 @@ __all__ = [
     'HBN',
     'InteRead',
     'JuDo1000',
+    'MouseCursor',
     'PoTeC',
     'PotsdamBingeRemotePVT',
     'PotsdamBingeWearablePVT',
