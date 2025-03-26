@@ -29,6 +29,7 @@ import polars as pl
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
+from pymovements.gaze.screen import Screen
 
 
 @dataclass
@@ -168,18 +169,19 @@ class PotsdamBingeRemotePVT(DatasetDefinition):
 
     experiment: Experiment = field(
         default_factory=lambda: Experiment(
-            screen_width_px=1920,
-            screen_height_px=1080,
-            screen_width_cm=59.76,
-            screen_height_cm=33.615,
-            distance_cm=None,
-            origin='center',
+            screen=Screen(
+                width_px=1920,
+                height_px=1080,
+                width_cm=59.76,
+                height_cm=33.615,
+                distance_cm=None,
+                origin='center',
+            ),
             eyetracker=EyeTracker(
                 sampling_rate=1000,
                 left=False,
                 right=True,
                 model='EyeLink 1000 Plus',
-                version=None,
                 vendor='EyeLink',
                 mount='Remote',
             ),
