@@ -1024,7 +1024,8 @@ def test_dataset_download_precomputed_no_extract_rm(
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomGazeOnly', 'CustomGazeOnlyNoMirror'],
-    indirect=['dataset_definition'])
+    indirect=['dataset_definition'],
+)
 def test_dataset_extract_remove_finished_true_gaze(
         mock_extract_archive,
         tmp_path,
@@ -1191,7 +1192,8 @@ def test_dataset_extract_remove_finished_false_both(
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomGazeOnly', 'CustomGazeOnlyNoMirror'],
-    indirect=['dataset_definition'])
+    indirect=['dataset_definition'],
+)
 def test_dataset_extract_remove_finished_false_gaze(
         mock_extract_archive,
         tmp_path,
@@ -1267,7 +1269,8 @@ def test_dataset_download_default_extract_both(
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomGazeOnly', 'CustomGazeOnlyNoMirror'],
-    indirect=['dataset_definition'])
+    indirect=['dataset_definition'],
+)
 def test_dataset_download_default_extract_gaze(
         mock_extract, mock_download, tmp_path, dataset_definition,
 ):
