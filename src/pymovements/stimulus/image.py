@@ -23,8 +23,8 @@ from __future__ import annotations
 from pathlib import Path
 
 from pymovements._utils._paths import get_filepaths
+from pymovements._utils._strings import curly_to_regex
 from pymovements.utils.plotting import draw_image_stimulus
-from pymovements.utils.strings import curly_to_regex
 
 
 class ImageStimulus:

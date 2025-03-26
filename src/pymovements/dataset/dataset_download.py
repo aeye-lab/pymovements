@@ -23,9 +23,9 @@ from __future__ import annotations
 import shutil
 from urllib.error import URLError
 
+from pymovements.dataset._utils._archives import extract_archive
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
-from pymovements.utils.archives import extract_archive
 from pymovements.utils.downloads import download_file
 
 
