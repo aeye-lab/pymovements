@@ -20,6 +20,7 @@
 """Test all functionality in pymovements.dataset.dataset."""
 import os
 import shutil
+from dataclasses import dataclass
 from pathlib import Path
 from unittest.mock import Mock
 
@@ -28,8 +29,14 @@ import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
-import pymovements as pm
+from pymovements import Dataset
 from pymovements import DatasetDefinition
+from pymovements import DatasetLibrary
+from pymovements import DatasetPaths
+from pymovements import events
+from pymovements import Experiment
+from pymovements import GazeDataFrame
+from pymovements.exceptions import InvalidProperty
 
 
 def create_raw_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):
@@ -274,7 +281,7 @@ def mock_toy(
 
     # Create GazeDataFrames for passing as ground truth
     gaze_dfs = [
-        pm.GazeDataFrame(gaze_df, pixel_columns=pixel_columns)
+        GazeDataFrame(gaze_df, pixel_columns=pixel_columns)
         for gaze_df in gaze_dfs
     ]
 
@@ -300,7 +307,7 @@ def mock_toy(
             gaze_schema[column] = pl.Float64
 
         # Create GazeDataFrames for passing as ground truth
-        gaze_df = pm.GazeDataFrame(
+        gaze_df = GazeDataFrame(
             pl.from_dict(gaze_data, schema=gaze_schema),
             pixel_columns=pixel_columns,
             position_columns=position_columns,
@@ -337,7 +344,7 @@ def mock_toy(
     create_event_files_from_fileinfo(event_dfs, fileinfo, rootpath / 'events')
 
     dataset_definition = DatasetDefinition(
-        experiment=pm.Experiment(
+        experiment=Experiment(
             screen_width_px=1280,
             screen_height_px=1024,
             screen_width_cm=38,
@@ -418,7 +425,7 @@ def mock_toy(
     return {
         'init_kwargs': {
             'definition': dataset_definition,
-            'path': pm.DatasetPaths(root=rootpath, dataset='.'),
+            'path': DatasetPaths(root=rootpath, dataset='.'),
         },
         'fileinfo': {
             'gaze': fileinfo,
@@ -469,8 +476,18 @@ def gaze_fixture_dataset(request, tmp_path):
     yield dataset_dict
 
 
+def test_init_with_definition_class():
+    @dataclass
+    class CustomPublicDataset(DatasetDefinition):
+        name: str = 'CustomPublicDataset'
+
+    dataset = Dataset(CustomPublicDataset, path='.')
+
+    assert dataset.definition == CustomPublicDataset()
+
+
 def test_load_correct_fileinfo(gaze_dataset_configuration):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
 
     expected_fileinfo = gaze_dataset_configuration['fileinfo']
@@ -478,7 +495,7 @@ def test_load_correct_fileinfo(gaze_dataset_configuration):
 
 
 def test_load_correct_raw_gaze_dfs(gaze_dataset_configuration):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
 
     expected_gaze_dfs = gaze_dataset_configuration['raw_gaze_dfs']
@@ -491,7 +508,7 @@ def test_load_correct_raw_gaze_dfs(gaze_dataset_configuration):
 
 
 def test_load_gaze_has_position_columns(gaze_dataset_configuration):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True)
 
     for result_gaze_df in dataset.gaze:
@@ -499,7 +516,7 @@ def test_load_gaze_has_position_columns(gaze_dataset_configuration):
 
 
 def test_load_correct_preprocessed_gaze_dfs(gaze_dataset_configuration):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True)
 
     expected_gaze_dfs = gaze_dataset_configuration['preprocessed_gaze_dfs']
@@ -512,7 +529,7 @@ def test_load_correct_preprocessed_gaze_dfs(gaze_dataset_configuration):
 
 
 def test_load_correct_trial_columns(gaze_dataset_configuration):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
 
     expected_trial_columns = gaze_dataset_configuration['trial_columns']
@@ -529,7 +546,7 @@ def test_load_fileinfo_column_in_trial_columns_warns(gaze_dataset_configuration)
     # add fileinfo column as trial column
     gaze_dataset_configuration['init_kwargs']['definition'].trial_columns = ['subject_id']
 
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
 
     with pytest.warns(UserWarning) as record:
         dataset.load()
@@ -539,7 +556,7 @@ def test_load_fileinfo_column_in_trial_columns_warns(gaze_dataset_configuration)
 
 
 def test_load_correct_event_dfs(gaze_dataset_configuration):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(events=True)
 
     expected_event_dfs = gaze_dataset_configuration['event_dfs']
@@ -568,7 +585,7 @@ def test_load_correct_event_dfs(gaze_dataset_configuration):
     ],
 )
 def test_load_subset(subset, fileinfo_idx, gaze_dataset_configuration):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(subset=subset)
 
     expected_fileinfo = gaze_dataset_configuration['fileinfo']
@@ -608,7 +625,7 @@ def test_load_subset(subset, fileinfo_idx, gaze_dataset_configuration):
 )
 def test_load_exceptions(init_kwargs, load_kwargs, exception, gaze_dataset_configuration):
     init_kwargs = {**gaze_dataset_configuration['init_kwargs'], **init_kwargs}
-    dataset = pm.Dataset(**init_kwargs)
+    dataset = Dataset(**init_kwargs)
 
     with pytest.raises(exception):
         dataset.load(**load_kwargs)
@@ -627,7 +644,7 @@ def test_load_exceptions(init_kwargs, load_kwargs, exception, gaze_dataset_confi
 )
 def test_save_gaze_exceptions(init_kwargs, save_kwargs, exception, gaze_dataset_configuration):
     init_kwargs = {**gaze_dataset_configuration['init_kwargs'], **init_kwargs}
-    dataset = pm.Dataset(**init_kwargs)
+    dataset = Dataset(**init_kwargs)
 
     with pytest.raises(exception):
         dataset.load()
@@ -653,14 +670,14 @@ def test_load_events_exceptions(
         gaze_dataset_configuration,
 ):
     init_kwargs = {**gaze_dataset_configuration['init_kwargs']}
-    dataset = pm.Dataset(**init_kwargs)
+    dataset = Dataset(**init_kwargs)
 
     with pytest.raises(exception) as excinfo:
         dataset.load()
         dataset.pix2deg()
         dataset.pos2vel()
         dataset.detect_events(
-            method=pm.events.ivt,
+            method=events.ivt,
             velocity_threshold=45,
             minimum_duration=55,
         )
@@ -686,14 +703,14 @@ Supported formats are: [\'csv\', \'txt\', \'tsv\', \'feather\']"""
 )
 def test_save_events_exceptions(init_kwargs, save_kwargs, exception, gaze_dataset_configuration):
     init_kwargs = {**gaze_dataset_configuration['init_kwargs'], **init_kwargs}
-    dataset = pm.Dataset(**init_kwargs)
+    dataset = Dataset(**init_kwargs)
 
     with pytest.raises(exception):
         dataset.load()
         dataset.pix2deg()
         dataset.pos2vel()
         dataset.detect_events(
-            method=pm.events.ivt,
+            method=events.ivt,
             velocity_threshold=45,
             minimum_duration=55,
         )
@@ -702,7 +719,7 @@ def test_save_events_exceptions(init_kwargs, save_kwargs, exception, gaze_datase
 
 def test_load_no_files_raises_exception(gaze_dataset_configuration):
     init_kwargs = {**gaze_dataset_configuration['init_kwargs']}
-    dataset = pm.Dataset(**init_kwargs)
+    dataset = Dataset(**init_kwargs)
 
     shutil.rmtree(dataset.paths.raw, ignore_errors=True)
     dataset.paths.raw.mkdir()
@@ -717,14 +734,14 @@ def test_load_no_files_raises_exception(gaze_dataset_configuration):
     indirect=['gaze_dataset_configuration'],
 )
 def test_load_mat_file_exception(gaze_dataset_configuration):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
 
     with pytest.raises(ValueError):
         dataset.load()
 
 
 def test_pix2deg(gaze_dataset_configuration):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
 
     original_schema = dataset.gaze[0].schema
@@ -737,7 +754,7 @@ def test_pix2deg(gaze_dataset_configuration):
 
 
 def test_deg2pix(gaze_dataset_configuration):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
 
     original_schema = dataset.gaze[0].schema
@@ -754,7 +771,7 @@ def test_deg2pix(gaze_dataset_configuration):
 
 
 def test_pos2acc(gaze_dataset_configuration):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
 
@@ -768,7 +785,7 @@ def test_pos2acc(gaze_dataset_configuration):
 
 
 def test_pos2vel(gaze_dataset_configuration):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
 
@@ -782,7 +799,7 @@ def test_pos2vel(gaze_dataset_configuration):
 
 
 def test_clip(gaze_dataset_configuration):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
 
@@ -800,7 +817,7 @@ def test_clip(gaze_dataset_configuration):
     [
         pytest.param(
             {
-                'method': pm.events.microsaccades,
+                'method': events.microsaccades,
                 'threshold': 1,
                 'eye': 'auto',
             },
@@ -816,7 +833,7 @@ def test_clip(gaze_dataset_configuration):
         ),
         pytest.param(
             {
-                'method': pm.events.fill,
+                'method': events.fill,
                 'eye': 'auto',
             },
             id='fill_class',
@@ -839,7 +856,7 @@ def test_clip(gaze_dataset_configuration):
         ),
         pytest.param(
             {
-                'method': pm.events.ivt,
+                'method': events.ivt,
                 'velocity_threshold': 1,
                 'minimum_duration': 1,
                 'eye': 'auto',
@@ -855,7 +872,7 @@ def test_clip(gaze_dataset_configuration):
         ),
         pytest.param(
             {
-                'method': pm.events.idt,
+                'method': events.idt,
                 'eye': 'auto',
             },
             id='idt_class',
@@ -863,14 +880,14 @@ def test_clip(gaze_dataset_configuration):
     ],
 )
 def test_detect_events_auto_eye(detect_event_kwargs, gaze_dataset_configuration):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
     dataset.detect_events(**detect_event_kwargs)
 
     expected_schema = {
-        'subject_id': pl.Int64, **pm.events.EventDataFrame._minimal_schema, 'duration': pl.Int64,
+        'subject_id': pl.Int64, **events.EventDataFrame._minimal_schema, 'duration': pl.Int64,
     }
     for result_event_df in dataset.events:
         assert result_event_df.schema == expected_schema
@@ -881,7 +898,7 @@ def test_detect_events_auto_eye(detect_event_kwargs, gaze_dataset_configuration)
     [
         pytest.param(
             {
-                'method': pm.events.microsaccades,
+                'method': events.microsaccades,
                 'threshold': 1,
                 'eye': 'left',
             },
@@ -889,7 +906,7 @@ def test_detect_events_auto_eye(detect_event_kwargs, gaze_dataset_configuration)
         ),
         pytest.param(
             {
-                'method': pm.events.microsaccades,
+                'method': events.microsaccades,
                 'threshold': 1,
                 'eye': 'right',
             },
@@ -898,7 +915,7 @@ def test_detect_events_auto_eye(detect_event_kwargs, gaze_dataset_configuration)
     ],
 )
 def test_detect_events_explicit_eye(detect_event_kwargs, gaze_dataset_configuration):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -914,7 +931,7 @@ def test_detect_events_explicit_eye(detect_event_kwargs, gaze_dataset_configurat
 
         expected_schema = {
             'subject_id': pl.Int64,
-            **pm.events.EventDataFrame._minimal_schema,
+            **events.EventDataFrame._minimal_schema,
             'duration': pl.Int64,
         }
 
@@ -931,36 +948,36 @@ def test_detect_events_explicit_eye(detect_event_kwargs, gaze_dataset_configurat
     [
         pytest.param(
             {
-                'method': pm.events.microsaccades,
+                'method': events.microsaccades,
                 'threshold': 1,
                 'eye': 'auto',
             },
             {
-                'method': pm.events.microsaccades,
+                'method': events.microsaccades,
                 'threshold': 1,
                 'eye': 'auto',
             },
             {
                 'subject_id': pl.Int64,
-                **pm.events.EventDataFrame._minimal_schema,
+                **events.EventDataFrame._minimal_schema,
                 'duration': pl.Int64,
             },
             id='two-saccade-runs',
         ),
         pytest.param(
             {
-                'method': pm.events.microsaccades,
+                'method': events.microsaccades,
                 'threshold': 1,
                 'eye': 'auto',
             },
             {
-                'method': pm.events.ivt,
+                'method': events.ivt,
                 'velocity_threshold': 1,
                 'minimum_duration': 1,
             },
             {
                 'subject_id': pl.Int64,
-                **pm.events.EventDataFrame._minimal_schema,
+                **events.EventDataFrame._minimal_schema,
                 'duration': pl.Int64,
             },
             id='one-saccade-one-fixation-run',
@@ -973,7 +990,7 @@ def test_detect_events_multiple_calls(
         expected_schema,
         gaze_dataset_configuration,
 ):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -1000,7 +1017,7 @@ def test_detect_events_multiple_calls(
     ],
 )
 def test_detect_events_alias(gaze_dataset_configuration, detect_kwargs, monkeypatch):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -1018,13 +1035,13 @@ def test_detect_events_alias(gaze_dataset_configuration, detect_kwargs, monkeypa
     indirect=['gaze_dataset_configuration'],
 )
 def test_detect_events_attribute_error(gaze_dataset_configuration):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
 
     detect_event_kwargs = {
-        'method': pm.events.microsaccades,
+        'method': events.microsaccades,
         'threshold': 1,
         'eye': 'right',
     }
@@ -1044,7 +1061,7 @@ def test_detect_events_attribute_error(gaze_dataset_configuration):
         pytest.param(
             {'position': 'custom_position'},
             {
-                'method': pm.events.idt,
+                'method': events.idt,
                 'threshold': 1,
             },
             (
@@ -1057,7 +1074,7 @@ def test_detect_events_attribute_error(gaze_dataset_configuration):
         pytest.param(
             {'velocity': 'custom_velocity'},
             {
-                'method': pm.events.microsaccades,
+                'method': events.microsaccades,
                 'threshold': 1,
             },
             (
@@ -1075,7 +1092,7 @@ def test_detect_events_raises_column_not_found_error(
         detect_event_kwargs,
         expected_message,
 ):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -1099,27 +1116,27 @@ def test_detect_events_raises_column_not_found_error(
             id='empty_list_stays_empty_list',
         ),
         pytest.param(
-            [pm.events.EventDataFrame()],
-            [pm.events.EventDataFrame()],
+            [events.EventDataFrame()],
+            [events.EventDataFrame()],
             id='empty_df_stays_empty_df',
         ),
         pytest.param(
-            [pm.events.EventDataFrame(name='event', onsets=[0], offsets=[99])],
-            [pm.events.EventDataFrame()],
+            [events.EventDataFrame(name='event', onsets=[0], offsets=[99])],
+            [events.EventDataFrame()],
             id='single_instance_filled_df_gets_cleared_to_empty_df',
         ),
         pytest.param(
             [
-                pm.events.EventDataFrame(name='event', onsets=[0], offsets=[99]),
-                pm.events.EventDataFrame(name='event', onsets=[0], offsets=[99]),
+                events.EventDataFrame(name='event', onsets=[0], offsets=[99]),
+                events.EventDataFrame(name='event', onsets=[0], offsets=[99]),
             ],
-            [pm.events.EventDataFrame(), pm.events.EventDataFrame()],
+            [events.EventDataFrame(), events.EventDataFrame()],
             id='two_instance_filled_df_gets_cleared_to_two_empty_dfs',
         ),
     ],
 )
 def test_clear_events(events_init, events_expected, tmp_path):
-    dataset = pm.Dataset('ToyDataset', path=tmp_path)
+    dataset = Dataset('ToyDataset', path=tmp_path)
     dataset.events = events_init
     dataset.clear_events()
 
@@ -1135,21 +1152,21 @@ def test_clear_events(events_init, events_expected, tmp_path):
     ('detect_event_kwargs', 'events_dirname', 'expected_save_dirpath', 'save_kwargs'),
     [
         pytest.param(
-            {'method': pm.events.microsaccades, 'threshold': 1, 'eye': 'auto'},
+            {'method': events.microsaccades, 'threshold': 1, 'eye': 'auto'},
             None,
             'events',
             {},
             id='none_dirname',
         ),
         pytest.param(
-            {'method': pm.events.microsaccades, 'threshold': 1, 'eye': 'auto'},
+            {'method': events.microsaccades, 'threshold': 1, 'eye': 'auto'},
             'events_test',
             'events_test',
             {},
             id='explicit_dirname',
         ),
         pytest.param(
-            {'method': pm.events.microsaccades, 'threshold': 1, 'eye': 'auto'},
+            {'method': events.microsaccades, 'threshold': 1, 'eye': 'auto'},
             None,
             'events',
             {'extension': 'csv'},
@@ -1164,7 +1181,7 @@ def test_save_events(
         save_kwargs,
         gaze_dataset_configuration,
 ):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -1185,21 +1202,21 @@ def test_save_events(
     ('detect_event_kwargs', 'events_dirname', 'expected_save_dirpath', 'load_save_kwargs'),
     [
         pytest.param(
-            {'method': pm.events.microsaccades, 'threshold': 1, 'eye': 'auto'},
+            {'method': events.microsaccades, 'threshold': 1, 'eye': 'auto'},
             None,
             'events',
             {},
             id='none_dirname',
         ),
         pytest.param(
-            {'method': pm.events.microsaccades, 'threshold': 1, 'eye': 'auto'},
+            {'method': events.microsaccades, 'threshold': 1, 'eye': 'auto'},
             'events_test',
             'events_test',
             {},
             id='explicit_dirname',
         ),
         pytest.param(
-            {'method': pm.events.microsaccades, 'threshold': 1, 'eye': 'auto'},
+            {'method': events.microsaccades, 'threshold': 1, 'eye': 'auto'},
             None,
             'events',
             {'extension': 'csv'},
@@ -1214,7 +1231,7 @@ def test_load_previously_saved_events_gaze(
         load_save_kwargs,
         gaze_dataset_configuration,
 ):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -1258,7 +1275,7 @@ def test_save_preprocessed_directory_exists(
         expected_save_dirpath,
         gaze_dataset_configuration,
 ):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -1286,7 +1303,7 @@ def test_save_preprocessed_directory_exists(
     ],
 )
 def test_save_preprocessed(gaze_dataset_configuration, drop_column):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -1316,7 +1333,7 @@ def test_save_preprocessed(gaze_dataset_configuration, drop_column):
     ],
 )
 def test_save_preprocessed_has_no_side_effect(gaze_dataset_configuration, drop_column):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
@@ -1377,12 +1394,12 @@ def test_save_creates_correct_directory(
         save_kwargs,
         gaze_dataset_configuration,
 ):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
 
-    detect_events_kwargs = {'method': pm.events.microsaccades, 'threshold': 1, 'eye': 'auto'}
+    detect_events_kwargs = {'method': events.microsaccades, 'threshold': 1, 'eye': 'auto'}
     dataset.detect_events(**detect_events_kwargs)
 
     preprocessed_dirname = save_kwargs.get('preprocessed_dirname', 'preprocessed')
@@ -1425,13 +1442,13 @@ def test_save_files_have_correct_extension(
         save_kwargs,
         gaze_dataset_configuration,
 ):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.pos2vel()
     dataset.pos2acc()
 
-    detect_events_kwargs = {'method': pm.events.microsaccades, 'threshold': 1, 'eye': 'auto'}
+    detect_events_kwargs = {'method': events.microsaccades, 'threshold': 1, 'eye': 'auto'}
     dataset.detect_events(**detect_events_kwargs)
 
     preprocessed_dirname = save_kwargs.get('preprocessed_dirname', 'preprocessed')
@@ -1475,7 +1492,7 @@ def test_save_files_have_correct_extension(
             },
         ),
         pytest.param(
-            pm.DatasetPaths(root='/data/set/path', dataset='.'),
+            DatasetPaths(root='/data/set/path', dataset='.'),
             {
                 'root': Path('/data/set/path/'),
                 'dataset': Path('/data/set/path/'),
@@ -1485,7 +1502,7 @@ def test_save_files_have_correct_extension(
             },
         ),
         pytest.param(
-            pm.DatasetPaths(root='/data/set/path', dataset='dataset'),
+            DatasetPaths(root='/data/set/path', dataset='dataset'),
             {
                 'root': Path('/data/set/path/'),
                 'dataset': Path('/data/set/path/dataset'),
@@ -1495,7 +1512,7 @@ def test_save_files_have_correct_extension(
             },
         ),
         pytest.param(
-            pm.DatasetPaths(root='/data/set/path', dataset='dataset', events='custom_events'),
+            DatasetPaths(root='/data/set/path', dataset='dataset', events='custom_events'),
             {
                 'root': Path('/data/set/path/'),
                 'dataset': Path('/data/set/path/dataset'),
@@ -1505,7 +1522,7 @@ def test_save_files_have_correct_extension(
             },
         ),
         pytest.param(
-            pm.DatasetPaths(
+            DatasetPaths(
                 root='/data/set/path',
                 dataset='dataset',
                 preprocessed='custom_preprocessed',
@@ -1519,7 +1536,7 @@ def test_save_files_have_correct_extension(
             },
         ),
         pytest.param(
-            pm.DatasetPaths(root='/data/set/path', dataset='dataset', raw='custom_raw'),
+            DatasetPaths(root='/data/set/path', dataset='dataset', raw='custom_raw'),
             {
                 'root': Path('/data/set/path/'),
                 'dataset': Path('/data/set/path/dataset'),
@@ -1531,7 +1548,7 @@ def test_save_files_have_correct_extension(
     ],
 )
 def test_paths(init_path, expected_paths):
-    dataset = pm.Dataset('ToyDataset', path=init_path)
+    dataset = Dataset('ToyDataset', path=init_path)
 
     assert dataset.paths.root == expected_paths['root']
     assert dataset.paths.dataset == expected_paths['dataset']
@@ -1549,7 +1566,7 @@ def test_paths(init_path, expected_paths):
     ],
 )
 def test_check_fileinfo(new_fileinfo, exception, tmp_path):
-    dataset = pm.Dataset('ToyDataset', path=tmp_path)
+    dataset = Dataset('ToyDataset', path=tmp_path)
 
     dataset.fileinfo = new_fileinfo
 
@@ -1565,7 +1582,7 @@ def test_check_fileinfo(new_fileinfo, exception, tmp_path):
     ],
 )
 def test_check_gaze_dataframe(new_gaze, exception, tmp_path):
-    dataset = pm.Dataset('ToyDataset', path=tmp_path)
+    dataset = Dataset('ToyDataset', path=tmp_path)
 
     dataset.gaze = new_gaze
 
@@ -1580,7 +1597,7 @@ def test_check_gaze_dataframe(new_gaze, exception, tmp_path):
 )
 def test_check_experiment(gaze_dataset_configuration):
     gaze_dataset_configuration['init_kwargs']['definition'].experiment = None
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
 
     with pytest.raises(AttributeError):
@@ -1593,7 +1610,7 @@ def test_check_experiment(gaze_dataset_configuration):
     indirect=['gaze_dataset_configuration'],
 )
 def test_velocity_columns(gaze_dataset_configuration):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True)
 
     for gaze_df in dataset.gaze:
@@ -1605,7 +1622,7 @@ def test_velocity_columns(gaze_dataset_configuration):
     [
         pytest.param(
             {'event_properties': 'foo'},
-            pm.exceptions.InvalidProperty,
+            InvalidProperty,
             ('foo', 'invalid', 'valid', 'peak_velocity'),
             id='invalid_property',
         ),
@@ -1617,7 +1634,7 @@ def test_event_dataframe_add_property_raises_exceptions(
         exception,
         msg_substrings,
 ):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True)
 
     with pytest.raises(exception) as excinfo:
@@ -1638,7 +1655,7 @@ def test_event_dataframe_add_property_has_expected_height(
         gaze_dataset_configuration,
         property_kwargs,
 ):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True)
 
     expected_heights = [len(event_df) for event_df in dataset.events]
@@ -1656,7 +1673,7 @@ def test_event_dataframe_add_property_has_expected_height(
             {'event_properties': 'peak_velocity'},
             {
                 'subject_id': pl.Int64,
-                **pm.events.EventDataFrame._minimal_schema,
+                **events.EventDataFrame._minimal_schema,
                 'duration': pl.Int64,
                 'peak_velocity': pl.Float64,
             },
@@ -1666,7 +1683,7 @@ def test_event_dataframe_add_property_has_expected_height(
             {'event_properties': 'location'},
             {
                 'subject_id': pl.Int64,
-                **pm.events.EventDataFrame._minimal_schema,
+                **events.EventDataFrame._minimal_schema,
                 'duration': pl.Int64,
                 'location': pl.List(pl.Float64),
             },
@@ -1679,7 +1696,7 @@ def test_event_dataframe_add_property_has_expected_schema(
         property_kwargs,
         expected_schema,
 ):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True)
 
     dataset.compute_event_properties(**property_kwargs)
@@ -1718,7 +1735,7 @@ def test_event_dataframe_add_property_effect_property_columns(
         property_kwargs,
         expected_property_columns,
 ):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True)
 
     dataset.compute_event_properties(**property_kwargs)
@@ -1743,7 +1760,7 @@ def test_event_dataframe_add_property_raises_exception(
         exception,
         exception_msg,
 ):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True)
 
     with pytest.raises(exception) as excinfo:
@@ -1774,7 +1791,7 @@ def test_event_dataframe_add_property_does_not_change_length(
         gaze_dataset_configuration,
         property_kwargs,
 ):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True)
 
     lengths_pre = [len(events_df.frame) for events_df in dataset.events]
@@ -1798,7 +1815,7 @@ def test_event_dataframe_add_property_does_not_change_length(
     ],
 )
 def test_compute_event_properties_alias(gaze_dataset_configuration, property_kwargs, monkeypatch):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True)
 
     mock = Mock()
@@ -1862,7 +1879,7 @@ def precomputed_fixture_dataset(request, tmp_path):
 
 
 def test_load_correct_fileinfo_precomputed(precomputed_dataset_configuration):
-    dataset = pm.Dataset(**precomputed_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**precomputed_dataset_configuration['init_kwargs'])
     dataset.load()
 
     expected_fileinfo = precomputed_dataset_configuration['fileinfo']['precomputed_events']
@@ -1871,7 +1888,7 @@ def test_load_correct_fileinfo_precomputed(precomputed_dataset_configuration):
 
 def test_load_no_files_precomputed_raises_exception(precomputed_dataset_configuration):
     init_kwargs = {**precomputed_dataset_configuration['init_kwargs']}
-    dataset = pm.Dataset(**init_kwargs)
+    dataset = Dataset(**init_kwargs)
 
     shutil.rmtree(dataset.paths.precomputed_events, ignore_errors=True)
     dataset.paths.precomputed_events.mkdir()
@@ -1937,7 +1954,7 @@ def precomputed_rm_fixture_dataset(request, tmp_path):
 
 
 def test_load_correct_fileinfo_precomputed_rm(precomputed_rm_dataset_configuration):
-    dataset = pm.Dataset(**precomputed_rm_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**precomputed_rm_dataset_configuration['init_kwargs'])
     dataset.load()
 
     all_fileinfo = precomputed_rm_dataset_configuration['fileinfo']
@@ -1947,7 +1964,7 @@ def test_load_correct_fileinfo_precomputed_rm(precomputed_rm_dataset_configurati
 
 def test_load_no_files_precomputed_rm_raises_exception(precomputed_rm_dataset_configuration):
     init_kwargs = {**precomputed_rm_dataset_configuration['init_kwargs']}
-    dataset = pm.Dataset(**init_kwargs)
+    dataset = Dataset(**init_kwargs)
 
     shutil.rmtree(dataset.paths.precomputed_reading_measures, ignore_errors=True)
     dataset.paths.precomputed_reading_measures.mkdir()
@@ -1977,7 +1994,7 @@ def test_load_no_files_precomputed_rm_raises_exception(precomputed_rm_dataset_co
     ],
 )
 def test_load_split_precomputed_events(precomputed_dataset_configuration, by, expected_len):
-    dataset = pm.Dataset(**precomputed_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**precomputed_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.split_precomputed_events(by)
     assert len(dataset.precomputed_events) == expected_len
@@ -1986,10 +2003,10 @@ def test_load_split_precomputed_events(precomputed_dataset_configuration, by, ex
 def test_dataset_definition_from_yaml(tmp_path):
     tmp_file = tmp_path / 'tmp.yaml'
 
-    dataset_def = pm.DatasetLibrary.get('ToyDataset')
+    dataset_def = DatasetLibrary.get('ToyDataset')
     dataset_def.to_yaml(tmp_file)
 
-    dataset_from_yaml = pm.Dataset(tmp_file, '.')
+    dataset_from_yaml = Dataset(tmp_file, '.')
     assert dataset_from_yaml.definition == dataset_def
 
 
@@ -2014,7 +2031,7 @@ def test_dataset_definition_from_yaml(tmp_path):
     ],
 )
 def test_load_split_gaze(gaze_dataset_configuration, by, expected_len):
-    dataset = pm.Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.split_gaze_data(by)
     assert len(dataset.gaze) == expected_len
