@@ -26,9 +26,9 @@ from urllib.error import URLError
 from warnings import warn
 
 from pymovements.dataset._utils._archives import extract_archive
+from pymovements.dataset._utils._downloads import download_file
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
-from pymovements.utils.downloads import download_file
 
 
 def download_dataset(
