@@ -19,9 +19,8 @@
 # SOFTWARE.
 """Test dataset definition."""
 from dataclasses import asdict
-from dataclasses import dataclass
-from dataclasses import field
 
+import pytest
 import yaml
 
 from pymovements import DatasetDefinition
@@ -29,21 +28,88 @@ from pymovements import DatasetLibrary
 from pymovements import Experiment
 
 
-def test_dataset_definition_to_yaml_equal_dicts_no_exp(tmp_path):
-    tmp_file = tmp_path / 'tmp.yaml'
-
-    @dataclass
-    class TestDatasetDefinition(DatasetDefinition):
-        name: str = 'Example'
-        has_files: dict[str, bool] = field(
-            default_factory=lambda: {
+@pytest.mark.parametrize(
+    ('resources', 'expected_resources'),
+    [
+        pytest.param(
+            {},
+            {
+                None: True,
                 'gaze': False,
                 'precomputed_events': False,
                 'precomputed_reading_measures': False,
             },
-        )
+            id='empty_resources_dict',
+        ),
+        pytest.param(
+            {'gaze': None},
+            {
+                None: True,
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='none_value_as_resources',
+        ),
+        pytest.param(
+            {'gaze': [{'resource': 'foo'}]},
+            {
+                None: False,
+                'gaze': True,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='gaze_resources',
+        ),
+        pytest.param(
+            {'precomputed_events': [{'resource': 'foo'}]},
+            {
+                None: False,
+                'gaze': False,
+                'precomputed_events': True,
+                'precomputed_reading_measures': False,
+            },
+            id='precomputed_event_resources',
+        ),
+        pytest.param(
+            {'precomputed_reading_measures': [{'resource': 'foo'}]},
+            {
+                None: False,
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': True,
+            },
+            id='precomputed_reading_measures_resources',
+        ),
+        pytest.param(
+            {
+                'gaze': [{'resource': 'foo'}],
+                'precomputed_events': [{'resource': 'foo'}],
+                'precomputed_reading_measures': [{'resource': 'foo'}],
+            },
+            {'gaze': True, 'precomputed_events': True, 'precomputed_reading_measures': True},
+            id='all_resources',
+        ),
+    ],
+)
+def test_dataset_definition_has_resources(resources, expected_resources):
+    definition = DatasetDefinition(resources=resources)
 
-    definition = TestDatasetDefinition()
+    for key, value in expected_resources.items():
+        assert definition.has_resources[key] == value
+
+
+def test_dataset_definition_to_yaml_equal_dicts_no_exp(tmp_path):
+    tmp_file = tmp_path / 'tmp.yaml'
+
+    definition = DatasetDefinition(
+        name='Example',
+        has_files={
+            'gaze': False,
+            'precomputed_events': False,
+            'precomputed_reading_measures': False,
+        },
+    )
     definition.to_yaml(tmp_file)
 
     with open(tmp_file, encoding='utf-8') as f:
@@ -57,29 +123,23 @@ def test_dataset_definition_to_yaml_equal_dicts_no_exp(tmp_path):
 def test_dataset_definition_to_yaml_equal_dicts(tmp_path):
     tmp_file = tmp_path / 'tmp.yaml'
 
-    @dataclass
-    class TestDatasetDefinition(DatasetDefinition):
-        name: str = 'Example'
-        has_files: dict[str, bool] = field(
-            default_factory=lambda: {
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-        )
-        experiment: Experiment = field(
-            default_factory=lambda: Experiment(
-                screen_width_px=1280,
-                screen_height_px=1024,
-                screen_width_cm=38.2,
-                screen_height_cm=30.2,
-                distance_cm=60,
-                origin='center',
-                sampling_rate=2000,
-            ),
-        )
-
-    definition = TestDatasetDefinition()
+    definition = DatasetDefinition(
+        name='Example',
+        has_files={
+            'gaze': False,
+            'precomputed_events': False,
+            'precomputed_reading_measures': False,
+        },
+        experiment=Experiment(
+            screen_width_px=1280,
+            screen_height_px=1024,
+            screen_width_cm=38.2,
+            screen_height_cm=30.2,
+            distance_cm=60,
+            origin='center',
+            sampling_rate=2000,
+        ),
+    )
     definition.to_yaml(tmp_file)
 
     with open(tmp_file, encoding='utf-8') as f:
@@ -117,17 +177,13 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
 
     yaml_definition = DatasetDefinition.from_yaml(dictionary_tmp_file)
 
-    @dataclass
-    class TestDatasetDefinition(DatasetDefinition):
-        name: str = 'Example'
-        has_files: dict[str, bool] = field(
-            default_factory=lambda: {
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-        )
-
-    definition = TestDatasetDefinition()
+    definition = DatasetDefinition(
+        name='Example',
+        has_files={
+            'gaze': False,
+            'precomputed_events': False,
+            'precomputed_reading_measures': False,
+        },
+    )
 
     assert definition.__dict__ == yaml_definition.__dict__
