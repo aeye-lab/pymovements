@@ -25,6 +25,7 @@ from pathlib import Path
 from typing import Any
 
 import polars as pl
+import pyreadr
 from tqdm.auto import tqdm
 
 from pymovements._utils._paths import match_filepaths
@@ -536,9 +537,20 @@ def load_precomputed_event_file(
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
 
-    valid_extensions = {'.csv', '.tsv', '.txt'}
-    if data_path.suffix in valid_extensions:
+    csv_extensions = {'.csv', '.tsv', '.txt'}
+    r_extensions = {'.rda'}
+    valid_extensions = csv_extensions | r_extensions
+    if data_path.suffix in csv_extensions:
         precomputed_event_df = pl.read_csv(data_path, **custom_read_kwargs)
+    elif data_path.suffix in r_extensions:
+        if 'r_dataframe_key' in custom_read_kwargs:
+            precomputed_r = pyreadr.read_r(data_path)
+            # convert to polars DataFrame because read_r has no .clone().
+            precomputed_event_df = pl.DataFrame(
+                precomputed_r[custom_read_kwargs['r_dataframe_key']],
+            )
+        else:
+            raise ValueError('please specify r_dataframe_key in custom_read_kwargs')
     else:
         raise ValueError(
             f'unsupported file format "{data_path.suffix}". '
