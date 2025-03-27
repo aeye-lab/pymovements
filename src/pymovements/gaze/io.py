@@ -28,12 +28,14 @@ import polars as pl
 from pymovements.gaze._utils.parsing import parse_eyelink
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze_dataframe import GazeDataFrame  # pylint: disable=cyclic-import
+from pymovements.utils.checks import check_is_mutual_exclusive
 
 
 def from_csv(
         file: str | Path,
         experiment: Experiment | None = None,
         *,
+        definition: pm.DatasetDefinition | None = None,
         trial_columns: str | list[str] | None = None,
         time_column: str | None = None,
         time_unit: str | None = None,
@@ -55,6 +57,9 @@ def from_csv(
         Path of gaze file.
     experiment : Experiment | None
         The experiment definition. (default: None)
+    definition: pm.DatasetDefinition | None
+        A dataset definition. Mutually exclusive with experiment and explicit arguments below.
+        (default: None)
     trial_columns: str | list[str] | None
         The name of the trial columns in the input data frame. If the list is empty or None,
         the input data frame is assumed to contain only one trial. If the list is not empty,
@@ -213,6 +218,18 @@ def from_csv(
     └──────┴───────────┘
 
     """
+    # definition and explicit arguments are mutually exclusive.
+    if definition:
+        check_is_mutual_exclusive(definition=definition, column_map=column_map)
+        column_map = definition.column_map
+
+        # TODO: column_schema_overrides = definition.column_schema_overrides
+
+        if not read_csv_kwargs:  # **read_csv_kwargs will be empty dict not None
+            read_csv_kwargs = None
+        check_is_mutual_exclusive(definition=definition, read_csv_kwargs=read_csv_kwargs)
+        read_csv_kwargs = definition.custom_read_kwargs['gaze']
+
     # Read data.
     gaze_data = pl.read_csv(file, **read_csv_kwargs)
     if column_map is not None:
@@ -256,6 +273,7 @@ def from_csv(
     gaze_df = GazeDataFrame(
         gaze_data,
         experiment=experiment,
+        definition=definition,
         trial_columns=trial_columns,
         time_column=time_column,
         time_unit=time_unit,

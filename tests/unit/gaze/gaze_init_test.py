@@ -1658,6 +1658,17 @@ def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_tr
 
         pytest.param(
             {
+                'data': pl.from_dict(data={}),
+                'experiment': Experiment(sampling_rate=1000),
+                'definition': DatasetDefinition(experiment=Experiment(sampling_rate=1000)),
+            },
+            ValueError,
+            'The arguments "definition" and "experiment" are mutually exclusive.',
+            id='definition_and_experiment',
+        ),
+
+        pytest.param(
+            {
                 'data': pl.from_dict(
                     data={'trial': [1]},
                     schema={'trial': pl.Int64},

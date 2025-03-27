@@ -53,7 +53,8 @@ class GazeDataFrame:
     events: pm.EventDataFrame | None
         A dataframe of events in the gaze signal. (default: None)
     definition: pm.DatasetDefinition | None
-        A dataset definition. Mutually exclusive with explicit arguments below. (default: None)
+        A dataset definition. Mutually exclusive with experiment and explicit arguments below.
+        (default: None)
     auto_column_detect: bool
         Flag indicating if the column names should be inferred automatically. (default: False)
     trial_columns: str | list[str] | None
@@ -209,25 +210,34 @@ class GazeDataFrame:
         self.frame = self.frame.fill_nan(None)
 
         # definition and explicit arguments are mutually exclusive.
-        if definition is not None:
+        if definition:
+            check_is_mutual_exclusive(definition=definition, experiment=experiment)
+            experiment = definition.experiment
+
             check_is_mutual_exclusive(definition=definition, trial_columns=trial_columns)
+            trial_columns = definition.trial_columns
+
             check_is_mutual_exclusive(definition=definition, time_column=time_column)
+            time_column = definition.time_column
+
             check_is_mutual_exclusive(definition=definition, time_unit=time_unit)
+            time_unit = definition.time_unit
+
             check_is_mutual_exclusive(definition=definition, pixel_columns=pixel_columns)
+            pixel_columns = definition.pixel_columns
+
             check_is_mutual_exclusive(definition=definition, position_columns=position_columns)
+            position_columns = definition.position_columns
+
             check_is_mutual_exclusive(definition=definition, velocity_columns=velocity_columns)
+            velocity_columns = definition.velocity_columns
+
             check_is_mutual_exclusive(
                 definition=definition, acceleration_columns=acceleration_columns,
             )
-            check_is_mutual_exclusive(definition=definition, distance_column=distance_column)
-
-            trial_columns = definition.trial_columns
-            time_column = definition.time_column
-            time_unit = definition.time_unit
-            pixel_columns = definition.pixel_columns
-            position_columns = definition.position_columns
-            velocity_columns = definition.velocity_columns
             acceleration_columns = definition.acceleration_columns
+
+            check_is_mutual_exclusive(definition=definition, distance_column=distance_column)
             distance_column = definition.distance_column
 
         trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns

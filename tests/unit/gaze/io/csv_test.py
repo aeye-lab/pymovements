@@ -21,11 +21,13 @@
 import polars as pl
 import pytest
 
-import pymovements as pm
+from pymovements import datasets
+from pymovements import DatasetDefinition
+from pymovements.gaze import from_csv
 
 
 @pytest.mark.parametrize(
-    ('kwargs', 'shape'),
+    ('kwargs', 'expected_shape', 'expected_schema'),
     [
         pytest.param(
             {
@@ -35,8 +37,10 @@ import pymovements as pm
                 'pixel_columns': ['x_left_pix', 'y_left_pix'],
             },
             (10, 2),
+            {'time': pl.Int64, 'pixel': pl.List(pl.Int64)},
             id='csv_mono_shape',
         ),
+
         pytest.param(
             {
                 'file': 'tests/files/binocular_example.csv',
@@ -46,93 +50,10 @@ import pymovements as pm
                 'position_columns': ['x_left_pos', 'y_left_pos', 'x_right_pos', 'y_right_pos'],
             },
             (10, 3),
+            {'time': pl.Int64, 'pixel': pl.List(pl.Int64), 'position': pl.List(pl.Float64)},
             id='csv_bino_shape',
         ),
-        pytest.param(
-            {
-                'file': 'tests/files/hbn_example.csv',
-                'time_column': pm.DatasetLibrary.get('HBN').time_column,
-                'time_unit': pm.DatasetLibrary.get('HBN').time_unit,
-                'experiment': pm.DatasetLibrary.get('HBN').experiment,
-                'pixel_columns': pm.DatasetLibrary.get('HBN').pixel_columns,
-            },
-            (10, 2),
-            id='hbn_dataset_example',
-        ),
-        pytest.param(
-            {
-                'file': 'tests/files/sbsat_example.csv',
-                'time_column': pm.DatasetLibrary.get('SBSAT').time_column,
-                'time_unit': pm.DatasetLibrary.get('SBSAT').time_unit,
-                'pixel_columns': pm.DatasetLibrary.get('SBSAT').pixel_columns,
-                **pm.DatasetLibrary.get('SBSAT').custom_read_kwargs['gaze'],
-            },
-            (10, 5),
-            id='sbsat_dataset_example',
-        ),
-        pytest.param(
-            {
-                'file': 'tests/files/gazebase_example.csv',
-                'time_column': pm.DatasetLibrary.get('GazeBase').time_column,
-                'time_unit': pm.DatasetLibrary.get('GazeBase').time_unit,
-                'position_columns': pm.DatasetLibrary.get('GazeBase').position_columns,
-                **pm.DatasetLibrary.get('GazeBase').custom_read_kwargs['gaze'],
-            },
-            (10, 7),
-            id='gazebase_dataset_example',
-        ),
-        pytest.param(
-            {
-                'file': 'tests/files/gaze_on_faces_example.csv',
-                'time_column': pm.DatasetLibrary.get('GazeOnFaces').time_column,
-                'time_unit': pm.DatasetLibrary.get('GazeOnFaces').time_unit,
-                'pixel_columns': pm.DatasetLibrary.get('GazeOnFaces').pixel_columns,
-                **pm.DatasetLibrary.get('GazeOnFaces').custom_read_kwargs['gaze'],
-            },
-            (10, 1),
-            id='gaze_on_faces_dataset_example',
-        ),
-        pytest.param(
-            {
-                'file': 'tests/files/gazebase_vr_example.csv',
-                'time_column': pm.DatasetLibrary.get('GazeBaseVR').time_column,
-                'time_unit': pm.DatasetLibrary.get('GazeBaseVR').time_unit,
-                'position_columns': pm.DatasetLibrary.get('GazeBaseVR').position_columns,
-            },
-            (10, 11),
-            id='gazebase_vr_dataset_example',
-        ),
-        pytest.param(
-            {
-                'file': 'tests/files/judo1000_example.csv',
-                'time_column': pm.DatasetLibrary.get('JuDo1000').time_column,
-                'time_unit': pm.DatasetLibrary.get('JuDo1000').time_unit,
-                'pixel_columns': pm.DatasetLibrary.get('JuDo1000').pixel_columns,
-                **pm.DatasetLibrary.get('JuDo1000').custom_read_kwargs['gaze'],
-            },
-            (10, 4),
-            id='judo1000_dataset_example',
-        ),
-    ],
-)
-def test_shapes(kwargs, shape):
-    gaze_dataframe = pm.gaze.from_csv(**kwargs)
-    assert gaze_dataframe.frame.shape == shape
 
-
-@pytest.mark.parametrize(
-    ('kwargs', 'schema_overrides'),
-    [
-        pytest.param(
-            {
-                'file': 'tests/files/monocular_example.csv',
-                'time_column': 'time',
-                'time_unit': 'ms',
-                'pixel_columns': ['x_left_pix', 'y_left_pix'],
-            },
-            [pl.Int64, pl.List(pl.Int64)],
-            id='csv_mono_schema_overrides',
-        ),
         pytest.param(
             {
                 'file': 'tests/files/missing_values_example.csv',
@@ -141,11 +62,136 @@ def test_shapes(kwargs, shape):
                 'pixel_columns': ['pixel_x', 'pixel_y'],
                 'position_columns': ['position_x', 'position_y'],
             },
-            [pl.Int64, pl.List(pl.Float64), pl.List(pl.Float64)],
-            id='csv_missing_values_schema_overrides',
+            (103, 3),
+            {'time': pl.Int64, 'pixel': pl.List(pl.Float64), 'position': pl.List(pl.Float64)},
+            id='csv_missing_values',
+        ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/gaze_on_faces_example.csv',
+                'definition': datasets.GazeOnFaces(),
+            },
+            (10, 2),
+            {'time': pl.Float64, 'pixel': pl.List(pl.Float32)},
+            id='gaze_on_faces_dataset_example',
+        ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/gazebase_example.csv',
+                'definition': datasets.GazeBase(),
+            },
+            (10, 7),
+            {
+                'time': pl.Int64, 'validity': pl.Int64, 'dP': pl.Float32, 'lab': pl.Int64,
+                'x_target_pos': pl.Float32, 'y_target_pos': pl.Float32,
+                'position': pl.List(pl.Float32),
+            },
+            id='gazebase_dataset_example',
+        ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/gazebase_vr_example.csv',
+                'definition': datasets.GazeBaseVR(),
+            },
+            (10, 11),
+            {
+                'time': pl.Float64,
+                'x_target_pos': pl.Float64, 'y_target_pos': pl.Float64, 'z_target_pos': pl.Float64,
+                'clx': pl.Float64, 'cly': pl.Float64, 'clz': pl.Float64,
+                'crx': pl.Float64, 'cry': pl.Float64, 'crz': pl.Float64,
+                'position': pl.List(pl.Float64),
+            },
+            id='gazebase_vr_dataset_example',
+        ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/hbn_example.csv',
+                'definition': datasets.HBN(),
+            },
+            (10, 2),
+            {'time': pl.Float64, 'pixel': pl.List(pl.Float32)},
+            id='hbn_dataset_example',
+        ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/judo1000_example.csv',
+                'definition': datasets.JuDo1000(),
+            },
+            (10, 4),
+            {
+                'trial_id': pl.Int64, 'point_id': pl.Int64,
+                'time': pl.Int64, 'pixel': pl.List(pl.Float32),
+            },
+            id='judo1000_dataset_example',
+        ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/sbsat_example.csv',
+                'definition': datasets.SBSAT(),
+            },
+            (10, 5),
+            {
+                'book_name': pl.String, 'screen_id': pl.Int64, 'time': pl.Int64,
+                'pupil_left': pl.Float32, 'pixel': pl.List(pl.Float32),
+            },
+            id='sbsat_dataset_example',
         ),
     ],
 )
-def test_schema_overrides(kwargs, schema_overrides):
-    gaze_dataframe = pm.gaze.from_csv(**kwargs)
-    assert gaze_dataframe.frame.dtypes == schema_overrides
+def test_from_csv_gaze_has_expected_shape_and_columns(kwargs, expected_shape, expected_schema):
+    gaze_dataframe = from_csv(**kwargs)
+
+    assert gaze_dataframe.frame.shape == expected_shape
+    assert gaze_dataframe.frame.schema == expected_schema
+
+
+@pytest.mark.parametrize(
+    ('kwargs', 'exception', 'exception_msg'),
+    [
+        pytest.param(
+            {
+                'file': 'tests/files/hbn_example.csv',
+                'definition': datasets.HBN(),
+                'time_column': datasets.HBN().time_column,
+            },
+            ValueError,
+            'The arguments "definition" and "time_column" are mutually exclusive.',
+            id='definition_and_time_column',
+        ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/gaze_on_faces_example.csv',
+                'definition': datasets.GazeOnFaces(),
+                **{'separator': ','}
+            },
+            ValueError,
+            'The arguments "definition" and "read_csv_kwargs" are mutually exclusive.',
+            id='definition_and_read_csv_kwargs',
+        ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/judo1000_example.csv',
+                'definition': datasets.JuDo1000(),
+                'column_map': {'trialId': 'trial_id', 'pointId': 'point_id'},
+            },
+            ValueError,
+            'The arguments "definition" and "column_map" are mutually exclusive.',
+            id='definition_and_column_map',
+        ),
+
+    ],
+)
+def test_from_csv_exceptions(kwargs, exception, exception_msg):
+    with pytest.raises(exception) as excinfo:
+        from_csv(**kwargs)
+
+    msg, = excinfo.value.args
+    assert msg == exception_msg
