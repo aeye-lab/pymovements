@@ -17,13 +17,26 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides path specific funtions."""
+"""Provides path specific funtions.
+
+.. deprecated:: v0.21.1
+   This module will be removed in v0.26.0.
+"""
 from __future__ import annotations
 
 import re
 from pathlib import Path
 
+from deprecated.sphinx import deprecated
 
+from pymovements._utils._paths import get_filepaths as _get_filepaths
+from pymovements._utils._paths import match_filepaths as _match_filepaths
+
+
+@deprecated(
+    reason='This function will be removed in v0.26.0.',
+    version='v0.21.1',
+)
 def get_filepaths(
         path: str | Path,
         extension: str | list[str] | None = None,
@@ -32,6 +45,9 @@ def get_filepaths(
     """Get filepaths from rootpath depending on extension or regular expression.
 
     Passing extension and regex is mutually exclusive.
+
+    .. deprecated:: v0.21.1
+       This module will be removed in v0.26.0.
 
     Parameters
     ----------
@@ -51,31 +67,17 @@ def get_filepaths(
     ValueError
         If both extension and regex is being passed.
     """
-    if extension is not None and regex is not None:
-        raise ValueError('extension and regex are mutually exclusive')
-
-    if extension is not None and isinstance(extension, str):
-        extension = [extension]
-
-    path = Path(path)
-    if not path.is_dir():
-        return []
-
-    filepaths = []
-    for childpath in path.iterdir():
-        if childpath.is_dir():
-            filepaths.extend(get_filepaths(path=childpath, extension=extension, regex=regex))
-        else:
-            # if extension specified and not matching, continue to next
-            if extension and childpath.suffix not in extension:
-                continue
-            # if regex specified and not matching, continue to next
-            if regex and not regex.match(childpath.name):
-                continue
-            filepaths.append(childpath)
-    return filepaths
+    return _get_filepaths(
+        path=path,
+        extension=extension,
+        regex=regex,
+    )
 
 
+@deprecated(
+    reason='This function will be removed in v0.26.0.',
+    version='v0.21.1',
+)
 def match_filepaths(
         path: str | Path,
         regex: re.Pattern,
@@ -83,6 +85,9 @@ def match_filepaths(
         relative_anchor: Path | None = None,
 ) -> list[dict[str, str]]:
     """Traverse path and match regular expression.
+
+    .. deprecated:: v0.21.1
+       This module will be removed in v0.26.0.
 
     Parameters
     ----------
@@ -106,34 +111,9 @@ def match_filepaths(
     ValueError
         If ``path`` does not point to a directory.
     """
-    path = Path(path)
-
-    if not path.exists():
-        raise ValueError(f'path does not exist (path = {path})')
-
-    if not path.is_dir():
-        raise ValueError(f'path must point to a directory (path = {path})')
-
-    if relative and relative_anchor is None:
-        relative_anchor = path
-
-    match_dicts: list[dict[str, str]] = []
-    for childpath in path.iterdir():
-        if childpath.is_dir():
-            recursive_results = match_filepaths(
-                path=childpath, regex=regex,
-                relative=relative, relative_anchor=relative_anchor,
-            )
-            match_dicts.extend(recursive_results)
-        elif match := regex.match(childpath.name):
-            match_dict = match.groupdict()
-
-            filepath = childpath
-            if relative:
-                # mypy is unaware that 'relative_anchor' can never be None (l.116)
-                assert relative_anchor is not None
-                filepath = filepath.relative_to(relative_anchor)
-
-            match_dict['filepath'] = str(filepath)
-            match_dicts.append(match_dict)
-    return match_dicts
+    return _match_filepaths(
+        path=path,
+        regex=regex,
+        relative=relative,
+        relative_anchor=relative_anchor,
+    )

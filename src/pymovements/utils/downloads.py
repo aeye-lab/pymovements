@@ -27,9 +27,9 @@ from typing import Any
 
 from tqdm.auto import tqdm
 
-from pymovements.utils.archives import extract_archive
+from pymovements.dataset._utils._archives import extract_archive
 
-USER_AGENT: str = 'aeye-lab/pymovements'
+USER_AGENT: str = 'pymovements'
 
 
 def download_and_extract_archive(
@@ -194,6 +194,9 @@ def _get_redirected_url(url: str, max_hops: int = 3) -> str:
     """
     initial_url = url
     headers = {'Method': 'HEAD', 'User-Agent': USER_AGENT}
+    opener = urllib.request.build_opener()
+    opener.addheaders = [('User-Agent', USER_AGENT)]
+    urllib.request.install_opener(opener)
 
     for _ in range(max_hops + 1):
         with urllib.request.urlopen(urllib.request.Request(url, headers=headers)) as response:
