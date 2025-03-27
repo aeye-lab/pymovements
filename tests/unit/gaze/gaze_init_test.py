@@ -23,7 +23,10 @@ import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
-import pymovements as pm
+from pymovements import DatasetDefinition
+from pymovements import EventDataFrame
+from pymovements import Experiment
+from pymovements import GazeDataFrame
 
 
 @pytest.mark.parametrize(
@@ -827,7 +830,7 @@ import pymovements as pm
                 'pixel_columns': ['x', 'y'],
                 'time_unit': 'step',
                 'time_column': 'time',
-                'experiment': pm.Experiment(
+                'experiment': Experiment(
                     screen_width_px=1,
                     screen_width_cm=1,
                     screen_height_px=1,
@@ -870,7 +873,7 @@ import pymovements as pm
                     schema={'x': pl.Float64, 'y': pl.Float64},
                 ),
                 'position_columns': ['x', 'y'],
-                'experiment': pm.Experiment(1024, 768, 38, 30, None, 'center', 100),
+                'experiment': Experiment(1024, 768, 38, 30, None, 'center', 100),
             },
             pl.from_dict(
                 {'time': [0, 10, 20], 'position': [[1.23, 4.56], [2.34, 5.67], [3.45, 6.78]]},
@@ -887,7 +890,7 @@ import pymovements as pm
                     schema={'x': pl.Float64, 'y': pl.Float64},
                 ),
                 'position_columns': ['x', 'y'],
-                'experiment': pm.Experiment(1024, 768, 38, 30, None, 'center', 1000),
+                'experiment': Experiment(1024, 768, 38, 30, None, 'center', 1000),
             },
             pl.from_dict(
                 {'time': [0, 1, 2], 'position': [[1.23, 4.56], [2.34, 5.67], [3.45, 6.78]]},
@@ -998,7 +1001,7 @@ import pymovements as pm
                 'data': pl.from_dict(
                     {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
                 ),
-                'definition': pm.DatasetDefinition(
+                'definition': DatasetDefinition(
                     pixel_columns=['x', 'y'],
                 ),
             },
@@ -1016,7 +1019,7 @@ import pymovements as pm
                     {'abc': [1], 'x': [1.23], 'y': [4.56]},
                     schema={'abc': pl.Int64, 'x': pl.Float64, 'y': pl.Float64},
                 ),
-                'definition': pm.DatasetDefinition(
+                'definition': DatasetDefinition(
                     pixel_columns=['x', 'y'],
                 ),
             },
@@ -1034,7 +1037,7 @@ import pymovements as pm
                     {'xl': [1.2], 'yl': [3.4], 'xr': [5.6], 'yr': [7.8]},
                     schema={'xl': pl.Float64, 'yl': pl.Float64, 'xr': pl.Float64, 'yr': pl.Float64},
                 ),
-                'definition': pm.DatasetDefinition(
+                'definition': DatasetDefinition(
                     pixel_columns=['xl', 'yl', 'xr', 'yr'],
                 ),
             },
@@ -1048,7 +1051,7 @@ import pymovements as pm
     ],
 )
 def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, expected_n_components):
-    gaze = pm.GazeDataFrame(**init_kwargs)
+    gaze = GazeDataFrame(**init_kwargs)
     assert_frame_equal(gaze.frame, expected_frame)
     assert gaze.n_components == expected_n_components
 
@@ -1095,6 +1098,18 @@ def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, exp
         pytest.param(
             {
                 'data': pl.from_dict(
+                    data={'trial': [1]},
+                    schema={'trial': pl.Int64},
+                ),
+                'definition': DatasetDefinition(trial_columns=['trial']),
+            },
+            ['trial'],
+            id='df_single_trial_column_definition',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
                     {'group': [2], 'trial': [1]},
                     schema={'group': pl.Int64, 'trial': pl.Int64},
                 ),
@@ -1107,7 +1122,7 @@ def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, exp
     ],
 )
 def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_trial_columns):
-    gaze = pm.GazeDataFrame(**init_kwargs)
+    gaze = GazeDataFrame(**init_kwargs)
     assert gaze.trial_columns == expected_trial_columns
 
 
@@ -1641,11 +1656,91 @@ def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_tr
             id='time_unit_unsupported',
         ),
 
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    data={'trial': [1]},
+                    schema={'trial': pl.Int64},
+                ),
+                'trial_columns': ['trial'],
+                'definition': DatasetDefinition(trial_columns=['trial']),
+            },
+            ValueError,
+            'The arguments "definition" and "trial_columns" are mutually exclusive.',
+            id='definition_and_trial_columns',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1.0, 1.5, 2.],
+                        'x': [0., 1., 2.],
+                        'y': [3., 4., 5.],
+                    },
+                    schema={'time': pl.Float64, 'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'definition': DatasetDefinition(
+                    time_column='time',
+                    time_unit='ms',
+                    pixel_columns=['x', 'y'],
+                ),
+                'time_column': 'time',
+            },
+            ValueError,
+            'The arguments "definition" and "time_column" are mutually exclusive.',
+            id='definition_and_time_column',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1.0, 1.5, 2.],
+                        'x': [0., 1., 2.],
+                        'y': [3., 4., 5.],
+                    },
+                    schema={'time': pl.Float64, 'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'definition': DatasetDefinition(
+                    time_column='time',
+                    time_unit='ms',
+                    pixel_columns=['x', 'y'],
+                ),
+                'time_unit': 'ms',
+            },
+            ValueError,
+            'The arguments "definition" and "time_unit" are mutually exclusive.',
+            id='definition_and_time_unit',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1.0, 1.5, 2.],
+                        'x': [0., 1., 2.],
+                        'y': [3., 4., 5.],
+                    },
+                    schema={'time': pl.Float64, 'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'definition': DatasetDefinition(
+                    time_column='time',
+                    time_unit='ms',
+                    pixel_columns=['x', 'y'],
+                ),
+                'pixel_columns': ['x', 'y'],
+            },
+            ValueError,
+            'The arguments "definition" and "pixel_columns" are mutually exclusive.',
+            id='definition_and_pixel_columns',
+        ),
+
     ],
 )
 def test_gaze_dataframe_init_exceptions(init_kwargs, exception, exception_msg):
     with pytest.raises(exception) as excinfo:
-        pm.GazeDataFrame(**init_kwargs)
+        GazeDataFrame(**init_kwargs)
 
     msg, = excinfo.value.args
     assert msg == exception_msg
@@ -1657,10 +1752,10 @@ def test_gaze_copy_init_has_same_n_components():
     Refers to issue #514.
     """
     df_orig = pl.from_numpy(np.zeros((3, 1000)), orient='col', schema=['t', 'x', 'y'])
-    gaze = pm.GazeDataFrame(df_orig, position_columns=['x', 'y'], time_column='t')
+    gaze = GazeDataFrame(df_orig, position_columns=['x', 'y'], time_column='t')
 
     df_copy = gaze.frame.clone()
-    gaze_copy = pm.GazeDataFrame(df_copy)
+    gaze_copy = GazeDataFrame(df_copy)
 
     assert gaze.n_components == gaze_copy.n_components
 
@@ -1680,7 +1775,7 @@ def test_gaze_copy_init_has_same_n_components():
         ),
 
         pytest.param(
-            pm.EventDataFrame(),
+            EventDataFrame(),
             {
                 'data': pl.from_dict(
                     {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
@@ -1691,19 +1786,19 @@ def test_gaze_copy_init_has_same_n_components():
         ),
 
         pytest.param(
-            pm.EventDataFrame(),
+            EventDataFrame(),
             {},
             id='no_data_empty_events',
         ),
 
         pytest.param(
-            pm.EventDataFrame(name='saccade', onsets=[0], offsets=[10]),
+            EventDataFrame(name='saccade', onsets=[0], offsets=[10]),
             {},
             id='no_data_with_saccades',
         ),
 
         pytest.param(
-            pm.EventDataFrame(name='fixation', onsets=[100], offsets=[910]),
+            EventDataFrame(name='fixation', onsets=[100], offsets=[910]),
             {
                 'data': pl.from_dict(
                     {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
@@ -1716,11 +1811,11 @@ def test_gaze_copy_init_has_same_n_components():
 )
 def test_gaze_init_events(events, init_kwargs):
     if events is None:
-        expected_events = pm.EventDataFrame().frame
+        expected_events = EventDataFrame().frame
     else:
         expected_events = events.frame
 
-    gaze = pm.GazeDataFrame(events=events, **init_kwargs)
+    gaze = GazeDataFrame(events=events, **init_kwargs)
 
     assert_frame_equal(gaze.events.frame, expected_events)
     # We don't want the events point to the same reference.
