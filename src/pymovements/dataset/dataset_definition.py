@@ -47,6 +47,9 @@ class DatasetDefinition:
     ----------
     name: str
         The name of the dataset. (default: '.')
+    info: str
+        Information about the dataset including but not limited to original citation,
+        general information. (default: '.')
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -142,6 +145,9 @@ class DatasetDefinition:
 
     # pylint: disable=too-many-instance-attributes
     name: str = '.'
+
+    info: str = ''
+
     has_files: dict[str, bool] = field(default_factory=dict)
 
     mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] = field(default_factory=dict)

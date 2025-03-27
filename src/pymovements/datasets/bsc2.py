@@ -31,7 +31,7 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 class BSCII(DatasetDefinition):
     """BSCII dataset :cite:p:`BSCII`.
 
-    This dataset includes monocular eye tracking data from a single participant in a single
+    This dataset includes monocular eye tracking data from several participants in a single
     session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
     eye tracker and precomputed events on aoi level are reported.
 
@@ -44,6 +44,10 @@ class BSCII(DatasetDefinition):
     ----------
     name: str
         The name of the dataset.
+
+    info: str
+        Information about the dataset including but not limited to original citation,
+        general information.
 
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
@@ -104,6 +108,31 @@ class BSCII(DatasetDefinition):
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'BSCII'
+
+    info: str = """\
+BSCII dataset :cite:p:`BSCII`.
+
+This dataset includes monocular eye tracking data from several participants in a single
+session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
+eye tracker and precomputed events on aoi level are reported.
+
+The participant is instructed to read texts and answer questions. The original purpose was to
+look into the differences in processing when reading simplified and traditional Chinese.
+
+Check the respective paper for details :cite:p:`BSCII`.
+
+If you use the dataset, please cite:
+
+@article{BSCII,
+    author={Yan, Ming and Pan, Jinger and Kliegl, Reinhold},
+    title={The {B}eijing {S}entence {C}orpus {II}: A cross-script comparison
+    between traditional and simplified Chinese sentence reading},
+    journal={Behavior Research Methods},
+    year={2025},
+    volume={57},
+    issue={2},
+}
+"""
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
