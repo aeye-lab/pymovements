@@ -96,7 +96,7 @@ class GazeDataFrame:
     ----------
     frame: pl.DataFrame
         A dataframe to be transformed to a polars dataframe.
-    events: pm.EventDataFrame | None
+    events: pm.EventDataFrame
         A dataframe of events in the gaze signal.
     experiment : Experiment | None
         The experiment definition.
