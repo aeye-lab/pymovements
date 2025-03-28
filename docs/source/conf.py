@@ -217,10 +217,8 @@ def linkcode_resolve(domain, info):
             return None
 
     try:
-        filepath = os.path.relpath(
-            inspect.getsourcefile(obj),
-            importlib.resources.files('pymovements'),
-        )
+        modpath = importlib.resources.files(topmodulename)
+        filepath = os.path.relpath(inspect.getsourcefile(obj), modpath)
         if filepath is None:
             return
     except Exception:
