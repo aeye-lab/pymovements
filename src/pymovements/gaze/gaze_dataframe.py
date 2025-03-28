@@ -184,6 +184,16 @@ class GazeDataFrame:
     └──────┴────────────┘
     """
 
+    frame: pl.DataFrame
+
+    events: pm.EventDataFrame
+
+    experiment: Experiment | None
+
+    trial_columns: list[str] | None
+
+    n_components: int | None
+
     def __init__(
             self,
             data: pl.DataFrame | None = None,
@@ -210,111 +220,20 @@ class GazeDataFrame:
         # Set nan values to null.
         self.frame = self.frame.fill_nan(None)
 
-        # explicit arguments take precedence over definition.
-        if definition:
-            if experiment is None:
-                experiment = definition.experiment
+        self._init_experiment(experiment, definition)
 
-            if trial_columns is None:
-                trial_columns = definition.trial_columns
-
-            if time_column is None:
-                time_column = definition.time_column
-
-            if time_unit is None:
-                time_unit = definition.time_unit
-
-            if pixel_columns is None:
-                pixel_columns = definition.pixel_columns
-
-            if position_columns is None:
-                position_columns = definition.position_columns
-
-            if velocity_columns is None:
-                velocity_columns = definition.velocity_columns
-
-            if acceleration_columns is None:
-                acceleration_columns = definition.acceleration_columns
-
-            if distance_column is None:
-                distance_column = definition.distance_column
-
-        trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
-        if trial_columns is not None and len(trial_columns) == 0:
-            trial_columns = None
-        _check_trial_columns(trial_columns, data)
-        self.trial_columns = trial_columns
-
-        self.experiment = experiment
-
-        # In case the 'time' column is already present we don't need to do anything.
-        # Otherwise, create a new time column starting with zero and set time unit to steps
-        if time_column is None and 'time' not in self.frame.columns:
-            # In case we have an experiment with sampling rate given, we create a time
-            if experiment is not None and experiment.sampling_rate is not None:
-                self.frame = self.frame.with_columns(
-                    time=pl.arange(0, len(self.frame)),
-                )
-
-                time_column = 'time'
-                time_unit = 'step'
-
-        # If no time_unit specified, assume milliseconds.
-        if self.frame is not None and time_unit is None:
-            time_unit = 'ms'
-
-        if time_column is not None:
-            self.frame = self.frame.rename({time_column: 'time'})
-
-        if 'time' in self.frame.columns:
-            self._convert_time_units(time_unit)
-
-        if distance_column is not None:
-            self.frame = self.frame.rename({distance_column: 'distance'})
-
-        # List of passed not-None column specifier lists.
-        # The list will be used for inferring n_components.
-        column_specifiers: list[list[str]] = []
-
-        component_suffixes = ['x', 'y', 'xl', 'yl', 'xr', 'yr', 'xa', 'ya']
-
-        if auto_column_detect and pixel_columns is None:
-            column_canditates = ['pixel_' + suffix for suffix in component_suffixes]
-            pixel_columns = [c for c in column_canditates if c in self.frame.columns]
-
-        if pixel_columns:
-            self._check_component_columns(pixel_columns=pixel_columns)
-            self.nest(pixel_columns, output_column='pixel')
-            column_specifiers.append(pixel_columns)
-
-        if auto_column_detect and position_columns is None:
-            column_canditates = ['position_' + suffix for suffix in component_suffixes]
-            position_columns = [c for c in column_canditates if c in self.frame.columns]
-
-        if position_columns:
-            self._check_component_columns(position_columns=position_columns)
-            self.nest(position_columns, output_column='position')
-            column_specifiers.append(position_columns)
-
-        if auto_column_detect and velocity_columns is None:
-            column_canditates = ['velocity_' + suffix for suffix in component_suffixes]
-            velocity_columns = [c for c in column_canditates if c in self.frame.columns]
-
-        if velocity_columns:
-            self._check_component_columns(velocity_columns=velocity_columns)
-            self.nest(velocity_columns, output_column='velocity')
-            column_specifiers.append(velocity_columns)
-
-        if auto_column_detect and acceleration_columns is None:
-            column_canditates = ['acceleration_' + suffix for suffix in component_suffixes]
-            acceleration_columns = [c for c in column_canditates if c in self.frame.columns]
-
-        if acceleration_columns:
-            self._check_component_columns(acceleration_columns=acceleration_columns)
-            self.nest(acceleration_columns, output_column='acceleration')
-            column_specifiers.append(acceleration_columns)
-
-        self.n_components = self._infer_n_components(column_specifiers)
+        self._init_columns(
+            trial_columns=trial_columns,
+            time_column=time_column,
+            time_unit=time_unit,
+            pixel_columns=pixel_columns,
+            position_columns=position_columns,
+            velocity_columns=velocity_columns,
+            acceleration_columns=acceleration_columns,
+            distance_column=distance_column,
+            auto_column_detect=auto_column_detect,
+            definition=definition,
+        )
 
         if events is None:
             if self.trial_columns is None:
@@ -1479,6 +1398,131 @@ class GazeDataFrame:
 
         return kwargs
 
+    def _init_columns(
+            self,
+            definition: pm.DatasetDefinition | None = None,
+            auto_column_detect: bool = False,
+            trial_columns: str | list[str] | None = None,
+            time_column: str | None = None,
+            time_unit: str | None = None,
+            pixel_columns: list[str] | None = None,
+            position_columns: list[str] | None = None,
+            velocity_columns: list[str] | None = None,
+            acceleration_columns: list[str] | None = None,
+            distance_column: str | None = None,
+    ) -> None:
+        # Explicit arguments take precedence over definition.
+        if definition:
+            if trial_columns is None:
+                trial_columns = definition.trial_columns
+
+            if time_column is None:
+                time_column = definition.time_column
+
+            if time_unit is None:
+                time_unit = definition.time_unit
+
+            if pixel_columns is None:
+                pixel_columns = definition.pixel_columns
+
+            if position_columns is None:
+                position_columns = definition.position_columns
+
+            if velocity_columns is None:
+                velocity_columns = definition.velocity_columns
+
+            if acceleration_columns is None:
+                acceleration_columns = definition.acceleration_columns
+
+            if distance_column is None:
+                distance_column = definition.distance_column
+
+        # Initialize trial_columns.
+        trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
+        if trial_columns is not None and len(trial_columns) == 0:
+            trial_columns = None
+        _check_trial_columns(trial_columns, self.frame)
+        self.trial_columns = trial_columns
+
+        # Initialize time column.
+        self._init_time_column(time_column, time_unit)
+
+        if distance_column is not None:
+            self.frame = self.frame.rename({distance_column: 'distance'})
+
+        component_suffixes = ['x', 'y', 'xl', 'yl', 'xr', 'yr', 'xa', 'ya']
+
+        if auto_column_detect and pixel_columns is None:
+            column_canditates = ['pixel_' + suffix for suffix in component_suffixes]
+            pixel_columns = [c for c in column_canditates if c in self.frame.columns]
+
+        if auto_column_detect and position_columns is None:
+            column_canditates = ['position_' + suffix for suffix in component_suffixes]
+            position_columns = [c for c in column_canditates if c in self.frame.columns]
+
+        if auto_column_detect and velocity_columns is None:
+            column_canditates = ['velocity_' + suffix for suffix in component_suffixes]
+            velocity_columns = [c for c in column_canditates if c in self.frame.columns]
+
+        if auto_column_detect and acceleration_columns is None:
+            column_canditates = ['acceleration_' + suffix for suffix in component_suffixes]
+            acceleration_columns = [c for c in column_canditates if c in self.frame.columns]
+
+        # List of passed not-None column specifier lists.
+        # The list will be used for inferring n_components.
+        column_specifiers: list[list[str]] = []
+
+        if pixel_columns:
+            self._check_component_columns(pixel_columns=pixel_columns)
+            self.nest(pixel_columns, output_column='pixel')
+            column_specifiers.append(pixel_columns)
+
+        if position_columns:
+            self._check_component_columns(position_columns=position_columns)
+            self.nest(position_columns, output_column='position')
+            column_specifiers.append(position_columns)
+
+        if velocity_columns:
+            self._check_component_columns(velocity_columns=velocity_columns)
+            self.nest(velocity_columns, output_column='velocity')
+            column_specifiers.append(velocity_columns)
+
+        if acceleration_columns:
+            self._check_component_columns(acceleration_columns=acceleration_columns)
+            self.nest(acceleration_columns, output_column='acceleration')
+            column_specifiers.append(acceleration_columns)
+
+        self.n_components = self._infer_n_components(column_specifiers)
+
+    def _init_time_column(
+            self,
+            time_column: str | None = None,
+            time_unit: str | None = None,
+    ):
+        """Initialize time column."""
+        # If no time column exists, create a new one starting with zero and set time unit to steps.
+        if time_column is None and 'time' not in self.frame.columns:
+            # In case we have an experiment with sampling rate given, we create a time
+            if self.experiment is not None and self.experiment.sampling_rate is not None:
+                self.frame = self.frame.with_columns(
+                    time=pl.arange(0, len(self.frame)),
+                )
+
+                time_column = 'time'
+                time_unit = 'step'
+
+        # If no time_unit specified, assume milliseconds.
+        if time_unit is None:
+            time_unit = 'ms'
+
+        # Rename time_column to 'time'.
+        if time_column is not None and time_column != 'time':
+            self.frame = self.frame.rename({time_column: 'time'})
+
+        # Convert time column to milliseconds.
+        if 'time' in self.frame.columns:
+            self._convert_time_units(time_unit)
+
     def _convert_time_units(self, time_unit: str | None) -> None:
         """Convert the time column to milliseconds based on the specified time unit."""
         if time_unit == 's':
@@ -1512,14 +1556,23 @@ class GazeDataFrame:
                     pl.col('time').cast(pl.Int64),
                 )
 
-    def __str__(self: Any) -> str:
+    def _init_experiment(
+            self, experiment: Experiment | None, definition: pm.DatasetDefinition | None,
+    ) -> None:
+        """Explicitly passed experiment takes precedence over definition."""
+        if definition is not None and experiment is None:
+            self.experiment = definition.experiment
+        else:
+            self.experiment = experiment
+
+    def __str__(self) -> str:
         """Return string representation of GazeDataFrame."""
         if self.experiment is None:
             return self.frame.__str__()
 
         return self.experiment.__str__() + '\n' + self.frame.__str__()
 
-    def __repr__(self: Any) -> str:
+    def __repr__(self) -> str:
         """Return string representation of GazeDataFrame."""
         return self.__str__()
 
