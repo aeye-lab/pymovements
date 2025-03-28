@@ -172,7 +172,6 @@ def test_savitzky_golay_raises_error(kwargs, series, exception, msg_substrings):
             pl.Series('A', [], pl.List(pl.Float64)),
             pl.Series('A', [], pl.List(pl.Float64)),
             id='empty_series_returns_empty_series',
-            marks=pytest.mark.xfail(reason='#475'),
         ),
         pytest.param(
             {
