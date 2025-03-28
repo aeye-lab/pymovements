@@ -1017,7 +1017,7 @@ from pymovements import GazeDataFrame
                     {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
                 ),
                 'definition': DatasetDefinition(pixel_columns=['foo', 'bar']),
-                'pixel_columns': ['x', 'y']
+                'pixel_columns': ['x', 'y'],
             },
             pl.from_dict(
                 {'pixel': [[1.23, 4.56]]},
@@ -1080,7 +1080,7 @@ from pymovements import GazeDataFrame
                     {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
                 ),
                 'definition': DatasetDefinition(position_columns=['foo', 'bar']),
-                'position_columns': ['x', 'y']
+                'position_columns': ['x', 'y'],
             },
             pl.from_dict(
                 {'position': [[1.23, 4.56]]},
@@ -1111,7 +1111,7 @@ from pymovements import GazeDataFrame
                     {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
                 ),
                 'definition': DatasetDefinition(velocity_columns=['foo', 'bar']),
-                'velocity_columns': ['x', 'y']
+                'velocity_columns': ['x', 'y'],
             },
             pl.from_dict(
                 {'velocity': [[1.23, 4.56]]},
@@ -1142,7 +1142,7 @@ from pymovements import GazeDataFrame
                     {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
                 ),
                 'definition': DatasetDefinition(acceleration_columns=['foo', 'bar']),
-                'acceleration_columns': ['x', 'y']
+                'acceleration_columns': ['x', 'y'],
             },
             pl.from_dict(
                 {'acceleration': [[1.23, 4.56]]},

@@ -28,7 +28,6 @@ import polars as pl
 from pymovements.gaze._utils.parsing import parse_eyelink
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze_dataframe import GazeDataFrame  # pylint: disable=cyclic-import
-from pymovements.utils.checks import check_is_mutual_exclusive
 
 
 def from_csv(

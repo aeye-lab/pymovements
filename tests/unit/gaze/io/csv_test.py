@@ -22,7 +22,6 @@ import polars as pl
 import pytest
 
 from pymovements import datasets
-from pymovements import DatasetDefinition
 from pymovements.gaze import from_csv
 
 
@@ -86,7 +85,7 @@ from pymovements.gaze import from_csv
                     'has_header': False,
                     'new_columns': ['foo', 'bar'],
                     'schema_overrides': [pl.Float32, pl.Float32],
-                }
+                },
             },
             (10, 2),
             {'time': pl.Float64, 'pixel': pl.List(pl.Float32)},
@@ -111,7 +110,7 @@ from pymovements.gaze import from_csv
             {
                 'file': 'tests/files/gazebase_example.csv',
                 'definition': datasets.GazeBase(),
-                'column_map': {'dP': 'test'}
+                'column_map': {'dP': 'test'},
             },
             (10, 7),
             {
