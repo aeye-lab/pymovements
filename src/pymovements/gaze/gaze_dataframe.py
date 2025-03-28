@@ -96,10 +96,10 @@ class GazeDataFrame:
     ----------
     frame: pl.DataFrame
         A dataframe to be transformed to a polars dataframe.
-    experiment : Experiment | None
-        The experiment definition.
     events: pm.EventDataFrame | None
         A dataframe of events in the gaze signal.
+    experiment : Experiment | None
+        The experiment definition.
     trial_columns: list[str] | None
         The name of the trial columns in the data frame. If not None, the transformation methods
         will be applied to each trial separately.
