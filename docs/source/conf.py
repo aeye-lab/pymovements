@@ -202,7 +202,7 @@ def linkcode_resolve(domain, info):
         return None
 
     modname = info['module']
-    modname.split('.')[0]
+    topmodulename = modname.split('.')[0]
     fullname = info['fullname']
 
     submod = sys.modules.get(modname)
