@@ -27,6 +27,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import importlib.resources
 import inspect
 import os
 import sys
@@ -36,8 +37,6 @@ from subprocess import run
 from pybtex.plugin import register_plugin
 from pybtex.style.formatting.plain import Style as PlainStyle
 from pybtex.style.labels import BaseLabelStyle
-
-import pymovements
 
 # add relative source path to python path
 sys.path.insert(0, os.path.abspath('src'))
@@ -203,7 +202,7 @@ def linkcode_resolve(domain, info):
         return None
 
     modname = info['module']
-    modname.split('.')[0]
+    topmodulename = modname.split('.')[0]
     fullname = info['fullname']
 
     submod = sys.modules.get(modname)
@@ -220,7 +219,7 @@ def linkcode_resolve(domain, info):
     try:
         filepath = os.path.relpath(
             inspect.getsourcefile(obj),
-            os.path.dirname(pymovements.__file__),
+            importlib.resources.files('pymovements'),
         )
         if filepath is None:
             return
