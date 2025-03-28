@@ -1001,9 +1001,7 @@ from pymovements import GazeDataFrame
                 'data': pl.from_dict(
                     {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
                 ),
-                'definition': DatasetDefinition(
-                    pixel_columns=['x', 'y'],
-                ),
+                'definition': DatasetDefinition(pixel_columns=['x', 'y']),
             },
             pl.from_dict(
                 {'pixel': [[1.23, 4.56]]},
@@ -1016,12 +1014,26 @@ from pymovements import GazeDataFrame
         pytest.param(
             {
                 'data': pl.from_dict(
+                    {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'definition': DatasetDefinition(pixel_columns=['foo', 'bar']),
+                'pixel_columns': ['x', 'y']
+            },
+            pl.from_dict(
+                {'pixel': [[1.23, 4.56]]},
+                schema={'pixel': pl.List(pl.Float64)},
+            ),
+            2,
+            id='df_single_row_two_pixel_columns_overwrite_dataset_definition',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
                     {'abc': [1], 'x': [1.23], 'y': [4.56]},
                     schema={'abc': pl.Int64, 'x': pl.Float64, 'y': pl.Float64},
                 ),
-                'definition': DatasetDefinition(
-                    pixel_columns=['x', 'y'],
-                ),
+                'definition': DatasetDefinition(pixel_columns=['x', 'y']),
             },
             pl.from_dict(
                 {'abc': [1], 'pixel': [[1.23, 4.56]]},
@@ -1037,9 +1049,7 @@ from pymovements import GazeDataFrame
                     {'xl': [1.2], 'yl': [3.4], 'xr': [5.6], 'yr': [7.8]},
                     schema={'xl': pl.Float64, 'yl': pl.Float64, 'xr': pl.Float64, 'yr': pl.Float64},
                 ),
-                'definition': DatasetDefinition(
-                    pixel_columns=['xl', 'yl', 'xr', 'yr'],
-                ),
+                'definition': DatasetDefinition(pixel_columns=['xl', 'yl', 'xr', 'yr']),
             },
             pl.from_dict(
                 {'pixel': [[1.2, 3.4, 5.6, 7.8]]},
@@ -1048,12 +1058,204 @@ from pymovements import GazeDataFrame
             4,
             id='df_single_row_four_pixel_columns_dataset_definition',
         ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'definition': DatasetDefinition(position_columns=['x', 'y']),
+            },
+            pl.from_dict(
+                {'position': [[1.23, 4.56]]},
+                schema={'position': pl.List(pl.Float64)},
+            ),
+            2,
+            id='df_single_row_two_position_columns_dataset_definition',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'definition': DatasetDefinition(position_columns=['foo', 'bar']),
+                'position_columns': ['x', 'y']
+            },
+            pl.from_dict(
+                {'position': [[1.23, 4.56]]},
+                schema={'position': pl.List(pl.Float64)},
+            ),
+            2,
+            id='df_single_row_two_position_columns_overwrite_dataset_definition',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'definition': DatasetDefinition(velocity_columns=['x', 'y']),
+            },
+            pl.from_dict(
+                {'velocity': [[1.23, 4.56]]},
+                schema={'velocity': pl.List(pl.Float64)},
+            ),
+            2,
+            id='df_single_row_two_velocity_columns_dataset_definition',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'definition': DatasetDefinition(velocity_columns=['foo', 'bar']),
+                'velocity_columns': ['x', 'y']
+            },
+            pl.from_dict(
+                {'velocity': [[1.23, 4.56]]},
+                schema={'velocity': pl.List(pl.Float64)},
+            ),
+            2,
+            id='df_single_row_two_velocity_columns_overwrite_dataset_definition',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'definition': DatasetDefinition(acceleration_columns=['x', 'y']),
+            },
+            pl.from_dict(
+                {'acceleration': [[1.23, 4.56]]},
+                schema={'acceleration': pl.List(pl.Float64)},
+            ),
+            2,
+            id='df_single_row_two_acceleration_columns_dataset_definition',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
+                ),
+                'definition': DatasetDefinition(acceleration_columns=['foo', 'bar']),
+                'acceleration_columns': ['x', 'y']
+            },
+            pl.from_dict(
+                {'acceleration': [[1.23, 4.56]]},
+                schema={'acceleration': pl.List(pl.Float64)},
+            ),
+            2,
+            id='df_single_row_two_acceleration_columns_overwrite_dataset_definition',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict({'t': [1.23]}, schema={'t': pl.Float64}),
+                'definition': DatasetDefinition(time_column='t'),
+            },
+            pl.from_dict({'time': [1.23]}, schema={'time': pl.Float64}),
+            None,
+            id='df_single_row_time_column_dataset_definition',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict({'t': [1.23]}, schema={'t': pl.Float64}),
+                'definition': DatasetDefinition(time_column='foo'),
+                'time_column': 't',
+            },
+            pl.from_dict({'time': [1.23]}, schema={'time': pl.Float64}),
+            None,
+            id='df_single_row_time_column_overwrites_dataset_definition',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict({'time': [1.23]}, schema={'time': pl.Float64}),
+                'definition': DatasetDefinition(time_unit='s'),
+            },
+            pl.from_dict({'time': [1230]}, schema={'time': pl.Int64}),
+            None,
+            id='df_single_row_time_unit_dataset_definition',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict({'time': [4.56]}, schema={'time': pl.Float64}),
+                'definition': DatasetDefinition(time_unit='ms'),
+                'time_unit': 's',
+            },
+            pl.from_dict({'time': [4560]}, schema={'time': pl.Int64}),
+            None,
+            id='df_single_row_time_unit_overwrites_dataset_definition',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict({'d': [1.23]}, schema={'d': pl.Float64}),
+                'definition': DatasetDefinition(distance_column='d'),
+            },
+            pl.from_dict({'distance': [1.23]}, schema={'distance': pl.Float64}),
+            None,
+            id='df_single_row_distance_column_dataset_definition',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict({'d': [1.23]}, schema={'d': pl.Float64}),
+                'definition': DatasetDefinition(distance_column='foo'),
+                'distance_column': 'd',
+            },
+            pl.from_dict({'distance': [1.23]}, schema={'distance': pl.Float64}),
+            None,
+            id='df_single_row_distance_column_overwrites_dataset_definition',
+        ),
+
     ],
 )
 def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, expected_n_components):
     gaze = GazeDataFrame(**init_kwargs)
     assert_frame_equal(gaze.frame, expected_frame)
     assert gaze.n_components == expected_n_components
+
+
+@pytest.mark.parametrize(
+    ('init_kwargs', 'expected_experiment'),
+    [
+        pytest.param(
+            {
+                'experiment': Experiment(sampling_rate=1000),
+            },
+            Experiment(sampling_rate=1000),
+            id='experiment',
+        ),
+
+        pytest.param(
+            {
+                'definition': DatasetDefinition(experiment=Experiment(sampling_rate=1234)),
+            },
+            Experiment(sampling_rate=1234),
+            id='definition',
+        ),
+
+        pytest.param(
+            {
+                'experiment': Experiment(sampling_rate=5678),
+                'definition': DatasetDefinition(experiment=Experiment(sampling_rate=1111)),
+            },
+            Experiment(sampling_rate=5678),
+            id='experiment_overwrites_definition',
+        ),
+
+    ],
+)
+def test_init_gaze_dataframe_has_expected_experiment(init_kwargs, expected_experiment):
+    gaze = GazeDataFrame(**init_kwargs)
+    assert gaze.experiment == expected_experiment
 
 
 @pytest.mark.parametrize(
@@ -1105,6 +1307,19 @@ def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, exp
             },
             ['trial'],
             id='df_single_trial_column_definition',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    data={'trial': [1]},
+                    schema={'trial': pl.Int64},
+                ),
+                'definition': DatasetDefinition(trial_columns=['foobar']),
+                'trial_columns': 'trial',
+            },
+            ['trial'],
+            id='df_single_trial_column_overwrites_definition',
         ),
 
         pytest.param(
@@ -1654,97 +1869,6 @@ def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_tr
             "Supported units are 's' for seconds, 'ms' for milliseconds and "
             "'step' for steps.",
             id='time_unit_unsupported',
-        ),
-
-        pytest.param(
-            {
-                'data': pl.from_dict(data={}),
-                'experiment': Experiment(sampling_rate=1000),
-                'definition': DatasetDefinition(experiment=Experiment(sampling_rate=1000)),
-            },
-            ValueError,
-            'The arguments "definition" and "experiment" are mutually exclusive.',
-            id='definition_and_experiment',
-        ),
-
-        pytest.param(
-            {
-                'data': pl.from_dict(
-                    data={'trial': [1]},
-                    schema={'trial': pl.Int64},
-                ),
-                'trial_columns': ['trial'],
-                'definition': DatasetDefinition(trial_columns=['trial']),
-            },
-            ValueError,
-            'The arguments "definition" and "trial_columns" are mutually exclusive.',
-            id='definition_and_trial_columns',
-        ),
-
-        pytest.param(
-            {
-                'data': pl.from_dict(
-                    {
-                        'time': [1.0, 1.5, 2.],
-                        'x': [0., 1., 2.],
-                        'y': [3., 4., 5.],
-                    },
-                    schema={'time': pl.Float64, 'x': pl.Float64, 'y': pl.Float64},
-                ),
-                'definition': DatasetDefinition(
-                    time_column='time',
-                    time_unit='ms',
-                    pixel_columns=['x', 'y'],
-                ),
-                'time_column': 'time',
-            },
-            ValueError,
-            'The arguments "definition" and "time_column" are mutually exclusive.',
-            id='definition_and_time_column',
-        ),
-
-        pytest.param(
-            {
-                'data': pl.from_dict(
-                    {
-                        'time': [1.0, 1.5, 2.],
-                        'x': [0., 1., 2.],
-                        'y': [3., 4., 5.],
-                    },
-                    schema={'time': pl.Float64, 'x': pl.Float64, 'y': pl.Float64},
-                ),
-                'definition': DatasetDefinition(
-                    time_column='time',
-                    time_unit='ms',
-                    pixel_columns=['x', 'y'],
-                ),
-                'time_unit': 'ms',
-            },
-            ValueError,
-            'The arguments "definition" and "time_unit" are mutually exclusive.',
-            id='definition_and_time_unit',
-        ),
-
-        pytest.param(
-            {
-                'data': pl.from_dict(
-                    {
-                        'time': [1.0, 1.5, 2.],
-                        'x': [0., 1., 2.],
-                        'y': [3., 4., 5.],
-                    },
-                    schema={'time': pl.Float64, 'x': pl.Float64, 'y': pl.Float64},
-                ),
-                'definition': DatasetDefinition(
-                    time_column='time',
-                    time_unit='ms',
-                    pixel_columns=['x', 'y'],
-                ),
-                'pixel_columns': ['x', 'y'],
-            },
-            ValueError,
-            'The arguments "definition" and "pixel_columns" are mutually exclusive.',
-            id='definition_and_pixel_columns',
         ),
 
     ],

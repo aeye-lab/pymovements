@@ -22,6 +22,7 @@ import polars as pl
 import pytest
 
 from pymovements import datasets
+from pymovements import DatasetDefinition
 from pymovements.gaze import from_csv
 
 
@@ -73,7 +74,23 @@ from pymovements.gaze import from_csv
             },
             (10, 2),
             {'time': pl.Float64, 'pixel': pl.List(pl.Float32)},
-            id='gaze_on_faces_dataset_example',
+        ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/gaze_on_faces_example.csv',
+                'definition': datasets.GazeOnFaces(),
+                'pixel_columns': ['foo', 'bar'],
+                **{
+                    'separator': ',',
+                    'has_header': False,
+                    'new_columns': ['foo', 'bar'],
+                    'schema_overrides': [pl.Float32, pl.Float32],
+                }
+            },
+            (10, 2),
+            {'time': pl.Float64, 'pixel': pl.List(pl.Float32)},
+            id='gaze_on_faces_dataset_explicit_read_kwargs_and_columns',
         ),
 
         pytest.param(
@@ -88,6 +105,21 @@ from pymovements.gaze import from_csv
                 'position': pl.List(pl.Float32),
             },
             id='gazebase_dataset_example',
+        ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/gazebase_example.csv',
+                'definition': datasets.GazeBase(),
+                'column_map': {'dP': 'test'}
+            },
+            (10, 7),
+            {
+                'time': pl.Int64, 'val': pl.Int64, 'test': pl.Float32, 'lab': pl.Int64,
+                'xT': pl.Float32, 'yT': pl.Float32,
+                'position': pl.List(pl.Float32),
+            },
+            id='gazebase_dataset_example_explicit_column_map',
         ),
 
         pytest.param(
@@ -114,6 +146,18 @@ from pymovements.gaze import from_csv
             (10, 2),
             {'time': pl.Float64, 'pixel': pl.List(pl.Float32)},
             id='hbn_dataset_example',
+        ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/hbn_example.csv',
+                'definition': datasets.HBN(),
+                'pixel_columns': [],
+                'position_columns': ['x_pix', 'y_pix'],
+            },
+            (10, 2),
+            {'time': pl.Float64, 'position': pl.List(pl.Float32)},
+            id='hbn_dataset_example_explicit_columns',
         ),
 
         pytest.param(
@@ -148,49 +192,3 @@ def test_from_csv_gaze_has_expected_shape_and_columns(kwargs, expected_shape, ex
 
     assert gaze_dataframe.frame.shape == expected_shape
     assert gaze_dataframe.frame.schema == expected_schema
-
-
-@pytest.mark.parametrize(
-    ('kwargs', 'exception', 'exception_msg'),
-    [
-        pytest.param(
-            {
-                'file': 'tests/files/hbn_example.csv',
-                'definition': datasets.HBN(),
-                'time_column': datasets.HBN().time_column,
-            },
-            ValueError,
-            'The arguments "definition" and "time_column" are mutually exclusive.',
-            id='definition_and_time_column',
-        ),
-
-        pytest.param(
-            {
-                'file': 'tests/files/gaze_on_faces_example.csv',
-                'definition': datasets.GazeOnFaces(),
-                **{'separator': ','},
-            },
-            ValueError,
-            'The arguments "definition" and "read_csv_kwargs" are mutually exclusive.',
-            id='definition_and_read_csv_kwargs',
-        ),
-
-        pytest.param(
-            {
-                'file': 'tests/files/judo1000_example.csv',
-                'definition': datasets.JuDo1000(),
-                'column_map': {'trialId': 'trial_id', 'pointId': 'point_id'},
-            },
-            ValueError,
-            'The arguments "definition" and "column_map" are mutually exclusive.',
-            id='definition_and_column_map',
-        ),
-
-    ],
-)
-def test_from_csv_exceptions(kwargs, exception, exception_msg):
-    with pytest.raises(exception) as excinfo:
-        from_csv(**kwargs)
-
-    msg, = excinfo.value.args
-    assert msg == exception_msg
