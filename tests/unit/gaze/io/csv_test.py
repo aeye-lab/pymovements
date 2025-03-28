@@ -22,7 +22,6 @@ import polars as pl
 import pytest
 
 from pymovements import datasets
-from pymovements import DatasetDefinition
 from pymovements.gaze import from_csv
 
 
@@ -169,7 +168,7 @@ def test_from_csv_gaze_has_expected_shape_and_columns(kwargs, expected_shape, ex
             {
                 'file': 'tests/files/gaze_on_faces_example.csv',
                 'definition': datasets.GazeOnFaces(),
-                **{'separator': ','}
+                **{'separator': ','},
             },
             ValueError,
             'The arguments "definition" and "read_csv_kwargs" are mutually exclusive.',
