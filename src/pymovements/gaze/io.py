@@ -25,9 +25,10 @@ from typing import Any
 
 import polars as pl
 
+import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.gaze._utils.parsing import parse_eyelink
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.gaze_dataframe import GazeDataFrame  # pylint: disable=cyclic-import
+from pymovements.gaze.gaze_dataframe import GazeDataFrame
 
 
 def from_csv(
@@ -224,7 +225,7 @@ def from_csv(
 
         # TODO: column_schema_overrides = definition.column_schema_overrides
 
-        if not read_csv_kwargs:
+        if not read_csv_kwargs and 'gaze' in definition.custom_read_kwargs:
             read_csv_kwargs = definition.custom_read_kwargs['gaze']
 
     # Read data.

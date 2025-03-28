@@ -21,6 +21,7 @@
 import polars as pl
 import pytest
 
+from pymovements import DatasetDefinition
 from pymovements import datasets
 from pymovements.gaze import from_csv
 
@@ -38,6 +39,20 @@ from pymovements.gaze import from_csv
             (10, 2),
             {'time': pl.Int64, 'pixel': pl.List(pl.Int64)},
             id='csv_mono_shape',
+        ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/monocular_example.csv',
+                'definition': DatasetDefinition(
+                    time_column='time',
+                    time_unit='ms',
+                    pixel_columns=['x_left_pix', 'y_left_pix'],
+                ),
+            },
+            (10, 2),
+            {'time': pl.Int64, 'pixel': pl.List(pl.Int64)},
+            id='csv_mono_shape_definition',
         ),
 
         pytest.param(
