@@ -117,7 +117,11 @@ html_css_files = [
 ]
 
 html_theme_options = {
-    'navigation_with_keys': False,
+    'navigation_with_keys': True,
+    
+    "repository_url": "https://github.com/aeye-lab/pymovements",
+    "use_source_button": True,
+    
     'external_links': [
         {
             'name': 'Contributing',
