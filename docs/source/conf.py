@@ -38,6 +38,8 @@ from pybtex.plugin import register_plugin
 from pybtex.style.formatting.plain import Style as PlainStyle
 from pybtex.style.labels import BaseLabelStyle
 
+import pymovements
+
 # add relative source path to python path
 sys.path.insert(0, os.path.abspath('src'))
 sys.path.insert(0, os.path.dirname(os.path.abspath('src')))
@@ -117,11 +119,7 @@ html_css_files = [
 ]
 
 html_theme_options = {
-    'navigation_with_keys': True,
-
-    'repository_url': 'https://github.com/aeye-lab/pymovements',
-    'use_source_button': True,
-
+    'navigation_with_keys': False,
     'external_links': [
         {
             'name': 'Contributing',
@@ -196,7 +194,7 @@ extlinks = {
 
 LINKCODE_URL = (
     f'https://github.com/aeye-lab/pymovements/blob/{REVISION}'
-    '/src/{filepath}#L{linestart}-L{linestop}'
+    '/src/pymovements/{filepath}#L{linestart}-L{linestop}'
 )
 
 
@@ -221,8 +219,10 @@ def linkcode_resolve(domain, info):
             return None
 
     try:
-        modpath = importlib.resources.require(topmodulename)[0].location
-        filepath = os.path.relpath(inspect.getsourcefile(obj), modpath)
+        filepath = os.path.relpath(
+            inspect.getsourcefile(obj),
+            os.path.dirname(pymovements.__file__),
+        )
         if filepath is None:
             return
     except Exception:
