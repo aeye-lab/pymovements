@@ -27,7 +27,6 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import importlib.resources
 import inspect
 import os
 import sys
@@ -204,7 +203,7 @@ def linkcode_resolve(domain, info):
         return None
 
     modname = info['module']
-    topmodulename = modname.split('.')[0]
+    modname.split('.')[0]
     fullname = info['fullname']
 
     submod = sys.modules.get(modname)
