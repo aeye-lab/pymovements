@@ -51,8 +51,7 @@ class GazeDataFrame:
     experiment : Experiment | None
         The experiment definition. (default: None)
     events: pm.EventDataFrame | None
-        A dataset definition. Explicitly passed arguments take precedence over definition.
-        (default: None)
+        A dataframe of events in the gaze signal. (default: None)
     definition: pm.DatasetDefinition | None
         A dataset definition. Explicitly passed arguments take precedence over definition.
         (default: None)
@@ -92,6 +91,20 @@ class GazeDataFrame:
         in the input data frame. If specified, the column will be used for pixel to dva
         transformations. If not specified, the constant eye-to-screen distance will be taken
         from the experiment definition. This column will be renamed to ``distance``. (default: None)
+
+    Attributes
+    ----------
+    frame: pl.DataFrame
+        A dataframe to be transformed to a polars dataframe.
+    experiment : Experiment | None
+        The experiment definition.
+    events: pm.EventDataFrame | None
+        A dataframe of events in the gaze signal.
+    trial_columns: list[str] | None
+        The name of the trial columns in the data frame. If not None, the transformation methods
+        will be applied to each trial separately.
+    n_components: int | None
+        The number of components in the pixel, position, velocity and acceleration columns.
 
     Notes
     -----
@@ -1411,6 +1424,7 @@ class GazeDataFrame:
             acceleration_columns: list[str] | None = None,
             distance_column: str | None = None,
     ) -> None:
+        """Initialize dataframe columns."""
         # Explicit arguments take precedence over definition.
         if definition:
             if trial_columns is None:
@@ -1498,7 +1512,7 @@ class GazeDataFrame:
             self,
             time_column: str | None = None,
             time_unit: str | None = None,
-    ):
+    ) -> None:
         """Initialize time column."""
         # If no time column exists, create a new one starting with zero and set time unit to steps.
         if time_column is None and 'time' not in self.frame.columns:
