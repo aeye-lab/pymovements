@@ -56,19 +56,19 @@ column_map:
 custom_read_kwargs:
   gaze:
     schema_overrides:
-      n: !polars.Float64
-      x: !polars.Float64
-      y: !polars.Float64
-      lx: !polars.Float64
-      ly: !polars.Float64
-      rx: !polars.Float64
-      ry: !polars.Float64
-      xT: !polars.Float64
-      yT: !polars.Float64
-      zT: !polars.Float64
-      clx: !polars.Float64
-      cly: !polars.Float64
-      clz: !polars.Float64
-      crx: !polars.Float64
-      cry: !polars.Float64
-      crz: !polars.Float64
+      n: !polars.Float32
+      x: !polars.Float32
+      y: !polars.Float32
+      lx: !polars.Float32
+      ly: !polars.Float32
+      rx: !polars.Float32
+      ry: !polars.Float32
+      xT: !polars.Float32
+      yT: !polars.Float32
+      zT: !polars.Float32
+      clx: !polars.Float32
+      cly: !polars.Float32
+      clz: !polars.Float32
+      crx: !polars.Float32
+      cry: !polars.Float32
+      crz: !polars.Float32
