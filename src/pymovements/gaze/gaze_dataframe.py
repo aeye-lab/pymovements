@@ -52,9 +52,6 @@ class GazeDataFrame:
         The experiment definition. (default: None)
     events: pm.EventDataFrame | None
         A dataframe of events in the gaze signal. (default: None)
-    definition: pm.DatasetDefinition | None
-        A dataset definition. Explicitly passed arguments take precedence over definition.
-        (default: None)
     auto_column_detect: bool
         Flag indicating if the column names should be inferred automatically. (default: False)
     trial_columns: str | list[str] | None
@@ -91,6 +88,9 @@ class GazeDataFrame:
         in the input data frame. If specified, the column will be used for pixel to dva
         transformations. If not specified, the constant eye-to-screen distance will be taken
         from the experiment definition. This column will be renamed to ``distance``. (default: None)
+    definition: pm.DatasetDefinition | None
+        A dataset definition. Explicitly passed arguments take precedence over definition.
+        (default: None)
 
     Attributes
     ----------
@@ -213,7 +213,6 @@ class GazeDataFrame:
             experiment: Experiment | None = None,
             events: pm.EventDataFrame | None = None,
             *,
-            definition: pm.DatasetDefinition | None = None,
             auto_column_detect: bool = False,
             trial_columns: str | list[str] | None = None,
             time_column: str | None = None,
@@ -223,6 +222,7 @@ class GazeDataFrame:
             velocity_columns: list[str] | None = None,
             acceleration_columns: list[str] | None = None,
             distance_column: str | None = None,
+            definition: pm.DatasetDefinition | None = None,
     ):
         if data is None:
             data = pl.DataFrame()

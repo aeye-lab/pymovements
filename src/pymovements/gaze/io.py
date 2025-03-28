@@ -35,7 +35,6 @@ def from_csv(
         file: str | Path,
         experiment: Experiment | None = None,
         *,
-        definition: pm.DatasetDefinition | None = None,
         trial_columns: str | list[str] | None = None,
         time_column: str | None = None,
         time_unit: str | None = None,
@@ -47,6 +46,7 @@ def from_csv(
         column_map: dict[str, str] | None = None,
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, type] | None = None,
+        definition: pm.DatasetDefinition | None = None,
         **read_csv_kwargs: Any,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
@@ -57,9 +57,6 @@ def from_csv(
         Path of gaze file.
     experiment : Experiment | None
         The experiment definition. (default: None)
-    definition: pm.DatasetDefinition | None
-        A dataset definition. Explicitly passed arguments take precedence over definition.
-        (default: None)
     trial_columns: str | list[str] | None
         The name of the trial columns in the input data frame. If the list is empty or None,
         the input data frame is assumed to contain only one trial. If the list is not empty,
@@ -101,6 +98,9 @@ def from_csv(
         (default: None)
     column_schema_overrides:  dict[str, type] | None
         Dictionary containing types for columns.
+        (default: None)
+    definition: pm.DatasetDefinition | None
+        A dataset definition. Explicitly passed arguments take precedence over definition.
         (default: None)
     **read_csv_kwargs: Any
         Additional keyword arguments to be passed to :py:func:`polars.read_csv` to read in the csv.
@@ -294,7 +294,8 @@ def from_asc(
         trial_columns: str | list[str] | None = None,
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, Any] | None = None,
-        encoding: str = 'ascii',
+        encoding: str | None = None,
+        definition: pm.DatasetDefinition | None = None,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
 
@@ -323,8 +324,11 @@ def from_asc(
     column_schema_overrides: dict[str, Any] | None
         Dictionary containing types for columns.
         (default: None)
-    encoding: str
-        Text encoding of the file. (default: 'ascii')
+    encoding: str | None
+        Text encoding of the file. If None, the locale encoding is used. (default: None)
+    definition: pm.DatasetDefinition | None
+        A dataset definition. Explicitly passed arguments take precedence over definition.
+        (default: None)
 
     Returns
     -------
@@ -360,12 +364,38 @@ def from_asc(
     >>> gaze.experiment.eyetracker.sampling_rate
     1000.0
     """
+
     if isinstance(patterns, str):
         if patterns == 'eyelink':
             # We use the default patterns of parse_eyelink then.
             patterns = None
         else:
             raise ValueError(f"unknown pattern key '{patterns}'. Supported keys are: eyelink")
+
+    # Explicit arguments take precedence over definition.
+    if definition:
+        if experiment is None:
+            experiment = definition.experiment
+
+        if trial_columns is None:
+            trial_columns = definition.trial_columns
+
+        if 'gaze' in definition.custom_read_kwargs:
+            custom_read_kwargs = definition.custom_read_kwargs['gaze']
+
+            # TODO: metadata_patterns: list[dict[str, Any] | str] | None = None,
+
+            if patterns is None and 'patterns' in custom_read_kwargs:
+                patterns = custom_read_kwargs['patterns']
+
+            if schema is None and 'schema' in custom_read_kwargs:
+                schema = custom_read_kwargs['schema']
+
+            if column_schema_overrides is None and 'column_schema_overrides' in custom_read_kwargs:
+                column_schema_overrides = custom_read_kwargs['column_schema_overrides']
+
+            if encoding is None and 'encoding' in custom_read_kwargs:
+                encoding = custom_read_kwargs['encoding']
 
     # Read data.
     gaze_data, metadata = parse_eyelink(
@@ -401,12 +431,12 @@ def from_asc(
     if experiment_resolution == (None, None):
         experiment.screen.width_px, experiment.screen.height_px = metadata['resolution']
     elif experiment_resolution != metadata['resolution']:
-        issues.append(f"Screen resolution: {experiment_resolution} vs. {metadata['resolution']}")
+        issues.append(f"Screen resolution: {experiment_resolution} != {metadata['resolution']}")
 
     # Sampling rate
     if experiment.eyetracker.sampling_rate != metadata['sampling_rate']:
         issues.append(
-            f"Sampling rate: {experiment.eyetracker.sampling_rate} vs. {metadata['sampling_rate']}",
+            f"Sampling rate: {experiment.eyetracker.sampling_rate} != {metadata['sampling_rate']}",
         )
 
     # Tracked eye
@@ -415,17 +445,17 @@ def from_asc(
     if experiment.eyetracker.left is None:
         experiment.eyetracker.left = asc_left_eye
     elif experiment.eyetracker.left != asc_left_eye:
-        issues.append(f"Left eye tracked: {experiment.eyetracker.left} vs. {asc_left_eye}")
+        issues.append(f"Left eye tracked: {experiment.eyetracker.left} != {asc_left_eye}")
     if experiment.eyetracker.right is None:
         experiment.eyetracker.right = asc_right_eye
     elif experiment.eyetracker.right != asc_right_eye:
-        issues.append(f"Right eye tracked: {experiment.eyetracker.right} vs. {asc_right_eye}")
+        issues.append(f"Right eye tracked: {experiment.eyetracker.right} != {asc_right_eye}")
 
     # Mount configuration
     if experiment.eyetracker.mount is None:
         experiment.eyetracker.mount = metadata['mount_configuration']['mount_type']
     elif experiment.eyetracker.mount != metadata['mount_configuration']['mount_type']:
-        issues.append(f"Mount configuration: {experiment.eyetracker.mount} vs. "
+        issues.append(f"Mount configuration: {experiment.eyetracker.mount} != "
                       f"{metadata['mount_configuration']['mount_type']}")
 
     # Eye tracker vendor
@@ -433,19 +463,19 @@ def from_asc(
     if experiment.eyetracker.vendor is None:
         experiment.eyetracker.vendor = asc_vendor
     elif experiment.eyetracker.vendor != asc_vendor:
-        issues.append(f"Eye tracker vendor: {experiment.eyetracker.vendor} vs. {asc_vendor}")
+        issues.append(f"Eye tracker vendor: {experiment.eyetracker.vendor} != {asc_vendor}")
 
     # Eye tracker model
     if experiment.eyetracker.model is None:
         experiment.eyetracker.model = metadata['model']
     elif experiment.eyetracker.model != metadata['model']:
-        issues.append(f"Eye tracker model: {experiment.eyetracker.model} vs. {metadata['model']}")
+        issues.append(f"Eye tracker model: {experiment.eyetracker.model} != {metadata['model']}")
 
     # Eye tracker software version
     if experiment.eyetracker.version is None:
         experiment.eyetracker.version = metadata['version_number']
     elif experiment.eyetracker.version != metadata['version_number']:
-        issues.append(f"Eye tracker software version: {experiment.eyetracker.version} vs. "
+        issues.append(f"Eye tracker software version: {experiment.eyetracker.version} != "
                       f"{metadata['version_number']}")
 
     if issues:

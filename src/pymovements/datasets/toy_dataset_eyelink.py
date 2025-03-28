@@ -182,6 +182,10 @@ class ToyDatasetEyeLink(DatasetDefinition):
         },
     )
 
+    trial_columns: list[str] = field(
+        default_factory=lambda: ['task', 'trial_id', 'screen_id', 'point_id'],
+    )
+
     time_column: str = 'time'
 
     time_unit: str = 'ms'
