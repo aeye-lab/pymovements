@@ -633,3 +633,73 @@ def test_from_asc_detects_mismatches_in_experiment_metadata(experiment_kwargs, i
     expected_msg = 'Experiment metadata does not match the metadata in the ASC file:\n'
     expected_msg += '\n'.join(f'- {issue}' for issue in issues)
     assert msg == expected_msg
+
+
+@pytest.mark.parametrize(
+    ('kwargs', 'expected_metadata'),
+    [
+        pytest.param(
+            {
+                'file': 'tests/files/eyelink_monocular_example.asc',
+                'definition': ToyDatasetEyeLink(),
+                'metadata_patterns': [
+                    {'pattern': r'!V TRIAL_VAR SUBJECT_ID (?P<subject_id>-?\d+)'},
+                ],
+            },
+            {
+                'subject_id': '-1',
+            },
+            id='eyelink_asc_mono_subject_id_metadata_patterns',
+        ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/eyelink_monocular_example.asc',
+                'definition': ToyDatasetEyeLink(
+                    trial_columns=None,
+                    custom_read_kwargs={
+                        'gaze': {
+                            'metadata_patterns': [
+                                {'pattern': r'!V TRIAL_VAR SUBJECT_ID (?P<subject_id>-?\d+)'},
+                            ],
+                        },
+                    },
+                ),
+            },
+            {
+                'subject_id': '-1',
+            },
+            id='eyelink_asc_mono_subject_id_definition',
+        ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/eyelink_monocular_example.asc',
+                'definition': ToyDatasetEyeLink(
+                    trial_columns=None,
+                    custom_read_kwargs={
+                        'gaze': {
+                            'metadata_patterns': [
+                                {'pattern': r'!V TRIAL_VAR SUBJECT_ID (?P<foobar>-?\d+)'},
+                            ],
+                        },
+                    },
+                ),
+                'metadata_patterns': [
+                    {'pattern': r'!V TRIAL_VAR SUBJECT_ID (?P<subject_id>-?\d+)'},
+                ],
+            },
+            {
+                'subject_id': '-1',
+            },
+            id='eyelink_asc_mono_subject_id_metadata_patterns_overrides_definition',
+        ),
+
+    ],
+)
+def test_from_asc_has_expected_metadata(kwargs, expected_metadata):
+    gaze = from_asc(**kwargs)
+
+    for key, value in expected_metadata.items():
+        assert key in gaze._metadata
+        assert gaze._metadata[key] == value

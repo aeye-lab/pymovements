@@ -383,10 +383,11 @@ def from_asc(
         if 'gaze' in definition.custom_read_kwargs:
             custom_read_kwargs = definition.custom_read_kwargs['gaze']
 
-            # TODO: metadata_patterns: list[dict[str, Any] | str] | None = None,
-
             if patterns is None and 'patterns' in custom_read_kwargs:
                 patterns = custom_read_kwargs['patterns']
+
+            if metadata_patterns is None and 'metadata_patterns' in custom_read_kwargs:
+                metadata_patterns = custom_read_kwargs['metadata_patterns']
 
             if schema is None and 'schema' in custom_read_kwargs:
                 schema = custom_read_kwargs['schema']
