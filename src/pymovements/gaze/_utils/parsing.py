@@ -355,8 +355,10 @@ def parse_eyelink(
 
                     # each metadata pattern should only match once
                     compiled_metadata_patterns.remove(pattern_dict)
+
     if not metadata:
-        raise Warning('No metadata found. Please check the file for errors.')
+        warnings.warn('No metadata found. Please check the file for errors.')
+
     # if the sampling rate is not found, we cannot calculate the data loss
     actual_number_of_samples = len(samples['time'])
     # if we don't have any recording config, we cannot calculate the data loss
