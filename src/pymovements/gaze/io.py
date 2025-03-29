@@ -396,8 +396,9 @@ def from_asc(
     # Tracked eye
     asc_left_eye = None
     asc_right_eye = None
-    if len(metadata['recording_config']) == 1:
-        asc_tracked_eye = metadata['recording_config'][0]['tracked_eye']
+    asc_tracked_eye = {config['tracked_eye'] for config in metadata['recording_config']}
+    if len(asc_tracked_eye) == 1:
+        asc_tracked_eye = asc_tracked_eye.pop()
         asc_left_eye = 'L' in asc_tracked_eye
         asc_right_eye = 'R' in asc_tracked_eye
     if experiment.eyetracker.left is None:
