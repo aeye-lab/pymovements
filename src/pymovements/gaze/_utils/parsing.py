@@ -362,7 +362,7 @@ def parse_eyelink(
     # if the sampling rate is not found, we cannot calculate the data loss
     actual_number_of_samples = len(samples['time'])
     # if we don't have any recording config, we cannot calculate the data loss
-    metadata['sampling_rate'] = _check_sampling_rate(recording_config)
+    metadata['sampling_rate'] = _check_reccfg_key(recording_config, 'sampling_rate', float)
 
     data_loss_ratio, data_loss_ratio_blinks = _calculate_data_loss(
         blinks=blinks,
@@ -371,6 +371,8 @@ def parse_eyelink(
         total_rec_duration=total_recording_duration,
         sampling_rate=metadata['sampling_rate'],
     )
+
+    metadata['tracked_eye'] = _check_reccfg_key(recording_config, 'tracked_eye')
 
     pre_processed_metadata: dict[str, Any] = _pre_process_metadata(metadata)
     # is not yet pre-processed but should be
@@ -438,33 +440,42 @@ def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:
     return return_metadata
 
 
-def _check_sampling_rate(recording_config: list[dict[str, Any]]) -> float | None:
-    """Check if the sampling rate is available in the recording config.
+def _check_reccfg_key(
+        recording_config: list[dict[str, Any]],
+        key: str,
+        astype: type | None = None,
+) -> float | None:
+    """Check if the recording configs contain consistent values for the specified key and return it.
+
+    Prints a warning if no recording config is found or if the value is inconsistent across entries.
 
     Parameters
     ----------
-    recording_config : list[dict[str, Any]]
-        List of dictionaries containing recording configuration details.
+    recording_config: list[dict[str, Any]]
+        List of dictionaries containing recording config details.
+    key: str
+        The key in the recording configs to check for consistency.
+    astype: type | None
+        The type to cast the value to.
 
     Returns
     -------
     float | None
-        The sampling rate of the first entry as a float if available, otherwise None.
-        prints a warning if no recording configuration is found or
-        if the sampling rate is inconsistent.
+        The value of the specified key if available, otherwise None.
     """
     if not recording_config:
-        sampling_rate = None
-        warnings.warn('No recording configuration found. Cannot calculate data loss.')
-    else:
-        sampling_rates = {d.get('sampling_rate') for d in recording_config}
-        if len(sampling_rates) != 1:
-            warnings.warn(
-                'Inconsistent sampling rates found. The first recorded sampling '
-                'rate is used to calculate the dataloss.',
-            )
-        sampling_rate = float(recording_config[0]['sampling_rate'])
-    return sampling_rate
+        warnings.warn('No recording configuration found.')
+        return None
+
+    values = {d.get(key) for d in recording_config}
+    if len(values) != 1:
+        warnings.warn(f'Inconsistent {key} found.')
+        return None
+
+    value = values.pop()
+    if astype is not None:
+        value = astype(value)
+    return value
 
 
 def _calculate_data_loss(

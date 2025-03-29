@@ -161,6 +161,7 @@ EXPECTED_METADATA = {
     'model': 'EyeLink Portable Duo',
     'version_number': '6.12',
     'sampling_rate': 1000.0,
+    'tracked_eye': 'L',
     'pupil_data_type': 'AREA',
     'calibrations': [],
     'validations': [],
@@ -361,14 +362,13 @@ def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_mo
         ),
         pytest.param(
             '** DATE: Wed Mar  8 09:25:20 2023\n',
-            'No recording configuration found. Cannot calculate data loss.',
+            'No recording configuration found.',
             id='no_reccfg',
         ),
         pytest.param(
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
             'MSG	2154556 RECCFG CR 2000 2 1 L\n',
-            'Inconsistent sampling rates found. The first recorded sampling '
-            'rate is used to calculate the dataloss.',
+            'Inconsistent sampling_rate found.',
             id='inconsistent_reccfg',
         ),
     ],
