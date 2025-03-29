@@ -74,6 +74,12 @@ class ToyDatasetEyeLink(DatasetDefinition):
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
+    trial_columns: list[str]
+            The name of the trial columns in the input data frame. If the list is empty or None,
+            the input data frame is assumed to contain only one trial. If the list is not empty,
+            the input data frame is assumed to contain multiple trials and the transformation
+            methods will be applied to each trial separately. (default: None)
+
     time_column: str
         The name of the timestamp column in the input data frame. This column will be renamed to
         ``time``.
@@ -180,6 +186,10 @@ class ToyDatasetEyeLink(DatasetDefinition):
                 'session_id': int,
             },
         },
+    )
+
+    trial_columns: list[str] = field(
+        default_factory=lambda: ['task', 'trial_id', 'screen_id', 'point_id'],
     )
 
     time_column: str = 'time'
