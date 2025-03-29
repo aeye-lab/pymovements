@@ -444,7 +444,7 @@ def _check_reccfg_key(
         recording_config: list[dict[str, Any]],
         key: str,
         astype: type | None = None,
-) -> float | None:
+) -> Any:
     """Check if the recording configs contain consistent values for the specified key and return it.
 
     Prints a warning if no recording config is found or if the value is inconsistent across entries.
@@ -460,7 +460,7 @@ def _check_reccfg_key(
 
     Returns
     -------
-    float | None
+    Any
         The value of the specified key if available, otherwise None.
     """
     if not recording_config:
