@@ -19,7 +19,6 @@
 # SOFTWARE.
 """Test dataset library."""
 import glob
-from dataclasses import dataclass
 from pathlib import Path
 from unittest import mock
 
@@ -73,8 +72,7 @@ def test_raise_value_error_get_non_existent_dataset():
         assert snippet in msg
 
 
-def test_register_defintion_class():
-    @dataclass
+def test_register_definition_class():
     @register_dataset
     class CustomDatasetDefinition(DatasetDefinition):
         name: str = 'CustomDatasetDefinition3'

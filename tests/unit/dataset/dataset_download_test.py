@@ -29,7 +29,6 @@ import pytest
 from pymovements import Dataset
 from pymovements import DatasetDefinition
 from pymovements import DatasetPaths
-from pymovements.dataset.dataset_download import extract_dataset
 
 
 @pytest.fixture(
@@ -1372,7 +1371,7 @@ def test_extract_dataset_precomputed_move_single_file(tmp_path):
         tmp_path / 'downloads' / '18sat_fixfinal.csv',
     )
 
-    extract_dataset(definition, DatasetPaths(root=tmp_path))
+    Dataset(definition, path=tmp_path).extract()
 
 
 def test_extract_dataset_precomputed_rm_move_single_file(tmp_path):
@@ -1411,7 +1410,7 @@ def test_extract_dataset_precomputed_rm_move_single_file(tmp_path):
         tmp_path / 'downloads' / 'copco_rm_dummy.csv',
     )
 
-    extract_dataset(definition, DatasetPaths(root=tmp_path))
+    Dataset(definition, path=tmp_path).extract()
 
 
 def test_dataset_download_no_precomputed_rm_resources_raises_exception(tmp_path):
