@@ -169,7 +169,7 @@ from pymovements.gaze import from_asc
                     'pixel': pl.List(pl.Float64),
                 },
             ),
-            id='eyelink_asc_mono_schema_overrides_overwrites_definition',
+            id='eyelink_asc_mono_schema_overrides_overrides_definition',
         ),
 
         pytest.param(
@@ -267,7 +267,7 @@ def test_from_asc_has_frame_equal(kwargs, expected_frame):
                 'trial_id': pl.Int32,
                 'pixel': pl.List(pl.Float64),
             },
-            id='eyelink_asc_mono_schema_overwrites_definition',
+            id='eyelink_asc_mono_schema_overrides_definition',
         ),
 
         pytest.param(
@@ -333,7 +333,7 @@ def test_from_asc_has_frame_equal(kwargs, expected_frame):
                 'pupil': pl.Float64,
                 'pixel': pl.List(pl.Float64),
             },
-            id='eyelink_asc_mono_no_dummy_pattern_eyelink_encoding_overwrites_definition',
+            id='eyelink_asc_mono_no_dummy_pattern_eyelink_encoding_overrides_definition',
         ),
     ],
 )
@@ -474,7 +474,7 @@ def test_from_asc_raises_exception(kwargs, exception, message):
                     mount='Desktop',
                 ),
             ),
-            id='1khz_experiment_overwrites_definition',
+            id='1khz_experiment_overrides_definition',
         ),
 
         pytest.param(
@@ -545,7 +545,7 @@ def test_from_asc_fills_in_experiment_metadata(init_kwargs, expected_experiment)
                 'trial_columns': ['trial_id'],
             },
             ['trial_id'],
-            id='eyelink_asc_mono_trial_columns_overwrite_definition',
+            id='eyelink_asc_mono_trial_columns_override_definition',
         ),
 
     ],

@@ -43,6 +43,7 @@ def from_csv(
         velocity_columns: list[str] | None = None,
         acceleration_columns: list[str] | None = None,
         distance_column: str | None = None,
+        auto_column_detect: bool = False,
         column_map: dict[str, str] | None = None,
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, type] | None = None,
@@ -90,6 +91,8 @@ def from_csv(
         the column will be used for pixel to dva transformations. If not specified, the
         constant eye-to-screen distance will be taken from the experiment definition.
         (default: None)
+    auto_column_detect: bool
+        Flag indicating if the column names should be inferred automatically. (default: False)
     column_map: dict[str, str] | None
         The keys are the columns to read, the values are the names to which they should be renamed.
         (default: None)
@@ -123,13 +126,13 @@ def from_csv(
 
     The supported number of component columns with the expected order are:
 
-    * zero columns: No nested component column will be created.
-    * two columns: monocular data; expected order: x-component, y-component
-    * four columns: binocular data; expected order: x-component left eye, y-component left eye,
-      x-component right eye, y-component right eye,
-    * six columns: binocular data with additional cyclopian data; expected order: x-component
+    - *zero columns*: No nested component column will be created.
+    - *two columns*: monocular data; expected order: x-component, y-component
+    - *four columns*: binocular data; expected order: x-component left eye, y-component left eye,
+      x-component right eye, y-component right eye
+    - *six columns*: binocular data with additional cyclopian data; expected order: x-component
       left eye, y-component left eye, x-component right eye, y-component right eye,
-      x-component cyclopian eye, y-component cyclopian eye,
+      x-component cyclopian eye, y-component cyclopian eye
 
 
     Examples
@@ -223,10 +226,9 @@ def from_csv(
         if column_map is None:
             column_map = definition.column_map
 
-        # TODO: column_schema_overrides = definition.column_schema_overrides
-
         if not read_csv_kwargs and 'gaze' in definition.custom_read_kwargs:
-            read_csv_kwargs = definition.custom_read_kwargs['gaze']
+            if definition.custom_read_kwargs['gaze']:
+                read_csv_kwargs = definition.custom_read_kwargs['gaze']
 
     # Read data.
     gaze_data = pl.read_csv(file, **read_csv_kwargs)
@@ -280,6 +282,7 @@ def from_csv(
         velocity_columns=velocity_columns,
         acceleration_columns=acceleration_columns,
         distance_column=distance_column,
+        auto_column_detect=auto_column_detect,
     )
     return gaze_df
 
@@ -364,7 +367,6 @@ def from_asc(
     >>> gaze.experiment.eyetracker.sampling_rate
     1000.0
     """
-
     if isinstance(patterns, str):
         if patterns == 'eyelink':
             # We use the default patterns of parse_eyelink then.
@@ -380,7 +382,7 @@ def from_asc(
         if trial_columns is None:
             trial_columns = definition.trial_columns
 
-        if 'gaze' in definition.custom_read_kwargs:
+        if 'gaze' in definition.custom_read_kwargs and definition.custom_read_kwargs['gaze']:
             custom_read_kwargs = definition.custom_read_kwargs['gaze']
 
             if patterns is None and 'patterns' in custom_read_kwargs:

@@ -133,7 +133,7 @@ from pymovements.gaze import from_csv
                 'xT': pl.Float32, 'yT': pl.Float32,
                 'position': pl.List(pl.Float32),
             },
-            id='gazebase_dataset_example_explicit_column_map',
+            id='gazebase_dataset_example_column_map_overrides_definition',
         ),
 
         pytest.param(
@@ -171,7 +171,7 @@ from pymovements.gaze import from_csv
             },
             (10, 2),
             {'time': pl.Float64, 'position': pl.List(pl.Float32)},
-            id='hbn_dataset_example_explicit_columns',
+            id='hbn_dataset_example_columns_override_definition',
         ),
 
         pytest.param(
@@ -185,6 +185,80 @@ from pymovements.gaze import from_csv
                 'time': pl.Int64, 'pixel': pl.List(pl.Float32),
             },
             id='judo1000_dataset_example',
+        ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/judo1000_example.csv',
+                'definition': datasets.JuDo1000(),
+                'column_schema_overrides': {'trial_id': pl.String},
+            },
+            (10, 4),
+            {
+                'trial_id': pl.String, 'point_id': pl.Int64,
+                'time': pl.Int64, 'pixel': pl.List(pl.Float32),
+            },
+            id='judo1000_dataset_example_column_schema_overrides',
+        ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/judo1000_example.csv',
+                'definition': datasets.JuDo1000(
+                    custom_read_kwargs={
+                        'gaze': {
+                            'schema_overrides': {
+                                'trialId': pl.String,
+                                'pointId': pl.String,
+                                'time': pl.Int64,
+                                'x_left': pl.Float32,
+                                'y_left': pl.Float32,
+                                'x_right': pl.Float32,
+                                'y_right': pl.Float32,
+                            },
+                            'separator': '\t',
+                        },
+                    },
+                ),
+            },
+            (10, 4),
+            {
+                'trial_id': pl.String, 'point_id': pl.String,
+                'time': pl.Int64, 'pixel': pl.List(pl.Float32),
+            },
+            id='judo1000_dataset_example_schema_overrides_from_definition',
+        ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/judo1000_example.csv',
+                'definition': datasets.JuDo1000(
+                    custom_read_kwargs={
+                        'gaze': {
+                            'schema_overrides': {
+                                'trialId': pl.String,
+                                'pointId': pl.String,
+                                'time': pl.Int64,
+                                'x_left': pl.Float32,
+                                'y_left': pl.Float32,
+                                'x_right': pl.Float32,
+                                'y_right': pl.Float32,
+                            },
+                            'separator': '\t',
+                        },
+                    },
+                ),
+                'column_schema_overrides': {
+                    'trial_id': pl.Int64,
+                    'point_id': pl.Int64,
+                },
+            },
+            (10, 4),
+            {
+                'trial_id': pl.Int64, 'point_id': pl.Int64,
+                'time': pl.Int64, 'pixel': pl.List(pl.Float32),
+            },
+            id='judo1000_dataset_example_column_schema_overrides_overrides_definition',
         ),
 
         pytest.param(

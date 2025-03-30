@@ -259,7 +259,6 @@ def load_gaze_files(
             fileinfo_row=fileinfo_row,
             definition=definition,
             preprocessed=preprocessed,
-            custom_read_kwargs=definition.custom_read_kwargs['gaze'],
         )
         gaze_dfs.append(gaze_df)
 
@@ -271,7 +270,6 @@ def load_gaze_file(
         fileinfo_row: dict[str, Any],
         definition: DatasetDefinition,
         preprocessed: bool = False,
-        custom_read_kwargs: dict[str, Any] | None = None,
 ) -> GazeDataFrame:
     """Load a gaze data file as GazeDataFrame.
 
@@ -286,8 +284,6 @@ def load_gaze_file(
     preprocessed: bool
         If ``True``, saved preprocessed data will be loaded, otherwise raw data will be loaded.
         (default: False)
-    custom_read_kwargs: dict[str, Any] | None
-        Dictionary of keyword arguments for reading gaze file. (default: None)
 
     Returns
     -------
@@ -301,9 +297,6 @@ def load_gaze_file(
     ValueError
         If extension is not in list of valid extensions.
     """
-    if custom_read_kwargs is None:
-        custom_read_kwargs = {}
-
     fileinfo_columns = {
         column: fileinfo_row[column] for column in
         [column for column in fileinfo_row.keys() if column != 'filepath']
@@ -333,76 +326,39 @@ def load_gaze_file(
 
             gaze_df = from_csv(
                 filepath,
-                trial_columns=trial_columns,
                 time_unit=time_unit,
+                auto_column_detect=True,
+                trial_columns=trial_columns,  # this includes all fileinfo_columns.
                 add_columns=fileinfo_columns,
+                # column_schema_overrides is used for fileinfo_columns passed as add_columns.
                 column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
             )
-
-            # suffixes as ordered after using GazeDataFrame.unnest()
-            component_suffixes = ['x', 'y', 'xl', 'yl', 'xr', 'yr', 'xa', 'ya']
-
-            pixel_columns = ['pixel_' + suffix for suffix in component_suffixes]
-            pixel_columns = [c for c in pixel_columns if c in gaze_df.frame.columns]
-
-            position_columns = ['position_' + suffix for suffix in component_suffixes]
-            position_columns = [c for c in position_columns if c in gaze_df.frame.columns]
-
-            velocity_columns = ['velocity_' + suffix for suffix in component_suffixes]
-            velocity_columns = [c for c in velocity_columns if c in gaze_df.frame.columns]
-
-            acceleration_columns = ['acceleration_' + suffix for suffix in component_suffixes]
-            acceleration_columns = [c for c in acceleration_columns if c in gaze_df.frame.columns]
-
-            column_specifiers: list[list[str]] = []
-            if len(pixel_columns) > 0:
-                gaze_df.nest(pixel_columns, output_column='pixel')
-                column_specifiers.append(pixel_columns)
-
-            if len(position_columns) > 0:
-                gaze_df.nest(position_columns, output_column='position')
-                column_specifiers.append(position_columns)
-
-            if len(velocity_columns) > 0:
-                gaze_df.nest(velocity_columns, output_column='velocity')
-                column_specifiers.append(velocity_columns)
-
-            if len(acceleration_columns) > 0:
-                gaze_df.nest(acceleration_columns, output_column='acceleration')
-                column_specifiers.append(acceleration_columns)
         else:
             gaze_df = from_csv(
                 filepath,
-                experiment=definition.experiment,
-                time_column=definition.time_column,
-                time_unit=definition.time_unit,
-                distance_column=definition.distance_column,
-                pixel_columns=definition.pixel_columns,
-                position_columns=definition.position_columns,
-                velocity_columns=definition.velocity_columns,
-                acceleration_columns=definition.acceleration_columns,
-                trial_columns=trial_columns,
-                column_map=definition.column_map,
+                definition=definition,
+                trial_columns=trial_columns,  # this includes all fileinfo_columns.
                 add_columns=fileinfo_columns,
+                # column_schema_overrides is used for fileinfo_columns passed as add_columns.
                 column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
-                **custom_read_kwargs,
             )
     elif filepath.suffix == '.feather':
         gaze_df = from_ipc(
             filepath,
             experiment=definition.experiment,
-            trial_columns=trial_columns,
+            trial_columns=trial_columns,  # this includes all fileinfo_columns.
             add_columns=fileinfo_columns,
+            # column_schema_overrides is used for fileinfo_columns passed as add_columns.
             column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
         )
     elif filepath.suffix == '.asc':
         gaze_df = from_asc(
             filepath,
-            experiment=definition.experiment,
-            trial_columns=trial_columns,
+            definition=definition,
+            trial_columns=trial_columns,  # this includes all fileinfo_columns.
             add_columns=fileinfo_columns,
+            # column_schema_overrides is used for fileinfo_columns passed as add_columns.
             column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
-            **custom_read_kwargs,
         )
     else:
         valid_extensions = ['csv', 'tsv', 'txt', 'feather', 'asc']
