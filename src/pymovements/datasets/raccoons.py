@@ -25,6 +25,9 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.gaze.experiment import Experiment
+from pymovements.gaze.eyetracker import EyeTracker
+from pymovements.gaze.screen import Screen
 
 
 @dataclass
@@ -51,10 +54,10 @@ class RaCCooNS(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, tuple[str, ...]]
+    mirrors: dict[str, list[str]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources: dict[str, tuple[dict[str, str | None], ...]]
+    resources: dict[str, list[dict[str, str | None]]]
         A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -63,6 +66,9 @@ class RaCCooNS(DatasetDefinition):
 
     extract: dict[str, bool]
         Decide whether to extract the data.
+
+    experiment: Experiment
+        The experiment definition.
 
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
@@ -114,42 +120,42 @@ class RaCCooNS(DatasetDefinition):
             'precomputed_reading_measures': True,
         },
     )
-    mirrors: dict[str, tuple[str, ...]] = field(
+    mirrors: dict[str, list[str]] = field(
         default_factory=lambda: {
-            'gaze': (
+            'gaze': [
                 'https://data.ru.nl/api/collectionfiles/ru/id/ru_395469/files/',
-            ),
-            'precomputed_events': (
+            ],
+            'precomputed_events': [
                 'https://data.ru.nl/api/collectionfiles/ru/id/ru_395469/files/',
-            ),
-            'precomputed_reading_measures': (
+            ],
+            'precomputed_reading_measures': [
                 'https://data.ru.nl/api/collectionfiles/ru/id/ru_395469/files/',
-            ),
+            ],
         },
     )
-    resources: dict[str, tuple[dict[str, str | None], ...]] = field(
+    resources: dict[str, list[dict[str, str | None]]] = field(
         default_factory=lambda: {
-            'gaze': (
+            'gaze': [
                 {
                     'resource': 'download/eyetracking%2FET_raw_data.zip',
                     'filename': 'ET_raw_data.zip',
                     'md5': None,  # type: ignore
                 },
-            ),
-            'precomputed_events': (
+            ],
+            'precomputed_events': [
                 {
                     'resource': 'download/eyetracking%2FET_fix_data.tsv',
                     'filename': 'ET_fix_data.tsv',
                     'md5': None,  # type: ignore
                 },
-            ),
-            'precomputed_reading_measures': (
+            ],
+            'precomputed_reading_measures': [
                 {
                     'resource': 'download/eyetracking%2FET_word_data.tsv',
                     'filename': 'ET_word_data.tsv',
                     'md5': None,  # type: ignore
                 },
-            ),
+            ],
         },
     )
 
@@ -159,6 +165,29 @@ class RaCCooNS(DatasetDefinition):
             'precomputed_events': False,
             'precomputed_reading_measures': False,
         },
+    )
+
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen=Screen(
+                width_px=1920,
+                # in the paper its written 1018, but assume typo
+                height_px=1080,
+                width_cm=56.8,
+                height_cm=33.5,
+                distance_cm=105.5,
+                origin='center',
+            ),
+            eyetracker=EyeTracker(
+                sampling_rate=1000,
+                # double check once data is back up
+                left=True,
+                right=False,
+                model='EyeLink 1000 Plus',
+                vendor='EyeLink',
+                mount='Desktop',
+            ),
+        ),
     )
 
     filename_format: dict[str, str] = field(
