@@ -188,7 +188,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
         },
     )
 
-    trial_columns: list[str] = field(
+    trial_columns: list[str] | None = field(
         default_factory=lambda: ['task', 'trial_id'],
     )
 
