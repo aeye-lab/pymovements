@@ -37,7 +37,7 @@ def download_dataset(
         *,
         extract: bool = True,
         remove_finished: bool = False,
-        resume: bool = False,
+        resume: bool = True,
         verbose: bool = True,
 ) -> None:
     """Download dataset resources.
@@ -65,7 +65,7 @@ def download_dataset(
         Remove archive files after extraction. (default: False)
     resume: bool
         Resume previous extraction by skipping existing files.
-        Checks for correct size of existing files but not integrity. (default: False)
+        Checks for correct size of existing files but not integrity. (default: True)
     verbose: bool
         If True, show progress of download and print status messages for integrity checking and
         file extraction. (default: True)
@@ -145,7 +145,7 @@ def extract_dataset(
         *,
         remove_finished: bool = False,
         remove_top_level: bool = True,
-        resume: bool = False,
+        resume: bool = True,
         verbose: int = 1,
 ) -> None:
     """Extract downloaded dataset archive files.
@@ -162,7 +162,7 @@ def extract_dataset(
         If ``True``, remove the top-level directory if it has only one child. (default: True)
     resume: bool
         Resume previous extraction by skipping existing files.
-        Checks for correct size of existing files but not integrity. (default: False)
+        Checks for correct size of existing files but not integrity. (default: True)
     verbose: int
         Verbosity levels: (1) Print messages for extracting each dataset resource without printing
         messages for recursive archives. (2) Print messages for extracting each dataset resource and
