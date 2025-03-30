@@ -27,7 +27,6 @@ import polars as pl
 
 from pymovements.gaze._utils.parsing import parse_eyelink
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.eyetracker import EyeTracker
 from pymovements.gaze.gaze_dataframe import GazeDataFrame  # pylint: disable=cyclic-import
 
 
@@ -37,7 +36,7 @@ def from_csv(
         *,
         trial_columns: str | list[str] | None = None,
         time_column: str | None = None,
-        time_unit: str | None = 'ms',
+        time_unit: str | None = None,
         pixel_columns: list[str] | None = None,
         position_columns: list[str] | None = None,
         velocity_columns: list[str] | None = None,
@@ -64,10 +63,10 @@ def from_csv(
     time_column: str | None
         The name of the timestamp column in the input data frame. (default: None)
     time_unit: str | None
-        The unit of the timestamps in the timespamp column in the input data frame. Supported
+        The unit of the timestamps in the timestamp column in the input data frame. Supported
         units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
         'step' the experiment definition must be specified. All timestamps will be converted to
-        milliseconds. (default: 'ms')
+        milliseconds. If time_unit is None, milliseconds are assumed. (default: None)
     pixel_columns: list[str] | None
         The name of the pixel position columns in the input data frame. These columns will be
         nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
@@ -376,8 +375,6 @@ def from_asc(
 
     if experiment is None:
         experiment = Experiment(sampling_rate=metadata['sampling_rate'])
-    if experiment.eyetracker is None:
-        experiment.eyetracker = EyeTracker()
 
     # Compare metadata from experiment definition with metadata from ASC file.
     # Fill in missing metadata in experiment definition and raise an error if there are conflicts
@@ -391,9 +388,7 @@ def from_asc(
         issues.append(f"Screen resolution: {experiment_resolution} vs. {metadata['resolution']}")
 
     # Sampling rate
-    if experiment.eyetracker.sampling_rate is None:
-        experiment.eyetracker.sampling_rate = metadata['sampling_rate']
-    elif experiment.eyetracker.sampling_rate != metadata['sampling_rate']:
+    if experiment.eyetracker.sampling_rate != metadata['sampling_rate']:
         issues.append(
             f"Sampling rate: {experiment.eyetracker.sampling_rate} vs. {metadata['sampling_rate']}",
         )
