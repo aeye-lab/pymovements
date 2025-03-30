@@ -19,7 +19,7 @@
 # SOFTWARE.
 """Provides path specific funtions.
 
-.. deprecated:: v0.21.0
+.. deprecated:: v0.21.1
    This module will be removed in v0.26.0.
 """
 from __future__ import annotations
@@ -35,7 +35,7 @@ from pymovements._utils._paths import match_filepaths as _match_filepaths
 
 @deprecated(
     reason='This function will be removed in v0.26.0.',
-    version='v0.21.0',
+    version='v0.21.1',
 )
 def get_filepaths(
         path: str | Path,
@@ -46,7 +46,7 @@ def get_filepaths(
 
     Passing extension and regex is mutually exclusive.
 
-    .. deprecated:: v0.21.0
+    .. deprecated:: v0.21.1
        This module will be removed in v0.26.0.
 
     Parameters
@@ -76,7 +76,7 @@ def get_filepaths(
 
 @deprecated(
     reason='This function will be removed in v0.26.0.',
-    version='v0.21.0',
+    version='v0.21.1',
 )
 def match_filepaths(
         path: str | Path,
@@ -86,7 +86,7 @@ def match_filepaths(
 ) -> list[dict[str, str]]:
     """Traverse path and match regular expression.
 
-    .. deprecated:: v0.21.0
+    .. deprecated:: v0.21.1
        This module will be removed in v0.26.0.
 
     Parameters

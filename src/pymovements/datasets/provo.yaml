@@ -1,0 +1,33 @@
+name: "Provo"
+
+has_files:
+  gaze: false
+  precomputed_events: true
+  precomputed_reading_measures: false
+
+mirrors:
+  precomputed_events:
+    - "https://osf.io/download/"
+
+resources:
+  precomputed_events:
+    - resource: "z3eh6/"
+      filename: "Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv"
+      md5: "7aa239e51e5d78528e2430f84a23da3f"
+
+extract:
+  precomputed_events: false
+
+filename_format:
+  precomputed_events: "Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv"
+
+filename_format_schema_overrides:
+  precomputed_events: {}
+
+custom_read_kwargs:
+  precomputed_events:
+    schema_overrides:
+      RECORDING_SESSION_LABEL: !polars.Utf8
+    encoding: "macroman"
+    null_values:
+      - "."
