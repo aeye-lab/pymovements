@@ -25,11 +25,9 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.dataset_library import register_dataset
 
 
 @dataclass
-@register_dataset
 class RaCCooNS(DatasetDefinition):
     """RaCCooNS dataset :cite:p:`RaCCooNS`.
 
@@ -88,8 +86,8 @@ class RaCCooNS(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.RaCCooNS` definition:
+    Initialize your :py:class:`~pymovements.Dataset` object with the
+    :py:class:`~pymovements.datasets.RaCCooNS` definition:
 
     >>> import pymovements as pm
     >>>
@@ -105,7 +103,7 @@ class RaCCooNS(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'RaCCooNS'
 
