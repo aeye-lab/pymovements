@@ -34,8 +34,8 @@ from tqdm import tqdm
 import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
-from pymovements.utils import checks
 from pymovements.utils.aois import get_aoi
+from pymovements.utils.checks import check_is_mutual_exclusive
 
 
 class GazeDataFrame:
@@ -88,6 +88,20 @@ class GazeDataFrame:
         in the input data frame. If specified, the column will be used for pixel to dva
         transformations. If not specified, the constant eye-to-screen distance will be taken
         from the experiment definition. This column will be renamed to ``distance``. (default: None)
+
+    Attributes
+    ----------
+    frame: pl.DataFrame
+        A dataframe to be transformed to a polars dataframe.
+    events: pm.EventDataFrame
+        A dataframe of events in the gaze signal.
+    experiment : Experiment | None
+        The experiment definition.
+    trial_columns: list[str] | None
+        The name of the trial columns in the data frame. If not None, the transformation methods
+        will be applied to each trial separately.
+    n_components: int | None
+        The number of components in the pixel, position, velocity and acceleration columns.
 
     Notes
     -----
@@ -180,6 +194,16 @@ class GazeDataFrame:
     └──────┴────────────┘
     """
 
+    frame: pl.DataFrame
+
+    events: pm.EventDataFrame
+
+    experiment: Experiment | None
+
+    trial_columns: list[str] | None
+
+    n_components: int | None
+
     def __init__(
             self,
             data: pl.DataFrame | None = None,
@@ -205,82 +229,19 @@ class GazeDataFrame:
         # Set nan values to null.
         self.frame = self.frame.fill_nan(None)
 
-        trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
-        if trial_columns is not None and len(trial_columns) == 0:
-            trial_columns = None
-        _check_trial_columns(trial_columns, data)
-
-        self.trial_columns = trial_columns
         self.experiment = experiment
 
-        # In case the 'time' column is already present we don't need to do anything.
-        # Otherwise, create a new time column starting with zero and set time unit to steps
-        if time_column is None and 'time' not in self.frame.columns:
-            # In case we have an experiment with sampling rate given, we create a time
-            if experiment is not None and experiment.sampling_rate is not None:
-                self.frame = self.frame.with_columns(
-                    time=pl.arange(0, len(self.frame)),
-                )
-
-                time_column = 'time'
-                time_unit = 'step'
-
-        # If no time_unit specified, assume milliseconds.
-        if self.frame is not None and time_unit is None:
-            time_unit = 'ms'
-
-        if time_column is not None:
-            self.frame = self.frame.rename({time_column: 'time'})
-
-        if 'time' in self.frame.columns:
-            self._convert_time_units(time_unit)
-
-        if distance_column is not None:
-            self.frame = self.frame.rename({distance_column: 'distance'})
-
-        # List of passed not-None column specifier lists.
-        # The list will be used for inferring n_components.
-        column_specifiers: list[list[str]] = []
-
-        component_suffixes = ['x', 'y', 'xl', 'yl', 'xr', 'yr', 'xa', 'ya']
-
-        if auto_column_detect and pixel_columns is None:
-            column_canditates = ['pixel_' + suffix for suffix in component_suffixes]
-            pixel_columns = [c for c in column_canditates if c in self.frame.columns]
-
-        if pixel_columns:
-            self._check_component_columns(pixel_columns=pixel_columns)
-            self.nest(pixel_columns, output_column='pixel')
-            column_specifiers.append(pixel_columns)
-
-        if auto_column_detect and position_columns is None:
-            column_canditates = ['position_' + suffix for suffix in component_suffixes]
-            position_columns = [c for c in column_canditates if c in self.frame.columns]
-
-        if position_columns:
-            self._check_component_columns(position_columns=position_columns)
-            self.nest(position_columns, output_column='position')
-            column_specifiers.append(position_columns)
-
-        if auto_column_detect and velocity_columns is None:
-            column_canditates = ['velocity_' + suffix for suffix in component_suffixes]
-            velocity_columns = [c for c in column_canditates if c in self.frame.columns]
-
-        if velocity_columns:
-            self._check_component_columns(velocity_columns=velocity_columns)
-            self.nest(velocity_columns, output_column='velocity')
-            column_specifiers.append(velocity_columns)
-
-        if auto_column_detect and acceleration_columns is None:
-            column_canditates = ['acceleration_' + suffix for suffix in component_suffixes]
-            acceleration_columns = [c for c in column_canditates if c in self.frame.columns]
-
-        if acceleration_columns:
-            self._check_component_columns(acceleration_columns=acceleration_columns)
-            self.nest(acceleration_columns, output_column='acceleration')
-            column_specifiers.append(acceleration_columns)
-
-        self.n_components = self._infer_n_components(column_specifiers)
+        self._init_columns(
+            trial_columns=trial_columns,
+            time_column=time_column,
+            time_unit=time_unit,
+            pixel_columns=pixel_columns,
+            position_columns=position_columns,
+            velocity_columns=velocity_columns,
+            acceleration_columns=acceleration_columns,
+            distance_column=distance_column,
+            auto_column_detect=auto_column_detect,
+        )
 
         if events is None:
             if self.trial_columns is None:
@@ -1148,7 +1109,7 @@ class GazeDataFrame:
                 'input column instead.',
             )
 
-        checks.check_is_mutual_exclusive(
+        check_is_mutual_exclusive(
             output_columns=output_columns,
             output_suffixes=output_suffixes,
         )
@@ -1445,6 +1406,108 @@ class GazeDataFrame:
 
         return kwargs
 
+    def _init_columns(
+            self,
+            auto_column_detect: bool = False,
+            trial_columns: str | list[str] | None = None,
+            time_column: str | None = None,
+            time_unit: str | None = None,
+            pixel_columns: list[str] | None = None,
+            position_columns: list[str] | None = None,
+            velocity_columns: list[str] | None = None,
+            acceleration_columns: list[str] | None = None,
+            distance_column: str | None = None,
+    ) -> None:
+        """Initialize dataframe columns."""
+        # Initialize trial_columns.
+        trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
+        if trial_columns is not None and len(trial_columns) == 0:
+            trial_columns = None
+        _check_trial_columns(trial_columns, self.frame)
+        self.trial_columns = trial_columns
+
+        # Initialize time column.
+        self._init_time_column(time_column, time_unit)
+
+        # Rename distance column if necessary.
+        if distance_column is not None and distance_column != 'distance':
+            self.frame = self.frame.rename({distance_column: 'distance'})
+
+        # Autodetect column names.
+        component_suffixes = ['x', 'y', 'xl', 'yl', 'xr', 'yr', 'xa', 'ya']
+
+        if auto_column_detect and pixel_columns is None:
+            column_canditates = ['pixel_' + suffix for suffix in component_suffixes]
+            pixel_columns = [c for c in column_canditates if c in self.frame.columns]
+
+        if auto_column_detect and position_columns is None:
+            column_canditates = ['position_' + suffix for suffix in component_suffixes]
+            position_columns = [c for c in column_canditates if c in self.frame.columns]
+
+        if auto_column_detect and velocity_columns is None:
+            column_canditates = ['velocity_' + suffix for suffix in component_suffixes]
+            velocity_columns = [c for c in column_canditates if c in self.frame.columns]
+
+        if auto_column_detect and acceleration_columns is None:
+            column_canditates = ['acceleration_' + suffix for suffix in component_suffixes]
+            acceleration_columns = [c for c in column_canditates if c in self.frame.columns]
+
+        # List of passed not-None column specifier lists.
+        # The list will be used for inferring n_components.
+        column_specifiers: list[list[str]] = []
+
+        # Nest multi-component columns.
+        if pixel_columns:
+            self._check_component_columns(pixel_columns=pixel_columns)
+            self.nest(pixel_columns, output_column='pixel')
+            column_specifiers.append(pixel_columns)
+
+        if position_columns:
+            self._check_component_columns(position_columns=position_columns)
+            self.nest(position_columns, output_column='position')
+            column_specifiers.append(position_columns)
+
+        if velocity_columns:
+            self._check_component_columns(velocity_columns=velocity_columns)
+            self.nest(velocity_columns, output_column='velocity')
+            column_specifiers.append(velocity_columns)
+
+        if acceleration_columns:
+            self._check_component_columns(acceleration_columns=acceleration_columns)
+            self.nest(acceleration_columns, output_column='acceleration')
+            column_specifiers.append(acceleration_columns)
+
+        self.n_components = self._infer_n_components(column_specifiers)
+
+    def _init_time_column(
+            self,
+            time_column: str | None = None,
+            time_unit: str | None = None,
+    ) -> None:
+        """Initialize time column."""
+        # If no time column exists, create a new one starting with zero and set time unit to steps.
+        if time_column is None and 'time' not in self.frame.columns:
+            # In case we have an experiment with sampling rate given, we create a time
+            if self.experiment is not None and self.experiment.sampling_rate is not None:
+                self.frame = self.frame.with_columns(
+                    time=pl.arange(0, len(self.frame)),
+                )
+
+                time_column = 'time'
+                time_unit = 'step'
+
+        # If no time_unit specified, assume milliseconds.
+        if time_unit is None:
+            time_unit = 'ms'
+
+        # Rename time_column to 'time'.
+        if time_column is not None and time_column != 'time':
+            self.frame = self.frame.rename({time_column: 'time'})
+
+        # Convert time column to milliseconds.
+        if 'time' in self.frame.columns:
+            self._convert_time_units(time_unit)
+
     def _convert_time_units(self, time_unit: str | None) -> None:
         """Convert the time column to milliseconds based on the specified time unit."""
         if time_unit == 's':
@@ -1478,14 +1541,14 @@ class GazeDataFrame:
                     pl.col('time').cast(pl.Int64),
                 )
 
-    def __str__(self: Any) -> str:
+    def __str__(self) -> str:
         """Return string representation of GazeDataFrame."""
         if self.experiment is None:
             return self.frame.__str__()
 
         return self.experiment.__str__() + '\n' + self.frame.__str__()
 
-    def __repr__(self: Any) -> str:
+    def __repr__(self) -> str:
         """Return string representation of GazeDataFrame."""
         return self.__str__()
 
