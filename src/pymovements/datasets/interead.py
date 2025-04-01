@@ -45,6 +45,10 @@ class InteRead(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    info: str
+        Information about the dataset including but not limited to original citation,
+        general information.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -123,6 +127,44 @@ class InteRead(DatasetDefinition):
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'InteRead'
+
+    info: str = """\
+InteRead dataset :cite:p:`InteRead`.
+
+This dataset includes monocular eye tracking data in an interrupted reading task.
+Automatic interruption occured during a reading task and participants continued
+reading after the pause.
+Eye movements are recorded at a sampling frequency of 1200Hz with video-based eye tracker.
+Provided data are raw gaze samples and precomputed event files both in pixel coordinates.
+
+For more details, check the paper :cite:p:`InteRead`.
+
+If you use the dataset, please cite:
+
+@inproceedings{InteRead,
+  title = {{I}nte{R}ead: An Eye Tracking Dataset of Interrupted Reading},
+  author = {Zermiani, Francesca  and
+    Dhar, Prajit  and
+    Sood, Ekta  and
+    K{\\"o}gel, Fabian  and
+    Bulling, Andreas  and
+    Wirzberger, Maria},
+  editor = {Calzolari, Nicoletta  and
+    Kan, Min-Yen  and
+    Hoste, Veronique  and
+    Lenci, Alessandro  and
+    Sakti, Sakriani  and
+    Xue, Nianwen},
+  booktitle = {Proceedings of the 2024 Joint International Conference on Computational Linguistics,
+  Language Resources and Evaluation (LREC-COLING 2024)},
+  month = may,
+  year = {2024},
+  address = {Torino, Italia},
+  publisher = {ELRA and ICCL},
+  url = {https://aclanthology.org/2024.lrec-main.802},
+  pages= {9154--9169},
+}
+"""
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
