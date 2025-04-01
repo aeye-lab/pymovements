@@ -106,6 +106,20 @@ class GazeDataFrame:
     n_components: int | None
         The number of components in the pixel, position, velocity and acceleration columns.
 
+    Attributes
+    ----------
+    frame: pl.DataFrame
+        A dataframe to be transformed to a polars dataframe.
+    events: pm.EventDataFrame
+        A dataframe of events in the gaze signal.
+    experiment : Experiment | None
+        The experiment definition.
+    trial_columns: list[str] | None
+        The name of the trial columns in the data frame. If not None, the transformation methods
+        will be applied to each trial separately.
+    n_components: int | None
+        The number of components in the pixel, position, velocity and acceleration columns.
+
     Notes
     -----
     About using the arguments ``pixel_columns``, ``position_columns``, ``velocity_columns``,
@@ -1413,7 +1427,6 @@ class GazeDataFrame:
 
     def _init_columns(
             self,
-            definition: pm.DatasetDefinition | None = None,
             auto_column_detect: bool = False,
             trial_columns: str | list[str] | None = None,
             time_column: str | None = None,
@@ -1423,6 +1436,7 @@ class GazeDataFrame:
             velocity_columns: list[str] | None = None,
             acceleration_columns: list[str] | None = None,
             distance_column: str | None = None,
+            definition: pm.DatasetDefinition | None = None,
     ) -> None:
         """Initialize dataframe columns."""
         # Explicit arguments take precedence over definition.
