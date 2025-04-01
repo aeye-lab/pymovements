@@ -534,7 +534,7 @@ def test_from_asc_fills_in_experiment_metadata(init_kwargs, expected_experiment)
                 'file': 'tests/files/eyelink_monocular_example.asc',
                 'definition': ToyDatasetEyeLink(),
             },
-            ['task', 'trial_id', 'screen_id', 'point_id'],
+            ['task', 'trial_id'],
             id='eyelink_asc_mono_definition',
         ),
 
