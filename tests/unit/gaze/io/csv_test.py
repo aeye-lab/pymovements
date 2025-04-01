@@ -37,6 +37,20 @@ import pymovements as pm
             (10, 2),
             id='csv_mono_shape',
         ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/monocular_example.csv',
+                'column_map': {
+                    'x_left_pix': 'pixel_xl',
+                    'y_left_pix': 'pixel_yl',
+                },
+                'auto_column_detect': True,
+            },
+            (10, 2),
+            id='csv_mono_shape_auto_column_detect',
+        ),
+
         pytest.param(
             {
                 'file': 'tests/files/binocular_example.csv',
@@ -48,6 +62,26 @@ import pymovements as pm
             (10, 3),
             id='csv_bino_shape',
         ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/binocular_example.csv',
+                'column_map': {
+                    'x_left_pix': 'pixel_xl',
+                    'y_left_pix': 'pixel_yl',
+                    'x_right_pix': 'pixel_xr',
+                    'y_right_pix': 'pixel_yr',
+                    'x_left_pos': 'position_xl',
+                    'y_left_pos': 'position_yl',
+                    'x_right_pos': 'position_xr',
+                    'y_right_pos': 'position_yr',
+                },
+                'auto_column_detect': True,
+            },
+            (10, 3),
+            id='csv_bino_shape_auto_column_detect',
+        ),
+
         pytest.param(
             {
                 'file': 'tests/files/hbn_example.csv',
@@ -59,6 +93,7 @@ import pymovements as pm
             (10, 2),
             id='hbn_dataset_example',
         ),
+
         pytest.param(
             {
                 'file': 'tests/files/sbsat_example.csv',
@@ -70,6 +105,7 @@ import pymovements as pm
             (10, 5),
             id='sbsat_dataset_example',
         ),
+
         pytest.param(
             {
                 'file': 'tests/files/gazebase_example.csv',
@@ -81,6 +117,7 @@ import pymovements as pm
             (10, 7),
             id='gazebase_dataset_example',
         ),
+
         pytest.param(
             {
                 'file': 'tests/files/gaze_on_faces_example.csv',
@@ -92,6 +129,7 @@ import pymovements as pm
             (10, 1),
             id='gaze_on_faces_dataset_example',
         ),
+
         pytest.param(
             {
                 'file': 'tests/files/gazebase_vr_example.csv',
@@ -102,6 +140,7 @@ import pymovements as pm
             (10, 11),
             id='gazebase_vr_dataset_example',
         ),
+
         pytest.param(
             {
                 'file': 'tests/files/judo1000_example.csv',
