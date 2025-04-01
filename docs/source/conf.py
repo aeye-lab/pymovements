@@ -59,10 +59,11 @@ author = 'The pymovements Project Authors'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
-    'sphinx.ext.napoleon',
+    'sphinx.ext.coverage',
+    'sphinx.ext.extlinks',
     'sphinx.ext.linkcode',
     'sphinx.ext.mathjax',
-    'sphinx.ext.extlinks',
+    'sphinx.ext.napoleon',
     'sphinx_copybutton',
     'sphinx_design',
     'sphinx_favicon',
@@ -71,6 +72,10 @@ extensions = [
     'sphinxcontrib.bibtex',
     'nbsphinx',
 ]
+
+coverage_modules = ['pymovements']
+coverage_show_missing_items = True
+coverage_statistics_to_stdout = True
 
 
 def config_inited_handler(app, config):

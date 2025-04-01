@@ -41,7 +41,7 @@ yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
 
 @dataclass
 class DatasetDefinition:
-    """Definition to initialize a :py:class:`~pymovements.dataset.Dataset`.
+    """Definition to initialize a :py:class:`~Dataset`.
 
     Attributes
     ----------
