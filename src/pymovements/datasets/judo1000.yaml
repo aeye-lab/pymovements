@@ -5,13 +5,9 @@ has_files:
   precomputed_events: false
   precomputed_reading_measures: false
 
-mirrors:
-  gaze:
-    - "https://osf.io/download/"
-
 resources:
   gaze:
-    - resource: "4wy7s/"
+    - resource: "https://osf.io/download/4wy7s/"
       filename: "JuDo1000.zip"
       md5: "b8b9e5bb65b78d6f2bd260451cdd89f8"
 

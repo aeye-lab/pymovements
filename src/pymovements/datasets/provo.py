@@ -51,9 +51,6 @@ class Provo(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
-
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
@@ -108,24 +105,20 @@ class Provo(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': ['https://osf.io/download/'],
-            },
-    )
+
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda:
             {
                 'precomputed_events': [
                     {
-                        'resource': 'z3eh6/',
+                        'resource': 'https://osf.io/download/z3eh6/',
                         'filename': 'Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv',
                         'md5': '7aa239e51e5d78528e2430f84a23da3f',
                     },
                 ],
             },
     )
+
     extract: dict[str, bool] = field(
         default_factory=lambda: {
             'precomputed_events': False,
