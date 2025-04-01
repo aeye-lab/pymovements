@@ -44,7 +44,7 @@ def extract_archive(
         recursive: bool = True,
         remove_finished: bool = False,
         remove_top_level: bool = True,
-        resume: bool = False,
+        resume: bool = True,
         verbose: int = 1,
 ) -> Path:
     """Extract an archive.
@@ -67,7 +67,7 @@ def extract_archive(
         If ``True``, remove the top-level directory if it has only one child. (default: True)
     resume: bool
         Resume previous extraction by skipping existing files.
-        Checks for correct size of existing files but not integrity. (default: False)
+        Checks for correct size of existing files but not integrity. (default: True)
     verbose: int
         Verbosity levels: (1) Print messages for extracting each dataset resource without printing
         messages for recursive archives. (2) Print additional messages for each recursive archive

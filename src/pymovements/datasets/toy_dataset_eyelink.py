@@ -189,7 +189,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
     )
 
     trial_columns: list[str] | None = field(
-        default_factory=lambda: ['task', 'trial_id', 'screen_id', 'point_id'],
+        default_factory=lambda: ['task', 'trial_id'],
     )
 
     time_column: str = 'time'

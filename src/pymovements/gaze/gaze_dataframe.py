@@ -1461,9 +1461,11 @@ class GazeDataFrame:
         # Initialize time column.
         self._init_time_column(time_column, time_unit)
 
-        if distance_column is not None:
+        # Rename distance column if necessary.
+        if distance_column is not None and distance_column != 'distance':
             self.frame = self.frame.rename({distance_column: 'distance'})
 
+        # Autodetect column names.
         component_suffixes = ['x', 'y', 'xl', 'yl', 'xr', 'yr', 'xa', 'ya']
 
         if auto_column_detect and pixel_columns is None:
@@ -1486,6 +1488,7 @@ class GazeDataFrame:
         # The list will be used for inferring n_components.
         column_specifiers: list[list[str]] = []
 
+        # Nest multi-component columns.
         if pixel_columns:
             self._check_component_columns(pixel_columns=pixel_columns)
             self.nest(pixel_columns, output_column='pixel')
