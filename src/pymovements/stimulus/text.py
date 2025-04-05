@@ -26,6 +26,8 @@ from typing import Any
 
 import polars as pl
 
+from pymovements._utils import _checks
+
 
 class TextStimulus:
     """A DataFrame for the text stimulus that the gaze data was recorded on.
@@ -111,6 +113,84 @@ class TextStimulus:
             )
             for df in self.aois.partition_by(by=by, as_dict=False)
         ]
+
+    def get_aoi(
+            self,
+            row: pl.DataFrame.row,
+            *,
+            x_eye: str,
+            y_eye: str,
+    ) -> str:
+        """Given eye movement and aoi dataframe, return aoi.
+
+        If `width` is used, calculation: start_x_column <= x_eye < start_x_column + width.
+        If `end_x_column` is used, calculation: start_x_column <= x_eye < end_x_column.
+        Analog for y coordinate and height.
+
+        Parameters
+        ----------
+        row: pl.DataFrame.row
+            Eye movement row.
+        x_eye: str
+            Name of x eye coordinate.
+        y_eye: str
+            Name of y eye coordinate.
+
+        Returns
+        -------
+        str
+            Looked at area of interest.
+
+        Raises
+        ------
+        ValueError
+            If width and end_TYPE_column is None.
+        """
+        if self.width_column is not None:
+            _checks.check_is_none_is_mutual(
+                height_column=self.width_column,
+                width_column=self.height_column,
+            )
+            aoi = self.aois.filter(
+                (self.aois[self.start_x_column] <= row[x_eye]) &
+                (
+                    row[x_eye] <
+                    self.aois[self.start_x_column] +
+                    self.aois[self.width_column]
+                ) &
+                (self.aois[self.start_y_column] <= row[y_eye]) &
+                (
+                    row[y_eye] <
+                    self.aois[self.start_y_column] +
+                    self.aois[self.height_column]
+                ),
+            )
+
+            if aoi.is_empty():
+                aoi.extend(pl.from_dict({col: None for col in aoi.columns}))
+            return aoi
+
+        if self.end_x_column is not None:
+            _checks.check_is_none_is_mutual(
+                end_x_column=self.end_x_column,
+                end_y_column=self.end_y_column,
+            )
+            aoi = self.aois.filter(
+                # x-coordinate: within bounding box
+                (self.aois[self.start_x_column] <= row[x_eye]) &
+                (row[x_eye] < self.aois[self.end_x_column]) &
+                # y-coordinate: within bounding box
+                (self.aois[self.start_y_column] <= row[y_eye]) &
+                (row[y_eye] < self.aois[self.end_y_column]),
+            )
+
+            if aoi.is_empty():
+                aoi.extend(pl.from_dict({col: None for col in aoi.columns}))
+
+            return aoi
+        raise ValueError(
+            'either TextStimulus.width or TextStimulus.end_x_column have to be not None',
+        )
 
 
 def from_file(

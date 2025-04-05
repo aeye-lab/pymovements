@@ -29,8 +29,9 @@ from typing import Any
 import polars as pl
 from tqdm.auto import tqdm
 
-from pymovements.dataset import dataset_download
 from pymovements.dataset import dataset_files
+from pymovements.dataset._archives import _extract_dataset
+from pymovements.dataset._downloads import _download_dataset
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_paths import DatasetPaths
@@ -153,7 +154,7 @@ class Dataset:
         if self.definition.has_files['precomputed_reading_measures']:
             self.load_precomputed_reading_measures()
 
-        # Events extracted previously by pymovements
+        # Events detected previously by pymovements
         if events:
             self.load_event_files(
                 events_dirname=events_dirname,
@@ -1008,7 +1009,7 @@ class Dataset:
         RuntimeError
             If downloading a resource failed for all given mirrors.
         """
-        dataset_download.download_dataset(
+        _download_dataset(
             definition=self.definition,
             paths=self.paths,
             extract=extract,
@@ -1047,7 +1048,7 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
-        dataset_download.extract_dataset(
+        _extract_dataset(
             definition=self.definition,
             paths=self.paths,
             remove_finished=remove_finished,

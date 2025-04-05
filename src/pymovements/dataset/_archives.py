@@ -35,9 +35,68 @@ from typing import IO
 from tqdm import tqdm
 
 from pymovements._utils._paths import get_filepaths
+from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.dataset_paths import DatasetPaths
 
 
-def extract_archive(
+def _extract_dataset(
+        definition: DatasetDefinition,
+        paths: DatasetPaths,
+        *,
+        remove_finished: bool = False,
+        remove_top_level: bool = True,
+        resume: bool = True,
+        verbose: int = 1,
+) -> None:
+    """Extract downloaded dataset archive files.
+
+    Parameters
+    ----------
+    definition: DatasetDefinition
+        The dataset definition.
+    paths: DatasetPaths
+        The dataset paths.
+    remove_finished: bool
+        Remove archive files after extraction. (default: False)
+    remove_top_level: bool
+        If ``True``, remove the top-level directory if it has only one child. (default: True)
+    resume: bool
+        Resume previous extraction by skipping existing files.
+        Checks for correct size of existing files but not integrity. (default: True)
+    verbose: int
+        Verbosity levels: (1) Print messages for extracting each dataset resource without printing
+        messages for recursive archives. (2) Print messages for extracting each dataset resource and
+        each recursive archive extract. (default: 1)
+    """
+    content_dirnames = {
+        'gaze': 'raw',
+        'precomputed_events': 'precomputed_events',
+        'precomputed_reading_measures': 'precomputed_reading_measures',
+    }
+
+    for content, content_directory in content_dirnames.items():
+        if definition.has_files[content]:
+            destination_dirpath = getattr(paths, content_directory)
+            destination_dirpath.mkdir(parents=True, exist_ok=True)
+            for resource in definition.resources[content]:
+                source_path = paths.downloads / resource['filename']
+
+                archive_type, compression_type = _detect_file_type(source_path)
+                if not archive_type and not compression_type:
+                    shutil.copy(source_path, destination_dirpath / resource['filename'])
+                else:
+                    _extract_archive(
+                        source_path=source_path,
+                        destination_path=destination_dirpath,
+                        recursive=True,
+                        remove_finished=remove_finished,
+                        remove_top_level=remove_top_level,
+                        resume=resume,
+                        verbose=verbose,
+                    )
+
+
+def _extract_archive(
         source_path: Path,
         destination_path: Path | None = None,
         *,
@@ -79,6 +138,17 @@ def extract_archive(
         Path to the directory the file was extracted to.
     """
     archive_type, compression_type = _detect_file_type(source_path)
+
+    if not archive_type and not compression_type:
+        # Raise error as we didn't find a valid suffix.
+        suffixes = ''.join(source_path.suffixes[-2:])
+        valid_suffixes = sorted(
+            set(_ARCHIVE_TYPE_ALIASES) | set(_ARCHIVE_EXTRACTORS) | set(_COMPRESSED_FILE_OPENERS),
+        )
+        raise RuntimeError(
+            f"Unsupported compression or archive type: '{suffixes}'.\n"
+            f"Supported suffixes are: '{valid_suffixes}'.",
+        )
 
     if not archive_type:
         return _decompress(
@@ -135,7 +205,7 @@ def extract_archive(
         for archive_filepath in archive_filepaths:
             extract_destination = archive_filepath.parent / archive_filepath.stem
 
-            extract_archive(
+            _extract_archive(
                 source_path=archive_filepath,
                 destination_path=extract_destination,
                 recursive=recursive,
@@ -296,10 +366,7 @@ def _detect_file_type(filepath: Path) -> tuple[str | None, str | None]:
 
             # Check if the second last suffix refers to an archive type.
             if (suffix2 := suffixes[-2]) not in _ARCHIVE_EXTRACTORS:
-                raise RuntimeError(
-                    f"Unsupported archive type: '{suffix2}'.\n"
-                    f"Supported suffixes are: '{sorted(set(_ARCHIVE_EXTRACTORS))}'.",
-                )
+                return None, None
             # We detected a compressed archive file (e.g. tar.gz).
             return suffix2, suffix
 
@@ -310,10 +377,7 @@ def _detect_file_type(filepath: Path) -> tuple[str | None, str | None]:
     valid_suffixes = sorted(
         set(_ARCHIVE_TYPE_ALIASES) | set(_ARCHIVE_EXTRACTORS) | set(_COMPRESSED_FILE_OPENERS),
     )
-    raise RuntimeError(
-        f"Unsupported compression or archive type: '{suffix}'.\n"
-        f"Supported suffixes are: '{valid_suffixes}'.",
-    )
+    return None, None
 
 
 def _decompress(

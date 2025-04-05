@@ -21,7 +21,6 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from pathlib import Path
 from typing import Literal
 from typing import Union
 
@@ -214,49 +213,6 @@ def setup_matplotlib(
         cmap_norm = norm_class(matplotlib.colors.Normalize)()
 
     return fig, ax, cmap, cmap_norm, cval, show_cbar
-
-
-def draw_image_stimulus(
-        image_stimulus: str | Path,
-        origin: str = 'upper',
-        show: bool = False,
-        figsize: tuple[float, float] = (15, 10),
-        extent: list[float] | None = None,
-        fig: matplotlib.pyplot.figure | None = None,
-        ax: matplotlib.pyplot.Axes | None = None,
-) -> tuple[matplotlib.pyplot.figure, matplotlib.pyplot.Axes]:
-    """Draw stimulus.
-
-    Parameters
-    ----------
-    image_stimulus: str | Path
-        Path to image stimulus.
-    origin: str
-        Origin how to draw the image.
-    show: bool
-        Boolean whether to show the image. (default: False)
-    figsize: tuple[float, float]
-        Size of the figure. (default: (15, 10))
-    extent: list[float] | None
-        Extent of image. (default: None)
-    fig: matplotlib.pyplot.figure | None
-        Matplotlib canvas. (default: None)
-    ax: matplotlib.pyplot.Axes | None
-        Matplotlib axes. (default: None)
-
-    Returns
-    -------
-    fig: matplotlib.pyplot.figure
-    ax: matplotlib.pyplot.Axes
-    """
-    img = PIL.Image.open(image_stimulus)
-    if not fig:
-        fig, ax = matplotlib.pyplot.subplots(figsize=figsize)
-    assert ax
-    ax.imshow(img, origin=origin, extent=extent)
-    if show:
-        matplotlib.pyplot.show()
-    return fig, ax
 
 
 def draw_line_data(

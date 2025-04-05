@@ -25,7 +25,6 @@ from typing import Any
 import numpy as np
 from scipy.signal import savgol_filter
 
-from pymovements.utils import checks
 
 
 def pix2deg(

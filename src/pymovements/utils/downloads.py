@@ -29,9 +29,8 @@ from pathlib import Path
 
 from deprecated.sphinx import deprecated
 
-from pymovements.dataset._utils._downloads import download_and_extract_archive \
-    as _download_and_extract_archive
-from pymovements.dataset._utils._downloads import download_file as _download_file
+from pymovements.dataset._archives import _extract_archive
+from pymovements.dataset._downloads import _download_file
 
 
 @deprecated(
@@ -85,15 +84,24 @@ def download_and_extract_archive(
         If the downloaded file has no suffix or suffix is not supported, or in case of a
         specified MD5 checksum which doesn't match the checksum of the downloaded file.
     """
-    return _download_and_extract_archive(
+    archive_path = _download_file(
         url=url,
-        download_dirpath=download_dirpath,
-        download_filename=download_filename,
-        extract_dirpath=extract_dirpath,
+        dirpath=download_dirpath,
+        filename=download_filename,
         md5=md5,
+        verbose=bool(verbose),
+    )
+
+    if extract_dirpath is None:
+        extract_dirpath = download_dirpath
+
+    _extract_archive(
+        source_path=archive_path,
+        destination_path=extract_dirpath,
         recursive=recursive,
         remove_finished=remove_finished,
         remove_top_level=remove_top_level,
+        resume=resume,
         verbose=verbose,
     )
 

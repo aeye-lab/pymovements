@@ -28,9 +28,9 @@ import matplotlib.scale
 import numpy as np
 
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
-from pymovements.utils.plotting import draw_line_data
-from pymovements.utils.plotting import LinearSegmentedColormapType
-from pymovements.utils.plotting import setup_matplotlib
+from pymovements.plotting._matlab import draw_line_data
+from pymovements.plotting._matlab import LinearSegmentedColormapType
+from pymovements.plotting._matlab import setup_matplotlib
 
 
 # This is really a dirty workaround to use the Agg backend if runnning pytest.

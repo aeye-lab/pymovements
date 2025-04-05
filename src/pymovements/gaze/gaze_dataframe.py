@@ -32,10 +32,10 @@ import polars as pl
 from tqdm import tqdm
 
 import pymovements as pm  # pylint: disable=cyclic-import
+from pymovements._utils._checks import check_is_mutual_exclusive
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
-from pymovements.utils.aois import get_aoi
-from pymovements.utils.checks import check_is_mutual_exclusive
+from pymovements.stimulus.text import TextStimulus
 
 
 class GazeDataFrame:
@@ -961,7 +961,7 @@ class GazeDataFrame:
 
     def map_to_aois(
             self,
-            aoi_dataframe: pm.stimulus.TextStimulus,
+            aoi_dataframe: TextStimulus,
             *,
             eye: str = 'auto',
             gaze_type: str = 'pixel',
@@ -973,7 +973,7 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        aoi_dataframe: pm.stimulus.TextStimulus
+        aoi_dataframe: TextStimulus
             Area of interest dataframe.
         eye: str
             String specificer for inferring eye components. Supported values are: auto, mono, left
@@ -1024,7 +1024,7 @@ class GazeDataFrame:
             raise ValueError('neither position nor pixel in gaze dataframe, one needed for mapping')
 
         aois = [
-            get_aoi(aoi_dataframe, row, x_eye, y_eye)
+            aoi_dataframe.get_aoi(row, x_eye, y_eye)
             for row in tqdm(self.frame.iter_rows(named=True))
         ]
         aoi_df = pl.concat(aois)

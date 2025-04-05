@@ -24,10 +24,9 @@ from unittest import mock
 
 import pytest
 
-from pymovements.dataset._utils._downloads import _DownloadProgressBar
-from pymovements.dataset._utils._downloads import _get_redirected_url
-from pymovements.dataset._utils._downloads import download_and_extract_archive
-from pymovements.dataset._utils._downloads import download_file
+from pymovements.dataset._downloads import _download_file
+from pymovements.dataset._downloads import _DownloadProgressBar
+from pymovements.dataset._downloads import _get_redirected_url
 
 
 @pytest.mark.parametrize(
@@ -42,7 +41,7 @@ def test_download_file(tmp_path, verbose):
     filename = 'pymovements-0.4.0.tar.gz'
     md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
 
-    filepath = download_file(url, tmp_path, filename, md5, verbose=verbose)
+    filepath = _download_file(url, tmp_path, filename, md5, verbose=verbose)
 
     assert filepath.exists()
     assert filepath.name == filename
@@ -57,7 +56,7 @@ def test_download_file_md5_None(tmp_path):
     url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
     filename = 'pymovements-0.4.0.tar.gz'
 
-    filepath = download_file(url, tmp_path, filename)
+    filepath = _download_file(url, tmp_path, filename)
 
     assert filepath.exists()
     assert filepath.name == filename
@@ -70,7 +69,7 @@ def test_download_file_404(tmp_path):
     md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
 
     with pytest.raises(OSError):
-        download_file(url, tmp_path, filename, md5)
+        _download_file(url, tmp_path, filename, md5)
 
 
 @pytest.mark.parametrize(
@@ -86,11 +85,11 @@ def test_download_file_https_failure(tmp_path, verbose):
     md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
 
     with mock.patch(
-        'pymovements.dataset._utils._downloads._download_url',
+        'pymovements.dataset._downloads._download_url',
         side_effect=OSError(),
     ):
         with pytest.raises(OSError):
-            download_file(url, tmp_path, filename, md5, verbose=verbose)
+            _download_file(url, tmp_path, filename, md5, verbose=verbose)
 
 
 def test_download_file_http_failure(tmp_path):
@@ -99,11 +98,11 @@ def test_download_file_http_failure(tmp_path):
     md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
 
     with mock.patch(
-        'pymovements.dataset._utils._downloads._download_url',
+        'pymovements.dataset._downloads._download_url',
         side_effect=OSError(),
     ):
         with pytest.raises(OSError):
-            download_file(url, tmp_path, filename, md5)
+            _download_file(url, tmp_path, filename, md5)
 
 
 def test_download_file_with_invalid_md5(tmp_path):
@@ -112,7 +111,7 @@ def test_download_file_with_invalid_md5(tmp_path):
     md5 = '00000000000000000000000000000000'
 
     with pytest.raises(RuntimeError) as excinfo:
-        download_file(url, tmp_path, filename, md5)
+        _download_file(url, tmp_path, filename, md5)
 
     msg, = excinfo.value.args
     assert msg == f"File {os.path.join(tmp_path, 'pymovements-0.4.0.tar.gz')} "\
@@ -148,88 +147,6 @@ def test__get_redirected_url_with_redirects_max_hops():
         'https://github.com/aeye-lab/pymovements/archive/master.zip '\
         'exceeded 0 redirects. The last redirect points to '\
         'https://codeload.github.com/aeye-lab/pymovements/zip/main.'
-
-
-def test_download_and_extract_archive(tmp_path):
-    url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
-    download_filename = 'pymovements-0.4.0.tar.gz'
-    md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
-    extract_dirpath = tmp_path / 'extracted'
-
-    download_and_extract_archive(
-        url,
-        tmp_path,
-        download_filename,
-        extract_dirpath,
-        md5,
-        remove_top_level=False,
-    )
-
-    assert extract_dirpath.exists()
-    assert (extract_dirpath / 'pymovements-0.4.0').exists()
-    assert (extract_dirpath / 'pymovements-0.4.0' / 'README.md').exists()
-
-    archive_path = tmp_path / download_filename
-    assert archive_path.exists()
-    with open(archive_path, 'rb') as f:
-        file_bytes = f.read()
-        assert hashlib.md5(file_bytes).hexdigest() == md5
-
-
-@pytest.mark.parametrize(
-    'verbose',
-    [
-        pytest.param(False, id='verbose_false'),
-        pytest.param(True, id='verbose_true'),
-    ],
-)
-def test_download_and_extract_archive_extract_dirpath_None(tmp_path, capsys, verbose):
-    url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
-    download_filename = 'pymovements-0.4.0.tar.gz'
-    md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
-    extract_dirpath = None
-
-    # extract first time
-    download_and_extract_archive(
-        url, tmp_path, download_filename, extract_dirpath, md5, verbose=verbose,
-    )
-    out, _ = capsys.readouterr()
-
-    if verbose:
-        assert out == 'Downloading '\
-            'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'\
-            f" to {os.path.join(tmp_path, 'pymovements-0.4.0.tar.gz')}\n" \
-            f'Checking integrity of pymovements-0.4.0.tar.gz\n'\
-            f'Extracting pymovements-0.4.0.tar.gz to {tmp_path}\n'
-    else:
-        assert out == ''
-
-    # extract second time to test already downloaded and verified file
-    download_and_extract_archive(
-        url, tmp_path, download_filename, extract_dirpath, md5, verbose=verbose,
-    )
-    out, _ = capsys.readouterr()
-
-    if verbose:
-        assert out == f'Using already downloaded and verified file: '\
-            f"{os.path.join(tmp_path, 'pymovements-0.4.0.tar.gz')}"\
-            f'\nExtracting pymovements-0.4.0.tar.gz to {tmp_path}\n'
-    else:
-        assert out == ''
-
-
-def test_download_and_extract_archive_invalid_md5(tmp_path):
-    url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
-    download_filename = 'pymovements-0.4.0.tar.gz'
-    md5 = '00000000000000000000000000000000'
-    extract_dirpath = tmp_path / 'extracted'
-
-    with pytest.raises(RuntimeError) as excinfo:
-        download_and_extract_archive(url, tmp_path, download_filename, extract_dirpath, md5)
-
-    msg, = excinfo.value.args
-    assert msg == f"File {os.path.join(tmp_path, 'pymovements-0.4.0.tar.gz')} "\
-        'not found or download corrupted.'
 
 
 def test__DownloadProgressBar_tsize_not_None():

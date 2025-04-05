@@ -378,7 +378,7 @@ def test_paths(init_path, expected_paths, dataset_definition):
     assert dataset.paths.downloads == expected_paths['downloads']
 
 
-@mock.patch('pymovements.dataset.dataset_download.download_file')
+@mock.patch('pymovements.dataset._downloads._download_file')
 @pytest.mark.filterwarnings('ignore:Failed to download from mirror.*:UserWarning')
 @pytest.mark.parametrize('dataset_definition', ['CustomGazeOnly'], indirect=['dataset_definition'])
 def test_dataset_download_both_mirrors_fail_gaze_only(
@@ -415,7 +415,7 @@ def test_dataset_download_both_mirrors_fail_gaze_only(
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.download_file')
+@mock.patch('pymovements.dataset._downloads._download_file')
 @pytest.mark.parametrize(
     'dataset_definition', ['CustomGazeOnlyNoMirror'], indirect=['dataset_definition'],
 )
@@ -446,7 +446,7 @@ def test_dataset_download_without_mirrors_fail_gaze_only(
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.download_file')
+@mock.patch('pymovements.dataset._downloads._download_file')
 @pytest.mark.filterwarnings('ignore:Failed to download from mirror.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition', ['CustomPrecomputedOnly'], indirect=['dataset_definition'],
@@ -485,7 +485,7 @@ def test_dataset_download_precomputed_events_both_mirrors_fail(
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.download_file')
+@mock.patch('pymovements.dataset._downloads._download_file')
 @pytest.mark.parametrize(
     'dataset_definition', ['CustomPrecomputedOnlyNoMirror'], indirect=['dataset_definition'],
 )
@@ -516,7 +516,7 @@ def test_dataset_download_precomputed_events_without_mirrors_fail(
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.download_file')
+@mock.patch('pymovements.dataset._downloads._download_file')
 @pytest.mark.filterwarnings('ignore:Failed to download from mirror.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition', ['CustomPrecomputedRMOnly'], indirect=['dataset_definition'],
@@ -555,7 +555,7 @@ def test_dataset_download_precomputed_reading_measures_both_mirrors_fail(
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.download_file')
+@mock.patch('pymovements.dataset._downloads._download_file')
 @pytest.mark.parametrize(
     'dataset_definition', ['CustomPrecomputedRMOnlyNoMirror'], indirect=['dataset_definition'],
 )
@@ -586,7 +586,7 @@ def test_dataset_download_precomputed_reading_measures_without_mirrors_fail(
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.download_file')
+@mock.patch('pymovements.dataset._downloads._download_file')
 @pytest.mark.filterwarnings('ignore:Failed to download from mirror.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition', ['CustomGazeAndPrecomputed'], indirect=['dataset_definition'],
@@ -624,7 +624,7 @@ def test_dataset_download_precomputed_and_gaze_both_mirrors_fail(
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.download_file')
+@mock.patch('pymovements.dataset._downloads._download_file')
 @pytest.mark.parametrize(
     'dataset_definition', ['CustomGazeAndPrecomputedNoMirror'], indirect=['dataset_definition'],
 )
@@ -654,7 +654,7 @@ def test_dataset_download_precomputed_and_gaze_without_mirrors_fail(
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.download_file')
+@mock.patch('pymovements.dataset._downloads._download_file')
 @pytest.mark.filterwarnings('ignore:Failed to download from mirror.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition', ['CustomGazeOnly'], indirect=['dataset_definition'],
@@ -684,7 +684,7 @@ def test_dataset_download_first_mirror_gaze_fails(mock_download_file, tmp_path, 
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.download_file')
+@mock.patch('pymovements.dataset._downloads._download_file')
 @pytest.mark.filterwarnings('ignore:Failed to download from mirror.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition', ['CustomPrecomputedOnly'], indirect=['dataset_definition'],
@@ -715,7 +715,7 @@ def test_dataset_download_first_mirror_precomputed_fails(
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.download_file')
+@mock.patch('pymovements.dataset._downloads._download_file')
 @pytest.mark.filterwarnings('ignore:Failed to download from mirror.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition', ['CustomPrecomputedRMOnly'], indirect=['dataset_definition'],
@@ -746,7 +746,7 @@ def test_dataset_download_first_mirror_precomputed_fails_rm(
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.download_file')
+@mock.patch('pymovements.dataset._downloads._download_file')
 @pytest.mark.filterwarnings('ignore:Failed to download from mirror.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition', ['CustomGazeAndPrecomputed'], indirect=['dataset_definition'],
@@ -789,7 +789,7 @@ def test_dataset_download_first_mirror_fails(mock_download_file, tmp_path, datas
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.download_file')
+@mock.patch('pymovements.dataset._downloads._download_file')
 @pytest.mark.filterwarnings('ignore:Failed to download from mirror.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition',
@@ -819,7 +819,7 @@ def test_dataset_download_file_not_found(mock_download_file, tmp_path, dataset_d
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.download_file')
+@mock.patch('pymovements.dataset._downloads._download_file')
 @pytest.mark.filterwarnings('ignore:Failed to download from mirror.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition',
@@ -848,7 +848,7 @@ def test_dataset_download_file_precomputed_not_found(
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.download_file')
+@mock.patch('pymovements.dataset._downloads._download_file')
 @pytest.mark.parametrize(
     'dataset_definition',
     [
@@ -875,7 +875,7 @@ def test_dataset_download_no_extract(mock_download_file, tmp_path, dataset_defin
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.download_file')
+@mock.patch('pymovements.dataset._downloads._download_file')
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomPrecomputedOnly', 'CustomPrecomputedOnlyNoMirror'],
@@ -899,7 +899,7 @@ def test_dataset_download_precomputed_no_extract(mock_download_file, tmp_path, d
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.download_file')
+@mock.patch('pymovements.dataset._downloads._download_file')
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomPrecomputedRMOnly', 'CustomPrecomputedRMOnlyNoMirror'],
@@ -925,7 +925,7 @@ def test_dataset_download_precomputed_no_extract_rm(
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.extract_archive')
+@mock.patch('pymovements.dataset._archives._extract_archive')
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomGazeOnly', 'CustomGazeOnlyNoMirror'],
@@ -955,7 +955,7 @@ def test_dataset_extract_remove_finished_true_gaze(
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.extract_archive')
+@mock.patch('pymovements.dataset._archives._extract_archive')
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomPrecomputedRMOnly', 'CustomPrecomputedRMOnlyNoMirror'],
@@ -985,7 +985,7 @@ def test_dataset_extract_rm(
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.extract_archive')
+@mock.patch('pymovements.dataset._archives._extract_archive')
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomGazeAndPrecomputed', 'CustomGazeAndPrecomputedNoMirror'],
@@ -1024,7 +1024,7 @@ def test_dataset_extract_remove_finished_true_both(
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.extract_archive')
+@mock.patch('pymovements.dataset._archives._extract_archive')
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomPrecomputedOnly', 'CustomPrecomputedOnlyNoMirror'],
@@ -1054,7 +1054,7 @@ def test_dataset_extract_remove_finished_true_precomputed(
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.extract_archive')
+@mock.patch('pymovements.dataset._archives._extract_archive')
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomGazeAndPrecomputed', 'CustomGazeAndPrecomputedNoMirror'],
@@ -1093,7 +1093,7 @@ def test_dataset_extract_remove_finished_false_both(
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.extract_archive')
+@mock.patch('pymovements.dataset._archives._extract_archive')
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomGazeOnly', 'CustomGazeOnlyNoMirror'],
@@ -1123,7 +1123,7 @@ def test_dataset_extract_remove_finished_false_gaze(
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.extract_archive')
+@mock.patch('pymovements.dataset._archives._extract_archive')
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomPrecomputedOnly', 'CustomPrecomputedOnlyNoMirror'],
@@ -1153,8 +1153,8 @@ def test_dataset_extract_remove_finished_false_precomputed(
     ])
 
 
-@mock.patch('pymovements.dataset.dataset_download.download_file')
-@mock.patch('pymovements.dataset.dataset_download.extract_archive')
+@mock.patch('pymovements.dataset._downloads._download_file')
+@mock.patch('pymovements.dataset._archives._extract_archive')
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomGazeAndPrecomputed', 'CustomGazeAndPrecomputedNoMirror'],
@@ -1169,8 +1169,8 @@ def test_dataset_download_default_extract_both(
     Dataset(dataset_definition, path=tmp_path).download()
 
 
-@mock.patch('pymovements.dataset.dataset_download.download_file')
-@mock.patch('pymovements.dataset.dataset_download.extract_archive')
+@mock.patch('pymovements.dataset._downloads._download_file')
+@mock.patch('pymovements.dataset._archives._extract_archive')
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomGazeOnly', 'CustomGazeOnlyNoMirror'],
@@ -1188,8 +1188,8 @@ def test_dataset_download_default_extract_gaze(
     mock_extract.assert_called_once()
 
 
-@mock.patch('pymovements.dataset.dataset_download.download_file')
-@mock.patch('pymovements.dataset.dataset_download.extract_archive')
+@mock.patch('pymovements.dataset._downloads._download_file')
+@mock.patch('pymovements.dataset._archives._extract_archive')
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomPrecomputedOnly', 'CustomPrecomputedOnlyNoMirror'],
@@ -1438,5 +1438,5 @@ def test_dataset_download_no_precomputed_rm_resources_raises_exception(tmp_path)
 
     msg, = excinfo.value.args
 
-    expected_msg = "'precomputed_reading_measures' resources must be specified to download dataset."
+    expected_msg = 'resources must be specified to download dataset.'
     assert msg == expected_msg

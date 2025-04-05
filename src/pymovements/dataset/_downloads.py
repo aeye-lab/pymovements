@@ -24,85 +24,177 @@ import hashlib
 import urllib.request
 from pathlib import Path
 from typing import Any
+from urllib.error import URLError
+from warnings import warn
 
 from tqdm.auto import tqdm
 
 from pymovements._version import get_versions
-from pymovements.dataset._utils._archives import extract_archive
+from pymovements.dataset._archives import _extract_dataset
+from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.dataset_paths import DatasetPaths
 
-USER_AGENT: str = f"pymovements/{get_versions()['version']}"
+_USER_AGENT: str = f"pymovements/{get_versions()['version']}"
 
 
-def download_and_extract_archive(
-        url: str,
-        download_dirpath: Path,
-        download_filename: str,
-        extract_dirpath: Path | None = None,
-        md5: str | None = None,
+def _download_dataset(
+        definition: DatasetDefinition,
+        paths: DatasetPaths,
         *,
-        recursive: bool = True,
+        extract: bool = True,
         remove_finished: bool = False,
-        remove_top_level: bool = True,
         resume: bool = True,
-        verbose: int = 1,
+        verbose: bool = True,
 ) -> None:
-    """Download and extract archive file.
+    """Download dataset resources.
+
+    This downloads all resources of the dataset. Per default this also extracts all archives
+    into :py:meth:`Dataset.paths.raw`,
+    To save space on your device you can remove the archive files after
+    successful extraction with ``remove_finished=True``.
+
+    If a corresponding file already exists in the local system, its checksum is calculated and
+    checked against the expected checksum.
+    Downloading will be evaded if the integrity of the existing file can be verified.
+    If the existing file does not match the expected checksum it is overwritten with the
+    downloaded new file.
 
     Parameters
     ----------
-    url: str
-        URL of archive file to be downloaded.
-    download_dirpath: Path
-        Path to directory where file will be saved to.
-    download_filename: str
-        Target filename of saved file.
-    extract_dirpath: Path | None
-        Path to directory where archive files will be extracted to. (default: None)
-    md5: str | None
-        MD5 checksum of downloaded file. If None, do not check. (default: None)
-    recursive: bool
-        Recursively extract archives which are included in extracted archive. (default: True)
+    definition: DatasetDefinition
+        The dataset definition.
+    paths: DatasetPaths
+        The dataset paths.
+    extract: bool
+        Extract dataset archive files. (default: True)
     remove_finished: bool
-        Remove downloaded file after successful extraction or decompression. (default: False)
-    remove_top_level: bool
-        If ``True``, remove the top-level directory if it has only one child. (default: True)
+        Remove archive files after extraction. (default: False)
     resume: bool
         Resume previous extraction by skipping existing files.
         Checks for correct size of existing files but not integrity. (default: True)
-    verbose: int
-        Verbosity levels: (1) Show download progress bar and print info messages on downloading
-        and extracting archive files without printing messages for recursive archive extraction.
-        (2) Print additional messages for each recursive archive extract. (default: 1)
+    verbose: bool
+        If True, show progress of download and print status messages for integrity checking and
+        file extraction. (default: True)
 
     Raises
     ------
+    AttributeError
+        If number of mirrors or number of resources specified for dataset is zero.
     RuntimeError
-        If the downloaded file has no suffix or suffix is not supported, or in case of a
-        specified MD5 checksum which doesn't match the checksum of the downloaded file.
+        If downloading a resource failed for all given mirrors.
     """
-    archive_path = download_file(
-        url=url,
-        dirpath=download_dirpath,
-        filename=download_filename,
-        md5=md5,
-        verbose=bool(verbose),
-    )
+    if not definition.resources:
+        raise AttributeError('resources must be specified to download dataset.')
 
-    if extract_dirpath is None:
-        extract_dirpath = download_dirpath
+    for content in ['gaze', 'precomputed_events', 'precomputed_reading_measures']:
+        if definition.has_files[content]:
+            if not definition.mirrors:
+                mirrors = None
+            else:
+                mirrors = definition.mirrors.get(content, None)
 
-    extract_archive(
-        source_path=archive_path,
-        destination_path=extract_dirpath,
-        recursive=recursive,
-        remove_finished=remove_finished,
-        remove_top_level=remove_top_level,
-        resume=resume,
-        verbose=verbose,
-    )
+            if not definition.resources[content]:
+                raise AttributeError(
+                    f"'{content}' resources must be specified to download dataset.")
+
+            _download_resources(
+                mirrors=mirrors,
+                resources=definition.resources[content],
+                target_dirpath=paths.downloads,
+                verbose=verbose,
+            )
+
+    if extract:
+        _extract_dataset(
+            definition=definition,
+            paths=paths,
+            remove_finished=remove_finished,
+            resume=resume,
+            verbose=verbose,
+        )
 
 
-def download_file(
+def _download_resources(
+        mirrors: list[str] | tuple[str, ...] | None,
+        resources: list[dict[str, str]] | tuple[dict[str, str], ...],
+        target_dirpath: Path,
+        verbose: bool,
+) -> None:
+    """Download resources."""
+    for resource in resources:
+        if not mirrors:
+            _download_resource_without_mirrors(resource, target_dirpath, verbose)
+        else:
+            assert mirrors is not None
+            _download_resource_with_mirrors(mirrors, resource, target_dirpath, verbose)
+
+
+def _download_resource_without_mirrors(
+        resource: dict[str, str],
+        target_dirpath: Path,
+        verbose: bool,
+) -> None:
+    """Download resouce without mirrors."""
+    try:
+        _download_file(
+            url=resource['resource'],
+            dirpath=target_dirpath,
+            filename=resource['filename'],
+            md5=resource['md5'],
+            verbose=verbose,
+        )
+
+    # pylint: disable=overlapping-except
+    except (URLError, OSError, RuntimeError) as error:
+        raise RuntimeError(
+            f"downloading resource {resource['resource']} failed.",
+        ) from error
+
+
+def _download_resource_with_mirrors(
+        mirrors: list[str] | tuple[str, ...],
+        resource: dict[str, str],
+        target_dirpath: Path,
+        verbose: bool,
+) -> None:
+    """Download resource with mirrors."""
+    success = False
+
+    for mirror_idx, mirror in enumerate(mirrors):
+
+        url = f'{mirror}{resource["resource"]}'
+
+        try:
+            _download_file(
+                url=url,
+                dirpath=target_dirpath,
+                filename=resource['filename'],
+                md5=resource['md5'],
+                verbose=verbose,
+            )
+            success = True
+
+        # pylint: disable=overlapping-except
+        except (URLError, OSError, RuntimeError) as error:
+            # Error downloading the resource, try next mirror
+            if mirror_idx < len(mirrors) - 1:
+                warning = UserWarning(
+                    f'Failed to download from mirror {mirror}\nTrying next mirror.',
+                )
+                warning.__cause__ = error
+                warn(warning)
+            continue
+
+        # downloading the resource was successful, we don't need to try another mirror
+        break
+
+    if not success:
+        raise RuntimeError(
+            f"downloading resource {resource['resource']} failed for all mirrors.",
+        )
+
+
+def _download_file(
         url: str,
         dirpath: Path,
         filename: str,
@@ -201,7 +293,7 @@ def _get_redirected_url(url: str, max_hops: int = 3) -> str:
         If number of redirects exceed `max_hops`.
     """
     initial_url = url
-    headers = {'Method': 'HEAD', 'User-Agent': USER_AGENT}
+    headers = {'Method': 'HEAD', 'User-Agent': _USER_AGENT}
 
     for _ in range(max_hops + 1):
         with urllib.request.urlopen(urllib.request.Request(url, headers=headers)) as response:
