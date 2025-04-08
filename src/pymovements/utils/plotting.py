@@ -21,15 +21,18 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from pathlib import Path
 from typing import Literal
 from typing import Union
 
 import matplotlib.pyplot
 import numpy as np
 import PIL.Image
+from deprecated.sphinx import deprecated
 from matplotlib.collections import LineCollection
 from typing_extensions import TypeAlias
+
+from pymovements.stimulus.image import _draw_image_stimulus
+
 
 LinearSegmentedColormapType: TypeAlias = dict[
     Literal['red', 'green', 'blue', 'alpha'],
@@ -216,6 +219,11 @@ def setup_matplotlib(
     return fig, ax, cmap, cmap_norm, cval, show_cbar
 
 
+@deprecated(
+    reason='Please use ImageStimulus.show() instead. '
+           'This function will be removed in v0.26.0.',
+    version='v0.21.1',
+)
 def draw_image_stimulus(
         image_stimulus: str | Path,
         origin: str = 'upper',
@@ -226,6 +234,10 @@ def draw_image_stimulus(
         ax: matplotlib.pyplot.Axes | None = None,
 ) -> tuple[matplotlib.pyplot.figure, matplotlib.pyplot.Axes]:
     """Draw stimulus.
+
+    .. deprecated:: v0.21.1
+       Please use :py:meth:`~pymovements.ImageStimulus.show()` instead.
+       This function will be removed in v0.26.0.
 
     Parameters
     ----------
@@ -249,14 +261,15 @@ def draw_image_stimulus(
     fig: matplotlib.pyplot.figure
     ax: matplotlib.pyplot.Axes
     """
-    img = PIL.Image.open(image_stimulus)
-    if not fig:
-        fig, ax = matplotlib.pyplot.subplots(figsize=figsize)
-    assert ax
-    ax.imshow(img, origin=origin, extent=extent)
-    if show:
-        matplotlib.pyplot.show()
-    return fig, ax
+    return _draw_image_stimulus(
+        image_stimulus=image_stimulus,
+        origin=origin,
+        show=show,
+        figsize=figsize,
+        extent=extent,
+        fig=fig,
+        ax=ax,
+    )
 
 
 def draw_line_data(

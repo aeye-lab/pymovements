@@ -24,7 +24,7 @@ from unittest.mock import Mock
 import pytest
 from matplotlib import pyplot
 
-import pymovements as pm
+from pymovements.stimulus.image import _draw_image_stimulus
 
 
 @pytest.mark.parametrize(
@@ -56,7 +56,7 @@ import pymovements as pm
 def test_show_image_stimulus(image_stimulus, origin, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(pyplot, 'show', mock)
-    pm.utils.plotting.draw_image_stimulus(image_stimulus, origin=origin, show=True)
+    _draw_image_stimulus(image_stimulus, origin=origin, show=True)
     pyplot.close()
     mock.assert_called_once()
 
@@ -90,7 +90,7 @@ def test_show_image_stimulus(image_stimulus, origin, monkeypatch):
 def test_no_show_image_stimulus(image_stimulus, origin, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(pyplot, 'show', mock)
-    pm.utils.plotting.draw_image_stimulus(image_stimulus, origin=origin, show=False)
+    _draw_image_stimulus(image_stimulus, origin=origin, show=False)
     pyplot.close()
     mock.assert_not_called()
 
@@ -125,7 +125,7 @@ def test_image_stimulus_fig_not_None(image_stimulus, origin, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(pyplot, 'show', mock)
     fig, ax = pyplot.subplots(figsize=(15, 10))
-    pm.utils.plotting.draw_image_stimulus(
+    _draw_image_stimulus(
         image_stimulus,
         origin=origin,
         fig=fig,
