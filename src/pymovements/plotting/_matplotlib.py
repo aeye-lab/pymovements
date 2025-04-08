@@ -21,7 +21,6 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from typing import Literal
-from typing import TypeAlias
 from typing import Union
 
 import matplotlib.colors
@@ -29,6 +28,7 @@ import matplotlib.pyplot
 import numpy as np
 import PIL.Image
 from matplotlib.collections import LineCollection
+from typing_extensions import TypeAlias
 
 
 LinearSegmentedColormapType: TypeAlias = dict[
