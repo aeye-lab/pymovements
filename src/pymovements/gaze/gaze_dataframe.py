@@ -34,7 +34,6 @@ from tqdm import tqdm
 import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
-from pymovements.utils.aois import get_aoi
 from pymovements.utils.checks import check_is_mutual_exclusive
 
 
@@ -1024,7 +1023,7 @@ class GazeDataFrame:
             raise ValueError('neither position nor pixel in gaze dataframe, one needed for mapping')
 
         aois = [
-            get_aoi(aoi_dataframe, row, x_eye, y_eye)
+            aoi_dataframe.get_aoi(row=row, x_eye=x_eye, y_eye=y_eye)
             for row in tqdm(self.frame.iter_rows(named=True))
         ]
         aoi_df = pl.concat(aois)
