@@ -30,7 +30,7 @@ import pymovements as pm
 def test_parse_eyelink_equal_gaze():
     filepath = 'tests/files/eyelink_monocular_example.asc'
 
-    gaze, _ = pm.gaze._utils.parsing.parse_eyelink(filepath)
+    gaze, _, _ = pm.gaze._utils.parsing.parse_eyelink(filepath)
     gaze_depr, _ = pm.utils.parsing.parse_eyelink(filepath)
 
     assert_frame_equal(gaze, gaze_depr)
