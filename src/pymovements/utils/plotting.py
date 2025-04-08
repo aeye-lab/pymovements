@@ -105,6 +105,7 @@ def setup_matplotlib(
         pad_factor=pad_factor,
     )
 
+
 @deprecated(
     reason='Please use ImageStimulus.show() instead. '
            'This function will be removed in v0.26.0.',
