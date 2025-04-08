@@ -92,7 +92,7 @@ MatplotlibSetupType: TypeAlias = tuple[
 ]
 
 
-def setup_matplotlib(
+def _setup_matplotlib(
         x_signal: np.ndarray,
         y_signal: np.ndarray,
         figsize: tuple[int, int],
@@ -215,7 +215,7 @@ def setup_matplotlib(
     return fig, ax, cmap, cmap_norm, cval, show_cbar
 
 
-def draw_line_data(
+def _draw_line_data(
         x_signal: np.ndarray,
         y_signal: np.ndarray,
         ax: matplotlib.pyplot.Axes,

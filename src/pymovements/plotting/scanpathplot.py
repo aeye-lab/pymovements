@@ -31,9 +31,9 @@ from matplotlib.patches import Circle
 
 from pymovements.events import EventDataFrame
 from pymovements.gaze import GazeDataFrame
-from pymovements.plotting._matplotlib import draw_line_data
+from pymovements.plotting._matplotlib import _draw_line_data
 from pymovements.plotting._matplotlib import LinearSegmentedColormapType
-from pymovements.plotting._matplotlib import setup_matplotlib
+from pymovements.plotting._matplotlib import _setup_matplotlib
 
 # This is really a dirty workaround to use the Agg backend if runnning pytest.
 # This is needed as Windows workers on GitHub fail randomly with other backends.
@@ -126,7 +126,7 @@ def scanpathplot(
     x_signal = events.frame[position_column].list.get(0)
     y_signal = events.frame[position_column].list.get(1)
 
-    fig, ax, cmap, cmap_norm, cval, show_cbar = setup_matplotlib(
+    fig, ax, cmap, cmap_norm, cval, show_cbar = _setup_matplotlib(
         x_signal,
         y_signal,
         figsize,
@@ -157,7 +157,7 @@ def scanpathplot(
         assert gaze
         gaze_x_signal = gaze.frame[gaze_position_column].list.get(0)
         gaze_y_signal = gaze.frame[gaze_position_column].list.get(1)
-        line = draw_line_data(
+        line = _draw_line_data(
             gaze_x_signal,
             gaze_y_signal,
             ax,
