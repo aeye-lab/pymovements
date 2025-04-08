@@ -469,7 +469,8 @@ def _check_reccfg_key(
 
     values = {d.get(key) for d in recording_config}
     if len(values) != 1:
-        warnings.warn(f"Found inconsistent values for '{key}': {values}")
+        sorted_values: list = sorted(values)
+        warnings.warn(f"Found inconsistent values for '{key}': {sorted_values}")
         return None
 
     value = values.pop()

@@ -368,7 +368,7 @@ def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_mo
         pytest.param(
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
             'MSG	2154556 RECCFG CR 2000 2 1 L\n',
-            "Found inconsistent values for 'sampling_rate': {'2000', '1000'}",
+            r"Found inconsistent values for 'sampling_rate': \['1000', '2000'\]",
             id='inconsistent_reccfg',
         ),
     ],
