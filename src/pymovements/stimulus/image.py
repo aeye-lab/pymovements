@@ -22,8 +22,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import PIL.Image
 import matplotlib.pyplot
+import PIL.Image
 
 from pymovements._utils._paths import get_filepaths
 from pymovements._utils._strings import curly_to_regex
