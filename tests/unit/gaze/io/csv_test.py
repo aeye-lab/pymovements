@@ -54,7 +54,7 @@ from pymovements.gaze import from_csv
             {'time': pl.Int64, 'pixel': pl.List(pl.Int64)},
             id='csv_mono_shape_definition',
         ),
-      
+
         pytest.param(
             {
                 'file': 'tests/files/monocular_example.csv',
