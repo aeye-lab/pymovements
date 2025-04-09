@@ -65,6 +65,7 @@ from pymovements.gaze import from_csv
                 'auto_column_detect': True,
             },
             (10, 2),
+            {'time': pl.Int64, 'pixel': pl.List(pl.Int64)},
             id='csv_mono_shape_auto_column_detect',
         ),
 
