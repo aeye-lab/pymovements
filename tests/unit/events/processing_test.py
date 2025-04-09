@@ -120,6 +120,46 @@ def test_event_gaze_processor_init(args, kwargs, expected_property_definitions):
             pm.exceptions.InvalidProperty, ('foo', 'invalid', 'peak_velocity'),
             id='unknown_event_property',
         ),
+        pytest.param(
+            [('peak_velocity', {}, None)], {},
+            ValueError, ('Tuple must have a length of 2.'),
+            id='tuple_length_incorrect',
+        ),
+        pytest.param(
+            [[('peak_velocity', {}), ('amplitude', {}, 1)]], {},
+            ValueError, ('Tuple must have a length of 2.'),
+            id='tuple_length_incorrect1',
+        ),
+        pytest.param(
+            [(1, {})], {},
+            TypeError, ('First item of tuple must be a string'),
+            id='first_item_not_string',
+        ),
+        pytest.param(
+            [('peak_velocity', 1)], {},
+            TypeError, ('Second item of tuple must be a dictionary'),
+            id='second_item_not_dict',
+        ),
+        pytest.param(
+            [[(1, 1), (1, {})]], {},
+            TypeError, ('First item of tuple must be a string'),
+            id='first_item_not_string1',
+        ),
+        pytest.param(
+            [[('peak_velocity', 1), ('amplitude', 1)]], {},
+            TypeError, ('Second item of tuple must be a dictionary'),
+            id='second_item_not_dict1',
+        ),
+        pytest.param(
+            [['peak_velocity', 1]], {},
+            TypeError, ('Each item in the list must be either a string or a tuple'),
+            id='list_contains_invalid_item',
+        ),
+        pytest.param(
+            [1], {},
+            TypeError, ('event_properties must be of type str, tuple, or list'),
+            id='event_properties_invalid_type',
+        ),
     ],
 )
 def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_substrings):
