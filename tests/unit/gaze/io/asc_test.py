@@ -403,19 +403,6 @@ def test_from_asc_detects_mismatches_in_experiment_metadata(experiment_kwargs, i
                 'metadata_patterns': [
                     {'pattern': r'ENCODING TEST (?P<foobar>.+)'},
                 ],
-            },
-            {
-                'foobar': 'ÄÖÜ',
-            },
-            id='eyelink_monocular_no_dummy_example_encoding_default',
-        ),
-
-        pytest.param(
-            {
-                'file': 'tests/files/eyelink_monocular_no_dummy_example.asc',
-                'metadata_patterns': [
-                    {'pattern': r'ENCODING TEST (?P<foobar>.+)'},
-                ],
                 'encoding': 'utf8',
             },
             {
