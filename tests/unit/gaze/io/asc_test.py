@@ -156,6 +156,7 @@ def test_from_asc_has_frame_equal(kwargs, expected_frame):
             },
             id='eyelink_asc_mono_pattern_eyelink',
         ),
+
         pytest.param(
             {
                 'file': 'tests/files/eyelink_monocular_example.asc',
@@ -178,6 +179,7 @@ def test_from_asc_has_frame_equal(kwargs, expected_frame):
             },
             id='eyelink_asc_mono_pattern_list',
         ),
+
         pytest.param(
             {
                 'file': 'tests/files/eyelink_monocular_2khz_example.asc',
@@ -191,6 +193,7 @@ def test_from_asc_has_frame_equal(kwargs, expected_frame):
             },
             id='eyelink_asc_mono_2khz_pattern_eyelink',
         ),
+
         pytest.param(
             {
                 'file': 'tests/files/eyelink_monocular_no_dummy_example.asc',
@@ -214,7 +217,7 @@ def test_from_asc_has_shape_and_schema(kwargs, shape, schema):
 
 
 @pytest.mark.parametrize(
-    ('kwargs', 'exception', 'message'),
+    ('kwargs', 'exception', 'message_prefix'),
     [
         pytest.param(
             {
@@ -225,14 +228,27 @@ def test_from_asc_has_shape_and_schema(kwargs, shape, schema):
             "unknown pattern key 'foobar'. Supported keys are: eyelink",
             id='unknown_pattern',
         ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/eyelink_monocular_no_dummy_example.asc',
+                'metadata_patterns': [
+                    {'pattern': r'ENCODING TEST (?P<foobar>.+)'},
+                ],
+                'encoding': 'ascii',
+            },
+            UnicodeDecodeError,
+            'ascii',
+            id='eyelink_monocular_no_dummy_example_encoding_ascii',
+        ),
     ],
 )
-def test_from_asc_raises_exception(kwargs, exception, message):
+def test_from_asc_raises_exception(kwargs, exception, message_prefix):
     with pytest.raises(exception) as excinfo:
         pm.gaze.from_asc(**kwargs)
 
-    msg, = excinfo.value.args
-    assert msg == message
+    msg = excinfo.value.args[0]
+    assert msg.startswith(message_prefix)
 
 
 @pytest.mark.parametrize(
@@ -376,3 +392,56 @@ def test_from_asc_detects_mismatches_in_experiment_metadata(experiment_kwargs, i
     expected_msg = 'Experiment metadata does not match the metadata in the ASC file:\n'
     expected_msg += '\n'.join(f'- {issue}' for issue in issues)
     assert msg == expected_msg
+
+
+@pytest.mark.parametrize(
+    ('kwargs', 'expected_metadata'),
+    [
+        pytest.param(
+            {
+                'file': 'tests/files/eyelink_monocular_no_dummy_example.asc',
+                'metadata_patterns': [
+                    {'pattern': r'ENCODING TEST (?P<foobar>.+)'},
+                ],
+            },
+            {
+                'foobar': 'ÄÖÜ',
+            },
+            id='eyelink_monocular_no_dummy_example_encoding_default',
+        ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/eyelink_monocular_no_dummy_example.asc',
+                'metadata_patterns': [
+                    {'pattern': r'ENCODING TEST (?P<foobar>.+)'},
+                ],
+                'encoding': 'utf8',
+            },
+            {
+                'foobar': 'ÄÖÜ',
+            },
+            id='eyelink_monocular_no_dummy_example_encoding_utf8',
+        ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/eyelink_monocular_no_dummy_example.asc',
+                'metadata_patterns': [
+                    {'pattern': r'ENCODING TEST (?P<foobar>.+)'},
+                ],
+                'encoding': 'latin1',
+            },
+            {
+                'foobar': 'Ã\x84Ã\x96Ã\x9c',
+            },
+            id='eyelink_monocular_no_dummy_example_encoding_latin1',
+        ),
+    ],
+)
+def test_from_asc_has_expected_metadata(kwargs, expected_metadata):
+    gaze = pm.gaze.from_asc(**kwargs)
+
+    for key, value in expected_metadata.items():
+        assert key in gaze._metadata
+        assert gaze._metadata[key] == value
