@@ -24,8 +24,6 @@ from polars.testing import assert_frame_equal
 
 import pymovements as pm
 
-# noqa: E501 # pylint: disable=line-too-long
-
 EXPECTED_DF = {
     'char_left_pixel': pl.DataFrame(
         [
