@@ -106,20 +106,6 @@ class GazeDataFrame:
     n_components: int | None
         The number of components in the pixel, position, velocity and acceleration columns.
 
-    Attributes
-    ----------
-    frame: pl.DataFrame
-        A dataframe to be transformed to a polars dataframe.
-    events: pm.EventDataFrame
-        A dataframe of events in the gaze signal.
-    experiment : Experiment | None
-        The experiment definition.
-    trial_columns: list[str] | None
-        The name of the trial columns in the data frame. If not None, the transformation methods
-        will be applied to each trial separately.
-    n_components: int | None
-        The number of components in the pixel, position, velocity and acceleration columns.
-
     Notes
     -----
     About using the arguments ``pixel_columns``, ``position_columns``, ``velocity_columns``,
