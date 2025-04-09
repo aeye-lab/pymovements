@@ -28,7 +28,7 @@ import yaml
 from pymovements import DatasetDefinition
 from pymovements import DatasetLibrary
 from pymovements import register_dataset
-from pymovements.datset.dataset_library import _add_shipped_datasets
+from pymovements.dataset.dataset_library import _add_shipped_datasets
 
 
 def test_add_single_definition():
