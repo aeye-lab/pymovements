@@ -42,6 +42,7 @@ def from_csv(
         velocity_columns: list[str] | None = None,
         acceleration_columns: list[str] | None = None,
         distance_column: str | None = None,
+        auto_column_detect: bool = False,
         column_map: dict[str, str] | None = None,
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, type] | None = None,
@@ -88,6 +89,8 @@ def from_csv(
         the column will be used for pixel to dva transformations. If not specified, the
         constant eye-to-screen distance will be taken from the experiment definition.
         (default: None)
+    auto_column_detect: bool
+        Flag indicating if the column names should be inferred automatically. (default: False)
     column_map: dict[str, str] | None
         The keys are the columns to read, the values are the names to which they should be renamed.
         (default: None)
@@ -118,13 +121,13 @@ def from_csv(
 
     The supported number of component columns with the expected order are:
 
-    * zero columns: No nested component column will be created.
-    * two columns: monocular data; expected order: x-component, y-component
-    * four columns: binocular data; expected order: x-component left eye, y-component left eye,
-      x-component right eye, y-component right eye,
-    * six columns: binocular data with additional cyclopian data; expected order: x-component
+    - **zero columns**: No nested component column will be created.
+    - **two columns**: monocular data; expected order: x-component, y-component
+    - **four columns**: binocular data; expected order: x-component left eye, y-component left eye,
+      x-component right eye, y-component right eye
+    - **six columns**: binocular data with additional cyclopian data; expected order: x-component
       left eye, y-component left eye, x-component right eye, y-component right eye,
-      x-component cyclopian eye, y-component cyclopian eye,
+      x-component cyclopian eye, y-component cyclopian eye
 
 
     Examples
@@ -264,6 +267,7 @@ def from_csv(
         velocity_columns=velocity_columns,
         acceleration_columns=acceleration_columns,
         distance_column=distance_column,
+        auto_column_detect=auto_column_detect,
     )
     return gaze_df
 
@@ -394,8 +398,8 @@ def from_asc(
         )
 
     # Tracked eye
-    asc_left_eye = 'L' in metadata['tracked_eye']
-    asc_right_eye = 'R' in metadata['tracked_eye']
+    asc_left_eye = 'L' in (metadata['tracked_eye'] or '')
+    asc_right_eye = 'R' in (metadata['tracked_eye'] or '')
     if experiment.eyetracker.left is None:
         experiment.eyetracker.left = asc_left_eye
     elif experiment.eyetracker.left != asc_left_eye:
