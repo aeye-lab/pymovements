@@ -394,8 +394,8 @@ def from_asc(
         )
 
     # Tracked eye
-    asc_left_eye = 'L' in metadata['tracked_eye']
-    asc_right_eye = 'R' in metadata['tracked_eye']
+    asc_left_eye = 'L' in (metadata['tracked_eye'] or '')
+    asc_right_eye = 'R' in (metadata['tracked_eye'] or '')
     if experiment.eyetracker.left is None:
         experiment.eyetracker.left = asc_left_eye
     elif experiment.eyetracker.left != asc_left_eye:
