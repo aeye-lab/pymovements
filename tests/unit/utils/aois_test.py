@@ -58,12 +58,12 @@ def test_get_aoi_equal_to_new(text_stimulus, row):
 
 def test_get_aoi_deprecated(text_stimulus):
     with pytest.raises(DeprecationWarning):
-        _ = get_aoi(text_stimulus, {'x': 400, 'y': 125}, 'x', 'y')
+        get_aoi(text_stimulus, {'x': 400, 'y': 125}, 'x', 'y')
 
 
 def test_get_aoi_removed(text_stimulus):
     with pytest.raises(DeprecationWarning) as info:
-        _ = get_aoi(text_stimulus, {'x': 400, 'y': 125}, 'x', 'y')
+        get_aoi(text_stimulus, {'x': 400, 'y': 125}, 'x', 'y')
 
     regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
 
