@@ -126,11 +126,11 @@ def from_csv(
 
     The supported number of component columns with the expected order are:
 
-    - *zero columns*: No nested component column will be created.
-    - *two columns*: monocular data; expected order: x-component, y-component
-    - *four columns*: binocular data; expected order: x-component left eye, y-component left eye,
+    - **zero columns**: No nested component column will be created.
+    - **two columns**: monocular data; expected order: x-component, y-component
+    - **four columns**: binocular data; expected order: x-component left eye, y-component left eye,
       x-component right eye, y-component right eye
-    - *six columns*: binocular data with additional cyclopian data; expected order: x-component
+    - **six columns**: binocular data with additional cyclopian data; expected order: x-component
       left eye, y-component left eye, x-component right eye, y-component right eye,
       x-component cyclopian eye, y-component cyclopian eye
 
@@ -443,8 +443,8 @@ def from_asc(
         )
 
     # Tracked eye
-    asc_left_eye = 'L' in metadata['tracked_eye']
-    asc_right_eye = 'R' in metadata['tracked_eye']
+    asc_left_eye = 'L' in (metadata['tracked_eye'] or '')
+    asc_right_eye = 'R' in (metadata['tracked_eye'] or '')
     if experiment.eyetracker.left is None:
         experiment.eyetracker.left = asc_left_eye
     elif experiment.eyetracker.left != asc_left_eye:

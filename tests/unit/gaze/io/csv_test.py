@@ -54,6 +54,19 @@ from pymovements.gaze import from_csv
             {'time': pl.Int64, 'pixel': pl.List(pl.Int64)},
             id='csv_mono_shape_definition',
         ),
+      
+        pytest.param(
+            {
+                'file': 'tests/files/monocular_example.csv',
+                'column_map': {
+                    'x_left_pix': 'pixel_xl',
+                    'y_left_pix': 'pixel_yl',
+                },
+                'auto_column_detect': True,
+            },
+            (10, 2),
+            id='csv_mono_shape_auto_column_detect',
+        ),
 
         pytest.param(
             {
@@ -66,6 +79,25 @@ from pymovements.gaze import from_csv
             (10, 3),
             {'time': pl.Int64, 'pixel': pl.List(pl.Int64), 'position': pl.List(pl.Float64)},
             id='csv_bino_shape',
+        ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/binocular_example.csv',
+                'column_map': {
+                    'x_left_pix': 'pixel_xl',
+                    'y_left_pix': 'pixel_yl',
+                    'x_right_pix': 'pixel_xr',
+                    'y_right_pix': 'pixel_yr',
+                    'x_left_pos': 'position_xl',
+                    'y_left_pos': 'position_yl',
+                    'x_right_pos': 'position_xr',
+                    'y_right_pos': 'position_yr',
+                },
+                'auto_column_detect': True,
+            },
+            (10, 3),
+            id='csv_bino_shape_auto_column_detect',
         ),
 
         pytest.param(

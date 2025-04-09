@@ -52,8 +52,6 @@ class GazeDataFrame:
         The experiment definition. (default: None)
     events: pm.EventDataFrame | None
         A dataframe of events in the gaze signal. (default: None)
-    auto_column_detect: bool
-        Flag indicating if the column names should be inferred automatically. (default: False)
     trial_columns: str | list[str] | None
         The name of the trial columns in the input data frame. If the list is empty or None,
         the input data frame is assumed to contain only one trial. If the list is not empty,
@@ -88,6 +86,8 @@ class GazeDataFrame:
         in the input data frame. If specified, the column will be used for pixel to dva
         transformations. If not specified, the constant eye-to-screen distance will be taken
         from the experiment definition. This column will be renamed to ``distance``. (default: None)
+    auto_column_detect: bool
+        Flag indicating if the column names should be inferred automatically. (default: False)
     definition: pm.DatasetDefinition | None
         A dataset definition. Explicitly passed arguments take precedence over definition.
         (default: None)
@@ -227,7 +227,6 @@ class GazeDataFrame:
             experiment: Experiment | None = None,
             events: pm.EventDataFrame | None = None,
             *,
-            auto_column_detect: bool = False,
             trial_columns: str | list[str] | None = None,
             time_column: str | None = None,
             time_unit: str | None = None,
@@ -236,6 +235,7 @@ class GazeDataFrame:
             velocity_columns: list[str] | None = None,
             acceleration_columns: list[str] | None = None,
             distance_column: str | None = None,
+            auto_column_detect: bool = False,
             definition: pm.DatasetDefinition | None = None,
     ):
         if data is None:
@@ -1427,7 +1427,6 @@ class GazeDataFrame:
 
     def _init_columns(
             self,
-            auto_column_detect: bool = False,
             trial_columns: str | list[str] | None = None,
             time_column: str | None = None,
             time_unit: str | None = None,
@@ -1436,6 +1435,7 @@ class GazeDataFrame:
             velocity_columns: list[str] | None = None,
             acceleration_columns: list[str] | None = None,
             distance_column: str | None = None,
+            auto_column_detect: bool = False,
             definition: pm.DatasetDefinition | None = None,
     ) -> None:
         """Initialize dataframe columns."""
