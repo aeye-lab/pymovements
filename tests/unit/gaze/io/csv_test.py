@@ -98,6 +98,7 @@ from pymovements.gaze import from_csv
                 'auto_column_detect': True,
             },
             (10, 3),
+            {'time': pl.Int64, 'pixel': pl.List(pl.Int64), 'position': pl.List(pl.Float64)},
             id='csv_bino_shape_auto_column_detect',
         ),
 
