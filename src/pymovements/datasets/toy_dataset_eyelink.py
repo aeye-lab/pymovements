@@ -247,6 +247,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
                     'point_id': pl.Int64,
                     'task': pl.Utf8,
                 },
+                'encoding': 'ascii',
             },
         },
     )
