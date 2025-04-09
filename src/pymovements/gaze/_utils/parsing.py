@@ -182,7 +182,7 @@ def parse_eyelink(
         patterns: list[dict[str, Any] | str] | None = None,
         schema: dict[str, Any] | None = None,
         metadata_patterns: list[dict[str, Any] | str] | None = None,
-        encoding: str = 'ascii',
+        encoding: str | None = None,
 ) -> tuple[pl.DataFrame, dict[str, Any]]:
     """Parse EyeLink asc file.
 
