@@ -44,7 +44,18 @@ from pymovements import DatasetLibrary
         pytest.param(pm.datasets.HBN, 'HBN', id='HBN'),
         pytest.param(pm.datasets.InteRead, 'InteRead', id='InteRead'),
         pytest.param(pm.datasets.JuDo1000, 'JuDo1000', id='JuDo1000'),
+        pytest.param(pm.datasets.MouseCursor, 'MouseCursor', id='MouseCursor'),
         pytest.param(pm.datasets.PoTeC, 'PoTeC', id='PoTeC'),
+        pytest.param(
+            pm.datasets.PotsdamBingeRemotePVT,
+            'PotsdamBingeRemotePVT',
+            id='PotsdamBingeRemotePVT',
+        ),
+        pytest.param(
+            pm.datasets.PotsdamBingeWearablePVT,
+            'PotsdamBingeWearablePVT',
+            id='PotsdamBingeWearablePVT',
+        ),
         pytest.param(pm.datasets.Provo, 'Provo', id='Provo'),
         pytest.param(pm.datasets.SBSAT, 'SBSAT', id='SBSAT'),
         pytest.param(pm.datasets.ToyDataset, 'ToyDataset', id='ToyDataset'),
@@ -57,37 +68,6 @@ def test_public_dataset_registered(definition, dataset_name):
     definition_from_library = DatasetLibrary.get(dataset_name).__dict__
     python_definition = definition().__dict__
     assert definition_from_library == python_definition
-
-
-@pytest.mark.parametrize(
-    ('definition', 'dataset_name'),
-    # please add datasets in alphabetical order
-    [
-        pytest.param(pm.datasets.BSC, 'BSC', id='BSC'),
-        pytest.param(pm.datasets.BSCII, 'BSCII', id='BSCII'),
-        pytest.param(pm.datasets.CodeComprehension, 'CodeComprehension', id='CodeComprehension'),
-        pytest.param(pm.datasets.CopCo, 'CopCo', id='CopCo'),
-        pytest.param(pm.datasets.DAEMONS, 'DAEMONS', id='DAEMONS'),
-        pytest.param(pm.datasets.DIDEC, 'DIDEC', id='DIDEC'),
-        pytest.param(pm.datasets.EMTeC, 'EMTeC', id='EMTeC'),
-        pytest.param(pm.datasets.FakeNewsPerception, 'FakeNewsPerception', id='FakeNewsPerception'),
-        pytest.param(pm.datasets.GazeBase, 'GazeBase', id='GazeBase'),
-        pytest.param(pm.datasets.GazeBaseVR, 'GazeBaseVR', id='GazeBaseVR'),
-        pytest.param(pm.datasets.GazeOnFaces, 'GazeOnFaces', id='GazeOnFaces'),
-        pytest.param(pm.datasets.HBN, 'HBN', id='HBN'),
-        pytest.param(pm.datasets.InteRead, 'InteRead', id='InteRead'),
-        pytest.param(pm.datasets.JuDo1000, 'JuDo1000', id='JuDo1000'),
-        pytest.param(pm.datasets.PoTeC, 'PoTeC', id='PoTeC'),
-        pytest.param(pm.datasets.Provo, 'Provo', id='Provo'),
-        pytest.param(pm.datasets.SBSAT, 'SBSAT', id='SBSAT'),
-        pytest.param(pm.datasets.ToyDataset, 'ToyDataset', id='ToyDataset'),
-        pytest.param(pm.datasets.ToyDatasetEyeLink, 'ToyDatasetEyeLink', id='ToyDatasetEyeLink'),
-        pytest.param(pm.datasets.UCL, 'UCL', id='UCL'),
-    ],
-)
-def test_public_dataset_registered_experiment(definition, dataset_name):
-    definition_from_library = DatasetLibrary.get(dataset_name).__dict__
     definition_from_lib_exp = definition_from_library.pop('experiment')
-    python_definition = definition().__dict__
     python_definition_exp = python_definition.pop('experiment')
     assert python_definition_exp == definition_from_lib_exp

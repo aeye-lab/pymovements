@@ -27,7 +27,7 @@ import polars as pl
 
 from pymovements.gaze._utils.parsing import parse_eyelink
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.gaze_dataframe import GazeDataFrame  # pylint: disable=cyclic-import
+from pymovements.gaze.gaze_dataframe import GazeDataFrame
 
 
 def from_csv(
@@ -36,12 +36,13 @@ def from_csv(
         *,
         trial_columns: str | list[str] | None = None,
         time_column: str | None = None,
-        time_unit: str | None = 'ms',
+        time_unit: str | None = None,
         pixel_columns: list[str] | None = None,
         position_columns: list[str] | None = None,
         velocity_columns: list[str] | None = None,
         acceleration_columns: list[str] | None = None,
         distance_column: str | None = None,
+        auto_column_detect: bool = False,
         column_map: dict[str, str] | None = None,
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, type] | None = None,
@@ -63,10 +64,10 @@ def from_csv(
     time_column: str | None
         The name of the timestamp column in the input data frame. (default: None)
     time_unit: str | None
-        The unit of the timestamps in the timespamp column in the input data frame. Supported
+        The unit of the timestamps in the timestamp column in the input data frame. Supported
         units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
         'step' the experiment definition must be specified. All timestamps will be converted to
-        milliseconds. (default: 'ms')
+        milliseconds. If time_unit is None, milliseconds are assumed. (default: None)
     pixel_columns: list[str] | None
         The name of the pixel position columns in the input data frame. These columns will be
         nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
@@ -88,6 +89,8 @@ def from_csv(
         the column will be used for pixel to dva transformations. If not specified, the
         constant eye-to-screen distance will be taken from the experiment definition.
         (default: None)
+    auto_column_detect: bool
+        Flag indicating if the column names should be inferred automatically. (default: False)
     column_map: dict[str, str] | None
         The keys are the columns to read, the values are the names to which they should be renamed.
         (default: None)
@@ -118,13 +121,13 @@ def from_csv(
 
     The supported number of component columns with the expected order are:
 
-    * zero columns: No nested component column will be created.
-    * two columns: monocular data; expected order: x-component, y-component
-    * four columns: binocular data; expected order: x-component left eye, y-component left eye,
-      x-component right eye, y-component right eye,
-    * six columns: binocular data with additional cyclopian data; expected order: x-component
+    - **zero columns**: No nested component column will be created.
+    - **two columns**: monocular data; expected order: x-component, y-component
+    - **four columns**: binocular data; expected order: x-component left eye, y-component left eye,
+      x-component right eye, y-component right eye
+    - **six columns**: binocular data with additional cyclopian data; expected order: x-component
       left eye, y-component left eye, x-component right eye, y-component right eye,
-      x-component cyclopian eye, y-component cyclopian eye,
+      x-component cyclopian eye, y-component cyclopian eye
 
 
     Examples
@@ -264,6 +267,7 @@ def from_csv(
         velocity_columns=velocity_columns,
         acceleration_columns=acceleration_columns,
         distance_column=distance_column,
+        auto_column_detect=auto_column_detect,
     )
     return gaze_df
 
@@ -394,8 +398,8 @@ def from_asc(
         )
 
     # Tracked eye
-    asc_left_eye = 'L' in metadata['tracked_eye']
-    asc_right_eye = 'R' in metadata['tracked_eye']
+    asc_left_eye = 'L' in (metadata['tracked_eye'] or '')
+    asc_right_eye = 'R' in (metadata['tracked_eye'] or '')
     if experiment.eyetracker.left is None:
         experiment.eyetracker.left = asc_left_eye
     elif experiment.eyetracker.left != asc_left_eye:
