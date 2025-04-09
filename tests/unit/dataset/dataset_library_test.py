@@ -28,7 +28,7 @@ import yaml
 from pymovements import DatasetDefinition
 from pymovements import DatasetLibrary
 from pymovements import register_dataset
-from pymovements.dataset.dataset_library import _add_shipped_datasets
+from pymovements.dataset import dataset_library
 
 
 def test_add_single_definition():
@@ -119,5 +119,5 @@ def test_dataset_library_contains_all_public_datasets_files():
 
 def test__add_shipped_datasets():
     with mock.patch('pymovements.dataset.dataset_library._add_shipped_datasets') as mock_add:
-        _add_shipped_datasets()
+        dataset_library._add_shipped_datasets()
         mock_add.assert_called_once()
