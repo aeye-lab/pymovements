@@ -92,3 +92,30 @@ def type_constructor(
         ) from exc
     except ValueError as exc:
         raise ValueError(f'Unknown {node=}') from exc
+
+
+def substitute_types(d: Any) -> Any:
+    if isinstance(d, dict):
+        return {k: substitute_types(v) for k, v in d.items()}
+    if isinstance(d, list):
+        return [substitute_types(v) for v in d]
+    if isinstance(d, type):
+        if d.__module__ == 'builtins':
+            return f'!{d.__name__}'
+        return f'!{d.__module__}.{d.__name__}'
+    return d
+
+
+def reverse_substitute_types(d: Any) -> Any:
+    if isinstance(d, dict):
+        return {k: reverse_substitute_types(v) for k, v in d.items()}
+    if isinstance(d, list):
+        return [reverse_substitute_types(v) for v in d]
+    if isinstance(d, str) and d.startswith('!'):
+        type_name = d[1:]
+        if '.' in type_name:
+            module_name, class_name = type_name.rsplit('.', 1)
+            module = importlib.import_module(module_name)
+            return getattr(module, class_name)
+        return getattr(builtins, type_name)
+    return d
