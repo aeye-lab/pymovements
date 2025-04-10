@@ -239,9 +239,7 @@ def test_dataset_definition_to_yaml_equal_dicts_no_exp(tmp_path):
     with open(tmp_file, encoding='utf-8') as f:
         yaml_dict = yaml.safe_load(f)
 
-    definition_dict = asdict(definition)
-    definition_dict['experiment'] = definition_dict['experiment'].to_dict()
-    assert definition_dict == yaml_dict
+    assert definition.to_dict() == yaml_dict
 
 
 def test_dataset_definition_to_yaml_equal_dicts(tmp_path):
@@ -269,9 +267,7 @@ def test_dataset_definition_to_yaml_equal_dicts(tmp_path):
     with open(tmp_file, encoding='utf-8') as f:
         yaml_dict = yaml.safe_load(f)
 
-    definition_dict = asdict(definition)
-    definition_dict['experiment'] = definition_dict['experiment'].to_dict()
-    assert definition_dict == yaml_dict
+    assert definition.to_dict() == yaml_dict
 
 
 def test_write_yaml_already_existing_dataset_definition_w_tuple_screen(tmp_path):
@@ -301,7 +297,7 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
 
     yaml_definition = DatasetDefinition.from_yaml(dictionary_tmp_file)
 
-    definition = DatasetDefinition(
+    expected_definition = DatasetDefinition(
         name='Example',
         has_files={
             'gaze': False,
@@ -310,4 +306,4 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
         },
     )
 
-    assert definition.__dict__ == yaml_definition.__dict__
+    assert yaml_definition == expected_definition

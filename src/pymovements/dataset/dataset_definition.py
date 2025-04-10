@@ -227,6 +227,18 @@ class DatasetDefinition:
         # Initialize DatasetDefinition with YAML data
         return DatasetDefinition(**data)
 
+    def to_dict(self) -> dict[str, Any]:
+        data = asdict(self)
+
+        # delete private fields from dictionary.
+        for key in list(data.keys()):
+            if key.startswith('_'):
+                del data[key]
+
+        data['experiment'] = data['experiment'].to_dict()
+
+        return data
+
     def to_yaml(self, path: str | Path) -> None:
         """Save a dataset definition to a YAML file.
 
@@ -235,7 +247,7 @@ class DatasetDefinition:
         path: str | Path
             Path where to save the YAML file to.
         """
-        data = asdict(self)
+        data = self.to_dict()
 
         def substitute_types(d: Any) -> Any:
             if isinstance(d, dict):
@@ -248,18 +260,18 @@ class DatasetDefinition:
                 return f'!{d.__module__}.{d.__name__}'
             return d
 
-        data['experiment'] = data['experiment'].to_dict()
-
         data = substitute_types(data)
 
         with open(path, 'w', encoding='utf-8') as f:
             yaml.dump(data, f, sort_keys=False)
 
     class HasResourcesIndexer:
-        def __init__(self, resources):
+        def __init__(self, resources: dict[str, list[dict[str, str]]]
+                                      | dict[str, tuple[dict[str, str], ...]],
+                     ):
             self._resources = resources
 
-        def __getitem__(self, key) -> bool:
+        def __getitem__(self, key: str) -> bool:
             try:
                 return len(self._resources[key]) > 0
             except KeyError:
@@ -284,8 +296,7 @@ class DatasetDefinition:
         def __eq__(self, other: Any):
             if isinstance(other, bool):
                 return self.__bool__() == other
-            else:
-                return super().__eq__(other)
+            return super().__eq__(other)
 
     @property
     def has_resources(self) -> DatasetDefinition.HasResourcesIndexer:
