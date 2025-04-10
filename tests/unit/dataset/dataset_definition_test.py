@@ -273,7 +273,7 @@ def test_dataset_definition_has_resources_indexable(resources, expected_resource
                 'time_column': None,
                 'time_unit': 'ms',
                 'trial_columns': None,
-                'velocity_columns': None
+                'velocity_columns': None,
             },
             id='no_experiment',
         ),
@@ -336,7 +336,7 @@ def test_dataset_definition_has_resources_indexable(resources, expected_resource
                 'time_column': None,
                 'time_unit': 'ms',
                 'trial_columns': None,
-                'velocity_columns': None
+                'velocity_columns': None,
             },
             id='experiment',
         ),
