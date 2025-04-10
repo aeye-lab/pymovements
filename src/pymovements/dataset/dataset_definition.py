@@ -20,8 +20,7 @@
 """DatasetDefinition module."""
 from __future__ import annotations
 
-import builtins
-import importlib
+from collections.abc import Mapping
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
@@ -30,6 +29,8 @@ from typing import Any
 
 import yaml
 
+from pymovements.dataset._utils._yaml import reverse_substitute_types
+from pymovements.dataset._utils._yaml import substitute_types
 from pymovements.dataset._utils._yaml import type_constructor
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
@@ -171,6 +172,10 @@ class DatasetDefinition:
     acceleration_columns: list[str] | None = None
     distance_column: str | None = None
 
+    _has_resources: HasResourcesIndexer = field(  # resources are set during __post_init__
+        default_factory=HasResourcesIndexer, init=False, repr=False, compare=False, hash=False,
+    )
+
     @staticmethod
     def from_yaml(path: str | Path) -> DatasetDefinition:
         """Load a dataset definition from a YAML file.
@@ -204,23 +209,22 @@ class DatasetDefinition:
                 eyetracker=eyetracker,
             )
 
-        def reverse_substitute_types(d: Any) -> Any:
-            if isinstance(d, dict):
-                return {k: reverse_substitute_types(v) for k, v in d.items()}
-            if isinstance(d, list):
-                return [reverse_substitute_types(v) for v in d]
-            if isinstance(d, str) and d.startswith('!'):
-                type_name = d[1:]
-                if '.' in type_name:
-                    module_name, class_name = type_name.rsplit('.', 1)
-                    module = importlib.import_module(module_name)
-                    return getattr(module, class_name)
-                return getattr(builtins, type_name)
-            return d
-
         data = reverse_substitute_types(data)
         # Initialize DatasetDefinition with YAML data
         return DatasetDefinition(**data)
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return definition as dictionary."""
+        data = asdict(self)
+
+        # delete private fields from dictionary.
+        for key in list(data.keys()):
+            if key.startswith('_'):
+                del data[key]
+
+        data['experiment'] = data['experiment'].to_dict()
+
+        return data
 
     def to_yaml(self, path: str | Path) -> None:
         """Save a dataset definition to a YAML file.
@@ -230,22 +234,51 @@ class DatasetDefinition:
         path: str | Path
             Path where to save the YAML file to.
         """
-        data = asdict(self)
-
-        def substitute_types(d: Any) -> Any:
-            if isinstance(d, dict):
-                return {k: substitute_types(v) for k, v in d.items()}
-            if isinstance(d, list):
-                return [substitute_types(v) for v in d]
-            if isinstance(d, type):
-                if d.__module__ == 'builtins':
-                    return f'!{d.__name__}'
-                return f'!{d.__module__}.{d.__name__}'
-            return d
-
-        data['experiment'] = data['experiment'].to_dict()
+        data = self.to_dict()
 
         data = substitute_types(data)
 
         with open(path, 'w', encoding='utf-8') as f:
             yaml.dump(data, f, sort_keys=False)
+
+    @property
+    def has_resources(self) -> HasResourcesIndexer:
+        return self._has_resources
+
+    def __post_init__(self) -> None:
+        self._has_resources.set_resources(self.resources)
+
+
+class HasResourcesIndexer:
+    def set_resources(
+            self, resources: dict[str, list[dict[str, str]]]
+        | dict[str, tuple[dict[str, str], ...]],
+    ) -> None:
+        self._resources = resources
+
+    def __getitem__(self, key: str) -> bool:
+        try:
+            return len(self._resources[key]) > 0
+        except KeyError:
+            return False
+        except TypeError:
+            return False
+
+    def __bool__(self) -> bool:
+        if not self._resources:
+            return False
+        if not isinstance(self._resources, Mapping):  # implements values(), dict is Mapping
+            return False
+
+        for resource_list in self._resources.values():
+            try:
+                if len(resource_list) > 0:
+                    return True
+            except TypeError:
+                return False
+        return False
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, bool):
+            return self.__bool__() == other
+        return super().__eq__(other)
