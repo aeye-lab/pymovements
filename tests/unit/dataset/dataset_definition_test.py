@@ -29,58 +29,169 @@ from pymovements import Experiment
 
 
 @pytest.mark.parametrize(
+    ('resources', 'expected_has_resources'),
+    [
+        pytest.param(
+            {},
+            False,
+            id='empty_resources_dict',
+        ),
+
+        pytest.param(
+            1,
+            False,
+            id='int_resources',
+        ),
+
+        pytest.param(
+            {'gaze': None},
+            False,
+            id='none_value_as_resources',
+        ),
+
+        pytest.param(
+            {'gaze': 1},
+            False,
+            id='int_as_resources_list',
+        ),
+
+        pytest.param(
+            {'gaze': []},
+            False,
+            id='empty_list_as_resources',
+        ),
+
+        pytest.param(
+            {'gaze': [{'resource': 'foo'}]},
+            True,
+            id='gaze_resources',
+        ),
+
+        pytest.param(
+            {'precomputed_events': [{'resource': 'foo'}]},
+            True,
+            id='precomputed_event_resources',
+        ),
+
+        pytest.param(
+            {'precomputed_reading_measures': [{'resource': 'foo'}]},
+            True,
+            id='precomputed_reading_measures_resources',
+        ),
+
+        pytest.param(
+            {
+                'gaze': [{'resource': 'foo'}],
+                'precomputed_events': [{'resource': 'foo'}],
+                'precomputed_reading_measures': [{'resource': 'foo'}],
+            },
+            True,
+            id='all_resources',
+        ),
+
+        pytest.param(
+            {
+                'foo': [{'resource': 'bar'}],
+            },
+            True,
+            id='custom_resources',
+        ),
+    ],
+)
+def test_dataset_definition_has_resources_boolean(resources, expected_has_resources):
+    definition = DatasetDefinition(resources=resources)
+
+    assert bool(definition.has_resources) == expected_has_resources
+    assert definition.has_resources == expected_has_resources
+    if definition.has_resources and not expected_has_resources:
+        assert False
+    if not definition.has_resources and expected_has_resources:
+        assert False
+
+
+@pytest.mark.parametrize(
     ('resources', 'expected_resources'),
     [
         pytest.param(
             {},
             {
-                None: True,
                 'gaze': False,
                 'precomputed_events': False,
                 'precomputed_reading_measures': False,
             },
             id='empty_resources_dict',
         ),
+
+        pytest.param(
+            1,
+            {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='int_resources',
+        ),
+
         pytest.param(
             {'gaze': None},
             {
-                None: True,
                 'gaze': False,
                 'precomputed_events': False,
                 'precomputed_reading_measures': False,
             },
             id='none_value_as_resources',
         ),
+
+        pytest.param(
+            {'gaze': 1},
+            {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='int_as_resources',
+        ),
+
+        pytest.param(
+            {'gaze': []},
+            {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='empty_list_as_resources',
+        ),
+
         pytest.param(
             {'gaze': [{'resource': 'foo'}]},
             {
-                None: False,
                 'gaze': True,
                 'precomputed_events': False,
                 'precomputed_reading_measures': False,
             },
             id='gaze_resources',
         ),
+
         pytest.param(
             {'precomputed_events': [{'resource': 'foo'}]},
             {
-                None: False,
                 'gaze': False,
                 'precomputed_events': True,
                 'precomputed_reading_measures': False,
             },
             id='precomputed_event_resources',
         ),
+
         pytest.param(
             {'precomputed_reading_measures': [{'resource': 'foo'}]},
             {
-                None: False,
                 'gaze': False,
                 'precomputed_events': False,
                 'precomputed_reading_measures': True,
             },
             id='precomputed_reading_measures_resources',
         ),
+
         pytest.param(
             {
                 'gaze': [{'resource': 'foo'}],
@@ -90,9 +201,22 @@ from pymovements import Experiment
             {'gaze': True, 'precomputed_events': True, 'precomputed_reading_measures': True},
             id='all_resources',
         ),
+
+        pytest.param(
+            {
+                'foo': [{'resource': 'bar'}],
+            },
+            {
+                'foo': True,
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='custom_resources',
+        ),
     ],
 )
-def test_dataset_definition_has_resources(resources, expected_resources):
+def test_dataset_definition_has_resources_indexable(resources, expected_resources):
     definition = DatasetDefinition(resources=resources)
 
     for key, value in expected_resources.items():

@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import builtins
 import importlib
+from collections.abc import Mapping
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
@@ -171,6 +172,8 @@ class DatasetDefinition:
     acceleration_columns: list[str] | None = None
     distance_column: str | None = None
 
+    _has_resources: HasResourcesIndexer | None = None  # is initialized during __post_init__
+
     @staticmethod
     def from_yaml(path: str | Path) -> DatasetDefinition:
         """Load a dataset definition from a YAML file.
@@ -250,31 +253,43 @@ class DatasetDefinition:
         with open(path, 'w', encoding='utf-8') as f:
             yaml.dump(data, f, sort_keys=False)
 
-    _has_resources = None
+    class HasResourcesIndexer:
+        def __init__(self, resources):
+            self._resources = resources
+
+        def __getitem__(self, key) -> bool:
+            try:
+                return len(self._resources[key]) > 0
+            except KeyError:
+                return False
+            except TypeError:
+                return False
+
+        def __bool__(self) -> bool:
+            if not self._resources:
+                return False
+            if not isinstance(self._resources, Mapping):  # implements values(), dict is Mapping
+                return False
+
+            for resource_list in self._resources.values():
+                try:
+                    if len(resource_list) > 0:
+                        return True
+                except TypeError:
+                    return False
+            return False
+
+        def __eq__(self, other: Any):
+            if isinstance(other, bool):
+                return self.__bool__() == other
+            else:
+                raise NotImplementedError(
+                    'HasResourcesIndexer comparison only implemented for bool',
+                )
 
     @property
-    def has_resources(self) -> HasResourcesIndex:
+    def has_resources(self) -> DatasetDefinition.HasResourcesIndexer:
         return self._has_resources
 
     def __post_init__(self):
-        self._has_resources = HasResourcesIndex(self.resources)
-
-
-class HasResourcesIndex:
-    def __init__(self, resources):
-        self.resources = resources
-
-    def __getitem__(self, key) -> bool:
-        if key is not None:
-            if not self.resources:
-                return False
-            elif key not in self.resources:
-                return False
-            elif not self.resources[key]:
-                return False
-            return True
-        else:
-            if not self.resources:
-                return True
-            else:
-                return False
+        self._has_resources = self.HasResourcesIndexer(self.resources)
