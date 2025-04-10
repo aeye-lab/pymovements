@@ -172,7 +172,9 @@ class DatasetDefinition:
     acceleration_columns: list[str] | None = None
     distance_column: str | None = None
 
-    _has_resources: HasResourcesIndexer | None = None  # is initialized during __post_init__
+    _has_resources: HasResourcesIndexer | None = field(  # is initialized during __post_init__
+        default=None, init=False, repr=False, compare=False, hash=False,
+    )
 
     @staticmethod
     def from_yaml(path: str | Path) -> DatasetDefinition:
@@ -283,9 +285,7 @@ class DatasetDefinition:
             if isinstance(other, bool):
                 return self.__bool__() == other
             else:
-                raise NotImplementedError(
-                    'HasResourcesIndexer comparison only implemented for bool',
-                )
+                return super().__eq__(other)
 
     @property
     def has_resources(self) -> DatasetDefinition.HasResourcesIndexer:
