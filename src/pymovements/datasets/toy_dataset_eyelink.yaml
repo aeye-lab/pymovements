@@ -5,13 +5,9 @@ has_files:
   precomputed_events: false
   precomputed_reading_measures: false
 
-mirrors:
-  gaze:
-    - "http://github.com/aeye-lab/pymovements-toy-dataset-eyelink/zipball/"
-
 resources:
   gaze:
-    - resource: "a970d090588542dad745297866e794ab9dad8795/"
+    - resource: "http://github.com/aeye-lab/pymovements-toy-dataset-eyelink/zipball/a970d090588542dad745297866e794ab9dad8795/"
       filename: "pymovements-toy-dataset-eyelink.zip"
       md5: "b1d426751403752c8a154fc48d1670ce"
 

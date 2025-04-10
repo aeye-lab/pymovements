@@ -52,9 +52,6 @@ class MouseCursor(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, list[str]]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
-
     resources: dict[str, list[dict[str, str]]]
         A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
@@ -134,25 +131,19 @@ class MouseCursor(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda: {
-            'gaze': [
-                'https://ars.els-cdn.com/content/image/',
-            ],
-        },
-    )
 
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
             'gaze': [
                 {
-                    'resource': '1-s2.0-S2352340921000160-mmc1.zip',
+                    'resource': 'https://ars.els-cdn.com/content/image/1-s2.0-S2352340921000160-mmc1.zip',  # noqa: E501 # pylint: disable=line-too-long
                     'filename': 'mousecursor.zip',
                     'md5': '7885e8fd44f14f02f60e9f62431aea63',
                 },
             ],
         },
     )
+
     extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     experiment: Experiment = field(

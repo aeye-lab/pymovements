@@ -5,13 +5,9 @@ has_files:
   precomputed_events: false
   precomputed_reading_measures: false
 
-mirrors:
-  gaze:
-    - "https://didec.uvt.nl/corpus/"
-
 resources:
   gaze:
-    - resource: "DIDEC_only_the_eyetracking_data.zip"
+    - resource: "https://didec.uvt.nl/corpus/DIDEC_only_the_eyetracking_data.zip"
       filename: "DIDEC_only_the_eyetracking_data.zip"
       md5: "d572b0b41828986ca48a2fcf6966728a"
 
