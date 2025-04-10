@@ -44,6 +44,10 @@ class CodeComprehension(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    info: str
+        Information about the dataset including but not limited to original citation,
+        general information.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -97,6 +101,36 @@ class CodeComprehension(DatasetDefinition):
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'CodeComprehension'
+
+    info: str = """\
+CodeComprehension dataset :cite:p:`CodeComprehension`.
+
+This dataset includes eye-tracking-while-code-reading data from participants in a single
+session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an
+EyeLink 1000 eye tracker and are provided as pixel coordinates.
+
+The participant is instructed to read the code snippet and answer a code comprehension question.
+
+If you use the dataset, please cite:
+
+@article{CodeComprehension,
+  author = {Alakmeh, Tarek and Reich, David and J\\"{a}ger, Lena and Fritz, Thomas},
+  title = {Predicting Code Comprehension: A Novel Approach to
+  Align Human Gaze with Code using Deep Neural Networks},
+  year = {2024},
+  issue_date = {July 2024},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {1},
+  number = {FSE},
+  url = {https://doi.org/10.1145/3660795},
+  doi = {10.1145/3660795},
+  journal = {Proc. ACM Softw. Eng.},
+  month = {jul},
+  articleno = {88},
+  numpages = {23},
+}
+"""
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

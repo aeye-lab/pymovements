@@ -32,7 +32,7 @@ from pymovements.gaze.experiment import Experiment
 class CopCo(DatasetDefinition):
     """CopCo dataset :cite:p:`CopCoL1Hollenstein`.
 
-    This dataset includes monocular eye tracking data from a single participants in a single
+    This dataset includes monocular eye tracking data from 58 participants in a single
     session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
     eye tracker and are provided as pixel coordinates.
 
@@ -47,6 +47,10 @@ class CopCo(DatasetDefinition):
     ----------
     name: str
         The name of the dataset.
+
+    info: str
+        Information about the dataset including but not limited to original citation,
+        general information.
 
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
@@ -125,6 +129,93 @@ class CopCo(DatasetDefinition):
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'CopCo'
+
+    info: str = """\
+CopCo dataset :cite:p:`CopCoL1Hollenstein`.
+
+This dataset includes monocular eye tracking data from 58 participants in a single
+session. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink 1000
+eye tracker and are provided as pixel coordinates.
+
+The participant is instructed to read texts and answer questions.
+
+The dataset includes the data from three papers:
+    the L1 data: :cite:p:`CopCoL1Hollenstein`,
+    the L1 data with dylsexia: :cite:p:`CopCoL1DysBjornsdottir`,
+    the L2 data: :cite:p:`CopCoL2`,
+
+If you use the dataset, please cite:
+  For L1:
+    @inproceedings{CopCoL1Hollenstein,
+      title = "The {C}openhagen Corpus of Eye Tracking Recordings from
+      Natural Reading of {D}anish Texts",
+      author = {Hollenstein, Nora  and
+        Barrett, Maria  and
+        Bj{\\"o}rnsd{\\'o}ttir, Marina},
+      editor = "Calzolari, Nicoletta  and
+        B{\\'e}chet, Fr{\\'e}d{\\'e}ric  and
+        Blache, Philippe  and
+        Choukri, Khalid  and
+        Cieri, Christopher  and
+        Declerck, Thierry  and
+        Goggi, Sara  and
+        Isahara, Hitoshi  and
+        Maegaard, Bente  and
+        Mariani, Joseph  and
+        Mazo, H{\\'e}l{\\`e}ne  and
+        Odijk, Jan  and
+        Piperidis, Stelios",
+      booktitle = "Proceedings of the Thirteenth Language Resources and Evaluation Conference",
+      month = jun,
+      year = "2022",
+      address = "Marseille, France",
+      publisher = "European Language Resources Association",
+      url = "https://aclanthology.org/2022.lrec-1.182",
+      pages = "1712--1720",
+    }
+
+  For L1 with dyslexia:
+    @inproceedings{CopCoL1DysBjornsdottir,
+      title = "Dyslexia Prediction from Natural Reading of {D}anish Texts",
+      author = {Bj{\\"o}rnsd{\\'o}ttir, Marina  and
+        Hollenstein, Nora  and
+        Barrett, Maria},
+      editor = {Alum{\\"a}e, Tanel  and
+        Fishel, Mark},
+      booktitle = "Proceedings of the 24th Nordic Conference on
+      Computational Linguistics (NoDaLiDa)",
+      month = may,
+      year = "2023",
+      address = "T{\\'o}rshavn, Faroe Islands",
+      publisher = "University of Tartu Library",
+      url = "https://aclanthology.org/2023.nodalida-1.7",
+      pages = "60--70",
+    }
+  For L2:
+    @inproceedings{CopCoL2,
+      title = "Reading Does Not Equal Reading:
+      Comparing, Simulating and Exploiting Reading Behavior across Populations",
+      author = {Reich, David R.  and
+        Deng, Shuwen  and
+        Bj{\\"o}rnsd{\\'o}ttir, Marina  and
+        J{\\"a}ger, Lena  and
+        Hollenstein, Nora},
+      editor = "Calzolari, Nicoletta  and
+        Kan, Min-Yen  and
+        Hoste, Veronique  and
+        Lenci, Alessandro  and
+        Sakti, Sakriani  and
+        Xue, Nianwen",
+      booktitle = "Proceedings of the 2024 Joint International Conference on
+      Computational Linguistics, Language Resources and Evaluation (LREC-COLING 2024)",
+      month = may,
+      year = "2024",
+      address = "Torino, Italia",
+      publisher = "ELRA and ICCL",
+      url = "https://aclanthology.org/2024.lrec-main.1187",
+      pages = "13586--13594",
+    }
+"""
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
