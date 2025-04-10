@@ -57,4 +57,5 @@ def test_public_dataset_registered(definition, dataset_name):
     assert dataset_name in DatasetLibrary.names()
     definition_from_library = DatasetLibrary.get(dataset_name)
 
+    # simple equal between objects does not work as classes have different names.
     assert definition().to_dict() == definition_from_library.to_dict()
