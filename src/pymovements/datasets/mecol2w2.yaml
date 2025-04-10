@@ -1,0 +1,34 @@
+name: "MECOL2W2"
+
+has_files:
+  gaze: false
+  precomputed_events: true
+  precomputed_reading_measures: false
+
+mirrors:
+  precomputed_events:
+    - "https://osf.io/download/"
+
+resources:
+  precomputed_events:
+    - resource: "677e22d30788b62a2dd10a52/"
+      filename: "joint_fix_trimmed_L2_wave2.rda"
+      md5: "f7eaf80ac5916d79351419fd4f1da2f6"
+
+extract:
+  precomputed_events: false
+
+filename_format:
+  precomputed_events: "joint_fix_trimmed_L2_wave2.rda"
+
+filename_format_schema_overrides:
+  precomputed_events: {}
+
+trial_columns:
+  - "uniform_id"
+  - "itemid"
+
+column_map: {}
+
+custom_read_kwargs:
+  precomputed_events: {'r_dataframe_key': 'joint.fix.l2_w2'}
