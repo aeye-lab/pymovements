@@ -172,8 +172,8 @@ class DatasetDefinition:
     acceleration_columns: list[str] | None = None
     distance_column: str | None = None
 
-    _has_resources: HasResourcesIndexer | None = field(  # is initialized during __post_init__
-        default=None, init=False, repr=False, compare=False, hash=False,
+    _has_resources: HasResourcesIndexer = field(  # resources are set during __post_init__
+        default_factory=HasResourcesIndexer, init=False, repr=False, compare=False, hash=False,
     )
 
     @staticmethod
@@ -241,43 +241,44 @@ class DatasetDefinition:
         with open(path, 'w', encoding='utf-8') as f:
             yaml.dump(data, f, sort_keys=False)
 
-    class HasResourcesIndexer:
-        def __init__(
-            self, resources: dict[str, list[dict[str, str]]]
-            | dict[str, tuple[dict[str, str], ...]],
-        ):
-            self._resources = resources
-
-        def __getitem__(self, key: str) -> bool:
-            try:
-                return len(self._resources[key]) > 0
-            except KeyError:
-                return False
-            except TypeError:
-                return False
-
-        def __bool__(self) -> bool:
-            if not self._resources:
-                return False
-            if not isinstance(self._resources, Mapping):  # implements values(), dict is Mapping
-                return False
-
-            for resource_list in self._resources.values():
-                try:
-                    if len(resource_list) > 0:
-                        return True
-                except TypeError:
-                    return False
-            return False
-
-        def __eq__(self, other: Any):
-            if isinstance(other, bool):
-                return self.__bool__() == other
-            return super().__eq__(other)
-
     @property
-    def has_resources(self) -> DatasetDefinition.HasResourcesIndexer:
+    def has_resources(self) -> HasResourcesIndexer:
         return self._has_resources
 
-    def __post_init__(self):
-        self._has_resources = self.HasResourcesIndexer(self.resources)
+    def __post_init__(self) -> None:
+        self._has_resources.set_resources(self.resources)
+
+
+class HasResourcesIndexer:
+    def set_resources(
+            self, resources: dict[str, list[dict[str, str]]]
+        | dict[str, tuple[dict[str, str], ...]],
+    ) -> None:
+        self._resources = resources
+
+    def __getitem__(self, key: str) -> bool:
+        try:
+            return len(self._resources[key]) > 0
+        except KeyError:
+            return False
+        except TypeError:
+            return False
+
+    def __bool__(self) -> bool:
+        if not self._resources:
+            return False
+        if not isinstance(self._resources, Mapping):  # implements values(), dict is Mapping
+            return False
+
+        for resource_list in self._resources.values():
+            try:
+                if len(resource_list) > 0:
+                    return True
+            except TypeError:
+                return False
+        return False
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, bool):
+            return self.__bool__() == other
+        return super().__eq__(other)
