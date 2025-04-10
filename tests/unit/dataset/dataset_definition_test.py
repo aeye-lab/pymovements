@@ -221,45 +221,171 @@ def test_dataset_definition_has_resources_indexable(resources, expected_resource
         assert definition.has_resources[key] == value
 
 
-def test_dataset_definition_to_yaml_equal_dicts_no_exp(tmp_path):
-    tmp_file = tmp_path / 'tmp.yaml'
-
-    definition = DatasetDefinition(
-        name='Example',
-        has_files={
-            'gaze': False,
-            'precomputed_events': False,
-            'precomputed_reading_measures': False,
-        },
-    )
-    definition.to_yaml(tmp_file)
-
-    with open(tmp_file, encoding='utf-8') as f:
-        yaml_dict = yaml.safe_load(f)
-
-    assert definition.to_dict() == yaml_dict
-
-
-def test_dataset_definition_to_yaml_equal_dicts(tmp_path):
-    tmp_file = tmp_path / 'tmp.yaml'
-
-    definition = DatasetDefinition(
-        name='Example',
-        has_files={
-            'gaze': False,
-            'precomputed_events': False,
-            'precomputed_reading_measures': False,
-        },
-        experiment=Experiment(
-            screen_width_px=1280,
-            screen_height_px=1024,
-            screen_width_cm=38.2,
-            screen_height_cm=30.2,
-            distance_cm=60,
-            origin='center',
-            sampling_rate=2000,
+@pytest.mark.parametrize(
+    ('definition', 'expected_dict'),
+    [
+        pytest.param(
+            DatasetDefinition(
+                name='Example',
+                has_files={
+                    'gaze': False,
+                    'precomputed_events': False,
+                    'precomputed_reading_measures': False,
+                },
+            ),
+            {
+                'name': 'Example',
+                'has_files': {
+                    'gaze': False,
+                    'precomputed_events': False,
+                    'precomputed_reading_measures': False,
+                },
+                'acceleration_columns': None,
+                'column_map': {},
+                'custom_read_kwargs': {},
+                'distance_column': None,
+                'experiment': {
+                    'eyetracker': {
+                        'left': None,
+                        'model': None,
+                        'mount': None,
+                        'right': None,
+                        'sampling_rate': None,
+                        'vendor': None,
+                        'version': None,
+                    },
+                    'screen': {
+                        'distance_cm': None,
+                        'height_cm': None,
+                        'height_px': None,
+                        'origin': 'upper left',
+                        'width_cm': None,
+                        'width_px': None,
+                    },
+                },
+                'extract': {},
+                'filename_format': {},
+                'filename_format_schema_overrides': {},
+                'mirrors': {},
+                'pixel_columns': None,
+                'position_columns': None,
+                'resources': {},
+                'time_column': None,
+                'time_unit': 'ms',
+                'trial_columns': None,
+                'velocity_columns': None
+            },
+            id='no_experiment',
         ),
-    )
+
+        pytest.param(
+            DatasetDefinition(
+                name='Example',
+                has_files={
+                    'gaze': False,
+                    'precomputed_events': False,
+                    'precomputed_reading_measures': False,
+                },
+                experiment=Experiment(
+                    screen_width_px=1280,
+                    screen_height_px=1024,
+                    screen_width_cm=38.2,
+                    screen_height_cm=30.2,
+                    distance_cm=60,
+                    origin='center',
+                    sampling_rate=2000,
+                ),
+            ),
+            {
+                'name': 'Example',
+                'has_files': {
+                    'gaze': False,
+                    'precomputed_events': False,
+                    'precomputed_reading_measures': False,
+                },
+                'acceleration_columns': None,
+                'column_map': {},
+                'custom_read_kwargs': {},
+                'distance_column': None,
+                'experiment': {
+                    'eyetracker': {
+                        'left': None,
+                        'model': None,
+                        'mount': None,
+                        'right': None,
+                        'sampling_rate': 2000,
+                        'vendor': None,
+                        'version': None,
+                    },
+                    'screen': {
+                        'distance_cm': 60,
+                        'height_cm': 30.2,
+                        'height_px': 1024,
+                        'origin': 'center',
+                        'width_cm': 38.2,
+                        'width_px': 1280,
+                    },
+                },
+                'extract': {},
+                'filename_format': {},
+                'filename_format_schema_overrides': {},
+                'mirrors': {},
+                'pixel_columns': None,
+                'position_columns': None,
+                'resources': {},
+                'time_column': None,
+                'time_unit': 'ms',
+                'trial_columns': None,
+                'velocity_columns': None
+            },
+            id='experiment',
+        ),
+    ],
+)
+def test_dataset_definition_to_dict_expected(definition, expected_dict):
+    assert definition.to_dict() == expected_dict
+
+
+@pytest.mark.parametrize(
+    ('definition'),
+    [
+        pytest.param(
+            DatasetDefinition(
+                name='Example',
+                has_files={
+                    'gaze': False,
+                    'precomputed_events': False,
+                    'precomputed_reading_measures': False,
+                },
+            ),
+            id='no_exp',
+        ),
+
+        pytest.param(
+            DatasetDefinition(
+                name='Example',
+                has_files={
+                    'gaze': False,
+                    'precomputed_events': False,
+                    'precomputed_reading_measures': False,
+                },
+                experiment=Experiment(
+                    screen_width_px=1280,
+                    screen_height_px=1024,
+                    screen_width_cm=38.2,
+                    screen_height_cm=30.2,
+                    distance_cm=60,
+                    origin='center',
+                    sampling_rate=2000,
+                ),
+            ),
+            id='no_exp',
+        ),
+    ],
+)
+def test_dataset_definition_to_yaml_equal_dicts(definition, tmp_path):
+    tmp_file = tmp_path / 'tmp.yaml'
+
     definition.to_yaml(tmp_file)
 
     with open(tmp_file, encoding='utf-8') as f:

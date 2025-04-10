@@ -214,6 +214,7 @@ class DatasetDefinition:
         return DatasetDefinition(**data)
 
     def to_dict(self) -> dict[str, Any]:
+        """Return definition as dictionary."""
         data = asdict(self)
 
         # delete private fields from dictionary.
