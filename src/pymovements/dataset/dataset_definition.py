@@ -266,9 +266,10 @@ class DatasetDefinition:
             yaml.dump(data, f, sort_keys=False)
 
     class HasResourcesIndexer:
-        def __init__(self, resources: dict[str, list[dict[str, str]]]
-                                      | dict[str, tuple[dict[str, str], ...]],
-                     ):
+        def __init__(
+            self, resources: dict[str, list[dict[str, str]]]
+            | dict[str, tuple[dict[str, str], ...]],
+        ):
             self._resources = resources
 
         def __getitem__(self, key: str) -> bool:
