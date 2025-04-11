@@ -29,12 +29,12 @@ def setup_import_pymovements():
 
 
 def import_pymovements():
-    import pymovements
+    import pymovements  # noqa: F401 # pylint: disable=import-outside-toplevel,unused-import
 
 
 def teardown_import_pymovements():
     try:
-        del pymovements
+        del pymovements  # noqa: F821 # pylint: disable=undefined-variable
     except BaseException:
         pass
 
@@ -53,7 +53,7 @@ def test_import_pymovements(benchmark):
 
 def import_pymovements_subprocess():
     cmd = [sys.executable, '-c', 'import pymovements']
-    subprocess.run(cmd)
+    subprocess.run(cmd, check=True)
 
 
 def test_import_pymovements_subprocess(benchmark):
@@ -65,7 +65,7 @@ def test_import_pymovements_subprocess(benchmark):
 
 def import_pymovements_subprocess_x():
     cmd = [sys.executable, '-X', 'importtime', '-c', 'import pymovements']
-    p = subprocess.run(cmd, stderr=subprocess.PIPE)
+    p = subprocess.run(cmd, stderr=subprocess.PIPE, check=True)
 
     lines = p.stderr.splitlines()
     line = lines[-1]
