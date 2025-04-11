@@ -99,12 +99,11 @@ from pymovements import Experiment
 def test_dataset_definition_has_resources_boolean(resources, expected_has_resources):
     definition = DatasetDefinition(resources=resources)
 
+    # there are multiple contexts of using booleans.
     assert bool(definition.has_resources) == expected_has_resources
     assert definition.has_resources == expected_has_resources
-    if definition.has_resources and not expected_has_resources:
-        assert False
-    if not definition.has_resources and expected_has_resources:
-        assert False
+    assert not (definition.has_resources and not expected_has_resources)
+    assert not (not definition.has_resources and expected_has_resources)
 
 
 @pytest.mark.parametrize(
