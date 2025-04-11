@@ -17,6 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Benchmark import times."""
 import subprocess
 import sys
 
@@ -28,7 +29,7 @@ def setup_import_pymovements():
 
 
 def import_pymovements():
-    pass
+    import pymovements
 
 
 def teardown_import_pymovements():
@@ -56,7 +57,7 @@ def import_pymovements_subprocess():
 
 
 def test_import_pymovements_subprocess(benchmark):
-    result = benchmark.pedantic(
+    benchmark.pedantic(
         import_pymovements_subprocess,
         iterations=1, rounds=10,
     )
@@ -74,7 +75,7 @@ def import_pymovements_subprocess_x():
 
 
 def test_import_pymovements_subprocess_x(benchmark):
-    result = benchmark.pedantic(
+    benchmark.pedantic(
         import_pymovements_subprocess_x,
         iterations=1, rounds=10,
     )
