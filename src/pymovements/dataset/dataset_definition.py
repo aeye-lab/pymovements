@@ -209,7 +209,13 @@ class DatasetDefinition:
         return DatasetDefinition(**data)
 
     def to_dict(self, hide_private: bool = True) -> dict[str, Any]:
-        """Return dictionary representation."""
+        """Return dictionary representation.
+
+        Parameters
+        ----------
+        hide_private: bool
+            Hide attributes that start with `_`.
+        """
         data = asdict(self)
 
         # Delete private fields from dictionary.
