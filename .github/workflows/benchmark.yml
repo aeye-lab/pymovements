@@ -8,7 +8,7 @@ on:
 
 jobs:
   pytest-benchmark:
-    name: Run Pytest benchmark example - github.com/benchmark-action/github-action-benchmark-results
+    name: pytest-benchmark
     runs-on: ubuntu-latest
     steps:
       - name: Checkout pymovements repository
@@ -40,11 +40,11 @@ jobs:
       - name: Store benchmark result
         uses: benchmark-action/github-action-benchmark@v1
         with:
-          name: Python Benchmark with pytest-benchmark
+          name: pytest-benchmark
           tool: 'pytest'
           output-file-path: benchmark-data.json
           external-data-json-path: ./cache/benchmark-data.json
-          #github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-push: false
           # Show alert with commit comment on detecting possible performance regression
           alert-threshold: '150%'
