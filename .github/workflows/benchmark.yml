@@ -35,7 +35,9 @@ jobs:
         with:
           path: ./cache
           key: benchmark-${{ github.ref_name }}-${{ github.run_id }}
-          restore-keys: benchmark-main
+          restore-keys:
+            - benchmark-${{ github.ref_name }}
+            - benchmark-main
 
       - name: Store benchmark result
         uses: benchmark-action/github-action-benchmark@v1
