@@ -46,9 +46,8 @@ jobs:
           external-data-json-path: ./cache/benchmark-data.json
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-push: false
-          # Show alert with commit comment on detecting possible performance regression
           alert-threshold: '150%'
           comment-on-alert: true
           fail-on-alert: true
           summary-always: true
-          alert-comment-cc-users: '@dkrako'
+          alert-comment-cc-users: '@dkrako,@SiQube'
