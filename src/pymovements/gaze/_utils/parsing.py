@@ -182,7 +182,7 @@ def parse_eyelink(
         patterns: list[dict[str, Any] | str] | None = None,
         schema: dict[str, Any] | None = None,
         metadata_patterns: list[dict[str, Any] | str] | None = None,
-        encoding: str = 'ascii',
+        encoding: str | None = None,
 ) -> tuple[pl.DataFrame, dict[str, Any]]:
     """Parse EyeLink asc file.
 
@@ -196,8 +196,8 @@ def parse_eyelink(
         Dictionary to optionally specify types of columns parsed by patterns. (default: None)
     metadata_patterns: list[dict[str, Any] | str] | None
         list of patterns to match for additional metadata. (default: None)
-    encoding: str
-        Text encoding of the file. (default: 'ascii')
+    encoding: str | None
+        Text encoding of the file. If None, the locale encoding is used. (default: None)
 
     Returns
     -------
