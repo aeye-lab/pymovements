@@ -1115,6 +1115,8 @@ def test_gaze_to_aoi_mapping_char_width_height(eye, aoi_column, gaze_type):
             **{'separator': '\t'},
             position_columns=['x_left', 'y_left', 'x_right', 'y_right'],
         )
+    else:
+        assert False, 'unknown gaze_type'
 
     gaze_df.map_to_aois(aoi_df, eye=eye, gaze_type=gaze_type)
     assert_frame_equal(gaze_df.frame, EXPECTED_DF[f'{aoi_column}_{eye}_{gaze_type}'])
@@ -1165,6 +1167,8 @@ def test_gaze_to_aoi_mapping_char_end(eye, aoi_column, gaze_type):
             **{'separator': '\t'},
             position_columns=['x_left', 'y_left', 'x_right', 'y_right'],
         )
+    else:
+        assert False, 'unknown gaze_type'
 
     gaze_df.map_to_aois(aoi_df, eye=eye, gaze_type=gaze_type)
     assert_frame_equal(gaze_df.frame, EXPECTED_DF[f'{aoi_column}_{eye}_{gaze_type}'])
