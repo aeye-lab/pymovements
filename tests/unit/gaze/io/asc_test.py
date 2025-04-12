@@ -724,7 +724,7 @@ def test_from_asc_detects_mismatches_in_experiment_metadata(experiment_kwargs, i
 
         pytest.param(
             {
-            'file': 'tests/files/eyelink_monocular_no_dummy_example.asc',
+                'file': 'tests/files/eyelink_monocular_no_dummy_example.asc',
                 'metadata_patterns': [
                     {'pattern': r'ENCODING TEST (?P<foobar>.+)'},
                 ],
@@ -740,6 +740,6 @@ def test_from_asc_detects_mismatches_in_experiment_metadata(experiment_kwargs, i
 def test_from_asc_has_expected_metadata(kwargs, expected_metadata):
     gaze = from_asc(**kwargs)
 
-        for key, value in expected_metadata.items():
+    for key, value in expected_metadata.items():
         assert key in gaze._metadata
         assert gaze._metadata[key] == value
