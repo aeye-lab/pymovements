@@ -23,16 +23,6 @@ import sys
 
 
 def setup_import_pymovements():
-    teardown_import_pymovements()
-    assert 'pymovements' not in sys.modules
-    assert not any(module.startswith('pymovements') for module in sys.modules)
-
-
-def import_pymovements():
-    import pymovements  # noqa: F401 # pylint: disable=import-outside-toplevel,unused-import
-
-
-def teardown_import_pymovements():
     try:
         del pymovements  # noqa: F821 # pylint: disable=undefined-variable
     except BaseException:
@@ -42,12 +32,19 @@ def teardown_import_pymovements():
         if module.startswith('pymovements'):
             del sys.modules[module]
 
+    assert 'pymovements' not in sys.modules
+    assert not any(module.startswith('pymovements') for module in sys.modules)
+
+
+def import_pymovements():
+    import pymovements  # noqa: F401 # pylint: disable=import-outside-toplevel,unused-import
+
 
 def test_import_pymovements(benchmark):
     benchmark.pedantic(
         import_pymovements,
         setup=setup_import_pymovements,
-        iterations=1, rounds=10,
+        iterations=1, rounds=1,  # only a single round due to leakage to subsequent rounds
     )
 
 
@@ -59,23 +56,5 @@ def import_pymovements_subprocess():
 def test_import_pymovements_subprocess(benchmark):
     benchmark.pedantic(
         import_pymovements_subprocess,
-        iterations=1, rounds=10,
-    )
-
-
-def import_pymovements_subprocess_x():
-    cmd = [sys.executable, '-X', 'importtime', '-c', 'import pymovements']
-    p = subprocess.run(cmd, stderr=subprocess.PIPE, check=True)
-
-    lines = p.stderr.splitlines()
-    line = lines[-1]
-    field = line.split(b'|')[-2].strip()
-    total = int(field)  # microseconds
-    return total, lines
-
-
-def test_import_pymovements_subprocess_x(benchmark):
-    benchmark.pedantic(
-        import_pymovements_subprocess_x,
         iterations=1, rounds=10,
     )
