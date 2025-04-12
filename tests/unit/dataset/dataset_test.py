@@ -39,6 +39,8 @@ from pymovements import GazeDataFrame
 from pymovements.exceptions import InvalidProperty
 
 
+# pylint: disable=too-many-lines
+
 class _UNSET:
     ...
 
