@@ -292,7 +292,7 @@ def test_dataset_definition_to_dict_hide_private_expected(hide_private, expected
         ),
     ],
 )
-def test_dataset_definition_to_yaml_equal_dicts_no_exp(definition, tmp_path):
+def test_dataset_definition_to_yaml_equal_dicts(definition, tmp_path):
     tmp_file = tmp_path / 'tmp.yaml'
 
     definition.to_yaml(tmp_file)
