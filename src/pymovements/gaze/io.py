@@ -282,7 +282,7 @@ def from_asc(
         trial_columns: str | list[str] | None = None,
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, Any] | None = None,
-        encoding: str = 'ascii',
+        encoding: str | None = None,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
 
@@ -311,8 +311,8 @@ def from_asc(
     column_schema_overrides: dict[str, Any] | None
         Dictionary containing types for columns.
         (default: None)
-    encoding: str
-        Text encoding of the file. (default: 'ascii')
+    encoding: str | None
+        Text encoding of the file. If None, the locale encoding is used. (default: None)
 
     Returns
     -------
