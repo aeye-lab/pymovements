@@ -25,6 +25,7 @@ import importlib
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
+from dataclasses import KW_ONLY
 from pathlib import Path
 from typing import Any
 
@@ -143,38 +144,36 @@ class DatasetDefinition:
     # pylint: disable=too-many-instance-attributes
     name: str = '.'
 
-    has_files: dict[str, bool] = field(default_factory=dict, kw_only=True)
+    _: KW_ONLY  # only the name can be passed as a positional argument.
 
-    mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] = field(
-        default_factory=dict, kw_only=True,
-    )
+    has_files: dict[str, bool] = field(default_factory=dict)
+
+    mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] = field(default_factory=dict)
 
     resources: dict[str, list[dict[str, str]]] | dict[str, tuple[dict[str, str], ...]] = field(
-        default_factory=dict, kw_only=True,
+        default_factory=dict,
     )
 
-    experiment: Experiment | None = field(default_factory=Experiment, kw_only=True)
+    experiment: Experiment | None = field(default_factory=Experiment)
 
-    extract: dict[str, bool] = field(default_factory=dict, kw_only=True)
+    extract: dict[str, bool] = field(default_factory=dict)
 
-    filename_format: dict[str, str] = field(default_factory=dict, kw_only=True)
+    filename_format: dict[str, str] = field(default_factory=dict)
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=dict, kw_only=True,
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] = field(default_factory=dict)
 
-    custom_read_kwargs: dict[str, dict[str, Any]] = field(default_factory=dict, kw_only=True)
+    custom_read_kwargs: dict[str, dict[str, Any]] = field(default_factory=dict)
 
-    column_map: dict[str, str] = field(default_factory=dict, kw_only=True)
+    column_map: dict[str, str] = field(default_factory=dict)
 
-    trial_columns: list[str] | None = field(default=None, kw_only=True)
-    time_column: str | None = field(default=None, kw_only=True)
-    time_unit: str | None = field(default='ms', kw_only=True)
-    pixel_columns: list[str] | None = field(default=None, kw_only=True)
-    position_columns: list[str] | None = field(default=None, kw_only=True)
-    velocity_columns: list[str] | None = field(default=None, kw_only=True)
-    acceleration_columns: list[str] | None = field(default=None, kw_only=True)
-    distance_column: str | None = field(default=None, kw_only=True)
+    trial_columns: list[str] | None = None
+    time_column: str | None = None
+    time_unit: str | None = 'ms'
+    pixel_columns: list[str] | None = None
+    position_columns: list[str] | None = None
+    velocity_columns: list[str] | None = None
+    acceleration_columns: list[str] | None = None
+    distance_column: str | None = None
 
     @staticmethod
     def from_yaml(path: str | Path) -> DatasetDefinition:
