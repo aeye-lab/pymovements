@@ -215,6 +215,11 @@ class DatasetDefinition:
         ----------
         hide_private: bool
             Hide attributes that start with `_`.
+
+        Returns
+        -------
+        dict[str, Any]
+            Dictionary representation of dataset definition.
         """
         data = asdict(self)
 
