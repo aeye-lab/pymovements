@@ -39,7 +39,8 @@ from pymovements import GazeDataFrame
 from pymovements.exceptions import InvalidProperty
 
 
-class _UNSET: ...
+class _UNSET:
+    ...
 
 
 def create_raw_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):
