@@ -119,7 +119,6 @@ def test_pos2acc_raises_error(kwargs, series, exception, msg_substrings):
             pl.Series('position', [], pl.List(pl.Float64)),
             pl.Series('acceleration', [], pl.List(pl.Float64)),
             id='empty_series_returns_empty_series',
-            marks=pytest.mark.xfail(reason='#475'),
         ),
         pytest.param(
             {'window_length': 3, 'degree': 1, 'sampling_rate': 1, 'n_components': 2},
