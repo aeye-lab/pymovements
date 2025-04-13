@@ -20,6 +20,7 @@
 """Test pymovements plotting utils."""
 import re
 
+import matplotlib.pyplot
 import numpy as np
 import pytest
 
@@ -29,35 +30,60 @@ from pymovements.utils.plotting import draw_line_data
 from pymovements.utils.plotting import setup_matplotlib
 
 
+@pytest.fixture(
+    name='axes',
+    params=[
+        (10, 15),
+        (15, 15),
+    ],
+)
+def axes_fixture(request):
+    fig = matplotlib.pyplot.figure(figsize=request.param)
+    yield fig.gca()
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+@pytest.mark.parametrize(
+    'kwargs',
+    [
+        pytest.param(
+            {
+                'x_signal': np.array([0.0, 1.0]),
+                'y_signal': np.array([0.0, 2.0]),
+                'figsize': (10, 15),
+            },
+            id='both_signals_figsize',
+        ),
+    ],
+)
+def test_setup_matplotlib(kwargs):
+    setup_matplotlib(**kwargs)
+
+
 @pytest.mark.filterwarnings('ignore::DeprecationWarning')
 @pytest.mark.parametrize(
     ('plotting_function', 'kwargs'),
     [
         pytest.param(
-            setup_matplotlib,
-            {
-                'x_signal': np.array([0.0, 0.0]),
-                'y_signal': np.array([0.0, 0.0]),
-                'figsize': (10, 15),
-            },
-            id='_setup_matplotlib',
-        ),
-
-        pytest.param(
             draw_image_stimulus,
-            {},
+            {
+                'image_stimulus': 'tests/files/pexels-zoorg-1000498.jpg',
+            },
             id='draw_image_stimulus',
         ),
 
         pytest.param(
             draw_line_data,
-            {},
+            {
+                'x_signal': np.array([0.0, 0.0]),
+                'y_signal': np.array([0.0, 0.0]),
+            },
             id='_draw_line_data',
         ),
     ],
 )
-def test_plotting_function(plotting_function, kwargs):
-    plotting_function(**kwargs)
+def test_plotting_function(plotting_function, kwargs, axes):
+    plotting_function(ax=axes, **kwargs)
 
 
 @pytest.mark.parametrize(
