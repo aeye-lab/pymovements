@@ -24,6 +24,8 @@
 """
 from __future__ import annotations
 
+from pathlib import Path
+
 import matplotlib.colors
 import matplotlib.pyplot
 import numpy as np
@@ -31,6 +33,8 @@ from deprecated.sphinx import deprecated
 
 from pymovements.plotting._matplotlib import _draw_line_data
 from pymovements.plotting._matplotlib import _setup_matplotlib
+from pymovements.plotting._matplotlib import LinearSegmentedColormapType
+from pymovements.plotting._matplotlib import MatplotlibSetupType
 from pymovements.stimulus.image import _draw_image_stimulus
 
 

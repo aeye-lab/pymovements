@@ -19,17 +19,14 @@
 # SOFTWARE.
 """Test pymovements plotting utils."""
 import re
-from pathlib import Path
-from unittest.mock import Mock
 
 import numpy as np
 import pytest
-from matplotlib import pyplot
 
 from pymovements import __version__
-from pymovements.utils.plotting import setup_matplotlib
 from pymovements.utils.plotting import draw_image_stimulus
 from pymovements.utils.plotting import draw_line_data
+from pymovements.utils.plotting import setup_matplotlib
 
 
 @pytest.mark.filterwarnings('ignore::DeprecationWarning')
