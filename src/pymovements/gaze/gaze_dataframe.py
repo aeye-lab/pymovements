@@ -34,7 +34,6 @@ from tqdm import tqdm
 import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
-from pymovements.utils.aois import get_aoi
 from pymovements.utils.checks import check_is_mutual_exclusive
 
 
@@ -52,8 +51,6 @@ class GazeDataFrame:
         The experiment definition. (default: None)
     events: pm.EventDataFrame | None
         A dataframe of events in the gaze signal. (default: None)
-    auto_column_detect: bool
-        Flag indicating if the column names should be inferred automatically. (default: False)
     trial_columns: str | list[str] | None
         The name of the trial columns in the input data frame. If the list is empty or None,
         the input data frame is assumed to contain only one trial. If the list is not empty,
@@ -88,6 +85,8 @@ class GazeDataFrame:
         in the input data frame. If specified, the column will be used for pixel to dva
         transformations. If not specified, the constant eye-to-screen distance will be taken
         from the experiment definition. This column will be renamed to ``distance``. (default: None)
+    auto_column_detect: bool
+        Flag indicating if the column names should be inferred automatically. (default: False)
 
     Attributes
     ----------
@@ -210,7 +209,6 @@ class GazeDataFrame:
             experiment: Experiment | None = None,
             events: pm.EventDataFrame | None = None,
             *,
-            auto_column_detect: bool = False,
             trial_columns: str | list[str] | None = None,
             time_column: str | None = None,
             time_unit: str | None = None,
@@ -219,6 +217,7 @@ class GazeDataFrame:
             velocity_columns: list[str] | None = None,
             acceleration_columns: list[str] | None = None,
             distance_column: str | None = None,
+            auto_column_detect: bool = False,
     ):
         if data is None:
             data = pl.DataFrame()
@@ -1024,7 +1023,7 @@ class GazeDataFrame:
             raise ValueError('neither position nor pixel in gaze dataframe, one needed for mapping')
 
         aois = [
-            get_aoi(aoi_dataframe, row, x_eye, y_eye)
+            aoi_dataframe.get_aoi(row=row, x_eye=x_eye, y_eye=y_eye)
             for row in tqdm(self.frame.iter_rows(named=True))
         ]
         aoi_df = pl.concat(aois)
@@ -1408,7 +1407,6 @@ class GazeDataFrame:
 
     def _init_columns(
             self,
-            auto_column_detect: bool = False,
             trial_columns: str | list[str] | None = None,
             time_column: str | None = None,
             time_unit: str | None = None,
@@ -1417,6 +1415,7 @@ class GazeDataFrame:
             velocity_columns: list[str] | None = None,
             acceleration_columns: list[str] | None = None,
             distance_column: str | None = None,
+            auto_column_detect: bool = False,
     ) -> None:
         """Initialize dataframe columns."""
         # Initialize trial_columns.
