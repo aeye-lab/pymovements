@@ -20,16 +20,17 @@
 """DatasetDefinition module."""
 from __future__ import annotations
 
-import builtins
-import importlib
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
 from typing import Any
+from typing import Union
 
 import yaml
 
+from pymovements.dataset._utils._yaml import reverse_substitute_types
+from pymovements.dataset._utils._yaml import substitute_types
 from pymovements.dataset._utils._yaml import type_constructor
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
@@ -37,6 +38,66 @@ from pymovements.gaze.screen import Screen
 
 
 yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
+
+
+# sphinx automatically substitutes _Resources with the Union using the | operator.
+_Resources = Union[dict[str, list[dict[str, str]]], dict[str, tuple[dict[str, str], ...]]]
+
+
+class _HasResourcesIndexer:
+    """Indexable :py:meth:`~pymovements.dataset.DatasetDefinition.has_resources` property."""
+
+    def __init__(self, resources: _Resources | None = None):
+        if resources is None:
+            self._resources: _Resources = {}
+        else:
+            self._resources = resources
+
+    def set_resources(self, resources: _Resources) -> None:
+        """Set dataset definition resources for lookup."""
+        self._resources = resources
+
+    def __getitem__(self, key: str) -> bool:
+        """Lookup if resources of specific content are set."""
+        try:
+            return len(self._resources[key]) > 0
+        except KeyError:  # if key not in self._resources
+            return False
+        except TypeError:  # if self._resources[key] doesn't implement __len__
+            return False
+
+    def __bool__(self) -> bool:
+        """Lookup if resources of any content are set."""
+        if not self._resources:
+            return False
+
+        # Get list of resource_lists and return False in case no values().
+        try:
+            list_of_resource_lists = self._resources.values()
+        except AttributeError:  # if values() not implemented by self._resources
+            return False
+
+        # Check if any resources are actually set in dictionary.
+        for resource_list in list_of_resource_lists:
+            try:
+                if len(resource_list) > 0:
+                    return True
+            except TypeError:  # if resources_list doesn't implement __len__
+                return False
+        return False
+
+    def __eq__(self, other: Any) -> bool:
+        """Return self == other.
+
+        Automatically casts to bool if compared to a boolean.
+        """
+        if isinstance(other, bool):  # Needed to check equality against booleans.
+            return self.__bool__() == other
+        return super().__eq__(other)
+
+    def __repr__(self) -> str:
+        """Returns string with boolean value wheter any resources are set."""
+        return str(self.__bool__())
 
 
 @dataclass
@@ -141,14 +202,13 @@ class DatasetDefinition:
     """
 
     # pylint: disable=too-many-instance-attributes
+
     name: str = '.'
     has_files: dict[str, bool] = field(default_factory=dict)
 
     mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] = field(default_factory=dict)
 
-    resources: dict[str, list[dict[str, str]]] | dict[str, tuple[dict[str, str], ...]] = field(
-        default_factory=dict,
-    )
+    resources: _Resources = field(default_factory=dict)
 
     experiment: Experiment | None = field(default_factory=Experiment)
 
@@ -170,6 +230,10 @@ class DatasetDefinition:
     velocity_columns: list[str] | None = None
     acceleration_columns: list[str] | None = None
     distance_column: str | None = None
+
+    _has_resources: _HasResourcesIndexer = field(
+        default_factory=_HasResourcesIndexer, init=False, repr=False, compare=False, hash=False,
+    )
 
     @staticmethod
     def from_yaml(path: str | Path) -> DatasetDefinition:
@@ -204,23 +268,29 @@ class DatasetDefinition:
                 eyetracker=eyetracker,
             )
 
-        def reverse_substitute_types(d: Any) -> Any:
-            if isinstance(d, dict):
-                return {k: reverse_substitute_types(v) for k, v in d.items()}
-            if isinstance(d, list):
-                return [reverse_substitute_types(v) for v in d]
-            if isinstance(d, str) and d.startswith('!'):
-                type_name = d[1:]
-                if '.' in type_name:
-                    module_name, class_name = type_name.rsplit('.', 1)
-                    module = importlib.import_module(module_name)
-                    return getattr(module, class_name)
-                return getattr(builtins, type_name)
-            return d
-
         data = reverse_substitute_types(data)
         # Initialize DatasetDefinition with YAML data
         return DatasetDefinition(**data)
+
+    def to_dict(self, hide_private: bool = True) -> dict[str, Any]:
+        """Return dictionary representation.
+
+        Parameters
+        ----------
+        hide_private: bool
+            Hide attributes that start with `_`.
+        """
+        data = asdict(self)
+
+        # Delete private fields from dictionary.
+        if hide_private:
+            for key in list(data.keys()):
+                if key.startswith('_'):
+                    del data[key]
+
+        data['experiment'] = data['experiment'].to_dict()
+
+        return data
 
     def to_yaml(self, path: str | Path) -> None:
         """Save a dataset definition to a YAML file.
@@ -230,22 +300,47 @@ class DatasetDefinition:
         path: str | Path
             Path where to save the YAML file to.
         """
-        data = asdict(self)
-
-        def substitute_types(d: Any) -> Any:
-            if isinstance(d, dict):
-                return {k: substitute_types(v) for k, v in d.items()}
-            if isinstance(d, list):
-                return [substitute_types(v) for v in d]
-            if isinstance(d, type):
-                if d.__module__ == 'builtins':
-                    return f'!{d.__name__}'
-                return f'!{d.__module__}.{d.__name__}'
-            return d
-
-        data['experiment'] = data['experiment'].to_dict()
+        data = self.to_dict()
 
         data = substitute_types(data)
 
         with open(path, 'w', encoding='utf-8') as f:
             yaml.dump(data, f, sort_keys=False)
+
+    @property
+    def has_resources(self) -> _HasResourcesIndexer:
+        """Checks for resources in :py:attr:`~pymovements.dataset.DatasetDefinition.resources`.
+
+        This read-only property checks if there are any resources set in
+        :py:attr:`~pymovements.dataset.DatasetDefinition.resources`. It can be used as a `bool` or
+        as an indexable class. In a boolean context it checks if there are any resources set in the
+        :py:cls:`~pymovements.dataset.DatasetDefinition`. Furthermore, you can index the property
+        to check if there are any resources set for a given content type.
+
+        Examples
+        --------
+        This custom :py:cls:`~pymovements.dataset.DatasetDefinition` has no resources defined:
+        >>> import pymovements as pm
+        >>> my_definition = pm.DatasetDefinition('MyDatasetWithoutOnlineResources', resources=None)
+        >>> my_definition.has_resources
+        False
+
+        A :py:cls:`~pymovements.dataset.DatasetDefinition` from our
+        :py:cls:`~pymovements.dataset.DatasetLibrary` will usually have some online resources
+        defined:
+        >>> definition = pm.DatasetLibrary.get('ToyDataset')
+        >>> definition.has_resources
+        True
+
+        You can also check if a specific content type is contained in the resources:
+        >>> definition.has_resources['gaze']
+        True
+
+        In this definition there are gaze resources defined, but no precomputed events.
+        >>> definition.has_resources['precomputed_events']
+        False
+        """
+        # Resources may have changed, so update indexer before returning.
+        # A better way to update the resources would be through a resources setter property.
+        self._has_resources.set_resources(self.resources)
+        return self._has_resources
