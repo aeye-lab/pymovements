@@ -17,11 +17,11 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test pymovements checks."""
+"""Test pymovements _checks."""
 import numpy as np
 import pytest
 
-from pymovements.utils import checks
+from pymovements._utils import _checks
 
 
 @pytest.mark.parametrize(
@@ -53,59 +53,10 @@ from pymovements.utils import checks
 def test_check_no_zeros_raises_error(variable, expected_error, expected_err_msg):
     """Test that check_no_zeros() only raises an Exception if there are zeros in the input array."""
     if expected_error is None:
-        checks.check_no_zeros(variable)
+        _checks.check_no_zeros(variable)
     else:
         with pytest.raises(expected_error) as excinfo:
-            checks.check_no_zeros(variable)
-        msg, = excinfo.value.args
-        assert msg == expected_err_msg
-
-
-@pytest.mark.parametrize(
-    ('arr', 'expected_error', 'expected_err_msg'),
-    [
-        pytest.param(
-            np.array([[1, 2], [3, 4]]),
-            None,
-            '',
-            id='no_nans_raises_no_error',
-        ),
-        pytest.param(
-            np.array([[1, 2], [np.nan, np.nan]]),
-            None,
-            '',
-            id='nans_same_time_steps_raises_no_error',
-        ),
-        pytest.param(
-            np.array([[np.nan, 2], [np.nan, 4]]),
-            ValueError,
-            'nans must occur at the same steps of horizontal and vertical direction',
-            id='nans_different_time_steps_raises_value_error',
-        ),
-        pytest.param(
-            np.array([[np.nan, 2], [3, 4]]),
-            ValueError,
-            'nans must occur at the same steps of horizontal and vertical direction',
-            id='nans_only_left_channel_raises_value_error',
-        ),
-        pytest.param(
-            np.array([[1, np.nan], [3, 4]]),
-            ValueError,
-            'nans must occur at the same steps of horizontal and vertical direction',
-            id='nans_only_right_channel_raises_value_error',
-        ),
-    ],
-)
-def test_check_nan_both_channels_raises_error(arr, expected_error, expected_err_msg):
-    """Test that check_nan_both_channels() raises an Exception.
-
-    Only iff all nans occur at the same time step for both channels.
-    """
-    if expected_error is None:
-        checks.check_nan_both_channels(arr)
-    else:
-        with pytest.raises(expected_error) as excinfo:
-            checks.check_nan_both_channels(arr)
+            _checks.check_no_zeros(variable)
         msg, = excinfo.value.args
         assert msg == expected_err_msg
 
@@ -188,24 +139,24 @@ def test_check_shapes_raises_error(kwargs, expected_error, expected_err_msg):
     positions and velocities are not equal.
     """
     if expected_error is None:
-        checks.check_shapes(**kwargs)
+        _checks.check_shapes(**kwargs)
     else:
         with pytest.raises(expected_error) as excinfo:
-            checks.check_shapes(**kwargs)
+            _checks.check_shapes(**kwargs)
         msg, = excinfo.value.args
         assert msg == expected_err_msg
 
 
 def test_check_two_kwargs_with_three_kwargs_raises_value_error() -> None:
     with pytest.raises(ValueError):
-        checks.check_two_kwargs(a=1, b=2, c=3)
+        _checks.check_two_kwargs(a=1, b=2, c=3)
 
 
 def test_check_is_not_none_raises_type_error() -> None:
     with pytest.raises(TypeError):
-        checks.check_is_not_none(a=1, b=None)
+        _checks.check_is_not_none(a=1, b=None)
 
 
 def test_check_is_scalar_raises_type_error() -> None:
     with pytest.raises(TypeError):
-        checks.check_is_scalar(a=1, b=None)
+        _checks.check_is_scalar(a=1, b=None)
