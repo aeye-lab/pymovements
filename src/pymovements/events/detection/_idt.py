@@ -22,11 +22,11 @@ from __future__ import annotations
 
 import numpy as np
 
+from pymovements._utils import _checks
 from pymovements.events._utils._filters import events_split_nans
 from pymovements.events._utils._filters import filter_candidates_remove_nans
 from pymovements.events.detection._library import register_event_detection
 from pymovements.events.frame import EventDataFrame
-from pymovements.utils import checks
 
 
 def dispersion(positions: list[list[float]] | np.ndarray) -> float:
@@ -106,7 +106,7 @@ def idt(
     """
     positions = np.array(positions)
 
-    checks.check_shapes(positions=positions)
+    _checks.check_shapes(positions=positions)
 
     if timesteps is None:
         timesteps = np.arange(len(positions), dtype=np.int64)
@@ -118,7 +118,7 @@ def idt(
         raise TypeError('timesteps must be of type int')
     timesteps = timesteps_int
 
-    checks.check_is_length_matching(positions=positions, timesteps=timesteps)
+    _checks.check_is_length_matching(positions=positions, timesteps=timesteps)
 
     if dispersion_threshold <= 0:
         raise ValueError('dispersion_threshold must be greater than 0')
