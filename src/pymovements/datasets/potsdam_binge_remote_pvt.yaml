@@ -1,5 +1,7 @@
 name: "PotsdamBingeRemotePVT"
 
+long_name: 'Potsdam Binge Remote Psychomotor Vigilance Task dataset'
+
 has_files:
   gaze: true
   precomputed_events: false

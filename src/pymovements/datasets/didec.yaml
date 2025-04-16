@@ -1,5 +1,7 @@
 name: "DIDEC"
 
+long_name: 'The Dutch Image Description and Eye-tracking Corpus'
+
 has_files:
   gaze: true
   precomputed_events: false

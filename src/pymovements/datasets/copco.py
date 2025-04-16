@@ -48,6 +48,9 @@ class CopCo(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -125,6 +128,8 @@ class CopCo(DatasetDefinition):
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'CopCo'
+
+    long_name: str = 'The Copenhagen Corpus of Eye-Tracking Recordings from Natural Reading'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

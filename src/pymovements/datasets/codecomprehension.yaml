@@ -1,5 +1,7 @@
 name: CodeComprehension
 
+long_name: "Code Comprehension"
+
 has_files:
   gaze: false
   precomputed_events: true
