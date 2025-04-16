@@ -1,5 +1,7 @@
 name: "GazeBase"
 
+long_name: "GazeBase dataset"
+
 has_files:
   gaze: true
   precomputed_events: false

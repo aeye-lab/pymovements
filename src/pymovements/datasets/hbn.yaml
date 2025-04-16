@@ -1,5 +1,7 @@
 name: "HBN"
 
+long_name: 'Healthy Brain Network dataset'
+
 has_files:
   gaze: true
   precomputed_events: false
