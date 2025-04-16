@@ -1,5 +1,7 @@
 name: BSC
 
+long_name: "Beijing Sentence Corpus"
+
 has_files:
   gaze: false
   precomputed_events: true
