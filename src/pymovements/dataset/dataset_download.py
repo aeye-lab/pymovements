@@ -77,6 +77,13 @@ def download_dataset(
     RuntimeError
         If downloading a resource failed for all given mirrors.
     """
+    disclaimer_text = f"""\
+You are downloading the {definition.long_name}. Please be aware that pymovements does not
+host or distribute any dataset resources and only provides a convenient interface to
+download the public dataset resources that were published by their respective authors.
+"""
+    print(disclaimer_text)
+
     if definition.has_files['gaze']:
         if not definition.mirrors or not definition.mirrors['gaze']:
             mirrors = None
