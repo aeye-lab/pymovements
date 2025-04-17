@@ -27,6 +27,7 @@
 
     BSC
     BSCII
+    ChineseReading
     CodeComprehension
     CopCo
     DAEMONS
@@ -61,6 +62,7 @@
 """
 from pymovements.datasets.bsc import BSC
 from pymovements.datasets.bsc2 import BSCII
+from pymovements.datasets.chinese_reading import ChineseReading
 from pymovements.datasets.codecomprehension import CodeComprehension
 from pymovements.datasets.copco import CopCo
 from pymovements.datasets.daemons import DAEMONS
@@ -89,6 +91,7 @@ from pymovements.datasets.ucl import UCL
 __all__ = [
     'BSC',
     'BSCII',
+    'ChineseReading',
     'CodeComprehension',
     'CopCo',
     'DAEMONS',
