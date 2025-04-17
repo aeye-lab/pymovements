@@ -67,6 +67,7 @@ docs = [
 test = [
   "pybtex",
   "pytest>=6.0.0",
+  "pytest-benchmark>=5.1.0",
   "pytest-cov>=4.0.0",
   "setuptools>=61.0.0",
   "types-tqdm>=4.64.0,<5"
