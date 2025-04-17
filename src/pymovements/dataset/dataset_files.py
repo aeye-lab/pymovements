@@ -515,7 +515,8 @@ def load_precomputed_event_file(
 
     csv_extensions = {'.csv', '.tsv', '.txt'}
     r_extensions = {'.rda'}
-    valid_extensions = csv_extensions | r_extensions
+    json_extensions = {'.jsonl', '.ndjson'}
+    valid_extensions = csv_extensions | r_extensions | json_extensions
     if data_path.suffix in csv_extensions:
         precomputed_event_df = pl.read_csv(data_path, **custom_read_kwargs)
     elif data_path.suffix in r_extensions:
@@ -527,6 +528,8 @@ def load_precomputed_event_file(
             )
         else:
             raise ValueError('please specify r_dataframe_key in custom_read_kwargs')
+    elif data_path.suffix in json_extensions:
+        precomputed_event_df = pl.read_ndjson(data_path, **custom_read_kwargs)
     else:
         raise ValueError(
             f'unsupported file format "{data_path.suffix}". '
