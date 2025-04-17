@@ -40,6 +40,7 @@
     HBN
     InteRead
     JuDo1000
+    MECOL1W1
     MouseCursor
     PoTeC
     PotsdamBingeRemotePVT
@@ -73,6 +74,9 @@ from pymovements.datasets.gazebasevr import GazeBaseVR
 from pymovements.datasets.hbn import HBN
 from pymovements.datasets.interead import InteRead
 from pymovements.datasets.judo1000 import JuDo1000
+from pymovements.datasets.mecol1w1 import MECOL1W1
+from pymovements.datasets.mecol2w1 import MECOL2W1
+from pymovements.datasets.mecol2w2 import MECOL2W2
 from pymovements.datasets.mousecursor import MouseCursor
 from pymovements.datasets.potec import PoTeC
 from pymovements.datasets.potsdam_binge_remote_pvt import PotsdamBingeRemotePVT
