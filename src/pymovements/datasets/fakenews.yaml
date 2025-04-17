@@ -1,5 +1,7 @@
 name: "FakeNewsPerception"
 
+long_name:  'Fake News Perception Eye Tracking Corpus'
+
 has_files:
   gaze: false
   precomputed_events: true

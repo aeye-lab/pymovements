@@ -1,5 +1,7 @@
 name: "GazeGraph"
 
+long_name: 'GazeGraph dataset'
+
 has_files:
   gaze: true
   precomputed_events: false
