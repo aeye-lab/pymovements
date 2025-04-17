@@ -40,6 +40,10 @@ filename_format_schema_overrides:
     subject_id: !int
     session_id: !int
 
+trial_columns:
+  - task
+  - trial_id
+
 time_column: "time"
 
 time_unit: "ms"
@@ -81,3 +85,4 @@ custom_read_kwargs:
       screen_id: !polars.Int64
       point_id: !polars.Int64
       task: !polars.Utf8
+    encoding: 'ascii'
