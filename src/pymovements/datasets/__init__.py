@@ -38,6 +38,7 @@
     GazeGraph
     GazeOnFaces
     HBN
+    IITBHGC
     InteRead
     JuDo1000
     MouseCursor
@@ -71,6 +72,7 @@ from pymovements.datasets.gaze_on_faces import GazeOnFaces
 from pymovements.datasets.gazebase import GazeBase
 from pymovements.datasets.gazebasevr import GazeBaseVR
 from pymovements.datasets.hbn import HBN
+from pymovements.datasets.iitb_hgc import IITBHGC
 from pymovements.datasets.interead import InteRead
 from pymovements.datasets.judo1000 import JuDo1000
 from pymovements.datasets.mousecursor import MouseCursor
@@ -98,6 +100,7 @@ __all__ = [
     'GazeGraph',
     'GazeOnFaces',
     'HBN',
+    'IITBHGC',
     'InteRead',
     'JuDo1000',
     'MouseCursor',
