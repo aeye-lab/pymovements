@@ -17,41 +17,53 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Tests deprecated utils.downloads."""
+"""Tests deprecated utils.parsing."""
 import re
 
 import pytest
+from polars.testing import assert_frame_equal
 
 from pymovements import __version__
-from pymovements.utils.downloads import download_and_extract_archive
-from pymovements.utils.downloads import download_file
+from pymovements.stimulus import text
+from pymovements.utils.aois import get_aoi
+
+
+@pytest.fixture(name='text_stimulus')
+def fixture_text_stimulus():
+    yield text.from_file(
+        'tests/files/toy_text_1_1_aoi.csv',
+        aoi_column='word',
+        start_x_column='top_left_x',
+        start_y_column='top_left_y',
+        end_x_column='bottom_left_x',
+        end_y_column='bottom_left_y',
+        page_column='page',
+    )
 
 
 @pytest.mark.filterwarnings('ignore::DeprecationWarning')
-@pytest.mark.parametrize('download_function', [download_and_extract_archive, download_file])
-def test_download_file(download_function, tmp_path):
-    url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
-    filename = 'pymovements-0.4.0.tar.gz'
+@pytest.mark.parametrize(
+    'row',
+    [
+        {'x': 400, 'y': 125},
+        {'x': 500, 'y': 300},
+    ],
+)
+def test_get_aoi_equal_to_new(text_stimulus, row):
+    aoi_old = get_aoi(text_stimulus, row, 'x', 'y')
+    aoi_new = text_stimulus.get_aoi(row=row, x_eye='x', y_eye='y')
 
-    download_function(url, tmp_path, filename)
+    assert_frame_equal(aoi_old, aoi_new)
 
 
-@pytest.mark.parametrize('download_function', [download_and_extract_archive, download_file])
-def test_archive_extract_deprecated(download_function, tmp_path):
-    url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
-    filename = 'pymovements-0.4.0.tar.gz'
-
+def test_get_aoi_deprecated(text_stimulus):
     with pytest.raises(DeprecationWarning):
-        download_function(url, tmp_path, filename)
+        get_aoi(text_stimulus, {'x': 400, 'y': 125}, 'x', 'y')
 
 
-@pytest.mark.parametrize('download_function', [download_and_extract_archive, download_file])
-def test_archive_extract_removed(download_function, tmp_path):
-    url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
-    filename = 'pymovements-0.4.0.tar.gz'
-
+def test_get_aoi_removed(text_stimulus):
     with pytest.raises(DeprecationWarning) as info:
-        download_function(url, tmp_path, filename)
+        get_aoi(text_stimulus, {'x': 400, 'y': 125}, 'x', 'y')
 
     regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
 
@@ -59,6 +71,6 @@ def test_archive_extract_removed(download_function, tmp_path):
     remove_version = regex.match(msg).groupdict()['version']
     current_version = __version__.split('+')[0]
     assert current_version < remove_version, (
-        f'utils/downloads.py was planned to be removed in v{remove_version}. '
+        f'utils/parsing.py was planned to be removed in v{remove_version}. '
         f'Current version is v{current_version}.'
     )
