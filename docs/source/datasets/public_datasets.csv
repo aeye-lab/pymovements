@@ -1,6 +1,7 @@
 Dataset,Citation,Samples,Events,Reading Measures,# Subjects,# Sessions per Subject,Sampling Rate,Stimulus Type
 :py:class:`~pymovements.datasets.BSC`,:cite:p:`BSC`,,X,,60,1,500 Hz,Text (sentences)
 :py:class:`~pymovements.datasets.BSCII`,:cite:p:`BSCII`,,X,,60,1,1000 Hz,Text (sentences)
+:py:class:`~pymovements.datasets.ChineseReading`,:cite:p:`ChineseReading`,,X,X,303,1,1000 Hz,Text (sentences)
 :py:class:`~pymovements.datasets.CodeComprehension`,:cite:p:`CodeComprehension`,,X,,27,1-2,2000 Hz,Text (code)
 :py:class:`~pymovements.datasets.CopCo`,":cite:p:`CopCoL1Hollenstein,CopCoL1DysBjornsdottir,CopCoL2`",X,X,X,58,1,1000 Hz,Text (documents)
 :py:class:`~pymovements.datasets.DAEMONS`,:cite:p:`DAEMONS`,,X,,250,1,1000 Hz,Image

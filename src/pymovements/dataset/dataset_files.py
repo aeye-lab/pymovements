@@ -438,9 +438,16 @@ def load_precomputed_reading_measure_file(
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
 
-    valid_extensions = {'.csv', '.tsv', '.txt'}
-    if data_path.suffix in valid_extensions:
+    csv_extensions = {'.csv', '.tsv', '.txt'}
+    excel_extensions = {'.xlsx'}
+    valid_extensions = csv_extensions | excel_extensions
+    if data_path.suffix in csv_extensions:
         precomputed_reading_measure_df = pl.read_csv(data_path, **custom_read_kwargs)
+    elif data_path.suffix in excel_extensions:
+        precomputed_reading_measure_df = pl.read_excel(
+            data_path,
+            sheet_name=custom_read_kwargs['sheet_name'],
+        )
     else:
         raise ValueError(
             f'unsupported file format "{data_path.suffix}". '
