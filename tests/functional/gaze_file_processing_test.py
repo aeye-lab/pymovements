@@ -44,6 +44,7 @@ import pymovements as pm
         'gazebase_vr',
         'judo1000',
         'potec',
+        'raccoons',
     ],
 )
 def fixture_gaze_init_kwargs(request):
@@ -164,6 +165,11 @@ def fixture_gaze_init_kwargs(request):
             'pixel_columns': pm.DatasetLibrary.get('PoTeC').pixel_columns,
             'experiment': pm.DatasetLibrary.get('PoTeC').experiment,
             **pm.DatasetLibrary.get('PoTeC').custom_read_kwargs['gaze'],
+        },
+        'raccoons': {
+            'file': 'tests/files/raccoons.asc',
+            'experiment': pm.DatasetLibrary.get('RaCCooNS').experiment,
+            **pm.DatasetLibrary.get('RaCCooNS').custom_read_kwargs['gaze'],
         },
 
     }

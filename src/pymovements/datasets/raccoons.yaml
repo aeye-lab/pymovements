@@ -46,7 +46,7 @@ experiment:
     # double check once data back online
     left: true
     right: false
-    model: "EyeLink 1000 Plus"
+    model: "EyeLink 1000"
     vendor: "EyeLink"
     mount: "Desktop"
 

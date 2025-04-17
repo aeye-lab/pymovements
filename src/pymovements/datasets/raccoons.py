@@ -183,7 +183,7 @@ class RaCCooNS(DatasetDefinition):
                 # double check once data is back up
                 left=True,
                 right=False,
-                model='EyeLink 1000 Plus',
+                model='EyeLink 1000',
                 vendor='EyeLink',
                 mount='Desktop',
             ),
