@@ -28,6 +28,7 @@
     BSC
     BSCII
     CodeComprehension
+    CoLAGaze
     CopCo
     DAEMONS
     DIDEC
@@ -61,6 +62,7 @@
 from pymovements.datasets.bsc import BSC
 from pymovements.datasets.bsc2 import BSCII
 from pymovements.datasets.codecomprehension import CodeComprehension
+from pymovements.datasets.colagaze import CoLAGaze
 from pymovements.datasets.copco import CopCo
 from pymovements.datasets.daemons import DAEMONS
 from pymovements.datasets.didec import DIDEC
@@ -88,6 +90,7 @@ __all__ = [
     'BSC',
     'BSCII',
     'CodeComprehension',
+    'CoLAGaze',
     'CopCo',
     'DAEMONS',
     'DIDEC',
