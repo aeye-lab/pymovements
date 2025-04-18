@@ -505,9 +505,13 @@ def load_precomputed_event_file(
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
 
-    valid_extensions = {'.csv', '.tsv', '.txt'}
-    if data_path.suffix in valid_extensions:
+    csv_extensions = {'.csv', '.tsv', '.txt'}
+    json_extensions = {'.jsonl', '.ndjson'}
+    valid_extensions = csv_extensions.union(json_extensions)
+    if data_path.suffix in csv_extensions:
         precomputed_event_df = pl.read_csv(data_path, **custom_read_kwargs)
+    elif data_path.suffix in json_extensions:
+        precomputed_event_df = pl.read_ndjson(data_path, **custom_read_kwargs)
     else:
         raise ValueError(
             f'unsupported file format "{data_path.suffix}". '
