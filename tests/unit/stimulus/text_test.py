@@ -202,13 +202,13 @@ def test_text_stimulus(aoi_file, custom_read_kwargs, expected):
         page_column='page',
         custom_read_kwargs=custom_read_kwargs,
     )
-    head = aois.aois.head(12)
+    head = aois.frame.head(12)
 
     assert_frame_equal(
         head,
         expected,
     )
-    assert len(aois.aois.columns) == len(expected.columns)
+    assert len(aois.frame.columns) == len(expected.columns)
 
 
 def test_text_stimulus_unsupported_format():
@@ -287,7 +287,7 @@ def test_text_stimulus_splitting_unique_within(aoi_file, custom_read_kwargs):
     )
 
     aois_df = aois_df.split(by='line_idx')
-    assert all(df.aois.n_unique(subset=['line_idx']) == 1 for df in aois_df)
+    assert all(df.frame.n_unique(subset=['line_idx']) == 1 for df in aois_df)
 
 
 @pytest.mark.parametrize(
@@ -320,7 +320,7 @@ def test_text_stimulus_splitting_different_between(aoi_file, custom_read_kwargs)
     aois_df = aois_df.split(by='line_idx')
     unique_values = []
     for df in aois_df:
-        unique_value = df.aois.unique(subset=['line_idx'])['line_idx'].to_list()
+        unique_value = df.frame.unique(subset=['line_idx'])['line_idx'].to_list()
         unique_values.extend(unique_value)
 
     assert len(unique_values) == len(set(unique_values))

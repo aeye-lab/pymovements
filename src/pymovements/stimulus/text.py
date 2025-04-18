@@ -34,7 +34,7 @@ class TextStimulus:
 
     Parameters
     ----------
-    aois: pl.DataFrame
+    frame: pl.DataFrame
         A stimulus dataframe.
     aoi_column: str
         Name of the column that contains the content of the aois.
@@ -61,7 +61,7 @@ class TextStimulus:
 
     def __init__(
             self,
-            aois: pl.DataFrame,
+            frame: pl.DataFrame,
             *,
             aoi_column: str,
             start_x_column: str,
@@ -73,7 +73,7 @@ class TextStimulus:
             page_column: str | None = None,
     ) -> None:
 
-        self.aois = aois.clone()
+        self.frame = frame.clone()
         self.aoi_column = aoi_column
         self.width_column = width_column
         self.height_column = height_column
@@ -101,7 +101,7 @@ class TextStimulus:
         """
         return [
             TextStimulus(
-                aois=df,
+                frame=df,
                 aoi_column=self.aoi_column,
                 width_column=self.width_column,
                 height_column=self.height_column,
@@ -111,7 +111,7 @@ class TextStimulus:
                 end_y_column=self.end_y_column,
                 page_column=self.page_column,
             )
-            for df in self.aois.partition_by(by=by, as_dict=False)
+            for df in self.frame.partition_by(by=by, as_dict=False)
         ]
 
     def get_aoi(
@@ -217,7 +217,7 @@ def from_file(
         )
 
     return TextStimulus(
-        aois=stimulus_df,
+        frame=stimulus_df,
         aoi_column=aoi_column,
         start_x_column=start_x_column,
         start_y_column=start_y_column,
@@ -271,18 +271,18 @@ def _get_aoi(
             height_column=aoi_dataframe.width_column,
             width_column=aoi_dataframe.height_column,
         )
-        aoi = aoi_dataframe.aois.filter(
-            (aoi_dataframe.aois[aoi_dataframe.start_x_column] <= row[x_eye]) &
+        aoi = aoi_dataframe.frame.filter(
+            (aoi_dataframe.frame[aoi_dataframe.start_x_column] <= row[x_eye]) &
             (
                 row[x_eye] <
-                aoi_dataframe.aois[aoi_dataframe.start_x_column] +
-                aoi_dataframe.aois[aoi_dataframe.width_column]
+                aoi_dataframe.frame[aoi_dataframe.start_x_column] +
+                aoi_dataframe.frame[aoi_dataframe.width_column]
             ) &
-            (aoi_dataframe.aois[aoi_dataframe.start_y_column] <= row[y_eye]) &
+            (aoi_dataframe.frame[aoi_dataframe.start_y_column] <= row[y_eye]) &
             (
                 row[y_eye] <
-                aoi_dataframe.aois[aoi_dataframe.start_y_column] +
-                aoi_dataframe.aois[aoi_dataframe.height_column]
+                aoi_dataframe.frame[aoi_dataframe.start_y_column] +
+                aoi_dataframe.frame[aoi_dataframe.height_column]
             ),
         )
 
@@ -295,13 +295,13 @@ def _get_aoi(
             end_x_column=aoi_dataframe.end_x_column,
             end_y_column=aoi_dataframe.end_y_column,
         )
-        aoi = aoi_dataframe.aois.filter(
+        aoi = aoi_dataframe.frame.filter(
             # x-coordinate: within bounding box
-            (aoi_dataframe.aois[aoi_dataframe.start_x_column] <= row[x_eye]) &
-            (row[x_eye] < aoi_dataframe.aois[aoi_dataframe.end_x_column]) &
+            (aoi_dataframe.frame[aoi_dataframe.start_x_column] <= row[x_eye]) &
+            (row[x_eye] < aoi_dataframe.frame[aoi_dataframe.end_x_column]) &
             # y-coordinate: within bounding box
-            (aoi_dataframe.aois[aoi_dataframe.start_y_column] <= row[y_eye]) &
-            (row[y_eye] < aoi_dataframe.aois[aoi_dataframe.end_y_column]),
+            (aoi_dataframe.frame[aoi_dataframe.start_y_column] <= row[y_eye]) &
+            (row[y_eye] < aoi_dataframe.frame[aoi_dataframe.end_y_column]),
         )
 
         if aoi.is_empty():
