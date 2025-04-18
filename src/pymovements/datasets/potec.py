@@ -182,7 +182,7 @@ class PoTeC(DatasetDefinition):
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
             'gaze': r'reader{subject_id:d}_{text_id}_raw_data.tsv',
-            'precomputed_events': r'reader{subject_id:d}_{text_id}_uncorrected_fixations.tsv'
+            'precomputed_events': r'reader{subject_id:d}_{text_id}_uncorrected_fixations.tsv',
         },
     )
 
@@ -223,6 +223,6 @@ class PoTeC(DatasetDefinition):
             'precomputed_events': {
                 'separator': '\t',
                 'null_values': '.',
-            }
+            },
         },
     )
