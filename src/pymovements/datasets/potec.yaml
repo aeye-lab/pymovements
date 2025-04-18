@@ -2,11 +2,13 @@ name: "PoTeC"
 
 has_files:
   gaze: true
-  precomputed_events: false
+  precomputed_events: true
   precomputed_reading_measures: false
 
 mirrors:
   gaze:
+    - "https://osf.io/download/"
+  precomputed_events:
     - "https://osf.io/download/"
 
 resources:
@@ -14,9 +16,14 @@ resources:
     - resource: "tgd9q/"
       filename: "PoTeC.zip"
       md5: "cffd45039757c3777e2fd130e5d8a2ad"
+  precomputed_events:
+    - resource: "d8pyg/"
+      filename: "fixation.zip"
+      md5: "ecd9a998d07158922bb9b8cdd52f5688"
 
 extract:
   gaze: true
+  precomputed_events: true
 
 experiment:
   screen_width_px: 1680
@@ -29,9 +36,13 @@ experiment:
 
 filename_format:
   gaze: 'reader{subject_id:d}_{text_id}_raw_data.tsv'
+  precomputed_events: 'reader{subject_id:d}_{text_id}_uncorrected_fixations.tsv'
 
 filename_format_schema_overrides:
   gaze:
+    subject_id: !int
+    text_id: !str
+  precomputed_events:
     subject_id: !int
     text_id: !str
 
@@ -51,3 +62,6 @@ custom_read_kwargs:
       y: !polars.Float32
       pupil_diameter: !polars.Float32
     separator: "\t"
+  precomputed_events:
+    separator: "\t"
+    null_values: '.'
