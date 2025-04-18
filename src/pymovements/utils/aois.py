@@ -17,15 +17,25 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Aoi utilities."""
+"""AOI utilities.
+
+.. deprecated:: v0.21.1
+   Please use :py:meth:`~pymovements.TextStimulus.get_aoi()` instead.
+   This module will be removed in v0.26.0.
+"""
 from __future__ import annotations
 
 import polars as pl
+from deprecated.sphinx import deprecated
 
 from pymovements.stimulus import TextStimulus
-from pymovements.utils import checks
 
 
+@deprecated(
+    reason='Please use TextStimulus.get_aoi() instead. '
+           'This function will be removed in v0.26.0.',
+    version='v0.21.1',
+)
 def get_aoi(
         aoi_dataframe: TextStimulus,
         row: pl.DataFrame.row,
@@ -37,6 +47,10 @@ def get_aoi(
     If `width` is used, calculation: start_x_column <= x_eye < start_x_column + width.
     If `end_x_column` is used, calculation: start_x_column <= x_eye < end_x_column.
     Analog for y coordinate and height.
+
+    .. deprecated:: v0.21.1
+       Please use :py:meth:`~pymovements.TextStimulus.get_aoi()` instead.
+       This function will be removed in v0.26.0.
 
     Parameters
     ----------
@@ -59,47 +73,4 @@ def get_aoi(
     ValueError
         If width and end_TYPE_column is None.
     """
-    if aoi_dataframe.width_column is not None:
-        checks.check_is_none_is_mutual(
-            height_column=aoi_dataframe.width_column,
-            width_column=aoi_dataframe.height_column,
-        )
-        try:
-            aoi = aoi_dataframe.aois.filter(
-                (aoi_dataframe.aois[aoi_dataframe.start_x_column] <= row[x_eye]) &
-                (
-                    row[x_eye] <
-                    aoi_dataframe.aois[aoi_dataframe.start_x_column] +
-                    aoi_dataframe.aois[aoi_dataframe.width_column]
-                ) &
-                (aoi_dataframe.aois[aoi_dataframe.start_y_column] <= row[y_eye]) &
-                (
-                    row[y_eye] <
-                    aoi_dataframe.aois[aoi_dataframe.start_y_column] +
-                    aoi_dataframe.aois[aoi_dataframe.height_column]
-                ),
-            )[aoi_dataframe.aoi_column].item()
-            return aoi
-        except ValueError:
-            return ''
-    elif aoi_dataframe.end_x_column is not None:
-        checks.check_is_none_is_mutual(
-            end_x_column=aoi_dataframe.end_x_column,
-            end_y_column=aoi_dataframe.end_y_column,
-        )
-        try:
-            aoi = aoi_dataframe.aois.filter(
-                # x-coordinate: within bounding box
-                (aoi_dataframe.aois[aoi_dataframe.start_x_column] <= row[x_eye]) &
-                (row[x_eye] < aoi_dataframe.aois[aoi_dataframe.end_x_column]) &
-                # y-coordinate: within bounding box
-                (aoi_dataframe.aois[aoi_dataframe.start_y_column] <= row[y_eye]) &
-                (row[y_eye] < aoi_dataframe.aois[aoi_dataframe.end_y_column]),
-            )[aoi_dataframe.aoi_column].item()
-            return aoi
-        except ValueError:
-            return ''
-    else:
-        raise ValueError(
-            'either aoi_dataframe.width or aoi_dataframe.end_x_column have to be not None',
-        )
+    return aoi_dataframe.get_aoi(row=row, x_eye=x_eye, y_eye=y_eye)

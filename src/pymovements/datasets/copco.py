@@ -25,12 +25,10 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.dataset_library import register_dataset
 from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
-@register_dataset
 class CopCo(DatasetDefinition):
     """CopCo dataset :cite:p:`CopCoL1Hollenstein`.
 
@@ -54,11 +52,11 @@ class CopCo(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, tuple[str, ...]]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
+    mirrors: dict[str, list[str]]
+        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources: dict[str, tuple[dict[str, str | None], ...]]
-        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+    resources: dict[str, list[dict[str, str | None]]]
+        A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -107,8 +105,8 @@ class CopCo(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.CopCo` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.CopCo` definition:
 
     >>> import pymovements as pm
     >>>
@@ -135,49 +133,51 @@ class CopCo(DatasetDefinition):
             'precomputed_reading_measures': True,
         },
     )
-    mirrors: dict[str, tuple[str, ...]] = field(
+    mirrors: dict[str, list[str]] = field(
         default_factory=lambda: {
-            'gaze': ('https://osf.io/download/',),
-            'precomputed_events': ('https://files.de-1.osf.io/',),
-            'precomputed_reading_measures': ('https://files.de-1.osf.io/',),
+            'gaze': ['https://osf.io/download/'],
+            'precomputed_events': ['https://files.de-1.osf.io/'],
+            'precomputed_reading_measures': ['https://files.de-1.osf.io/'],
         },
     )
-    resources: dict[str, tuple[dict[str, str | None], ...]] = field(
+    resources: dict[str, list[dict[str, str | None]]] = field(
         default_factory=lambda: {
-            'gaze': (
+            'gaze': [
                 {
                     'resource': 'bg9r4/',
                     'filename': 'csvs.zip',
                     'md5': '9dc3276714397b7fccac1e179a14c52b',  # type:ignore
                 },
-            ),
-            'precomputed_events': (
+            ],
+            'precomputed_events': [
                 {
                     'resource':
                     'v1/resources/ud8s5/providers/osfstorage/61e13174c99ebd02df017c14/?zip=',
                     'filename': 'FixationReports.zip',
                     'md5': None,  # type:ignore
                 },
-            ),
-            'precomputed_reading_measures': (
+            ],
+            'precomputed_reading_measures': [
                 {
                     'resource':
                     'v1/resources/ud8s5/providers/osfstorage/61e1317cc99ebd02df017c4f/?zip=',
                     'filename': 'ReadingMeasures.zip',
                     'md5': None,  # type:ignore
                 },
-            ),
+            ],
         },
     )
 
-    experiment: Experiment = Experiment(
-        screen_width_px=1920,
-        screen_height_px=1080,
-        screen_width_cm=59.,
-        screen_height_cm=33.5,
-        distance_cm=85,
-        origin='center',
-        sampling_rate=1000,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=1920,
+            screen_height_px=1080,
+            screen_width_cm=59.,
+            screen_height_cm=33.5,
+            distance_cm=85,
+            origin='center',
+            sampling_rate=1000,
+        ),
     )
 
     extract: dict[str, bool] = field(

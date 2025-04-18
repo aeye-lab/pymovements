@@ -222,7 +222,7 @@ class DatasetPaths:
         Path('/path/to/your/dataset')
 
         If you just want to specify the root directory path which holds all your local datasets, you
-        can create pass a :py:class:`~pymovements.DatasetPaths` object and set the `root`:
+        can create pass a :py:class:`~pymovements.dataset.DatasetPaths` object and set the `root`:
         >>> paths = pm.DatasetPaths(root='/path/to/your/common/root/')
         >>> dataset = pm.Dataset("ToyDataset", path=paths)
         >>> dataset.path# doctest: +SKIP
@@ -282,7 +282,7 @@ class DatasetPaths:
         Path('/path/to/your/dataset/events')
 
         If you just want to specify the root directory path which holds all your local datasets, you
-        can create pass a :py:class:`~pymovements.DatasetPaths` object and set the `root`:
+        can create pass a :py:class:`~pymovements.dataset.DatasetPaths` object and set the `root`:
         >>> paths = pm.DatasetPaths(root='/path/to/your/common/root/')
         >>> dataset = pm.Dataset("ToyDataset", path=paths)
         >>> dataset.paths.events# doctest: +SKIP
@@ -317,7 +317,7 @@ class DatasetPaths:
         Path('/path/to/your/dataset/preprocessed')
 
         If you just want to specify the root directory path which holds all your local datasets, you
-        can create pass a :py:class:`~pymovements.DatasetPaths` object and set the `root`:
+        can create pass a :py:class:`~pymovements.dataset.DatasetPaths` object and set the `root`:
         >>> paths = pm.DatasetPaths(root='path/to/your/common/root/')
         >>> dataset = pm.Dataset("ToyDataset", path=paths)
         >>> dataset.paths.preprocessed# doctest: +SKIP
@@ -354,7 +354,7 @@ class DatasetPaths:
         Path('/path/to/your/dataset/raw')
 
         If you just want to specify the root directory path which holds all your local datasets, you
-        can create pass a :py:class:`~pymovements.DatasetPaths` object and set the `root`:
+        can create pass a :py:class:`~pymovements.dataset.DatasetPaths` object and set the `root`:
         >>> paths = pm.DatasetPaths(root='path/to/your/common/root/')
         >>> dataset = pm.Dataset("ToyDataset", path=paths)
         >>> dataset.paths.raw# doctest: +SKIP
@@ -439,7 +439,7 @@ class DatasetPaths:
         Path('/path/to/your/dataset/precomputed_events')
 
         If you just want to specify the root directory path which holds all your local datasets, you
-        can create pass a :py:class:`~pymovements.DatasetPaths` object and set the `root`:
+        can create pass a :py:class:`~pymovements.dataset.DatasetPaths` object and set the `root`:
         >>> paths = pm.DatasetPaths(root='path/to/your/common/root/')
         >>> dataset = pm.Dataset("ToyDataset", path=paths)
         >>> dataset.paths.precomputed_events# doctest: +SKIP
@@ -482,7 +482,7 @@ class DatasetPaths:
         Path('/path/to/your/dataset/precomputed_reading_measures')
 
         If you just want to specify the root directory path which holds all your local datasets, you
-        can create pass a :py:class:`~pymovements.DatasetPaths` object and set the `root`:
+        can create pass a :py:class:`~pymovements.dataset.DatasetPaths` object and set the `root`:
         >>> paths = pm.DatasetPaths(root='path/to/your/common/root/')
         >>> dataset = pm.Dataset("ToyDataset", path=paths)
         >>> dataset.paths.precomputed_reading_measures# doctest: +SKIP
@@ -525,7 +525,7 @@ class DatasetPaths:
         Path('/path/to/your/dataset/downloads')
 
         If you just want to specify the root directory path which holds all your local datasets, you
-        can create pass a :py:class:`~pymovements.DatasetPaths` object and set the `root`:
+        can create pass a :py:class:`~pymovements.dataset.DatasetPaths` object and set the `root`:
         >>> paths = pm.DatasetPaths(root='path/to/your/common/root/')
         >>> dataset = pm.Dataset("ToyDataset", path=paths)
         >>> dataset.paths.downloads# doctest: +SKIP

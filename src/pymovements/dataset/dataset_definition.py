@@ -20,16 +20,28 @@
 """DatasetDefinition module."""
 from __future__ import annotations
 
+import builtins
+import importlib
+from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
+from pathlib import Path
 from typing import Any
 
+import yaml
+
+from pymovements.dataset._utils._yaml import type_constructor
 from pymovements.gaze.experiment import Experiment
+from pymovements.gaze.eyetracker import EyeTracker
+from pymovements.gaze.screen import Screen
+
+
+yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
 
 
 @dataclass
 class DatasetDefinition:
-    """Definition to initialize a :py:class:`~pymovements.Dataset`.
+    """Definition to initialize a :py:class:`~pymovements.dataset.Dataset`.
 
     Attributes
     ----------
@@ -38,11 +50,11 @@ class DatasetDefinition:
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-    mirrors: dict[str, tuple[str, ...]]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
+    mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]]
+        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
         (default: field(default_factory=dict))
-    resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
+    resources: dict[str, list[dict[str, str]]] | dict[str, tuple[dict[str, str], ...]]
+        A list of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
@@ -132,11 +144,14 @@ class DatasetDefinition:
     name: str = '.'
     has_files: dict[str, bool] = field(default_factory=dict)
 
-    mirrors: dict[str, tuple[str, ...]] = field(default_factory=dict)
+    mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] = field(default_factory=dict)
 
-    resources: dict[str, tuple[dict[str, str], ...]] = field(default_factory=dict)
+    resources: dict[str, list[dict[str, str]]] | dict[str, tuple[dict[str, str], ...]] = field(
+        default_factory=dict,
+    )
 
-    experiment: Experiment | None = None
+    experiment: Experiment | None = field(default_factory=Experiment)
+
     extract: dict[str, bool] = field(default_factory=dict)
 
     filename_format: dict[str, str] = field(default_factory=dict)
@@ -155,3 +170,82 @@ class DatasetDefinition:
     velocity_columns: list[str] | None = None
     acceleration_columns: list[str] | None = None
     distance_column: str | None = None
+
+    @staticmethod
+    def from_yaml(path: str | Path) -> DatasetDefinition:
+        """Load a dataset definition from a YAML file.
+
+        Parameters
+        ----------
+        path: str | Path
+            Path to the YAML definition file
+
+        Returns
+        -------
+        DatasetDefinition
+            Initialized dataset definition
+        """
+        with open(path, encoding='utf-8') as f:
+            data = yaml.safe_load(f)
+
+        # Convert experiment dict to Experiment object if present
+        if 'experiment' in data:
+            if 'eyetracker' in data['experiment']:
+                eyetracker = EyeTracker(**data['experiment'].pop('eyetracker'))
+            else:
+                eyetracker = None
+            if 'screen' in data['experiment']:
+                screen = Screen(**data['experiment'].pop('screen'))
+            else:
+                screen = None
+            data['experiment'] = Experiment(
+                **data['experiment'],
+                screen=screen,
+                eyetracker=eyetracker,
+            )
+
+        def reverse_substitute_types(d: Any) -> Any:
+            if isinstance(d, dict):
+                return {k: reverse_substitute_types(v) for k, v in d.items()}
+            if isinstance(d, list):
+                return [reverse_substitute_types(v) for v in d]
+            if isinstance(d, str) and d.startswith('!'):
+                type_name = d[1:]
+                if '.' in type_name:
+                    module_name, class_name = type_name.rsplit('.', 1)
+                    module = importlib.import_module(module_name)
+                    return getattr(module, class_name)
+                return getattr(builtins, type_name)
+            return d
+
+        data = reverse_substitute_types(data)
+        # Initialize DatasetDefinition with YAML data
+        return DatasetDefinition(**data)
+
+    def to_yaml(self, path: str | Path) -> None:
+        """Save a dataset definition to a YAML file.
+
+        Parameters
+        ----------
+        path: str | Path
+            Path where to save the YAML file to.
+        """
+        data = asdict(self)
+
+        def substitute_types(d: Any) -> Any:
+            if isinstance(d, dict):
+                return {k: substitute_types(v) for k, v in d.items()}
+            if isinstance(d, list):
+                return [substitute_types(v) for v in d]
+            if isinstance(d, type):
+                if d.__module__ == 'builtins':
+                    return f'!{d.__name__}'
+                return f'!{d.__module__}.{d.__name__}'
+            return d
+
+        data['experiment'] = data['experiment'].to_dict()
+
+        data = substitute_types(data)
+
+        with open(path, 'w', encoding='utf-8') as f:
+            yaml.dump(data, f, sort_keys=False)
