@@ -36,14 +36,14 @@ class TextStimulus:
     ----------
     aois: pl.DataFrame
         A stimulus dataframe.
-    aoi_column: str
-        Name of the column that contains the content of the aois.
-    start_x_column: str
+    aoi_column: str | None
+    Name of the column that contains the content of the aois. (default: None)
+    start_x_column: str | None
         Name of the column which contains the x coordinate's start position of the
-        areas of interest.
-    start_y_column: str
+        areas of interest. (default: None)
+    start_y_column: str | None
         Name of the column which contains the y coordinate's start position of the
-        areas of interest.
+        areas of interest. (default: None)
     width_column: str | None
         Name of the column which contains the width of the area of interest. (default: None)
     height_column: str | None
@@ -63,9 +63,9 @@ class TextStimulus:
             self,
             aois: pl.DataFrame,
             *,
-            aoi_column: str,
-            start_x_column: str,
-            start_y_column: str,
+            aoi_column: str | None = None,
+            start_x_column: str | None = None,
+            start_y_column: str | None = None,
             width_column: str | None = None,
             height_column: str | None = None,
             end_x_column: str | None = None,
@@ -152,9 +152,9 @@ class TextStimulus:
 def from_file(
         aoi_path: str | Path,
         *,
-        aoi_column: str,
-        start_x_column: str,
-        start_y_column: str,
+        aoi_column: str | None = None,
+        start_x_column: str | None = None,
+        start_y_column: str | None = None,
         width_column: str | None = None,
         height_column: str | None = None,
         end_x_column: str | None = None,
@@ -168,12 +168,12 @@ def from_file(
     ----------
     aoi_path:  str | Path
         Path to file to be read.
-    aoi_column: str
+    aoi_column: str | None
         Name of the column that contains the content of the aois.
-    start_x_column: str
+    start_x_column: str | None
         Name of the column which contains the x coordinate's start position of the
         areas of interest.
-    start_y_column: str
+    start_y_column: str | None
         Name of the column which contains the y coordinate's start position of the
         areas of interest.
     width_column: str | None
@@ -203,13 +203,20 @@ def from_file(
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
 
-    valid_extensions = {'.csv', '.tsv', '.txt', '.ias'}
-    if aoi_path.suffix in valid_extensions:
+    csv_extensions = {'.csv', '.tsv', '.txt', '.ias'}
+    excel_extensions = {'.xlsx'}
+    valid_extensions = csv_extensions.union(excel_extensions)
+    if aoi_path.suffix in csv_extensions:
         stimulus_df = pl.read_csv(
             aoi_path,
             **custom_read_kwargs,
         )
         stimulus_df = stimulus_df.fill_null(' ')
+    elif aoi_path.suffix in excel_extensions:
+        stimulus_df = pl.read_excel(
+            aoi_path,
+            **custom_read_kwargs,
+        )
     else:
         raise ValueError(
             f'unsupported file format "{aoi_path.suffix}".'

@@ -109,12 +109,16 @@ class BSC(DatasetDefinition):
             'gaze': False,
             'precomputed_events': True,
             'precomputed_reading_measures': False,
+            'stimulus': True,
         },
     )
     mirrors: dict[str, list[str]] = field(
         default_factory=lambda:
             {
                 'precomputed_events': [
+                    'https://osf.io/download/',
+                ],
+                'stimulus': [
                     'https://osf.io/download/',
                 ],
             },
@@ -129,11 +133,19 @@ class BSC(DatasetDefinition):
                         'md5': 'c7118bfe48c91264d69c45d347f11416',
                     },
                 ],
+                'stimulus': [
+                    {
+                        'resource': 't4vbg/',
+                        'filename': 'BSC.Word.Info.v2.xlsx',
+                        'md5': '21144da9848018d35869b3a0a892f52d',
+                    },
+                ],
             },
     )
     extract: dict[str, bool] = field(
         default_factory=lambda: {
             'precomputed_events': True,
+            'stimulus': False,
         },
     )
 
@@ -141,6 +153,7 @@ class BSC(DatasetDefinition):
         default_factory=lambda:
             {
                 'precomputed_events': 'BSC.EMD.txt',
+                'stimulus': 'BSC.Word.Info.v2.xlsx',
             },
     )
 
@@ -148,6 +161,7 @@ class BSC(DatasetDefinition):
         default_factory=lambda:
             {
                 'precomputed_events': {},
+                'stimulus': {},
             },
     )
 
@@ -164,5 +178,6 @@ class BSC(DatasetDefinition):
         default_factory=lambda:
             {
                 'precomputed_events': {'separator': '\t'},
+                'stimulus': {'sheet_name': 'word'},
             },
     )

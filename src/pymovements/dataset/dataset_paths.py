@@ -40,6 +40,9 @@ class DatasetPaths:
     events: str
         Name of directory under dataset path that will be used to store event data. We advise
         the user to keep the event data separate from the original raw data. (default: 'events')
+    stimulus: str
+        Name of directory under dataset path that contains stimulus data.
+        Can be `.` if stimulus data is located in dataset path. (default: 'stimulus')
     precomputed_events: str
         Name of directory under dataset path that contains precomputed event data.
         Can be `.` if precomputed event data is located in dataset path.
@@ -65,6 +68,7 @@ class DatasetPaths:
             dataset: str | None = None,
             raw: str = 'raw',
             events: str = 'events',
+            stimulus: str = 'stimulus',
             precomputed_events: str = 'precomputed_events',
             precomputed_reading_measures: str = 'precomputed_reading_measures',
             preprocessed: str = 'preprocessed',
@@ -74,6 +78,7 @@ class DatasetPaths:
         self._dataset = dataset
         self._raw = raw
         self._events = events
+        self._stimulus = stimulus
         self._precomputed_events = precomputed_events
         self._precomputed_reading_measures = precomputed_reading_measures
         self._preprocessed = preprocessed
@@ -370,6 +375,49 @@ class DatasetPaths:
         Path('/path/to/your/datasets/ToyDataset')
         """
         return self.dataset / self._raw
+
+    @property
+    def stimulus(self) -> Path:
+        """The path to the directory of the stimulus data.
+
+        The path points to the stimulus data directory under the dataset path.
+
+        Returns
+        -------
+        Path
+            Path to the stimulus data directory.
+
+        Example
+        -------
+        >>> import pymovements as pm
+        >>>
+        >>> dataset = pm.Dataset("ToyDataset", path='/path/to/your/dataset/')
+        >>> dataset.paths.stimulus# doctest: +SKIP
+        Path('/path/to/your/dataset/stimulus')
+
+        If you just want to specify the root directory path which holds all your local datasets, you
+        can create pass a :py:class:`~pymovements.DatasetPaths` object and set the `root`:
+        >>> paths = pm.DatasetPaths(root='path/to/your/common/root/')
+        >>> dataset = pm.Dataset("ToyDataset", path=paths)
+        >>> dataset.paths.stimulus# doctest: +SKIP
+        Path('path/to/your/common/root/ToyDataset/stimulus')
+
+        This way you can also explicitely specify the stimulus directory name.
+        The default is `stimulus`.
+        >>> paths = pm.DatasetPaths(root='/path/to/your/datasets/', stimulus='my_s')
+        >>> dataset = pm.Dataset("ToyDataset", path=paths)
+        >>> dataset.paths.stimulus# doctest: +SKIP
+        Path('/path/to/your/datasets/ToyDataset/my_s')
+
+        If your stimulus data is not in a separate directory under the root path then you
+        can also specify `.` as the directory name. We discourage this and advise the user to keep
+        precomputed and preprocessed data separated.
+        >>> paths = pm.DatasetPaths(root='/path/to/your/datasets/', stimulus='.')
+        >>> dataset = pm.Dataset("ToyDataset", path=paths)
+        >>> dataset.paths.stimulus# doctest: +SKIP
+        Path('/path/to/your/datasets/ToyDataset')
+        """
+        return self.dataset / self._stimulus
 
     @property
     def precomputed_events(self) -> Path:
