@@ -243,7 +243,7 @@ def dataset_fixture():
         'char',
     ],
 )
-def test_gaze_to_aoi_mapping_char_width_height(aoi_column, dataset):
+def test_event_to_aoi_mapping_char_width_height(aoi_column, dataset):
     aoi_df = pm.stimulus.text.from_file(
         'tests/files/toy_text_1_1_aoi.csv',
         aoi_column=aoi_column,
@@ -265,7 +265,7 @@ def test_gaze_to_aoi_mapping_char_width_height(aoi_column, dataset):
         'char',
     ],
 )
-def test_gaze_to_aoi_mapping_char_end(aoi_column, dataset):
+def test_event_to_aoi_mapping_char_end(aoi_column, dataset):
     aoi_df = pm.stimulus.text.from_file(
         'tests/files/toy_text_1_1_aoi.csv',
         aoi_column=aoi_column,
@@ -313,4 +313,4 @@ def test_map_to_aois_raises_value_error_missing_width_height(dataset):
     with pytest.raises(ValueError) as excinfo:
         dataset.events[0].map_to_aois(aoi_df)
     msg, = excinfo.value.args
-    assert msg == 'either aoi_dataframe.width or aoi_dataframe.end_x_column have to be not None'
+    assert msg == 'either TextStimulus.width or TextStimulus.end_x_column must be defined'

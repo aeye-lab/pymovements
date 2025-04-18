@@ -23,6 +23,7 @@ from __future__ import annotations
 import calendar
 import datetime
 import re
+import warnings
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
@@ -48,13 +49,6 @@ EYELINK_META_REGEXES = [
         ),
         r'\*\*\s+(?P<version_2>EYELINK.*)',
         r'MSG\s+\d+[.]?\d*\s+DISPLAY_COORDS\s*=?\s*(?P<resolution>.*)',
-        (
-            r'MSG\s+\d+[.]?\d*\s+RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+'
-            r'(?P<sampling_rate>\d+)\s+'
-            r'(?P<file_sample_filter>(0|1|2))\s+'
-            r'(?P<link_sample_filter>(0|1|2))\s+'
-            r'(?P<tracked_eye>(L|R|LR))\s*'
-        ),
         r'PUPIL\s+(?P<pupil_data_type>(AREA|DIAMETER))\s*',
         r'MSG\s+\d+[.]?\d*\s+ELCLCFG\s+(?P<mount_configuration>.*)',
     )
@@ -109,6 +103,14 @@ STOP_RECORDING_REGEX = re.compile(
     r'END\s+(?P<timestamp>(\d+[.]?\d*))\s+\s+(?P<types>.*)\s+RES\s+'
     r'(?P<xres>[\d\.]*)\s+(?P<yres>[\d\.]*)\s*',
 )
+RECORDING_CONFIG = re.compile(
+    r'MSG\s+(?P<timestamp>\d+[.]?\d*)\s+'
+    r'RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+'
+    r'(?P<sampling_rate>\d+)\s+'
+    r'(?P<file_sample_filter>0|1|2)\s+'
+    r'(?P<link_sample_filter>0|1|2)\s+'
+    r'(?P<tracked_eye>LR|[LR])\s*',
+)
 
 
 def check_nan(sample_location: str) -> float:
@@ -162,7 +164,7 @@ def compile_patterns(patterns: list[dict[str, Any] | str]) -> list[dict[str, Any
                 })
                 continue
 
-            if isinstance(pattern['pattern'], tuple):
+            if isinstance(pattern['pattern'], (tuple, list)):
                 for single_pattern in pattern['pattern']:
                     compiled_patterns.append({
                         **pattern,
@@ -220,7 +222,7 @@ def parse_eyelink(
         patterns: list[dict[str, Any] | str] | None = None,
         schema: dict[str, Any] | None = None,
         metadata_patterns: list[dict[str, Any] | str] | None = None,
-        encoding: str = 'ascii',
+        encoding: str | None = None,
 ) -> tuple[pl.DataFrame, pl.DataFrame, dict[str, Any]]:
     """Parse EyeLink asc file.
 
@@ -234,8 +236,8 @@ def parse_eyelink(
         Dictionary to optionally specify types of columns parsed by patterns. (default: None)
     metadata_patterns: list[dict[str, Any] | str] | None
         list of patterns to match for additional metadata. (default: None)
-    encoding: str
-        Text encoding of the file. (default: 'ascii')
+    encoding: str | None
+        Text encoding of the file. If None, the locale encoding is used. (default: None)
 
     Returns
     -------
@@ -297,7 +299,7 @@ def parse_eyelink(
     # TODO: remove blink metadata
     blinks = []
     invalid_samples = []
-
+    recording_config = []
     blink = False
 
     start_recording_timestamp = ''
@@ -305,7 +307,6 @@ def parse_eyelink(
     num_blink_samples = 0
 
     for line in lines:
-
         for pattern_dict in compiled_patterns:
 
             if match := pattern_dict['pattern'].match(line):
@@ -363,6 +364,9 @@ def parse_eyelink(
                 num_blink_samples = 0
                 blinks.append(blink_info)
 
+        elif eye_side_match := RECORDING_CONFIG.match(line):
+            recording_config.append(eye_side_match.groupdict())
+
         elif match := START_RECORDING_REGEX.match(line):
             start_recording_timestamp = match.groupdict()['timestamp']
 
@@ -417,10 +421,12 @@ def parse_eyelink(
                     compiled_metadata_patterns.remove(pattern_dict)
 
     if not metadata:
-        raise Warning('No metadata found. Please check the file for errors.')
+        warnings.warn('No metadata found. Please check the file for errors.')
 
     # if the sampling rate is not found, we cannot calculate the data loss
     actual_number_of_samples = len(samples['time'])
+    # if we don't have any recording config, we cannot calculate the data loss
+    metadata['sampling_rate'] = _check_reccfg_key(recording_config, 'sampling_rate', float)
 
     data_loss_ratio, data_loss_ratio_blinks = _calculate_data_loss(
         blinks=blinks,
@@ -430,6 +436,8 @@ def parse_eyelink(
         sampling_rate=metadata['sampling_rate'],
     )
 
+    metadata['tracked_eye'] = _check_reccfg_key(recording_config, 'tracked_eye')
+
     pre_processed_metadata: dict[str, Any] = _pre_process_metadata(metadata)
     # is not yet pre-processed but should be
     pre_processed_metadata['calibrations'] = calibrations
@@ -438,6 +446,7 @@ def parse_eyelink(
     pre_processed_metadata['data_loss_ratio'] = data_loss_ratio
     pre_processed_metadata['data_loss_ratio_blinks'] = data_loss_ratio_blinks
     pre_processed_metadata['total_recording_duration_ms'] = total_recording_duration
+    pre_processed_metadata['recording_config'] = recording_config
 
     gaze_schema_overrides = {
         'time': pl.Float64,
@@ -485,11 +494,6 @@ def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:
         resolution = (coordinates[2] - coordinates[0] + 1, coordinates[3] - coordinates[1] + 1)
         metadata['resolution'] = resolution
 
-    if metadata['sampling_rate']:
-        metadata['sampling_rate'] = float(metadata['sampling_rate'])
-    else:
-        metadata['sampling_rate'] = 'unknown'
-
     # if the date has been parsed fully, convert the date to a datetime object
     if 'day' in metadata and 'year' in metadata and 'month' in metadata and 'time' in metadata:
         metadata['day'] = int(metadata['day'])
@@ -509,12 +513,51 @@ def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:
     return return_metadata
 
 
+def _check_reccfg_key(
+        recording_config: list[dict[str, Any]],
+        key: str,
+        astype: type | None = None,
+) -> Any:
+    """Check if the recording configs contain consistent values for the specified key and return it.
+
+    Prints a warning if no recording config is found or if the value is inconsistent across entries.
+
+    Parameters
+    ----------
+    recording_config: list[dict[str, Any]]
+        List of dictionaries containing recording config details.
+    key: str
+        The key in the recording configs to check for consistency.
+    astype: type | None
+        The type to cast the value to.
+
+    Returns
+    -------
+    Any
+        The value of the specified key if available, otherwise None.
+    """
+    if not recording_config:
+        warnings.warn('No recording configuration found.')
+        return None
+
+    values = {d.get(key) for d in recording_config}
+    if len(values) != 1:
+        sorted_values: list = sorted(values)
+        warnings.warn(f"Found inconsistent values for '{key}': {sorted_values}")
+        return None
+
+    value = values.pop()
+    if astype is not None:
+        value = astype(value)
+    return value
+
+
 def _calculate_data_loss(
         blinks: list[dict[str, Any]],
         invalid_samples: list[str],
         actual_num_samples: int,
-        total_rec_duration: float,
-        sampling_rate: float,
+        total_rec_duration: float | None = None,
+        sampling_rate: float | None = None,
 ) -> tuple[float | str, float | str]:
     """Calculate data loss and blink loss.
 
@@ -526,9 +569,9 @@ def _calculate_data_loss(
         List of invalid samples.
     actual_num_samples: int
         Number of actual samples recorded.
-    total_rec_duration: float
+    total_rec_duration: float | None
         Total duration of the recording.
-    sampling_rate: float
+    sampling_rate: float | None
         Sampling rate of the eye tracker.
 
     Returns

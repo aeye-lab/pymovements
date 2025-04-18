@@ -178,18 +178,15 @@ EXPECTED_METADATA = {
     'version_2': 'EYELINK II CL v6.12 Feb  1 2018 (EyeLink Portable Duo)',
     'model': 'EyeLink Portable Duo',
     'version_number': '6.12',
-    'sampling_rate': 1000.00,
-    'file_sample_filter': '2',
-    'link_sample_filter': '1',
-    'pupil_data_type': 'AREA',
-    'tracking_mode': 'CR',
+    'sampling_rate': 1000.0,
     'tracked_eye': 'L',
+    'pupil_data_type': 'AREA',
     'calibrations': [],
     'validations': [],
     'resolution': (1280, 1024),
-    'data_loss_ratio_blinks': 0.16666666666666666,
-    'data_loss_ratio': 0.25,
-    'total_recording_duration_ms': 12.0,
+    'data_loss_ratio_blinks': 0.18181818181818182,
+    'data_loss_ratio': 0.2727272727272727,
+    'total_recording_duration_ms': 11,
     'datetime': datetime.datetime(2023, 3, 8, 9, 25, 20),
     'blinks': [{
         'duration_ms': 4.0,
@@ -207,6 +204,16 @@ EXPECTED_METADATA = {
     'metadata_2': 'abc',
     'metadata_3': True,
     'metadata_4': None,
+    'recording_config': [
+        {
+            'sampling_rate': '1000',
+            'file_sample_filter': '2',
+            'link_sample_filter': '1',
+            'timestamp': '2154555',
+            'tracked_eye': 'L',
+            'tracking_mode': 'CR',
+        },
+    ],
 }
 
 
@@ -289,7 +296,6 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
     ('metadata', 'expected_version', 'expected_model'),
     [
         pytest.param(
-            '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL v6.12 Feb  1 2018 (EyeLink Portable Duo)',
             '6.12',
@@ -297,7 +303,6 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
             id='eye_link_portable_duo',
         ),
         pytest.param(
-            '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL v5.12 Feb  1 2018\n',
             '5.12',
@@ -305,7 +310,6 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
             id='eye_link_1000_plus',
         ),
         pytest.param(
-            '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL v4.12 Feb  1 2018',
             '4.12',
@@ -313,7 +317,6 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
             id='eye_link_1000_1',
         ),
         pytest.param(
-            '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL v3.12 Feb  1 2018',
             '3.12',
@@ -321,7 +324,6 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
             id='eye_link_1000_2',
         ),
         pytest.param(
-            '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL v2.12 Feb  1 2018',
             '2.12',
@@ -329,21 +331,18 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
             id='eye_link_II',
         ),
         pytest.param(
-            '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK REVISION 2.00 (Aug 12 1997)',
             '2.00',
             'EyeLink I',
             id='eye_link_I',
         ),
         pytest.param(
-            '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: nothing\n',
             'unknown',
             'unknown',
             id='unknown_version_1',
         ),
         pytest.param(
-            '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** VERSION: EYELINK II 1\n'
             '** EYELINK II CL Feb  1 2018 (EyeLink Portable Duo)',
             'unknown',
@@ -351,7 +350,6 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
             id='unknown_version_2',
         ),
         pytest.param(
-            '** DATE: Wed Mar  8 09:25:20 2023\n'
             '** TYPE: EDF_FILE BINARY EVENT SAMPLE TAGGED',
             'unknown',
             'unknown',
@@ -359,6 +357,8 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
         ),
     ],
 )
+@pytest.mark.filterwarnings('ignore:No metadata found.')
+@pytest.mark.filterwarnings('ignore:No recording configuration found.')
 def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_model):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
@@ -375,24 +375,33 @@ def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_mo
     ('metadata', 'expected_msg'),
     [
         pytest.param(
-            '',
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n',
             'No metadata found. Please check the file for errors.',
-            id='eye_link_no_metadata',
+            id='no_metadata',
+        ),
+        pytest.param(
+            '** DATE: Wed Mar  8 09:25:20 2023\n',
+            'No recording configuration found.',
+            id='no_reccfg',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'MSG	2154556 RECCFG CR 2000 2 1 L\n',
+            r"Found inconsistent values for 'sampling_rate': \['1000', '2000'\]",
+            id='inconsistent_reccfg',
         ),
     ],
 )
-def test_no_metadata_warning(tmp_path, metadata, expected_msg):
+@pytest.mark.filterwarnings('ignore:No metadata found.')
+@pytest.mark.filterwarnings('ignore:No recording configuration found.')
+def test_metadata_warnings(tmp_path, metadata, expected_msg):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
     with pytest.raises(Warning) as info:
-        _, _, metadata = pm.gaze._utils.parsing.parse_eyelink(
+        _, metadata = pm.gaze._utils.parsing.parse_eyelink(
             filepath,
         )
-
-    msg = info.value.args[0]
-
-    assert msg == expected_msg
 
 
 @pytest.mark.parametrize(
@@ -422,7 +431,6 @@ def test_no_metadata_warning(tmp_path, metadata, expected_msg):
             id='cal_timestamp_with_space',
         ),
         pytest.param(
-            '** DATE: Wed Feb  1 04:38:54 2017\n'
             'MSG	7045618 !CAL\n'
             '>>>>>>> CALIBRATION (HV9,P-CR) FOR LEFT: <<<<<<<<<\n',
             [],
@@ -435,7 +443,6 @@ def test_no_metadata_warning(tmp_path, metadata, expected_msg):
             id='cal_timestamp_no_space_no_val',
         ),
         pytest.param(
-            '** DATE: Wed Feb  1 04:38:54 2017\n'
             'MSG	7045618 !CAL\n'
             'MSG	7045618 !CAL\n',
             [],
@@ -444,6 +451,8 @@ def test_no_metadata_warning(tmp_path, metadata, expected_msg):
         ),
     ],
 )
+@pytest.mark.filterwarnings('ignore:No metadata found.')
+@pytest.mark.filterwarnings('ignore:No recording configuration found.')
 def test_val_cal_eyelink(tmp_path, metadata, expected_validation, expected_calibration):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
@@ -479,7 +488,6 @@ def test_parse_val_cal_eyelink_monocular_file():
     ('metadata', 'expected_blinks'),
     [
         pytest.param(
-            '** DATE: Wed Mar  8 09:25:20 2023\n'
             'EVENTS	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2\n'
             'SBLINK R 10000018\n'
             '10000019	   .	   .	    0.0	    0.0	...\n'
@@ -494,7 +502,6 @@ def test_parse_val_cal_eyelink_monocular_file():
             id='blink',
         ),
         pytest.param(
-            '** DATE: Wed Mar  8 09:25:20 2023\n'
             'EVENTS	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2\n'
             'SBLINK R 10000018\n'
             '10000019	   .	   .	    0.0	    0.0	...\n'
@@ -523,7 +530,6 @@ def test_parse_val_cal_eyelink_monocular_file():
             id='multiple_blinks',
         ),
         pytest.param(
-            '** DATE: Wed Mar  8 09:25:20 2023\n'
             'EVENTS	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2\n'
             'SBLINK R 10000018\n'
             '10000019	   .	   .	    0.0	...\n'
@@ -552,7 +558,6 @@ def test_parse_val_cal_eyelink_monocular_file():
             id='multiple_blinks_no_dummy',
         ),
         pytest.param(
-            '** DATE: Wed Mar  8 09:25:20 2023\n'
             'SBLINK R 10000018\n'
             '10000019	   .	   .	    0.0	    0.0	...\n'
             '10000020	   .	   .	    0.0	    0.0	...\n'
@@ -567,6 +572,8 @@ def test_parse_val_cal_eyelink_monocular_file():
         ),
     ],
 )
+@pytest.mark.filterwarnings('ignore:No metadata found.')
+@pytest.mark.filterwarnings('ignore:No recording configuration found.')
 def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
@@ -604,7 +611,6 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
             id='only_blinks_no_dummy',
         ),
         pytest.param(
-            '** DATE: Wed Mar  8 09:25:20 2023\n'
             'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
             'SBLINK R 10000018\n'
             '10000019	   .	   .	    0.0	    0.0	...\n'
@@ -637,7 +643,6 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
             id='blinks_and_lost_samples',
         ),
         pytest.param(
-            '** DATE: Wed Mar  8 09:25:20 2023\n'
             'START	10000021 	RIGHT	SAMPLES	EVENTS\n'
             '10000021	   .	   .	    0.0	    0.0	...\n'
             '10000022	   .	   .	    0.0	    0.0	...\n'
@@ -666,7 +671,7 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
             'END	10000022 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
             0,
             0.5,
-            id='missing_timestamps_lost_samples',
+            id='missing_timestamps_lost_samples1',
         ),
         pytest.param(
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
@@ -679,7 +684,7 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
             'END	10000024 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
             0.25,
             0.75,
-            id='missing_timestamps_lost_samples',
+            id='missing_timestamps_lost_samples_blink',
         ),
         pytest.param(
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
@@ -699,10 +704,12 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
             'END	10000021 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
             0,
             1,
-            id='missing_timestamps_lost_samples',
+            id='no_samples',
         ),
     ],
 )
+@pytest.mark.filterwarnings('ignore:No metadata found.')
+@pytest.mark.filterwarnings('ignore:No recording configuration found.')
 def test_parse_eyelink_data_loss_ratio(
         tmp_path, metadata, expected_blink_ratio, expected_overall_ratio,
 ):
@@ -715,6 +722,8 @@ def test_parse_eyelink_data_loss_ratio(
     assert parsed_metadata['data_loss_ratio'] == expected_overall_ratio
 
 
+@pytest.mark.filterwarnings('ignore:No metadata found.')
+@pytest.mark.filterwarnings('ignore:No recording configuration found.')
 def test_parse_eyelink_datetime(tmp_path):
     metadata = '** DATE: Wed Mar  8 09:25:20 2023\n'
     expected_datetime = datetime.datetime(2023, 3, 8, 9, 25, 20)
@@ -926,6 +935,7 @@ def test_parse_eyelink_mount_config(tmp_path, metadata, expected_mount_config):
         ),
     ],
 )
+@pytest.mark.filterwarnings('ignore:No recording configuration found.')
 def test_parse_eyelink_encoding(tmp_path, bytestring, encoding, expected_text):
     filepath = tmp_path / 'sub.asc'
     filepath.write_bytes(bytestring)
