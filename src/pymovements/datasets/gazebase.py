@@ -137,8 +137,8 @@ class GazeBase(DatasetDefinition):
 
     mirrors: dict[str, list[str]] = field(
         default_factory=lambda: {
-            'gaze': ['https://figshare.com/ndownloader/files/',],
-            'stimulus': ['https://figshare.com/ndownloader/files/',],
+            'gaze': ['https://figshare.com/ndownloader/files/'],
+            'stimulus': ['https://figshare.com/ndownloader/files/'],
         },
     )
 
