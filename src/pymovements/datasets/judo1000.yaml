@@ -1,5 +1,7 @@
 name: "JuDo1000"
 
+long_name: 'Jumping Dots dataset'
+
 has_files:
   gaze: true
   precomputed_events: false

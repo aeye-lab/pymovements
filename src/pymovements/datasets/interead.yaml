@@ -1,5 +1,7 @@
 name: "InteRead"
 
+long_name: "Interrupted Reading dataset"
+
 has_files:
   gaze: true
   precomputed_events: true

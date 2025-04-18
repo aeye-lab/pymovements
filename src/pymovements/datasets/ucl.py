@@ -44,6 +44,9 @@ class UCL(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -97,6 +100,8 @@ class UCL(DatasetDefinition):
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'UCL'
+
+    long_name: str = 'UCL corpus'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

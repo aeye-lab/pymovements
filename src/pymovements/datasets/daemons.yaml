@@ -1,5 +1,7 @@
 name: "DAEMONS"
 
+long_name: 'DAta set for Eye Movement On Natural Scenes'
+
 has_files:
   gaze: false
   precomputed_events: true
