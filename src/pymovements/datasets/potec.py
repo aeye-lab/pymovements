@@ -129,7 +129,7 @@ class PoTeC(DatasetDefinition):
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
-            'precomputed_events': False,
+            'precomputed_events': True,
             'precomputed_reading_measures': False,
         },
     )
@@ -137,6 +137,7 @@ class PoTeC(DatasetDefinition):
     mirrors: dict[str, list[str]] = field(
         default_factory=lambda: {
             'gaze': ['https://osf.io/download/'],
+            'precomputed_events': ['https://osf.io/download/'],
         },
     )
 
@@ -149,10 +150,22 @@ class PoTeC(DatasetDefinition):
                     'md5': 'cffd45039757c3777e2fd130e5d8a2ad',
                 },
             ],
+            'precomputed_events': [
+                {
+                    'resource': 'd8pyg/',
+                    'filename': 'fixation.zip',
+                    'md5': 'ecd9a998d07158922bb9b8cdd52f5688',
+                },
+            ],
         },
     )
 
-    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
+    extract: dict[str, bool] = field(
+        default_factory=lambda: {
+            'gaze': True,
+            'precomputed_events': True,
+        },
+    )
 
     experiment: Experiment = field(
         default_factory=lambda: Experiment(
@@ -169,12 +182,17 @@ class PoTeC(DatasetDefinition):
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
             'gaze': r'reader{subject_id:d}_{text_id}_raw_data.tsv',
+            'precomputed_events': r'reader{subject_id:d}_{text_id}_uncorrected_fixations.tsv'
         },
     )
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
             'gaze': {
+                'subject_id': int,
+                'text_id': str,
+            },
+            'precomputed_events': {
                 'subject_id': int,
                 'text_id': str,
             },
@@ -202,5 +220,9 @@ class PoTeC(DatasetDefinition):
                 },
                 'separator': '\t',
             },
+            'precomputed_events': {
+                'separator': '\t',
+                'null_values': '.',
+            }
         },
     )
