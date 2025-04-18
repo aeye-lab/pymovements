@@ -76,7 +76,7 @@ MSG 10000007 START_TRIAL_1
 the next line now should have the trial column set to 1
 START	10000008 	RIGHT	SAMPLES	EVENTS
 10000008	  850.7	  717.5	  714.0	    0.0	...
-EFIX	R	10000000	10000008	10	850.7	717.5	714.0
+EFIX	R	10000000	10000008	9	850.7	717.5	714.0
 END	10000009 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000009 STOP_TRIAL_1
 MSG 10000010 START_TRIAL_2
@@ -103,8 +103,8 @@ START	10000017 	RIGHT	SAMPLES	EVENTS
 SBLINK R 10000020
 10000020	   .	   .	    0.0	    0.0	...
 10000021	   .	   .	    0.0	    0.0	...
-EBLINK R 10000020	10000022	4
-ESACC	R	10000011	10000022	13	850.7	717.5	850.7	717.5	19.00	590
+EBLINK R 10000020	10000022	3
+ESACC	R	10000011	10000022	12	850.7	717.5	850.7	717.5	19.00	590
 END	10000022 	SAMPLES	EVENTS	RES	  38.54	  31.12
 """
 
@@ -162,7 +162,7 @@ EXPECTED_EVENT_DF = pl.from_dict(
     {
         'name': ['fixation_eyelink', 'blink_eyelink', 'saccade_eyelink'],
         'onset': [10000000.0, 10000020.0, 10000011.0],
-        'offset': [10000008.0, 10000022.0, 10000022.0],
+        'offset': [10000009.0, 10000023.0, 10000023.0],
         'task': [None, None, 'B'],
         'trial_id': [None, None, '2'],
     },
@@ -227,8 +227,8 @@ def test_parse_eyelink(tmp_path):
         metadata_patterns=METADATA_PATTERNS,
     )
 
-    assert_frame_equal(gaze_df, EXPECTED_GAZE_DF, check_column_order=False)
-    assert_frame_equal(event_df, EXPECTED_EVENT_DF, check_column_order=False)
+    assert_frame_equal(gaze_df, EXPECTED_GAZE_DF, check_column_order=False, rtol=0)
+    assert_frame_equal(event_df, EXPECTED_EVENT_DF, check_column_order=False, rtol=0)
     assert metadata == EXPECTED_METADATA
 
 
@@ -398,8 +398,8 @@ def test_metadata_warnings(tmp_path, metadata, expected_msg):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    with pytest.raises(Warning) as info:
-        _, metadata = pm.gaze._utils.parsing.parse_eyelink(
+    with pytest.warns(Warning, match=expected_msg):
+        _, _, metadata = pm.gaze._utils.parsing.parse_eyelink(
             filepath,
         )
 

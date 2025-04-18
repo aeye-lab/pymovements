@@ -299,7 +299,7 @@ def parse_eyelink(
     # TODO: remove blink metadata
     blinks = []
     invalid_samples = []
-    recording_config = []
+    recording_config: list[dict[str, str]] = []
     blink = False
 
     start_recording_timestamp = ''
@@ -340,6 +340,9 @@ def parse_eyelink(
 
         elif event := parse_eyelink_event_end(line):
             event_name, event_onset, event_offset = event
+            # See https://www.sr-research.com/support/thread-9411.html
+            sample_length = 1 / float(recording_config[-1]['sampling_rate']) * 1000
+            event_offset += sample_length
             events['name'].append(f'{event_name}_eyelink')
             events['onset'].append(event_onset)
             events['offset'].append(event_offset)
@@ -364,8 +367,8 @@ def parse_eyelink(
                 num_blink_samples = 0
                 blinks.append(blink_info)
 
-        elif eye_side_match := RECORDING_CONFIG.match(line):
-            recording_config.append(eye_side_match.groupdict())
+        elif match := RECORDING_CONFIG.match(line):
+            recording_config.append(match.groupdict())
 
         elif match := START_RECORDING_REGEX.match(line):
             start_recording_timestamp = match.groupdict()['timestamp']
