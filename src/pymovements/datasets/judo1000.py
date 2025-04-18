@@ -47,6 +47,10 @@ class JuDo1000(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    info: str
+        Information about the dataset including but not limited to original citation,
+        general information.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -125,6 +129,28 @@ class JuDo1000(DatasetDefinition):
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'JuDo1000'
+
+    info: str = """\
+JuDo1000 dataset :cite:p:`JuDo1000`.
+
+This dataset includes binocular eye tracking data from 150 participants in four sessions with an
+interval of at least one week between two sessions. Eye movements are recorded at a sampling
+frequency of 1000 Hz using an EyeLink Portable Duo video-based eye tracker and are provided as
+pixel coordinates. Participants are instructed to watch a random jumping dot on a computer
+screen.
+
+Check the respective `repository <https://osf.io/5zpvk/>`_ for details.
+
+If you use the dataset, please cite:
+
+@misc{JuDo1000,
+  author = {Makowski, Silvia and Jäger, Lena A. and Prasse, Paul and Scheffer, Tobias},
+  title = {{JuDo1000} Eye Tracking Data Set},
+  year = {2020},
+  pages = {1-10},
+  doi = {10.17605/OSF.IO/5ZPVK},
+}
+"""
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

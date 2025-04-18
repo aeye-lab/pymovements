@@ -53,6 +53,10 @@ class GazeBase(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    info: str
+        Information about the dataset including but not limited to original citation,
+        general information.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -125,6 +129,35 @@ class GazeBase(DatasetDefinition):
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'GazeBase'
+
+    info: str = """\
+GazeBase dataset :cite:p:`GazeBase`.
+
+This dataset includes monocular (left eye) eye tracking data from 322 participants captured over
+a period of 37 months. Participants attended up to 9 rounds during this time frame, with each
+round consisting of two contiguous sessions.
+
+Eye movements are recorded at a sampling frequency of 1000 Hz using an EyeLink 1000 video-based
+eye tracker and are provided as positional data in degrees of visual angle.
+
+In each of the two sessions per round, participants are instructed to complete a series of
+tasks, including a fixation task (FIX), a horizontal saccade task (HSS), a random saccade task
+(RAN), a reading task (TEX), two free viewing video tasks (VD1 and VD2) and a gaze-driven gaming
+task (BLG).
+
+Check the respective paper for details :cite:p:`GazeBase`.
+
+If you use the dataset, please cite:
+@article{GazeBase,
+  author = {Griffith, Henry and Lohr, Dillon and Abdulin, Evgeny and Komogortsev, Oleg},
+  year = {2021},
+  pages = {},
+  title = {{GazeBase}, a large-scale, multi-stimulus, longitudinal eye movement dataset},
+  volume = {8},
+  journal = {Scientific Data},
+  doi = {10.1038/s41597-021-00959-y},
+}
+"""
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

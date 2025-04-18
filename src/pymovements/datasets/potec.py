@@ -57,6 +57,10 @@ class PoTeC(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    info: str
+        Information about the dataset including but not limited to original citation,
+        general information.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -125,6 +129,43 @@ class PoTeC(DatasetDefinition):
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'PoTeC'
+
+    info: str = """\
+PoTeC dataset :cite:p:`PoTeC`.
+
+The Potsdam Textbook Corpus (PoTeC) is a naturalistic eye-tracking-while-reading
+corpus containing data from 75 participants reading 12 scientific texts.
+PoTeC is the first naturalistic eye-tracking-while-reading corpus that contains
+eye-movements from domain-experts as well as novices in a within-participant
+manipulation: It is based on a 2×2×2 fully-crossed factorial design which includes
+the participants' level of study and the participants' discipline of study as
+between-subject factors and the text domain as a within-subject factor. The
+participants' reading comprehension was assessed by a series of text comprehension
+questions and their domain knowledge was tested by text-independent
+background questions for each of the texts. The materials are annotated for a
+variety of linguistic features at different levels. We envision PoTeC to be used
+for a wide range of studies including but not limited to analyses of expert and
+non-expert reading strategies.
+
+The corpus and all the accompanying data at all
+stages of the preprocessing pipeline and all code used to preprocess the data are
+made available via `GitHub. <https://github.com/DiLi-Lab/PoTeC>`_
+
+If you use the dataset, please cite:
+
+@misc{PoTeC,
+  url = {https://github.com/DiLi-Lab/PoTeC},
+  author = {
+  Jakobi, Deborah N. and
+  Kern, Thomas and
+  Reich, David R. and
+  Haller, Patrick and
+  J\\"ager, Lena A.},
+  title = {{PoTeC}: A {G}erman Naturalistic Eye-tracking-while-reading Corpus},
+  year = {2024},
+  note = {under review},
+}
+"""
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
