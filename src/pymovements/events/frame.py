@@ -83,7 +83,7 @@ class EventDataFrame:
     └──────────┴─────────┴─────────┴──────────┘
     """
 
-    _minimal_schema = {'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64}
+    _minimal_schema = {'name': pl.Utf8, 'onset': pl.Float64, 'offset': pl.Float64}
 
     def __init__(
             self,
@@ -141,8 +141,8 @@ class EventDataFrame:
 
                 data_dict = {
                     'name': pl.Series(name, dtype=pl.Utf8),
-                    'onset': pl.Series(onsets, dtype=pl.Int64),
-                    'offset': pl.Series(offsets, dtype=pl.Int64),
+                    'onset': pl.Series(onsets, dtype=pl.Float64),
+                    'offset': pl.Series(offsets, dtype=pl.Float64),
                 }
 
                 if trials is not None:
@@ -154,8 +154,8 @@ class EventDataFrame:
             else:
                 data_dict = {
                     'name': pl.Series([], dtype=pl.Utf8),
-                    'onset': pl.Series([], dtype=pl.Int64),
-                    'offset': pl.Series([], dtype=pl.Int64),
+                    'onset': pl.Series([], dtype=pl.Float64),
+                    'offset': pl.Series([], dtype=pl.Float64),
                 }
                 self.trial_columns = None
 
