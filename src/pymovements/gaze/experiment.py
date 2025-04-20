@@ -131,7 +131,24 @@ class Experiment:
 
         if self.sampling_rate is not None:
             checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
+                 
+    @staticmethod
+    def from_dict(dictionary: dict[str, Any]) -> 'Experiment':
+        screen = None
+        eyetracker = None
 
+        if 'screen' in dictionary:
+            screen = Screen(**dictionary.pop('screen'))
+
+        if 'eyetracker' in dictionary:
+            eyetracker = EyeTracker(**dictionary.pop('eyetracker'))
+
+        return Experiment(
+            **dictionary,
+            screen=screen,
+            eyetracker=eyetracker,
+        )
+        
     @property
     def sampling_rate(self) -> float | None:
         """Get sampling rate of experiment."""

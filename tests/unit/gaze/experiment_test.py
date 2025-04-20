@@ -78,3 +78,36 @@ def test_sampling_rate_trivial_equality(experiment_init_kwargs):
 )
 def test_sampling_rate_equality(experiment1, experiment2):
     assert experiment1 == experiment2
+
+
+@pytest.mark.parametrize(
+    ('dictionary', 'expected_experiment'),
+    [
+        pytest.param(
+            {'sampling_rate': 1000},
+            Experiment(eyetracker=EyeTracker(sampling_rate=1000)),
+            id='sampling_rate',
+        ),
+
+        pytest.param(
+            {'eyetracker': {'sampling_rate': 1000}},
+            Experiment(eyetracker=EyeTracker(sampling_rate=1000)),
+            id='eyetracker_sampling_rate',
+        ),
+
+        pytest.param(
+            {'screen_width_px': 1024, 'screen_height_px': 768},
+            Experiment(screen=Screen(1024, 768)),
+            id='screen_width_px_and_screen_height_px',
+        ),
+
+        pytest.param(
+            {'screen': {'width_px': 1024, 'height_px': 768}},
+            Experiment(screen=Screen(1024, 768)),
+            id='screen_width_px_and_height_px',
+        ),
+    ],
+)
+def test_experiment_from_dict(dictionary, expected_experiment):
+    experiment = Experiment.from_dict(dictionary)
+    assert experiment == expected_experiment
