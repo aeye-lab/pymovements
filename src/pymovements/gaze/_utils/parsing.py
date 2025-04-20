@@ -63,12 +63,11 @@ VALIDATION_REGEX = re.compile(
     r'(?P<validation_score_max>\d.\d\d)\s+max',
 )
 
-# TODO: support all EFIX/ESACC/EBLINK formats (optional angular position)
 FIXATION_START_REGEX = re.compile(r'SFIX\s+(R|L)\s+(?P<timestamp>(\d+[.]?\d*))\s*')
 FIXATION_STOP_REGEX = re.compile(
     r'EFIX\s+(R|L)\s+(?P<timestamp_start>(\d+[.]?\d*))\s+'
     r'(?P<timestamp_end>(\d+[.]?\d*))\s+(?P<duration_ms>(\d+[.]?\d*))\s+'
-    r'(?P<avg_x_pix>(\d+[.]?\d*))\s+(?P<avg_y_pix>(\d+[.]?\d*))\s+(?P<avg_pupil>(\d+[.]?\d*))\s*',
+    r'(?P<avg_x_pix>(\d+[.]?\d*))\s+(?P<avg_y_pix>(\d+[.]?\d*))\s+(?P<avg_pupil>(\d+[.]?\d*))\s*.*',
 )
 SACCADE_START_REGEX = re.compile(r'SSACC\s+(R|L)\s+(?P<timestamp>(\d+[.]?\d*))\s*')
 SACCADE_STOP_REGEX = re.compile(
@@ -76,7 +75,7 @@ SACCADE_STOP_REGEX = re.compile(
     r'(?P<timestamp_end>(\d+[.]?\d*))\s+(?P<duration_ms>(\d+[.]?\d*))\s+'
     r'(?P<start_x_pix>(\d+[.]?\d*))\s+(?P<start_y_pix>(\d+[.]?\d*))\s+'
     r'(?P<end_x_pix>(\d+[.]?\d*))\s+(?P<end_y_pix>(\d+[.]?\d*))\s+'
-    r'(?P<amplitude>(\d+[.]?\d*))\s+(?P<peak_velocity>(\d+[.]?\d*))\s*',
+    r'(?P<amplitude>(\d+[.]?\d*))\s+(?P<peak_velocity>(\d+[.]?\d*))\s*.*',
 )
 BLINK_START_REGEX = re.compile(r'SBLINK\s+(R|L)\s+(?P<timestamp>(\d+[.]?\d*))\s*')
 BLINK_STOP_REGEX = re.compile(
