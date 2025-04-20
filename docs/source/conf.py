@@ -47,7 +47,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath('src'))))
 # -- Project information -----------------------------------------------------
 
 project = 'pymovements'
-copyright = '2022-2023 The pymovements Project Authors'
+copyright = '2022-2025 The pymovements Project Authors'
 author = 'The pymovements Project Authors'
 
 
@@ -192,7 +192,7 @@ extlinks = {
 
 LINKCODE_URL = (
     f'https://github.com/aeye-lab/pymovements/blob/{REVISION}'
-    '/src/{filepath}#L{linestart}-L{linestop}'
+    '/src/pymovements/{filepath}#L{linestart}-L{linestop}'
 )
 
 
@@ -217,7 +217,7 @@ def linkcode_resolve(domain, info):
             return None
 
     try:
-        modpath = importlib.resources.require(topmodulename)[0].location
+        modpath = importlib.resources.files(topmodulename)
         filepath = os.path.relpath(inspect.getsourcefile(obj), modpath)
         if filepath is None:
             return

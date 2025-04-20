@@ -25,18 +25,15 @@
    :toctree:
    :template: module.rst
 
-    pymovements.utils.archives
-    pymovements.utils.checks
-    pymovements.utils.decorators
-    pymovements.utils.downloads
-    pymovements.utils.filters
-    pymovements.utils.parsing
-    pymovements.utils.paths
+    archives
+    checks
+    downloads
+    parsing
+    paths
 """
 from pymovements.utils import aois
 from pymovements.utils import archives
 from pymovements.utils import checks
-from pymovements.utils import decorators
 from pymovements.utils import downloads
 from pymovements.utils import parsing
 from pymovements.utils import paths
@@ -47,7 +44,6 @@ __all__ = [
     'aois',
     'archives',
     'checks',
-    'decorators',
     'downloads',
     'parsing',
     'plotting',

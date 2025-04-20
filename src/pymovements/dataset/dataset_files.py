@@ -20,12 +20,15 @@
 """Functionality to scan, load and save dataset files."""
 from __future__ import annotations
 
+import warnings
 from pathlib import Path
 from typing import Any
 
 import polars as pl
 from tqdm.auto import tqdm
 
+from pymovements._utils._paths import match_filepaths
+from pymovements._utils._strings import curly_to_regex
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events import EventDataFrame
@@ -35,8 +38,6 @@ from pymovements.gaze.io import from_asc
 from pymovements.gaze.io import from_csv
 from pymovements.gaze.io import from_ipc
 from pymovements.reading_measures import ReadingMeasures
-from pymovements.utils.paths import match_filepaths
-from pymovements.utils.strings import curly_to_regex
 
 
 def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataFrame:
@@ -303,10 +304,27 @@ def load_gaze_file(
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
 
-    add_columns = {
-        key: fileinfo_row[key] for key in
-        [key for key in fileinfo_row.keys() if key != 'filepath']
+    fileinfo_columns = {
+        column: fileinfo_row[column] for column in
+        [column for column in fileinfo_row.keys() if column != 'filepath']
     }
+
+    # check if we have any trial columns specified.
+    if not definition.trial_columns:
+        trial_columns = list(fileinfo_columns)
+    else:  # check for duplicates and merge.
+        trial_columns = definition.trial_columns
+
+        # Make sure fileinfo row is not duplicated as a trial_column:
+        if set(trial_columns).intersection(list(fileinfo_columns)):
+            dupes = set(trial_columns).intersection(list(fileinfo_columns))
+            warnings.warn(
+                f'removed duplicated fileinfo columns from trial_columns: {", ".join(dupes)}',
+            )
+            trial_columns = list(set(trial_columns).difference(list(fileinfo_columns)))
+
+        # expand trial columns with added fileinfo columns
+        trial_columns = list(fileinfo_columns) + trial_columns
 
     if filepath.suffix in {'.csv', '.txt', '.tsv'}:
         if preprocessed:
@@ -315,43 +333,12 @@ def load_gaze_file(
 
             gaze_df = from_csv(
                 filepath,
-                trial_columns=definition.trial_columns,
+                trial_columns=trial_columns,
                 time_unit=time_unit,
-                add_columns=add_columns,
+                auto_column_detect=True,
+                add_columns=fileinfo_columns,
                 column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
             )
-
-            # suffixes as ordered after using GazeDataFrame.unnest()
-            component_suffixes = ['x', 'y', 'xl', 'yl', 'xr', 'yr', 'xa', 'ya']
-
-            pixel_columns = ['pixel_' + suffix for suffix in component_suffixes]
-            pixel_columns = [c for c in pixel_columns if c in gaze_df.frame.columns]
-
-            position_columns = ['position_' + suffix for suffix in component_suffixes]
-            position_columns = [c for c in position_columns if c in gaze_df.frame.columns]
-
-            velocity_columns = ['velocity_' + suffix for suffix in component_suffixes]
-            velocity_columns = [c for c in velocity_columns if c in gaze_df.frame.columns]
-
-            acceleration_columns = ['acceleration_' + suffix for suffix in component_suffixes]
-            acceleration_columns = [c for c in acceleration_columns if c in gaze_df.frame.columns]
-
-            column_specifiers: list[list[str]] = []
-            if len(pixel_columns) > 0:
-                gaze_df.nest(pixel_columns, output_column='pixel')
-                column_specifiers.append(pixel_columns)
-
-            if len(position_columns) > 0:
-                gaze_df.nest(position_columns, output_column='position')
-                column_specifiers.append(position_columns)
-
-            if len(velocity_columns) > 0:
-                gaze_df.nest(velocity_columns, output_column='velocity')
-                column_specifiers.append(velocity_columns)
-
-            if len(acceleration_columns) > 0:
-                gaze_df.nest(acceleration_columns, output_column='acceleration')
-                column_specifiers.append(acceleration_columns)
         else:
             gaze_df = from_csv(
                 filepath,
@@ -363,9 +350,9 @@ def load_gaze_file(
                 position_columns=definition.position_columns,
                 velocity_columns=definition.velocity_columns,
                 acceleration_columns=definition.acceleration_columns,
-                trial_columns=definition.trial_columns,
+                trial_columns=trial_columns,
                 column_map=definition.column_map,
-                add_columns=add_columns,
+                add_columns=fileinfo_columns,
                 column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
                 **custom_read_kwargs,
             )
@@ -373,14 +360,16 @@ def load_gaze_file(
         gaze_df = from_ipc(
             filepath,
             experiment=definition.experiment,
-            add_columns=add_columns,
+            trial_columns=trial_columns,
+            add_columns=fileinfo_columns,
             column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
         )
     elif filepath.suffix == '.asc':
         gaze_df = from_asc(
             filepath,
             experiment=definition.experiment,
-            add_columns=add_columns,
+            trial_columns=trial_columns,
+            add_columns=fileinfo_columns,
             column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
             **custom_read_kwargs,
         )

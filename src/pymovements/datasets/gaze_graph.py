@@ -27,12 +27,10 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.dataset_library import register_dataset
 from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
-@register_dataset
 class GazeGraph(DatasetDefinition):
     """GazeGraph dataset :cite:p:`GazeGraph`.
 
@@ -57,11 +55,11 @@ class GazeGraph(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, tuple[str, ...]]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
+    mirrors: dict[str, list[str]]
+        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+    resources: dict[str, list[dict[str, str]]]
+        A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -110,8 +108,8 @@ class GazeGraph(DatasetDefinition):
 
     Examples
     --------
-    Initialize your :py:class:`~pymovements.PublicDataset` object with the
-    :py:class:`~pymovements.GazeGraph` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.GazeGraph` definition:
 
     >>> import pymovements as pm
     >>>
@@ -139,33 +137,35 @@ class GazeGraph(DatasetDefinition):
         },
     )
 
-    mirrors: dict[str, tuple[str, ...]] = field(
+    mirrors: dict[str, list[str]] = field(
         default_factory=lambda: {
-            'gaze': ('https://codeload.github.com/GazeGraphResource/GazeGraph/zip/refs/heads/',),
+            'gaze': ['https://codeload.github.com/GazeGraphResource/GazeGraph/zip/refs/heads/'],
         },
     )
 
-    resources: dict[str, tuple[dict[str, str], ...]] = field(
+    resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
-            'gaze': (
+            'gaze': [
                 {
                     'resource': 'master',
                     'filename': 'gaze_graph_data.zip',
                     'md5': '181f4b79477cee6e0267482d989610b0',
                 },
-            ),
+            ],
         },
     )
 
     # no information about the resolution and screen size given. only 34-inch monitor
-    experiment: Experiment = Experiment(
-        screen_width_px=3440,
-        screen_height_px=1440,
-        screen_width_cm=79.375,
-        screen_height_cm=34.0106,
-        distance_cm=50,
-        origin='center',
-        sampling_rate=30,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=3440,
+            screen_height_px=1440,
+            screen_width_cm=79.375,
+            screen_height_cm=34.0106,
+            distance_cm=50,
+            origin='center',
+            sampling_rate=30,
+        ),
     )
 
     extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
@@ -185,7 +185,7 @@ class GazeGraph(DatasetDefinition):
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: ['subject_id', 'task'])
+    trial_columns: list[str] = field(default_factory=lambda: [])
 
     time_column: Any = None
 

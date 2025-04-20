@@ -37,6 +37,20 @@ import pymovements as pm
             (10, 2),
             id='csv_mono_shape',
         ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/monocular_example.csv',
+                'column_map': {
+                    'x_left_pix': 'pixel_xl',
+                    'y_left_pix': 'pixel_yl',
+                },
+                'auto_column_detect': True,
+            },
+            (10, 2),
+            id='csv_mono_shape_auto_column_detect',
+        ),
+
         pytest.param(
             {
                 'file': 'tests/files/binocular_example.csv',
@@ -48,67 +62,92 @@ import pymovements as pm
             (10, 3),
             id='csv_bino_shape',
         ),
+
+        pytest.param(
+            {
+                'file': 'tests/files/binocular_example.csv',
+                'column_map': {
+                    'x_left_pix': 'pixel_xl',
+                    'y_left_pix': 'pixel_yl',
+                    'x_right_pix': 'pixel_xr',
+                    'y_right_pix': 'pixel_yr',
+                    'x_left_pos': 'position_xl',
+                    'y_left_pos': 'position_yl',
+                    'x_right_pos': 'position_xr',
+                    'y_right_pos': 'position_yr',
+                },
+                'auto_column_detect': True,
+            },
+            (10, 3),
+            id='csv_bino_shape_auto_column_detect',
+        ),
+
         pytest.param(
             {
                 'file': 'tests/files/hbn_example.csv',
-                'time_column': pm.datasets.HBN().time_column,
-                'time_unit': pm.datasets.HBN().time_unit,
-                'experiment': pm.datasets.HBN().experiment,
-                'pixel_columns': pm.datasets.HBN().pixel_columns,
+                'time_column': pm.DatasetLibrary.get('HBN').time_column,
+                'time_unit': pm.DatasetLibrary.get('HBN').time_unit,
+                'experiment': pm.DatasetLibrary.get('HBN').experiment,
+                'pixel_columns': pm.DatasetLibrary.get('HBN').pixel_columns,
             },
             (10, 2),
             id='hbn_dataset_example',
         ),
+
         pytest.param(
             {
                 'file': 'tests/files/sbsat_example.csv',
-                'time_column': pm.datasets.SBSAT().time_column,
-                'time_unit': pm.datasets.SBSAT().time_unit,
-                'pixel_columns': pm.datasets.SBSAT().pixel_columns,
-                **pm.datasets.SBSAT().custom_read_kwargs['gaze'],
+                'time_column': pm.DatasetLibrary.get('SBSAT').time_column,
+                'time_unit': pm.DatasetLibrary.get('SBSAT').time_unit,
+                'pixel_columns': pm.DatasetLibrary.get('SBSAT').pixel_columns,
+                **pm.DatasetLibrary.get('SBSAT').custom_read_kwargs['gaze'],
             },
             (10, 5),
             id='sbsat_dataset_example',
         ),
+
         pytest.param(
             {
                 'file': 'tests/files/gazebase_example.csv',
-                'time_column': pm.datasets.GazeBase().time_column,
-                'time_unit': pm.datasets.GazeBase().time_unit,
-                'position_columns': pm.datasets.GazeBase().position_columns,
-                **pm.datasets.GazeBase().custom_read_kwargs['gaze'],
+                'time_column': pm.DatasetLibrary.get('GazeBase').time_column,
+                'time_unit': pm.DatasetLibrary.get('GazeBase').time_unit,
+                'position_columns': pm.DatasetLibrary.get('GazeBase').position_columns,
+                **pm.DatasetLibrary.get('GazeBase').custom_read_kwargs['gaze'],
             },
             (10, 7),
             id='gazebase_dataset_example',
         ),
+
         pytest.param(
             {
                 'file': 'tests/files/gaze_on_faces_example.csv',
-                'time_column': pm.datasets.GazeOnFaces().time_column,
-                'time_unit': pm.datasets.GazeOnFaces().time_unit,
-                'pixel_columns': pm.datasets.GazeOnFaces().pixel_columns,
-                **pm.datasets.GazeOnFaces().custom_read_kwargs['gaze'],
+                'time_column': pm.DatasetLibrary.get('GazeOnFaces').time_column,
+                'time_unit': pm.DatasetLibrary.get('GazeOnFaces').time_unit,
+                'pixel_columns': pm.DatasetLibrary.get('GazeOnFaces').pixel_columns,
+                **pm.DatasetLibrary.get('GazeOnFaces').custom_read_kwargs['gaze'],
             },
             (10, 1),
             id='gaze_on_faces_dataset_example',
         ),
+
         pytest.param(
             {
                 'file': 'tests/files/gazebase_vr_example.csv',
-                'time_column': pm.datasets.GazeBaseVR().time_column,
-                'time_unit': pm.datasets.GazeBaseVR().time_unit,
-                'position_columns': pm.datasets.GazeBaseVR().position_columns,
+                'time_column': pm.DatasetLibrary.get('GazeBaseVR').time_column,
+                'time_unit': pm.DatasetLibrary.get('GazeBaseVR').time_unit,
+                'position_columns': pm.DatasetLibrary.get('GazeBaseVR').position_columns,
             },
             (10, 11),
             id='gazebase_vr_dataset_example',
         ),
+
         pytest.param(
             {
                 'file': 'tests/files/judo1000_example.csv',
-                'time_column': pm.datasets.JuDo1000().time_column,
-                'time_unit': pm.datasets.JuDo1000().time_unit,
-                'pixel_columns': pm.datasets.JuDo1000().pixel_columns,
-                **pm.datasets.JuDo1000().custom_read_kwargs['gaze'],
+                'time_column': pm.DatasetLibrary.get('JuDo1000').time_column,
+                'time_unit': pm.DatasetLibrary.get('JuDo1000').time_unit,
+                'pixel_columns': pm.DatasetLibrary.get('JuDo1000').pixel_columns,
+                **pm.DatasetLibrary.get('JuDo1000').custom_read_kwargs['gaze'],
             },
             (10, 4),
             id='judo1000_dataset_example',
