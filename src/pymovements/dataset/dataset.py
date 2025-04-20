@@ -64,7 +64,6 @@ class Dataset:
         self.events: list[EventDataFrame] = []
         self.precomputed_events: list[PrecomputedEventDataFrame] = []
         self.precomputed_reading_measures: list[ReadingMeasures] = []
-        self.trial_columns: list[str] = []
 
         # Handle different definition input types
         if isinstance(definition, (str, Path)):
@@ -98,7 +97,6 @@ class Dataset:
             events_dirname: str | None = None,
             preprocessed_dirname: str | None = None,
             extension: str = 'feather',
-            set_trial_columns: bool = False,
     ) -> Dataset:
         """Parse file information and load all gaze files.
 
@@ -130,11 +128,6 @@ class Dataset:
             Specifies the file format for loading data. Valid options are: `csv`, `feather`,
             `tsv`, `txt`, `asc`.
             (default: 'feather')
-        set_trial_columns: bool
-            If ``True``, sets the trial columns for each GazeDataFrame with the columns
-            that are not `fileinfo` defined at the dataset level. (default: False)
-            Useful when preprocessed feather files do not have trial columns
-            defined at the dataframe level.
 
         Returns
         -------
@@ -143,17 +136,12 @@ class Dataset:
         """
         self.scan()
         self.fileinfo = dataset_files.take_subset(fileinfo=self.fileinfo, subset=subset)
-        columns = self.fileinfo['gaze'].columns if 'gaze' in self.fileinfo else []
-        self.trial_columns = [
-            column for column in columns if column != 'filepath'
-        ]
 
         if self.definition.has_files['gaze']:
             self.load_gaze_files(
                 preprocessed=preprocessed,
                 preprocessed_dirname=preprocessed_dirname,
                 extension=extension,
-                set_trial_columns=set_trial_columns,
             )
 
         # Event files precomuted by authors of the dataset
@@ -198,7 +186,6 @@ class Dataset:
             preprocessed: bool = False,
             preprocessed_dirname: str | None = None,
             extension: str = 'feather',
-            set_trial_columns: bool = False,
     ) -> Dataset:
         """Load all available gaze data files.
 
@@ -216,11 +203,6 @@ class Dataset:
             Specifies the file format for loading data. Valid options are: `csv`, `feather`,
             `tsv`, `txt`, `asc`.
             (default: 'feather')
-        set_trial_columns: bool
-            If ``True``, sets the trial columns for each GazeDataFrame with the columns
-            that are not 'fileinfo' defined at the dataset level. (default: False)
-            Useful when preprocessed feather files do not have trial columns
-            defined at the dataframe level.
 
         Returns
         -------
@@ -243,9 +225,6 @@ class Dataset:
             preprocessed_dirname=preprocessed_dirname,
             extension=extension,
         )
-        if set_trial_columns:
-            for gaze_df in self.gaze:
-                gaze_df.trial_columns = self.trial_columns
 
         return self
 
@@ -773,7 +752,7 @@ class Dataset:
         name: str | None
             Process only events that match the name. (default: None)
         verbose : bool
-            If ``True``, show progress bar info. (default: True)
+            If ``True``, show progress bar. (default: True)
 
         Raises
         ------
