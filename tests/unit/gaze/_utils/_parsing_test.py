@@ -194,6 +194,7 @@ EXPECTED_METADATA = {
             'timestamp': '2154555',
             'tracked_eye': 'L',
             'tracking_mode': 'CR',
+            'resolution': (1280.0, 1024.0),
         },
     ],
 }
@@ -389,7 +390,6 @@ def test_metadata_warnings(tmp_path, metadata, expected_msg):
     ('metadata', 'expected_validation', 'expected_calibration'),
     [
         pytest.param(
-            'MSG	2095865 GAZE_COORDS 0 0 1279 1023\n'
             'MSG	7045618 !CAL \n'
             '>>>>>>> CALIBRATION (HV9,P-CR) FOR LEFT: <<<<<<<<<\n'
             'MSG	7045618 !CAL Calibration points:  \n'
