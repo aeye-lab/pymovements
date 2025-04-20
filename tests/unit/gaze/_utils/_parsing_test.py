@@ -45,7 +45,7 @@ some
 lines
 MSG	2154555 RECCFG CR 1000 2 1 L
 MSG	2154555 ELCLCFG BTABLER
-MSG	2095865 DISPLAY_COORDS 0 0 1279 1023
+MSG	2095865 GAZE_COORDS 0.00 0.00 1279.00 1023.00
 PRESCALER	1
 VPRESCALER	1
 PUPIL	AREA
@@ -389,7 +389,7 @@ def test_metadata_warnings(tmp_path, metadata, expected_msg):
     ('metadata', 'expected_validation', 'expected_calibration'),
     [
         pytest.param(
-            'MSG	2095865 DISPLAY_COORDS 0 0 1279 1023\n'
+            'MSG	2095865 GAZE_COORDS 0 0 1279 1023\n'
             'MSG	7045618 !CAL \n'
             '>>>>>>> CALIBRATION (HV9,P-CR) FOR LEFT: <<<<<<<<<\n'
             'MSG	7045618 !CAL Calibration points:  \n'

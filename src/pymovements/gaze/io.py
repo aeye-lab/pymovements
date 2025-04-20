@@ -510,7 +510,9 @@ def _fill_experiment_from_parsing_metadata(
     # Screen resolution (assuming that width and height will always be missing or set together)
     experiment_resolution = (experiment.screen.width_px, experiment.screen.height_px)
     if experiment_resolution == (None, None):
-        experiment.screen.width_px, experiment.screen.height_px = metadata['resolution']
+        width, height = metadata['resolution']
+        experiment.screen.width_px = round(width)
+        experiment.screen.height_px = round(height)
     elif experiment_resolution != metadata['resolution']:
         issues.append(f"Screen resolution: {experiment_resolution} != {metadata['resolution']}")
 

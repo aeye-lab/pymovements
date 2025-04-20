@@ -48,7 +48,7 @@ EYELINK_META_REGEXES = [
             r'\s+(?P<day>\d\d?)\s+(?P<time>\d\d:\d\d:\d\d)\s+(?P<year>\d{4})\s*'
         ),
         r'\*\*\s+(?P<version_2>EYELINK.*)',
-        r'MSG\s+\d+[.]?\d*\s+DISPLAY_COORDS\s*=?\s*(?P<resolution>.*)',
+        r'MSG\s+\d+[.]?\d*\s+GAZE_COORDS\s*=?\s*(?P<resolution>.*)',
         r'PUPIL\s+(?P<pupil_data_type>(AREA|DIAMETER))\s*',
         r'MSG\s+\d+[.]?\d*\s+ELCLCFG\s+(?P<mount_configuration>.*)',
     )
@@ -417,7 +417,7 @@ def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:
     )
 
     if 'resolution' in metadata:
-        coordinates = [int(coord) for coord in metadata['resolution'].split()]
+        coordinates = [float(coord) for coord in metadata['resolution'].split()]
         resolution = (coordinates[2] - coordinates[0] + 1, coordinates[3] - coordinates[1] + 1)
         metadata['resolution'] = resolution
 
