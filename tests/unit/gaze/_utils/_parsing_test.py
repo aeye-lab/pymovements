@@ -370,7 +370,16 @@ def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_mo
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
             'MSG	2154556 RECCFG CR 2000 2 1 L\n',
             r"Found inconsistent values for 'sampling_rate': \['1000', '2000'\]",
-            id='inconsistent_reccfg',
+            id='inconsistent_sampling_rate',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'MSG	2154555 GAZE_COORDS 0 0 1919 1079\n'
+            'MSG	2154556 RECCFG CR 1000 2 1 L\n'
+            'MSG	2154556 GAZE_COORDS 0 0 1023 767\n',
+            "Found inconsistent values for 'resolution': "
+            r'\[\(1024.0, 768.0\), \(1920.0, 1080.0\)\]',
+            id='inconsistent_resolution',
         ),
     ],
 )
