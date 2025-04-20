@@ -96,13 +96,6 @@ CALIBRATION_REGEX = re.compile(
     r'(?P<tracked_eye>RIGHT|LEFT):\s+<{9}',
 )
 
-START_RECORDING_REGEX = re.compile(
-    r'START\s+(?P<timestamp>(\d+[.]?\d*))\s+(RIGHT|LEFT)\s+(?P<types>.*)',
-)
-STOP_RECORDING_REGEX = re.compile(
-    r'END\s+(?P<timestamp>(\d+[.]?\d*))\s+\s+(?P<types>.*)\s+RES\s+'
-    r'(?P<xres>[\d\.]*)\s+(?P<yres>[\d\.]*)\s*',
-)
 RECORDING_CONFIG = re.compile(
     r'MSG\s+(?P<timestamp>\d+[.]?\d*)\s+'
     r'RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+'
@@ -296,15 +289,7 @@ def parse_eyelink(
 
     validations = []
     calibrations = []
-    # TODO: remove blink metadata
-    blinks = []
-    invalid_samples = []
     recording_config: list[dict[str, str]] = []
-    blink = False
-
-    start_recording_timestamp = ''
-    total_recording_duration = 0.0
-    num_blink_samples = 0
 
     for line in lines:
         for pattern_dict in compiled_patterns:
@@ -334,9 +319,6 @@ def parse_eyelink(
 
         elif event_name := parse_eyelink_event_start(line):
             current_event_additional[event_name] = {**current_additional}
-            # TODO: remove
-            if BLINK_START_REGEX.match(line):
-                blink = True
 
         elif event := parse_eyelink_event_end(line):
             event_name, event_onset, event_offset = event
@@ -353,31 +335,8 @@ def parse_eyelink(
                 )
             current_event_additional[event_name] = {}
 
-            # TODO: remove
-            if event_name == 'blink':
-                blink = False
-                blink_info = {
-                    'start_timestamp': event_onset,
-                    'stop_timestamp': event_offset,
-                    # TODO: https://www.sr-research.com/support/thread-9411.html
-                    # 'duration_ms': float(parsed_blink['duration_ms']),
-                    'duration_ms': float(event_offset - event_onset),
-                    'num_samples': num_blink_samples,
-                }
-                num_blink_samples = 0
-                blinks.append(blink_info)
-
         elif match := RECORDING_CONFIG.match(line):
             recording_config.append(match.groupdict())
-
-        elif match := START_RECORDING_REGEX.match(line):
-            start_recording_timestamp = match.groupdict()['timestamp']
-
-        elif match := STOP_RECORDING_REGEX.match(line):
-            stop_recording_timestamp = match.groupdict()['timestamp']
-            block_duration = float(stop_recording_timestamp) - float(start_recording_timestamp)
-
-            total_recording_duration += block_duration
 
         elif eye_tracking_sample_match := EYE_TRACKING_SAMPLE.match(line):
 
@@ -398,12 +357,6 @@ def parse_eyelink(
 
             for additional_column in additional_columns:
                 samples[additional_column].append(current_additional[additional_column])
-
-            if match := INVALID_SAMPLE_REGEX.match(line):
-                if blink:
-                    num_blink_samples += 1
-                else:
-                    invalid_samples.append(match.groupdict()['timestamp'])
 
         elif match := CALIBRATION_TIMESTAMP_REGEX.match(line):
             cal_timestamp = match.groupdict()['timestamp']
@@ -426,29 +379,13 @@ def parse_eyelink(
     if not metadata:
         warnings.warn('No metadata found. Please check the file for errors.')
 
-    # if the sampling rate is not found, we cannot calculate the data loss
-    actual_number_of_samples = len(samples['time'])
-    # if we don't have any recording config, we cannot calculate the data loss
     metadata['sampling_rate'] = _check_reccfg_key(recording_config, 'sampling_rate', float)
-
-    data_loss_ratio, data_loss_ratio_blinks = _calculate_data_loss(
-        blinks=blinks,
-        invalid_samples=invalid_samples,
-        actual_num_samples=actual_number_of_samples,
-        total_rec_duration=total_recording_duration,
-        sampling_rate=metadata['sampling_rate'],
-    )
-
     metadata['tracked_eye'] = _check_reccfg_key(recording_config, 'tracked_eye')
 
     pre_processed_metadata: dict[str, Any] = _pre_process_metadata(metadata)
     # is not yet pre-processed but should be
     pre_processed_metadata['calibrations'] = calibrations
     pre_processed_metadata['validations'] = validations
-    pre_processed_metadata['blinks'] = blinks
-    pre_processed_metadata['data_loss_ratio'] = data_loss_ratio
-    pre_processed_metadata['data_loss_ratio_blinks'] = data_loss_ratio_blinks
-    pre_processed_metadata['total_recording_duration_ms'] = total_recording_duration
     pre_processed_metadata['recording_config'] = recording_config
 
     gaze_schema_overrides = {
@@ -553,54 +490,6 @@ def _check_reccfg_key(
     if astype is not None:
         value = astype(value)
     return value
-
-
-def _calculate_data_loss(
-        blinks: list[dict[str, Any]],
-        invalid_samples: list[str],
-        actual_num_samples: int,
-        total_rec_duration: float | None = None,
-        sampling_rate: float | None = None,
-) -> tuple[float | str, float | str]:
-    """Calculate data loss and blink loss.
-
-    Parameters
-    ----------
-    blinks: list[dict[str, Any]]
-        List of dicts of blinks. Each dict containing start and stop timestamps and duration.
-    invalid_samples: list[str]
-        List of invalid samples.
-    actual_num_samples: int
-        Number of actual samples recorded.
-    total_rec_duration: float | None
-        Total duration of the recording.
-    sampling_rate: float | None
-        Sampling rate of the eye tracker.
-
-    Returns
-    -------
-    tuple[float | str, float | str]
-        Data loss ratio and blink loss ratio.
-    """
-    if not sampling_rate or not total_rec_duration:
-        return 'unknown', 'unknown'
-
-    dl_ratio_blinks = 0.0
-
-    num_expected_samples = total_rec_duration * float(sampling_rate) / 1000
-
-    total_lost_samples = num_expected_samples - actual_num_samples
-
-    if blinks:
-        total_blink_samples = sum(blink['num_samples'] for blink in blinks)
-        dl_ratio_blinks = total_blink_samples / num_expected_samples
-        total_lost_samples += total_blink_samples
-
-    total_lost_samples += len(invalid_samples)
-
-    dl_ratio = total_lost_samples / num_expected_samples
-
-    return dl_ratio, dl_ratio_blinks
 
 
 def _parse_full_eyelink_version(version_str_1: str, version_str_2: str) -> tuple[str, str]:
