@@ -284,6 +284,7 @@ def from_asc(
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, Any] | None = None,
         encoding: str | None = None,
+        events: bool = False,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
 
@@ -314,6 +315,8 @@ def from_asc(
         (default: None)
     encoding: str | None
         Text encoding of the file. If None, the locale encoding is used. (default: None)
+    events: bool
+        Flag indicating if events should be parsed from the asc file. (default: False)
 
     Returns
     -------
@@ -382,7 +385,10 @@ def from_asc(
     experiment = _fill_experiment_from_parsing_metadata(experiment, metadata)
 
     # Create gaze and event data frames.
-    event_df = EventDataFrame(event_data)
+    if events:
+        event_df = EventDataFrame(event_data)
+    else:
+        event_df = None
     gaze_df = GazeDataFrame(
         gaze_data,
         experiment=experiment,
