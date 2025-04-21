@@ -908,12 +908,11 @@ class GazeDataFrame:
             :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
         RuntimeError
             If specified event name ``name`` is missing from ``events``.
-            If no events are available to compute event properties. Consider calling detect before.
         """
-        if self.events is None:
-            raise RuntimeError(
+        if len(self.events) == 0:
+            warnings.warn(
                 'No events available to compute event properties. '
-                'Consider calling detect before.',
+                'Did you forget to use detect()?.',
             )
 
         identifiers = self.trial_columns if self.trial_columns is not None else []
