@@ -912,7 +912,7 @@ class GazeDataFrame:
         if len(self.events) == 0:
             warnings.warn(
                 'No events available to compute event properties. '
-                'Did you forget to use detect()?.',
+                'Did you forget to use detect()?',
             )
 
         identifiers = self.trial_columns if self.trial_columns is not None else []
