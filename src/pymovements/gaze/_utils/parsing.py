@@ -48,6 +48,7 @@ EYELINK_META_REGEXES = [
             r'\s+(?P<day>\d\d?)\s+(?P<time>\d\d:\d\d:\d\d)\s+(?P<year>\d{4})\s*'
         ),
         r'\*\*\s+(?P<version_2>EYELINK.*)',
+        r'MSG\s+\d+[.]?\d*\s+DISPLAY_COORDS\s*=?\s*(?P<DISPLAY_COORDS>.*)',
         r'PUPIL\s+(?P<pupil_data_type>(AREA|DIAMETER))\s*',
         r'MSG\s+\d+[.]?\d*\s+ELCLCFG\s+(?P<mount_configuration>.*)',
     )
@@ -423,6 +424,10 @@ def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:
     metadata['version_number'], metadata['model'] = _parse_full_eyelink_version(
         metadata['version_1'], metadata['version_2'],
     )
+
+    if 'DISPLAY_COORDS' in metadata:
+        display_coords = tuple(float(coord) for coord in metadata['DISPLAY_COORDS'].split())
+        metadata['DISPLAY_COORDS'] = display_coords
 
     # if the date has been parsed fully, convert the date to a datetime object
     if 'day' in metadata and 'year' in metadata and 'month' in metadata and 'time' in metadata:

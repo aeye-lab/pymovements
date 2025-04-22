@@ -43,9 +43,10 @@ ASC_TEXT = r"""
 
 some
 lines
+MSG	2095865 DISPLAY_COORDS 0 0 1279 1023
 MSG	2154555 RECCFG CR 1000 2 1 L
 MSG	2154555 ELCLCFG BTABLER
-MSG	2095865 GAZE_COORDS 0.00 0.00 1279.00 1023.00
+MSG	2154555 GAZE_COORDS 0.00 0.00 1279.00 1023.00
 PRESCALER	1
 VPRESCALER	1
 PUPIL	AREA
@@ -166,6 +167,7 @@ EXPECTED_METADATA = {
     'calibrations': [],
     'validations': [],
     'resolution': (1280, 1024),
+    'DISPLAY_COORDS': (0.0, 0.0, 1279.0, 1023.0),
     'data_loss_ratio_blinks': 0.18181818181818182,
     'data_loss_ratio': 0.2727272727272727,
     'total_recording_duration_ms': 11.0,
