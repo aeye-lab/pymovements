@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Module for parsing input data."""
+# pylint: disable=too-many-statements
 from __future__ import annotations
 
 import calendar
