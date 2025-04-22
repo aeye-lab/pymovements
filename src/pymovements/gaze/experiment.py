@@ -29,6 +29,7 @@ from pymovements.gaze import transforms_numpy
 from pymovements.gaze.eyetracker import EyeTracker
 from pymovements.gaze.screen import Screen
 from pymovements.utils import checks
+from pymovements.utils.formatting import HTML
 
 
 class Experiment:
@@ -221,3 +222,7 @@ class Experiment:
     def __str__(self: Experiment) -> str:
         """Return Experiment string."""
         return f'{type(self).__name__}(screen={self.screen}, eyetracker={self.eyetracker})'
+
+    def _repr_html_(self) -> str:
+        """Return HTML representation of Experiment for Jupyter notebooks."""
+        return HTML.repr(self)

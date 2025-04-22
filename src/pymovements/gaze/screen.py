@@ -26,6 +26,7 @@ import numpy as np
 
 from pymovements.gaze import transforms_numpy
 from pymovements.utils import checks
+from pymovements.utils.formatting import HTML
 
 
 @dataclass
@@ -280,3 +281,7 @@ class Screen:
         checks.check_is_not_none(**{key: value})
         assert isinstance(value, (int, float))
         checks.check_is_greater_than_zero(**{key: value})
+
+    def _repr_html_(self) -> str:
+        """Return HTML representation of Screen for Jupyter notebooks."""
+        return HTML.repr(self)

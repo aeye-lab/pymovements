@@ -35,6 +35,7 @@ import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
 from pymovements.utils.checks import check_is_mutual_exclusive
+from pymovements.utils.formatting import HTML
 
 
 class GazeDataFrame:
@@ -1550,6 +1551,10 @@ class GazeDataFrame:
     def __repr__(self) -> str:
         """Return string representation of GazeDataFrame."""
         return self.__str__()
+
+    def _repr_html_(self) -> str:
+        """Return HTML representation of GazeDataFrame for Jupyter notebooks."""
+        return HTML.repr(self, ['frame', 'events', 'trial_columns', 'experiment'])
 
 
 def _check_trial_columns(trial_columns: list[str] | None, data: pl.DataFrame) -> None:

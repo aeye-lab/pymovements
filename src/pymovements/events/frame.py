@@ -30,6 +30,7 @@ from tqdm import tqdm
 from pymovements.events.properties import duration
 from pymovements.stimulus.text import TextStimulus
 from pymovements.utils import checks
+from pymovements.utils.formatting import HTML
 
 
 class EventDataFrame:
@@ -337,3 +338,7 @@ class EventDataFrame:
     def __repr__(self) -> str:
         """Return string representation of event dataframe."""
         return self.__str__()
+
+    def _repr_html_(self) -> str:
+        """Return HTML representation of EventDataFrame for Jupyter notebooks."""
+        return HTML.repr(self, ['frame', 'trial_columns'])

@@ -23,6 +23,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from pymovements.utils import checks
+from pymovements.utils.formatting import HTML
 
 
 @dataclass
@@ -75,3 +76,7 @@ class EyeTracker:
         """Check that the sampling rate is a positive number."""
         if self.sampling_rate is not None:
             checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
+
+    def _repr_html_(self) -> str:
+        """Return HTML representation of EyeTracker for Jupyter notebooks."""
+        return HTML.repr(self)
