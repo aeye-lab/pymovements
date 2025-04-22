@@ -29,6 +29,26 @@ from pymovements import Experiment
 
 
 @pytest.mark.parametrize(
+    'init_kwargs',
+    [
+        pytest.param(
+            {'name': 'A'},
+            id='name_only',
+        ),
+        pytest.param(
+            {'name': 'A', 'experiment': Experiment(sampling_rate=1000)},
+            id='name_and_experiment',
+        ),
+    ],
+)
+def test_dataset_definition_is_equal(init_kwargs):
+    definition1 = DatasetDefinition(**init_kwargs)
+    definition2 = DatasetDefinition(**init_kwargs)
+
+    assert definition1 == definition2
+
+
+@pytest.mark.parametrize(
     ('definition', 'expected_dict'),
     [
         pytest.param(
