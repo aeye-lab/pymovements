@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2025 The pymovements Project Authors
+# Copyright (c) 2022-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the pymovements example eyelink toy dataset."""
+"""Provides a definition for the PotsdamBingeWearablePVT dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -29,17 +29,20 @@ import polars as pl
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
+from pymovements.gaze.screen import Screen
 
 
 @dataclass
-class ToyDatasetEyeLink(DatasetDefinition):
-    """Example toy dataset with EyeLink data.
+class PotsdamBingeWearablePVT(DatasetDefinition):
+    """PotsdamBingeWearablePVT dataset :cite:p:`PotsdamBingePVT`.
 
-    This dataset includes monocular eye tracking data from a single participants in a single
-    session. Eye movements are recorded at a sampling frequency of 1000 Hz using an EyeLink Portable
-    Duo video-based eye tracker and are provided as pixel coordinates.
+    This dataset includes monocular eye tracking data from 57 participants in two sessions with an
+    interval of at least one week between two sessions. Eye movements are recorded at a sampling
+    frequency of ~200 Hz (upsampled to 1000 Hz and synchronised with the EyeLink 1000 Plus
+    tracking the right eye) using Pupil Core eye-tracking glasses and are provided as
+    pixel coordinates. Participants are instructed to perform a PVT trial.
 
-    The participant is instructed to read a single text and some JuDo trials.
+    Check the respective `repository <https://osf.io/qf7e6/>`_ for details.
 
     Attributes
     ----------
@@ -51,10 +54,10 @@ class ToyDatasetEyeLink(DatasetDefinition):
         'precomputed_reading_measures'.
 
     mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
+        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, list[dict[str, str]]]
-        A list of dataset gaze_resources. Each list entry must be a dictionary with the following
+        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -74,7 +77,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
-    trial_columns: list[str] | None
+    trial_columns: list[str]
             The name of the trial columns in the input data frame. If the list is empty or None,
             the input data frame is assumed to contain only one trial. If the list is not empty,
             the input data frame is assumed to contain multiple trials and the transformation
@@ -90,6 +93,10 @@ class ToyDatasetEyeLink(DatasetDefinition):
         'step' the experiment definition must be specified. All timestamps will be converted to
         milliseconds.
 
+    distance_column: str
+        The name of the distance column in the input data frame. These column will be
+        used to convert pixel coordinates into degrees of visual angle.
+
     pixel_columns: list[str]
         The name of the pixel position columns in the input data frame. These columns will be
         nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
@@ -101,14 +108,15 @@ class ToyDatasetEyeLink(DatasetDefinition):
     custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function.
 
+
     Examples
     --------
-    Initialize your :py:class:`~pymovements.Dataset` object with the
-    :py:class:`~pymovements.datasets.ToyDatasetEyeLink` definition:
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.PotsdamBingeWearablePVT` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("ToyDatasetEyeLink", path='data/ToyDatasetEyeLink')
+    >>> dataset = pm.Dataset("PotsdamBingeWearablePVT", path='data/PotsdamBingeWearablePVT')
 
     Download the dataset resources:
 
@@ -120,9 +128,9 @@ class ToyDatasetEyeLink(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The DatasetDefinition child classes potentially share code chunks for definitions.
+    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'ToyDatasetEyeLink'
+    name: str = 'PotsdamBingeWearablePVT'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
@@ -131,51 +139,58 @@ class ToyDatasetEyeLink(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-
     mirrors: dict[str, list[str]] = field(
         default_factory=lambda: {
-            'gaze': [
-                'http://github.com/aeye-lab/pymovements-toy-dataset-eyelink/zipball/',
-            ],
+            'gaze': ['https://osf.io/download/'],
         },
     )
 
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
-            'gaze':
-                [
-                    {
-                        'resource': 'a970d090588542dad745297866e794ab9dad8795/',
-                        'filename': 'pymovements-toy-dataset-eyelink.zip',
-                        'md5': 'b1d426751403752c8a154fc48d1670ce',
-                    },
-                ],
+            'gaze': [
+                {
+                    'resource': '9vbs8/',
+                    'filename': 'a.zip',
+                    'md5': '87c6c74a9a17cbd093b91f9415e8dd9d',
+                },
+                {
+                    'resource': 'yqukn/',
+                    'filename': 'b.zip',
+                    'md5': '54038547b1a373253b38999a227dde63',
+                },
+                {
+                    'resource': 'yf2xa/',
+                    'filename': 'e.zip',
+                    'md5': 'a0d0203cbb273f6908c1b52a42750551',
+                },
+            ],
         },
     )
-
     extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     experiment: Experiment = field(
         default_factory=lambda: Experiment(
-            screen_width_px=1280,
-            screen_height_px=1024,
-            screen_width_cm=38,
-            screen_height_cm=30.2,
-            distance_cm=68,
-            origin='upper left',
+            screen=Screen(
+                width_px=1920,
+                height_px=1080,
+                width_cm=59.76,
+                height_cm=33.615,
+                origin='center',
+            ),
             eyetracker=EyeTracker(
-                sampling_rate=1000.0,
+                sampling_rate=1000,
                 left=True,
                 right=False,
-                model='EyeLink Portable Duo',
-                vendor='EyeLink',
+                model='Pupil Core eye-tracking glasses',
+                vendor='Pupil Labs',
+                mount='Wearable',
             ),
         ),
     )
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
-            'gaze': r'subject_{subject_id:d}_session_{session_id:d}.asc',
+            'gaze': r'{subject_id:d}_{session_id:d}_{condition:s}_{trial_id:d}_{block_id:d}.csv',
         },
     )
 
@@ -183,71 +198,57 @@ class ToyDatasetEyeLink(DatasetDefinition):
         default_factory=lambda: {
             'gaze': {
                 'subject_id': int,
-                'session_id': int,
+                'trial_id': int,
+                'block_id': int,
             },
         },
     )
 
-    trial_columns: list[str] | None = field(
-        default_factory=lambda: ['task', 'trial_id'],
+    trial_columns: list[str] = field(
+        default_factory=lambda: [
+            'trial_id',
+            'subject_id',
+        ],
     )
 
-    time_column: str = 'time'
+    time_column: str = 'eyelink_timestamp'
 
     time_unit: str = 'ms'
 
-    pixel_columns: list[str] = field(default_factory=lambda: ['x_pix', 'y_pix'])
+    distance_column: str = 'target_distance'
 
-    column_map: dict[str, str] = field(default_factory=lambda: {})
+    pixel_columns: list[str] = field(
+        default_factory=lambda: [
+            'x_pix_pupilcore_interpolated',
+            'y_pix_pupilcore_interpolated',
+        ],
+    )
+
+    column_map: dict[str, str] = field(
+        default_factory=lambda: {},
+    )
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
             'gaze': {
-                'patterns': [
-                    {
-                        'pattern': 'SYNCTIME_READING_SCREEN',
-                        'column': 'task',
-                        'value': 'reading',
-                    },
-                    {
-                        'pattern': 'SYNCTIME_JUDO',
-                        'column': 'task',
-                        'value': 'judo',
-                    },
-                    {
-                        'pattern': ['READING[.]STOP', 'JUDO[.]STOP'],
-                        'column': 'task',
-                        'value': None,
-                    },
-
-                    r'TRIALID (?P<trial_id>\d+)',
-                    {
-                        'pattern': 'TRIAL_RESULT',
-                        'column': 'trial_id',
-                        'value': None,
-                    },
-
-                    r'SYNCTIME_READING_SCREEN_(?P<screen_id>\d+)',
-                    {
-                        'pattern': 'READING[.]STOP',
-                        'column': 'screen_id',
-                        'value': None,
-                    },
-
-                    r'SYNCTIME.P(?P<point_id>\d+)',
-                    {
-                        'pattern': r'P\d[.]STOP',
-                        'column': 'point_id',
-                        'value': None,
-                    },
-                ],
-                'schema': {
-                    'trial_id': pl.Int64,
-                    'screen_id': pl.Int64,
-                    'point_id': pl.Int64,
-                    'task': pl.Utf8,
+                'schema_overrides': {
+                    'trial_id': pl.Float32,
+                    'block_id': pl.Float32,
+                    'x_pix_eyelink': pl.Float32,
+                    'y_pix_eyelink': pl.Float32,
+                    'eyelink_timestamp': pl.Int64,
+                    'x_pix_pupilcore_interpolated': pl.Float32,
+                    'y_pix_pupilcore_interpolated': pl.Float32,
+                    'pupil_size_eyelink': pl.Float32,
+                    'target_distance': pl.Float32,
+                    'pupil_size_pupilcore_interpolated': pl.Float32,
+                    'pupil_confidence_interpolated': pl.Float32,
+                    'time_to_prev_bac': pl.Float32,
+                    'time_to_next_bac': pl.Float32,
+                    'prev_bac': pl.Float32,
+                    'next_bac': pl.Float32,
                 },
-                'encoding': 'ascii',
+                'separator': ',',
             },
         },
     )

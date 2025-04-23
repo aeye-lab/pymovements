@@ -46,6 +46,16 @@ from pymovements import DatasetLibrary
         pytest.param(pm.datasets.JuDo1000, 'JuDo1000', id='JuDo1000'),
         pytest.param(pm.datasets.MouseCursor, 'MouseCursor', id='MouseCursor'),
         pytest.param(pm.datasets.PoTeC, 'PoTeC', id='PoTeC'),
+        pytest.param(
+            pm.datasets.PotsdamBingeRemotePVT,
+            'PotsdamBingeRemotePVT',
+            id='PotsdamBingeRemotePVT',
+        ),
+        pytest.param(
+            pm.datasets.PotsdamBingeWearablePVT,
+            'PotsdamBingeWearablePVT',
+            id='PotsdamBingeWearablePVT',
+        ),
         pytest.param(pm.datasets.Provo, 'Provo', id='Provo'),
         pytest.param(pm.datasets.SBSAT, 'SBSAT', id='SBSAT'),
         pytest.param(pm.datasets.ToyDataset, 'ToyDataset', id='ToyDataset'),
@@ -55,9 +65,7 @@ from pymovements import DatasetLibrary
 )
 def test_public_dataset_registered(definition, dataset_name):
     assert dataset_name in DatasetLibrary.names()
-    definition_from_library = DatasetLibrary.get(dataset_name).__dict__
-    python_definition = definition().__dict__
-    assert definition_from_library == python_definition
-    definition_from_lib_exp = definition_from_library.pop('experiment')
-    python_definition_exp = python_definition.pop('experiment')
-    assert python_definition_exp == definition_from_lib_exp
+    definition_from_library = DatasetLibrary.get(dataset_name)
+
+    # simple equal between objects does not work as classes have different names.
+    assert definition().to_dict() == definition_from_library.to_dict()
