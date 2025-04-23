@@ -1609,7 +1609,17 @@ def test_velocity_columns(gaze_dataset_configuration):
             ('foo', 'invalid', 'valid', 'peak_velocity'),
             id='invalid_property',
         ),
-    ],
+
+        pytest.param(
+            {'event_properties': 'duration'},
+            ValueError,
+            (
+                'event properties already exist and cannot be recomputed',
+                'duration', 'Please remove them first',
+            ),
+            id='existing_column',
+        ),
+],
 )
 def test_event_dataframe_add_property_raises_exceptions(
         gaze_dataset_configuration,
