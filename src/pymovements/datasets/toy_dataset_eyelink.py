@@ -46,6 +46,10 @@ class ToyDatasetEyeLink(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    info: str
+        Information about the dataset including but not limited to original citation,
+        general information.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -123,6 +127,16 @@ class ToyDatasetEyeLink(DatasetDefinition):
     # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'ToyDatasetEyeLink'
+
+    info: str = """\
+Example toy dataset with EyeLink data.
+
+This dataset includes monocular eye tracking data from a single participants in a single
+session. Eye movements are recorded at a sampling frequency of 1000 Hz using an EyeLink Portable
+Duo video-based eye tracker and are provided as pixel coordinates.
+
+The participant is instructed to read a single text and some JuDo trials.
+"""
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

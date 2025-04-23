@@ -2059,3 +2059,11 @@ def test_load_split_gaze(gaze_dataset_configuration, by, expected_len):
     dataset.load()
     dataset.split_gaze_data(by)
     assert len(dataset.gaze) == expected_len
+
+
+def test_dataset_info(capsys):
+    dataset = pm.Dataset('ToyDataset', 'data')
+    dataset.info
+    outerr = capsys.readouterr().out
+    assert 'includes monocular eye tracking data' in outerr
+    assert 'to read 4 texts with 5 screens each.' in outerr

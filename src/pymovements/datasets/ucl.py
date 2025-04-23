@@ -44,6 +44,10 @@ class UCL(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    info: str
+        Information about the dataset including but not limited to original citation,
+        general information.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -97,6 +101,35 @@ class UCL(DatasetDefinition):
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'UCL'
+
+    info: str = """\
+UCL dataset :cite:p:`UCL`.
+
+UCL is a dataset of word-by-word reading times collected through
+self-paced reading and eye-tracking experiments to evaluate
+computational psycholinguistic models of English sentence comprehension.
+361 sentences from narrative sources, ensuring they were understandable without context,
+and recorded reading times from participants using both methods.
+
+For more details check out the original paper :cite:p:`UCL`.
+
+If you use the dataset, please cite:
+
+@article{UCL,
+  author = {
+      Frank, Stefan L. and
+      Fernandez Monsalve, Irene and
+      Thompson, Robin L. and
+      Vigliocco, Gabriella
+  },
+  year = {2013},
+  title = {Reading time data for evaluating broad-coverage models of {E}nglish sentence processing},
+  journal = {Behavior Research Methods},
+  volume = {45},
+  issue = {4},
+  doi = {10.3758/s13428-012-0313-y},
+}
+"""
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

@@ -1048,6 +1048,14 @@ class Dataset:
         return self
 
     @property
+    def info(self) -> None:
+        """The information about the dataset.
+
+        Print dataset information and citation key.
+        """
+        print(self.definition.info)
+
+    @property
     def path(self) -> Path:
         """The path to the dataset directory.
 

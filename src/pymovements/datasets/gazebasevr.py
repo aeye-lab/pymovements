@@ -54,6 +54,10 @@ class GazeBaseVR(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    info: str
+        Information about the dataset including but not limited to original citation,
+        general information.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -126,6 +130,38 @@ class GazeBaseVR(DatasetDefinition):
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'GazeBaseVR'
+
+    info: str = """\
+GazeBaseVR dataset :cite:p:`GazeBaseVR`.
+
+This dataset includes binocular plus an additional cyclopian eye tracking data from 407
+participants captured over a 26-month period. Participants attended up to 3 rounds during this
+time frame, with each round consisting of two contiguous sessions.
+
+Eye movements are recorded at a sampling frequency of 250 Hz a using SensoMotoric
+Instrument’s (SMI’s) tethered ET VR head-mounted display based on the
+HTC Vive (hereon called the ET-HMD) eye tracker and are provided as
+positional data in degrees of visual angle.
+
+In each of the two sessions per round, participants are instructed to complete a series of
+tasks, a vergence task (VRG), a smooth pursuit task (PUR), a video viewing task (VID),
+a reading task (TEX), and a random saccade task (RAN).
+
+Check the respective paper for details :cite:p:`GazeBaseVR`.
+
+If you use the dataset, please cite:
+
+@article{GazeBaseVR,
+  author = {Lohr, Dillon and Aziz, Samantha and Friedman, Lee and Komogortsev, Oleg},
+  year = {2023},
+  pages = {},
+  title = {{GazeBaseVR}, a large-scale, longitudinal, binocular eye-tracking
+  dataset collected in virtual reality},
+  volume = {10},
+  journal = {Scientific Data},
+  doi = {10.1038/s41597-023-02075-5},
+}
+"""
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

@@ -45,6 +45,10 @@ class EMTeC(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    info: str
+        Information about the dataset including but not limited to original citation,
+        general information.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -119,6 +123,29 @@ class EMTeC(DatasetDefinition):
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'EMTeC'
+
+    info: str = """\
+EMTeC dataset :cite:p:`EMTeC`.
+
+This dataset includes eye-tracking data from 107 native speakers of English reading
+machine generated texts.  Eye movements are recorded at a sampling frequency of 1,000 Hz
+using an EyeLink 1000 eye tracker and are provided as pixel coordinates.
+
+Check the respective paper for details :cite:p:`EMTeC`.
+
+If you use the dataset, please cite:
+
+@misc{EMTeC,
+  title={EMTeC: A Corpus of Eye Movements on Machine-Generated Texts},
+  author={Lena Sophia Bolliger and Patrick Haller and Isabelle Caroline Rose Cretton and
+  David Robert Reich and Tannon Kew and Lena Ann Jäger},
+  year={2024},
+  eprint={2408.04289},
+  archivePrefix={arXiv},
+  primaryClass={cs.CL},
+  url={https://arxiv.org/abs/2408.04289},
+}
+"""
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
