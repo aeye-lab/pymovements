@@ -1,5 +1,7 @@
 name: "CopCo"
 
+long_name: 'Copenhagen Corpus of Eye-Tracking Recordings from Natural Reading'
+
 has_files:
   gaze: true
   precomputed_events: true
