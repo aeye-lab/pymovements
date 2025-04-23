@@ -233,15 +233,17 @@ class DatasetDefinition:
 
         return data
 
-    def to_yaml(self, path: str | Path) -> None:
+    def to_yaml(self, path: str | Path, exclude_private: bool = True) -> None:
         """Save a dataset definition to a YAML file.
 
         Parameters
         ----------
         path: str | Path
             Path where to save the YAML file to.
+        exclude_private: bool
+            Exclude attributes that start with `_`.
         """
-        data = self.to_dict()
+        data = self.to_dict(exclude_private=exclude_private)
 
         data = substitute_types(data)
 
