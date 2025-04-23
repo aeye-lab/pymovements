@@ -43,7 +43,7 @@ from pymovements.synthetic import step_function
             id='length_10_start_value_1_step_5_to_0',
         ),
         pytest.param(
-            {'length': 10, 'steps': [5], 'values': [0], 'start_value': 1},
+            {'length': 10, 'steps': [5], 'values': [0], 'start_value': 1, dtype=np.int64},
             {'value': np.concatenate([np.ones(5, dtype=np.int64), np.zeros(5, dtype=np.int64)])},
             id='length_10_start_value_1_step_5_to_0_int64',
         ),
