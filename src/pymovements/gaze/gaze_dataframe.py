@@ -928,7 +928,7 @@ class GazeDataFrame:
                 f"The following event properties already exist and cannot be recomputed: "
                 f"{existing_columns}. Please remove them first.",
             )
-        
+
         new_properties = processor.process(
             self.events, self, identifiers=identifiers, name=name,
         )
