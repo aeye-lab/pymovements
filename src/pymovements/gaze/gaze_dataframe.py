@@ -911,6 +911,8 @@ class GazeDataFrame:
             :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
         RuntimeError
             If specified event name ``name`` is missing from ``events``.
+        ValueError
+            If the computed property already exists as a column in ``events``.
         """
         if len(self.events) == 0:
             warnings.warn(
