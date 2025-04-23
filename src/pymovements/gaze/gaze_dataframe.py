@@ -920,6 +920,15 @@ class GazeDataFrame:
 
         identifiers = self.trial_columns if self.trial_columns is not None else []
         processor = EventGazeProcessor(event_properties)
+
+        event_property_names = [property[0] for property in processor.event_properties]
+        existing_columns = set(self.events[0].columns) & set(event_property_names)
+        if existing_columns:
+            raise ValueError(
+                f"The following event properties already exist and cannot be recomputed: "
+                f"{existing_columns}. Please remove them first.",
+            )
+        
         new_properties = processor.process(
             self.events, self, identifiers=identifiers, name=name,
         )
