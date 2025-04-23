@@ -121,6 +121,7 @@ def test_step_function(params, expected):
 
     arr = step_function(**params)
     assert np.array_equal(arr, expected['value']), f"arr = {arr}, expected = {expected['value']}"
+    assert arr.dtype == expected['value'].dtype
 
 
 @pytest.mark.parametrize(
