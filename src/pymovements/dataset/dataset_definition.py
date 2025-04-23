@@ -96,7 +96,7 @@ class _HasResourcesIndexer:
         return super().__eq__(other)
 
     def __repr__(self) -> str:
-        """Returns string with boolean value wheter any resources are set."""
+        """Return string with boolean value wheter any resources are set."""
         return str(self.__bool__())
 
 
@@ -213,7 +213,9 @@ class DatasetDefinition:
 
     mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] = field(default_factory=dict)
 
-    resources: _Resources = field(default_factory=dict)
+    resources: dict[str, list[dict[str, str]]] | dict[str, tuple[dict[str, str], ...]] = field(
+        default_factory=dict,
+    )
 
     experiment: Experiment | None = field(default_factory=Experiment)
 
