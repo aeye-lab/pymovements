@@ -31,7 +31,7 @@ def step_function(
         values: list[float | tuple[float, ...]],
         start_value: float | tuple[float, ...] = 0,
         noise: float = 0,
-        dtype: np.dtype = np.float32,
+        dtype: np.typing.DTypeLike = np.float32,
 ) -> np.ndarray:
     """Create a synthetic eye gaze by using a simple step function.
 
