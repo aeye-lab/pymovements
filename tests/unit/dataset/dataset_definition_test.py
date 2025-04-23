@@ -54,6 +54,7 @@ def test_dataset_definition_is_equal(init_kwargs):
         pytest.param(
             DatasetDefinition(
                 name='Example',
+                long_name='Example',
                 has_files={
                     'gaze': False,
                     'precomputed_events': False,
@@ -62,6 +63,7 @@ def test_dataset_definition_is_equal(init_kwargs):
             ),
             {
                 'name': 'Example',
+                'long_name': 'Example',
                 'has_files': {
                     'gaze': False,
                     'precomputed_events': False,
@@ -104,10 +106,10 @@ def test_dataset_definition_is_equal(init_kwargs):
             },
             id='no_experiment',
         ),
-
         pytest.param(
             DatasetDefinition(
                 name='Example',
+                long_name='Example',
                 has_files={
                     'gaze': False,
                     'precomputed_events': False,
@@ -125,6 +127,7 @@ def test_dataset_definition_is_equal(init_kwargs):
             ),
             {
                 'name': 'Example',
+                'long_name': 'Example',
                 'has_files': {
                     'gaze': False,
                     'precomputed_events': False,
@@ -180,6 +183,7 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
             True,
             {
                 'name': 'MyDatasetDefinition',
+                'long_name': '.',
                 'has_files': {},
                 'acceleration_columns': None,
                 'column_map': {},
@@ -223,6 +227,7 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
             False,
             {
                 'name': 'MyDatasetDefinition',
+                'long_name': '.',
                 '_foobar': 'test',
                 'has_files': {},
                 'acceleration_columns': None,
