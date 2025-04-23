@@ -32,6 +32,7 @@ import polars as pl
 from tqdm import tqdm
 
 import pymovements as pm  # pylint: disable=cyclic-import
+from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
 from pymovements.utils.checks import check_is_mutual_exclusive
@@ -884,6 +885,46 @@ class GazeDataFrame:
                 [self.events.frame, *new_events_grouped],
                 how='diagonal',
             )
+
+    def compute_event_properties(
+            self,
+            event_properties: str | tuple[str, dict[str, Any]]
+            | list[str | tuple[str, dict[str, Any]]],
+            name: str | None = None,
+    ) -> None:
+        """Calculate event properties for given events.
+
+        The calculated event properties are added as columns to
+        :py:attr:`~pymovements.gaze.GazeDataFrame.events`.
+
+        Parameters
+        ----------
+        event_properties: str | tuple[str, dict[str, Any]] | list[str | tuple[str, dict[str, Any]]]
+            The event properties to compute.
+        name: str | None
+            Process only events that match the name. (default: None)
+
+        Raises
+        ------
+        InvalidProperty
+            If ``property_name`` is not a valid property. See
+            :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
+        RuntimeError
+            If specified event name ``name`` is missing from ``events``.
+        """
+        if len(self.events) == 0:
+            warnings.warn(
+                'No events available to compute event properties. '
+                'Did you forget to use detect()?',
+            )
+
+        identifiers = self.trial_columns if self.trial_columns is not None else []
+        processor = EventGazeProcessor(event_properties)
+        new_properties = processor.process(
+            self.events, self, identifiers=identifiers, name=name,
+        )
+        join_on = identifiers + ['name', 'onset', 'offset']
+        self.events.add_event_properties(new_properties, join_on=join_on)
 
     def measure_samples(
             self,
