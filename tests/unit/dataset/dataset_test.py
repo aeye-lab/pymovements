@@ -1650,7 +1650,7 @@ def test_velocity_columns(gaze_dataset_configuration):
             ),
             id='existing_column',
         ),
-],
+    ],
 )
 def test_event_dataframe_add_property_raises_exceptions(
         gaze_dataset_configuration,
