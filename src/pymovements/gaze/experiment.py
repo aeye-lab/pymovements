@@ -20,6 +20,7 @@
 """Provides the Experiment class."""
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import asdict
 from typing import Any
 
@@ -134,6 +135,26 @@ class Experiment:
 
     @staticmethod
     def from_dict(dictionary: dict[str, Any]) -> Experiment:
+        """Create an Experiment instance from a dictionary.
+
+        This static method allows initializing an Experiment object
+        from a dictionary that may contain nested dictionaries for
+        'screen' and 'eyetracker'. These nested dictionaries are
+        automatically converted into Screen and EyeTracker instances.
+
+        Args:
+            dictionary (dict[str, Any]): A dictionary containing Experiment parameters.
+                Expected keys:
+                - 'screen' (dict): Parameters to initialize a Screen object.
+                - 'eyetracker' (dict): Parameters to initialize an EyeTracker object.
+                Other keys are passed directly to the Experiment constructor.
+
+        Returns
+        -------
+        Experiment
+            An initialized Experiment instance.
+        """
+        dictionary = deepcopy(dictionary)
         screen = None
         eyetracker = None
 
