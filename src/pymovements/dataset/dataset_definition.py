@@ -208,13 +208,13 @@ class DatasetDefinition:
         # Initialize DatasetDefinition with YAML data
         return DatasetDefinition(**data)
 
-    def to_dict(self, hide_private: bool = True) -> dict[str, Any]:
+    def to_dict(self, exclude_private: bool = True) -> dict[str, Any]:
         """Return dictionary representation.
 
         Parameters
         ----------
-        hide_private: bool
-            Hide attributes that start with `_`.
+        exclude_private: bool
+            Exclude attributes that start with `_`.
 
         Returns
         -------
@@ -224,7 +224,7 @@ class DatasetDefinition:
         data = asdict(self)
 
         # Delete private fields from dictionary.
-        if hide_private:
+        if exclude_private:
             for key in list(data.keys()):
                 if key.startswith('_'):
                     del data[key]

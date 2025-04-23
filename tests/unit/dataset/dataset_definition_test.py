@@ -174,7 +174,7 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
 
 
 @pytest.mark.parametrize(
-    ('hide_private', 'expected_dict'),
+    ('exclude_private', 'expected_dict'),
     [
         pytest.param(
             True,
@@ -264,7 +264,7 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
         ),
     ],
 )
-def test_dataset_definition_to_dict_hide_private_expected(hide_private, expected_dict):
+def test_dataset_definition_to_dict_exclude_private_expected(exclude_private, expected_dict):
     @dataclass
     class MyDatasetDefinition(DatasetDefinition):
         name: str = 'MyDatasetDefinition'
@@ -272,7 +272,7 @@ def test_dataset_definition_to_dict_hide_private_expected(hide_private, expected
 
     definition = MyDatasetDefinition()
 
-    assert definition.to_dict(hide_private=hide_private) == expected_dict
+    assert definition.to_dict(exclude_private=exclude_private) == expected_dict
 
 
 @pytest.mark.parametrize(
