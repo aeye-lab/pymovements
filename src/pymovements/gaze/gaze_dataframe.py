@@ -922,7 +922,7 @@ class GazeDataFrame:
         processor = EventGazeProcessor(event_properties)
 
         event_property_names = [property[0] for property in processor.event_properties]
-        existing_columns = set(self.events[0].columns) & set(event_property_names)
+        existing_columns = set(self.events.columns) & set(event_property_names)
         if existing_columns:
             raise ValueError(
                 f"The following event properties already exist and cannot be recomputed: "
