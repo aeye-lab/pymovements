@@ -64,7 +64,7 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
     """
     # Get all filepaths that match regular expression.
     _fileinfo_dicts = {}
-    if definition.has_resources['gaze']:
+    if definition.has_files['gaze']:
         fileinfo_dicts = match_filepaths(
             path=paths.raw,
             regex=curly_to_regex(definition.filename_format['gaze']),
@@ -83,7 +83,7 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
             ])
         _fileinfo_dicts['gaze'] = fileinfo_df
 
-    if definition.has_resources['precomputed_events']:
+    if definition.has_files['precomputed_events']:
         fileinfo_dicts = match_filepaths(
             path=paths.precomputed_events,
             regex=curly_to_regex(definition.filename_format['precomputed_events']),
@@ -102,7 +102,7 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
         _fileinfo_dicts['precomputed_events'] = fileinfo_df
 
     pc_rm = 'precomputed_reading_measures'
-    if definition.has_resources[pc_rm]:
+    if definition.has_files[pc_rm]:
         fileinfo_dicts = match_filepaths(
             path=paths.precomputed_reading_measures,
             regex=curly_to_regex(definition.filename_format[pc_rm]),

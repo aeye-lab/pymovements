@@ -137,7 +137,7 @@ class Dataset:
         self.scan()
         self.fileinfo = dataset_files.take_subset(fileinfo=self.fileinfo, subset=subset)
 
-        if self.definition.has_resources['gaze']:
+        if self.definition.has_files['gaze']:
             self.load_gaze_files(
                 preprocessed=preprocessed,
                 preprocessed_dirname=preprocessed_dirname,
@@ -145,11 +145,11 @@ class Dataset:
             )
 
         # Event files precomuted by authors of the dataset
-        if self.definition.has_resources['precomputed_events']:
+        if self.definition.has_files['precomputed_events']:
             self.load_precomputed_events()
 
         # Reading measures files precomuted by authors of the dataset
-        if self.definition.has_resources['precomputed_reading_measures']:
+        if self.definition.has_files['precomputed_reading_measures']:
             self.load_precomputed_reading_measures()
 
         # Events extracted previously by pymovements
