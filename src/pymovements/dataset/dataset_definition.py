@@ -23,6 +23,7 @@ from __future__ import annotations
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
+from dataclasses import KW_ONLY
 from pathlib import Path
 from typing import Any
 
@@ -142,6 +143,9 @@ class DatasetDefinition:
 
     # pylint: disable=too-many-instance-attributes
     name: str = '.'
+
+    _: KW_ONLY  # only the name can be passed as a positional argument.
+
     has_files: dict[str, bool] = field(default_factory=dict)
 
     mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] = field(default_factory=dict)
