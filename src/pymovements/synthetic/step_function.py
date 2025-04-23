@@ -136,7 +136,7 @@ def step_function(
     else:
         arr = np.tile(start_value, (length, 1))
 
-    # change type of elements to float32, to allow np.nan
+    # create array of requested dtype.
     arr = np.array(arr, dtype=dtype)
 
     # Iterate through all steps except the last.
