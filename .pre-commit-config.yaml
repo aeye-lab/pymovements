@@ -144,7 +144,6 @@ repos:
         args:
           [
             '--output-format=parseable',
-            '--disable=duplicate-code',
             '--disable=missing-class-docstring',
             '--disable=missing-function-docstring',
             '--disable=protected-access',
