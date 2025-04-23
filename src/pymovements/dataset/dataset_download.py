@@ -33,7 +33,7 @@ from pymovements.dataset.dataset_paths import DatasetPaths
 
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('__name__')
+logger = logging.getLogger(__name__)
 
 
 def download_dataset(
