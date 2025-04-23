@@ -911,6 +911,8 @@ class GazeDataFrame:
             :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
         RuntimeError
             If specified event name ``name`` is missing from ``events``.
+        ValueError
+            If the computed property already exists as a column in ``events``.
         """
         if len(self.events) == 0:
             warnings.warn(
@@ -920,6 +922,15 @@ class GazeDataFrame:
 
         identifiers = self.trial_columns if self.trial_columns is not None else []
         processor = EventGazeProcessor(event_properties)
+
+        event_property_names = [property[0] for property in processor.event_properties]
+        existing_columns = set(self.events.columns) & set(event_property_names)
+        if existing_columns:
+            raise ValueError(
+                f"The following event properties already exist and cannot be recomputed: "
+                f"{existing_columns}. Please remove them first.",
+            )
+
         new_properties = processor.process(
             self.events, self, identifiers=identifiers, name=name,
         )
