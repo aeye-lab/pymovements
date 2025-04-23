@@ -892,7 +892,10 @@ class GazeDataFrame:
             | list[str | tuple[str, dict[str, Any]]],
             name: str | None = None,
     ) -> None:
-        """Calculate an event property for and add it as a column to the event dataframe.
+        """Calculate event properties for given events.
+
+        The calculated event properties are added as columns to
+        :py:attr:`~pymovements.gaze.GazeDataFrame.events`.
 
         Parameters
         ----------
