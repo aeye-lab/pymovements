@@ -264,6 +264,7 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
                 'time_unit': 'ms',
                 'trial_columns': None,
                 'velocity_columns': None,
+                '_has_resources': False,
             },
             id='False',
         ),
