@@ -359,8 +359,8 @@ from pymovements.synthetic import step_function
                 'minimum_duration': 2,
             },
             pm.gaze.from_numpy(
-                time=np.arange(1000, 1010, 0.1, dtype=float),
-                velocity=step_function(length=100, steps=[0], values=[(0, 0)]),
+                time=np.arange(1000, 1100, 0.1, dtype=float),
+                velocity=step_function(length=1000, steps=[0], values=[(0, 0)]),
                 orient='row',
                 experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
@@ -370,7 +370,6 @@ from pymovements.synthetic import step_function
                 offsets=[1099],
             ),
             id='ivt_constant_position_single_fixation_with_timesteps_float',
-            marks=pytest.mark.xfail(reason='#532'),
         ),
 
         pytest.param(
