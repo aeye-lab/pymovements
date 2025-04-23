@@ -1,5 +1,7 @@
 name: "ToyDatasetEyeLink"
 
+long_name: "pymovements Toy Dataset EyeLink"
+
 has_files:
   gaze: true
   precomputed_events: false
@@ -39,6 +41,10 @@ filename_format_schema_overrides:
   gaze:
     subject_id: !int
     session_id: !int
+
+trial_columns:
+  - task
+  - trial_id
 
 time_column: "time"
 
@@ -81,3 +87,4 @@ custom_read_kwargs:
       screen_id: !polars.Int64
       point_id: !polars.Int64
       task: !polars.Utf8
+    encoding: 'ascii'

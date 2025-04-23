@@ -1,5 +1,7 @@
 name: "MouseCursor"
 
+long_name: "Mouse Cursor dataset"
+
 has_files:
   gaze: true
   precomputed_events: false

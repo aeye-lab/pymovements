@@ -36,7 +36,6 @@ from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events import EventDataFrame
 from pymovements.events.precomputed import PrecomputedEventDataFrame
-from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import GazeDataFrame
 from pymovements.reading_measures import ReadingMeasures
 
@@ -159,6 +158,8 @@ class Dataset:
                 events_dirname=events_dirname,
                 extension=extension,
             )
+            for loaded_gaze_df, loaded_events_df in zip(self.gaze, self.events):
+                loaded_gaze_df.events = loaded_events_df
 
         return self
 
@@ -224,6 +225,7 @@ class Dataset:
             preprocessed_dirname=preprocessed_dirname,
             extension=extension,
         )
+
         return self
 
     def load_precomputed_events(self) -> None:
@@ -741,7 +743,7 @@ class Dataset:
             name: str | None = None,
             verbose: bool = True,
     ) -> Dataset:
-        """Calculate an event property for and add it as a column to the event dataframe.
+        """Calculate an event property and add it as a column to the event dataframe.
 
         Parameters
         ----------
@@ -759,28 +761,16 @@ class Dataset:
             :py:mod:`pymovements.events` for an overview of supported properties.
         RuntimeError
             If specified event name ``name`` is missing from ``events``.
+        ValueError
+            If the computed property already exists in the event dataframe.
 
         Returns
         -------
         Dataset
             Returns self, useful for method cascading.
         """
-        processor = EventGazeProcessor(event_properties)
-
-        identifier_columns = [
-            column
-            for column in self.fileinfo['gaze'].columns
-            if column != 'filepath'
-        ]
-
-        disable_progressbar = not verbose
-        for events, gaze in tqdm(zip(self.events, self.gaze), disable=disable_progressbar):
-            new_properties = processor.process(
-                events, gaze, identifiers=identifier_columns, name=name,
-            )
-            join_on = identifier_columns + ['name', 'onset', 'offset']
-            events.add_event_properties(new_properties, join_on=join_on)
-
+        for gaze in tqdm(self.gaze, disable=not verbose):
+            gaze.compute_event_properties(event_properties, name=name)
         return self
 
     def compute_properties(
@@ -966,7 +956,7 @@ class Dataset:
             *,
             extract: bool = True,
             remove_finished: bool = False,
-            resume: bool = False,
+            resume: bool = True,
             verbose: int = 1,
     ) -> Dataset:
         """Download dataset resources.
@@ -990,7 +980,7 @@ class Dataset:
             Remove archive files after extraction. (default: False)
         resume: bool
             Resume previous extraction by skipping existing files.
-            Checks for correct size of existing files but not integrity. (default: False)
+            Checks for correct size of existing files but not integrity. (default: True)
         verbose: int
             Verbosity levels: (1) Show download progress bar and print info messages on downloading
             and extracting archive files without printing messages for recursive archive extraction.
@@ -1023,7 +1013,7 @@ class Dataset:
             *,
             remove_finished: bool = False,
             remove_top_level: bool = True,
-            resume: bool = False,
+            resume: bool = True,
             verbose: int = 1,
     ) -> Dataset:
         """Extract downloaded dataset archive files.
@@ -1036,7 +1026,7 @@ class Dataset:
             If ``True``, remove the top-level directory if it has only one child. (default: True)
         resume: bool
             Resume previous extraction by skipping existing files.
-            Checks for correct size of existing files but not integrity. (default: False)
+            Checks for correct size of existing files but not integrity. (default: True)
         verbose: int
             Verbosity levels: (1) Print messages for extracting each dataset resource without
             printing messages for recursive archives. (2) Print additional messages for each

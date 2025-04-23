@@ -108,6 +108,8 @@ class DatasetDefinition:
     ----------
     name: str
         The name of the dataset. (default: '.')
+    long_name: str
+        The entire name of the dataset. (default: '.')
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -204,6 +206,9 @@ class DatasetDefinition:
     # pylint: disable=too-many-instance-attributes
 
     name: str = '.'
+
+    long_name: str = '.'
+
     has_files: dict[str, bool] = field(default_factory=dict)
 
     mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] = field(default_factory=dict)
@@ -272,18 +277,23 @@ class DatasetDefinition:
         # Initialize DatasetDefinition with YAML data
         return DatasetDefinition(**data)
 
-    def to_dict(self, hide_private: bool = True) -> dict[str, Any]:
+    def to_dict(self, exclude_private: bool = True) -> dict[str, Any]:
         """Return dictionary representation.
 
         Parameters
         ----------
-        hide_private: bool
-            Hide attributes that start with `_`.
+        exclude_private: bool
+            Exclude attributes that start with `_`.
+
+        Returns
+        -------
+        dict[str, Any]
+            Dictionary representation of dataset definition.
         """
         data = asdict(self)
 
         # Delete private fields from dictionary.
-        if hide_private:
+        if exclude_private:
             for key in list(data.keys()):
                 if key.startswith('_'):
                     del data[key]
@@ -292,15 +302,17 @@ class DatasetDefinition:
 
         return data
 
-    def to_yaml(self, path: str | Path) -> None:
+    def to_yaml(self, path: str | Path, exclude_private: bool = True) -> None:
         """Save a dataset definition to a YAML file.
 
         Parameters
         ----------
         path: str | Path
             Path where to save the YAML file to.
+        exclude_private: bool
+            Exclude attributes that start with `_`.
         """
-        data = self.to_dict()
+        data = self.to_dict(exclude_private=exclude_private)
 
         data = substitute_types(data)
 

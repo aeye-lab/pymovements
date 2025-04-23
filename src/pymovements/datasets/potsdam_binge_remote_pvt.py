@@ -17,28 +17,31 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the InteRead dataset."""
+"""Provides a definition for the PotsdamBingeRemotePVT dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
 
+import polars as pl
+
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.gaze.experiment import Experiment
+from pymovements.gaze.eyetracker import EyeTracker
+from pymovements.gaze.screen import Screen
 
 
 @dataclass
-class InteRead(DatasetDefinition):
-    """InteRead dataset :cite:p:`InteRead`.
+class PotsdamBingeRemotePVT(DatasetDefinition):
+    """PotsdamBingeRemotePVT dataset :cite:p:`PotsdamBingePVT`.
 
-    This dataset includes monocular eye tracking data in an interrupted reading task.
-    Automatic interruption occured during a reading task and participants continued
-    reading after the pause.
-    Eye movements are recorded at a sampling frequency of 1200Hz with video-based eye tracker.
-    Provided data are raw gaze samples and precomputed event files both in pixel coordinates.
+    This dataset includes monocular eye tracking data from 57 participants in two sessions with an
+    interval of at least one week between two sessions. Eye movements are recorded at a sampling
+    frequency of 1000 Hz using an EyeLink 1000 Plus video-based eye tracker and are provided as
+    pixel coordinates. Participants are instructed to perform a PVT trial.
 
-    For more details, check the paper :cite:p:`InteRead`.
+    Check the respective `repository <https://osf.io/qf7e6/>`_ for details.
 
     Attributes
     ----------
@@ -53,10 +56,10 @@ class InteRead(DatasetDefinition):
         'precomputed_reading_measures'.
 
     mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
+        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, list[dict[str, str]]]
-        A list of dataset gaze_resources. Each list entry must be a dictionary with the following
+        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -92,6 +95,10 @@ class InteRead(DatasetDefinition):
         'step' the experiment definition must be specified. All timestamps will be converted to
         milliseconds.
 
+    distance_column: str
+        The name of the distance column in the input data frame. These column will be
+        used to convert pixel coordinates into degrees of visual angle.
+
     pixel_columns: list[str]
         The name of the pixel position columns in the input data frame. These columns will be
         nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
@@ -107,11 +114,11 @@ class InteRead(DatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
-    :py:class:`~pymovements.datasets.InteRead` definition:
+    :py:class:`~pymovements.datasets.PotsdamBingeRemotePVT` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("InteRead", path='data/InteRead')
+    >>> dataset = pm.Dataset("PotsdamBingeRemotePVT", path='data/PotsdamBingeRemotePVT')
 
     Download the dataset resources:
 
@@ -125,21 +132,20 @@ class InteRead(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'InteRead'
+    name: str = 'PotsdamBingeRemotePVT'
 
-    long_name: str = 'Interrupted Reading dataset'
+    long_name: str = 'Potsdam Binge Remote PVT dataset'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
-            'precomputed_events': True,
+            'precomputed_events': False,
             'precomputed_reading_measures': False,
         },
     )
     mirrors: dict[str, list[str]] = field(
         default_factory=lambda: {
             'gaze': ['https://osf.io/download/'],
-            'precomputed_events': ['https://osf.io/download/'],
         },
     )
 
@@ -147,77 +153,107 @@ class InteRead(DatasetDefinition):
         default_factory=lambda: {
             'gaze': [
                 {
-                    'resource': '6ju3x/',
-                    'filename': 'resampled_gaze.csv.zip',
-                    'md5': '06b2cdff1827086fa125a703ee9d4324',
+                    'resource': '9vbs8/',
+                    'filename': 'a.zip',
+                    'md5': '87c6c74a9a17cbd093b91f9415e8dd9d',
                 },
-            ],
-            'precomputed_events': [
                 {
-                    'resource': '85ckh/',
-                    'filename': 'resumption_fixation.csv',
-                    'md5': '44edb7c58318ad76af1fa6f1bc1f1ceb',
+                    'resource': 'yqukn/',
+                    'filename': 'b.zip',
+                    'md5': '54038547b1a373253b38999a227dde63',
+                },
+                {
+                    'resource': 'yf2xa/',
+                    'filename': 'e.zip',
+                    'md5': 'a0d0203cbb273f6908c1b52a42750551',
                 },
             ],
         },
     )
-    extract: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': False,
-        },
-    )
+    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     experiment: Experiment = field(
         default_factory=lambda: Experiment(
-            screen_width_px=1920,
-            screen_height_px=1080,
-            screen_width_cm=52.8,
-            screen_height_cm=29.7,
-            distance_cm=57,
-            origin='center',
-            sampling_rate=1200,
+            screen=Screen(
+                width_px=1920,
+                height_px=1080,
+                width_cm=59.76,
+                height_cm=33.615,
+                distance_cm=None,
+                origin='center',
+            ),
+            eyetracker=EyeTracker(
+                sampling_rate=1000,
+                left=False,
+                right=True,
+                model='EyeLink 1000 Plus',
+                vendor='EyeLink',
+                mount='Remote',
+            ),
         ),
     )
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
-            'gaze': r'resampled_gaze.csv',
-            'precomputed_events': r'resumption_fixation.csv',
+            'gaze': r'{subject_id:d}_{session_id:d}_{condition:s}_{trial_id:d}_{block_id:d}.csv',
         },
     )
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
-            'gaze': {},
-            'precomputed_events': {},
+            'gaze': {
+                'subject_id': int,
+                'trial_id': int,
+                'block_id': int,
+            },
         },
     )
 
     trial_columns: list[str] = field(
         default_factory=lambda: [
-            'participant_id',
-            'page_id',
-            'interruption_state',
+            'trial_id',
+            'subject_id',
         ],
     )
 
-    time_column: str = ''
+    time_column: str = 'eyelink_timestamp'
 
     time_unit: str = 'ms'
 
+    distance_column: str = 'target_distance'
+
     pixel_columns: list[str] = field(
         default_factory=lambda: [
-            'x',
-            'y',
+            'x_pix_eyelink',
+            'y_pix_eyelink',
         ],
     )
 
-    column_map: dict[str, str] = field(default_factory=lambda: {})
+    column_map: dict[str, str] = field(
+        default_factory=lambda: {},
+    )
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
-            'gaze': {},
-            'precomputed_events': {},
+            'gaze': {
+                'schema_overrides': {
+                    'trial_id': pl.Float32,
+                    'block_id': pl.Float32,
+                    'x_pix_eyelink': pl.Float32,
+                    'y_pix_eyelink': pl.Float32,
+                    'eyelink_timestamp': pl.Int64,
+                    'x_pix_pupilcore_interpolated': pl.Float32,
+                    'y_pix_pupilcore_interpolated': pl.Float32,
+                    'pupil_size_eyelink': pl.Float32,
+                    'target_distance': pl.Float32,
+                    'pupil_size_pupilcore_interpolated': pl.Float32,
+                    'pupil_confidence_interpolated': pl.Float32,
+                    'time_to_prev_bac': pl.Float32,
+                    'time_to_next_bac': pl.Float32,
+                    'prev_bac': pl.Float32,
+                    'next_bac': pl.Float32,
+                },
+                'separator': ',',
+            },
         },
     )
