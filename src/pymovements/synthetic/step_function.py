@@ -48,7 +48,7 @@ def step_function(
     noise: float
         If greater than zero, gaussian noise is scaled according to value and superimposed on the
         output array. (default: 0)
-    dtype: np.dtype
+    dtype: np.typing.DTypeLike
         The desired data type of the output array. (default: np.float32)
 
     Returns
