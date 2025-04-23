@@ -44,7 +44,7 @@ from pymovements.synthetic import step_function
         ),
         pytest.param(
             {'length': 10, 'steps': [5], 'values': [0], 'start_value': 1},
-            {'value': np.concatenate([np.ones(5), np.zeros(5)], dtype=np.int64, casting='unsafe')},
+            {'value': np.concatenate([np.ones(5, dtype=np.int64), np.zeros(5, dtype=np.int64)])},
             id='length_10_start_value_1_step_5_to_0_int64',
         ),
         pytest.param(
@@ -54,19 +54,19 @@ from pymovements.synthetic import step_function
         ),
         pytest.param(
             {'length': 10, 'steps': [5], 'values': [(1, 2)], 'start_value': 10},
-            {'value': np.concatenate([np.tile(10, (5, 2)), np.tile((1, 2), (5, 1))])},
+            {'value': np.concatenate([np.tile(10.0, (5, 2)), np.tile((1, 2), (5, 1))])},
             id='length_10_2_channel_single_step_with_single_start_value',
         ),
         pytest.param(
             {'length': 10, 'steps': [5], 'values': [(1, 2)], 'start_value': (11, 12)},
-            {'value': np.concatenate([np.tile((11, 12), (5, 1)), np.tile((1, 2), (5, 1))])},
+            {'value': np.concatenate([np.tile((11.0, 12), (5, 1)), np.tile((1, 2), (5, 1))])},
             id='length_10_2_channel_single_step_with_2_channel_start_value',
         ),
         pytest.param(
             {'length': 10, 'steps': [5], 'values': [(1, 2, 3, 4)], 'start_value': (11, 12, 13, 14)},
             {
                 'value': np.concatenate([
-                    np.tile((11, 12, 13, 14), (5, 1)),
+                    np.tile((11.0, 12, 13, 14), (5, 1)),
                     np.tile((1, 2, 3, 4), (5, 1)),
                 ]),
             },
