@@ -1,23 +1,19 @@
 name: "EMTeC"
 
+long_name: 'Eye movements on Machine-generated Texts Corpus'
+
 has_files:
   gaze: true
   precomputed_events: true
   precomputed_reading_measures: false
 
-mirrors:
-  gaze:
-    - "https://osf.io/download/"
-  precomputed_events:
-    - "https://osf.io/download/"
-
 resources:
   gaze:
-    - resource: "374sk/"
+    - resource: "https://osf.io/download/374sk/"
       filename: "subject_level_data.zip"
       md5: "dca99e47ef43f3696acec4fd70967750"
   precomputed_events:
-    - resource: "2hs8p/"
+    - resource: "https://osf.io/download/2hs8p/"
       filename: "fixations.csv"
       md5: "5e05a364a1d8a044d8b36506aa91437e"
 

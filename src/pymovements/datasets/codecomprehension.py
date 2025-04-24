@@ -44,12 +44,12 @@ class CodeComprehension(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
@@ -98,6 +98,8 @@ class CodeComprehension(DatasetDefinition):
 
     name: str = 'CodeComprehension'
 
+    long_name: str = 'Code Comprehension dataset'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': False,
@@ -106,19 +108,11 @@ class CodeComprehension(DatasetDefinition):
         },
     )
 
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda: {
-            'precomputed_events': ['https://zenodo.org/'],
-        },
-    )
-
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
             'precomputed_events': [
                 {
-                    'resource':
-                    'records/11123101/files/Predicting%20Code%20Comprehension%20Package'
-                    '.zip?download=1',
+                    'resource': 'https://zenodo.org/records/11123101/files/Predicting%20Code%20Comprehension%20Package.zip?download=1',  # noqa: E501 # pylint: disable=line-too-long
                     'filename': 'data.zip',
                     'md5': '3a3c6fb96550bc2c2ddcf5d458fb12a2',
                 },

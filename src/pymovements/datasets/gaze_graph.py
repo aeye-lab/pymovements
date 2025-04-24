@@ -51,12 +51,12 @@ class GazeGraph(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
@@ -129,6 +129,8 @@ class GazeGraph(DatasetDefinition):
 
     name: str = 'GazeGraph'
 
+    long_name: str = 'GazeGraph dataset'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
@@ -137,17 +139,11 @@ class GazeGraph(DatasetDefinition):
         },
     )
 
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda: {
-            'gaze': ['https://codeload.github.com/GazeGraphResource/GazeGraph/zip/refs/heads/'],
-        },
-    )
-
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
             'gaze': [
                 {
-                    'resource': 'master',
+                    'resource': 'https://codeload.github.com/GazeGraphResource/GazeGraph/zip/refs/heads/master',  # noqa: E501 # pylint: disable=line-too-long
                     'filename': 'gaze_graph_data.zip',
                     'md5': '181f4b79477cee6e0267482d989610b0',
                 },
