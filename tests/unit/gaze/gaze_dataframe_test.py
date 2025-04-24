@@ -17,6 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Tests deprecated GazeDataFrame alias for Gaze."""
 import re
 
 import pytest
@@ -134,12 +135,14 @@ def test_is_gaze_df_deprecated():
 
 
 def test_is_gaze_df_subclass_deprecated():
+    # pylint: disable=unused-variable
     with pytest.raises(DeprecationWarning):
         class AnotherGazeDataFrameSubclass(GazeDataFrame):
             ...
 
 
 def test_is_gaze_df_subsubclass_deprecated():
+    # pylint: disable=unused-variable
     with pytest.raises(DeprecationWarning):
         class YetAnotherGazeDataFrameSubclass(GazeDataFrame):
             ...

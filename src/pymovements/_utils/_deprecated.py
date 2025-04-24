@@ -17,26 +17,52 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Helpers for deprecations."""
 from __future__ import annotations
 
+from typing import Any
 from warnings import warn
 
 
 class DeprecatedClassMeta(type):
-    def __new__(cls, name, bases, classdict, *args, **kwargs):
+    """Metaclass for deprecated class aliases.
+
+    The class serves as an equivalent alias for the `isinstance()` and `issubclass()` methods.
+    It supports subclassing of the deprecated class.
+
+    Examples
+    --------
+    This is how a deprecated alias is defined:
+    >>> class NewClass:
+    >>>     variable = 42
+    >>>
+    >>> class OldClass(DeprecatedClassMeta):
+    >>>     _DeprecatedClassMeta__alias = NewClass
+    >>>     _DeprecatedClassMeta__version_deprecated = 'v1.23.4'
+    >>>     _DeprecatedClassMeta__version_removed = 'v2.0.0'
+
+    As you see, an `OldClass` object is an instance of both OldClass and NewClass:
+    >>> isinstance(OldClass(), NewClass)
+    True
+
+    As well as vice versa:
+    >>> isinstance(NewClass(), OldClass)
+    True
+    """
+
+    def __new__(
+            mcs: type[DeprecatedClassMeta], name: str, bases: tuple, classdict: dict, *args: Any, **kwargs: Any,
+    ) -> DeprecatedClassMeta:
+        """Create new deprecated class."""
         alias = classdict.get('_DeprecatedClassMeta__alias')
         version_deprecated = classdict.get('_DeprecatedClassMeta__version_deprecated')
         version_removed = classdict.get('_DeprecatedClassMeta__version_removed')
 
         if alias is not None:
-            def new(cls, *args, **kwargs):
+            def new(cls: type, *args: Any, **kwargs: Any) -> type:
                 alias = getattr(cls, '_DeprecatedClassMeta__alias')
-                version_deprecated = getattr(
-                    cls, '_DeprecatedClassMeta__version_deprecated',
-                )
-                version_removed = getattr(
-                    cls, '_DeprecatedClassMeta__version_removed',
-                )
+                version_deprecated = getattr(cls, '_DeprecatedClassMeta__version_deprecated')
+                version_removed = getattr(cls, '_DeprecatedClassMeta__version_removed')
 
                 if alias is not None:
                     warn(
@@ -62,7 +88,7 @@ class DeprecatedClassMeta(type):
 
             if alias is not None:
                 warn(
-                    f"{cls.__name__} has been renamed to {alias.__name__} "
+                    f"{mcs.__name__} has been renamed to {alias.__name__} "
                     f"in {version_deprecated} "
                     f"and will be removed in {version_removed}.",
                     DeprecationWarning, stacklevel=2,
@@ -73,22 +99,20 @@ class DeprecatedClassMeta(type):
             if b not in fixed_bases:
                 fixed_bases.append(b)
 
-        fixed_bases = tuple(fixed_bases)
+        return super().__new__(mcs, name, tuple(fixed_bases), classdict, *args, **kwargs)
 
-        return super().__new__(
-            cls, name, fixed_bases, classdict, *args, **kwargs,
-        )
+    def __instancecheck__(cls, instance: Any) -> bool:
+        """Check if is instance of deprecated class.
 
-    def __instancecheck__(cls, instance):
-        return any(
-            cls.__subclasscheck__(c)
-            for c in {type(instance), instance.__class__}
-        )
+        Provides implementation for isinstance().
+        """
+        return any(cls.__subclasscheck__(c()) for c in (type(instance), instance.__class__))
 
-    def __subclasscheck__(cls, subclass):
+    def __subclasscheck__(cls, subclass: Any) -> bool:
+        """Check if is subclass of deprecated class.
+
+        Provides implementation for issubclass().
+        """
         if subclass is cls:
             return True
-        else:
-            return issubclass(
-                subclass, getattr(cls, '_DeprecatedClassMeta__alias'),
-            )
+        return issubclass(subclass, getattr(cls, '_DeprecatedClassMeta__alias'))

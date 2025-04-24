@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Module for the Gaze."""
+"""Gaze implementation."""
 from __future__ import annotations
 
 import inspect
@@ -39,7 +39,9 @@ from pymovements.utils.checks import check_is_mutual_exclusive
 
 
 class Gaze:
-    """A DataFrame for gaze time series data.
+    """Self-contained data structure containing gaze represented as samples or events.
+
+    Includes metadata on the experiment and recording setup.
 
     Each row is a sample at a specific timestep.
     Each column is a channel in the gaze time series.
