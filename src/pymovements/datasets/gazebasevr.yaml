@@ -53,6 +53,7 @@ position_columns:
 column_map:
   xT: "x_target_pos"
   yT: "y_target_pos"
+  zT: "z_target_pos"
 
 custom_read_kwargs:
   gaze:
