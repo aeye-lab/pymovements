@@ -29,6 +29,7 @@
     EyeTracker
     Screen
     Gaze
+    GazeDataFrame
 
 .. rubric:: Transformations
 
@@ -80,6 +81,7 @@ from pymovements.gaze import transforms_numpy
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
 from pymovements.gaze.gaze import Gaze
+from pymovements.gaze.gaze_dataframe import GazeDataFrame
 from pymovements.gaze.integration import from_numpy
 from pymovements.gaze.integration import from_pandas
 from pymovements.gaze.io import from_asc

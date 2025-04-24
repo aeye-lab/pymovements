@@ -1,0 +1,143 @@
+import re
+
+import pytest
+
+from pymovements import __version__
+from pymovements import Gaze
+from pymovements import GazeDataFrame
+
+
+@pytest.fixture(name='gaze_subclass')
+def fixture_gaze_subclass():
+    class GazeSubclass(Gaze):
+        ...
+    yield GazeSubclass
+
+
+@pytest.fixture(name='gaze_df_subclass')
+def fixture_gaze_df_subclass():
+    class GazeDataFrameSubclass(GazeDataFrame):
+        ...
+    yield GazeDataFrameSubclass
+
+
+@pytest.fixture(name='gaze_df_subsubclass')
+def fixture_gaze_df_subsubclass(gaze_df_subclass):
+    class GazeDataFrameSubSubclass(gaze_df_subclass):
+        ...
+
+    yield GazeDataFrameSubSubclass
+
+
+def test_gaze_issubclass_gaze_df():
+    assert issubclass(Gaze, GazeDataFrame)
+
+
+def test_gaze_subclass_issubclass_gaze_df(gaze_subclass):
+    assert issubclass(gaze_subclass, GazeDataFrame)
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+def test_gaze_df_subclass_issubclass_gaze(gaze_df_subclass):
+    assert issubclass(gaze_df_subclass, Gaze)
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+def test_gaze_df_subclass_issubclass_gazedf(gaze_df_subclass):
+    assert issubclass(gaze_df_subclass, GazeDataFrame)
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+def test_gaze_df_subsubclass_issubclass_gaze(gaze_df_subsubclass):
+    assert issubclass(gaze_df_subsubclass, Gaze)
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+def test_gaze_df_subsubclass_issubclass_gaze_df(gaze_df_subsubclass):
+    assert issubclass(gaze_df_subsubclass, GazeDataFrame)
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+def test_gaze_df_isinstance_gaze_df():
+    gaze_df = GazeDataFrame()
+    assert isinstance(gaze_df, GazeDataFrame)
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+def test_gaze_df_subclass_isinstance_gaze_df(gaze_df_subclass):
+    gaze_df = gaze_df_subclass()
+    assert isinstance(gaze_df, GazeDataFrame)
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+def test_gaze_df_subsubclass_isinstance_gaze_df(gaze_df_subsubclass):
+    gaze_df = gaze_df_subsubclass()
+    assert isinstance(gaze_df, GazeDataFrame)
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+def test_gaze_df_subsubclass_isinstance_gaze(gaze_df_subsubclass):
+    gaze_df = gaze_df_subsubclass()
+    assert isinstance(gaze_df, Gaze)
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+def test_gaze_df_isinstance_gaze():
+    gaze_df = GazeDataFrame()
+    assert isinstance(gaze_df, Gaze)
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+def test_gaze_df_subclass_isinstance_gaze(gaze_df_subclass):
+    gaze_df = gaze_df_subclass()
+    assert isinstance(gaze_df, Gaze)
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+def test_gaze_isinstance_gaze_df():
+    gaze = Gaze()
+    assert isinstance(gaze, GazeDataFrame)
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+def test_gaze_subclass_isinstance_gaze_df(gaze_subclass):
+    gaze = gaze_subclass()
+    assert isinstance(gaze, GazeDataFrame)
+
+
+def test_is_gaze_df_deprecated():
+    with pytest.raises(DeprecationWarning):
+        GazeDataFrame()
+
+
+def test_is_gaze_df_subclass_deprecated():
+    with pytest.raises(DeprecationWarning):
+        class AnotherGazeDataFrameSubclass(GazeDataFrame):
+            ...
+
+
+def test_is_gaze_df_subsubclass_deprecated():
+    with pytest.raises(DeprecationWarning):
+        class YetAnotherGazeDataFrameSubclass(GazeDataFrame):
+            ...
+
+    with pytest.raises(DeprecationWarning):
+        class AnotherGazeDataFrameSubSubclass(GazeDataFrame):
+            ...
+
+
+def test_is_gaze_df_removed():
+    with pytest.raises(DeprecationWarning) as info:
+        GazeDataFrame()
+
+    regex = re.compile(
+        r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*',
+    )
+
+    msg = info.value.args[0]
+    remove_version = regex.match(msg).groupdict()['version']
+    current_version = __version__.split('+')[0]
+    assert current_version < remove_version, (
+        f'GazeDataFrame was planned to be removed in v{remove_version}. '
+        f'Current version is v{current_version}.'
+    )

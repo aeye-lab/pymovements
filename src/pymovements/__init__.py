@@ -40,6 +40,7 @@ from pymovements.events import EventProcessor
 from pymovements.gaze import Experiment
 from pymovements.gaze import EyeTracker
 from pymovements.gaze import Gaze
+from pymovements.gaze import GazeDataFrame
 from pymovements.gaze import Screen
 from pymovements.measure import register_sample_measure
 from pymovements.measure import SampleMeasureLibrary
