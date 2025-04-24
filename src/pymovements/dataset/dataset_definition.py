@@ -47,11 +47,8 @@ _Resources = Union[dict[str, list[dict[str, str]]], dict[str, tuple[dict[str, st
 class _HasResourcesIndexer:
     """Indexable :py:meth:`~pymovements.dataset.DatasetDefinition.has_resources` property."""
 
-    def __init__(self, resources: _Resources | None = None):
-        if resources is None:
-            self._resources: _Resources = {}
-        else:
-            self._resources = resources
+    def __init__(self):
+        self._resources: _Resources = {}
 
     def set_resources(self, resources: _Resources) -> None:
         """Set dataset definition resources for lookup."""
