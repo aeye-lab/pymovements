@@ -1,6 +1,6 @@
 name: "ToyDataset"
 
-long_name: "Toy Dataset"
+long_name: "pymovements Toy Dataset"
 
 has_files:
   gaze: true

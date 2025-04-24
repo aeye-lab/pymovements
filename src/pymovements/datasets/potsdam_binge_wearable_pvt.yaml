@@ -1,6 +1,6 @@
 name: "PotsdamBingeWearablePVT"
 
-long_name: 'Potsdam Binge Wearable Psychomotor Vigilance Task dataset'
+long_name: 'Potsdam Binge Wearable PVT dataset'
 
 has_files:
   gaze: true

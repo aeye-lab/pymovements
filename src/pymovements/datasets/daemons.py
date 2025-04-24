@@ -106,7 +106,7 @@ class DAEMONS(DatasetDefinition):
 
     name: str = 'DAEMONS'
 
-    long_name: str = 'DAta set for Eye Movement On Natural Scenes'
+    long_name: str = 'Potsdam data set of eye movement on natural scenes'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

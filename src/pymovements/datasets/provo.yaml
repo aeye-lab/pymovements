@@ -1,6 +1,6 @@
 name: "Provo"
 
-long_name: 'Provo corpus'
+long_name: 'Provo Corpus'
 
 has_files:
   gaze: false

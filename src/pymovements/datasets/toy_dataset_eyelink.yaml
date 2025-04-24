@@ -1,6 +1,6 @@
 name: "ToyDatasetEyeLink"
 
-long_name: "Toy Dataset EyeLink"
+long_name: "pymovements Toy Dataset EyeLink"
 
 has_files:
   gaze: true

@@ -134,7 +134,7 @@ class PotsdamBingeRemotePVT(DatasetDefinition):
 
     name: str = 'PotsdamBingeRemotePVT'
 
-    long_name: str = 'Potsdam Binge Remote Psychomotor Vigilance Task dataset'
+    long_name: str = 'Potsdam Binge Remote PVT dataset'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

@@ -1,6 +1,6 @@
 name: "DAEMONS"
 
-long_name: 'DAta set for Eye Movement On Natural Scenes'
+long_name: 'Potsdam data set of eye movement on natural scenes'
 
 has_files:
   gaze: false

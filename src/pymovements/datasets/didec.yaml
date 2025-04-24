@@ -1,6 +1,6 @@
 name: "DIDEC"
 
-long_name: 'The Dutch Image Description and Eye-tracking Corpus'
+long_name: 'Dutch Image Description and Eye-tracking Corpus'
 
 has_files:
   gaze: true

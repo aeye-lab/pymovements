@@ -129,7 +129,7 @@ class CopCo(DatasetDefinition):
 
     name: str = 'CopCo'
 
-    long_name: str = 'The Copenhagen Corpus of Eye-Tracking Recordings from Natural Reading'
+    long_name: str = 'Copenhagen Corpus of Eye-Tracking Recordings from Natural Reading'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

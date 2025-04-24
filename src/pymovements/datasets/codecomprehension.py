@@ -101,7 +101,7 @@ class CodeComprehension(DatasetDefinition):
 
     name: str = 'CodeComprehension'
 
-    long_name: str = 'Code Comprehension'
+    long_name: str = 'Code Comprehension dataset'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

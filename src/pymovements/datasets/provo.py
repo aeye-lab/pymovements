@@ -104,7 +104,7 @@ class Provo(DatasetDefinition):
 
     name: str = 'Provo'
 
-    long_name: str = 'Provo corpus'
+    long_name: str = 'Provo Corpus'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

@@ -135,7 +135,7 @@ class PotsdamBingeWearablePVT(DatasetDefinition):
 
     name: str = 'PotsdamBingeWearablePVT'
 
-    long_name: str = 'Potsdam Binge Wearable Psychomotor Vigilance Task dataset'
+    long_name: str = 'Potsdam Binge Wearable PVT dataset'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

@@ -1,6 +1,6 @@
 name: "UCL"
 
-long_name: "UCL corpus"
+long_name: "University College London corpus"
 
 has_files:
   gaze: false

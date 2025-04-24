@@ -1,6 +1,6 @@
 name: "PotsdamBingeRemotePVT"
 
-long_name: 'Potsdam Binge Remote Psychomotor Vigilance Task dataset'
+long_name: 'Potsdam Binge Remote PVT dataset'
 
 has_files:
   gaze: true

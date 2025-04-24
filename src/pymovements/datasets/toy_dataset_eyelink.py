@@ -127,7 +127,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
 
     name: str = 'ToyDatasetEyeLink'
 
-    long_name: str = 'Toy Dataset EyeLink'
+    long_name: str = 'pymovements Toy Dataset EyeLink'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

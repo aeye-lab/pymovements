@@ -101,7 +101,7 @@ class UCL(DatasetDefinition):
 
     name: str = 'UCL'
 
-    long_name: str = 'UCL corpus'
+    long_name: str = 'University College London corpus'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

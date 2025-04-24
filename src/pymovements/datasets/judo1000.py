@@ -129,7 +129,7 @@ class JuDo1000(DatasetDefinition):
 
     name: str = 'JuDo1000'
 
-    long_name: str = 'Jumping Dots dataset'
+    long_name: str = 'Jumping Dots 1000 Hz dataset'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

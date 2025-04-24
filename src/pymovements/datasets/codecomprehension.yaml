@@ -1,6 +1,6 @@
 name: CodeComprehension
 
-long_name: "Code Comprehension"
+long_name: "Code Comprehension dataset"
 
 has_files:
   gaze: false

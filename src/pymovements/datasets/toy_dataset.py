@@ -120,7 +120,7 @@ class ToyDataset(DatasetDefinition):
 
     name: str = 'ToyDataset'
 
-    long_name: str = 'Toy Dataset'
+    long_name: str = 'pymovements Toy Dataset'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

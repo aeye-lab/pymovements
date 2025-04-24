@@ -125,7 +125,7 @@ class DIDEC(DatasetDefinition):
 
     name: str = 'DIDEC'
 
-    long_name: str = 'The Dutch Image Description and Eye-tracking Corpus'
+    long_name: str = 'Dutch Image Description and Eye-tracking Corpus'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
