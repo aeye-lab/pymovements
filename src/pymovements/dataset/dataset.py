@@ -1003,20 +1003,8 @@ class Dataset:
         RuntimeError
             If downloading a resource failed for all given mirrors.
         """
-        if self.definition.long_name is not None:
-            dataset_name = self.definition.long_name
-        else:
-            dataset_name = self.definition.name
-
-        disclaimer_text = f"""\
-        You are downloading the {dataset_name}. Please be aware that pymovements does not
-        host or distribute any dataset resources and only provides a convenient interface to
-        download the public dataset resources that were published by their respective authors.
-
-        Please cite the referenced publication if you intend to use the dataset in your research.
-        """
-        logger.info(disclaimer_text)
-
+        logger.info(self._disclaimer())
+        
         dataset_download.download_dataset(
             definition=self.definition,
             paths=self.paths,
@@ -1119,3 +1107,18 @@ class Dataset:
             raise AttributeError('gaze files were not loaded yet. please run load() beforehand')
         if len(self.gaze) == 0:
             raise AttributeError('no files present in gaze attribute')
+
+    def _disclaimer() -> str:
+        """Return string for dataset download disclaimer."""
+        if self.definition.long_name is not None:
+            dataset_name = self.definition.long_name
+        else:
+            dataset_name = self.definition.name + ' dataset'
+
+        return f"""\
+        You are downloading the {dataset_name}. Please be aware that pymovements does not
+        host or distribute any dataset resources and only provides a convenient interface to
+        download the public dataset resources that were published by their respective authors.
+
+        Please cite the referenced publication if you intend to use the dataset in your research.
+        """
