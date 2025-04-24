@@ -201,6 +201,7 @@ class GazeBaseVR(DatasetDefinition):
         default_factory=lambda: {
             'xT': 'x_target_pos',
             'yT': 'y_target_pos',
+            'zT': 'z_target_pos',
         },
     )
 
