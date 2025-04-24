@@ -323,7 +323,7 @@ def test_from_asc_fills_in_experiment_metadata(file, metadata):
                 'screen_height_px': 1080,
                 'sampling_rate': 1000,
             },
-            ['Screen resolution: (1920, 1080) != (1280, 1024)'],
+            ['Screen resolution: (1920, 1080) != (1280.0, 1024.0)'],
             id='screen_resolution',
         ),
         pytest.param(

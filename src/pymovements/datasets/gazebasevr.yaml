@@ -1,5 +1,7 @@
 name: "GazeBaseVR"
 
+long_name: 'GazeBaseVR dataset'
+
 has_files:
   gaze: true
   precomputed_events: false
@@ -51,6 +53,7 @@ position_columns:
 column_map:
   xT: "x_target_pos"
   yT: "y_target_pos"
+  zT: "z_target_pos"
 
 custom_read_kwargs:
   gaze:
