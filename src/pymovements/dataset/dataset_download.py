@@ -20,7 +20,6 @@
 """Provides private functions for downloading and extracting datasets."""
 from __future__ import annotations
 
-import logging
 import shutil
 from pathlib import Path
 from urllib.error import URLError
@@ -30,10 +29,6 @@ from pymovements.dataset._utils._archives import extract_archive
 from pymovements.dataset._utils._downloads import download_file
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
-
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 def download_dataset(
@@ -82,15 +77,6 @@ def download_dataset(
     RuntimeError
         If downloading a resource failed for all given mirrors.
     """
-    disclaimer_text = f"""\
-You are downloading the {definition.long_name}. Please be aware that pymovements does not
-host or distribute any dataset resources and only provides a convenient interface to
-download the public dataset resources that were published by their respective authors.
-
-Please cite the referenced publication if you intend to use the dataset in your research.
-"""
-    logger.info(disclaimer_text)
-
     if definition.has_files['gaze']:
         if not definition.mirrors or not definition.mirrors['gaze']:
             mirrors = None
