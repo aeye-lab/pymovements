@@ -179,7 +179,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                 {'subject_id': [1], 'onset': [0], 'offset': [10]},
                 schema={'subject_id': pl.Int64, 'onset': pl.Int64, 'offset': pl.Int64},
             ),
-            pm.GazeDataFrame(
+            pm.Gaze(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(10),
@@ -221,7 +221,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                 {'subject_id': [1], 'onset': [0], 'offset': [10]},
                 schema={'subject_id': pl.Int64, 'onset': pl.Int64, 'offset': pl.Int64},
             ),
-            pm.GazeDataFrame(
+            pm.Gaze(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(10),
@@ -263,7 +263,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                 {'subject_id': [1], 'onset': [0], 'offset': [5]},
                 schema={'subject_id': pl.Int64, 'onset': pl.Int64, 'offset': pl.Int64},
             ),
-            pm.GazeDataFrame(
+            pm.Gaze(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(10),
@@ -305,7 +305,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                 {'subject_id': [1], 'onset': [0], 'offset': [10]},
                 schema={'subject_id': pl.Int64, 'onset': pl.Int64, 'offset': pl.Int64},
             ),
-            pm.GazeDataFrame(
+            pm.Gaze(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(10),
@@ -347,7 +347,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                 {'subject_id': [1], 'onset': [0], 'offset': [10]},
                 schema={'subject_id': pl.Int64, 'onset': pl.Int64, 'offset': pl.Int64},
             ),
-            pm.GazeDataFrame(
+            pm.Gaze(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(10),
@@ -391,7 +391,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                     'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
                 },
             ),
-            pm.GazeDataFrame(
+            pm.Gaze(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(100),
@@ -435,7 +435,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                     'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
                 },
             ),
-            pm.GazeDataFrame(
+            pm.Gaze(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(100),
@@ -479,7 +479,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                     'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
                 },
             ),
-            pm.GazeDataFrame(
+            pm.Gaze(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(100),
@@ -523,7 +523,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                     'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
                 },
             ),
-            pm.GazeDataFrame(
+            pm.Gaze(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(100),
@@ -571,7 +571,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                     'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
                 },
             ),
-            pm.GazeDataFrame(
+            pm.Gaze(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(100),
@@ -619,7 +619,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
                     'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
                 },
             ),
-            pm.GazeDataFrame(
+            pm.Gaze(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(100),
@@ -679,7 +679,7 @@ def test_event_gaze_processor_process_correct_result(
                 {'subject_id': [1], 'onset': [0], 'offset': [10]},
                 schema={'subject_id': pl.Int64, 'onset': pl.Int64, 'offset': pl.Int64},
             ),
-            pm.GazeDataFrame(
+            pm.Gaze(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(10),
@@ -710,7 +710,7 @@ def test_event_gaze_processor_process_correct_result(
                     'subject_id': pl.Int64, 'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64,
                 },
             ),
-            pm.GazeDataFrame(
+            pm.Gaze(
                 pl.from_dict(
                     {
                         'subject_id': np.ones(100),

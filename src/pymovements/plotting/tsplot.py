@@ -26,11 +26,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import polars as pl
 
-from pymovements.gaze import GazeDataFrame
+from pymovements.gaze import Gaze
 
 
 def tsplot(
-        gaze: GazeDataFrame,
+        gaze: Gaze,
         channels: list[str] | None = None,
         xlabel: str | None = None,
         n_cols: int | None = None,
@@ -51,8 +51,8 @@ def tsplot(
 
     Parameters
     ----------
-    gaze: GazeDataFrame
-        The GazeDataFrame to plot.
+    gaze: Gaze
+        The Gaze to plot.
     channels: list[str] | None
         List of channel names to plot. If None, all channels will be plotted. (default: None)
     xlabel: str | None

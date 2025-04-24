@@ -36,7 +36,7 @@ from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events import EventDataFrame
 from pymovements.events.precomputed import PrecomputedEventDataFrame
-from pymovements.gaze import GazeDataFrame
+from pymovements.gaze import Gaze
 from pymovements.reading_measures import ReadingMeasures
 
 
@@ -60,7 +60,7 @@ class Dataset:
             path: str | Path | DatasetPaths,
     ):
         self.fileinfo: pl.DataFrame = pl.DataFrame()
-        self.gaze: list[GazeDataFrame] = []
+        self.gaze: list[Gaze] = []
         self.events: list[EventDataFrame] = []
         self.precomputed_events: list[PrecomputedEventDataFrame] = []
         self.precomputed_reading_measures: list[ReadingMeasures] = []
@@ -250,7 +250,7 @@ class Dataset:
             self,
             by: Sequence[str],
     ) -> None:
-        """Split gaze data into separated GazeDataFrame's.
+        """Split gaze data into separated Gaze's.
 
         Parameters
         ----------
@@ -335,7 +335,7 @@ class Dataset:
             verbose: bool = True,
             **kwargs: Any,
     ) -> Dataset:
-        """Apply preprocessing method to all GazeDataFrames in Dataset.
+        """Apply preprocessing method to all Gazes in Dataset.
 
         Parameters
         ----------
@@ -727,7 +727,7 @@ class Dataset:
                 disable=disable_progressbar,
         ):
             gaze.detect(method, eye=eye, clear=clear, **kwargs)
-            # workaround until events are fully part of the GazeDataFrame
+            # workaround until events are fully part of the Gaze
             gaze.events.frame = dataset_files.add_fileinfo(
                 definition=self.definition,
                 df=gaze.events.frame,

@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test all GazeDataFrame functionality."""
+"""Test all Gaze functionality."""
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
@@ -39,7 +39,7 @@ import pymovements as pm
     ],
 )
 def test_gaze_dataframe_init(init_arg):
-    gaze_df = pm.GazeDataFrame(init_arg)
+    gaze_df = pm.Gaze(init_arg)
     assert isinstance(gaze_df.frame, pl.DataFrame)
 
 
@@ -79,7 +79,7 @@ def test_gaze_dataframe_init(init_arg):
     ],
 )
 def test_gaze_dataframe_velocity_columns(init_df, velocity_columns):
-    gaze_df = pm.GazeDataFrame(init_df, velocity_columns=velocity_columns)
+    gaze_df = pm.Gaze(init_df, velocity_columns=velocity_columns)
 
     assert 'velocity' in gaze_df.columns
 
@@ -120,7 +120,7 @@ def test_gaze_dataframe_velocity_columns(init_df, velocity_columns):
     ],
 )
 def test_gaze_dataframe_pixel_position_columns(init_df, pixel_columns):
-    gaze_df = pm.GazeDataFrame(init_df, pixel_columns=pixel_columns)
+    gaze_df = pm.Gaze(init_df, pixel_columns=pixel_columns)
 
     assert 'pixel' in gaze_df.columns
 
@@ -161,13 +161,13 @@ def test_gaze_dataframe_pixel_position_columns(init_df, pixel_columns):
     ],
 )
 def test_gaze_dataframe_position_columns(init_df, position_columns):
-    gaze_df = pm.GazeDataFrame(init_df, position_columns=position_columns)
+    gaze_df = pm.Gaze(init_df, position_columns=position_columns)
 
     assert 'position' in gaze_df.columns
 
 
 def test_gaze_dataframe_copy_with_experiment():
-    gaze = pm.GazeDataFrame(
+    gaze = pm.Gaze(
         pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
         experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
         position_columns=['x', 'y'],
@@ -185,7 +185,7 @@ def test_gaze_dataframe_copy_with_experiment():
 
 
 def test_gaze_dataframe_copy_no_experiment():
-    gaze = pm.GazeDataFrame(
+    gaze = pm.Gaze(
         pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
         experiment=None,
         position_columns=['x', 'y'],
@@ -202,7 +202,7 @@ def test_gaze_dataframe_copy_no_experiment():
 
 
 def test_gaze_dataframe_split():
-    gaze = pm.GazeDataFrame(
+    gaze = pm.Gaze(
         pl.DataFrame(
             {
                 'x': [0, 1, 2, 3],
@@ -224,7 +224,7 @@ def test_gaze_dataframe_split():
 
 
 def test_gaze_dataframe_compute_event_properties_no_events():
-    gaze = pm.GazeDataFrame(
+    gaze = pm.Gaze(
         pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64, 'trial_id': pl.Int8}),
         position_columns=['x', 'y'],
         trial_columns=['trial_id'],

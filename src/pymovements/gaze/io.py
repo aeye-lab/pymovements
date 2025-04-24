@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Functionality to load GazeDataFrame from a csv file."""
+"""Functionality to load Gaze from a csv file."""
 from __future__ import annotations
 
 import math
@@ -28,7 +28,7 @@ import polars as pl
 
 from pymovements.gaze._utils.parsing import parse_eyelink
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.gaze import GazeDataFrame
+from pymovements.gaze.gaze import Gaze
 
 
 def from_csv(
@@ -48,8 +48,8 @@ def from_csv(
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, type] | None = None,
         **read_csv_kwargs: Any,
-) -> GazeDataFrame:
-    """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
+) -> Gaze:
+    """Initialize a :py:class:`pymovements.gaze.Gaze`.
 
     Parameters
     ----------
@@ -108,7 +108,7 @@ def from_csv(
 
     Returns
     -------
-    GazeDataFrame
+    Gaze
         The gaze data frame read from the csv file.
 
     Notes
@@ -153,7 +153,7 @@ def from_csv(
     │ 9    ┆ 0          ┆ 0          │
     └──────┴────────────┴────────────┘
 
-    We can now load the data into a ``GazeDataFrame`` by specyfing the experimental setting
+    We can now load the data into a ``Gaze`` by specyfing the experimental setting
     and the names of the pixel position columns. We can specify a custom separator for the csv
     file by passing it as a keyword argument to :py:func:`polars.read_csv`:
 
@@ -257,7 +257,7 @@ def from_csv(
         ])
 
     # Create gaze data frame.
-    gaze_df = GazeDataFrame(
+    gaze_df = Gaze(
         gaze_data,
         experiment=experiment,
         trial_columns=trial_columns,
@@ -284,8 +284,8 @@ def from_asc(
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, Any] | None = None,
         encoding: str | None = None,
-) -> GazeDataFrame:
-    """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
+) -> Gaze:
+    """Initialize a :py:class:`pymovements.gaze.Gaze`.
 
     Parameters
     ----------
@@ -317,13 +317,13 @@ def from_asc(
 
     Returns
     -------
-    GazeDataFrame
+    Gaze
         The gaze data frame read from the asc file.
 
     Examples
     --------
     Let's assume we have an EyeLink asc file stored at `tests/files/eyelink_monocular_example.asc`.
-    We can then load the data into a ``GazeDataFrame``:
+    We can then load the data into a ``Gaze``:
 
     >>> from pymovements.gaze.io import from_asc
     >>> gaze = from_asc(file='tests/files/eyelink_monocular_example.asc')
@@ -382,7 +382,7 @@ def from_asc(
     experiment = _fill_experiment_from_parsing_metadata(experiment, metadata)
 
     # Create gaze data frame.
-    gaze_df = GazeDataFrame(
+    gaze_df = Gaze(
         gaze_data,
         experiment=experiment,
         trial_columns=trial_columns,
@@ -403,8 +403,8 @@ def from_ipc(
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, type] | None = None,
         **read_ipc_kwargs: Any,
-) -> GazeDataFrame:
-    """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
+) -> Gaze:
+    """Initialize a :py:class:`pymovements.gaze.Gaze`.
 
     Parameters
     ----------
@@ -432,13 +432,13 @@ def from_ipc(
 
     Returns
     -------
-    GazeDataFrame
+    Gaze
         The gaze data frame read from the ipc file.
 
     Examples
     --------
     Let's assume we have an IPC file stored at `tests/files/monocular_example.feather`.
-    We can then load the data into a ``GazeDataFrame``:
+    We can then load the data into a ``Gaze``:
 
     >>> from pymovements.gaze.io import from_ipc
     >>> gaze = from_ipc(file='tests/files/monocular_example.feather')
@@ -488,7 +488,7 @@ def from_ipc(
         ])
 
     # Create gaze data frame.
-    gaze_df = GazeDataFrame(
+    gaze_df = Gaze(
         gaze_data,
         experiment=experiment,
         trial_columns=trial_columns,

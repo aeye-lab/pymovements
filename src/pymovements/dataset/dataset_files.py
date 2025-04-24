@@ -33,7 +33,7 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events import EventDataFrame
 from pymovements.events.precomputed import PrecomputedEventDataFrame
-from pymovements.gaze.gaze import GazeDataFrame
+from pymovements.gaze.gaze import Gaze
 from pymovements.gaze.io import from_asc
 from pymovements.gaze.io import from_csv
 from pymovements.gaze.io import from_ipc
@@ -205,7 +205,7 @@ def load_gaze_files(
         preprocessed: bool = False,
         preprocessed_dirname: str | None = None,
         extension: str = 'feather',
-) -> list[GazeDataFrame]:
+) -> list[Gaze]:
     """Load all available gaze data files.
 
     Parameters
@@ -231,7 +231,7 @@ def load_gaze_files(
 
     Returns
     -------
-    list[GazeDataFrame]
+    list[Gaze]
         Returns self, useful for method cascading.
 
     Raises
@@ -241,7 +241,7 @@ def load_gaze_files(
     RuntimeError
         If file type of gaze file is not supported.
     """
-    gaze_dfs: list[GazeDataFrame] = []
+    gaze_dfs: list[Gaze] = []
 
     # Read gaze files from fileinfo attribute.
     for fileinfo_row in tqdm(fileinfo.to_dicts()):
@@ -272,8 +272,8 @@ def load_gaze_file(
         definition: DatasetDefinition,
         preprocessed: bool = False,
         custom_read_kwargs: dict[str, Any] | None = None,
-) -> GazeDataFrame:
-    """Load a gaze data file as GazeDataFrame.
+) -> Gaze:
+    """Load a gaze data file as Gaze.
 
     Parameters
     ----------
@@ -291,8 +291,8 @@ def load_gaze_file(
 
     Returns
     -------
-    GazeDataFrame
-        The resulting GazeDataFrame
+    Gaze
+        The resulting Gaze
 
     Raises
     ------
@@ -623,7 +623,7 @@ def save_events(
 
 
 def save_preprocessed(
-        gaze: list[GazeDataFrame],
+        gaze: list[Gaze],
         fileinfo: pl.DataFrame,
         paths: DatasetPaths,
         preprocessed_dirname: str | None = None,
@@ -637,7 +637,7 @@ def save_preprocessed(
 
     Parameters
     ----------
-    gaze: list[GazeDataFrame]
+    gaze: list[Gaze]
         The gaze dataframes to save.
     fileinfo: pl.DataFrame
         A dataframe holding file information.

@@ -28,7 +28,7 @@ import pytest
 from matplotlib import figure
 
 from pymovements.gaze import Experiment
-from pymovements.gaze.gaze import GazeDataFrame
+from pymovements.gaze.gaze import Gaze
 from pymovements.plotting import heatmap
 
 
@@ -56,8 +56,8 @@ def args_fixture(experiment_fixture, request):
         },
     )
 
-    # Init a GazeDataFrame
-    gdf = GazeDataFrame(
+    # Init a Gaze
+    gdf = Gaze(
         data=df,
         experiment=experiment_fixture,
         pixel_columns=pixel_columns,
@@ -208,7 +208,7 @@ def test_heatmap_no_experiment_property():
         },
     )
 
-    gdf = GazeDataFrame(data=df, pixel_columns=['x_pix', 'y_pix'], experiment=None)
+    gdf = Gaze(data=df, pixel_columns=['x_pix', 'y_pix'], experiment=None)
 
     with pytest.raises(ValueError):
         heatmap(gdf, show=False)

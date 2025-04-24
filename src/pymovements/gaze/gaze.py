@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Module for the GazeDataFrame."""
+"""Module for the Gaze."""
 from __future__ import annotations
 
 import inspect
@@ -38,7 +38,7 @@ from pymovements.gaze.experiment import Experiment
 from pymovements.utils.checks import check_is_mutual_exclusive
 
 
-class GazeDataFrame:
+class Gaze:
     """A DataFrame for gaze time series data.
 
     Each row is a sample at a specific timestep.
@@ -143,10 +143,10 @@ class GazeDataFrame:
     │ 1002 ┆ 0.3 ┆ 0.3 │
     └──────┴─────┴─────┘
 
-    We can now initialize our ``GazeDataFrame`` by specyfing the names of the pixel position
+    We can now initialize our ``Gaze`` by specyfing the names of the pixel position
     columns, the timestamp column and the unit of the timestamps.
 
-    >>> gaze = GazeDataFrame(data=df, pixel_columns=['x', 'y'], time_column='t', time_unit='ms')
+    >>> gaze = Gaze(data=df, pixel_columns=['x', 'y'], time_column='t', time_unit='ms')
     >>> gaze
     shape: (3, 2)
     ┌──────┬────────────┐
@@ -177,7 +177,7 @@ class GazeDataFrame:
     └─────┴─────┘
 
     >>> experiment = Experiment(1024, 768, 38, 30, 60, 'center', sampling_rate=100)
-    >>> gaze = GazeDataFrame(data=df_no_time, experiment=experiment, pixel_columns=['x', 'y'])
+    >>> gaze = Gaze(data=df_no_time, experiment=experiment, pixel_columns=['x', 'y'])
     >>> gaze
     Experiment(screen=Screen(width_px=1024, height_px=768, width_cm=38, height_cm=30,
      distance_cm=60, origin='center'), eyetracker=EyeTracker(sampling_rate=100, left=None,
@@ -264,7 +264,7 @@ class GazeDataFrame:
             function: str,
             **kwargs: Any,
     ) -> None:
-        """Apply preprocessing method to GazeDataFrame.
+        """Apply preprocessing method to Gaze.
 
         Parameters
         ----------
@@ -280,8 +280,8 @@ class GazeDataFrame:
         else:
             raise ValueError(f"unsupported method '{function}'")
 
-    def split(self, by: Sequence[str]) -> list[GazeDataFrame]:
-        """Split the GazeDataFrame into multiple frames based on specified column(s).
+    def split(self, by: Sequence[str]) -> list[Gaze]:
+        """Split the Gaze into multiple frames based on specified column(s).
 
         Parameters
         ----------
@@ -292,12 +292,12 @@ class GazeDataFrame:
 
         Returns
         -------
-        list[GazeDataFrame]
-            A list of new GazeDataFrame instances, each containing a partition of the
+        list[Gaze]
+            A list of new Gaze instances, each containing a partition of the
             original data with all metadata and configurations preserved.
         """
         return [
-            GazeDataFrame(
+            Gaze(
                 new_frame,
                 experiment=self.experiment,
                 trial_columns=self.trial_columns,
@@ -498,7 +498,7 @@ class GazeDataFrame:
     ) -> None:
         """Clip gaze signal values.
 
-        This method requires a properly initialized :py:attr:`~.GazeDataFrame.experiment` attribute.
+        This method requires a properly initialized :py:attr:`~.Gaze.experiment` attribute.
 
         After success, the gaze dataframe is clipped.
 
@@ -533,7 +533,7 @@ class GazeDataFrame:
     def pix2deg(self) -> None:
         """Compute gaze positions in degrees of visual angle from pixel position coordinates.
 
-        This method requires a properly initialized :py:attr:`~.GazeDataFrame.experiment` attribute.
+        This method requires a properly initialized :py:attr:`~.Gaze.experiment` attribute.
 
         After success, the gaze dataframe is extended by the resulting dva position columns.
 
@@ -553,7 +553,7 @@ class GazeDataFrame:
     ) -> None:
         """Compute gaze positions in pixel position coordinates from degrees of visual angle.
 
-        This method requires a properly initialized :py:attr:`~.GazeDataFrame.experiment` attribute.
+        This method requires a properly initialized :py:attr:`~.Gaze.experiment` attribute.
 
         After success, the gaze dataframe is extended by the resulting dva position columns.
 
@@ -589,7 +589,7 @@ class GazeDataFrame:
     ) -> None:
         """Compute gaze acceleration in dva/s^2 from dva position coordinates.
 
-        This method requires a properly initialized :py:attr:`~.GazeDataFrame.experiment` attribute.
+        This method requires a properly initialized :py:attr:`~.Gaze.experiment` attribute.
 
         After success, the gaze dataframe is extended by the resulting velocity columns.
 
@@ -617,7 +617,7 @@ class GazeDataFrame:
     ) -> None:
         """Compute gaze velocity in dva/s from dva position coordinates.
 
-        This method requires a properly initialized :py:attr:`~.GazeDataFrame.experiment` attribute.
+        This method requires a properly initialized :py:attr:`~.Gaze.experiment` attribute.
 
         After success, the gaze dataframe is extended by the resulting velocity columns.
 
@@ -663,14 +663,14 @@ class GazeDataFrame:
 
         Examples
         --------
-        Lets create an example GazeDataFrame of 1000Hz with a time column and a position column.
-        Please note that time is always stored in milliseconds in the GazeDataFrame.
+        Lets create an example Gaze of 1000Hz with a time column and a position column.
+        Please note that time is always stored in milliseconds in the Gaze.
         >>> df = pl.DataFrame({
         ...     'time': [0, 1, 2, 3, 4],
         ...     'x': [1, 2, 3, 4, 5],
         ...     'y': [1, 2, 3, 4, 5],
         ... })
-        >>> gaze = GazeDataFrame(data=df, time_column='time', pixel_columns=['x', 'y'])
+        >>> gaze = Gaze(data=df, time_column='time', pixel_columns=['x', 'y'])
         >>> gaze.frame
         shape: (5, 2)
         ┌──────┬───────────┐
@@ -685,7 +685,7 @@ class GazeDataFrame:
         │ 4    ┆ [5, 5]    │
         └──────┴───────────┘
 
-        We can now upsample the GazeDataFrame to 2000Hz with interpolating the values in
+        We can now upsample the Gaze to 2000Hz with interpolating the values in
         the pixel column.
         >>> gaze.resample(
         ...     resampling_rate=2000,
@@ -710,7 +710,7 @@ class GazeDataFrame:
         │ 4.0  ┆ [5.0, 5.0] │
         └──────┴────────────┘
 
-        Downsample the GazeDataFrame to 500Hz results in the following DataFrame.
+        Downsample the Gaze to 500Hz results in the following DataFrame.
         >>> gaze.resample(resampling_rate=500)
         >>> gaze.frame
         shape: (3, 2)
@@ -895,7 +895,7 @@ class GazeDataFrame:
         """Calculate event properties for given events.
 
         The calculated event properties are added as columns to
-        :py:attr:`~pymovements.gaze.GazeDataFrame.events`.
+        :py:attr:`~pymovements.gaze.Gaze.events`.
 
         Parameters
         ----------
@@ -944,7 +944,7 @@ class GazeDataFrame:
     ) -> pl.DataFrame:
         """Calculate eye movement measure for gaze data samples.
 
-        If :py:class:``GazeDataFrame`` has :py:attr:``trial_columns``, measures will be grouped by
+        If :py:class:``Gaze`` has :py:attr:``trial_columns``, measures will be grouped by
         trials.
 
         Parameters
@@ -961,7 +961,7 @@ class GazeDataFrame:
 
         Examples
         --------
-        Let's initialize an example GazeDataFrame first:
+        Let's initialize an example Gaze first:
         >>> gaze = pm.gaze.from_numpy(
         ...     distance=np.concatenate([np.zeros(40), np.full(10, np.nan), np.ones(50)]),
         ... )
@@ -1205,15 +1205,15 @@ class GazeDataFrame:
                 ],
             ).drop(input_col)
 
-    def clone(self) -> GazeDataFrame:
-        """Return a copy of the GazeDataFrame.
+    def clone(self) -> Gaze:
+        """Return a copy of the Gaze.
 
         Returns
         -------
-        GazeDataFrame
-            A copy of the GazeDataFrame.
+        Gaze
+            A copy of the Gaze.
         """
-        gaze = GazeDataFrame(
+        gaze = Gaze(
             data=self.frame.clone(),
             experiment=deepcopy(self.experiment),
         )
@@ -1401,7 +1401,7 @@ class GazeDataFrame:
         eye_components: tuple[int, int] | None
             The eye components to be used for filling event detection keyword arguments.
         **kwargs: Any
-            The source keyword arguments passed to the `GazeDataFrame.detect()` method.
+            The source keyword arguments passed to the `Gaze.detect()` method.
 
         Returns
         -------
@@ -1593,14 +1593,14 @@ class GazeDataFrame:
                 )
 
     def __str__(self) -> str:
-        """Return string representation of GazeDataFrame."""
+        """Return string representation of Gaze."""
         if self.experiment is None:
             return self.frame.__str__()
 
         return self.experiment.__str__() + '\n' + self.frame.__str__()
 
     def __repr__(self) -> str:
-        """Return string representation of GazeDataFrame."""
+        """Return string representation of Gaze."""
         return self.__str__()
 
 

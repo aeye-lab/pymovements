@@ -27,7 +27,7 @@ import matplotlib.pyplot as plt
 import matplotlib.scale
 import numpy as np
 
-from pymovements.gaze.gaze import GazeDataFrame
+from pymovements.gaze.gaze import Gaze
 from pymovements.utils.plotting import draw_line_data
 from pymovements.utils.plotting import LinearSegmentedColormapType
 from pymovements.utils.plotting import setup_matplotlib
@@ -41,7 +41,7 @@ if 'pytest' in sys.modules:  # pragma: no cover
 
 
 def traceplot(
-        gaze: GazeDataFrame,
+        gaze: Gaze,
         position_column: str = 'pixel',
         cval: np.ndarray | None = None,  # pragma: no cover
         cmap: matplotlib.colors.Colormap | None = None,
@@ -63,8 +63,8 @@ def traceplot(
 
     Parameters
     ----------
-    gaze: GazeDataFrame
-        The GazeDataFrame to plot.
+    gaze: Gaze
+        The Gaze to plot.
     position_column: str
         The column name of the x and y position data (default: 'pixel')
     cval: np.ndarray | None

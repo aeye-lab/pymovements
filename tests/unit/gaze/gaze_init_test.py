@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test GazeDataFrame initialization."""
+"""Test Gaze initialization."""
 import numpy as np
 import polars as pl
 import pytest
@@ -995,7 +995,7 @@ import pymovements as pm
     ],
 )
 def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, expected_n_components):
-    gaze = pm.GazeDataFrame(**init_kwargs)
+    gaze = pm.Gaze(**init_kwargs)
     assert_frame_equal(gaze.frame, expected_frame)
     assert gaze.n_components == expected_n_components
 
@@ -1054,7 +1054,7 @@ def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, exp
     ],
 )
 def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_trial_columns):
-    gaze = pm.GazeDataFrame(**init_kwargs)
+    gaze = pm.Gaze(**init_kwargs)
     assert gaze.trial_columns == expected_trial_columns
 
 
@@ -1592,7 +1592,7 @@ def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_tr
 )
 def test_gaze_dataframe_init_exceptions(init_kwargs, exception, exception_msg):
     with pytest.raises(exception) as excinfo:
-        pm.GazeDataFrame(**init_kwargs)
+        pm.Gaze(**init_kwargs)
 
     msg, = excinfo.value.args
     assert msg == exception_msg
@@ -1604,10 +1604,10 @@ def test_gaze_copy_init_has_same_n_components():
     Refers to issue #514.
     """
     df_orig = pl.from_numpy(np.zeros((3, 1000)), orient='col', schema=['t', 'x', 'y'])
-    gaze = pm.GazeDataFrame(df_orig, position_columns=['x', 'y'], time_column='t')
+    gaze = pm.Gaze(df_orig, position_columns=['x', 'y'], time_column='t')
 
     df_copy = gaze.frame.clone()
-    gaze_copy = pm.GazeDataFrame(df_copy)
+    gaze_copy = pm.Gaze(df_copy)
 
     assert gaze.n_components == gaze_copy.n_components
 
@@ -1667,7 +1667,7 @@ def test_gaze_init_events(events, init_kwargs):
     else:
         expected_events = events.frame
 
-    gaze = pm.GazeDataFrame(events=events, **init_kwargs)
+    gaze = pm.Gaze(events=events, **init_kwargs)
 
     assert_frame_equal(gaze.events.frame, expected_events)
     # We don't want the events point to the same reference.

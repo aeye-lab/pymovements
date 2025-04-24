@@ -35,7 +35,7 @@ from pymovements import DatasetLibrary
 from pymovements import DatasetPaths
 from pymovements import events
 from pymovements import Experiment
-from pymovements import GazeDataFrame
+from pymovements import Gaze
 from pymovements.exceptions import InvalidProperty
 
 
@@ -293,9 +293,9 @@ def mock_toy(
 
     create_raw_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath / 'raw')
 
-    # Create GazeDataFrames for passing as ground truth
+    # Create Gazes for passing as ground truth
     gaze_dfs = [
-        GazeDataFrame(gaze_df, pixel_columns=pixel_columns)
+        Gaze(gaze_df, pixel_columns=pixel_columns)
         for gaze_df in gaze_dfs
     ]
 
@@ -320,8 +320,8 @@ def mock_toy(
             gaze_data[column] = np.zeros(1000)
             gaze_schema[column] = pl.Float64
 
-        # Create GazeDataFrames for passing as ground truth
-        gaze_df = GazeDataFrame(
+        # Create Gazes for passing as ground truth
+        gaze_df = Gaze(
             pl.from_dict(gaze_data, schema=gaze_schema),
             pixel_columns=pixel_columns,
             position_columns=position_columns,

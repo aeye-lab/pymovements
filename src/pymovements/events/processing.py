@@ -128,7 +128,7 @@ class EventGazeProcessor:
     def process(
             self,
             events: EventDataFrame,
-            gaze: pm.GazeDataFrame,
+            gaze: pm.Gaze,
             identifiers: str | list[str],
             name: str | None = None,
     ) -> pl.DataFrame:
@@ -138,7 +138,7 @@ class EventGazeProcessor:
         ----------
         events: EventDataFrame
             Event data to process event properties from.
-        gaze: pm.GazeDataFrame
+        gaze: pm.Gaze
             Gaze data to process event properties from.
         identifiers: str | list[str]
             Column names to join on events and gaze dataframes.
