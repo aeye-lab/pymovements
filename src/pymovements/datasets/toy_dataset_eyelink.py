@@ -46,6 +46,9 @@ class ToyDatasetEyeLink(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -123,6 +126,8 @@ class ToyDatasetEyeLink(DatasetDefinition):
     # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'ToyDatasetEyeLink'
+
+    long_name: str = 'pymovements Toy Dataset EyeLink'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

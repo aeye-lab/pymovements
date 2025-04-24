@@ -1,5 +1,7 @@
 name: "ToyDatasetEyeLink"
 
+long_name: "pymovements Toy Dataset EyeLink"
+
 has_files:
   gaze: true
   precomputed_events: false
