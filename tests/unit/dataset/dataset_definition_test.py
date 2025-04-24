@@ -372,6 +372,12 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
     ('resources', 'expected_has_resources'),
     [
         pytest.param(
+            None,
+            False,
+            id='none',
+        ),
+
+        pytest.param(
             {},
             False,
             id='empty_resources_dict',
@@ -560,3 +566,10 @@ def test_dataset_definition_has_resources_indexable(resources, expected_resource
 
     for key, value in expected_resources.items():
         assert definition.has_resources[key] == value
+
+
+def test_dataset_definition_not_equal():
+    definition1 = DatasetDefinition(resources={'gaze': [{'resource': 'foo'}]})
+    definition2 = DatasetDefinition(resources={})
+
+    assert definition1.has_resources != definition2.has_resources
