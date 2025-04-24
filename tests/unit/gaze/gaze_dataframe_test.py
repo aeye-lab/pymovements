@@ -52,6 +52,10 @@ def test_gaze_issubclass_gaze_df():
     assert issubclass(Gaze, GazeDataFrame)
 
 
+def test_gaze_df_issubclass_gaze_df():
+    assert issubclass(GazeDataFrame, GazeDataFrame)
+
+
 def test_gaze_subclass_issubclass_gaze_df(gaze_subclass):
     assert issubclass(gaze_subclass, GazeDataFrame)
 
