@@ -135,6 +135,7 @@ class SBSAT(DatasetDefinition):
             'gaze': True,
             'precomputed_events': True,
             'precomputed_reading_measures': False,
+            'stimulus': False,   # TODO
         },
     )
     mirrors: dict[str, list[str]] = field(
@@ -142,6 +143,9 @@ class SBSAT(DatasetDefinition):
             {
                 'gaze': ['https://osf.io/download/'],
                 'precomputed_events': [
+                    'https://raw.githubusercontent.com/ahnchive/SB-SAT/master/fixation/',
+                ],
+                'precomputed_aois': (
                     'https://raw.githubusercontent.com/ahnchive/SB-SAT/master/fixation/',
                 ],
             },
@@ -167,7 +171,8 @@ class SBSAT(DatasetDefinition):
     )
     extract: dict[str, bool] = field(
         default_factory=lambda: {
-            'gaze': True, 'precomputed_events': False,
+            'gaze': True,
+            'precomputed_events': False,
         },
     )
 

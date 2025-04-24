@@ -38,6 +38,10 @@ from pymovements.gaze.io import from_asc
 from pymovements.gaze.io import from_csv
 from pymovements.gaze.io import from_ipc
 from pymovements.reading_measures import ReadingMeasures
+from pymovements.stimulus import image
+from pymovements.stimulus import text
+from pymovements.utils.paths import match_filepaths
+from pymovements.utils.strings import curly_to_regex
 
 
 def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataFrame:
@@ -82,6 +86,24 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
                 for fileinfo_key, fileinfo_dtype in items
             ])
         _fileinfo_dicts['gaze'] = fileinfo_df
+
+    if definition.has_files['stimulus']:
+        fileinfo_dicts = match_filepaths(
+            path=paths.stimulus,
+            regex=curly_to_regex(definition.filename_format['stimulus']),
+            relative=True,
+        )
+        if not fileinfo_dicts:
+            raise RuntimeError(f'no matching files found in {paths.stimulus}')
+        fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
+        fileinfo_df = fileinfo_df.sort(by='filepath')
+        if definition.filename_format_schema_overrides['stimulus']:
+            items = definition.filename_format_schema_overrides['stimulus'].items()
+            fileinfo_df = fileinfo_df.with_columns([
+                pl.col(fileinfo_key).cast(fileinfo_dtype)
+                for fileinfo_key, fileinfo_dtype in items
+            ])
+        _fileinfo_dicts['stimulus'] = fileinfo_df
 
     if definition.has_files['precomputed_events']:
         fileinfo_dicts = match_filepaths(
@@ -515,6 +537,78 @@ def load_precomputed_event_file(
         )
 
     return PrecomputedEventDataFrame(data=precomputed_event_df)
+
+
+def load_stimulus_file(
+        data_path: str | Path,
+        custom_read_kwargs: dict[str, Any] | None = None,
+) -> image.ImageStimulus | text.TextStimulus:
+    """Load precomputed events from files.
+
+    Parameters
+    ----------
+    data_path:  str | Path
+        Path to file to be read.
+    custom_read_kwargs: dict[str, Any] | None
+        Custom read keyword arguments for polars. (default: None)
+
+    Returns
+    -------
+    image.ImageStimulus | text.TextStimulus
+        Returns the image / text stimulus file.
+    """
+    data_path = Path(data_path)
+    if custom_read_kwargs is None:
+        custom_read_kwargs = {}
+
+    csv_extensions = {'.csv', '.tsv', '.txt', '.ias'}
+    excel_extensions = {'.xlsx'}
+    text_valid_extensions = csv_extensions.union(excel_extensions)
+    if data_path.suffix in text_valid_extensions:
+        stimulus_df = text.from_file(
+            data_path,
+            custom_read_kwargs=custom_read_kwargs,
+        )
+    else:
+        raise ValueError(
+            f'unsupported file format "{data_path.suffix}". '
+            f'Supported formats are: {", ".join(sorted(text_valid_extensions))}',
+        )
+
+    return stimulus_df
+
+
+def load_stimulus(
+        definition: DatasetDefinition,
+        fileinfo: pl.DataFrame,
+        paths: DatasetPaths,
+) -> list[ImageStimulus | TextStimulus]:
+    """Load stimulus for dataset.
+
+    Parameters
+    ----------
+    definition:  DatasetDefinition
+        Dataset definition to load stimulus files.
+    fileinfo: pl.DataFrame
+        Information about the files.
+    paths: DatasetPaths
+        Adjustable paths to extract datasets.
+
+    Returns
+    -------
+    list[ImageStimulus | TextStimulus]
+        Return list of stimulus dataframes.
+    """
+    stimulus_files = []
+    for filepath in fileinfo.to_dicts():
+        data_path = paths.stimulus / Path(filepath['filepath'])
+        stimulus_files.append(
+            load_stimulus_file(
+                data_path,
+                definition.custom_read_kwargs['stimulus'],
+            ),
+        )
+    return stimulus_files
 
 
 def add_fileinfo(

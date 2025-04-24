@@ -37,7 +37,9 @@ from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events import EventDataFrame
 from pymovements.events.precomputed import PrecomputedEventDataFrame
 from pymovements.gaze import GazeDataFrame
-from pymovements.reading_measures import ReadingMeasures
+from pymovements.reading_measures.frame import ReadingMeasures
+from pymovements.stimulus.image import ImageStimulus
+from pymovements.stimulus.text import TextStimulus
 
 
 class Dataset:
@@ -62,6 +64,7 @@ class Dataset:
         self.fileinfo: pl.DataFrame = pl.DataFrame()
         self.gaze: list[GazeDataFrame] = []
         self.events: list[EventDataFrame] = []
+        self.stimulus: list[ImageStimulus | TextStimulus] = []
         self.precomputed_events: list[PrecomputedEventDataFrame] = []
         self.precomputed_reading_measures: list[ReadingMeasures] = []
 
@@ -148,6 +151,9 @@ class Dataset:
         if self.definition.has_files['precomputed_events']:
             self.load_precomputed_events()
 
+        if self.definition.has_files['stimulus']:
+            self.load_stimulus_files()
+
         # Reading measures files precomuted by authors of the dataset
         if self.definition.has_files['precomputed_reading_measures']:
             self.load_precomputed_reading_measures()
@@ -227,6 +233,14 @@ class Dataset:
         )
 
         return self
+
+    def load_stimulus_files(self) -> None:
+        """Load stimulus files."""
+        self._check_fileinfo()
+        self.stimulus = dataset_files.load_stimulus(
+            self.definition,
+            self.fileinfo['stimulus'],
+        )
 
     def load_precomputed_events(self) -> None:
         """Load precomputed events."""

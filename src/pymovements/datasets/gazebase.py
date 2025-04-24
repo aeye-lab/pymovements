@@ -136,12 +136,14 @@ class GazeBase(DatasetDefinition):
             'gaze': True,
             'precomputed_events': False,
             'precomputed_reading_measures': False,
+            'stimulus': True,
         },
     )
 
     mirrors: dict[str, list[str]] = field(
         default_factory=lambda: {
             'gaze': ['https://figshare.com/ndownloader/files/'],
+            'stimulus': ['https://figshare.com/ndownloader/files/'],
         },
     )
 
@@ -154,10 +156,22 @@ class GazeBase(DatasetDefinition):
                     'md5': 'cb7eb895fb48f8661decf038ab998c9a',
                 },
             ],
+            'stimulus': [
+                {
+                    'resource': '27039812',
+                    'filename': 'GazeBase_v2_0.zip',
+                    'md5': 'cb7eb895fb48f8661decf038ab998c9a',
+                },
+            ],
         },
     )
 
-    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
+    extract: dict[str, bool] = field(
+        default_factory=lambda: {
+            'gaze': True,
+            'stimulus': True,
+        },
+    )
 
     experiment: Experiment = field(
         default_factory=lambda: Experiment(
