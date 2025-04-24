@@ -56,9 +56,6 @@ class GazeOnFaces(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
-
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
@@ -134,17 +131,11 @@ class GazeOnFaces(DatasetDefinition):
         },
     )
 
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda: {
-            'gaze': ['https://uncloud.univ-nantes.fr/index.php/s/'],
-        },
-    )
-
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
             'gaze': [
                 {
-                    'resource': '8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip',
+                    'resource': 'https://uncloud.univ-nantes.fr/index.php/s/8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip',  # noqa: E501 # pylint: disable=line-too-long
                     'filename': 'gaze_csv.zip',
                     'md5': 'fe219f07c9253cd9aaee6bd50233c034',
                 },
