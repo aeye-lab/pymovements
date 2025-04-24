@@ -1,5 +1,7 @@
 name: SBSAT
 
+long_name: "Stony Brook SAT reading fixation dataset"
+
 has_files:
   gaze: true
   precomputed_events: true

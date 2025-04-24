@@ -45,6 +45,9 @@ class DIDEC(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -121,6 +124,8 @@ class DIDEC(DatasetDefinition):
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'DIDEC'
+
+    long_name: str = 'Dutch Image Description and Eye-tracking Corpus'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

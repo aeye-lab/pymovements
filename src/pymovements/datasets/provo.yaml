@@ -1,5 +1,7 @@
 name: "Provo"
 
+long_name: 'Provo Corpus'
+
 has_files:
   gaze: false
   precomputed_events: true

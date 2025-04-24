@@ -39,6 +39,12 @@ from pymovements import GazeDataFrame
 from pymovements.exceptions import InvalidProperty
 
 
+# pylint: disable=too-many-lines
+
+class _UNSET:
+    ...
+
+
 def create_raw_gaze_files_from_fileinfo(gaze_dfs, fileinfo, rootpath):
     rootpath.mkdir(parents=True, exist_ok=True)
 
@@ -111,18 +117,26 @@ def mock_toy(
         raw_fileformat,
         eyes,
         remote=False,
-        has_files={
+        has_files=_UNSET,
+        extract=_UNSET,
+        filename_format_schema_overrides=_UNSET,
+):
+    if has_files is _UNSET:
+        has_files = {
             'gaze': True,
             'precomputed_events': False,
             'precomputed_reading_measures': False,
-        },
-        extract={'gaze': True, 'precomputed_events': True},
-        filename_format_schema_overrides={
+        }
+
+    if extract is _UNSET:
+        extract = {'gaze': True, 'precomputed_events': True}
+
+    if filename_format_schema_overrides is _UNSET:
+        filename_format_schema_overrides = {
             'gaze': {'subject_id': pl.Int64},
             'precomputed_events': {'subject_id': pl.Int64},
             'precomputed_reading_measures': {'subject_id': pl.Int64},
-        },
-):
+        }
 
     if filename_format_schema_overrides['precomputed_events']:
         subject_ids = list(range(1, 21))
@@ -1625,6 +1639,16 @@ def test_velocity_columns(gaze_dataset_configuration):
             InvalidProperty,
             ('foo', 'invalid', 'valid', 'peak_velocity'),
             id='invalid_property',
+        ),
+
+        pytest.param(
+            {'event_properties': 'duration'},
+            ValueError,
+            (
+                'event properties already exist and cannot be recomputed',
+                'duration', 'Please remove them first',
+            ),
+            id='existing_column',
         ),
     ],
 )
