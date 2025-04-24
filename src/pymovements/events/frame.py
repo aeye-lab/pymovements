@@ -30,7 +30,6 @@ from tqdm import tqdm
 from pymovements.events.properties import duration
 from pymovements.stimulus.text import TextStimulus
 from pymovements.utils import checks
-from pymovements.utils.aois import get_aoi
 
 
 class EventDataFrame:
@@ -325,7 +324,7 @@ class EventDataFrame:
         """
         self.unnest()
         aois = [
-            get_aoi(aoi_dataframe, row, 'location_x', 'location_y')
+            aoi_dataframe.get_aoi(row=row, x_eye='location_x', y_eye='location_y')
             for row in tqdm(self.frame.iter_rows(named=True))
         ]
         aoi_df = pl.concat(aois)

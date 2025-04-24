@@ -45,6 +45,9 @@ class FakeNewsPerception(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -78,6 +81,8 @@ class FakeNewsPerception(DatasetDefinition):
     """
 
     name: str = 'FakeNewsPerception'
+
+    long_name: str = 'Fake News Perception Eye Tracking Corpus'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

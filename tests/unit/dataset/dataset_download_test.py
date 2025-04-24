@@ -949,7 +949,7 @@ def test_dataset_extract_remove_finished_true_gaze(
             recursive=True,
             remove_finished=True,
             remove_top_level=False,
-            resume=False,
+            resume=True,
             verbose=1,
         ),
     ])
@@ -979,7 +979,7 @@ def test_dataset_extract_rm(
             recursive=True,
             remove_finished=False,
             remove_top_level=True,
-            resume=False,
+            resume=True,
             verbose=1,
         ),
     ])
@@ -1009,7 +1009,7 @@ def test_dataset_extract_remove_finished_true_both(
             recursive=True,
             remove_finished=True,
             remove_top_level=False,
-            resume=False,
+            resume=True,
             verbose=1,
         ),
         mock.call(
@@ -1018,7 +1018,7 @@ def test_dataset_extract_remove_finished_true_both(
             recursive=True,
             remove_finished=True,
             remove_top_level=False,
-            resume=False,
+            resume=True,
             verbose=1,
         ),
     ])
@@ -1048,7 +1048,7 @@ def test_dataset_extract_remove_finished_true_precomputed(
             recursive=True,
             remove_finished=True,
             remove_top_level=False,
-            resume=False,
+            resume=True,
             verbose=1,
         ),
     ])
@@ -1078,7 +1078,7 @@ def test_dataset_extract_remove_finished_false_both(
             recursive=True,
             remove_finished=False,
             remove_top_level=True,
-            resume=False,
+            resume=True,
             verbose=1,
         ),
         mock.call(
@@ -1087,7 +1087,7 @@ def test_dataset_extract_remove_finished_false_both(
             recursive=True,
             remove_finished=False,
             remove_top_level=True,
-            resume=False,
+            resume=True,
             verbose=1,
         ),
     ])
@@ -1117,7 +1117,7 @@ def test_dataset_extract_remove_finished_false_gaze(
             recursive=True,
             remove_finished=False,
             remove_top_level=True,
-            resume=False,
+            resume=True,
             verbose=1,
         ),
     ])
@@ -1147,7 +1147,7 @@ def test_dataset_extract_remove_finished_false_precomputed(
             recursive=True,
             remove_finished=False,
             remove_top_level=True,
-            resume=False,
+            resume=True,
             verbose=1,
         ),
     ])
@@ -1332,7 +1332,8 @@ def test_public_dataset_registered_correct_attributes(tmp_path, dataset_definiti
     assert dataset.definition.resources == dataset_definition.resources
     assert dataset.definition.experiment == dataset_definition.experiment
     assert dataset.definition.filename_format == dataset_definition.filename_format
-    assert dataset.definition.filename_format_schema_overrides == dataset_definition.filename_format_schema_overrides  # noqa: E501 # pylint: disable=line-too-long
+    assert dataset.definition.filename_format_schema_overrides \
+        == dataset_definition.filename_format_schema_overrides
     assert dataset.definition.has_files == dataset_definition.has_files
 
 

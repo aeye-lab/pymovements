@@ -46,6 +46,9 @@ class ToyDatasetEyeLink(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -70,6 +73,12 @@ class ToyDatasetEyeLink(DatasetDefinition):
     filename_format_schema_overrides: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
+
+    trial_columns: list[str] | None
+            The name of the trial columns in the input data frame. If the list is empty or None,
+            the input data frame is assumed to contain only one trial. If the list is not empty,
+            the input data frame is assumed to contain multiple trials and the transformation
+            methods will be applied to each trial separately.
 
     time_column: str
         The name of the timestamp column in the input data frame. This column will be renamed to
@@ -114,6 +123,8 @@ class ToyDatasetEyeLink(DatasetDefinition):
     # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'ToyDatasetEyeLink'
+
+    long_name: str = 'pymovements Toy Dataset EyeLink'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
@@ -171,6 +182,10 @@ class ToyDatasetEyeLink(DatasetDefinition):
         },
     )
 
+    trial_columns: list[str] | None = field(
+        default_factory=lambda: ['task', 'trial_id'],
+    )
+
     time_column: str = 'time'
 
     time_unit: str = 'ms'
@@ -226,6 +241,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
                     'point_id': pl.Int64,
                     'task': pl.Utf8,
                 },
+                'encoding': 'ascii',
             },
         },
     )

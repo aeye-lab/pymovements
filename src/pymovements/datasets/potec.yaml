@@ -1,5 +1,7 @@
 name: "PoTeC"
 
+long_name: "Potsdam Textbook Corpus"
+
 has_files:
   gaze: true
   precomputed_events: false

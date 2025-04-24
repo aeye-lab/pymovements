@@ -1,5 +1,7 @@
 name: "ToyDataset"
 
+long_name: "pymovements Toy Dataset"
+
 has_files:
   gaze: true
   precomputed_events: false

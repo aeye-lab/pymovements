@@ -1,5 +1,7 @@
 name: "DAEMONS"
 
+long_name: 'Potsdam data set of eye movement on natural scenes'
+
 has_files:
   gaze: false
   precomputed_events: true

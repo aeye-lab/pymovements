@@ -1,5 +1,7 @@
 name: "UCL"
 
+long_name: "University College London corpus"
+
 has_files:
   gaze: false
   precomputed_events: true

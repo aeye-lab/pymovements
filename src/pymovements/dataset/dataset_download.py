@@ -20,15 +20,20 @@
 """Provides private functions for downloading and extracting datasets."""
 from __future__ import annotations
 
+import logging
 import shutil
 from pathlib import Path
 from urllib.error import URLError
 from warnings import warn
 
 from pymovements.dataset._utils._archives import extract_archive
+from pymovements.dataset._utils._downloads import download_file
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
-from pymovements.utils.downloads import download_file
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def download_dataset(
@@ -37,7 +42,7 @@ def download_dataset(
         *,
         extract: bool = True,
         remove_finished: bool = False,
-        resume: bool = False,
+        resume: bool = True,
         verbose: bool = True,
 ) -> None:
     """Download dataset resources.
@@ -65,7 +70,7 @@ def download_dataset(
         Remove archive files after extraction. (default: False)
     resume: bool
         Resume previous extraction by skipping existing files.
-        Checks for correct size of existing files but not integrity. (default: False)
+        Checks for correct size of existing files but not integrity. (default: True)
     verbose: bool
         If True, show progress of download and print status messages for integrity checking and
         file extraction. (default: True)
@@ -77,6 +82,15 @@ def download_dataset(
     RuntimeError
         If downloading a resource failed for all given mirrors.
     """
+    disclaimer_text = f"""\
+You are downloading the {definition.long_name}. Please be aware that pymovements does not
+host or distribute any dataset resources and only provides a convenient interface to
+download the public dataset resources that were published by their respective authors.
+
+Please cite the referenced publication if you intend to use the dataset in your research.
+"""
+    logger.info(disclaimer_text)
+
     if definition.has_files['gaze']:
         if not definition.mirrors or not definition.mirrors['gaze']:
             mirrors = None
@@ -145,7 +159,7 @@ def extract_dataset(
         *,
         remove_finished: bool = False,
         remove_top_level: bool = True,
-        resume: bool = False,
+        resume: bool = True,
         verbose: int = 1,
 ) -> None:
     """Extract downloaded dataset archive files.
@@ -162,7 +176,7 @@ def extract_dataset(
         If ``True``, remove the top-level directory if it has only one child. (default: True)
     resume: bool
         Resume previous extraction by skipping existing files.
-        Checks for correct size of existing files but not integrity. (default: False)
+        Checks for correct size of existing files but not integrity. (default: True)
     verbose: int
         Verbosity levels: (1) Print messages for extracting each dataset resource without printing
         messages for recursive archives. (2) Print messages for extracting each dataset resource and
