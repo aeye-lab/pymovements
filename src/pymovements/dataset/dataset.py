@@ -743,7 +743,7 @@ class Dataset:
             name: str | None = None,
             verbose: bool = True,
     ) -> Dataset:
-        """Calculate an event property for and add it as a column to the event dataframe.
+        """Calculate an event property and add it as a column to the event dataframe.
 
         Parameters
         ----------
@@ -761,6 +761,8 @@ class Dataset:
             :py:mod:`pymovements.events` for an overview of supported properties.
         RuntimeError
             If specified event name ``name`` is missing from ``events``.
+        ValueError
+            If the computed property already exists in the event dataframe.
 
         Returns
         -------
