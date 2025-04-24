@@ -1003,7 +1003,10 @@ class Dataset:
         RuntimeError
             If downloading a resource failed for all given mirrors.
         """
-        dataset_name = self.definition.long_name if not None else self.definition.name
+        if self.definition.long_name is not None:
+            dataset_name = self.definition.long_name
+        else:
+            dataset_name = self.definition.name
 
         disclaimer_text = f"""\
         You are downloading the {dataset_name}. Please be aware that pymovements does not
