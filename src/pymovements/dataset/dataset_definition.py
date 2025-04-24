@@ -51,7 +51,7 @@ class _HasResourcesIndexer:
     :py:meth:`~pymovements.dataset.DatasetDefinition.resources`.
     """
 
-    def __init__(self) -> _HasResourcesIndexer:
+    def __init__(self) -> None:
         self._resources: _Resources = {}
 
     def set_resources(self, resources: _Resources) -> None:
