@@ -96,6 +96,7 @@ __all__ = [
     'from_numpy',
     'from_pandas',
     'Gaze',
+    'GazeDataFrame',
     'Screen',
     'transforms_numpy',
     'transforms',

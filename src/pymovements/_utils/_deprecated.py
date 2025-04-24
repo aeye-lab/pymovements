@@ -51,7 +51,12 @@ class DeprecatedClassMeta(type):
     """
 
     def __new__(
-            mcs: type[DeprecatedClassMeta], name: str, bases: tuple, classdict: dict, *args: Any, **kwargs: Any,
+            mcs: type[DeprecatedClassMeta],
+            name: str,
+            bases: tuple,
+            classdict: dict,
+            *args: Any,
+            **kwargs: Any,
     ) -> DeprecatedClassMeta:
         """Create new deprecated class."""
         alias = classdict.get('_DeprecatedClassMeta__alias')
@@ -106,7 +111,7 @@ class DeprecatedClassMeta(type):
 
         Provides implementation for isinstance().
         """
-        return any(cls.__subclasscheck__(c()) for c in (type(instance), instance.__class__))
+        return any(cls.__subclasscheck__(c) for c in (type(instance), instance.__class__))
 
     def __subclasscheck__(cls, subclass: Any) -> bool:
         """Check if is subclass of deprecated class.
