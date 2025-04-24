@@ -1004,7 +1004,7 @@ class Dataset:
             If downloading a resource failed for all given mirrors.
         """
         logger.info(self._disclaimer())
-        
+
         dataset_download.download_dataset(
             definition=self.definition,
             paths=self.paths,
