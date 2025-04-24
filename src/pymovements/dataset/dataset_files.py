@@ -33,7 +33,7 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events import EventDataFrame
 from pymovements.events.precomputed import PrecomputedEventDataFrame
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
+from pymovements.gaze.gaze import GazeDataFrame
 from pymovements.gaze.io import from_asc
 from pymovements.gaze.io import from_csv
 from pymovements.gaze.io import from_ipc

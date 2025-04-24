@@ -27,7 +27,7 @@ import matplotlib.pyplot as plt
 import matplotlib.scale
 import numpy as np
 
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
+from pymovements.gaze.gaze import GazeDataFrame
 from pymovements.utils.plotting import draw_line_data
 from pymovements.utils.plotting import LinearSegmentedColormapType
 from pymovements.utils.plotting import setup_matplotlib

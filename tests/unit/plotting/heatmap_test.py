@@ -28,7 +28,7 @@ import pytest
 from matplotlib import figure
 
 from pymovements.gaze import Experiment
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
+from pymovements.gaze.gaze import GazeDataFrame
 from pymovements.plotting import heatmap
 
 
