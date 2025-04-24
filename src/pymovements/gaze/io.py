@@ -257,7 +257,7 @@ def from_csv(
         ])
 
     # Create gaze data frame.
-    gaze_df = Gaze(
+    gaze = Gaze(
         gaze_data,
         experiment=experiment,
         trial_columns=trial_columns,
@@ -270,7 +270,7 @@ def from_csv(
         distance_column=distance_column,
         auto_column_detect=auto_column_detect,
     )
-    return gaze_df
+    return gaze
 
 
 def from_asc(
@@ -382,7 +382,7 @@ def from_asc(
     experiment = _fill_experiment_from_parsing_metadata(experiment, metadata)
 
     # Create gaze data frame.
-    gaze_df = Gaze(
+    gaze = Gaze(
         gaze_data,
         experiment=experiment,
         trial_columns=trial_columns,
@@ -390,8 +390,8 @@ def from_asc(
         time_unit='ms',
         pixel_columns=['x_pix', 'y_pix'],
     )
-    gaze_df._metadata = metadata  # pylint: disable=protected-access
-    return gaze_df
+    gaze._metadata = metadata  # pylint: disable=protected-access
+    return gaze
 
 
 def from_ipc(
@@ -488,12 +488,12 @@ def from_ipc(
         ])
 
     # Create gaze data frame.
-    gaze_df = Gaze(
+    gaze = Gaze(
         gaze_data,
         experiment=experiment,
         trial_columns=trial_columns,
     )
-    return gaze_df
+    return gaze
 
 
 def _fill_experiment_from_parsing_metadata(

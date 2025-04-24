@@ -39,8 +39,8 @@ import pymovements as pm
     ],
 )
 def test_gaze_dataframe_init(init_arg):
-    gaze_df = pm.Gaze(init_arg)
-    assert isinstance(gaze_df.frame, pl.DataFrame)
+    gaze = pm.Gaze(init_arg)
+    assert isinstance(gaze.frame, pl.DataFrame)
 
 
 @pytest.mark.parametrize(
@@ -79,9 +79,9 @@ def test_gaze_dataframe_init(init_arg):
     ],
 )
 def test_gaze_dataframe_velocity_columns(init_df, velocity_columns):
-    gaze_df = pm.Gaze(init_df, velocity_columns=velocity_columns)
+    gaze = pm.Gaze(init_df, velocity_columns=velocity_columns)
 
-    assert 'velocity' in gaze_df.columns
+    assert 'velocity' in gaze.columns
 
 
 @pytest.mark.parametrize(
@@ -120,9 +120,9 @@ def test_gaze_dataframe_velocity_columns(init_df, velocity_columns):
     ],
 )
 def test_gaze_dataframe_pixel_position_columns(init_df, pixel_columns):
-    gaze_df = pm.Gaze(init_df, pixel_columns=pixel_columns)
+    gaze = pm.Gaze(init_df, pixel_columns=pixel_columns)
 
-    assert 'pixel' in gaze_df.columns
+    assert 'pixel' in gaze.columns
 
 
 @pytest.mark.parametrize(
@@ -161,9 +161,9 @@ def test_gaze_dataframe_pixel_position_columns(init_df, pixel_columns):
     ],
 )
 def test_gaze_dataframe_position_columns(init_df, position_columns):
-    gaze_df = pm.Gaze(init_df, position_columns=position_columns)
+    gaze = pm.Gaze(init_df, position_columns=position_columns)
 
-    assert 'position' in gaze_df.columns
+    assert 'position' in gaze.columns
 
 
 def test_gaze_dataframe_copy_with_experiment():
@@ -216,7 +216,7 @@ def test_gaze_dataframe_split():
     )
 
     split_gaze = gaze.split('trial_id')
-    assert all(gaze_df.frame.n_unique('trial_id') == 1 for gaze_df in split_gaze)
+    assert all(gaze.frame.n_unique('trial_id') == 1 for gaze in split_gaze)
     assert len(split_gaze) == 3
     assert_frame_equal(gaze.frame.filter(pl.col('trial_id') == 0), split_gaze[0].frame)
     assert_frame_equal(gaze.frame.filter(pl.col('trial_id') == 1), split_gaze[1].frame)

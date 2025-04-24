@@ -57,14 +57,14 @@ def args_fixture(experiment_fixture, request):
     )
 
     # Init a Gaze
-    gdf = Gaze(
+    gaze = Gaze(
         data=df,
         experiment=experiment_fixture,
         pixel_columns=pixel_columns,
         position_columns=position_columns,
     )
 
-    return gdf, request.param
+    return gaze, request.param
 
 
 @pytest.mark.parametrize(
@@ -208,7 +208,7 @@ def test_heatmap_no_experiment_property():
         },
     )
 
-    gdf = Gaze(data=df, pixel_columns=['x_pix', 'y_pix'], experiment=None)
+    gaze = Gaze(data=df, pixel_columns=['x_pix', 'y_pix'], experiment=None)
 
     with pytest.raises(ValueError):
-        heatmap(gdf, show=False)
+        heatmap(gaze, show=False)

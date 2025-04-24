@@ -987,10 +987,10 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
     ],
 )
 def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg):
-    gaze_df = pm.Gaze(**init_kwargs)
+    gaze = pm.Gaze(**init_kwargs)
 
     with pytest.raises(exception) as excinfo:
-        gaze_df.pix2deg()
+        gaze.pix2deg()
 
     msg, = excinfo.value.args
     assert msg == expected_msg
@@ -1016,10 +1016,10 @@ def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg)
     ],
 )
 def test_gaze_dataframe_pix2deg_warnings(init_kwargs, warning, expected_msg):
-    gaze_df = pm.Gaze(**init_kwargs)
+    gaze = pm.Gaze(**init_kwargs)
 
     with pytest.warns(warning) as excinfo:
-        gaze_df.pix2deg()
+        gaze.pix2deg()
 
     msg = excinfo[0].message.args[0]
     assert msg == expected_msg
@@ -1087,10 +1087,10 @@ def test_gaze_dataframe_pix2deg_warnings(init_kwargs, warning, expected_msg):
     ],
 )
 def test_gaze_dataframe_deg2pix_exceptions(init_kwargs, exception, expected_msg):
-    gaze_df = pm.Gaze(**init_kwargs)
+    gaze = pm.Gaze(**init_kwargs)
 
     with pytest.raises(exception) as excinfo:
-        gaze_df.deg2pix()
+        gaze.deg2pix()
 
     msg, = excinfo.value.args
     assert msg == expected_msg
@@ -1188,10 +1188,10 @@ def test_gaze_dataframe_pos2acc_creates_acceleration_column(data, experiment, po
     ],
 )
 def test_gaze_dataframe_pos2acc_exceptions(init_kwargs, exception, expected_msg):
-    gaze_df = pm.Gaze(**init_kwargs)
+    gaze = pm.Gaze(**init_kwargs)
 
     with pytest.raises(exception) as excinfo:
-        gaze_df.pos2acc()
+        gaze.pos2acc()
 
     msg, = excinfo.value.args
     assert msg == expected_msg
@@ -1311,10 +1311,10 @@ def test_gaze_dataframe_clip_creates_new_column(experiment):
     ],
 )
 def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg):
-    gaze_df = pm.Gaze(**init_kwargs)
+    gaze = pm.Gaze(**init_kwargs)
 
     with pytest.raises(exception) as excinfo:
-        gaze_df.pos2vel()
+        gaze.pos2vel()
 
     msg, = excinfo.value.args
     assert msg == expected_msg

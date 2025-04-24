@@ -1104,13 +1104,13 @@ def test_gaze_to_aoi_mapping_char_width_height(eye, aoi_column, gaze_type):
         page_column='page',
     )
     if gaze_type == 'pixel':
-        gaze_df = pm.gaze.io.from_csv(
+        gaze = pm.gaze.io.from_csv(
             'tests/files/judo1000_example.csv',
             **{'separator': '\t'},
             pixel_columns=['x_left', 'y_left', 'x_right', 'y_right'],
         )
     elif gaze_type == 'position':
-        gaze_df = pm.gaze.io.from_csv(
+        gaze = pm.gaze.io.from_csv(
             'tests/files/judo1000_example.csv',
             **{'separator': '\t'},
             position_columns=['x_left', 'y_left', 'x_right', 'y_right'],
@@ -1118,8 +1118,8 @@ def test_gaze_to_aoi_mapping_char_width_height(eye, aoi_column, gaze_type):
     else:
         assert False, 'unknown gaze_type'
 
-    gaze_df.map_to_aois(aoi_df, eye=eye, gaze_type=gaze_type)
-    assert_frame_equal(gaze_df.frame, EXPECTED_DF[f'{aoi_column}_{eye}_{gaze_type}'])
+    gaze.map_to_aois(aoi_df, eye=eye, gaze_type=gaze_type)
+    assert_frame_equal(gaze.frame, EXPECTED_DF[f'{aoi_column}_{eye}_{gaze_type}'])
 
 
 @pytest.mark.parametrize(
@@ -1156,13 +1156,13 @@ def test_gaze_to_aoi_mapping_char_end(eye, aoi_column, gaze_type):
         page_column='page',
     )
     if gaze_type == 'pixel':
-        gaze_df = pm.gaze.io.from_csv(
+        gaze = pm.gaze.io.from_csv(
             'tests/files/judo1000_example.csv',
             **{'separator': '\t'},
             pixel_columns=['x_left', 'y_left', 'x_right', 'y_right'],
         )
     elif gaze_type == 'position':
-        gaze_df = pm.gaze.io.from_csv(
+        gaze = pm.gaze.io.from_csv(
             'tests/files/judo1000_example.csv',
             **{'separator': '\t'},
             position_columns=['x_left', 'y_left', 'x_right', 'y_right'],
@@ -1170,8 +1170,8 @@ def test_gaze_to_aoi_mapping_char_end(eye, aoi_column, gaze_type):
     else:
         assert False, 'unknown gaze_type'
 
-    gaze_df.map_to_aois(aoi_df, eye=eye, gaze_type=gaze_type)
-    assert_frame_equal(gaze_df.frame, EXPECTED_DF[f'{aoi_column}_{eye}_{gaze_type}'])
+    gaze.map_to_aois(aoi_df, eye=eye, gaze_type=gaze_type)
+    assert_frame_equal(gaze.frame, EXPECTED_DF[f'{aoi_column}_{eye}_{gaze_type}'])
 
 
 def test_map_to_aois_raises_value_error():
@@ -1184,13 +1184,13 @@ def test_map_to_aois_raises_value_error():
         height_column='height',
         page_column='page',
     )
-    gaze_df = pm.gaze.io.from_csv(
+    gaze = pm.gaze.io.from_csv(
         'tests/files/judo1000_example.csv',
         **{'separator': '\t'},
         position_columns=['x_left', 'y_left', 'x_right', 'y_right'],
     )
 
     with pytest.raises(ValueError) as excinfo:
-        gaze_df.map_to_aois(aoi_df, eye='right', gaze_type='')
+        gaze.map_to_aois(aoi_df, eye='right', gaze_type='')
     msg, = excinfo.value.args
     assert msg == 'neither position nor pixel in gaze dataframe, one needed for mapping'

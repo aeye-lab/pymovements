@@ -158,8 +158,8 @@ class Dataset:
                 events_dirname=events_dirname,
                 extension=extension,
             )
-            for loaded_gaze_df, loaded_events_df in zip(self.gaze, self.events):
-                loaded_gaze_df.events = loaded_events_df
+            for loaded_gaze, loaded_events_df in zip(self.gaze, self.events):
+                loaded_gaze.events = loaded_events_df
 
         return self
 
@@ -942,7 +942,7 @@ class Dataset:
             If extension is not in list of valid extensions.
         """
         dataset_files.save_preprocessed(
-            gaze=self.gaze,
+            gazes=self.gaze,
             fileinfo=self.fileinfo['gaze'],
             paths=self.paths,
             preprocessed_dirname=preprocessed_dirname,

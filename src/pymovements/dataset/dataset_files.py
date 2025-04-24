@@ -241,7 +241,7 @@ def load_gaze_files(
     RuntimeError
         If file type of gaze file is not supported.
     """
-    gaze_dfs: list[Gaze] = []
+    gazes: list[Gaze] = []
 
     # Read gaze files from fileinfo attribute.
     for fileinfo_row in tqdm(fileinfo.to_dicts()):
@@ -254,16 +254,16 @@ def load_gaze_files(
                 extension=extension,
             )
 
-        gaze_df = load_gaze_file(
+        gaze = load_gaze_file(
             filepath=filepath,
             fileinfo_row=fileinfo_row,
             definition=definition,
             preprocessed=preprocessed,
             custom_read_kwargs=definition.custom_read_kwargs['gaze'],
         )
-        gaze_dfs.append(gaze_df)
+        gazes.append(gaze)
 
-    return gaze_dfs
+    return gazes
 
 
 def load_gaze_file(
@@ -331,7 +331,7 @@ def load_gaze_file(
             # Time unit is always milliseconds for preprocessed data if a time column is present.
             time_unit = 'ms'
 
-            gaze_df = from_csv(
+            gaze = from_csv(
                 filepath,
                 trial_columns=trial_columns,
                 time_unit=time_unit,
@@ -340,7 +340,7 @@ def load_gaze_file(
                 column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
             )
         else:
-            gaze_df = from_csv(
+            gaze = from_csv(
                 filepath,
                 experiment=definition.experiment,
                 time_column=definition.time_column,
@@ -357,7 +357,7 @@ def load_gaze_file(
                 **custom_read_kwargs,
             )
     elif filepath.suffix == '.feather':
-        gaze_df = from_ipc(
+        gaze = from_ipc(
             filepath,
             experiment=definition.experiment,
             trial_columns=trial_columns,
@@ -365,7 +365,7 @@ def load_gaze_file(
             column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
         )
     elif filepath.suffix == '.asc':
-        gaze_df = from_asc(
+        gaze = from_asc(
             filepath,
             experiment=definition.experiment,
             trial_columns=trial_columns,
@@ -380,7 +380,7 @@ def load_gaze_file(
             f'Supported formats are: {valid_extensions}',
         )
 
-    return gaze_df
+    return gaze
 
 
 def load_precomputed_reading_measures(
@@ -623,7 +623,7 @@ def save_events(
 
 
 def save_preprocessed(
-        gaze: list[Gaze],
+        gazes: list[Gaze],
         fileinfo: pl.DataFrame,
         paths: DatasetPaths,
         preprocessed_dirname: str | None = None,
@@ -637,7 +637,7 @@ def save_preprocessed(
 
     Parameters
     ----------
-    gaze: list[Gaze]
+    gazes: list[Gaze]
         The gaze dataframes to save.
     fileinfo: pl.DataFrame
         A dataframe holding file information.
@@ -661,8 +661,8 @@ def save_preprocessed(
     """
     disable_progressbar = not verbose
 
-    for file_id, gaze_df in enumerate(tqdm(gaze, disable=disable_progressbar)):
-        gaze_df = gaze_df.clone()
+    for file_id, gaze in enumerate(tqdm(gazes, disable=disable_progressbar)):
+        gaze = gaze.clone()
 
         raw_filepath = paths.raw / Path(fileinfo[file_id, 'filepath'])
         preprocessed_filepath = paths.get_preprocessed_filepath(
@@ -671,20 +671,20 @@ def save_preprocessed(
         )
 
         if extension == 'csv':
-            gaze_df.unnest()
+            gaze.unnest()
 
-        for column in gaze_df.columns:
+        for column in gaze.columns:
             if column in fileinfo.columns:
-                gaze_df.frame = gaze_df.frame.drop(column)
+                gaze.frame = gaze.frame.drop(column)
 
         if verbose >= 2:
             print('Save file to', preprocessed_filepath)
 
         preprocessed_filepath.parent.mkdir(parents=True, exist_ok=True)
         if extension == 'feather':
-            gaze_df.frame.write_ipc(preprocessed_filepath)
+            gaze.frame.write_ipc(preprocessed_filepath)
         elif extension == 'csv':
-            gaze_df.frame.write_csv(preprocessed_filepath)
+            gaze.frame.write_csv(preprocessed_filepath)
         else:
             valid_extensions = ['csv', 'feather']
             raise ValueError(
