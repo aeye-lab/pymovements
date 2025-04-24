@@ -1108,7 +1108,7 @@ class Dataset:
         if len(self.gaze) == 0:
             raise AttributeError('no files present in gaze attribute')
 
-    def _disclaimer() -> str:
+    def _disclaimer(self) -> str:
         """Return string for dataset download disclaimer."""
         if self.definition.long_name is not None:
             dataset_name = self.definition.long_name
