@@ -45,7 +45,11 @@ _Resources = Union[dict[str, list[dict[str, str]]], dict[str, tuple[dict[str, st
 
 
 class _HasResourcesIndexer:
-    """Indexable :py:meth:`~pymovements.dataset.DatasetDefinition.has_resources` property."""
+    """Helper class for :py:meth:`~pymovements.dataset.DatasetDefinition.has_resources` property.
+    
+    Provides dynamic inference on the presence of any
+    :py:meth:`~pymovements.dataset.DatasetDefinition.resources`.
+    """
 
     def __init__(self):
         self._resources: _Resources = {}
