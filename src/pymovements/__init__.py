@@ -65,6 +65,7 @@ __all__ = [
     'EyeTracker',
     'Screen',
     'Gaze',
+    'GazeDataFrame',
 
     'exceptions',
 
