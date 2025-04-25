@@ -20,8 +20,8 @@
 # pylint: disable=cyclic-import
 """Provides utility functions.
 
-.. deprecated:: v0.21.1
-   This module will be removed in v0.26.0.
+.. deprecated:: v0.22.0
+   This module will be removed in v0.27.0.
 
 .. rubric:: Modules
 
