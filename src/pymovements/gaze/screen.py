@@ -24,11 +24,12 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from pymovements._utils._html import html_repr
 from pymovements.gaze import transforms_numpy
 from pymovements.utils import checks
-from pymovements.utils.formatting import HTML
 
 
+@html_repr()
 @dataclass
 class Screen:
     """Screen class for holding screen properties.
@@ -281,7 +282,3 @@ class Screen:
         checks.check_is_not_none(**{key: value})
         assert isinstance(value, (int, float))
         checks.check_is_greater_than_zero(**{key: value})
-
-    def _repr_html_(self) -> str:
-        """Return HTML representation of Screen for Jupyter notebooks."""
-        return HTML.repr(self)
