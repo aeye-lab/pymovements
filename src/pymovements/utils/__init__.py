@@ -20,6 +20,9 @@
 # pylint: disable=cyclic-import
 """Provides utility functions.
 
+.. deprecated:: v0.21.1
+   This module will be removed in v0.26.0.
+
 .. rubric:: Modules
 
 .. autosummary::
@@ -31,6 +34,8 @@
     parsing
     paths
 """
+from deprecated.sphinx import deprecated
+
 from pymovements.utils import aois
 from pymovements.utils import archives
 from pymovements.utils import downloads
