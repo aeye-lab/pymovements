@@ -19,8 +19,8 @@
 # SOFTWARE.
 """Functions for plotting.
 
-.. deprecated:: v0.21.1
-   This module will be removed in v0.26.0.
+.. deprecated:: v0.22.0
+   This module will be removed in v0.27.0.
 """
 from __future__ import annotations
 
@@ -39,8 +39,8 @@ from pymovements.stimulus.image import _draw_image_stimulus
 
 
 @deprecated(
-    reason='This function will be removed in v0.26.0.',
-    version='v0.21.1',
+    reason='This function will be removed in v0.27.0.',
+    version='v0.22.0',
 )
 def setup_matplotlib(
         x_signal: np.ndarray,
@@ -59,8 +59,8 @@ def setup_matplotlib(
 ) -> MatplotlibSetupType:
     """Configure cmap.
 
-    .. deprecated:: v0.21.1
-       This function will be removed in v0.26.0.
+    .. deprecated:: v0.22.0
+       This function will be removed in v0.27.0.
 
     Parameters
     ----------
@@ -115,8 +115,8 @@ def setup_matplotlib(
 
 @deprecated(
     reason='Please use ImageStimulus.show() instead. '
-           'This function will be removed in v0.26.0.',
-    version='v0.21.1',
+           'This function will be removed in v0.27.0.',
+    version='v0.22.0',
 )
 def draw_image_stimulus(
         image_stimulus: str | Path,
@@ -129,9 +129,9 @@ def draw_image_stimulus(
 ) -> tuple[matplotlib.pyplot.figure, matplotlib.pyplot.Axes]:
     """Draw stimulus.
 
-    .. deprecated:: v0.21.1
+    .. deprecated:: v0.22.0
        Please use :py:meth:`~pymovements.ImageStimulus.show()` instead.
-       This function will be removed in v0.26.0.
+       This function will be removed in v0.27.0.
 
     Parameters
     ----------
@@ -167,8 +167,8 @@ def draw_image_stimulus(
 
 
 @deprecated(
-    reason='This function will be removed in v0.26.0.',
-    version='v0.21.1',
+    reason='This function will be removed in v0.27.0.',
+    version='v0.22.0',
 )
 def draw_line_data(
         x_signal: np.ndarray,
@@ -180,8 +180,8 @@ def draw_line_data(
 ) -> matplotlib.pyplot.Axes:
     """Draw line data.
 
-    .. deprecated:: v0.21.1
-       This function will be removed in v0.26.0.
+    .. deprecated:: v0.22.0
+       This function will be removed in v0.27.0.
 
     Parameters
     ----------
