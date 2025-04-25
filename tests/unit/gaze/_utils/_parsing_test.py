@@ -186,9 +186,9 @@ EXPECTED_METADATA = {
     'validations': [],
     'resolution': (1280, 1024),
     'DISPLAY_COORDS': (0.0, 0.0, 1279.0, 1023.0),
-    'data_loss_ratio_blinks': 0.18181818181818182,
-    'data_loss_ratio': 0.2727272727272727,
-    'total_recording_duration_ms': 11,
+    'data_loss_ratio_blinks': 3 / 12,
+    'data_loss_ratio': 4 / 12,
+    'total_recording_duration_ms': 12.0,
     'datetime': datetime.datetime(2023, 3, 8, 9, 25, 20),
     'mount_configuration': {
         'mount_type': 'Desktop',
@@ -495,10 +495,10 @@ def test_parse_val_cal_eyelink_monocular_file():
         pytest.param(
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
             'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
-            'SBLINK R 10000018\n'
+            'SBLINK R 10000019\n'
             '10000019	   .	   .	    0.0	    0.0	...\n'
             '10000020	   .	   .	    0.0	    0.0	...\n'
-            'EBLINK R 10000018	10000020	2\n'
+            'EBLINK R 10000019	10000020	2\n'
             'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
             1,
             1,
@@ -507,25 +507,14 @@ def test_parse_val_cal_eyelink_monocular_file():
         pytest.param(
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
             'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
-            'SBLINK R 10000018\n'
+            'SBLINK R 10000019\n'
             '10000019	   .	   .	    0.0	...\n'
             '10000020	   .	   .	    0.0	...\n'
-            'EBLINK R 10000018	10000020	2\n'
+            'EBLINK R 10000019	10000020	2\n'
             'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
             1,
             1,
             id='only_blinks_no_dummy',
-        ),
-        pytest.param(
-            'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
-            'SBLINK R 10000018\n'
-            '10000019	   .	   .	    0.0	    0.0	...\n'
-            '10000020	   .	   .	    0.0	    0.0	...\n'
-            'EBLINK R 10000018	10000020	2\n'
-            'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
-            'unknown',
-            'unknown',
-            id='unknown_sampling_rate_only_blinks',
         ),
         pytest.param(
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
@@ -539,23 +528,14 @@ def test_parse_val_cal_eyelink_monocular_file():
         pytest.param(
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
             'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
-            'SBLINK R 10000018\n'
+            'SBLINK R 10000019\n'
             '10000019	   .	   .	    0.0	    0.0	...\n'
-            'EBLINK R 10000018	10000019	1\n'
+            'EBLINK R 10000019	10000019	1\n'
             '10000020	   .	   .	    0.0	    0.0	...\n'
             'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
             0.5,
             1.0,
             id='blinks_and_lost_samples',
-        ),
-        pytest.param(
-            'START	10000021 	RIGHT	SAMPLES	EVENTS\n'
-            '10000021	   .	   .	    0.0	    0.0	...\n'
-            '10000022	   .	   .	    0.0	    0.0	...\n'
-            'END	10000022 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
-            'unknown',
-            'unknown',
-            id='lost_samples_no_sampling_rate',
         ),
         pytest.param(
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
@@ -584,25 +564,13 @@ def test_parse_val_cal_eyelink_monocular_file():
             'START	10000020 	RIGHT	SAMPLES	EVENTS\n'
             '10000020	   850.7	  717.5	  714.0	    0.0	...\n'
             '10000022	   .	   .	    0.0	    0.0	...\n'
-            'SBLINK R 10000023\n'
+            'SBLINK R 10000024\n'
             '10000024	   .	   .	    0.0	    0.0	...\n'
-            'EBLINK R 10000023	10000024	1\n'
+            'EBLINK R 10000024	10000024	1\n'
             'END	10000024 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
             0.25,
             0.75,
             id='missing_timestamps_lost_samples_blink',
-        ),
-        pytest.param(
-            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
-            'SBLINK R 10000018\n'
-            '10000019	   .	   .	    0.0	    0.0	...\n'
-            '10000020	   .	   .	    0.0	    0.0	...\n'
-            'EBLINK R 10000018	10000020	2\n'
-            '10000021	   .	   .	    0.0	    0.0	...\n'
-            '10000022	   .	   .	    0.0	    0.0	...\n',
-            'unknown',
-            'unknown',
-            id='blinks_and_lost_samples_no_start_end',
         ),
         pytest.param(
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
@@ -612,10 +580,41 @@ def test_parse_val_cal_eyelink_monocular_file():
             1,
             id='no_samples',
         ),
+        pytest.param(
+            'MSG	10000018.0 RECCFG CR 1000 2 1 L\n'
+            'START	10000018.0 	RIGHT	SAMPLES	EVENTS\n'
+            '10000019.0	   850.7	  717.5	  714.0	    0.0	...\n'
+            '10000020.0	   850.7	  717.5	  714.0	    0.0	...\n'
+            'END	10000020.0 	SAMPLES	EVENTS	RES	  38.54	  31.12\n'
+            'MSG	10000021.0 RECCFG CR 2000 2 1 L\n'
+            'START	10000021.0 	RIGHT	SAMPLES	EVENTS\n'
+            'END	10000023.0 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            0,
+            2 / 3,
+            id='varying_sampling_rate',
+        ),
+        pytest.param(
+            'MSG	10000018.0 RECCFG CR 1000 2 1 L\n'
+            'START	10000018.0 	RIGHT	SAMPLES	EVENTS\n'
+            '10000019.0	   850.7	  717.5	  714.0	    0.0	...\n'
+            '10000020.0	   850.7	  717.5	  714.0	    0.0	...\n'
+            'END	10000020.0 	SAMPLES	EVENTS	RES	  38.54	  31.12\n'
+            'MSG	10000021.0 RECCFG CR 2000 2 1 L\n'
+            'START	10000021.0 	RIGHT	SAMPLES	EVENTS\n'
+            'SBLINK R 10000020.0\n'
+            '10000020.0	   .	   .	    0.0	    0.0	...\n'
+            '10000021.0	   .	   .	    0.0	    0.0	...\n'
+            'EBLINK R 10000020.0	10000021.5	2.0\n'
+            'END	10000023.0 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            2 / 3,
+            2 / 3,
+            id='varying_sampling_rate_blink',
+        ),
     ],
 )
 @pytest.mark.filterwarnings('ignore:No metadata found.')
 @pytest.mark.filterwarnings('ignore:No recording configuration found.')
+@pytest.mark.filterwarnings("ignore:Found inconsistent values for 'sampling_rate':")
 def test_parse_eyelink_data_loss_ratio(
         tmp_path, metadata, expected_blink_ratio, expected_overall_ratio,
 ):

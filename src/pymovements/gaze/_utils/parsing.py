@@ -18,7 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Module for parsing input data."""
-# pylint: disable=too-many-statements
 from __future__ import annotations
 
 import calendar
@@ -84,10 +83,6 @@ BLINK_STOP_REGEX = re.compile(
     r'(?P<timestamp_end>(\d+[.]?\d*))\s+(?P<duration_ms>(\d+[.]?\d*))\s*',
 )
 
-INVALID_SAMPLE_REGEX = re.compile(
-    r'(?P<timestamp>(\d+[.]?\d*))\s+\.\s+\.\s+(?P<dummy>0\.0)?\s+0\.0\s+\.\.\.\s*',
-)
-
 CALIBRATION_TIMESTAMP_REGEX = re.compile(r'MSG\s+(?P<timestamp>\d+[.]?\d*)\s+!CAL\s*\n')
 
 CALIBRATION_REGEX = re.compile(
@@ -96,7 +91,7 @@ CALIBRATION_REGEX = re.compile(
     r'(?P<tracked_eye>RIGHT|LEFT):\s+<{9}',
 )
 
-RECORDING_CONFIG = re.compile(
+RECORDING_CONFIG_REGEX = re.compile(
     r'MSG\s+(?P<timestamp>\d+[.]?\d*)\s+'
     r'RECCFG\s+(?P<tracking_mode>[A-Z,a-z]+)\s+'
     r'(?P<sampling_rate>\d+)\s+'
@@ -106,6 +101,13 @@ RECORDING_CONFIG = re.compile(
 )
 RESOLUTION_REGEX = re.compile(
     r'MSG\s+\d+[.]?\d*\s+GAZE_COORDS\s*=?\s*(?P<resolution>.*)',
+)
+START_RECORDING_REGEX = re.compile(
+    r'START\s+(?P<timestamp>(\d+[.]?\d*))\s+(RIGHT|LEFT)\s+(?P<types>.*)',
+)
+STOP_RECORDING_REGEX = re.compile(
+    r'END\s+(?P<timestamp>(\d+[.]?\d*))\s+\s+(?P<types>.*)\s+RES\s+'
+    r'(?P<xres>[\d\.]*)\s+(?P<yres>[\d\.]*)\s*',
 )
 
 
@@ -294,6 +296,12 @@ def parse_eyelink(
     calibrations = []
     recording_config: list[dict[str, Any]] = []
 
+    total_recording_duration = 0.0
+    num_expected_samples = 0
+    num_valid_samples = 0  # excluding blinks
+    num_blink_samples = 0
+    blinking = False
+
     for line in lines:
         for pattern_dict in compiled_patterns:
 
@@ -323,6 +331,9 @@ def parse_eyelink(
         elif event_name := parse_eyelink_event_start(line):
             current_event_additional[event_name] = {**current_additional}
 
+            if event_name == 'blink':
+                blinking = True
+
         elif event := parse_eyelink_event_end(line):
             event_name, event_onset, event_offset = event
             # See https://www.sr-research.com/support/thread-9411.html
@@ -338,13 +349,28 @@ def parse_eyelink(
                 )
             current_event_additional[event_name] = {}
 
-        elif match := RECORDING_CONFIG.match(line):
+            if event_name == 'blink':
+                num_blink_samples += round((event_offset - event_onset) / sample_length)
+                blinking = False
+
+        elif match := RECORDING_CONFIG_REGEX.match(line):
             recording_config.append(match.groupdict())
 
         elif match := RESOLUTION_REGEX.match(line):
             left, top, right, bottom = (float(coord) for coord in match.group('resolution').split())
             # GAZE_COORDS is always logged after RECCFG -> add it to the last recording_config
             recording_config[-1]['resolution'] = (right - left + 1, bottom - top + 1)
+
+        elif match := START_RECORDING_REGEX.match(line):
+            start_recording_timestamp = match.groupdict()['timestamp']
+
+        elif match := STOP_RECORDING_REGEX.match(line):
+            stop_recording_timestamp = match.groupdict()['timestamp']
+            block_duration = float(stop_recording_timestamp) - float(start_recording_timestamp)
+            total_recording_duration += block_duration
+            num_expected_samples += round(
+                block_duration * float(recording_config[-1]['sampling_rate']) / 1000,
+            )
 
         elif eye_tracking_sample_match := EYE_TRACKING_SAMPLE.match(line):
 
@@ -365,6 +391,9 @@ def parse_eyelink(
 
             for additional_column in additional_columns:
                 samples[additional_column].append(current_additional[additional_column])
+
+            if not blinking and x_pix is not np.nan and y_pix is not np.nan and pupil is not np.nan:
+                num_valid_samples += 1
 
         elif match := CALIBRATION_TIMESTAMP_REGEX.match(line):
             cal_timestamp = match.groupdict()['timestamp']
@@ -396,6 +425,11 @@ def parse_eyelink(
     pre_processed_metadata['calibrations'] = calibrations
     pre_processed_metadata['validations'] = validations
     pre_processed_metadata['recording_config'] = recording_config
+    pre_processed_metadata['total_recording_duration_ms'] = total_recording_duration
+    (
+        pre_processed_metadata['data_loss_ratio'],
+        pre_processed_metadata['data_loss_ratio_blinks'],
+    ) = _calculate_data_loss_ratio(num_expected_samples, num_valid_samples, num_blink_samples)
 
     gaze_schema_overrides = {
         'time': pl.Float64,
@@ -500,6 +534,35 @@ def _check_reccfg_key(
     return value
 
 
+def _calculate_data_loss_ratio(
+        num_expected_samples: int,
+        num_valid_samples: int,
+        num_blink_samples: int,
+) -> tuple[float, float]:
+    """Calculate the total data loss and data loss due to blinks.
+
+    Parameters
+    ----------
+    num_expected_samples: int
+        Number of total expected samples.
+    num_valid_samples: int
+        Number of valid samples (excluding blink samples).
+    num_blink_samples: int
+        Number of blink samples.
+
+    Returns
+    -------
+    tuple[float, float]
+        Data loss ratio and blink loss ratio.
+    """
+    if num_expected_samples == 0:
+        return 0.0, 0.0
+
+    total_data_loss = (num_expected_samples - num_valid_samples) / num_expected_samples
+    blink_data_loss = num_blink_samples / num_expected_samples
+    return total_data_loss, blink_data_loss
+
+
 def _parse_full_eyelink_version(version_str_1: str, version_str_2: str) -> tuple[str, str]:
     """Parse the two version strings into an eyelink version number and model.
 
@@ -558,7 +621,6 @@ def _parse_eyelink_mount_config(mount_config: str) -> dict[str, str]:
     -------
     dict[str, str]
         Dictionary with the mount configuration spelled out.
-
     """
     possible_mounts = {
         'MTABLER': {
