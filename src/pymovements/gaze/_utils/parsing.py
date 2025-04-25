@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Module for parsing input data."""
+# pylint: disable=too-many-statements
 from __future__ import annotations
 
 import calendar
@@ -48,7 +49,7 @@ EYELINK_META_REGEXES = [
             r'\s+(?P<day>\d\d?)\s+(?P<time>\d\d:\d\d:\d\d)\s+(?P<year>\d{4})\s*'
         ),
         r'\*\*\s+(?P<version_2>EYELINK.*)',
-        r'MSG\s+\d+[.]?\d*\s+DISPLAY_COORDS\s*=?\s*(?P<resolution>.*)',
+        r'MSG\s+\d+[.]?\d*\s+DISPLAY_COORDS\s*=?\s*(?P<DISPLAY_COORDS>.*)',
         r'PUPIL\s+(?P<pupil_data_type>(AREA|DIAMETER))\s*',
         r'MSG\s+\d+[.]?\d*\s+ELCLCFG\s+(?P<mount_configuration>.*)',
     )
@@ -102,6 +103,9 @@ RECORDING_CONFIG = re.compile(
     r'(?P<file_sample_filter>0|1|2)\s+'
     r'(?P<link_sample_filter>0|1|2)\s+'
     r'(?P<tracked_eye>LR|[LR])\s*',
+)
+RESOLUTION_REGEX = re.compile(
+    r'MSG\s+\d+[.]?\d*\s+GAZE_COORDS\s*=?\s*(?P<resolution>.*)',
 )
 
 
@@ -288,7 +292,7 @@ def parse_eyelink(
 
     validations = []
     calibrations = []
-    recording_config: list[dict[str, str]] = []
+    recording_config: list[dict[str, Any]] = []
 
     for line in lines:
         for pattern_dict in compiled_patterns:
@@ -337,6 +341,11 @@ def parse_eyelink(
         elif match := RECORDING_CONFIG.match(line):
             recording_config.append(match.groupdict())
 
+        elif match := RESOLUTION_REGEX.match(line):
+            left, top, right, bottom = (float(coord) for coord in match.group('resolution').split())
+            # GAZE_COORDS is always logged after RECCFG -> add it to the last recording_config
+            recording_config[-1]['resolution'] = (right - left + 1, bottom - top + 1)
+
         elif eye_tracking_sample_match := EYE_TRACKING_SAMPLE.match(line):
 
             timestamp_s = eye_tracking_sample_match.group('time')
@@ -380,6 +389,7 @@ def parse_eyelink(
 
     metadata['sampling_rate'] = _check_reccfg_key(recording_config, 'sampling_rate', float)
     metadata['tracked_eye'] = _check_reccfg_key(recording_config, 'tracked_eye')
+    metadata['resolution'] = _check_reccfg_key(recording_config, 'resolution')
 
     pre_processed_metadata: dict[str, Any] = _pre_process_metadata(metadata)
     # is not yet pre-processed but should be
@@ -428,10 +438,9 @@ def _pre_process_metadata(metadata: defaultdict[str, Any]) -> dict[str, Any]:
         metadata['version_1'], metadata['version_2'],
     )
 
-    if 'resolution' in metadata:
-        coordinates = [int(coord) for coord in metadata['resolution'].split()]
-        resolution = (coordinates[2] - coordinates[0] + 1, coordinates[3] - coordinates[1] + 1)
-        metadata['resolution'] = resolution
+    if 'DISPLAY_COORDS' in metadata:
+        display_coords = tuple(float(coord) for coord in metadata['DISPLAY_COORDS'].split())
+        metadata['DISPLAY_COORDS'] = display_coords
 
     # if the date has been parsed fully, convert the date to a datetime object
     if 'day' in metadata and 'year' in metadata and 'month' in metadata and 'time' in metadata:

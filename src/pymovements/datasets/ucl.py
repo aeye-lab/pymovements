@@ -44,12 +44,12 @@ class UCL(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
@@ -98,6 +98,8 @@ class UCL(DatasetDefinition):
 
     name: str = 'UCL'
 
+    long_name: str = 'University College London corpus'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': False,
@@ -105,30 +107,19 @@ class UCL(DatasetDefinition):
             'precomputed_reading_measures': True,
         },
     )
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda: {
-            'precomputed_events': [
-                'https://static-content.springer.com/esm/'
-                'art%3A10.3758%2Fs13428-012-0313-y/MediaObjects/',
-            ],
-            'precomputed_reading_measures': [
-                'https://static-content.springer.com/esm/'
-                'art%3A10.3758%2Fs13428-012-0313-y/MediaObjects/',
-            ],
-        },
-    )
+
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
             'precomputed_events': [
                 {
-                    'resource': '13428_2012_313_MOESM1_ESM.zip',
+                    'resource': 'https://static-content.springer.com/esm/art%3A10.3758%2Fs13428-012-0313-y/MediaObjects/13428_2012_313_MOESM1_ESM.zip',  # noqa: E501 # pylint: disable=line-too-long
                     'filename': 'UCL_events.zip',
                     'md5': '77e3c0cacccb0a074a55d23aa8531ca5',
                 },
             ],
             'precomputed_reading_measures': [
                 {
-                    'resource': '13428_2012_313_MOESM1_ESM.zip',
+                    'resource': 'https://static-content.springer.com/esm/art%3A10.3758%2Fs13428-012-0313-y/MediaObjects/13428_2012_313_MOESM1_ESM.zip',  # noqa: E501 # pylint: disable=line-too-long
                     'filename': 'UCL_measures.zip',
                     'md5': '77e3c0cacccb0a074a55d23aa8531ca5',
                 },

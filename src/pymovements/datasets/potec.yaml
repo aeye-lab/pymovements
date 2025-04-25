@@ -1,17 +1,15 @@
 name: "PoTeC"
 
+long_name: "Potsdam Textbook Corpus"
+
 has_files:
   gaze: true
   precomputed_events: false
   precomputed_reading_measures: false
 
-mirrors:
-  gaze:
-    - "https://osf.io/download/"
-
 resources:
   gaze:
-    - resource: "tgd9q/"
+    - resource: "https://osf.io/download/tgd9q/"
       filename: "PoTeC.zip"
       md5: "cffd45039757c3777e2fd130e5d8a2ad"
 
