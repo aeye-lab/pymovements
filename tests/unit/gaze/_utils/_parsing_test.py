@@ -184,6 +184,9 @@ EXPECTED_METADATA = {
     'calibrations': [],
     'validations': [],
     'resolution': (1280, 1024),
+    'data_loss_ratio_blinks': 0.18181818181818182,
+    'data_loss_ratio': 0.2727272727272727,
+    'total_recording_duration_ms': 11,
     'datetime': datetime.datetime(2023, 3, 8, 9, 25, 20),
     'mount_configuration': {
         'mount_type': 'Desktop',
@@ -473,6 +476,145 @@ def test_parse_val_cal_eyelink_monocular_file():
 
     assert metadata['calibrations'] == expected_calibration
     assert metadata['validations'] == expected_validation
+
+
+@pytest.mark.parametrize(
+    ('metadata', 'expected_blink_ratio', 'expected_overall_ratio'),
+    [
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
+            'SBLINK R 10000018\n'
+            '10000019	   .	   .	    0.0	    0.0	...\n'
+            '10000020	   .	   .	    0.0	    0.0	...\n'
+            'EBLINK R 10000018	10000020	2\n'
+            'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            1,
+            1,
+            id='only_blinks',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
+            'SBLINK R 10000018\n'
+            '10000019	   .	   .	    0.0	...\n'
+            '10000020	   .	   .	    0.0	...\n'
+            'EBLINK R 10000018	10000020	2\n'
+            'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            1,
+            1,
+            id='only_blinks_no_dummy',
+        ),
+        pytest.param(
+            'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
+            'SBLINK R 10000018\n'
+            '10000019	   .	   .	    0.0	    0.0	...\n'
+            '10000020	   .	   .	    0.0	    0.0	...\n'
+            'EBLINK R 10000018	10000020	2\n'
+            'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            'unknown',
+            'unknown',
+            id='unknown_sampling_rate_only_blinks',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
+            '10000019	   .	   .	    0.0	    0.0	...\n'
+            'END	10000019 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            0,
+            1,
+            id='lost_samples_no_blinks',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
+            'SBLINK R 10000018\n'
+            '10000019	   .	   .	    0.0	    0.0	...\n'
+            'EBLINK R 10000018	10000019	1\n'
+            '10000020	   .	   .	    0.0	    0.0	...\n'
+            'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            0.5,
+            1.0,
+            id='blinks_and_lost_samples',
+        ),
+        pytest.param(
+            'START	10000021 	RIGHT	SAMPLES	EVENTS\n'
+            '10000021	   .	   .	    0.0	    0.0	...\n'
+            '10000022	   .	   .	    0.0	    0.0	...\n'
+            'END	10000022 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            'unknown',
+            'unknown',
+            id='lost_samples_no_sampling_rate',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
+            '10000019	   850.7	  717.5	  714.0	    0.0	...\n'
+            '10000020	   850.7	  717.5	  714.0	    0.0	...\n'
+            '10000022	   850.7	  717.5	  714.0	    0.0	...\n'
+            'END	10000022 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            0,
+            0.25,
+            id='missing_timestamps',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
+            '10000019	   850.7	  717.5	  714.0	    0.0	...\n'
+            '10000020	   850.7	  717.5	  714.0	    0.0	...\n'
+            '10000022	   .	   .	    0.0	    0.0	...\n'
+            'END	10000022 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            0,
+            0.5,
+            id='missing_timestamps_lost_samples1',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'START	10000020 	RIGHT	SAMPLES	EVENTS\n'
+            '10000020	   850.7	  717.5	  714.0	    0.0	...\n'
+            '10000022	   .	   .	    0.0	    0.0	...\n'
+            'SBLINK R 10000023\n'
+            '10000024	   .	   .	    0.0	    0.0	...\n'
+            'EBLINK R 10000023	10000024	1\n'
+            'END	10000024 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            0.25,
+            0.75,
+            id='missing_timestamps_lost_samples_blink',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'SBLINK R 10000018\n'
+            '10000019	   .	   .	    0.0	    0.0	...\n'
+            '10000020	   .	   .	    0.0	    0.0	...\n'
+            'EBLINK R 10000018	10000020	2\n'
+            '10000021	   .	   .	    0.0	    0.0	...\n'
+            '10000022	   .	   .	    0.0	    0.0	...\n',
+            'unknown',
+            'unknown',
+            id='blinks_and_lost_samples_no_start_end',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'START	10000020 	RIGHT	SAMPLES	EVENTS\n'
+            'END	10000021 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            0,
+            1,
+            id='no_samples',
+        ),
+    ],
+)
+@pytest.mark.filterwarnings('ignore:No metadata found.')
+@pytest.mark.filterwarnings('ignore:No recording configuration found.')
+def test_parse_eyelink_data_loss_ratio(
+        tmp_path, metadata, expected_blink_ratio, expected_overall_ratio,
+):
+    filepath = tmp_path / 'sub.asc'
+    filepath.write_text(metadata)
+
+    _, _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
+
+    assert parsed_metadata['data_loss_ratio_blinks'] == expected_blink_ratio
+    assert parsed_metadata['data_loss_ratio'] == expected_overall_ratio
 
 
 @pytest.mark.filterwarnings('ignore:No metadata found.')
