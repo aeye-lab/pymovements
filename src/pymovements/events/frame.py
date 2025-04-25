@@ -165,6 +165,19 @@ class EventDataFrame:
         if self.trial_columns is not None:
             self.frame = self.frame.select([*self.trial_columns, *self._minimal_schema.keys()])
 
+        # Convert to int if possible.
+        all_decimals = self.frame.select(
+            pl.all_horizontal(
+                pl.col('onset', 'offset').round()
+                .eq(pl.col('onset', 'offset'))
+                .all(),
+            ),
+        ).item()
+        if all_decimals:
+            self.frame = self.frame.with_columns(
+                pl.col('onset', 'offset').cast(pl.Int64),
+            )
+
         if 'duration' not in self.frame.columns:
             self._add_duration_property()
 
