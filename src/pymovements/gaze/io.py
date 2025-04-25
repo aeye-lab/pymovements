@@ -20,6 +20,7 @@
 """Functionality to load GazeDataFrame from a csv file."""
 from __future__ import annotations
 
+import math
 from pathlib import Path
 from typing import Any
 
@@ -275,7 +276,7 @@ def from_csv(
 def from_asc(
         file: str | Path,
         *,
-        patterns: str | list[dict[str, Any] | str] | None = 'eyelink',
+        patterns: str | list[dict[str, Any] | str] | None = None,
         metadata_patterns: list[dict[str, Any] | str] | None = None,
         schema: dict[str, Any] | None = None,
         experiment: Experiment | None = None,
@@ -292,7 +293,8 @@ def from_asc(
         Path of IPC/feather file.
     patterns: str | list[dict[str, Any] | str] | None
         List of patterns to match for additional columns or a key identifier of eye tracker specific
-        default patterns. Supported values are: eyelink. (default: 'eyelink')
+        default patterns. Supported values are: `'eyelink'`. If `None` is passed, `'eyelink'` is
+        assumed. (default: None)
     metadata_patterns: list[dict[str, Any] | str] | None
         List of patterns to match for extracting metadata from custom logged messages.
         (default: None)
@@ -510,7 +512,9 @@ def _fill_experiment_from_parsing_metadata(
     # Screen resolution (assuming that width and height will always be missing or set together)
     experiment_resolution = (experiment.screen.width_px, experiment.screen.height_px)
     if experiment_resolution == (None, None):
-        experiment.screen.width_px, experiment.screen.height_px = metadata['resolution']
+        width, height = metadata['resolution']
+        experiment.screen.width_px = math.ceil(width)
+        experiment.screen.height_px = math.ceil(height)
     elif experiment_resolution != metadata['resolution']:
         issues.append(f"Screen resolution: {experiment_resolution} != {metadata['resolution']}")
 

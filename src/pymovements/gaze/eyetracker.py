@@ -22,8 +22,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from pymovements._utils import _checks
 from pymovements._utils._html import html_repr
-from pymovements.utils import checks
 
 
 @html_repr()
@@ -76,4 +76,4 @@ class EyeTracker:
     def __post_init__(self) -> None:
         """Check that the sampling rate is a positive number."""
         if self.sampling_rate is not None:
-            checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
+            _checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
