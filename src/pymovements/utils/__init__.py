@@ -34,8 +34,6 @@
     parsing
     paths
 """
-from deprecated.sphinx import deprecated
-
 from pymovements.utils import aois
 from pymovements.utils import archives
 from pymovements.utils import downloads
