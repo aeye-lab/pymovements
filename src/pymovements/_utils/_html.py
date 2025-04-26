@@ -20,8 +20,8 @@
 """Provides functions for generating HTML representations of objects for Jupyter notebooks."""
 from __future__ import annotations
 
-from html import escape
 from collections.abc import Callable
+from html import escape
 from typing import TypeVar
 from uuid import uuid4
 
