@@ -23,8 +23,6 @@ from __future__ import annotations
 from collections.abc import Sized
 from typing import Any
 
-import numpy as np
-
 
 def check_no_zeros(variable: Any, name: str = 'variable') -> None:
     """Check if variable, or if it is iterable, any of its components are zero.
@@ -56,23 +54,6 @@ def check_no_zeros(variable: Any, name: str = 'variable') -> None:
         for variable_component in variable:
             if variable_component == 0:
                 raise ValueError(error_message)
-
-
-def check_nan_both_channels(arr: np.ndarray) -> None:
-    """Check if all nans occur at the same time steps for both channels.
-
-    Parameters
-    ----------
-    arr: np.ndarray
-        Array of shape (N, 2) with horizontal and vertical gaze coordinates.
-    """
-    # sanity check: horizontal and vertical gaze coordinates missing
-    # values at the same time (Eyelink eyetracker never records only
-    # one coordinate)
-    if not np.array_equal(np.isnan(arr[:, 0]), np.isnan(arr[:, 1])):
-        raise ValueError(
-            'nans must occur at the same steps of horizontal and vertical direction',
-        )
 
 
 def check_shapes(**kwargs: Any) -> None:
