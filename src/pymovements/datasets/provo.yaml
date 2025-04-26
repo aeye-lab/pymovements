@@ -7,13 +7,9 @@ has_files:
   precomputed_events: true
   precomputed_reading_measures: false
 
-mirrors:
-  precomputed_events:
-    - "https://osf.io/download/"
-
 resources:
   precomputed_events:
-    - resource: "z3eh6/"
+    - resource: "https://osf.io/download/z3eh6/"
       filename: "Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv"
       md5: "7aa239e51e5d78528e2430f84a23da3f"
 

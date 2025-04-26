@@ -24,8 +24,8 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from pymovements._utils import _checks
 from pymovements.gaze import transforms_numpy
-from pymovements.utils import checks
 
 
 @dataclass
@@ -88,19 +88,19 @@ class Screen:
     def __post_init__(self) -> None:
         """Check fields for validity."""
         if self.width_px is not None:
-            checks.check_is_greater_than_zero(width_px=self.width_px)
+            _checks.check_is_greater_than_zero(width_px=self.width_px)
 
         if self.height_px is not None:
-            checks.check_is_greater_than_zero(height_px=self.height_px)
+            _checks.check_is_greater_than_zero(height_px=self.height_px)
 
         if self.width_cm is not None:
-            checks.check_is_greater_than_zero(width_cm=self.width_cm)
+            _checks.check_is_greater_than_zero(width_cm=self.width_cm)
 
         if self.height_cm is not None:
-            checks.check_is_greater_than_zero(height_cm=self.height_cm)
+            _checks.check_is_greater_than_zero(height_cm=self.height_cm)
 
         if self.distance_cm is not None:
-            checks.check_is_greater_than_zero(distance_cm=self.distance_cm)
+            _checks.check_is_greater_than_zero(distance_cm=self.distance_cm)
 
     @property
     def x_max_dva(self) -> float:
@@ -114,7 +114,7 @@ class Screen:
         self._check_numerical_attribute('distance_cm')
         assert self.distance_cm is not None
 
-        checks.check_is_not_none(origin=self.origin)
+        _checks.check_is_not_none(origin=self.origin)
         assert self.origin is not None
 
         return float(
@@ -139,7 +139,7 @@ class Screen:
         self._check_numerical_attribute('distance_cm')
         assert self.distance_cm is not None
 
-        checks.check_is_not_none(origin=self.origin)
+        _checks.check_is_not_none(origin=self.origin)
         assert self.origin is not None
 
         return float(
@@ -164,7 +164,7 @@ class Screen:
         self._check_numerical_attribute('distance_cm')
         assert self.distance_cm is not None
 
-        checks.check_is_not_none(origin=self.origin)
+        _checks.check_is_not_none(origin=self.origin)
         assert self.origin is not None
 
         return float(
@@ -189,7 +189,7 @@ class Screen:
         self._check_numerical_attribute('distance_cm')
         assert self.distance_cm is not None
 
-        checks.check_is_not_none(origin=self.origin)
+        _checks.check_is_not_none(origin=self.origin)
         assert self.origin is not None
 
         return float(
@@ -263,7 +263,7 @@ class Screen:
         self._check_numerical_attribute('distance_cm')
         assert self.distance_cm is not None
 
-        checks.check_is_not_none(origin=self.origin)
+        _checks.check_is_not_none(origin=self.origin)
         assert self.origin is not None
 
         return transforms_numpy.pix2deg(
@@ -277,6 +277,6 @@ class Screen:
     def _check_numerical_attribute(self, key: str) -> None:
         """Check if numerical attribute is not None and greater than zero."""
         value = getattr(self, key, None)
-        checks.check_is_not_none(**{key: value})
+        _checks.check_is_not_none(**{key: value})
         assert isinstance(value, (int, float))
-        checks.check_is_greater_than_zero(**{key: value})
+        _checks.check_is_greater_than_zero(**{key: value})

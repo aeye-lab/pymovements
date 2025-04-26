@@ -183,7 +183,7 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
             True,
             {
                 'name': 'MyDatasetDefinition',
-                'long_name': '.',
+                'long_name': None,
                 'has_files': {},
                 'acceleration_columns': None,
                 'column_map': {},
@@ -227,7 +227,7 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
             False,
             {
                 'name': 'MyDatasetDefinition',
-                'long_name': '.',
+                'long_name': None,
                 '_foobar': 'test',
                 'has_files': {},
                 'acceleration_columns': None,

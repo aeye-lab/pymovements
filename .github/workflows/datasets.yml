@@ -30,6 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [prepare-matrix]
     strategy:
+      fail-fast: false
       matrix:
         dataset: ${{ fromJSON(needs.prepare-matrix.outputs.all_datasets) }}
     steps:
