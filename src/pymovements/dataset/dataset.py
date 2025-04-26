@@ -30,6 +30,7 @@ from typing import Any
 import polars as pl
 from tqdm.auto import tqdm
 
+from pymovements._utils._html import html_repr
 from pymovements.dataset import dataset_download
 from pymovements.dataset import dataset_files
 from pymovements.dataset.dataset_definition import DatasetDefinition
@@ -45,6 +46,10 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+@html_repr([
+    'gaze', 'events', 'precomputed_events',
+    'precomputed_reading_measures', 'definition', 'fileinfo',
+])
 class Dataset:
     """Dataset base class.
 

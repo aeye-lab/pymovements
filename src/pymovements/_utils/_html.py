@@ -21,11 +21,12 @@
 from __future__ import annotations
 
 from html import escape
-from typing import Callable
+from collections.abc import Callable
 from typing import TypeVar
 from uuid import uuid4
 
 import polars as pl
+
 
 STYLE = """
 <style>
@@ -61,7 +62,6 @@ STYLE = """
     }
     .pm-section-details {
         display: none;
-        padding-left: 1em;
     }
     .pm-section-toggle:checked ~ .pm-section-details {
         display: block;
@@ -131,17 +131,8 @@ def _attr_html(name: str, obj: object) -> str:
     section_id = uuid4()
     name = escape(name)
 
-    if isinstance(obj, pl.DataFrame):
-        inline_details = escape(
-            f"DataFrame ({len(obj.columns)} columns, {len(obj)} rows)",
-        )
-    else:
-        inline_details = escape(repr(obj).replace('\n', ' ')[:50])
-
-    if hasattr(obj, '_repr_html_'):
-        details = obj._repr_html_()
-    else:
-        details = escape(repr(obj))
+    inline_details = _attr_inline_details_html(obj)
+    details = _attr_details_html(obj)
 
     return f"""
     <li class="pm-section">
@@ -151,3 +142,44 @@ def _attr_html(name: str, obj: object) -> str:
         <div class="pm-section-details">{details}</div>
     </li>
     """
+
+
+def _attr_inline_details_html(obj: object) -> str:
+    if isinstance(obj, pl.DataFrame):
+        inline_details = f"DataFrame ({len(obj.columns)} columns, {len(obj)} rows)"
+    elif isinstance(obj, list):
+        inline_details = f"list ({len(obj)} items)"
+    elif isinstance(obj, dict):
+        inline_details = f"dict ({len(obj)} items)"
+    elif len(repr(obj)) < 50:
+        inline_details = repr(obj).replace('\n', ' ')
+    else:
+        inline_details = type(obj).__name__
+    return escape(inline_details)
+
+
+def _attr_details_html(obj: object) -> str:
+    if isinstance(obj, list):
+        details = '<ul>'
+        num_shown = 2
+        for item in obj[:num_shown]:
+            # TODO: Limit recursion depth
+            details += f'<li>{_attr_details_html(item)}</li>'
+        if len(obj) > num_shown:
+            details += f'<li>({len(obj) - 2} more)</li>'
+        details += '</ul>'
+    elif isinstance(obj, dict):
+        details = '<ul>'
+        num_shown = 2
+        for key, value in list(obj.items())[:num_shown]:
+            # TODO: Limit recursion depth
+            details += f'<li><strong>{escape(str(key))}:</strong><br>'
+            details += f'{_attr_details_html(value)}</li>'
+        if len(obj) > num_shown:
+            details += f'<li>({len(obj) - 2} more)</li>'
+        details += '</ul>'
+    elif hasattr(obj, '_repr_html_'):
+        details = obj._repr_html_()
+    else:
+        details = escape(repr(obj))
+    return details

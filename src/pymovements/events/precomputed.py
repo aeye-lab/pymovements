@@ -22,7 +22,10 @@ from __future__ import annotations
 
 import polars as pl
 
+from pymovements._utils._html import html_repr
 
+
+@html_repr()
 class PrecomputedEventDataFrame:
     """A DataFrame for precomputed eye movement event data.
 
