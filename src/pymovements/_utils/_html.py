@@ -37,7 +37,7 @@ STYLE = """
     }
     .pm-section {
         list-style: none;
-        padding-top: 0.5em;
+        padding-bottom: 0.5em;
     }
     .pm-section-title {
         font-size: 120%;
@@ -147,39 +147,46 @@ def _attr_html(name: str, obj: object) -> str:
 def _attr_inline_details_html(obj: object) -> str:
     if isinstance(obj, pl.DataFrame):
         inline_details = f"DataFrame ({len(obj.columns)} columns, {len(obj)} rows)"
+
     elif isinstance(obj, list):
         inline_details = f"list ({len(obj)} items)"
+
     elif isinstance(obj, dict):
         inline_details = f"dict ({len(obj)} items)"
+
     elif len(repr(obj)) < 50:
         inline_details = repr(obj).replace('\n', ' ')
+
     else:
         inline_details = type(obj).__name__
+
     return escape(inline_details)
 
 
-def _attr_details_html(obj: object) -> str:
-    if isinstance(obj, list):
+def _attr_details_html(obj: object, depth: int = 0, max_depth: int = 3) -> str:
+    if isinstance(obj, list) and depth < max_depth:
         details = '<ul>'
         num_shown = 2
         for item in obj[:num_shown]:
-            # TODO: Limit recursion depth
-            details += f'<li>{_attr_details_html(item)}</li>'
+            details += f'<li>{_attr_details_html(item, depth + 1)}</li>'
         if len(obj) > num_shown:
             details += f'<li>({len(obj) - 2} more)</li>'
         details += '</ul>'
-    elif isinstance(obj, dict):
+
+    elif isinstance(obj, dict) and depth < max_depth:
         details = '<ul>'
         num_shown = 2
         for key, value in list(obj.items())[:num_shown]:
-            # TODO: Limit recursion depth
             details += f'<li><strong>{escape(str(key))}:</strong><br>'
-            details += f'{_attr_details_html(value)}</li>'
+            details += f'{_attr_details_html(value, depth + 1)}</li>'
         if len(obj) > num_shown:
             details += f'<li>({len(obj) - 2} more)</li>'
         details += '</ul>'
+
     elif hasattr(obj, '_repr_html_'):
         details = obj._repr_html_()
+
     else:
         details = escape(repr(obj))
+
     return details
