@@ -62,9 +62,13 @@ STYLE = """
     }
     .pm-section-details {
         display: none;
+        padding-left: 1em;
     }
     .pm-section-toggle:checked ~ .pm-section-details {
         display: block;
+    }
+    .pm-section-details > ul {
+        padding-left: 1em;
     }
 </style>
 """
