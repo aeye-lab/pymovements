@@ -372,9 +372,11 @@ def from_asc(
     if isinstance(patterns, str):
         if patterns == 'eyelink':
             # We use the default patterns of parse_eyelink then.
-            patterns = None
+            _patterns = None
         else:
             raise ValueError(f"unknown pattern key '{patterns}'. Supported keys are: eyelink")
+    else:
+        _patterns = patterns
 
     # Explicit arguments take precedence over definition.
     if definition:
@@ -387,8 +389,8 @@ def from_asc(
         if 'gaze' in definition.custom_read_kwargs and definition.custom_read_kwargs['gaze']:
             custom_read_kwargs = definition.custom_read_kwargs['gaze']
 
-            if patterns is None and 'patterns' in custom_read_kwargs:
-                patterns = custom_read_kwargs['patterns']
+            if _patterns is None and 'patterns' in custom_read_kwargs:
+                _patterns = custom_read_kwargs['patterns']
 
             if metadata_patterns is None and 'metadata_patterns' in custom_read_kwargs:
                 metadata_patterns = custom_read_kwargs['metadata_patterns']
@@ -405,7 +407,7 @@ def from_asc(
     # Read data.
     gaze_data, metadata = parse_eyelink(
         file,
-        patterns=patterns,
+        patterns=_patterns,
         schema=schema,
         metadata_patterns=metadata_patterns,
         encoding=encoding,
