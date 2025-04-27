@@ -132,12 +132,12 @@ def _obj_html(obj: object, attrs: list[str] | None = None) -> str:
     """
 
 
-def _attr_html(name: str, obj: object) -> str:
+def _attr_html(name: str, obj: object, depth: int = 0) -> str:
     section_id = uuid4()
     name = escape(name)
 
     inline_details = _attr_inline_details_html(obj)
-    details = _attr_details_html(obj)
+    details = _attr_details_html(obj, depth=depth)
 
     return f"""
     <li class="pm-section">
@@ -179,15 +179,13 @@ def _attr_details_html(obj: object, depth: int = 0, max_depth: int = 3) -> str:
         details += '</ul>'
 
     elif isinstance(obj, dict) and depth < max_depth:
-        sections = []
-        for key in islice(obj.keys(), 2):
+        details = '<ul class="pm-section-list">'
+        for key in islice(obj.keys(), num_shown):
             value = obj[key]
-            sections.append(_attr_html(key, value))
-        details = f"""
-        <ul class="pm-section-list">
-            {"".join(sections)}
-        </ul>
-        """
+            details += _attr_html(key, value, depth + 1)
+        if len(obj) > num_shown:
+            details += f'<li>({len(obj) - 2} more)</li>'
+        details += '</ul>'
 
     elif hasattr(obj, '_repr_html_'):
         details = obj._repr_html_()
