@@ -32,10 +32,10 @@ import polars as pl
 from tqdm import tqdm
 
 import pymovements as pm  # pylint: disable=cyclic-import
+from pymovements._utils._checks import check_is_mutual_exclusive
 from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
-from pymovements.utils.checks import check_is_mutual_exclusive
 
 
 class Gaze:

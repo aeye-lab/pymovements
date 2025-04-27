@@ -195,9 +195,9 @@ class GazeDataFrame(metaclass=DeprecatedMetaClass):
     └──────┴────────────┘
     """
 
-    _DeprecatedClassMeta__alias = Gaze
-    _DeprecatedClassMeta__version_deprecated = 'v0.22.0'
-    _DeprecatedClassMeta__version_removed = 'v0.27.0'
+    _DeprecatedMetaClass__alias = Gaze
+    _DeprecatedMetaClass__version_deprecated = 'v0.22.0'
+    _DeprecatedMetaClass__version_removed = 'v0.27.0'
 
     frame: pl.DataFrame
 

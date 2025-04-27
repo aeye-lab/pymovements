@@ -37,9 +37,9 @@ class DeprecatedMetaClass(type):
     >>>     variable = 42
     >>>
     >>> class OldClass(DeprecatedMetaClass):
-    >>>     _DeprecatedClassMeta__alias = NewClass
-    >>>     _DeprecatedClassMeta__version_deprecated = 'v1.23.4'
-    >>>     _DeprecatedClassMeta__version_removed = 'v2.0.0'
+    >>>     _DeprecatedMetaClass__alias = NewClass
+    >>>     _DeprecatedMetaClass__version_deprecated = 'v1.23.4'
+    >>>     _DeprecatedMetaClass__version_removed = 'v2.0.0'
 
     As you see, an `OldClass` object is an instance of both OldClass and NewClass:
     >>> isinstance(OldClass(), NewClass)
@@ -59,15 +59,15 @@ class DeprecatedMetaClass(type):
             **kwargs: Any,
     ) -> DeprecatedMetaClass:
         """Create new deprecated class."""
-        alias = classdict.get('_DeprecatedClassMeta__alias')
-        version_deprecated = classdict.get('_DeprecatedClassMeta__version_deprecated')
-        version_removed = classdict.get('_DeprecatedClassMeta__version_removed')
+        alias = classdict.get('_DeprecatedMetaClass__alias')
+        version_deprecated = classdict.get('_DeprecatedMetaClass__version_deprecated')
+        version_removed = classdict.get('_DeprecatedMetaClass__version_removed')
 
         if alias is not None:
             def new(cls: type, *args: Any, **kwargs: Any) -> type:
-                alias = getattr(cls, '_DeprecatedClassMeta__alias')
-                version_deprecated = getattr(cls, '_DeprecatedClassMeta__version_deprecated')
-                version_removed = getattr(cls, '_DeprecatedClassMeta__version_removed')
+                alias = getattr(cls, '_DeprecatedMetaClass__alias')
+                version_deprecated = getattr(cls, '_DeprecatedMetaClass__version_deprecated')
+                version_removed = getattr(cls, '_DeprecatedMetaClass__version_removed')
 
                 if alias is not None:
                     warn(
@@ -80,16 +80,16 @@ class DeprecatedMetaClass(type):
                 return alias(*args, **kwargs)
 
             classdict['__new__'] = new
-            classdict['_DeprecatedClassMeta__alias'] = alias
-            classdict['_DeprecatedClassMeta__version_deprecated'] = version_deprecated
-            classdict['_DeprecatedClassMeta__version_removed'] = version_removed
+            classdict['_DeprecatedMetaClass__alias'] = alias
+            classdict['_DeprecatedMetaClass__version_deprecated'] = version_deprecated
+            classdict['_DeprecatedMetaClass__version_removed'] = version_removed
 
         fixed_bases = []
 
         for b in bases:
-            alias = getattr(b, '_DeprecatedClassMeta__alias', None)
-            version_deprecated = classdict.get('_DeprecatedClassMeta__version_deprecated')
-            version_removed = classdict.get('_DeprecatedClassMeta__version_removed')
+            alias = getattr(b, '_DeprecatedMetaClass__alias', None)
+            version_deprecated = classdict.get('_DeprecatedMetaClass__version_deprecated')
+            version_removed = classdict.get('_DeprecatedMetaClass__version_removed')
 
             if alias is not None:
                 warn(
@@ -106,18 +106,20 @@ class DeprecatedMetaClass(type):
 
         return super().__new__(mcs, name, tuple(fixed_bases), classdict, *args, **kwargs)
 
-    def __instancecheck__(cls, instance: Any) -> bool:
+    @classmethod
+    def __instancecheck__(mcs, instance: Any) -> bool:
         """Check if is instance of deprecated class.
 
         Provides implementation for isinstance().
         """
-        return any(cls.__subclasscheck__(subclass=c) for c in (type(instance), instance.__class__))
+        return any(mcs.__subclasscheck__(subclass=c) for c in (type(instance), instance.__class__))
 
-    def __subclasscheck__(cls, subclass: Any) -> bool:
+    @classmethod
+    def __subclasscheck__(mcs, subclass: Any) -> bool:
         """Check if is subclass of deprecated class.
 
         Provides implementation for issubclass().
         """
-        if subclass is cls:
+        if subclass is mcs:
             return True
-        return issubclass(subclass, getattr(cls, '_DeprecatedClassMeta__alias'))
+        return issubclass(subclass, getattr(mcs, '_DeprecatedMetaClass__alias'))
