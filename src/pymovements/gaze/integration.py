@@ -26,10 +26,10 @@ import numpy as np
 import pandas as pd
 import polars as pl
 
+from pymovements._utils import _checks
 from pymovements.events.frame import EventDataFrame
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze import Gaze
-from pymovements.utils import checks
 
 
 def from_numpy(
@@ -227,12 +227,12 @@ def from_numpy(
     └──────┴────────────┘
     """
     # Either data or {time, pixel, position, velocity, acceleration} must be None.
-    checks.check_is_mutual_exclusive(data=data, time=time)
-    checks.check_is_mutual_exclusive(data=data, pixel=pixel)
-    checks.check_is_mutual_exclusive(data=data, position=position)
-    checks.check_is_mutual_exclusive(data=data, velocity=velocity)
-    checks.check_is_mutual_exclusive(data=data, acceleration=acceleration)
-    checks.check_is_mutual_exclusive(data=data, distance=distance)
+    _checks.check_is_mutual_exclusive(data=data, time=time)
+    _checks.check_is_mutual_exclusive(data=data, pixel=pixel)
+    _checks.check_is_mutual_exclusive(data=data, position=position)
+    _checks.check_is_mutual_exclusive(data=data, velocity=velocity)
+    _checks.check_is_mutual_exclusive(data=data, acceleration=acceleration)
+    _checks.check_is_mutual_exclusive(data=data, distance=distance)
 
     if data is not None:
         df = pl.from_numpy(data=data, schema=schema, orient=orient)
