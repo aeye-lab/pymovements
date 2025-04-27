@@ -34,15 +34,20 @@ class DeprecatedMetaClass(type):
     --------
     This is how a deprecated alias is defined:
     >>> class NewClass:
-    >>>     variable = 42
+    ...     variable = 42
     >>>
-    >>> class OldClass(DeprecatedMetaClass):
-    >>>     _DeprecatedMetaClass__alias = NewClass
-    >>>     _DeprecatedMetaClass__version_deprecated = 'v1.23.4'
-    >>>     _DeprecatedMetaClass__version_removed = 'v2.0.0'
+    >>> class OldClass(metaclass=DeprecatedMetaClass):
+    ...     _DeprecatedMetaClass__alias = NewClass
+    ...     _DeprecatedMetaClass__version_deprecated = 'v1.23.4'
+    ...     _DeprecatedMetaClass__version_removed = 'v2.0.0'
+
+    Instantiating `OldClass` gives a warning:
+    >>> old_class = OldClass()  # doctest: +SKIP
+    DeprecationWarning('OldClass has been renamed to NewClass in v1.23.4 and will be removed in
+      v2.0.0.')
 
     As you see, an `OldClass` object is an instance of both OldClass and NewClass:
-    >>> isinstance(OldClass(), NewClass)
+    >>> isinstance(old_class, NewClass)  # doctest: +SKIP
     True
 
     As well as vice versa:
