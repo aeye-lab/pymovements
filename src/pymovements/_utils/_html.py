@@ -22,6 +22,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from html import escape
+from itertools import islice
 from typing import TypeVar
 from uuid import uuid4
 
@@ -126,7 +127,7 @@ def _obj_html(obj: object, attrs: list[str] | None = None) -> str:
     {STYLE}
     <span class="pm-section-title">{title}</span>
     <ul class="pm-section-list">
-    {"".join(sections)}
+        {"".join(sections)}
     </ul>
     """
 
@@ -178,14 +179,15 @@ def _attr_details_html(obj: object, depth: int = 0, max_depth: int = 3) -> str:
         details += '</ul>'
 
     elif isinstance(obj, dict) and depth < max_depth:
-        details = '<ul>'
-        num_shown = 2
-        for key, value in list(obj.items())[:num_shown]:
-            details += f'<li><strong>{escape(str(key))}:</strong><br>'
-            details += f'{_attr_details_html(value, depth + 1)}</li>'
-        if len(obj) > num_shown:
-            details += f'<li>({len(obj) - 2} more)</li>'
-        details += '</ul>'
+        sections = []
+        for key in islice(obj.keys(), 2):
+            value = obj[key]
+            sections.append(_attr_html(key, value))
+        details = f"""
+        <ul class="pm-section-list">
+            {"".join(sections)}
+        </ul>
+        """
 
     elif hasattr(obj, '_repr_html_'):
         details = obj._repr_html_()
