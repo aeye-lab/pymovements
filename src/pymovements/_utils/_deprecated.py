@@ -74,13 +74,12 @@ class DeprecatedMetaClass(type):
                 version_deprecated = getattr(cls, '_DeprecatedMetaClass__version_deprecated')
                 version_removed = getattr(cls, '_DeprecatedMetaClass__version_removed')
 
-                if alias is not None:
-                    warn(
-                        f"{cls.__name__} has been renamed to {alias.__name__} "
-                        f"in {version_deprecated} "
-                        f"and will be removed in {version_removed}.",
-                        DeprecationWarning, stacklevel=2,
-                    )
+                warn(
+                    f"{cls.__name__} has been renamed to {alias.__name__} "
+                    f"in {version_deprecated} "
+                    f"and will be removed in {version_removed}.",
+                    DeprecationWarning, stacklevel=2,
+                )
 
                 return alias(*args, **kwargs)
 
