@@ -120,8 +120,7 @@ class DeprecatedMetaClass(type):
 
         Provides implementation for isinstance().
         """
-        __subclasscheck__ = getattr(cls, '__subclasscheck__')
-        return any(
-            __subclasscheck__(cls=cls, subclass=c)
-            for c in (type(instance), instance.__class__)
-        )
+        # pylint: disable=no-value-for-parameter
+        # pylint doesn't get that this is a metaclass method:
+        # see: https://github.com/pylint-dev/pylint/issues/3268
+        return any(cls.__subclasscheck__(c) for c in (type(instance), instance.__class__))
