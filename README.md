@@ -46,7 +46,7 @@ dataset = pm.Dataset(
     path='data/judo100',         # setup your local dataset path
 )
 dataset.download()               # download a public dataset from our dataset library
-dataset.load()                   # download the dataset
+dataset.load()                   # load the dataset
 ```
 
 calculate velocities on the fly
