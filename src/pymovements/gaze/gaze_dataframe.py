@@ -28,12 +28,12 @@ from __future__ import annotations
 import polars as pl
 
 import pymovements as pm  # pylint: disable=cyclic-import
-from pymovements._utils._deprecated import DeprecatedClassMeta
+from pymovements._utils._deprecated import DeprecatedMetaClass
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze import Gaze
 
 
-class GazeDataFrame(metaclass=DeprecatedClassMeta):
+class GazeDataFrame(metaclass=DeprecatedMetaClass):
     """Self-contained data structure containing gaze represented as samples or events.
 
     .. deprecated:: v0.22.0

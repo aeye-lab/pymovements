@@ -24,8 +24,8 @@ from typing import Any
 from warnings import warn
 
 
-class DeprecatedClassMeta(type):
-    """Metaclass for deprecated class aliases.
+class DeprecatedMetaClass(type):
+    """MetaClass for deprecated class aliases.
 
     The class serves as an equivalent alias for the `isinstance()` and `issubclass()` methods.
     It supports subclassing of the deprecated class.
@@ -36,7 +36,7 @@ class DeprecatedClassMeta(type):
     >>> class NewClass:
     >>>     variable = 42
     >>>
-    >>> class OldClass(DeprecatedClassMeta):
+    >>> class OldClass(DeprecatedMetaClass):
     >>>     _DeprecatedClassMeta__alias = NewClass
     >>>     _DeprecatedClassMeta__version_deprecated = 'v1.23.4'
     >>>     _DeprecatedClassMeta__version_removed = 'v2.0.0'
@@ -51,13 +51,13 @@ class DeprecatedClassMeta(type):
     """
 
     def __new__(
-            mcs: type[DeprecatedClassMeta],
+            mcs: type[DeprecatedMetaClass],
             name: str,
             bases: tuple,
             classdict: dict,
             *args: Any,
             **kwargs: Any,
-    ) -> DeprecatedClassMeta:
+    ) -> DeprecatedMetaClass:
         """Create new deprecated class."""
         alias = classdict.get('_DeprecatedClassMeta__alias')
         version_deprecated = classdict.get('_DeprecatedClassMeta__version_deprecated')
