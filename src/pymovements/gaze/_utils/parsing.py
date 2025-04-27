@@ -247,6 +247,7 @@ def parse_eyelink(
     Warning
         If no metadata is found in the file.
     """
+    # pylint: disable=too-many-branches, too-many-statements
     if patterns is None:
         patterns = []
     compiled_patterns = compile_patterns(patterns)
