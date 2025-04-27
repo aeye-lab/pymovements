@@ -106,20 +106,22 @@ class DeprecatedMetaClass(type):
 
         return super().__new__(mcs, name, tuple(fixed_bases), classdict, *args, **kwargs)
 
-    @classmethod
-    def __instancecheck__(mcs, instance: Any) -> bool:
-        """Check if is instance of deprecated class.
-
-        Provides implementation for isinstance().
-        """
-        return any(mcs.__subclasscheck__(subclass=c) for c in (type(instance), instance.__class__))
-
-    @classmethod
-    def __subclasscheck__(mcs, subclass: Any) -> bool:
+    def __subclasscheck__(cls, subclass: Any) -> bool:
         """Check if is subclass of deprecated class.
 
         Provides implementation for issubclass().
         """
-        if subclass is mcs:
+        if subclass is cls:
             return True
-        return issubclass(subclass, getattr(mcs, '_DeprecatedMetaClass__alias'))
+        return issubclass(subclass, getattr(cls, '_DeprecatedMetaClass__alias'))
+
+    def __instancecheck__(cls, instance: Any) -> bool:
+        """Check if is instance of deprecated class.
+
+        Provides implementation for isinstance().
+        """
+        __subclasscheck__ = getattr(cls, '__subclasscheck__')
+        return any(
+            __subclasscheck__(cls=cls, subclass=c)
+            for c in (type(instance), instance.__class__)
+        )
