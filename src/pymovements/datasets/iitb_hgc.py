@@ -42,12 +42,12 @@ class IITBHGC(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
@@ -102,6 +102,8 @@ class IITBHGC(DatasetDefinition):
 
     name: str = 'IITBHGC'
 
+    long_name: str = 'IITB-Hallucination Gaze corpus'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': False,
@@ -110,19 +112,12 @@ class IITBHGC(DatasetDefinition):
         },
     )
 
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda: {
-            'precomputed_events': [
-                'https://huggingface.co/datasets/cfilt/IITB-HGC/resolve/main/',
-            ],
-        },
-    )
-
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
             'precomputed_events': [
                 {
-                    'resource': 'IITB_HGC.jsonl?download=true',
+                    'resource': 'https://huggingface.co/datasets/cfilt/IITB-HGC/'
+                    'resolve/main/IITB_HGC.jsonl?download=true',
                     'filename': 'IITB_HGC.jsonl',
                     'md5': 'cde5dd88534e87d9b2f1ab6e47133b5c',
                 },
