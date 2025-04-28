@@ -31,7 +31,7 @@ from pymovements._utils._paths import match_filepaths
 from pymovements._utils._strings import curly_to_regex
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
-from pymovements.events import EventDataFrame
+from pymovements.events import Events
 from pymovements.events.precomputed import PrecomputedEventDataFrame
 from pymovements.gaze.gaze import Gaze
 from pymovements.gaze.io import from_asc
@@ -130,7 +130,7 @@ def load_event_files(
         paths: DatasetPaths,
         events_dirname: str | None = None,
         extension: str = 'feather',
-) -> list[EventDataFrame]:
+) -> list[Events]:
     """Load all event files according to fileinfo dataframe.
 
     Parameters
@@ -152,7 +152,7 @@ def load_event_files(
 
     Returns
     -------
-    list[EventDataFrame]
+    list[Events]
         List of event dataframes.
 
     Raises
@@ -162,7 +162,7 @@ def load_event_files(
     ValueError
         If extension is not in list of valid extensions.
     """
-    event_dfs: list[EventDataFrame] = []
+    event_dfs: list[Events] = []
 
     # read and preprocess input files
     for fileinfo_row in tqdm(fileinfo.to_dicts()):
@@ -193,7 +193,7 @@ def load_event_files(
             fileinfo=fileinfo_row,
         )
 
-        event_dfs.append(EventDataFrame(event_df))
+        event_dfs.append(Events(event_df))
 
     return event_dfs
 
@@ -543,7 +543,7 @@ def add_fileinfo(
 
 
 def save_events(
-        events: list[EventDataFrame],
+        events: list[Events],
         fileinfo: pl.DataFrame,
         paths: DatasetPaths,
         events_dirname: str | None = None,
@@ -557,7 +557,7 @@ def save_events(
 
     Parameters
     ----------
-    events: list[EventDataFrame]
+    events: list[Events]
         The event dataframes to save.
     fileinfo: pl.DataFrame
         A dataframe holding file information.

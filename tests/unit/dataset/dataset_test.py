@@ -901,7 +901,7 @@ def test_detect_events_auto_eye(detect_event_kwargs, gaze_dataset_configuration)
     dataset.detect_events(**detect_event_kwargs)
 
     expected_schema = {
-        'subject_id': pl.Int64, **events.EventDataFrame._minimal_schema, 'duration': pl.Int64,
+        'subject_id': pl.Int64, **events.Events._minimal_schema, 'duration': pl.Int64,
     }
     for result_event_df in dataset.events:
         assert result_event_df.schema == expected_schema
@@ -945,7 +945,7 @@ def test_detect_events_explicit_eye(detect_event_kwargs, gaze_dataset_configurat
 
         expected_schema = {
             'subject_id': pl.Int64,
-            **events.EventDataFrame._minimal_schema,
+            **events.Events._minimal_schema,
             'duration': pl.Int64,
         }
 
@@ -973,7 +973,7 @@ def test_detect_events_explicit_eye(detect_event_kwargs, gaze_dataset_configurat
             },
             {
                 'subject_id': pl.Int64,
-                **events.EventDataFrame._minimal_schema,
+                **events.Events._minimal_schema,
                 'duration': pl.Int64,
             },
             id='two-saccade-runs',
@@ -991,7 +991,7 @@ def test_detect_events_explicit_eye(detect_event_kwargs, gaze_dataset_configurat
             },
             {
                 'subject_id': pl.Int64,
-                **events.EventDataFrame._minimal_schema,
+                **events.Events._minimal_schema,
                 'duration': pl.Int64,
             },
             id='one-saccade-one-fixation-run',
@@ -1130,21 +1130,21 @@ def test_detect_events_raises_column_not_found_error(
             id='empty_list_stays_empty_list',
         ),
         pytest.param(
-            [events.EventDataFrame()],
-            [events.EventDataFrame()],
+            [events.Events()],
+            [events.Events()],
             id='empty_df_stays_empty_df',
         ),
         pytest.param(
-            [events.EventDataFrame(name='event', onsets=[0], offsets=[99])],
-            [events.EventDataFrame()],
+            [events.Events(name='event', onsets=[0], offsets=[99])],
+            [events.Events()],
             id='single_instance_filled_df_gets_cleared_to_empty_df',
         ),
         pytest.param(
             [
-                events.EventDataFrame(name='event', onsets=[0], offsets=[99]),
-                events.EventDataFrame(name='event', onsets=[0], offsets=[99]),
+                events.Events(name='event', onsets=[0], offsets=[99]),
+                events.Events(name='event', onsets=[0], offsets=[99]),
             ],
-            [events.EventDataFrame(), events.EventDataFrame()],
+            [events.Events(), events.Events()],
             id='two_instance_filled_df_gets_cleared_to_two_empty_dfs',
         ),
     ],
@@ -1697,7 +1697,7 @@ def test_event_dataframe_add_property_has_expected_height(
             {'event_properties': 'peak_velocity'},
             {
                 'subject_id': pl.Int64,
-                **events.EventDataFrame._minimal_schema,
+                **events.Events._minimal_schema,
                 'duration': pl.Int64,
                 'peak_velocity': pl.Float64,
             },
@@ -1707,7 +1707,7 @@ def test_event_dataframe_add_property_has_expected_height(
             {'event_properties': 'location'},
             {
                 'subject_id': pl.Int64,
-                **events.EventDataFrame._minimal_schema,
+                **events.Events._minimal_schema,
                 'duration': pl.Int64,
                 'location': pl.List(pl.Float64),
             },

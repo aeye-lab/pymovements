@@ -35,7 +35,7 @@ from pymovements.dataset import dataset_files
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_paths import DatasetPaths
-from pymovements.events import EventDataFrame
+from pymovements.events import Events
 from pymovements.events.precomputed import PrecomputedEventDataFrame
 from pymovements.gaze import Gaze
 from pymovements.reading_measures import ReadingMeasures
@@ -66,7 +66,7 @@ class Dataset:
     ):
         self.fileinfo: pl.DataFrame = pl.DataFrame()
         self.gaze: list[Gaze] = []
-        self.events: list[EventDataFrame] = []
+        self.events: list[Events] = []
         self.precomputed_events: list[PrecomputedEventDataFrame] = []
         self.precomputed_reading_measures: list[ReadingMeasures] = []
 
@@ -639,7 +639,7 @@ class Dataset:
 
     def detect_events(
             self,
-            method: Callable[..., EventDataFrame] | str,
+            method: Callable[..., Events] | str,
             *,
             eye: str = 'auto',
             clear: bool = False,
@@ -684,7 +684,7 @@ class Dataset:
 
     def detect(
             self,
-            method: Callable[..., EventDataFrame] | str,
+            method: Callable[..., Events] | str,
             *,
             eye: str = 'auto',
             clear: bool = False,
@@ -827,7 +827,7 @@ class Dataset:
             return self
 
         for file_id, _ in enumerate(self.events):
-            self.events[file_id] = EventDataFrame()
+            self.events[file_id] = Events()
 
         return self
 

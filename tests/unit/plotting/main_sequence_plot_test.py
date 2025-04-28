@@ -25,7 +25,7 @@ import polars as pl
 import pytest
 from matplotlib import pyplot as plt
 
-from pymovements.events import EventDataFrame
+from pymovements.events import Events
 from pymovements.plotting.main_sequence_plot import main_sequence_plot
 
 
@@ -33,7 +33,7 @@ from pymovements.plotting.main_sequence_plot import main_sequence_plot
     ('input_df', 'show', 'color', 'marker', 'alpha', 'size'),
     [
         pytest.param(
-            EventDataFrame(
+            Events(
                 pl.DataFrame(
                     {
                         'amplitude': [1.0, 1.0, 2.0, 2.0, 3.0, 4.0],
@@ -85,7 +85,7 @@ def test_main_sequence_plot_show_plot(input_df, show, monkeypatch, color, marker
     'input_df',
     [
         pytest.param(
-            EventDataFrame(
+            Events(
                 pl.DataFrame(
                     {
                         'amplitude': [1.0, 1.0, 2.0, 2.0, 3.0, 4.0],
@@ -121,7 +121,7 @@ def test_main_sequence_plot_filter_out_fixations(input_df, monkeypatch):
     'input_df',
     [
         pytest.param(
-            EventDataFrame(
+            Events(
                 pl.DataFrame(
                     {
                         'amplitude': np.arange(100),
@@ -147,7 +147,7 @@ def test_main_sequence_plot_save_path(input_df, monkeypatch):
     ('input_df', 'show'),
     [
         pytest.param(
-            EventDataFrame(
+            Events(
                 pl.DataFrame(
                     {
                         'amplitude': np.arange(100),
@@ -173,7 +173,7 @@ def test_main_sequence_plot_not_show(input_df, show, monkeypatch):
     ('input_df', 'title'),
     [
         pytest.param(
-            EventDataFrame(
+            Events(
                 pl.DataFrame(
                     {
                         'amplitude': np.arange(100),
@@ -198,7 +198,7 @@ def test_main_sequence_plot_set_title(input_df, title, monkeypatch):
     ('input_df', 'expected_error', 'error_msg'),
     [
         pytest.param(
-            EventDataFrame(
+            Events(
                 pl.DataFrame(
                     {
                         'peak_velocity': np.linspace(10, 50, num=100),
@@ -214,7 +214,7 @@ def test_main_sequence_plot_set_title(input_df, title, monkeypatch):
             id='amplitude_missing',
         ),
         pytest.param(
-            EventDataFrame(
+            Events(
                 pl.DataFrame(
                     {
                         'amplitude': np.arange(100),
@@ -229,7 +229,7 @@ def test_main_sequence_plot_set_title(input_df, title, monkeypatch):
             id='peak_velocity_missing',
         ),
         pytest.param(
-            EventDataFrame(
+            Events(
                 pl.DataFrame(
                     {
                         'amplitude': [1.0, 1.0],

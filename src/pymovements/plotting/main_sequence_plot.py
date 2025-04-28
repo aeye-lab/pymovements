@@ -24,11 +24,11 @@ import matplotlib.pyplot as plt
 import polars as pl
 from matplotlib.collections import Collection
 
-from pymovements.events import EventDataFrame
+from pymovements.events import Events
 
 
 def main_sequence_plot(
-        event_df: EventDataFrame,
+        event_df: Events,
         marker_size: float = 25,
         color: str = 'purple',
         alpha: float = 0.5,
@@ -43,7 +43,7 @@ def main_sequence_plot(
 
     Parameters
     ----------
-    event_df: EventDataFrame
+    event_df: Events
         It must contain columns "peak_velocity" and "amplitude".
     marker_size: float
         Size of the marker symbol. (default: 25)

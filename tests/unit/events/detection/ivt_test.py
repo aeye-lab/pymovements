@@ -111,7 +111,7 @@ def test_ivt_raise_error(kwargs, expected_error):
                 'velocity_threshold': 1,
                 'minimum_duration': 10,
             },
-            pm.EventDataFrame(),
+            pm.Events(),
             id='constant_velocity_no_fixation',
         ),
         pytest.param(
@@ -120,7 +120,7 @@ def test_ivt_raise_error(kwargs, expected_error):
                 'velocity_threshold': 1,
                 'minimum_duration': 1,
             },
-            pm.EventDataFrame(
+            pm.Events(
                 name='fixation',
                 onsets=[0],
                 offsets=[99],
@@ -134,7 +134,7 @@ def test_ivt_raise_error(kwargs, expected_error):
                 'minimum_duration': 1,
                 'name': 'custom_fixation',
             },
-            pm.EventDataFrame(
+            pm.Events(
                 name='custom_fixation',
                 onsets=[0],
                 offsets=[99],
@@ -152,7 +152,7 @@ def test_ivt_raise_error(kwargs, expected_error):
                 'velocity_threshold': 1,
                 'minimum_duration': 1,
             },
-            pm.EventDataFrame(
+            pm.Events(
                 name='fixation',
                 onsets=[0, 51],
                 offsets=[48, 99],
@@ -171,7 +171,7 @@ def test_ivt_raise_error(kwargs, expected_error):
                 'velocity_threshold': 1,
                 'minimum_duration': 1,
             },
-            pm.EventDataFrame(
+            pm.Events(
                 name='fixation',
                 onsets=[0, 21],
                 offsets=[9, 89],
@@ -191,7 +191,7 @@ def test_ivt_raise_error(kwargs, expected_error):
                 'minimum_duration': 1,
                 'include_nan': True,
             },
-            pm.EventDataFrame(
+            pm.Events(
                 name='fixation',
                 onsets=[0],
                 offsets=[89],
@@ -205,7 +205,7 @@ def test_ivt_raise_error(kwargs, expected_error):
                 'velocity_threshold': 1,
                 'minimum_duration': 1,
             },
-            pm.EventDataFrame(
+            pm.Events(
                 name='fixation',
                 onsets=[1000],
                 offsets=[1099],

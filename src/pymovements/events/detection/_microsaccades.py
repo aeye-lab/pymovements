@@ -27,7 +27,7 @@ import numpy as np
 from pymovements._utils import _checks
 from pymovements.events._utils._filters import filter_candidates_remove_nans
 from pymovements.events.detection._library import register_event_detection
-from pymovements.events.frame import EventDataFrame
+from pymovements.events.frame import Events
 from pymovements.gaze.transforms_numpy import consecutive
 
 
@@ -41,7 +41,7 @@ def microsaccades(
         minimum_threshold: float = 1e-10,
         include_nan: bool = False,
         name: str = 'saccade',
-) -> EventDataFrame:
+) -> Events:
     """Detect micro-saccades from velocity gaze sequence.
 
     This algorithm has a noise-adaptive velocity threshold parameter, which can also be set
@@ -81,7 +81,7 @@ def microsaccades(
 
     Returns
     -------
-    EventDataFrame
+    Events
         A dataframe with detected saccades as rows.
 
     Raises
@@ -143,7 +143,7 @@ def microsaccades(
     offsets = timesteps[[candidate_indices[-1] for candidate_indices in candidates]].flatten()
 
     # Create event dataframe from onsets and offsets.
-    event_df = EventDataFrame(name=name, onsets=onsets, offsets=offsets)
+    event_df = Events(name=name, onsets=onsets, offsets=offsets)
     return event_df
 
 

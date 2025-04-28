@@ -51,7 +51,7 @@ class GazeDataFrame(metaclass=DeprecatedMetaClass):
         A dataframe to be transformed to a polars dataframe. (default: None)
     experiment : Experiment | None
         The experiment definition. (default: None)
-    events: pm.EventDataFrame | None
+    events: pm.Events | None
         A dataframe of events in the gaze signal. (default: None)
     trial_columns: str | list[str] | None
         The name of the trial columns in the input data frame. If the list is empty or None,
@@ -204,7 +204,7 @@ class GazeDataFrame(metaclass=DeprecatedMetaClass):
 
     frame: pl.DataFrame
 
-    events: pm.EventDataFrame
+    events: pm.Events
 
     experiment: Experiment | None
 

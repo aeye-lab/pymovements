@@ -34,7 +34,7 @@ from pymovements.dataset import DatasetDefinition
 from pymovements.dataset import DatasetLibrary
 from pymovements.dataset import DatasetPaths
 from pymovements.dataset import register_dataset
-from pymovements.events import EventDataFrame
+from pymovements.events import Events
 from pymovements.events import EventGazeProcessor
 from pymovements.events import EventProcessor
 from pymovements.gaze import Experiment
@@ -56,7 +56,7 @@ __all__ = [
     'register_dataset',
 
     'events',
-    'EventDataFrame',
+    'Events',
     'EventGazeProcessor',
     'EventProcessor',
 

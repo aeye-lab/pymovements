@@ -32,18 +32,18 @@ import pymovements as pm
     [
         pytest.param(
             {
-                'events': pm.EventDataFrame(name='fixation', onsets=[0], offsets=[100]),
+                'events': pm.Events(name='fixation', onsets=[0], offsets=[100]),
                 'timesteps': np.arange(0, 100),
             },
-            pm.EventDataFrame(),
+            pm.Events(),
             id='fixation_from_start_to_end_no_fill',
         ),
         pytest.param(
             {
-                'events': pm.EventDataFrame(name='fixation', onsets=[10], offsets=[100]),
+                'events': pm.Events(name='fixation', onsets=[10], offsets=[100]),
                 'timesteps': np.arange(0, 100),
             },
-            pm.EventDataFrame(
+            pm.Events(
                 name='unclassified',
                 onsets=[0],
                 offsets=[9],
@@ -52,10 +52,10 @@ import pymovements as pm
         ),
         pytest.param(
             {
-                'events': pm.EventDataFrame(name='fixation', onsets=[0], offsets=[90]),
+                'events': pm.Events(name='fixation', onsets=[0], offsets=[90]),
                 'timesteps': np.arange(0, 100),
             },
-            pm.EventDataFrame(
+            pm.Events(
                 name='unclassified',
                 onsets=[90],
                 offsets=[99],
@@ -64,10 +64,10 @@ import pymovements as pm
         ),
         pytest.param(
             {
-                'events': pm.EventDataFrame(name='fixation', onsets=[0, 50], offsets=[40, 100]),
+                'events': pm.Events(name='fixation', onsets=[0, 50], offsets=[40, 100]),
                 'timesteps': np.arange(0, 100),
             },
-            pm.EventDataFrame(
+            pm.Events(
                 name='unclassified',
                 onsets=[40],
                 offsets=[49],
@@ -76,12 +76,12 @@ import pymovements as pm
         ),
         pytest.param(
             {
-                'events': pm.EventDataFrame(
+                'events': pm.Events(
                     name=['fixation', 'saccade'], onsets=[0, 50], offsets=[40, 100],
                 ),
                 'timesteps': np.arange(0, 100),
             },
-            pm.EventDataFrame(
+            pm.Events(
                 name='unclassified',
                 onsets=[40],
                 offsets=[49],

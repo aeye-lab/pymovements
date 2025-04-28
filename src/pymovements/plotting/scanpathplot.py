@@ -29,7 +29,7 @@ import matplotlib.scale
 import numpy as np
 from matplotlib.patches import Circle
 
-from pymovements.events import EventDataFrame
+from pymovements.events import Events
 from pymovements.gaze import Gaze
 from pymovements.utils.plotting import draw_line_data
 from pymovements.utils.plotting import LinearSegmentedColormapType
@@ -44,7 +44,7 @@ if 'pytest' in sys.modules:  # pragma: no cover
 
 
 def scanpathplot(
-        events: EventDataFrame,
+        events: Events,
         gaze: Gaze | None = None,
         position_column: str = 'location',
         cval: np.ndarray | None = None,  # pragma: no cover
@@ -71,7 +71,7 @@ def scanpathplot(
 
     Parameters
     ----------
-    events: EventDataFrame
+    events: Events
         The EventDataFrame to plot.
     gaze: Gaze | None
         Optional Gaze Dataframe. (default: None)

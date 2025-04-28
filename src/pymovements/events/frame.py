@@ -32,8 +32,8 @@ from pymovements.events.properties import duration
 from pymovements.stimulus.text import TextStimulus
 
 
-class EventDataFrame:
-    """A DataFrame for event data.
+class Events:
+    """A data structure for event data.
 
     Each row has at least an event name with its onset and offset specified.
 
@@ -64,7 +64,7 @@ class EventDataFrame:
     We define an event dataframe with given names of events and lists of onsets and offsets.
     Durations are computed automatically.
 
-    >>> event = EventDataFrame(
+    >>> event = Events(
     ...    name=['fixation', 'fixation', 'fixation', 'fixation', ],
     ...    onsets=[1988147, 1988351, 1988592, 1988788],
     ...    offsets=[1988322, 1988546, 1988736, 1989013]
@@ -259,15 +259,15 @@ class EventDataFrame:
         event_property_columns -= set(self._additional_columns)
         return list(event_property_columns)
 
-    def copy(self) -> EventDataFrame:
+    def copy(self) -> Events:
         """Return a copy of the EventDataFrame.
 
         Returns
         -------
-        EventDataFrame
+        Events
             A copy of the EventDataFrame.
         """
-        return EventDataFrame(data=self.frame.clone())
+        return Events(data=self.frame.clone())
 
     def _add_minimal_schema_columns(self, df: pl.DataFrame) -> pl.DataFrame:
         """Add minimal schema columns to :py:class:`polars.DataFrame` if they are missing.

@@ -73,7 +73,7 @@ def fixture_dataset():
 )
 def test_event_dataframe_init_exceptions(kwargs, exception, msg_substrings):
     with pytest.raises(exception) as excinfo:
-        pm.EventDataFrame(**kwargs)
+        pm.Events(**kwargs)
 
     msg, = excinfo.value.args
     for msg_substring in msg_substrings:
@@ -90,7 +90,7 @@ def test_event_dataframe_init_exceptions(kwargs, exception, msg_substrings):
     ],
 )
 def test_event_dataframe_init_expected_schema(args, kwargs, expected_schema_after_init):
-    event_df = pm.EventDataFrame(*args, **kwargs)
+    event_df = pm.Events(*args, **kwargs)
     assert event_df.schema == expected_schema_after_init
 
 
@@ -104,7 +104,7 @@ def test_event_dataframe_init_expected_schema(args, kwargs, expected_schema_afte
     ],
 )
 def test_event_dataframe_init_has_expected_length(args, kwargs, expected_length):
-    event_df = pm.EventDataFrame(*args, **kwargs)
+    event_df = pm.Events(*args, **kwargs)
     assert len(event_df) == expected_length
 
 
@@ -126,7 +126,7 @@ def test_event_dataframe_init_has_expected_length(args, kwargs, expected_length)
     ],
 )
 def test_event_dataframe_init_has_correct_name(args, kwargs, expected_name):
-    event_df = pm.EventDataFrame(*args, **kwargs)
+    event_df = pm.Events(*args, **kwargs)
     assert (event_df['name'].to_numpy() == expected_name).all()
 
 
@@ -140,7 +140,7 @@ def test_event_dataframe_init_has_correct_name(args, kwargs, expected_name):
     ],
 )
 def test_event_dataframe_init_has_correct_names(args, kwargs, expected_names):
-    event_df = pm.EventDataFrame(*args, **kwargs)
+    event_df = pm.Events(*args, **kwargs)
     assert (event_df['name'] == expected_names).all()
 
 
@@ -175,7 +175,7 @@ def test_event_dataframe_init_has_correct_names(args, kwargs, expected_names):
     ],
 )
 def test_event_dataframe_init_expected(args, kwargs, expected_df_data, expected_schema_after_init):
-    event_df = pm.EventDataFrame(*args, **kwargs)
+    event_df = pm.Events(*args, **kwargs)
 
     expected_df = pl.DataFrame(data=expected_df_data, schema=expected_schema_after_init)
     assert_frame_equal(event_df.frame, expected_df)
@@ -255,7 +255,7 @@ def test_event_dataframe_init_expected(args, kwargs, expected_df_data, expected_
     ],
 )
 def test_event_dataframe_init_expected_df(args, kwargs, expected_df):
-    event_df = pm.EventDataFrame(*args, **kwargs)
+    event_df = pm.Events(*args, **kwargs)
 
     assert_frame_equal(event_df.frame, expected_df)
 
@@ -315,7 +315,7 @@ def test_event_dataframe_init_expected_df(args, kwargs, expected_df):
     ],
 )
 def test_event_dataframe_init_expected_trial_column_list(kwargs, expected_trial_column_list):
-    events = pm.EventDataFrame(**kwargs)
+    events = pm.Events(**kwargs)
 
     assert events.trial_columns == expected_trial_column_list
 
@@ -385,7 +385,7 @@ def test_event_dataframe_init_expected_trial_column_list(kwargs, expected_trial_
     ],
 )
 def test_event_dataframe_init_expected_trial_column_data(kwargs, expected_trial_column_data):
-    events = pm.EventDataFrame(**kwargs)
+    events = pm.Events(**kwargs)
 
     if isinstance(expected_trial_column_data, pl.Series):
         expected_trial_column_data = pl.DataFrame(expected_trial_column_data)
@@ -394,13 +394,13 @@ def test_event_dataframe_init_expected_trial_column_data(kwargs, expected_trial_
 
 def test_event_dataframe_columns_same_as_frame():
     init_kwargs = {'onsets': [0], 'offsets': [1]}
-    event_df = pm.EventDataFrame(**init_kwargs)
+    event_df = pm.Events(**init_kwargs)
 
     assert event_df.columns == event_df.frame.columns
 
 
 def test_event_dataframe_copy():
-    events = pm.EventDataFrame(name='saccade', onsets=[0], offsets=[123])
+    events = pm.Events(name='saccade', onsets=[0], offsets=[123])
     events_copy = events.copy()
 
     # We want to have separate dataframes but with the exact same data.
@@ -413,9 +413,9 @@ def test_event_dataframe_copy():
     ('events', 'kwargs', 'expected_df'),
     [
         pytest.param(
-            pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
+            pm.Events(name='a', onsets=[0], offsets=[1]),
             {'column': 'trial', 'data': 1},
-            pm.EventDataFrame(
+            pm.Events(
                 pl.DataFrame(
                     {'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
                 ),
@@ -423,9 +423,9 @@ def test_event_dataframe_copy():
             id='single_row_trial_str',
         ),
         pytest.param(
-            pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
+            pm.Events(name='a', onsets=[0], offsets=[1]),
             {'column': ['trial'], 'data': 1},
-            pm.EventDataFrame(
+            pm.Events(
                 pl.DataFrame(
                     {'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
                 ),
@@ -433,9 +433,9 @@ def test_event_dataframe_copy():
             id='single_row_trial_list_data_int',
         ),
         pytest.param(
-            pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
+            pm.Events(name='a', onsets=[0], offsets=[1]),
             {'column': ['trial'], 'data': [1]},
-            pm.EventDataFrame(
+            pm.Events(
                 pl.DataFrame(
                     {'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
                 ),
@@ -443,9 +443,9 @@ def test_event_dataframe_copy():
             id='single_row_trial_list_single_identifier',
         ),
         pytest.param(
-            pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
+            pm.Events(name='a', onsets=[0], offsets=[1]),
             {'column': ['group', 'trial'], 'data': ['A', 1]},
-            pm.EventDataFrame(
+            pm.Events(
                 pl.DataFrame(
                     {'group': 'A', 'trial': [1], 'name': 'a', 'onset': [0], 'offset': [1]},
                 ),
@@ -453,9 +453,9 @@ def test_event_dataframe_copy():
             id='single_row_trial_list_single_identifier',
         ),
         pytest.param(
-            pm.EventDataFrame(name='a', onsets=[0, 8], offsets=[1, 9]),
+            pm.Events(name='a', onsets=[0, 8], offsets=[1, 9]),
             {'column': ['trial'], 'data': [1]},
-            pm.EventDataFrame(
+            pm.Events(
                 pl.DataFrame(
                     {'trial': [1, 1], 'name': ['a', 'a'], 'onset': [0, 8], 'offset': [1, 9]},
                 ),
@@ -473,7 +473,7 @@ def test_event_dataframe_add_trial_column(events, kwargs, expected_df):
     ('events', 'kwargs', 'exception', 'message'),
     [
         pytest.param(
-            pm.EventDataFrame(name='a', onsets=[0], offsets=[1]),
+            pm.Events(name='a', onsets=[0], offsets=[1]),
             {'column': ['group', 'trial'], 'data': 1},
             TypeError,
             'data must be passed as a list of values in case of providing multiple columns',
