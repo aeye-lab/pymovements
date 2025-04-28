@@ -38,7 +38,7 @@ import pymovements as pm
         ),
     ],
 )
-def test_gaze_dataframe_init(init_arg):
+def test_gaze_init(init_arg):
     gaze = pm.Gaze(init_arg)
     assert isinstance(gaze.frame, pl.DataFrame)
 
@@ -78,7 +78,7 @@ def test_gaze_dataframe_init(init_arg):
         ),
     ],
 )
-def test_gaze_dataframe_velocity_columns(init_df, velocity_columns):
+def test_gaze_velocity_columns(init_df, velocity_columns):
     gaze = pm.Gaze(init_df, velocity_columns=velocity_columns)
 
     assert 'velocity' in gaze.columns
@@ -119,7 +119,7 @@ def test_gaze_dataframe_velocity_columns(init_df, velocity_columns):
         ),
     ],
 )
-def test_gaze_dataframe_pixel_position_columns(init_df, pixel_columns):
+def test_gaze_pixel_position_columns(init_df, pixel_columns):
     gaze = pm.Gaze(init_df, pixel_columns=pixel_columns)
 
     assert 'pixel' in gaze.columns
@@ -160,13 +160,13 @@ def test_gaze_dataframe_pixel_position_columns(init_df, pixel_columns):
         ),
     ],
 )
-def test_gaze_dataframe_position_columns(init_df, position_columns):
+def test_gaze_position_columns(init_df, position_columns):
     gaze = pm.Gaze(init_df, position_columns=position_columns)
 
     assert 'position' in gaze.columns
 
 
-def test_gaze_dataframe_copy_with_experiment():
+def test_gaze_copy_with_experiment():
     gaze = pm.Gaze(
         pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
         experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
@@ -184,7 +184,7 @@ def test_gaze_dataframe_copy_with_experiment():
     assert gaze.experiment == gaze_copy.experiment
 
 
-def test_gaze_dataframe_copy_no_experiment():
+def test_gaze_copy_no_experiment():
     gaze = pm.Gaze(
         pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
         experiment=None,
@@ -201,7 +201,7 @@ def test_gaze_dataframe_copy_no_experiment():
     assert gaze.experiment is gaze_copy.experiment
 
 
-def test_gaze_dataframe_split():
+def test_gaze_split():
     gaze = pm.Gaze(
         pl.DataFrame(
             {
@@ -223,7 +223,7 @@ def test_gaze_dataframe_split():
     assert_frame_equal(gaze.frame.filter(pl.col('trial_id') == 2), split_gaze[2].frame)
 
 
-def test_gaze_dataframe_compute_event_properties_no_events():
+def test_gaze_compute_event_properties_no_events():
     gaze = pm.Gaze(
         pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64, 'trial_id': pl.Int8}),
         position_columns=['x', 'y'],

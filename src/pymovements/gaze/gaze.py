@@ -90,6 +90,9 @@ class Gaze:
         from the experiment definition. This column will be renamed to ``distance``. (default: None)
     auto_column_detect: bool
         Flag indicating if the column names should be inferred automatically. (default: False)
+    definition: pm.DatasetDefinition | None
+        A dataset definition. Explicitly passed arguments take precedence over definition.
+        (default: None)
 
     Attributes
     ----------
@@ -893,7 +896,7 @@ class Gaze:
     def compute_event_properties(
             self,
             event_properties: str | tuple[str, dict[str, Any]]
-                              | list[str | tuple[str, dict[str, Any]]],
+            | list[str | tuple[str, dict[str, Any]]],
             name: str | None = None,
     ) -> None:
         """Calculate event properties for given events.

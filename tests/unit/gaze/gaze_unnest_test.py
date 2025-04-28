@@ -229,7 +229,7 @@ import pymovements as pm
 
     ],
 )
-def test_gaze_dataframe_unnest_has_expected_frame(init_data, unnest_kwargs, expected):
+def test_gaze_unnest_has_expected_frame(init_data, unnest_kwargs, expected):
     gaze = pm.Gaze(init_data)
     gaze.unnest(**unnest_kwargs)
     assert_frame_equal(gaze.frame, expected)
@@ -351,7 +351,7 @@ def test_gaze_dataframe_unnest_has_expected_frame(init_data, unnest_kwargs, expe
         ),
     ],
 )
-def test_gaze_dataframe_unnest_has_expected_frame_multiple_unnest(
+def test_gaze_unnest_has_expected_frame_multiple_unnest(
         init_data, unnest_kwargs, expected,
 ):
     gaze = pm.Gaze(init_data)
@@ -443,7 +443,7 @@ def test_gaze_dataframe_unnest_has_expected_frame_multiple_unnest(
     ],
 
 )
-def test_gaze_dataframe_unnest_errors(init_data, unnest_kwargs, exception, exception_msg):
+def test_gaze_unnest_errors(init_data, unnest_kwargs, exception, exception_msg):
     with pytest.raises(exception) as exc_info:
         gaze = pm.Gaze(init_data)
         gaze.unnest(**unnest_kwargs)
@@ -466,7 +466,7 @@ def test_gaze_dataframe_unnest_errors(init_data, unnest_kwargs, exception, excep
     ],
 
 )
-def test_gaze_dataframe_unnest_invalid_number_of_components(
+def test_gaze_unnest_invalid_number_of_components(
         init_data, unnest_kwargs, n_components, exception, exception_msg,
 ):
     with pytest.raises(exception) as exc_info:

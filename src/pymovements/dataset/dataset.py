@@ -389,7 +389,7 @@ class Dataset:
         >>> dataset.apply('resample', resampling_rate=2000)# doctest:+ELLIPSIS
         <pymovements.dataset.dataset.Dataset object at ...>
         """
-        self._check_gaze_dataframe()
+        self._check_gaze()
 
         disable_progressbar = not verbose
         for gaze in tqdm(self.gaze, disable=disable_progressbar):
@@ -721,7 +721,7 @@ class Dataset:
         AttributeError
             If gaze files have not been loaded yet or gaze files do not contain the right columns.
         """
-        self._check_gaze_dataframe()
+        self._check_gaze()
 
         if not self.events:
             self.events = [gaze.events for gaze in self.gaze]
@@ -1101,7 +1101,7 @@ class Dataset:
         if len(self.fileinfo) == 0:
             raise AttributeError('no files present in fileinfo attribute')
 
-    def _check_gaze_dataframe(self) -> None:
+    def _check_gaze(self) -> None:
         """Check if gaze attribute is set and there is at least one gaze dataframe available."""
         if self.gaze is None:
             raise AttributeError('gaze files were not loaded yet. please run load() beforehand')

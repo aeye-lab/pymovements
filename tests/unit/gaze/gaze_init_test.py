@@ -26,7 +26,7 @@ from polars.testing import assert_frame_equal
 from pymovements import DatasetDefinition
 from pymovements import EventDataFrame
 from pymovements import Experiment
-from pymovements import GazeDataFrame
+from pymovements import Gaze
 
 
 @pytest.mark.parametrize(
@@ -1217,7 +1217,7 @@ from pymovements import GazeDataFrame
 
     ],
 )
-def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, expected_n_components):
+def test_init_gaze_has_expected_attrs(init_kwargs, expected_frame, expected_n_components):
     gaze = Gaze(**init_kwargs)
     assert_frame_equal(gaze.frame, expected_frame)
     assert gaze.n_components == expected_n_components
@@ -1253,8 +1253,8 @@ def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, exp
 
     ],
 )
-def test_init_gaze_dataframe_has_expected_experiment(init_kwargs, expected_experiment):
-    gaze = GazeDataFrame(**init_kwargs)
+def test_init_gaze_has_expected_experiment(init_kwargs, expected_experiment):
+    gaze = Gaze(**init_kwargs)
     assert gaze.experiment == expected_experiment
 
 
@@ -1336,7 +1336,7 @@ def test_init_gaze_dataframe_has_expected_experiment(init_kwargs, expected_exper
 
     ],
 )
-def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_trial_columns):
+def test_init_gaze_has_expected_trial_columns(init_kwargs, expected_trial_columns):
     gaze = Gaze(**init_kwargs)
     assert gaze.trial_columns == expected_trial_columns
 
@@ -1873,7 +1873,7 @@ def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_tr
 
     ],
 )
-def test_gaze_dataframe_init_exceptions(init_kwargs, exception, exception_msg):
+def test_gaze_init_exceptions(init_kwargs, exception, exception_msg):
     with pytest.raises(exception) as excinfo:
         Gaze(**init_kwargs)
 

@@ -914,7 +914,7 @@ def test_gaze_transform_raises_exception(init_kwargs, exception, exception_msg):
         ),
     ],
 )
-def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_columns):
+def test_gaze_pix2deg_creates_position_column(data, experiment, pixel_columns):
     gaze = pm.Gaze(
         data=pl.from_dict(data),
         experiment=experiment,
@@ -986,7 +986,7 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
         ),
     ],
 )
-def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg):
+def test_gaze_pix2deg_exceptions(init_kwargs, exception, expected_msg):
     gaze = pm.Gaze(**init_kwargs)
 
     with pytest.raises(exception) as excinfo:
@@ -1015,7 +1015,7 @@ def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg)
         ),
     ],
 )
-def test_gaze_dataframe_pix2deg_warnings(init_kwargs, warning, expected_msg):
+def test_gaze_pix2deg_warnings(init_kwargs, warning, expected_msg):
     gaze = pm.Gaze(**init_kwargs)
 
     with pytest.warns(warning) as excinfo:
@@ -1086,7 +1086,7 @@ def test_gaze_dataframe_pix2deg_warnings(init_kwargs, warning, expected_msg):
         ),
     ],
 )
-def test_gaze_dataframe_deg2pix_exceptions(init_kwargs, exception, expected_msg):
+def test_gaze_deg2pix_exceptions(init_kwargs, exception, expected_msg):
     gaze = pm.Gaze(**init_kwargs)
 
     with pytest.raises(exception) as excinfo:
@@ -1121,7 +1121,7 @@ def test_gaze_dataframe_deg2pix_exceptions(init_kwargs, exception, expected_msg)
         ),
     ],
 )
-def test_gaze_dataframe_pos2acc_creates_acceleration_column(data, experiment, position_columns):
+def test_gaze_pos2acc_creates_acceleration_column(data, experiment, position_columns):
     gaze = pm.Gaze(
         data=pl.from_dict(data),
         experiment=experiment,
@@ -1187,7 +1187,7 @@ def test_gaze_dataframe_pos2acc_creates_acceleration_column(data, experiment, po
         ),
     ],
 )
-def test_gaze_dataframe_pos2acc_exceptions(init_kwargs, exception, expected_msg):
+def test_gaze_pos2acc_exceptions(init_kwargs, exception, expected_msg):
     gaze = pm.Gaze(**init_kwargs)
 
     with pytest.raises(exception) as excinfo:
@@ -1222,7 +1222,7 @@ def test_gaze_dataframe_pos2acc_exceptions(init_kwargs, exception, expected_msg)
         ),
     ],
 )
-def test_gaze_dataframe_pos2vel_creates_velocity_column(data, experiment, position_columns):
+def test_gaze_pos2vel_creates_velocity_column(data, experiment, position_columns):
     gaze = pm.Gaze(
         data=pl.from_dict(data),
         experiment=experiment,
@@ -1232,7 +1232,7 @@ def test_gaze_dataframe_pos2vel_creates_velocity_column(data, experiment, positi
     assert 'velocity' in gaze.columns
 
 
-def test_gaze_dataframe_clip_creates_new_column(experiment):
+def test_gaze_clip_creates_new_column(experiment):
     gaze = pm.Gaze(
         data=pl.from_dict(
             {
@@ -1310,7 +1310,7 @@ def test_gaze_dataframe_clip_creates_new_column(experiment):
         ),
     ],
 )
-def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg):
+def test_gaze_pos2vel_exceptions(init_kwargs, exception, expected_msg):
     gaze = pm.Gaze(**init_kwargs)
 
     with pytest.raises(exception) as excinfo:
@@ -1385,7 +1385,7 @@ def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg)
         ),
     ],
 )
-def test_gaze_dataframe_smooth_expected_column(
+def test_gaze_smooth_expected_column(
         gaze_init_kwargs, kwargs, expected,
 ):
     gaze = pm.Gaze(**gaze_init_kwargs)
@@ -1583,7 +1583,7 @@ def test_gaze_dataframe_smooth_expected_column(
         ),
     ],
 )
-def test_gaze_dataframe_resample_expected(
+def test_gaze_resample_expected(
         gaze_init_kwargs, kwargs, expected_frame,
 ):
     gaze = pm.Gaze(**gaze_init_kwargs)
@@ -1592,7 +1592,7 @@ def test_gaze_dataframe_resample_expected(
     assert_frame_equal(gaze.frame, expected_frame)
 
 
-def test_gaze_dataframe_resample_changes_experiemnt_sampling_rate(experiment):
+def test_gaze_resample_changes_experiemnt_sampling_rate(experiment):
     gaze = pm.Gaze(
         data=pl.from_dict(
             {

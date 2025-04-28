@@ -270,7 +270,6 @@ def load_gaze_file(
         fileinfo_row: dict[str, Any],
         definition: DatasetDefinition,
         preprocessed: bool = False,
-        custom_read_kwargs: dict[str, Any] | None = None,
 ) -> Gaze:
     """Load a gaze data file as Gaze.
 

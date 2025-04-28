@@ -1595,13 +1595,13 @@ def test_check_fileinfo(new_fileinfo, exception, tmp_path):
         pytest.param([], AttributeError),
     ],
 )
-def test_check_gaze_dataframe(new_gaze, exception, tmp_path):
+def test_check_gaze(new_gaze, exception, tmp_path):
     dataset = Dataset('ToyDataset', path=tmp_path)
 
     dataset.gaze = new_gaze
 
     with pytest.raises(exception):
-        dataset._check_gaze_dataframe()
+        dataset._check_gaze()
 
 
 @pytest.mark.parametrize(
