@@ -142,9 +142,9 @@ def test_is_gaze_df_subclass_deprecated():
 
 
 def test_is_gaze_df_dubplicate_subclass_deprecated():
-    # pylint: disable=unused-variable,duplicate-bases
+    # pylint: disable=unused-variable
     with pytest.raises(DeprecationWarning):
-        class AnotherGazeDataFrameSubclass(GazeDataFrame, GazeDataFrame):
+        class AnotherGazeDataFrameSubclass(GazeDataFrame):
             ...
 
 
@@ -154,9 +154,9 @@ def test_is_gaze_df_subsubclass_deprecated():
         class YetAnotherGazeDataFrameSubclass(GazeDataFrame):
             ...
 
-    with pytest.raises(DeprecationWarning):
-        class AnotherGazeDataFrameSubSubclass(GazeDataFrame):
-            ...
+        with pytest.raises(DeprecationWarning):
+            class AnotherGazeDataFrameSubSubclass(YetAnotherGazeDataFrameSubclass):
+                ...
 
 
 def test_is_gaze_df_removed():

@@ -88,7 +88,7 @@ class DeprecatedMetaClass(type):
             classdict['_DeprecatedMetaClass__version_deprecated'] = version_deprecated
             classdict['_DeprecatedMetaClass__version_removed'] = version_removed
 
-        fixed_bases = []
+        fixed_bases = set()
 
         for b in bases:
             alias = getattr(b, '_DeprecatedMetaClass__alias', None)
@@ -103,10 +103,7 @@ class DeprecatedMetaClass(type):
                     DeprecationWarning, stacklevel=2,
                 )
 
-            # Avoid duplicate base classes.
-            b = alias or b
-            if b not in fixed_bases:
-                fixed_bases.append(b)
+            fixed_bases.add(alias or b)
 
         return super().__new__(mcs, name, tuple(fixed_bases), classdict, *args, **kwargs)
 
