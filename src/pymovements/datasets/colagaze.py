@@ -43,12 +43,12 @@ class CoLAGaze(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
@@ -97,6 +97,8 @@ class CoLAGaze(DatasetDefinition):
 
     name: str = 'CoLAGaze'
 
+    long_name: str = 'Corpus of Eye Movements for Linguistic Acceptability'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             # Note: Gaze is currently disabled due to metadata mismatch issue.
@@ -106,42 +108,31 @@ class CoLAGaze(DatasetDefinition):
         },
     )
 
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda: {
-            'gaze': [
-                'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
-                '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
-            ],
-            'precomputed_events': [
-                'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
-                '678e0b41987c157db5204d3b/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
-            ],
-            'precomputed_reading_measures': [
-                'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
-                '678e045672fc74248add6338/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
-            ],
-        },
-    )
-
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
             'gaze': [
                 {
-                    'resource': '',
+                    'resource':
+                    'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
+                    '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
                     'filename': 'raw_data.zip',
                     'md5': None,  # type: ignore
                 },
             ],
             'precomputed_events': [
                 {
-                    'resource': '',
+                    'resource':
+                    'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
+                    '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
                     'filename': 'fixations.zip',
                     'md5': None,  # type: ignore
                 },
             ],
             'precomputed_reading_measures': [
                 {
-                    'resource': '',
+                    'resource':
+                    'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
+                    '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
                     'filename': 'measures.zip',
                     'md5': None,  # type: ignore
                 },
