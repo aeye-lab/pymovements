@@ -23,7 +23,7 @@ from __future__ import annotations
 import numpy as np
 
 from pymovements.events.detection._library import register_event_detection
-from pymovements.events.frame import Events
+from pymovements.events.events import Events
 from pymovements.gaze.transforms_numpy import consecutive
 
 

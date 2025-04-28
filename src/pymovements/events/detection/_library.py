@@ -22,7 +22,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from pymovements.events.frame import Events
+from pymovements.events.events import Events
 
 
 class EventDetectionLibrary:

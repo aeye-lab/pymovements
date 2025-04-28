@@ -27,7 +27,7 @@ import pandas as pd
 import polars as pl
 
 from pymovements._utils import _checks
-from pymovements.events.frame import Events
+from pymovements.events.events import Events
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze import Gaze
 
