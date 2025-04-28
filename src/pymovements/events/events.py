@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides the EventDataFrame class."""
+"""Provides the Events class."""
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -260,12 +260,12 @@ class Events:
         return list(event_property_columns)
 
     def copy(self) -> Events:
-        """Return a copy of the EventDataFrame.
+        """Return a copy of the Events.
 
         Returns
         -------
         Events
-            A copy of the EventDataFrame.
+            A copy of the Events.
         """
         return Events(data=self.frame.clone())
 

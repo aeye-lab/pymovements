@@ -47,7 +47,7 @@ def fill(
         Minimum fixation duration. The duration is specified in the units used in ``timesteps``.
         (default: 1)
     name: str
-        Name for detected events in EventDataFrame. (default: 'unclassified')
+        Name for detected events in Events. (default: 'unclassified')
 
     Returns
     -------
@@ -102,5 +102,5 @@ def fill(
     offsets = timesteps[[candidate_indices[-1] for candidate_indices in candidates]].flatten()
 
     # Create event dataframe from onsets and offsets.
-    event_df = Events(name=name, onsets=onsets, offsets=offsets)
-    return event_df
+    events = Events(name=name, onsets=onsets, offsets=offsets)
+    return events

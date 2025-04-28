@@ -68,7 +68,7 @@ def ivt(
         Indicator, whether we want to split events on missing/corrupt value (np.nan)
         (default: False)
     name: str
-        Name for detected events in EventDataFrame. (default: 'fixation')
+        Name for detected events in Events. (default: 'fixation')
 
     Returns
     -------
@@ -130,5 +130,5 @@ def ivt(
     offsets = timesteps[[candidate_indices[-1] for candidate_indices in candidates]].flatten()
 
     # Create event dataframe from onsets and offsets.
-    event_df = Events(name=name, onsets=onsets, offsets=offsets)
-    return event_df
+    events = Events(name=name, onsets=onsets, offsets=offsets)
+    return events

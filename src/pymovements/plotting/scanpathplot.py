@@ -72,7 +72,7 @@ def scanpathplot(
     Parameters
     ----------
     events: Events
-        The EventDataFrame to plot.
+        The Events to plot.
     gaze: Gaze | None
         Optional Gaze Dataframe. (default: None)
     position_column: str

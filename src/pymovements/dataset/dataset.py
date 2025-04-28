@@ -163,8 +163,8 @@ class Dataset:
                 events_dirname=events_dirname,
                 extension=extension,
             )
-            for loaded_gaze, loaded_events_df in zip(self.gaze, self.events):
-                loaded_gaze.events = loaded_events_df
+            for loaded_gaze, loaded_events in zip(self.gaze, self.events):
+                loaded_gaze.events = loaded_events
 
         return self
 
@@ -650,7 +650,7 @@ class Dataset:
 
         Parameters
         ----------
-        method : Callable[..., EventDataFrame] | str
+        method : Callable[..., Events] | str
             The event detection method to be applied.
         eye: str
             Select which eye to choose. Valid options are ``auto``, ``left``, ``right`` or ``None``.
@@ -697,7 +697,7 @@ class Dataset:
 
         Parameters
         ----------
-        method: Callable[..., EventDataFrame] | str
+        method: Callable[..., Events] | str
             The event detection method to be applied.
         eye: str
             Select which eye to choose. Valid options are ``auto``, ``left``, ``right`` or ``None``.

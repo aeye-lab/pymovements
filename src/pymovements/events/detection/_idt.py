@@ -88,7 +88,7 @@ def idt(
         Indicator, whether we want to split events on missing/corrupt value (np.nan).
         (default: False)
     name: str
-        Name for detected events in EventDataFrame. (default: 'fixation')
+        Name for detected events in Events. (default: 'fixation')
 
     Returns
     -------
@@ -210,5 +210,5 @@ def idt(
     onsets_arr = np.array(onsets).flatten()
     offsets_arr = np.array(offsets).flatten()
 
-    event_df = Events(name=name, onsets=onsets_arr, offsets=offsets_arr)
-    return event_df
+    events = Events(name=name, onsets=onsets_arr, offsets=offsets_arr)
+    return events

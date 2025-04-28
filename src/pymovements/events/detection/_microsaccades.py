@@ -77,7 +77,7 @@ def microsaccades(
         Indicator, whether we want to split events on missing/corrupt value (np.nan)
         (default: False)
     name: str
-        Name for detected events in EventDataFrame. (default: 'saccade')
+        Name for detected events in Events. (default: 'saccade')
 
     Returns
     -------
@@ -143,8 +143,8 @@ def microsaccades(
     offsets = timesteps[[candidate_indices[-1] for candidate_indices in candidates]].flatten()
 
     # Create event dataframe from onsets and offsets.
-    event_df = Events(name=name, onsets=onsets, offsets=offsets)
-    return event_df
+    events = Events(name=name, onsets=onsets, offsets=offsets)
+    return events
 
 
 def compute_threshold(arr: np.ndarray, method: str = 'engbert2015') -> np.ndarray:

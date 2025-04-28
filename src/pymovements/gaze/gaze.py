@@ -98,7 +98,7 @@ class Gaze:
     ----------
     frame: pl.DataFrame
         A dataframe to be transformed to a polars dataframe.
-    events: pm.EventDataFrame
+    events: pm.Events
         A dataframe of events in the gaze signal.
     experiment : Experiment | None
         The experiment definition.
@@ -799,7 +799,7 @@ class Gaze:
 
         Parameters
         ----------
-        method: Callable[..., pm.EventDataFrame] | str
+        method: Callable[..., pm.Events] | str
             The event detection method to be applied.
         eye: str
             Select which eye to choose. Valid options are ``auto``, ``left``, ``right`` or ``None``.
@@ -1399,7 +1399,7 @@ class Gaze:
 
         Parameters
         ----------
-        method: Callable[..., pm.EventDataFrame]
+        method: Callable[..., pm.Events]
             The method for which the keyword argument dictionary will be filled.
         gaze: pl.DataFrame
             The gaze dataframe to be used for filling event detection keyword arguments.
