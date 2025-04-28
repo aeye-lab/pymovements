@@ -22,32 +22,6 @@ import subprocess
 import sys
 
 
-def setup_import_pymovements():
-    try:
-        del pymovements  # noqa: F821 # pylint: disable=undefined-variable
-    except BaseException:
-        pass
-
-    for module in list(sys.modules.keys()):
-        if module.startswith('pymovements'):
-            del sys.modules[module]
-
-    assert 'pymovements' not in sys.modules
-    assert not any(module.startswith('pymovements') for module in sys.modules)
-
-
-def import_pymovements():
-    import pymovements  # noqa: F401 # pylint: disable=import-outside-toplevel,unused-import
-
-
-def test_import_pymovements(benchmark):
-    benchmark.pedantic(
-        import_pymovements,
-        setup=setup_import_pymovements,
-        iterations=1, rounds=1,  # only a single round due to leakage to subsequent rounds
-    )
-
-
 def import_pymovements_subprocess():
     cmd = [sys.executable, '-c', 'import pymovements']
     subprocess.run(cmd, check=True)
