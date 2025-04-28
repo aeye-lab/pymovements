@@ -27,8 +27,8 @@ import polars as pl
 import pytest
 from matplotlib import figure
 
-from pymovements.gaze import Experiment
-from pymovements.gaze.gaze import Gaze
+from pymovements import Experiment
+from pymovements import Gaze
 from pymovements.plotting import heatmap
 
 
