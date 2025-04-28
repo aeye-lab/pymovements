@@ -20,10 +20,13 @@
 """Provides the EventDataFrame class."""
 from __future__ import annotations
 
+import polars as pl
+
+from pymovements._utils._deprecated import DeprecatedMetaClass
 from pymovements.events.events import Events
 
 
-class EventDataFrame:
+class EventDataFrame(metaclass=DeprecatedMetaClass):
     """A data structure for event data.
 
     Each row has at least an event name with its onset and offset specified.
@@ -43,6 +46,14 @@ class EventDataFrame:
         List of trial identifiers. (default: None)
     trial_columns: list[str] | str | None
         List of trial columns in passed dataframe.
+
+    Attributes
+    ----------
+    frame: pl.DataFrame
+        A dataframe of events.
+    trial_columns: list[str] | None
+        The name of the trial columns in the data frame. If not None, processing methods
+        will be applied to each trial separately.
 
     Raises
     ------
@@ -73,6 +84,10 @@ class EventDataFrame:
     │ fixation ┆ 1988788 ┆ 1989013 ┆ 225      │
     └──────────┴─────────┴─────────┴──────────┘
     """
+
+    frame: pl.DataFrame
+
+    trial_columns: list[str] | None
 
     _DeprecatedMetaClass__alias = Events
     _DeprecatedMetaClass__version_deprecated = 'v0.22.0'

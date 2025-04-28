@@ -53,6 +53,14 @@ class Events:
     trial_columns: list[str] | str | None
         List of trial columns in passed dataframe.
 
+    Attributes
+    ----------
+    frame: pl.DataFrame
+        A dataframe of events.
+    trial_columns: list[str] | None
+        The name of the trial columns in the data frame. If not None, processing methods
+        will be applied to each trial separately.
+
     Raises
     ------
     ValueError
@@ -82,6 +90,10 @@ class Events:
     │ fixation ┆ 1988788 ┆ 1989013 ┆ 225      │
     └──────────┴─────────┴─────────┴──────────┘
     """
+
+    frame: pl.DataFrame
+
+    trial_columns: list[str] | None
 
     _minimal_schema = {'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64}
 

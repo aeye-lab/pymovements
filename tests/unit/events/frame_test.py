@@ -23,8 +23,8 @@ import re
 import pytest
 
 from pymovements import __version__
-from pymovements import Events
 from pymovements import EventDataFrame
+from pymovements import Events
 
 
 @pytest.fixture(name='events_subclass')

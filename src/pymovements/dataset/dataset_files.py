@@ -581,14 +581,14 @@ def save_events(
     """
     disable_progressbar = not verbose
 
-    for file_id, events in enumerate(tqdm(events, disable=disable_progressbar)):
+    for file_id, events_in in enumerate(tqdm(events, disable=disable_progressbar)):
         raw_filepath = paths.raw / Path(fileinfo[file_id, 'filepath'])
         events_filepath = paths.raw_to_event_filepath(
             raw_filepath, events_dirname=events_dirname,
             extension=extension,
         )
 
-        events_out = events.frame.clone()
+        events_out = events_in.frame.clone()
         for column in events_out.columns:
             if column in fileinfo.columns:
                 events_out = events_out.drop(column)

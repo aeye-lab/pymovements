@@ -20,16 +20,19 @@
 """Provides the main sequence plotting function."""
 from __future__ import annotations
 
+from warnings import warn
+
 import matplotlib.pyplot as plt
 import polars as pl
 from matplotlib.collections import Collection
 
 from pymovements._utils._checks import check_is_mutual_exclusive
-from pymovements.events import Events
+from pymovements.events.events import Events
+from pymovements.events.frame import EventDataFrame
 
 
 def main_sequence_plot(
-        events: Events,
+        events: Events | EventDataFrame,
         marker_size: float = 25,
         color: str = 'purple',
         alpha: float = 0.5,
@@ -39,14 +42,14 @@ def main_sequence_plot(
         savepath: str | None = None,
         show: bool = True,
         *,
-        event_df: Events | None = None,
+        event_df: Events | EventDataFrame | None = None,
         **kwargs: Collection,
 ) -> None:
     """Plot the saccade main sequence.
 
     Parameters
     ----------
-    events: Events
+    events: Events | EventDataFrame
         It must contain columns "peak_velocity" and "amplitude".
     marker_size: float
         Size of the marker symbol. (default: 25)
@@ -64,8 +67,8 @@ def main_sequence_plot(
         If given, figure will be saved to this path. (default: None)
     show: bool
         If True, figure will be shown. (default: True)
-    event_df: Events
-        It must contain columns "peak_velocity" and "amplitude".
+    event_df: Events | EventDataFrame | None
+        It must contain columns "peak_velocity" and "amplitude". (default: None)
     **kwargs: Collection
         Additional keyword arguments passed to matplotlib.pyplot.scatter.
 
@@ -78,12 +81,16 @@ def main_sequence_plot(
         If the event dataframe does not contain any saccades.
     """
     if event_df is not None:
-        warn(DeprecationWarning)
+        warn(
+            'The argument event_df has been renamed to events '
+            'in v0.22.0 and will be removed in v0.27.0.',
+            DeprecationWarning,
+        )
         check_is_mutual_exclusive(events=events, event_df=event_df)
         events = event_df
 
     event_col_name = 'name'
-    saccades = event_df.frame.filter(pl.col(event_col_name) == 'saccade')
+    saccades = events.frame.filter(pl.col(event_col_name) == 'saccade')
 
     if saccades.is_empty():
         raise ValueError(
