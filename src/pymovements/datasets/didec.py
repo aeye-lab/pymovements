@@ -45,12 +45,12 @@ class DIDEC(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, list[dict[str, str]]]
         A list of dataset resources. Each list entry must be a dictionary with the following keys:
@@ -122,6 +122,8 @@ class DIDEC(DatasetDefinition):
 
     name: str = 'DIDEC'
 
+    long_name: str = 'Dutch Image Description and Eye-tracking Corpus'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
@@ -130,17 +132,11 @@ class DIDEC(DatasetDefinition):
         },
     )
 
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda: {
-            'gaze': ['https://didec.uvt.nl/corpus/'],
-        },
-    )
-
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
             'gaze': [
                 {
-                    'resource': 'DIDEC_only_the_eyetracking_data.zip',
+                    'resource': 'https://didec.uvt.nl/corpus/DIDEC_only_the_eyetracking_data.zip',
                     'filename': 'DIDEC_only_the_eyetracking_data.zip',
                     'md5': 'd572b0b41828986ca48a2fcf6966728a',
                 },

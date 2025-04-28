@@ -1,17 +1,15 @@
 name: "HBN"
 
+long_name: 'Healthy Brain Network dataset'
+
 has_files:
   gaze: true
   precomputed_events: false
   precomputed_reading_measures: false
 
-mirrors:
-  gaze:
-    - "https://files.osf.io/v1/resources/qknuv/providers/osfstorage/"
-
 resources:
   gaze:
-    - resource: "651190031e76a453918a9971"
+    - resource: "https://files.osf.io/v1/resources/qknuv/providers/osfstorage/651190031e76a453918a9971"
       filename: "data.zip"
       md5: "2c523e911022ffc0eab700e34e9f7f30"
 

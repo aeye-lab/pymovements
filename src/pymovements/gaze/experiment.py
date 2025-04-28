@@ -25,10 +25,10 @@ from typing import Any
 
 import numpy as np
 
+from pymovements._utils import _checks
 from pymovements.gaze import transforms_numpy
 from pymovements.gaze.eyetracker import EyeTracker
 from pymovements.gaze.screen import Screen
-from pymovements.utils import checks
 
 
 class Experiment:
@@ -102,17 +102,17 @@ class Experiment:
             screen: Screen | None = None,
             eyetracker: EyeTracker | None = None,
     ):
-        checks.check_is_mutual_exclusive(screen_width_px=screen_width_px, screen=screen)
-        checks.check_is_mutual_exclusive(screen_height_px=screen_height_px, screen=screen)
-        checks.check_is_mutual_exclusive(screen_width_cm=screen_width_cm, screen=screen)
-        checks.check_is_mutual_exclusive(screen_height_cm=screen_height_cm, screen=screen)
-        checks.check_is_mutual_exclusive(distance_cm=distance_cm, screen=screen)
-        checks.check_is_mutual_exclusive(sampling_rate=sampling_rate, eyetracker=eyetracker)
+        _checks.check_is_mutual_exclusive(screen_width_px=screen_width_px, screen=screen)
+        _checks.check_is_mutual_exclusive(screen_height_px=screen_height_px, screen=screen)
+        _checks.check_is_mutual_exclusive(screen_width_cm=screen_width_cm, screen=screen)
+        _checks.check_is_mutual_exclusive(screen_height_cm=screen_height_cm, screen=screen)
+        _checks.check_is_mutual_exclusive(distance_cm=distance_cm, screen=screen)
+        _checks.check_is_mutual_exclusive(sampling_rate=sampling_rate, eyetracker=eyetracker)
 
         # the origin default value needs special care to not mess with a passed screen.
         if origin == 'upper left' and screen is not None:
             origin = None  # set origin to None to pass mutual exclusivity check
-        checks.check_is_mutual_exclusive(origin=origin, screen=screen)
+        _checks.check_is_mutual_exclusive(origin=origin, screen=screen)
 
         if screen is None:
             screen = Screen(
@@ -130,7 +130,7 @@ class Experiment:
         self.eyetracker = eyetracker
 
         if self.sampling_rate is not None:
-            checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
+            _checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
 
     @property
     def sampling_rate(self) -> float | None:
@@ -203,8 +203,6 @@ class Experiment:
 
     def __eq__(self: Experiment, other: Experiment) -> bool:
         """Compare equality to other Experiment."""
-        print(self.screen, other.screen, self.screen == other.screen)
-        print(self.eyetracker, other.eyetracker, self.eyetracker == other.eyetracker)
         return self.screen == other.screen and self.eyetracker == other.eyetracker
 
     def to_dict(self) -> dict[str, Any | dict[str, str | float | None]]:

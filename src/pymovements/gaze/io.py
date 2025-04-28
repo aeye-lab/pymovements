@@ -20,11 +20,13 @@
 """Functionality to load GazeDataFrame from a csv file."""
 from __future__ import annotations
 
+import math
 from pathlib import Path
 from typing import Any
 
 import polars as pl
 
+import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.gaze._utils.parsing import parse_eyelink
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
@@ -46,6 +48,7 @@ def from_csv(
         column_map: dict[str, str] | None = None,
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, type] | None = None,
+        definition: pm.DatasetDefinition | None = None,
         **read_csv_kwargs: Any,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
@@ -99,6 +102,9 @@ def from_csv(
         (default: None)
     column_schema_overrides:  dict[str, type] | None
         Dictionary containing types for columns.
+        (default: None)
+    definition: pm.DatasetDefinition | None
+        A dataset definition. Explicitly passed arguments take precedence over definition.
         (default: None)
     **read_csv_kwargs: Any
         Additional keyword arguments to be passed to :py:func:`polars.read_csv` to read in the csv.
@@ -216,6 +222,15 @@ def from_csv(
     └──────┴───────────┘
 
     """
+    # explicit arguments take precedence over definition.
+    if definition:
+        if column_map is None:
+            column_map = definition.column_map
+
+        if not read_csv_kwargs and 'gaze' in definition.custom_read_kwargs:
+            if definition.custom_read_kwargs['gaze']:
+                read_csv_kwargs = definition.custom_read_kwargs['gaze']
+
     # Read data.
     gaze_data = pl.read_csv(file, **read_csv_kwargs)
     if column_map is not None:
@@ -259,6 +274,7 @@ def from_csv(
     gaze_df = GazeDataFrame(
         gaze_data,
         experiment=experiment,
+        definition=definition,
         trial_columns=trial_columns,
         time_column=time_column,
         time_unit=time_unit,
@@ -275,7 +291,7 @@ def from_csv(
 def from_asc(
         file: str | Path,
         *,
-        patterns: str | list[dict[str, Any] | str] | None = 'eyelink',
+        patterns: str | list[dict[str, Any] | str] | None = None,
         metadata_patterns: list[dict[str, Any] | str] | None = None,
         schema: dict[str, Any] | None = None,
         experiment: Experiment | None = None,
@@ -283,6 +299,7 @@ def from_asc(
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, Any] | None = None,
         encoding: str | None = None,
+        definition: pm.DatasetDefinition | None = None,
 ) -> GazeDataFrame:
     """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
 
@@ -292,7 +309,8 @@ def from_asc(
         Path of IPC/feather file.
     patterns: str | list[dict[str, Any] | str] | None
         List of patterns to match for additional columns or a key identifier of eye tracker specific
-        default patterns. Supported values are: eyelink. (default: 'eyelink')
+        default patterns. Supported values are: `'eyelink'`. If `None` is passed, `'eyelink'` is
+        assumed. (default: None)
     metadata_patterns: list[dict[str, Any] | str] | None
         List of patterns to match for extracting metadata from custom logged messages.
         (default: None)
@@ -313,6 +331,9 @@ def from_asc(
         (default: None)
     encoding: str | None
         Text encoding of the file. If None, the locale encoding is used. (default: None)
+    definition: pm.DatasetDefinition | None
+        A dataset definition. Explicitly passed arguments take precedence over definition.
+        (default: None)
 
     Returns
     -------
@@ -351,14 +372,42 @@ def from_asc(
     if isinstance(patterns, str):
         if patterns == 'eyelink':
             # We use the default patterns of parse_eyelink then.
-            patterns = None
+            _patterns = None
         else:
             raise ValueError(f"unknown pattern key '{patterns}'. Supported keys are: eyelink")
+    else:
+        _patterns = patterns
+
+    # Explicit arguments take precedence over definition.
+    if definition:
+        if experiment is None:
+            experiment = definition.experiment
+
+        if trial_columns is None:
+            trial_columns = definition.trial_columns
+
+        if 'gaze' in definition.custom_read_kwargs and definition.custom_read_kwargs['gaze']:
+            custom_read_kwargs = definition.custom_read_kwargs['gaze']
+
+            if _patterns is None and 'patterns' in custom_read_kwargs:
+                _patterns = custom_read_kwargs['patterns']
+
+            if metadata_patterns is None and 'metadata_patterns' in custom_read_kwargs:
+                metadata_patterns = custom_read_kwargs['metadata_patterns']
+
+            if schema is None and 'schema' in custom_read_kwargs:
+                schema = custom_read_kwargs['schema']
+
+            if column_schema_overrides is None and 'column_schema_overrides' in custom_read_kwargs:
+                column_schema_overrides = custom_read_kwargs['column_schema_overrides']
+
+            if encoding is None and 'encoding' in custom_read_kwargs:
+                encoding = custom_read_kwargs['encoding']
 
     # Read data.
     gaze_data, metadata = parse_eyelink(
         file,
-        patterns=patterns,
+        patterns=_patterns,
         schema=schema,
         metadata_patterns=metadata_patterns,
         encoding=encoding,
@@ -510,7 +559,9 @@ def _fill_experiment_from_parsing_metadata(
     # Screen resolution (assuming that width and height will always be missing or set together)
     experiment_resolution = (experiment.screen.width_px, experiment.screen.height_px)
     if experiment_resolution == (None, None):
-        experiment.screen.width_px, experiment.screen.height_px = metadata['resolution']
+        width, height = metadata['resolution']
+        experiment.screen.width_px = math.ceil(width)
+        experiment.screen.height_px = math.ceil(height)
     elif experiment_resolution != metadata['resolution']:
         issues.append(f"Screen resolution: {experiment_resolution} != {metadata['resolution']}")
 

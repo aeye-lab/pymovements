@@ -66,9 +66,7 @@ from pymovements import DatasetLibrary
 )
 def test_public_dataset_registered(definition, dataset_name):
     assert dataset_name in DatasetLibrary.names()
-    definition_from_library = DatasetLibrary.get(dataset_name).__dict__
-    python_definition = definition().__dict__
-    assert definition_from_library == python_definition
-    definition_from_lib_exp = definition_from_library.pop('experiment')
-    python_definition_exp = python_definition.pop('experiment')
-    assert python_definition_exp == definition_from_lib_exp
+    definition_from_library = DatasetLibrary.get(dataset_name)
+
+    # simple equal between objects does not work as classes have different names.
+    assert definition().to_dict() == definition_from_library.to_dict()
