@@ -54,12 +54,12 @@ class GazeBaseVR(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
@@ -127,6 +127,8 @@ class GazeBaseVR(DatasetDefinition):
 
     name: str = 'GazeBaseVR'
 
+    long_name: str = 'GazeBaseVR dataset'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
@@ -134,17 +136,12 @@ class GazeBaseVR(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda: {
-            'gaze': ['https://figshare.com/ndownloader/files/'],
-        },
-    )
 
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
             'gaze': [
                 {
-                    'resource': '38844024',
+                    'resource': 'https://figshare.com/ndownloader/files/38844024',
                     'filename': 'gazebasevr.zip',
                     'md5': '048c04b00fd64347375cc8d37b451a22',
                 },
@@ -196,6 +193,7 @@ class GazeBaseVR(DatasetDefinition):
         default_factory=lambda: {
             'xT': 'x_target_pos',
             'yT': 'y_target_pos',
+            'zT': 'z_target_pos',
         },
     )
 
