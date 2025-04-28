@@ -102,7 +102,7 @@ class CoLAGaze(DatasetDefinition):
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             # Note: Gaze is currently disabled due to metadata mismatch issue.
-            'gaze': False,
+            'gaze': True,
             'precomputed_events': True,
             'precomputed_reading_measures': True,
         },
