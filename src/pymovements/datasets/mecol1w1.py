@@ -43,12 +43,12 @@ class MECOL1W1(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
@@ -102,6 +102,8 @@ class MECOL1W1(DatasetDefinition):
 
     name: str = 'MECOL1W1'
 
+    long_name: str = 'Multilingual Eye-tracking Corpus native reader first wave'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': False,
@@ -110,29 +112,18 @@ class MECOL1W1(DatasetDefinition):
         },
     )
 
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda: {
-            'precomputed_events': [
-                'https://osf.io/download/',
-            ],
-            'precomputed_reading_measures': [
-                'https://osf.io/download/',
-            ],
-        },
-    )
-
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
             'precomputed_events': [
                 {
-                    'resource': '67dc6027920cab9abae48b83/',
+                    'resource': 'https://osf.io/download/67dc6027920cab9abae48b83/',
                     'filename': 'joint_l1_fixation_version1.3.rda',
                     'md5': '3c969a930a71cd62c67b936426dd079b',
                 },
             ],
             'precomputed_reading_measures': [
                 {
-                    'resource': 'n5pvh/',
+                    'resource': 'https://osf.io/download/n5pvh/',
                     'filename': 'sentence_data_version1.3.csv',
                     'md5': '609f82b6f45b7c98a0769c6ce14ee6e9',
                 },

@@ -274,7 +274,8 @@ def test_load_precomputed_file_unsupported_file_format():
         pm.dataset.dataset_files.load_precomputed_event_file(filepath)
 
     msg, = exc.value.args
-    assert msg == 'unsupported file format ".feather". Supported formats are: .csv, .rda, .tsv, .txt'  # noqa: E501
+    assert msg == 'unsupported file format ".feather". '\
+        'Supported formats are: .csv, .rda, .tsv, .txt'
 
 
 def test_load_precomputed_file_rda_raise_value_error():
