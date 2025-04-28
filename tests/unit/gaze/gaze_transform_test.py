@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test GazeDataFrame transform method."""
+"""Test Gaze transform method."""
 import numpy as np
 import polars as pl
 import pytest
@@ -46,7 +46,7 @@ def fixture_experiment():
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
             pm.gaze.transforms.downsample, {'factor': 1},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': np.arange(1000, 1100, 1),
@@ -71,7 +71,7 @@ def fixture_experiment():
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
             'downsample', {'factor': 1},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': np.arange(1000, 1100, 1),
@@ -96,7 +96,7 @@ def fixture_experiment():
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
             'downsample', {'factor': 2},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': np.arange(1000, 1010, 2),
@@ -129,7 +129,7 @@ def fixture_experiment():
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
             'center_origin', {},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': [1000],
@@ -163,7 +163,7 @@ def fixture_experiment():
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
             'center_origin', {},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': [1000, 1000],
@@ -197,7 +197,7 @@ def fixture_experiment():
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
             'pix2deg', {},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': [1000, 1000],
@@ -234,7 +234,7 @@ def fixture_experiment():
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
             'pix2deg', {'n_components': 2},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': [1000, 1000],
@@ -271,7 +271,7 @@ def fixture_experiment():
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
             'pix2deg', {},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': [1000],
@@ -310,7 +310,7 @@ def fixture_experiment():
                 'distance_column': 'distance',
             },
             'pix2deg', {},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': [1000, 1000],
@@ -350,7 +350,7 @@ def fixture_experiment():
                 'distance_column': 'distance',
             },
             'pix2deg', {'n_components': 2},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': [1000, 1000],
@@ -390,7 +390,7 @@ def fixture_experiment():
                 'pixel_columns': ['x_pix', 'y_pix'],
             },
             'pix2deg', {'distance': 'distance'},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': [1000, 1000],
@@ -430,7 +430,7 @@ def fixture_experiment():
                 'distance_column': 'distance',
             },
             'pix2deg', {},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': [1000],
@@ -469,7 +469,7 @@ def fixture_experiment():
                 'position_columns': ['x_dva', 'y_dva'],
             },
             'deg2pix', {'pixel_origin': 'center'},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': [1000, 1000],
@@ -506,7 +506,7 @@ def fixture_experiment():
                 'position_columns': ['x_dva', 'y_dva'],
             },
             'deg2pix', {},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': [1000],
@@ -545,7 +545,7 @@ def fixture_experiment():
                 'distance_column': 'distance',
             },
             'deg2pix', {'pixel_origin': 'center'},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': [1000, 1000],
@@ -584,7 +584,7 @@ def fixture_experiment():
                 'position_columns': ['x_dva', 'y_dva'],
             },
             'pos2vel', {'method': 'preceding'},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'trial_id': [1, 1, 1, 2, 2, 2],
@@ -622,7 +622,7 @@ def fixture_experiment():
                 'position_columns': ['x_dva', 'y_dva'],
             },
             'pos2vel', {'method': 'neighbors'},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': [1000, 1001, 1002],
@@ -659,7 +659,7 @@ def fixture_experiment():
                 'position_columns': ['x_dva', 'y_dva'],
             },
             'pos2vel', {'method': 'fivepoint'},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': [1000, 1001, 1002, 1003, 1004],
@@ -698,7 +698,7 @@ def fixture_experiment():
                 'trial_columns': 'trial_id',
             },
             'pos2vel', {'method': 'preceding'},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'trial_id': [1, 1, 1, 2, 2, 2],
@@ -726,7 +726,7 @@ def fixture_experiment():
                 'position_columns': ['x_dva', 'y_dva'],
             },
             'smooth', {'method': 'moving_average', 'window_length': 3},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
@@ -750,7 +750,7 @@ def fixture_experiment():
                 'position_columns': ['x_dva', 'y_dva'],
             },
             pm.gaze.transforms.smooth, {'method': 'moving_average', 'window_length': 3},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
@@ -778,7 +778,7 @@ def fixture_experiment():
                 'input_column': 'pixel', 'output_column': 'pixel', 'n_components': 2,
                 'lower_bound': 1, 'upper_bound': 10,
             },
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': [1000, 1001, 1002, 1003],
@@ -796,7 +796,7 @@ def fixture_experiment():
 def test_gaze_transform_expected_frame(
         gaze_init_kwargs, transform_method, transform_kwargs, expected,
 ):
-    gaze = pm.GazeDataFrame(**gaze_init_kwargs)
+    gaze = pm.Gaze(**gaze_init_kwargs)
     gaze.transform(transform_method, **transform_kwargs)
 
     # the deg2pix test cases result in a column order different to the default ordering
@@ -837,7 +837,7 @@ def test_gaze_transform_expected_frame(
                 'distance_column': 'distance',
             },
             'pix2deg', {},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': [1000],
@@ -861,7 +861,7 @@ def test_gaze_transfrom_expected_frame_warning(
         gaze_init_kwargs, transform_method, transform_kwargs, expected_result, expected_warning,
 ):
     with pytest.warns(expected_warning):
-        gaze = pm.GazeDataFrame(**gaze_init_kwargs)
+        gaze = pm.Gaze(**gaze_init_kwargs)
         gaze.transform(transform_method, **transform_kwargs)
 
         assert_frame_equal(gaze.frame, expected_result.frame)
@@ -883,7 +883,7 @@ def test_gaze_transfrom_expected_frame_warning(
 )
 def test_gaze_transform_raises_exception(init_kwargs, exception, exception_msg):
     with pytest.raises(exception) as excinfo:
-        pm.GazeDataFrame(**init_kwargs)
+        pm.Gaze(**init_kwargs)
 
     msg, = excinfo.value.args
     assert msg == exception_msg
@@ -914,8 +914,8 @@ def test_gaze_transform_raises_exception(init_kwargs, exception, exception_msg):
         ),
     ],
 )
-def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_columns):
-    gaze = pm.GazeDataFrame(
+def test_gaze_pix2deg_creates_position_column(data, experiment, pixel_columns):
+    gaze = pm.Gaze(
         data=pl.from_dict(data),
         experiment=experiment,
         pixel_columns=pixel_columns,
@@ -986,11 +986,11 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
         ),
     ],
 )
-def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg):
-    gaze_df = pm.GazeDataFrame(**init_kwargs)
+def test_gaze_pix2deg_exceptions(init_kwargs, exception, expected_msg):
+    gaze = pm.Gaze(**init_kwargs)
 
     with pytest.raises(exception) as excinfo:
-        gaze_df.pix2deg()
+        gaze.pix2deg()
 
     msg, = excinfo.value.args
     assert msg == expected_msg
@@ -1015,11 +1015,11 @@ def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg)
         ),
     ],
 )
-def test_gaze_dataframe_pix2deg_warnings(init_kwargs, warning, expected_msg):
-    gaze_df = pm.GazeDataFrame(**init_kwargs)
+def test_gaze_pix2deg_warnings(init_kwargs, warning, expected_msg):
+    gaze = pm.Gaze(**init_kwargs)
 
     with pytest.warns(warning) as excinfo:
-        gaze_df.pix2deg()
+        gaze.pix2deg()
 
     msg = excinfo[0].message.args[0]
     assert msg == expected_msg
@@ -1086,11 +1086,11 @@ def test_gaze_dataframe_pix2deg_warnings(init_kwargs, warning, expected_msg):
         ),
     ],
 )
-def test_gaze_dataframe_deg2pix_exceptions(init_kwargs, exception, expected_msg):
-    gaze_df = pm.GazeDataFrame(**init_kwargs)
+def test_gaze_deg2pix_exceptions(init_kwargs, exception, expected_msg):
+    gaze = pm.Gaze(**init_kwargs)
 
     with pytest.raises(exception) as excinfo:
-        gaze_df.deg2pix()
+        gaze.deg2pix()
 
     msg, = excinfo.value.args
     assert msg == expected_msg
@@ -1121,8 +1121,8 @@ def test_gaze_dataframe_deg2pix_exceptions(init_kwargs, exception, expected_msg)
         ),
     ],
 )
-def test_gaze_dataframe_pos2acc_creates_acceleration_column(data, experiment, position_columns):
-    gaze = pm.GazeDataFrame(
+def test_gaze_pos2acc_creates_acceleration_column(data, experiment, position_columns):
+    gaze = pm.Gaze(
         data=pl.from_dict(data),
         experiment=experiment,
         position_columns=position_columns,
@@ -1187,11 +1187,11 @@ def test_gaze_dataframe_pos2acc_creates_acceleration_column(data, experiment, po
         ),
     ],
 )
-def test_gaze_dataframe_pos2acc_exceptions(init_kwargs, exception, expected_msg):
-    gaze_df = pm.GazeDataFrame(**init_kwargs)
+def test_gaze_pos2acc_exceptions(init_kwargs, exception, expected_msg):
+    gaze = pm.Gaze(**init_kwargs)
 
     with pytest.raises(exception) as excinfo:
-        gaze_df.pos2acc()
+        gaze.pos2acc()
 
     msg, = excinfo.value.args
     assert msg == expected_msg
@@ -1222,8 +1222,8 @@ def test_gaze_dataframe_pos2acc_exceptions(init_kwargs, exception, expected_msg)
         ),
     ],
 )
-def test_gaze_dataframe_pos2vel_creates_velocity_column(data, experiment, position_columns):
-    gaze = pm.GazeDataFrame(
+def test_gaze_pos2vel_creates_velocity_column(data, experiment, position_columns):
+    gaze = pm.Gaze(
         data=pl.from_dict(data),
         experiment=experiment,
         position_columns=position_columns,
@@ -1232,8 +1232,8 @@ def test_gaze_dataframe_pos2vel_creates_velocity_column(data, experiment, positi
     assert 'velocity' in gaze.columns
 
 
-def test_gaze_dataframe_clip_creates_new_column(experiment):
-    gaze = pm.GazeDataFrame(
+def test_gaze_clip_creates_new_column(experiment):
+    gaze = pm.Gaze(
         data=pl.from_dict(
             {
                 'time': [1000, 1001, 1002, 1003],
@@ -1310,11 +1310,11 @@ def test_gaze_dataframe_clip_creates_new_column(experiment):
         ),
     ],
 )
-def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg):
-    gaze_df = pm.GazeDataFrame(**init_kwargs)
+def test_gaze_pos2vel_exceptions(init_kwargs, exception, expected_msg):
+    gaze = pm.Gaze(**init_kwargs)
 
     with pytest.raises(exception) as excinfo:
-        gaze_df.pos2vel()
+        gaze.pos2vel()
 
     msg, = excinfo.value.args
     assert msg == expected_msg
@@ -1338,7 +1338,7 @@ def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg)
                 'position_columns': ['x_dva', 'y_dva'],
             },
             {'method': 'moving_average', 'column': 'pixel', 'window_length': 3},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
@@ -1368,7 +1368,7 @@ def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg)
                 'position_columns': ['x_dva', 'y_dva'],
             },
             {'method': 'moving_average', 'column': 'position', 'window_length': 3},
-            pm.GazeDataFrame(
+            pm.Gaze(
                 data=pl.from_dict(
                     {
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
@@ -1385,10 +1385,10 @@ def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg)
         ),
     ],
 )
-def test_gaze_dataframe_smooth_expected_column(
+def test_gaze_smooth_expected_column(
         gaze_init_kwargs, kwargs, expected,
 ):
-    gaze = pm.GazeDataFrame(**gaze_init_kwargs)
+    gaze = pm.Gaze(**gaze_init_kwargs)
     gaze.smooth(**kwargs)
 
     assert_frame_equal(gaze.frame, expected.frame)
@@ -1583,17 +1583,17 @@ def test_gaze_dataframe_smooth_expected_column(
         ),
     ],
 )
-def test_gaze_dataframe_resample_expected(
+def test_gaze_resample_expected(
         gaze_init_kwargs, kwargs, expected_frame,
 ):
-    gaze = pm.GazeDataFrame(**gaze_init_kwargs)
+    gaze = pm.Gaze(**gaze_init_kwargs)
     gaze.resample(**kwargs)
 
     assert_frame_equal(gaze.frame, expected_frame)
 
 
-def test_gaze_dataframe_resample_changes_experiemnt_sampling_rate(experiment):
-    gaze = pm.GazeDataFrame(
+def test_gaze_resample_changes_experiemnt_sampling_rate(experiment):
+    gaze = pm.Gaze(
         data=pl.from_dict(
             {
                 'time': [1000, 1001, 1002, 1003],
