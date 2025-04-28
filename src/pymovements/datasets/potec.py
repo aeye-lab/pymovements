@@ -57,12 +57,12 @@ class PoTeC(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
@@ -126,6 +126,8 @@ class PoTeC(DatasetDefinition):
 
     name: str = 'PoTeC'
 
+    long_name: str = 'Potsdam Textbook Corpus'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
@@ -134,25 +136,18 @@ class PoTeC(DatasetDefinition):
         },
     )
 
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda: {
-            'gaze': ['https://osf.io/download/'],
-            'precomputed_events': ['https://osf.io/download/'],
-        },
-    )
-
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
             'gaze': [
                 {
-                    'resource': 'tgd9q/',
+                    'resource': 'https://osf.io/download/tgd9q/',
                     'filename': 'PoTeC.zip',
                     'md5': 'cffd45039757c3777e2fd130e5d8a2ad',
                 },
             ],
             'precomputed_events': [
                 {
-                    'resource': 'd8pyg/',
+                    'resource': 'https://osf.io/download/d8pyg/',
                     'filename': 'fixation.zip',
                     'md5': 'ecd9a998d07158922bb9b8cdd52f5688',
                 },

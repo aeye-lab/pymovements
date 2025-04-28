@@ -221,3 +221,17 @@ def test_gaze_dataframe_split():
     assert_frame_equal(gaze.frame.filter(pl.col('trial_id') == 0), split_gaze[0].frame)
     assert_frame_equal(gaze.frame.filter(pl.col('trial_id') == 1), split_gaze[1].frame)
     assert_frame_equal(gaze.frame.filter(pl.col('trial_id') == 2), split_gaze[2].frame)
+
+
+def test_gaze_dataframe_compute_event_properties_no_events():
+    gaze = pm.GazeDataFrame(
+        pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64, 'trial_id': pl.Int8}),
+        position_columns=['x', 'y'],
+        trial_columns=['trial_id'],
+    )
+
+    with pytest.warns(
+        UserWarning,
+        match='No events available to compute event properties. Did you forget to use detect()?',
+    ):
+        gaze.compute_event_properties('amplitude')
