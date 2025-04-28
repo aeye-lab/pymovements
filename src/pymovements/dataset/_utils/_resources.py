@@ -22,7 +22,6 @@ from __future__ import annotations
 
 from typing import Any
 from typing import TypeAlias
-from typing import Union
 
 # sphinx automatically substitutes _Resources with the Union using the | operator.
 _Resources: TypeAlias = dict[str, list[dict[str, str]]] | dict[str, tuple[dict[str, str], ...]]
