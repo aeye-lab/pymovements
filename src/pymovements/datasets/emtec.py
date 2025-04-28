@@ -126,7 +126,7 @@ class EMTeC(DatasetDefinition):
         default_factory=lambda: {
             'gaze': True,
             'precomputed_events': True,
-            'precomputed_reading_measures': False,
+            'precomputed_reading_measures': True,
         },
     )
 
@@ -146,12 +146,20 @@ class EMTeC(DatasetDefinition):
                     'md5': '5e05a364a1d8a044d8b36506aa91437e',
                 },
             ],
+            'precomputed_reading_measures': [
+                {
+                    'resource': 'https://osf.io/download/s4ny8/',
+                    'filename': 'reading_measures.csv',
+                    'md5': '56880f50af20682558065ac2d26be827',
+                },
+            ],
         },
     )
     extract: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
             'precomputed_events': False,
+            'precomputed_reading_measures': False,
         },
     )
 
@@ -172,6 +180,7 @@ class EMTeC(DatasetDefinition):
             {
                 'gaze': r'ET_{subject_id:d}.csv',
                 'precomputed_events': r'fixations.csv',
+                'precomputed_reading_measures': r'reading_measures.csv',
             },
     )
 
@@ -180,6 +189,7 @@ class EMTeC(DatasetDefinition):
             {
                 'gaze': {'subject_id': int},
                 'precomputed_events': {},
+                'precomputed_reading_measures': {},
             },
     )
 
@@ -219,5 +229,6 @@ class EMTeC(DatasetDefinition):
                 },
             },
             'precomputed_events': {'separator': '\t'},
+            'precomputed_reading_measures': {'separator': '\t'},
         },
     )
