@@ -35,9 +35,9 @@ from pymovements.dataset import dataset_files
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_paths import DatasetPaths
-from pymovements.events import EventDataFrame
+from pymovements.events import Events
 from pymovements.events.precomputed import PrecomputedEventDataFrame
-from pymovements.gaze import GazeDataFrame
+from pymovements.gaze import Gaze
 from pymovements.reading_measures import ReadingMeasures
 
 
@@ -65,8 +65,8 @@ class Dataset:
             path: str | Path | DatasetPaths,
     ):
         self.fileinfo: pl.DataFrame = pl.DataFrame()
-        self.gaze: list[GazeDataFrame] = []
-        self.events: list[EventDataFrame] = []
+        self.gaze: list[Gaze] = []
+        self.events: list[Events] = []
         self.precomputed_events: list[PrecomputedEventDataFrame] = []
         self.precomputed_reading_measures: list[ReadingMeasures] = []
 
@@ -163,8 +163,8 @@ class Dataset:
                 events_dirname=events_dirname,
                 extension=extension,
             )
-            for loaded_gaze_df, loaded_events_df in zip(self.gaze, self.events):
-                loaded_gaze_df.events = loaded_events_df
+            for loaded_gaze, loaded_events in zip(self.gaze, self.events):
+                loaded_gaze.events = loaded_events
 
         return self
 
@@ -255,7 +255,7 @@ class Dataset:
             self,
             by: Sequence[str],
     ) -> None:
-        """Split gaze data into separated GazeDataFrame's.
+        """Split gaze data into separated Gaze's.
 
         Parameters
         ----------
@@ -340,7 +340,7 @@ class Dataset:
             verbose: bool = True,
             **kwargs: Any,
     ) -> Dataset:
-        """Apply preprocessing method to all GazeDataFrames in Dataset.
+        """Apply preprocessing method to all Gazes in Dataset.
 
         Parameters
         ----------
@@ -389,7 +389,7 @@ class Dataset:
         >>> dataset.apply('resample', resampling_rate=2000)# doctest:+ELLIPSIS
         <pymovements.dataset.dataset.Dataset object at ...>
         """
-        self._check_gaze_dataframe()
+        self._check_gaze()
 
         disable_progressbar = not verbose
         for gaze in tqdm(self.gaze, disable=disable_progressbar):
@@ -639,7 +639,7 @@ class Dataset:
 
     def detect_events(
             self,
-            method: Callable[..., EventDataFrame] | str,
+            method: Callable[..., Events] | str,
             *,
             eye: str = 'auto',
             clear: bool = False,
@@ -650,7 +650,7 @@ class Dataset:
 
         Parameters
         ----------
-        method : Callable[..., EventDataFrame] | str
+        method : Callable[..., Events] | str
             The event detection method to be applied.
         eye: str
             Select which eye to choose. Valid options are ``auto``, ``left``, ``right`` or ``None``.
@@ -684,7 +684,7 @@ class Dataset:
 
     def detect(
             self,
-            method: Callable[..., EventDataFrame] | str,
+            method: Callable[..., Events] | str,
             *,
             eye: str = 'auto',
             clear: bool = False,
@@ -697,7 +697,7 @@ class Dataset:
 
         Parameters
         ----------
-        method: Callable[..., EventDataFrame] | str
+        method: Callable[..., Events] | str
             The event detection method to be applied.
         eye: str
             Select which eye to choose. Valid options are ``auto``, ``left``, ``right`` or ``None``.
@@ -721,7 +721,7 @@ class Dataset:
         AttributeError
             If gaze files have not been loaded yet or gaze files do not contain the right columns.
         """
-        self._check_gaze_dataframe()
+        self._check_gaze()
 
         if not self.events:
             self.events = [gaze.events for gaze in self.gaze]
@@ -732,7 +732,7 @@ class Dataset:
                 disable=disable_progressbar,
         ):
             gaze.detect(method, eye=eye, clear=clear, **kwargs)
-            # workaround until events are fully part of the GazeDataFrame
+            # workaround until events are fully part of the Gaze
             gaze.events.frame = dataset_files.add_fileinfo(
                 definition=self.definition,
                 df=gaze.events.frame,
@@ -827,7 +827,7 @@ class Dataset:
             return self
 
         for file_id, _ in enumerate(self.events):
-            self.events[file_id] = EventDataFrame()
+            self.events[file_id] = Events()
 
         return self
 
@@ -947,7 +947,7 @@ class Dataset:
             If extension is not in list of valid extensions.
         """
         dataset_files.save_preprocessed(
-            gaze=self.gaze,
+            gazes=self.gaze,
             fileinfo=self.fileinfo['gaze'],
             paths=self.paths,
             preprocessed_dirname=preprocessed_dirname,
@@ -1101,7 +1101,7 @@ class Dataset:
         if len(self.fileinfo) == 0:
             raise AttributeError('no files present in fileinfo attribute')
 
-    def _check_gaze_dataframe(self) -> None:
+    def _check_gaze(self) -> None:
         """Check if gaze attribute is set and there is at least one gaze dataframe available."""
         if self.gaze is None:
             raise AttributeError('gaze files were not loaded yet. please run load() beforehand')

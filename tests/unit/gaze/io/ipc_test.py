@@ -51,6 +51,6 @@ import pymovements as pm
     ],
 )
 def test_shapes(kwargs, shape):
-    gaze_dataframe = pm.gaze.from_ipc(**kwargs)
+    gaze = pm.gaze.from_ipc(**kwargs)
 
-    assert gaze_dataframe.frame.shape == shape
+    assert gaze.frame.shape == shape

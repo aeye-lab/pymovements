@@ -74,7 +74,7 @@ def test_microsaccades_raises_error(kwargs, expected):
                 ),
                 'threshold': 10,
             },
-            pm.EventDataFrame(),
+            pm.Events(),
             id='two_steps_one_saccade_high_threshold_no_events',
         ),
         pytest.param(
@@ -87,7 +87,7 @@ def test_microsaccades_raises_error(kwargs, expected):
                 ),
                 'threshold': 1e-5,
             },
-            pm.EventDataFrame(
+            pm.Events(
                 name='saccade',
                 onsets=[40],
                 offsets=[49],
@@ -105,7 +105,7 @@ def test_microsaccades_raises_error(kwargs, expected):
                 'threshold': 1e-5,
                 'name': 'custom_saccade',
             },
-            pm.EventDataFrame(
+            pm.Events(
                 name='custom_saccade',
                 onsets=[40],
                 offsets=[49],
@@ -122,7 +122,7 @@ def test_microsaccades_raises_error(kwargs, expected):
                 ),
                 'threshold': 1e-5,
             },
-            pm.EventDataFrame(
+            pm.Events(
                 name='saccade',
                 onsets=[20, 70],
                 offsets=[29, 79],
@@ -140,7 +140,7 @@ def test_microsaccades_raises_error(kwargs, expected):
                 'threshold': 1,
                 'include_nan': True,
             },
-            pm.EventDataFrame(
+            pm.Events(
                 name='saccade',
                 onsets=[20, 70],
                 offsets=[29, 79],
@@ -158,7 +158,7 @@ def test_microsaccades_raises_error(kwargs, expected):
                 'threshold': 1,
                 'minimum_duration': 1,
             },
-            pm.EventDataFrame(
+            pm.Events(
                 name='saccade',
                 onsets=[20, 28, 70],
                 offsets=[24, 29, 79],
@@ -175,7 +175,7 @@ def test_microsaccades_raises_error(kwargs, expected):
                 ),
                 'threshold': 'std',
             },
-            pm.EventDataFrame(),
+            pm.Events(),
             id='string_based_threshold',
         ),
         pytest.param(
@@ -189,7 +189,7 @@ def test_microsaccades_raises_error(kwargs, expected):
                 'timesteps': np.arange(1000, 1100, dtype=int),
                 'threshold': 1e-5,
             },
-            pm.EventDataFrame(
+            pm.Events(
                 name='saccade',
                 onsets=[1040],
                 offsets=[1049],

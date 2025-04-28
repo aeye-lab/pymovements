@@ -127,7 +127,7 @@ def test_idt_raises_error(kwargs, expected_error):
                 'dispersion_threshold': 1,
                 'minimum_duration': 10,
             },
-            pm.events.EventDataFrame(),
+            pm.events.Events(),
             id='constant_velocity_no_fixation',
         ),
         pytest.param(
@@ -136,7 +136,7 @@ def test_idt_raises_error(kwargs, expected_error):
                 'dispersion_threshold': 1,
                 'minimum_duration': 2,
             },
-            pm.events.EventDataFrame(
+            pm.events.Events(
                 name='fixation',
                 onsets=[0],
                 offsets=[99],
@@ -150,7 +150,7 @@ def test_idt_raises_error(kwargs, expected_error):
                 'minimum_duration': 2,
                 'name': 'custom_fixation',
             },
-            pm.events.EventDataFrame(
+            pm.events.Events(
                 name='custom_fixation',
                 onsets=[0],
                 offsets=[99],
@@ -168,7 +168,7 @@ def test_idt_raises_error(kwargs, expected_error):
                 'dispersion_threshold': 1,
                 'minimum_duration': 2,
             },
-            pm.events.EventDataFrame(
+            pm.events.Events(
                 name='fixation',
                 onsets=[0, 50],
                 offsets=[49, 99],
@@ -187,7 +187,7 @@ def test_idt_raises_error(kwargs, expected_error):
                 'dispersion_threshold': 1,
                 'minimum_duration': 2,
             },
-            pm.events.EventDataFrame(
+            pm.events.Events(
                 name='fixation',
                 onsets=[0, 20],
                 offsets=[9, 89],
@@ -207,7 +207,7 @@ def test_idt_raises_error(kwargs, expected_error):
                 'minimum_duration': 2,
                 'include_nan': True,
             },
-            pm.events.EventDataFrame(
+            pm.events.Events(
                 name='fixation',
                 onsets=[0],
                 offsets=[89],
@@ -221,7 +221,7 @@ def test_idt_raises_error(kwargs, expected_error):
                 'dispersion_threshold': 1,
                 'minimum_duration': 2,
             },
-            pm.events.EventDataFrame(
+            pm.events.Events(
                 name='fixation',
                 onsets=[1000],
                 offsets=[1099],
@@ -235,7 +235,7 @@ def test_idt_raises_error(kwargs, expected_error):
                 'dispersion_threshold': 1,
                 'minimum_duration': 2,
             },
-            pm.events.EventDataFrame(
+            pm.events.Events(
                 name='fixation',
                 onsets=[1000],
                 offsets=[1099],
@@ -249,7 +249,7 @@ def test_idt_raises_error(kwargs, expected_error):
                 'dispersion_threshold': 1,
                 'minimum_duration': 2,
             },
-            pm.events.EventDataFrame(
+            pm.events.Events(
                 name='fixation',
                 onsets=[1000],
                 offsets=[1099],
@@ -263,7 +263,7 @@ def test_idt_raises_error(kwargs, expected_error):
                 'dispersion_threshold': 1,
                 'minimum_duration': 2,
             },
-            pm.events.EventDataFrame(
+            pm.events.Events(
                 name='fixation',
                 onsets=[1000],
                 offsets=[1099],
