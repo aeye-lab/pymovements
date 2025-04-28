@@ -43,12 +43,12 @@ class MECOL2W1(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
@@ -102,6 +102,8 @@ class MECOL2W1(DatasetDefinition):
 
     name: str = 'MECOL2W1'
 
+    long_name: str = 'Multilingual Eye-tracking Corpus second language reader first wave'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': False,
@@ -110,19 +112,11 @@ class MECOL2W1(DatasetDefinition):
         },
     )
 
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda: {
-            'precomputed_events': [
-                'https://osf.io/download/',
-            ],
-        },
-    )
-
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
             'precomputed_events': [
                 {
-                    'resource': '8rygu/',
+                    'resource': 'https://osf.io/download/8rygu/',
                     'filename': 'joint_l2_fixation_trimmed_report_2.0.rda',
                     'md5': '1ff32c5823eb70c22bab725499fbbf87',
                 },
