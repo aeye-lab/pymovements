@@ -44,34 +44,45 @@ class FakeNewsPerception(DatasetDefinition):
     ----------
     name: str
         The name of the dataset.
+
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
+
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
+
     experiment: Experiment
         The experiment definition.
+
     extract: dict[str, bool]
         Decide whether to extract the data.
+
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
+
     filename_format_schema_overrides: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
+
     column_map: dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
+
     custom_read_kwargs: dict[str, Any]
         If specified, these keyword arguments will be passed to the file reading function.
     """
 
     name: str = 'FakeNewsPerception'
+
+    long_name: str = 'Fake News Perception Eye Tracking Corpus'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
@@ -81,17 +92,11 @@ class FakeNewsPerception(DatasetDefinition):
         },
     )
 
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda: {
-            'precomputed_events': ['https://dataverse.harvard.edu/'],
-        },
-    )
-
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
             'precomputed_events': [
                 {
-                    'resource': 'api/access/datafile/4200164',
+                    'resource': 'https://dataverse.harvard.edu/api/access/datafile/4200164',
                     'filename': 'D3-Eye-movements-data.zip',
                     'md5': 'ab009f28cd703f433e9b6c02b0bb38d2',
                 },

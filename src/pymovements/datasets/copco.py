@@ -48,12 +48,12 @@ class CopCo(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, list[dict[str, str | None]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
@@ -126,6 +126,8 @@ class CopCo(DatasetDefinition):
 
     name: str = 'CopCo'
 
+    long_name: str = 'Copenhagen Corpus of Eye-Tracking Recordings from Natural Reading'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
@@ -133,18 +135,12 @@ class CopCo(DatasetDefinition):
             'precomputed_reading_measures': True,
         },
     )
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda: {
-            'gaze': ['https://osf.io/download/'],
-            'precomputed_events': ['https://files.de-1.osf.io/'],
-            'precomputed_reading_measures': ['https://files.de-1.osf.io/'],
-        },
-    )
+
     resources: dict[str, list[dict[str, str | None]]] = field(
         default_factory=lambda: {
             'gaze': [
                 {
-                    'resource': 'bg9r4/',
+                    'resource': 'https://osf.io/download/bg9r4/',
                     'filename': 'csvs.zip',
                     'md5': '9dc3276714397b7fccac1e179a14c52b',  # type:ignore
                 },
@@ -152,7 +148,7 @@ class CopCo(DatasetDefinition):
             'precomputed_events': [
                 {
                     'resource':
-                    'v1/resources/ud8s5/providers/osfstorage/61e13174c99ebd02df017c14/?zip=',
+                    'https://files.de-1.osf.io/v1/resources/ud8s5/providers/osfstorage/61e13174c99ebd02df017c14/?zip=',  # noqa: E501 # pylint: disable=line-too-long
                     'filename': 'FixationReports.zip',
                     'md5': None,  # type:ignore
                 },
@@ -160,7 +156,7 @@ class CopCo(DatasetDefinition):
             'precomputed_reading_measures': [
                 {
                     'resource':
-                    'v1/resources/ud8s5/providers/osfstorage/61e1317cc99ebd02df017c4f/?zip=',
+                    'https://files.de-1.osf.io/v1/resources/ud8s5/providers/osfstorage/61e1317cc99ebd02df017c4f/?zip=',  # noqa: E501 # pylint: disable=line-too-long
                     'filename': 'ReadingMeasures.zip',
                     'md5': None,  # type:ignore
                 },

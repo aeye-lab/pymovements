@@ -22,12 +22,12 @@ from __future__ import annotations
 
 import numpy as np
 
+from pymovements._utils import _checks
 from pymovements.events._utils._filters import filter_candidates_remove_nans
 from pymovements.events.detection._library import register_event_detection
 from pymovements.events.frame import EventDataFrame
 from pymovements.gaze.transforms_numpy import consecutive
 from pymovements.gaze.transforms_numpy import norm
-from pymovements.utils import checks
 
 
 @register_event_detection
@@ -85,7 +85,7 @@ def ivt(
     """
     velocities = np.array(velocities)
 
-    checks.check_shapes(velocities=velocities)
+    _checks.check_shapes(velocities=velocities)
 
     if velocity_threshold is None:
         raise ValueError('velocity threshold must not be None')
@@ -95,7 +95,7 @@ def ivt(
     if timesteps is None:
         timesteps = np.arange(len(velocities), dtype=np.int64)
     timesteps = np.array(timesteps)
-    checks.check_is_length_matching(velocities=velocities, timesteps=timesteps)
+    _checks.check_is_length_matching(velocities=velocities, timesteps=timesteps)
 
     # Get all indices with norm-velocities below threshold.
     velocity_norm = norm(velocities, axis=1)
