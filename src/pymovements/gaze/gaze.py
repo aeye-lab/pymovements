@@ -221,6 +221,7 @@ class Gaze:
             acceleration_columns: list[str] | None = None,
             distance_column: str | None = None,
             auto_column_detect: bool = False,
+            definition: pm.DatasetDefinition | None = None,
     ):
         if data is None:
             data = pl.DataFrame()
@@ -231,7 +232,7 @@ class Gaze:
         # Set nan values to null.
         self.frame = self.frame.fill_nan(None)
 
-        self.experiment = experiment
+        self._init_experiment(experiment, definition)
 
         self._init_columns(
             trial_columns=trial_columns,
@@ -243,6 +244,7 @@ class Gaze:
             acceleration_columns=acceleration_columns,
             distance_column=distance_column,
             auto_column_detect=auto_column_detect,
+            definition=definition,
         )
 
         if events is None:
@@ -891,7 +893,7 @@ class Gaze:
     def compute_event_properties(
             self,
             event_properties: str | tuple[str, dict[str, Any]]
-            | list[str | tuple[str, dict[str, Any]]],
+                              | list[str | tuple[str, dict[str, Any]]],
             name: str | None = None,
     ) -> None:
         """Calculate event properties for given events.
@@ -1470,8 +1472,35 @@ class Gaze:
             acceleration_columns: list[str] | None = None,
             distance_column: str | None = None,
             auto_column_detect: bool = False,
+            definition: pm.DatasetDefinition | None = None,
     ) -> None:
         """Initialize dataframe columns."""
+        # Explicit arguments take precedence over definition.
+        if definition:
+            if trial_columns is None:
+                trial_columns = definition.trial_columns
+
+            if time_column is None:
+                time_column = definition.time_column
+
+            if time_unit is None:
+                time_unit = definition.time_unit
+
+            if pixel_columns is None:
+                pixel_columns = definition.pixel_columns
+
+            if position_columns is None:
+                position_columns = definition.position_columns
+
+            if velocity_columns is None:
+                velocity_columns = definition.velocity_columns
+
+            if acceleration_columns is None:
+                acceleration_columns = definition.acceleration_columns
+
+            if distance_column is None:
+                distance_column = definition.distance_column
+
         # Initialize trial_columns.
         trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
         if trial_columns is not None and len(trial_columns) == 0:
@@ -1593,6 +1622,15 @@ class Gaze:
                 self.frame = self.frame.with_columns(
                     pl.col('time').cast(pl.Int64),
                 )
+
+    def _init_experiment(
+            self, experiment: Experiment | None, definition: pm.DatasetDefinition | None,
+    ) -> None:
+        """Explicitly passed experiment takes precedence over definition."""
+        if definition is not None and experiment is None:
+            self.experiment = definition.experiment
+        else:
+            self.experiment = experiment
 
     def __str__(self) -> str:
         """Return string representation of Gaze."""

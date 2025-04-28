@@ -89,6 +89,9 @@ class GazeDataFrame(metaclass=DeprecatedMetaClass):
         from the experiment definition. This column will be renamed to ``distance``. (default: None)
     auto_column_detect: bool
         Flag indicating if the column names should be inferred automatically. (default: False)
+    definition: pm.DatasetDefinition | None
+        A dataset definition. Explicitly passed arguments take precedence over definition.
+        (default: None)
 
     Attributes
     ----------
