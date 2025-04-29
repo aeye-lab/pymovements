@@ -137,17 +137,49 @@ class Experiment:
     def from_dict(dictionary: dict[str, Any]) -> Experiment:
         """Create an Experiment instance from a dictionary.
 
-        This static method allows initializing an Experiment object
-        from a dictionary that may contain nested dictionaries for
-        'screen' and 'eyetracker'. These nested dictionaries are
-        automatically converted into Screen and EyeTracker instances.
+        Parameters
+        ----------
+        dictionary : dict[str, Any]
+            A dictionary containing Experiment parameters.
 
-        Args:
-            dictionary (dict[str, Any]): A dictionary containing Experiment parameters.
-                Expected keys:
-                - 'screen' (dict): Parameters to initialize a Screen object.
-                - 'eyetracker' (dict): Parameters to initialize an EyeTracker object.
-                Other keys are passed directly to the Experiment constructor.
+        Notes
+        -----
+        The dictionary may contain nested dictionaries for 'screen' and 'eyetracker'.
+        These will be automatically converted into Screen and EyeTracker instances.
+
+        Examples
+        --------
+        >>> data = {
+        ...     "screen": {
+        ...         "width_px": 1280,
+        ...         "height_px": 1024,
+        ...         "width_cm": 38.0,
+        ...         "height_cm": 30.0,
+        ...         "distance_cm": 68.0,
+        ...         "origin": "upper left"
+        ...     },
+        ...     "eyetracker": {
+        ...         "sampling_rate": 1000.0
+        ...     }
+        ... }
+        >>> experiment = Experiment.from_dict({
+        ...     "screen": {
+        ...         "width_px": 1280,
+        ...         "height_px": 1024,
+        ...         "width_cm": 38.0,
+        ...         "height_cm": 30.0,
+        ...         "distance_cm": 68.0,
+        ...         "origin": "upper left"
+        ...     },
+        ...     "eyetracker": {
+        ...         "sampling_rate": 1000.0
+        ...     }
+        ... })
+        >>> print(experiment)
+        Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38.0, height_cm=30.0,
+                                 distance_cm=68.0, origin='upper left'), 
+                   eyetracker=EyeTracker(sampling_rate=1000.0, left=None, right=None, model=None, 
+                                          version=None, vendor=None, mount=None))
 
         Returns
         -------
