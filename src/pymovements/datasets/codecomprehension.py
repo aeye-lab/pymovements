@@ -27,12 +27,9 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.dataset_library import register_dataset
-from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
-@register_dataset
 class CodeComprehension(DatasetDefinition):
     """CodeComprehension dataset :cite:p:`CodeComprehension`.
 
@@ -47,15 +44,15 @@ class CodeComprehension(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, tuple[str, ...]]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
-
-    resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+    resources: dict[str, list[dict[str, str]]]
+        A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -64,9 +61,6 @@ class CodeComprehension(DatasetDefinition):
     extract: dict[str, bool]
         Decide whether to extract the data.
 
-    experiment: Experiment
-        The experiment definition.
-
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
@@ -74,27 +68,6 @@ class CodeComprehension(DatasetDefinition):
     filename_format_schema_overrides: dict[str, dict[str, type]]
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
-
-    trial_columns: list[str]
-            The name of the trial columns in the input data frame. If the list is empty or None,
-            the input data frame is assumed to contain only one trial. If the list is not empty,
-            the input data frame is assumed to contain multiple trials and the transformation
-            methods will be applied to each trial separately.
-
-    time_column: str
-        The name of the timestamp column in the input data frame. This column will be renamed to
-        ``time``.
-
-    time_unit: str
-        The unit of the timestamps in the timestamp column in the input data frame. Supported
-        units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
-        'step' the experiment definition must be specified. All timestamps will be converted to
-        milliseconds.
-
-    pixel_columns: list[str]
-        The name of the pixel position columns in the input data frame. These columns will be
-        nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
-        column will not be created.
 
     column_map: dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
@@ -125,6 +98,8 @@ class CodeComprehension(DatasetDefinition):
 
     name: str = 'CodeComprehension'
 
+    long_name: str = 'Code Comprehension dataset'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': False,
@@ -133,37 +108,19 @@ class CodeComprehension(DatasetDefinition):
         },
     )
 
-    mirrors: dict[str, tuple[str, ...]] = field(
+    resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
-            'precomputed_events': ('https://zenodo.org/',),
-        },
-    )
-
-    resources: dict[str, tuple[dict[str, str], ...]] = field(
-        default_factory=lambda: {
-            'precomputed_events': (
+            'precomputed_events': [
                 {
-                    'resource':
-                    'records/11123101/files/Predicting%20Code%20Comprehension%20Package'
-                    '.zip?download=1',
+                    'resource': 'https://zenodo.org/records/11123101/files/Predicting%20Code%20Comprehension%20Package.zip?download=1',  # noqa: E501 # pylint: disable=line-too-long
                     'filename': 'data.zip',
                     'md5': '3a3c6fb96550bc2c2ddcf5d458fb12a2',
                 },
-            ),
+            ],
         },
     )
 
     extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': True})
-
-    experiment: Experiment = Experiment(
-        screen_width_px=None,
-        screen_height_px=None,
-        screen_width_cm=None,
-        screen_height_cm=None,
-        distance_cm=None,
-        origin=None,
-        sampling_rate=2000,
-    )
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
@@ -176,14 +133,6 @@ class CodeComprehension(DatasetDefinition):
             'precomputed_events': {'subject_id': pl.Utf8},
         },
     )
-
-    trial_columns: list[str] = field(default_factory=lambda: [])
-
-    time_column: str = ''
-
-    time_unit: str = ''
-
-    pixel_columns: list[str] = field(default_factory=lambda: [])
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 

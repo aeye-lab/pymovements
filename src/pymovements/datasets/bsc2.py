@@ -25,12 +25,9 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.dataset_library import register_dataset
-from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
-@register_dataset
 class BSCII(DatasetDefinition):
     """BSCII dataset :cite:p:`BSCII`.
 
@@ -48,15 +45,15 @@ class BSCII(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, tuple[str, ...]]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
-
-    resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+    resources: dict[str, list[dict[str, str]]]
+        A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -64,9 +61,6 @@ class BSCII(DatasetDefinition):
 
     extract: dict[str, bool]
         Decide whether to extract the data.
-
-    experiment: Experiment
-        The experiment definition.
 
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
@@ -81,21 +75,6 @@ class BSCII(DatasetDefinition):
             the input data frame is assumed to contain only one trial. If the list is not empty,
             the input data frame is assumed to contain multiple trials and the transformation
             methods will be applied to each trial separately.
-
-    time_column: str
-        The name of the timestamp column in the input data frame. This column will be renamed to
-        ``time``.
-
-    time_unit: str
-        The unit of the timestamps in the timestamp column in the input data frame. Supported
-        units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
-        'step' the experiment definition must be specified. All timestamps will be converted to
-        milliseconds.
-
-    pixel_columns: list[str]
-        The name of the pixel position columns in the input data frame. These columns will be
-        nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
-        column will not be created.
 
     column_map: dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
@@ -126,6 +105,8 @@ class BSCII(DatasetDefinition):
 
     name: str = 'BSCII'
 
+    long_name: str = 'Beijing Sentence Corpus II'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': False,
@@ -133,35 +114,24 @@ class BSCII(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-    mirrors: dict[str, tuple[str, ...]] = field(
+
+    resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda:
             {
-                'precomputed_events': (
-                    'https://osf.io/download/',
-                ),
-            },
-    )
-    resources: dict[str, tuple[dict[str, str], ...]] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': (
+                'precomputed_events': [
                     {
-                        'resource': '2cuys/',
+                        'resource': 'https://osf.io/download/2cuys/',
                         'filename': 'BSCII.EMD.rev.zip',
                         'md5': '4daad0fa922785d8c681a883b1197e1e',
                     },
-                ),
+                ],
             },
     )
+
     extract: dict[str, bool] = field(
         default_factory=lambda: {
             'precomputed_events': True,
         },
-    )
-
-    experiment: Experiment = Experiment(
-        screen_width_px=None, screen_height_px=None, screen_width_cm=None,
-        screen_height_cm=None, distance_cm=None, origin=None, sampling_rate=1,
     )
 
     filename_format: dict[str, str] = field(
@@ -184,12 +154,6 @@ class BSCII(DatasetDefinition):
             'screen_id',
         ],
     )
-
-    time_column: str = 'time'
-
-    time_unit: str = 'ms'
-
-    pixel_columns: list[str] = field(default_factory=lambda: [])
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 

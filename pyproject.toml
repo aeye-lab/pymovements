@@ -37,12 +37,13 @@ dependencies = [
   "matplotlib>=3.8.0,<3.11",
   "numpy>=1.22.4,<2.3",
   "pandas>=2.1.4,<2.3",
-  "polars>=1.21.0,<1.25",
+  "polars>=1.21.0,<1.29",
   "pyarrow>=11.0.0,<19.1",
   "pyopenssl>=16.0.0,<25.1",
+  "pyyaml>=6.0.2,<6.1",
   "scipy>=1.8.0,<1.16",
   "tqdm>=4.27.0,<4.68",
-  "typing_extensions>=4.0.0,<4.13"
+  "typing_extensions>=4.0.0,<4.14"
 ]
 dynamic = ["version"]
 
@@ -55,7 +56,7 @@ docs = [
   "pybtex",
   "pydata-sphinx-theme>=0.12",
   "setuptools>=61.0.0",
-  "sphinx>=5.3.0,<7.4",
+  "sphinx>=7.0,<8.3",
   "sphinx-copybutton>=0.4.0",
   "sphinx-favicon>=1.0.1",
   "sphinx_design>=0.3.0",
@@ -66,6 +67,7 @@ docs = [
 test = [
   "pybtex",
   "pytest>=6.0.0",
+  "pytest-benchmark>=5.1.0",
   "pytest-cov>=4.0.0",
   "setuptools>=61.0.0",
   "types-tqdm>=4.64.0,<5"
@@ -152,6 +154,12 @@ filterwarnings = [
   "ignore:datetime.datetime.utcfromtimestamp() is deprecated.*:DeprecationWarning"
 ]
 testpaths = ['tests', 'src']
+
+[tool.setuptools.package-data]
+pymovements = ["datasets/*.yaml"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.setuptools-git-versioning]
 enabled = true

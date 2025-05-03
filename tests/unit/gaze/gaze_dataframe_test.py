@@ -181,13 +181,7 @@ def test_gaze_dataframe_copy_with_experiment():
 
     # We want to have separate experiment instances but the same values.
     assert gaze.experiment is not gaze_copy.experiment
-    assert gaze.experiment.screen.width_px == gaze_copy.experiment.screen.width_px
-    assert gaze.experiment.screen.height_px == gaze_copy.experiment.screen.height_px
-    assert gaze.experiment.screen.width_cm == gaze_copy.experiment.screen.width_cm
-    assert gaze.experiment.screen.height_cm == gaze_copy.experiment.screen.height_cm
-    assert gaze.experiment.screen.distance_cm == gaze_copy.experiment.screen.distance_cm
-    assert gaze.experiment.screen.origin == gaze_copy.experiment.screen.origin
-    assert gaze.experiment.sampling_rate == gaze_copy.experiment.sampling_rate
+    assert gaze.experiment == gaze_copy.experiment
 
 
 def test_gaze_dataframe_copy_no_experiment():
@@ -227,3 +221,17 @@ def test_gaze_dataframe_split():
     assert_frame_equal(gaze.frame.filter(pl.col('trial_id') == 0), split_gaze[0].frame)
     assert_frame_equal(gaze.frame.filter(pl.col('trial_id') == 1), split_gaze[1].frame)
     assert_frame_equal(gaze.frame.filter(pl.col('trial_id') == 2), split_gaze[2].frame)
+
+
+def test_gaze_dataframe_compute_event_properties_no_events():
+    gaze = pm.GazeDataFrame(
+        pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64, 'trial_id': pl.Int8}),
+        position_columns=['x', 'y'],
+        trial_columns=['trial_id'],
+    )
+
+    with pytest.warns(
+        UserWarning,
+        match='No events available to compute event properties. Did you forget to use detect()?',
+    ):
+        gaze.compute_event_properties('amplitude')

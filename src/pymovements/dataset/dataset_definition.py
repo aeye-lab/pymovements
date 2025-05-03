@@ -20,11 +20,23 @@
 """DatasetDefinition module."""
 from __future__ import annotations
 
+from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
+from pathlib import Path
 from typing import Any
 
+import yaml
+
+from pymovements.dataset._utils._yaml import reverse_substitute_types
+from pymovements.dataset._utils._yaml import substitute_types
+from pymovements.dataset._utils._yaml import type_constructor
 from pymovements.gaze.experiment import Experiment
+from pymovements.gaze.eyetracker import EyeTracker
+from pymovements.gaze.screen import Screen
+
+
+yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
 
 
 @dataclass
@@ -35,14 +47,16 @@ class DatasetDefinition:
     ----------
     name: str
         The name of the dataset. (default: '.')
+    long_name: str | None
+        The entire name of the dataset. (default: None)
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-    mirrors: dict[str, tuple[str, ...]]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
+    mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]]
+        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
         (default: field(default_factory=dict))
-    resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset resources. Each list entry must be a dictionary with the following keys:
+    resources: dict[str, list[dict[str, str]]] | dict[str, tuple[dict[str, str], ...]]
+        A list of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
@@ -130,13 +144,19 @@ class DatasetDefinition:
 
     # pylint: disable=too-many-instance-attributes
     name: str = '.'
+
+    long_name: str | None = None
+
     has_files: dict[str, bool] = field(default_factory=dict)
 
-    mirrors: dict[str, tuple[str, ...]] = field(default_factory=dict)
+    mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] = field(default_factory=dict)
 
-    resources: dict[str, tuple[dict[str, str], ...]] = field(default_factory=dict)
+    resources: dict[str, list[dict[str, str]]] | dict[str, tuple[dict[str, str], ...]] = field(
+        default_factory=dict,
+    )
 
-    experiment: Experiment | None = None
+    experiment: Experiment | None = field(default_factory=Experiment)
+
     extract: dict[str, bool] = field(default_factory=dict)
 
     filename_format: dict[str, str] = field(default_factory=dict)
@@ -155,3 +175,82 @@ class DatasetDefinition:
     velocity_columns: list[str] | None = None
     acceleration_columns: list[str] | None = None
     distance_column: str | None = None
+
+    @staticmethod
+    def from_yaml(path: str | Path) -> DatasetDefinition:
+        """Load a dataset definition from a YAML file.
+
+        Parameters
+        ----------
+        path: str | Path
+            Path to the YAML definition file
+
+        Returns
+        -------
+        DatasetDefinition
+            Initialized dataset definition
+        """
+        with open(path, encoding='utf-8') as f:
+            data = yaml.safe_load(f)
+
+        # Convert experiment dict to Experiment object if present
+        if 'experiment' in data:
+            if 'eyetracker' in data['experiment']:
+                eyetracker = EyeTracker(**data['experiment'].pop('eyetracker'))
+            else:
+                eyetracker = None
+            if 'screen' in data['experiment']:
+                screen = Screen(**data['experiment'].pop('screen'))
+            else:
+                screen = None
+            data['experiment'] = Experiment(
+                **data['experiment'],
+                screen=screen,
+                eyetracker=eyetracker,
+            )
+
+        data = reverse_substitute_types(data)
+        # Initialize DatasetDefinition with YAML data
+        return DatasetDefinition(**data)
+
+    def to_dict(self, exclude_private: bool = True) -> dict[str, Any]:
+        """Return dictionary representation.
+
+        Parameters
+        ----------
+        exclude_private: bool
+            Exclude attributes that start with `_`.
+
+        Returns
+        -------
+        dict[str, Any]
+            Dictionary representation of dataset definition.
+        """
+        data = asdict(self)
+
+        # Delete private fields from dictionary.
+        if exclude_private:
+            for key in list(data.keys()):
+                if key.startswith('_'):
+                    del data[key]
+
+        data['experiment'] = data['experiment'].to_dict()
+
+        return data
+
+    def to_yaml(self, path: str | Path, exclude_private: bool = True) -> None:
+        """Save a dataset definition to a YAML file.
+
+        Parameters
+        ----------
+        path: str | Path
+            Path where to save the YAML file to.
+        exclude_private: bool
+            Exclude attributes that start with `_`.
+        """
+        data = self.to_dict(exclude_private=exclude_private)
+
+        data = substitute_types(data)
+
+        with open(path, 'w', encoding='utf-8') as f:
+            yaml.dump(data, f, sort_keys=False)

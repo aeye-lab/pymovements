@@ -27,13 +27,11 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.dataset_library import register_dataset
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
 
 
 @dataclass
-@register_dataset
 class ToyDatasetEyeLink(DatasetDefinition):
     """Example toy dataset with EyeLink data.
 
@@ -48,15 +46,15 @@ class ToyDatasetEyeLink(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, tuple[str, ...]]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
-
-    resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+    resources: dict[str, list[dict[str, str]]]
+        A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -76,7 +74,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
-    trial_columns: list[str]
+    trial_columns: list[str] | None
             The name of the trial columns in the input data frame. If the list is empty or None,
             the input data frame is assumed to contain only one trial. If the list is not empty,
             the input data frame is assumed to contain multiple trials and the transformation
@@ -126,6 +124,8 @@ class ToyDatasetEyeLink(DatasetDefinition):
 
     name: str = 'ToyDatasetEyeLink'
 
+    long_name: str = 'pymovements Toy Dataset EyeLink'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
@@ -134,42 +134,36 @@ class ToyDatasetEyeLink(DatasetDefinition):
         },
     )
 
-    mirrors: dict[str, tuple[str, ...]] = field(
-        default_factory=lambda: {
-            'gaze': (
-                'http://github.com/aeye-lab/pymovements-toy-dataset-eyelink/zipball/',
-            ),
-        },
-    )
-
-    resources: dict[str, tuple[dict[str, str], ...]] = field(
+    resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
             'gaze':
-                (
+                [
                     {
-                        'resource': 'a970d090588542dad745297866e794ab9dad8795/',
+                        'resource': 'http://github.com/aeye-lab/pymovements-toy-dataset-eyelink/zipball/a970d090588542dad745297866e794ab9dad8795/',  # noqa: E501 # pylint: disable=line-too-long
                         'filename': 'pymovements-toy-dataset-eyelink.zip',
                         'md5': 'b1d426751403752c8a154fc48d1670ce',
                     },
-                ),
+                ],
         },
     )
 
     extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
-    experiment: Experiment = Experiment(
-        screen_width_px=1280,
-        screen_height_px=1024,
-        screen_width_cm=38,
-        screen_height_cm=30.2,
-        distance_cm=68,
-        origin='upper left',
-        eyetracker=EyeTracker(
-            sampling_rate=1000.0,
-            left=True,
-            right=False,
-            model='EyeLink Portable Duo',
-            vendor='EyeLink',
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=1280,
+            screen_height_px=1024,
+            screen_width_cm=38,
+            screen_height_cm=30.2,
+            distance_cm=68,
+            origin='upper left',
+            eyetracker=EyeTracker(
+                sampling_rate=1000.0,
+                left=True,
+                right=False,
+                model='EyeLink Portable Duo',
+                vendor='EyeLink',
+            ),
         ),
     )
 
@@ -188,7 +182,9 @@ class ToyDatasetEyeLink(DatasetDefinition):
         },
     )
 
-    trial_columns: list[str] = field(default_factory=lambda: [])
+    trial_columns: list[str] | None = field(
+        default_factory=lambda: ['task', 'trial_id'],
+    )
 
     time_column: str = 'time'
 
@@ -213,7 +209,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
                         'value': 'judo',
                     },
                     {
-                        'pattern': ('READING[.]STOP', 'JUDO[.]STOP'),
+                        'pattern': ['READING[.]STOP', 'JUDO[.]STOP'],
                         'column': 'task',
                         'value': None,
                     },
@@ -245,6 +241,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
                     'point_id': pl.Int64,
                     'task': pl.Utf8,
                 },
+                'encoding': 'ascii',
             },
         },
     )

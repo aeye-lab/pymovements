@@ -27,12 +27,10 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.dataset_library import register_dataset
 from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
-@register_dataset
 class JuDo1000(DatasetDefinition):
     """JuDo1000 dataset :cite:p:`JuDo1000`.
 
@@ -49,15 +47,15 @@ class JuDo1000(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, tuple[str, ...]]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
-
-    resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+    resources: dict[str, list[dict[str, str]]]
+        A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -128,6 +126,8 @@ class JuDo1000(DatasetDefinition):
 
     name: str = 'JuDo1000'
 
+    long_name: str = 'Jumping Dots 1000 Hz dataset'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
@@ -135,35 +135,31 @@ class JuDo1000(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-    mirrors: dict[str, tuple[str, ...]] = field(
-        default_factory=lambda: {
-            'gaze': (
-                'https://osf.io/download/',
-            ),
-        },
-    )
 
-    resources: dict[str, tuple[dict[str, str], ...]] = field(
+    resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
-            'gaze': (
+            'gaze': [
                 {
-                    'resource': '4wy7s/',
+                    'resource': 'https://osf.io/download/4wy7s/',
                     'filename': 'JuDo1000.zip',
                     'md5': 'b8b9e5bb65b78d6f2bd260451cdd89f8',
                 },
-            ),
+            ],
         },
     )
+
     extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
-    experiment: Experiment = Experiment(
-        screen_width_px=1280,
-        screen_height_px=1024,
-        screen_width_cm=38,
-        screen_height_cm=30.2,
-        distance_cm=68,
-        origin='upper left',
-        sampling_rate=1000,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=1280,
+            screen_height_px=1024,
+            screen_width_cm=38,
+            screen_height_cm=30.2,
+            distance_cm=68,
+            origin='upper left',
+            sampling_rate=1000,
+        ),
     )
 
     filename_format: dict[str, str] = field(

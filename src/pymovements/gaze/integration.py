@@ -26,10 +26,10 @@ import numpy as np
 import pandas as pd
 import polars as pl
 
+from pymovements._utils import _checks
 from pymovements.events.frame import EventDataFrame
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze_dataframe import GazeDataFrame
-from pymovements.utils import checks
 
 
 def from_numpy(
@@ -48,7 +48,7 @@ def from_numpy(
         orient: Literal['col', 'row'] = 'col',
         trial_columns: str | list[str] | None = None,
         time_column: str | None = None,
-        time_unit: str | None = 'ms',
+        time_unit: str | None = None,
         pixel_columns: list[str] | None = None,
         position_columns: list[str] | None = None,
         velocity_columns: list[str] | None = None,
@@ -101,9 +101,10 @@ def from_numpy(
     time_column: str | None
         The name of the timestamp column in the input data frame. (default: None)
     time_unit: str | None
-        The unit of the timestamps. Supported units are 's' for seconds, 'ms' for milliseconds and
-        'step' for steps. If the unit is 'step' the experiment definition must be specified. All
-        timestamps will be converted to milliseconds. (default: None)
+        The unit of the timestamps in the timestamp column in the input data frame. Supported
+        units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
+        'step' the experiment definition must be specified. All timestamps will be converted to
+        milliseconds. If time_unit is None, milliseconds are assumed. (default: None)
     pixel_columns: list[str] | None
         The name of the pixel position columns in the input data frame. (default: None)
     position_columns: list[str] | None
@@ -226,12 +227,12 @@ def from_numpy(
     └──────┴────────────┘
     """
     # Either data or {time, pixel, position, velocity, acceleration} must be None.
-    checks.check_is_mutual_exclusive(data=data, time=time)
-    checks.check_is_mutual_exclusive(data=data, pixel=pixel)
-    checks.check_is_mutual_exclusive(data=data, position=position)
-    checks.check_is_mutual_exclusive(data=data, velocity=velocity)
-    checks.check_is_mutual_exclusive(data=data, acceleration=acceleration)
-    checks.check_is_mutual_exclusive(data=data, distance=distance)
+    _checks.check_is_mutual_exclusive(data=data, time=time)
+    _checks.check_is_mutual_exclusive(data=data, pixel=pixel)
+    _checks.check_is_mutual_exclusive(data=data, position=position)
+    _checks.check_is_mutual_exclusive(data=data, velocity=velocity)
+    _checks.check_is_mutual_exclusive(data=data, acceleration=acceleration)
+    _checks.check_is_mutual_exclusive(data=data, distance=distance)
 
     if data is not None:
         df = pl.from_numpy(data=data, schema=schema, orient=orient)
@@ -318,7 +319,7 @@ def from_pandas(
         *,
         trial_columns: str | list[str] | None = None,
         time_column: str | None = None,
-        time_unit: str | None = 'ms',
+        time_unit: str | None = None,
         pixel_columns: list[str] | None = None,
         position_columns: list[str] | None = None,
         velocity_columns: list[str] | None = None,
@@ -343,10 +344,10 @@ def from_pandas(
     time_column: str | None
         The name of the timestamp column in the input data frame. (default: None)
     time_unit: str | None
-        The unit of the timestamps in the input data frame. Supported units are 's' for seconds,
-        'ms' for milliseconds and 'step' for steps. If the unit is 'step' the experiment
-        definition must be specified. All timestamps will be converted to milliseconds.
-        (default: 'ms')
+        The unit of the timestamps in the timestamp column in the input data frame. Supported
+        units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
+        'step' the experiment definition must be specified. All timestamps will be converted to
+        milliseconds. If time_unit is None, milliseconds are assumed. (default: None)
     pixel_columns: list[str] | None
         The name of the pixel position columns in the input data frame. (default: None)
     position_columns: list[str] | None

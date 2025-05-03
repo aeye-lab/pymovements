@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the Gaze4hate dataset."""
+"""Provides a definition for the Gaze4Hate dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -31,14 +31,14 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 @register_dataset
-class Gaze4hate(DatasetDefinition):
-    """Gaze4hate dataset :cite:p:`Gaze4hate`.
+class Gaze4Hate(DatasetDefinition):
+    """Gaze4Hate dataset :cite:p:`Gaze4Hate`.
 
     This dataset includes monocular eye tracking data from 43 participants annotating sentences for
     hate speech. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink
     1000 Plus eye tracker and are provided as pixel coordinates.
 
-    Check the respective paper for details :cite:p:`Gaze4hate`.
+    Check the respective paper for details :cite:p:`Gaze4Hate`.
 
     Attributes
     ----------
@@ -103,11 +103,11 @@ class Gaze4hate(DatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
-    :py:class:`~pymovements.datasets.Gaze4hate` definition:
+    :py:class:`~pymovements.datasets.Gaze4Hate` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("Gaze4hate", path='data/Gaze4hate')
+    >>> dataset = pm.Dataset("Gaze4Hate", path='data/Gaze4Hate')
 
     Download the dataset resources:
 
@@ -121,7 +121,7 @@ class Gaze4hate(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'Gaze4hate'
+    name: str = 'Gaze4Hate'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

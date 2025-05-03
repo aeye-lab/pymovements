@@ -25,12 +25,10 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.dataset_library import register_dataset
 from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
-@register_dataset
 class InteRead(DatasetDefinition):
     """InteRead dataset :cite:p:`InteRead`.
 
@@ -47,15 +45,15 @@ class InteRead(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, tuple[str, ...]]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
-
-    resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+    resources: dict[str, list[dict[str, str]]]
+        A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -126,6 +124,8 @@ class InteRead(DatasetDefinition):
 
     name: str = 'InteRead'
 
+    long_name: str = 'Interrupted Reading dataset'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
@@ -133,35 +133,26 @@ class InteRead(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-    mirrors: dict[str, tuple[str, ...]] = field(
-        default_factory=lambda: {
-            'gaze': (
-                'https://osf.io/download/',
-            ),
-            'precomputed_events': (
-                'https://osf.io/download/',
-            ),
-        },
-    )
 
-    resources: dict[str, tuple[dict[str, str], ...]] = field(
+    resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
-            'gaze': (
+            'gaze': [
                 {
-                    'resource': '6ju3x/',
+                    'resource': 'https://osf.io/download/6ju3x/',
                     'filename': 'resampled_gaze.csv.zip',
                     'md5': '06b2cdff1827086fa125a703ee9d4324',
                 },
-            ),
-            'precomputed_events': (
+            ],
+            'precomputed_events': [
                 {
-                    'resource': '85ckh/',
+                    'resource': 'https://osf.io/download/85ckh/',
                     'filename': 'resumption_fixation.csv',
                     'md5': '44edb7c58318ad76af1fa6f1bc1f1ceb',
                 },
-            ),
+            ],
         },
     )
+
     extract: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
@@ -169,14 +160,16 @@ class InteRead(DatasetDefinition):
         },
     )
 
-    experiment: Experiment = Experiment(
-        screen_width_px=1920,
-        screen_height_px=1080,
-        screen_width_cm=52.8,
-        screen_height_cm=29.7,
-        distance_cm=57,
-        origin='center',
-        sampling_rate=1200,
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=1920,
+            screen_height_px=1080,
+            screen_width_cm=52.8,
+            screen_height_cm=29.7,
+            distance_cm=57,
+            origin='center',
+            sampling_rate=1200,
+        ),
     )
 
     filename_format: dict[str, str] = field(
