@@ -836,7 +836,7 @@ class GazeDataFrame:
 
             self.events.frame = pl.concat(
                 [self.events.frame, new_events.frame],
-                how='diagonal',
+                how='diagonal_relaxed',
             )
         else:
             grouped_frames = self.frame.partition_by(

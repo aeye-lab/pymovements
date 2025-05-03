@@ -44,9 +44,9 @@ class EventDataFrame:
         exclusive with all the other arguments. (default: None)
     name: str | list[str] | None
         Name of events. (default: None)
-    onsets: list[int] | np.ndarray | None
+    onsets: list[int | float] | np.ndarray | None
         List of onsets. (default: None)
-    offsets: list[int] | np.ndarray | None
+    offsets: list[int | float] | np.ndarray | None
         List of offsets. (default: None)
     trials: list[int | float | str] | np.ndarray | None
         List of trial identifiers. (default: None)
@@ -89,8 +89,8 @@ class EventDataFrame:
             self,
             data: pl.DataFrame | None = None,
             name: str | list[str] | None = None,
-            onsets: list[int] | np.ndarray | None = None,
-            offsets: list[int] | np.ndarray | None = None,
+            onsets: list[int | float] | np.ndarray | None = None,
+            offsets: list[int | float] | np.ndarray | None = None,
             trials: list[int | float | str] | np.ndarray | None = None,
             trial_columns: list[str] | str | None = None,
     ):
