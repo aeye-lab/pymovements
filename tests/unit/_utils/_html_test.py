@@ -34,6 +34,20 @@ class Foo:
     def __init__(self, a: int, b: str) -> None:
         self.a = a
         self.b = b
+        self._private = 'private'  # Should be excluded from the HTML representation
+
+    @property
+    def working_property(self) -> str:
+        """Properties should be included in the HTML representation."""
+        return f'{self.a} {self.b}'
+
+    @property
+    def failing_property(self) -> None:
+        """Properties that raise an error should be excluded from the HTML representation."""
+        raise RuntimeError()
+
+    def method(self) -> None:
+        """All methods should be excluded from the HTML representation."""
 
 
 @pytest.mark.parametrize(
@@ -57,6 +71,12 @@ class Foo:
             r'<label for="pm-\2" class="pm-section-label">b:</label>\s*'
             r'<div class="pm-section-inline-details">&#x27;test&#x27;</div>\s*'
             r'<div class="pm-section-details">&#x27;test&#x27;</div>\s*'
+            r'</li>\s*'
+            r'<li class="pm-section">\s*'
+            r'<input id="pm-([0-9a-f-]+)" class="pm-section-toggle" type="checkbox">\s*'
+            r'<label for="pm-\3" class="pm-section-label">working_property:</label>\s*'
+            r'<div class="pm-section-inline-details">&#x27;123 test&#x27;</div>\s*'
+            r'<div class="pm-section-details">&#x27;123 test&#x27;</div>\s*'
             r'</li>\s*'
             r'</ul>\s*',
             id='all_attrs',
