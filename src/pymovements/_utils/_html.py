@@ -101,6 +101,7 @@ def html_repr(attrs: list[str] | None = None) -> Callable[[T], T]:
 
 
 def _obj_html(obj: object, attrs: list[str] | None = None) -> str:
+    """Generate HTML representation for an object."""
     if attrs is None:
         attrs = []
         for attr in dir(obj):
@@ -133,6 +134,7 @@ def _obj_html(obj: object, attrs: list[str] | None = None) -> str:
 
 
 def _attr_html(name: str, obj: object, depth: int = 0) -> str:
+    """Generate HTML representation for an attribute."""
     section_id = uuid4()
     name = escape(name)
 
@@ -150,6 +152,7 @@ def _attr_html(name: str, obj: object, depth: int = 0) -> str:
 
 
 def _attr_inline_details_html(obj: object) -> str:
+    """Generate inline (collapsed) details for HTML representation."""
     if isinstance(obj, pl.DataFrame):
         inline_details = f"DataFrame ({len(obj.columns)} columns, {len(obj)} rows)"
 
@@ -169,26 +172,28 @@ def _attr_inline_details_html(obj: object) -> str:
 
 
 def _attr_details_html(obj: object, depth: int = 0, max_depth: int = 3) -> str:
+    """Generate expanded details for HTML representation."""
+    max_items = 2
+
     if isinstance(obj, list) and depth < max_depth:
         details = '<ul>'
-        num_shown = 2
-        for item in obj[:num_shown]:
+        for item in obj[:max_items]:
             details += f'<li>{_attr_details_html(item, depth + 1)}</li>'
-        if len(obj) > num_shown:
+        if len(obj) > max_items:
             details += f'<li>({len(obj) - 2} more)</li>'
         details += '</ul>'
 
     elif isinstance(obj, dict) and depth < max_depth:
         details = '<ul class="pm-section-list">'
-        for key in islice(obj.keys(), num_shown):
+        for key in islice(obj.keys(), max_items):
             value = obj[key]
             details += _attr_html(key, value, depth + 1)
-        if len(obj) > num_shown:
+        if len(obj) > max_items:
             details += f'<li>({len(obj) - 2} more)</li>'
         details += '</ul>'
 
     elif hasattr(obj, '_repr_html_'):
-        details = obj._repr_html_()
+        details = obj._repr_html_()  # pylint: disable=protected-access
 
     else:
         details = escape(repr(obj))
