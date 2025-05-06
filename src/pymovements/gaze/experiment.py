@@ -150,6 +150,7 @@ class Experiment:
         Examples
         --------
         Passing a flat dictionary:
+
         >>> experiment = Experiment.from_dict({
         ...     "screen_width_px": 1280,
         ...     "screen_height_px": 1024,
@@ -162,15 +163,16 @@ class Experiment:
         Experiment(
             screen=Screen(
                 width_px=1280, height_px=1024, width_cm=38.0, height_cm=30.0,
-                distance_cm=68.0, origin='upper left',
+                distance_cm=68.0, origin='upper left'
             ),
             eyetracker=EyeTracker(
                 sampling_rate=1000.0, left=None, right=None,
-                model=None, version=None, vendor=None, mount=None,
-            ),
+                model=None, version=None, vendor=None, mount=None
+            )
         )
 
         The same result using nested dictionaries for `screen` and `eyetracker`:
+
         >>> experiment = Experiment.from_dict({
         ...     "screen": {
         ...         "width_px": 1280,
@@ -188,12 +190,12 @@ class Experiment:
         Experiment(
             screen=Screen(
                 width_px=1280, height_px=1024, width_cm=38.0, height_cm=30.0,
-                distance_cm=68.0, origin='upper left',
+                distance_cm=68.0, origin='upper left'
             ),
             eyetracker=EyeTracker(
                 sampling_rate=1000.0, left=None, right=None,
-                model=None, version=None, vendor=None, mount=None,
-            ),
+                model=None, version=None, vendor=None, mount=None
+            )
         )
 
         Returns
