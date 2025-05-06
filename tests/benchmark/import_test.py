@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2025 The pymovements Project Authors
+# Copyright (c) 2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,36 +17,18 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-# pylint: disable=cyclic-import
-"""Provides utility functions.
-
-.. deprecated:: v0.22.0
-   This module will be removed in v0.27.0.
-
-.. rubric:: Modules
-
-.. autosummary::
-   :toctree:
-   :template: module.rst
-
-    archives
-    downloads
-    parsing
-    paths
-"""
-from pymovements.utils import aois
-from pymovements.utils import archives
-from pymovements.utils import downloads
-from pymovements.utils import parsing
-from pymovements.utils import paths
-from pymovements.utils import plotting
+"""Benchmark import times."""
+import subprocess
+import sys
 
 
-__all__ = [
-    'aois',
-    'archives',
-    'downloads',
-    'parsing',
-    'plotting',
-    'paths',
-]
+def import_pymovements_subprocess():
+    cmd = [sys.executable, '-c', 'import pymovements']
+    subprocess.run(cmd, check=True)
+
+
+def test_import_pymovements_subprocess(benchmark):
+    benchmark.pedantic(
+        import_pymovements_subprocess,
+        iterations=1, rounds=10,
+    )

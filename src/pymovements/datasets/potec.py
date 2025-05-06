@@ -64,9 +64,6 @@ class PoTeC(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
-
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
@@ -134,14 +131,8 @@ class PoTeC(DatasetDefinition):
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
-            'precomputed_events': False,
+            'precomputed_events': True,
             'precomputed_reading_measures': False,
-        },
-    )
-
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda: {
-            'gaze': ['https://osf.io/download/'],
         },
     )
 
@@ -149,15 +140,27 @@ class PoTeC(DatasetDefinition):
         default_factory=lambda: {
             'gaze': [
                 {
-                    'resource': 'tgd9q/',
+                    'resource': 'https://osf.io/download/tgd9q/',
                     'filename': 'PoTeC.zip',
                     'md5': 'cffd45039757c3777e2fd130e5d8a2ad',
+                },
+            ],
+            'precomputed_events': [
+                {
+                    'resource': 'https://osf.io/download/d8pyg/',
+                    'filename': 'fixation.zip',
+                    'md5': 'ecd9a998d07158922bb9b8cdd52f5688',
                 },
             ],
         },
     )
 
-    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
+    extract: dict[str, bool] = field(
+        default_factory=lambda: {
+            'gaze': True,
+            'precomputed_events': True,
+        },
+    )
 
     experiment: Experiment = field(
         default_factory=lambda: Experiment(
@@ -174,12 +177,17 @@ class PoTeC(DatasetDefinition):
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
             'gaze': r'reader{subject_id:d}_{text_id}_raw_data.tsv',
+            'precomputed_events': r'reader{subject_id:d}_{text_id}_uncorrected_fixations.tsv',
         },
     )
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
             'gaze': {
+                'subject_id': int,
+                'text_id': str,
+            },
+            'precomputed_events': {
                 'subject_id': int,
                 'text_id': str,
             },
@@ -206,6 +214,10 @@ class PoTeC(DatasetDefinition):
                     'pupil_diameter': pl.Float32,
                 },
                 'separator': '\t',
+            },
+            'precomputed_events': {
+                'separator': '\t',
+                'null_values': '.',
             },
         },
     )

@@ -7,13 +7,9 @@ has_files:
   precomputed_events: false
   precomputed_reading_measures: false
 
-mirrors:
-  gaze:
-    - "https://figshare.com/ndownloader/files/"
-
 resources:
   gaze:
-    - resource: "38844024"
+    - resource: "https://figshare.com/ndownloader/files/38844024"
       filename: "gazebasevr.zip"
       md5: "048c04b00fd64347375cc8d37b451a22"
 
@@ -53,6 +49,7 @@ position_columns:
 column_map:
   xT: "x_target_pos"
   yT: "y_target_pos"
+  zT: "z_target_pos"
 
 custom_read_kwargs:
   gaze:
