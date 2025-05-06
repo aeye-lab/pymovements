@@ -32,8 +32,6 @@ from pymovements.dataset._utils._yaml import reverse_substitute_types
 from pymovements.dataset._utils._yaml import substitute_types
 from pymovements.dataset._utils._yaml import type_constructor
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.eyetracker import EyeTracker
-from pymovements.gaze.screen import Screen
 
 
 yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
