@@ -45,6 +45,7 @@ from pymovements import DatasetLibrary
         pytest.param(pm.datasets.InteRead, 'InteRead', id='InteRead'),
         pytest.param(pm.datasets.JuDo1000, 'JuDo1000', id='JuDo1000'),
         pytest.param(pm.datasets.MouseCursor, 'MouseCursor', id='MouseCursor'),
+        pytest.param(pm.datasets.OneStop, 'OneStop', id='OneStop'),
         pytest.param(pm.datasets.PoTeC, 'PoTeC', id='PoTeC'),
         pytest.param(
             pm.datasets.PotsdamBingeRemotePVT,
