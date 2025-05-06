@@ -195,19 +195,7 @@ class DatasetDefinition:
 
         # Convert experiment dict to Experiment object if present
         if 'experiment' in data:
-            if 'eyetracker' in data['experiment']:
-                eyetracker = EyeTracker(**data['experiment'].pop('eyetracker'))
-            else:
-                eyetracker = None
-            if 'screen' in data['experiment']:
-                screen = Screen(**data['experiment'].pop('screen'))
-            else:
-                screen = None
-            data['experiment'] = Experiment(
-                **data['experiment'],
-                screen=screen,
-                eyetracker=eyetracker,
-            )
+            data['experiment'] = Experiment.from_dict(data['experiment'])
 
         data = reverse_substitute_types(data)
         # Initialize DatasetDefinition with YAML data
