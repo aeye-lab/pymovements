@@ -157,7 +157,7 @@ class Experiment:
         ...     "screen_height_cm": 30.0,
         ...     "distance_cm": 68.0,
         ...     "sampling_rate": 1000.0,
-        ... }
+        ... })
         >>> print(experiment)
         Experiment(
             screen=Screen(
