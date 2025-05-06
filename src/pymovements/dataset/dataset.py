@@ -46,10 +46,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-@repr_html([
-    'gaze', 'events', 'precomputed_events',
-    'precomputed_reading_measures', 'definition', 'fileinfo',
-])
+@repr_html()
 class Dataset:
     """Dataset base class.
 
