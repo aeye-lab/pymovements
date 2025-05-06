@@ -32,8 +32,6 @@ from pymovements.dataset._utils._yaml import reverse_substitute_types
 from pymovements.dataset._utils._yaml import substitute_types
 from pymovements.dataset._utils._yaml import type_constructor
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.eyetracker import EyeTracker
-from pymovements.gaze.screen import Screen
 
 
 yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
@@ -195,19 +193,7 @@ class DatasetDefinition:
 
         # Convert experiment dict to Experiment object if present
         if 'experiment' in data:
-            if 'eyetracker' in data['experiment']:
-                eyetracker = EyeTracker(**data['experiment'].pop('eyetracker'))
-            else:
-                eyetracker = None
-            if 'screen' in data['experiment']:
-                screen = Screen(**data['experiment'].pop('screen'))
-            else:
-                screen = None
-            data['experiment'] = Experiment(
-                **data['experiment'],
-                screen=screen,
-                eyetracker=eyetracker,
-            )
+            data['experiment'] = Experiment.from_dict(data['experiment'])
 
         data = reverse_substitute_types(data)
         # Initialize DatasetDefinition with YAML data
