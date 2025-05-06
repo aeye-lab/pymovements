@@ -31,44 +31,44 @@ import polars as pl
 
 STYLE = """
 <style>
-    .pm-section-list {
+    .pymovements-section-list {
         margin: 0;
         padding: 0;
         font-family: sans-serif;
     }
-    .pm-section {
+    .pymovements-section {
         list-style: none;
         padding-bottom: 0.5em;
     }
-    .pm-section-title {
+    .pymovements-section-title {
         font-size: 120%;
         font-weight: bold;
     }
-    .pm-section-toggle {
+    .pymovements-section-toggle {
         display: none;
     }
-    .pm-section-label {
+    .pymovements-section-label {
         cursor: pointer;
         font-weight: bold;
     }
-    .pm-section-label:before {
+    .pymovements-section-label:before {
         display: inline-block;
         content: "►";
     }
-    .pm-section-toggle:checked + .pm-section-label:before {
+    .pymovements-section-toggle:checked + .pymovements-section-label:before {
         content: "▼";
     }
-    .pm-section-inline-details {
+    .pymovements-section-inline-details {
         display: inline-block;
     }
-    .pm-section-details {
+    .pymovements-section-details {
         display: none;
         padding-left: 1em;
     }
-    .pm-section-toggle:checked ~ .pm-section-details {
+    .pymovements-section-toggle:checked ~ .pymovements-section-details {
         display: block;
     }
-    .pm-section-details > ul {
+    .pymovements-section-details > ul {
         padding-left: 1em;
     }
 </style>
@@ -78,7 +78,7 @@ STYLE = """
 T = TypeVar('T')
 
 
-def html_repr(attrs: list[str] | None = None) -> Callable[[T], T]:
+def repr_html(attrs: list[str] | None = None) -> Callable[[T], T]:
     """Add an HTML representation to the class for Jupyter notebooks.
 
     Parameters
@@ -126,8 +126,8 @@ def _obj_html(obj: object, attrs: list[str] | None = None) -> str:
 
     return f"""
     {STYLE}
-    <span class="pm-section-title">{title}</span>
-    <ul class="pm-section-list">
+    <span class="pymovements-section-title">{title}</span>
+    <ul class="pymovements-section-list">
         {"".join(sections)}
     </ul>
     """
@@ -142,11 +142,11 @@ def _attr_html(name: str, obj: object, depth: int = 0) -> str:
     details = _attr_details_html(obj, depth=depth)
 
     return f"""
-    <li class="pm-section">
-        <input id="pm-{section_id}" class="pm-section-toggle" type="checkbox">
-        <label for="pm-{section_id}" class="pm-section-label">{name}:</label>
-        <div class="pm-section-inline-details">{inline_details}</div>
-        <div class="pm-section-details">{details}</div>
+    <li class="pymovements-section">
+        <input id="pm-{section_id}" class="pymovements-section-toggle" type="checkbox">
+        <label for="pm-{section_id}" class="pymovements-section-label">{name}:</label>
+        <div class="pymovements-section-inline-details">{inline_details}</div>
+        <div class="pymovements-section-details">{details}</div>
     </li>
     """
 
@@ -184,7 +184,7 @@ def _attr_details_html(obj: object, depth: int = 0, max_depth: int = 3) -> str:
         details += '</ul>'
 
     elif isinstance(obj, dict) and depth < max_depth:
-        details = '<ul class="pm-section-list">'
+        details = '<ul class="pymovements-section-list">'
         for key in islice(obj.keys(), max_items):
             value = obj[key]
             details += _attr_html(key, value, depth + 1)

@@ -25,11 +25,11 @@ from dataclasses import dataclass
 import numpy as np
 
 from pymovements._utils import _checks
-from pymovements._utils._html import html_repr
+from pymovements._utils._html import repr_html
 from pymovements.gaze import transforms_numpy
 
 
-@html_repr()
+@repr_html()
 @dataclass
 class Screen:
     """Screen class for holding screen properties.

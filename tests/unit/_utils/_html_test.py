@@ -101,7 +101,7 @@ class Foo:
 )
 def test_html_repr(cls, attrs, init_args, init_kwargs, expected_html):
     # Apply decorator
-    cls = _html.html_repr(attrs)(cls)
+    cls = _html.repr_html(attrs)(cls)
     # Create instance of the class
     obj = cls(*init_args, **init_kwargs)
     # Get HTML representation

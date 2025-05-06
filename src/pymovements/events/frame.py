@@ -28,12 +28,12 @@ import polars as pl
 from tqdm import tqdm
 
 from pymovements._utils import _checks
-from pymovements._utils._html import html_repr
+from pymovements._utils._html import repr_html
 from pymovements.events.properties import duration
 from pymovements.stimulus.text import TextStimulus
 
 
-@html_repr(['frame', 'trial_columns'])
+@repr_html(['frame', 'trial_columns'])
 class EventDataFrame:
     """A DataFrame for event data.
 

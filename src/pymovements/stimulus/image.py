@@ -25,12 +25,12 @@ from pathlib import Path
 import matplotlib.pyplot
 import PIL.Image
 
-from pymovements._utils._html import html_repr
+from pymovements._utils._html import repr_html
 from pymovements._utils._paths import get_filepaths
 from pymovements._utils._strings import curly_to_regex
 
 
-@html_repr()
+@repr_html()
 class ImageStimulus:
     """A DataFrame for image stimulus.
 

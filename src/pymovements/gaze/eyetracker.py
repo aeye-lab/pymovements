@@ -23,10 +23,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from pymovements._utils import _checks
-from pymovements._utils._html import html_repr
+from pymovements._utils._html import repr_html
 
 
-@html_repr()
+@repr_html()
 @dataclass
 class EyeTracker:
     """EyeTracker class for holding eyetracker properties.
