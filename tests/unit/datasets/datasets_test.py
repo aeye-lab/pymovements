@@ -43,6 +43,7 @@ from pymovements import DatasetLibrary
         pytest.param(pm.datasets.GazeOnFaces, 'GazeOnFaces', id='GazeOnFaces'),
         pytest.param(pm.datasets.HBN, 'HBN', id='HBN'),
         pytest.param(pm.datasets.InteRead, 'InteRead', id='InteRead'),
+        pytest.param(pm.datasets.IITBHGC, 'IITBHGC', id='IITBHGC'),
         pytest.param(pm.datasets.JuDo1000, 'JuDo1000', id='JuDo1000'),
         pytest.param(pm.datasets.MouseCursor, 'MouseCursor', id='MouseCursor'),
         pytest.param(pm.datasets.PoTeC, 'PoTeC', id='PoTeC'),
