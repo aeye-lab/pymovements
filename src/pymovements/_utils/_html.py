@@ -143,8 +143,8 @@ def _attr_html(name: str, obj: object, depth: int = 0) -> str:
 
     return f"""
     <li class="pymovements-section">
-        <input id="pm-{section_id}" class="pymovements-section-toggle" type="checkbox">
-        <label for="pm-{section_id}" class="pymovements-section-label">{name}:</label>
+        <input id="pymovements-{section_id}" class="pymovements-section-toggle" type="checkbox">
+        <label for="pymovements-{section_id}" class="pymovements-section-label">{name}:</label>
         <div class="pymovements-section-inline-details">{inline_details}</div>
         <div class="pymovements-section-details">{details}</div>
     </li>
