@@ -28,6 +28,7 @@ from typing import Any
 
 import yaml
 
+from pymovements._utils._html import repr_html
 from pymovements.dataset._utils._yaml import reverse_substitute_types
 from pymovements.dataset._utils._yaml import substitute_types
 from pymovements.dataset._utils._yaml import type_constructor
@@ -37,6 +38,7 @@ from pymovements.gaze.experiment import Experiment
 yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
 
 
+@repr_html()
 @dataclass
 class DatasetDefinition:
     """Definition to initialize a :py:class:`~pymovements.dataset.Dataset`.
