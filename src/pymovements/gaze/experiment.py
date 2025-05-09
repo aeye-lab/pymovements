@@ -20,17 +20,20 @@
 """Provides the Experiment class."""
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import asdict
 from typing import Any
 
 import numpy as np
 
 from pymovements._utils import _checks
+from pymovements._utils._html import repr_html
 from pymovements.gaze import transforms_numpy
 from pymovements.gaze.eyetracker import EyeTracker
 from pymovements.gaze.screen import Screen
 
 
+@repr_html()
 class Experiment:
     """Experiment class for holding experiment properties.
 
@@ -131,6 +134,80 @@ class Experiment:
 
         if self.sampling_rate is not None:
             _checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
+
+    @staticmethod
+    def from_dict(dictionary: dict[str, Any]) -> Experiment:
+        """Create an Experiment instance from a dictionary.
+
+        Parameters
+        ----------
+        dictionary : dict[str, Any]
+            A dictionary containing Experiment parameters.
+
+        Notes
+        -----
+        The dictionary may contain nested dictionaries for 'screen' and 'eyetracker'.
+        These will be automatically converted into Screen and EyeTracker instances.
+
+        Examples
+        --------
+        Passing a flat dictionary:
+
+        >>> experiment = Experiment.from_dict({
+        ...     "screen_width_px": 1280,
+        ...     "screen_height_px": 1024,
+        ...     "screen_width_cm": 38.0,
+        ...     "screen_height_cm": 30.0,
+        ...     "distance_cm": 68.0,
+        ...     "sampling_rate": 1000.0,
+        ... })
+        >>> print(experiment)
+        Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38.0, height_cm=30.0,
+                                 distance_cm=68.0, origin='upper left'),
+                   eyetracker=EyeTracker(sampling_rate=1000.0, left=None, right=None,
+                                        model=None, version=None, vendor=None, mount=None))
+
+        The same result using nested dictionaries for `screen` and `eyetracker`:
+
+        >>> experiment = Experiment.from_dict({
+        ...     "screen": {
+        ...         "width_px": 1280,
+        ...         "height_px": 1024,
+        ...         "width_cm": 38.0,
+        ...         "height_cm": 30.0,
+        ...         "distance_cm": 68.0,
+        ...         "origin": "upper left"
+        ...     },
+        ...     "eyetracker": {
+        ...         "sampling_rate": 1000.0
+        ...     }
+        ... })
+        >>> print(experiment)
+        Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38.0, height_cm=30.0,
+                                 distance_cm=68.0, origin='upper left'),
+                   eyetracker=EyeTracker(sampling_rate=1000.0, left=None, right=None,
+                                        model=None, version=None, vendor=None, mount=None))
+
+        Returns
+        -------
+        Experiment
+            An initialized Experiment instance.
+        """
+        dictionary = deepcopy(dictionary)
+        screen = None
+        eyetracker = None
+
+        if 'screen' in dictionary:
+            screen = Screen(**dictionary.pop('screen'))
+
+        if 'eyetracker' in dictionary:
+            eyetracker = EyeTracker(**dictionary.pop('eyetracker'))
+
+        return Experiment(
+            **dictionary,
+            screen=screen,
+            eyetracker=eyetracker,
+        )
 
     @property
     def sampling_rate(self) -> float | None:

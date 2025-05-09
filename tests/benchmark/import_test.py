@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2025 The pymovements Project Authors
+# Copyright (c) 2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,24 +17,18 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Module for the precomputed events dataframe."""
-from __future__ import annotations
-
-import polars as pl
-
-from pymovements._utils._html import repr_html
+"""Benchmark import times."""
+import subprocess
+import sys
 
 
-@repr_html()
-class PrecomputedEventDataFrame:
-    """A DataFrame for precomputed eye movement event data.
+def import_pymovements_subprocess():
+    cmd = [sys.executable, '-c', 'import pymovements']
+    subprocess.run(cmd, check=True)
 
-    Parameters
-    ----------
-    data: pl.DataFrame
-        A precomputed event dataframe.
-    """
 
-    def __init__(self, data: pl.DataFrame) -> None:
-
-        self.frame = data.clone()
+def test_import_pymovements_subprocess(benchmark):
+    benchmark.pedantic(
+        import_pymovements_subprocess,
+        iterations=1, rounds=10,
+    )
