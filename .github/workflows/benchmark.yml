@@ -23,12 +23,27 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
+          cache: 'pip'
 
+      - name: Restore cached tox environment
+        uses: actions/cache/restore@v4
+        with:
+          key:
+            tox-benchmark-${{hashFiles('tox.ini') }}
+          path: .tox
+          
       - name: Install tox
         run: python -m pip install tox
 
       - name: Setup benchmark environment
         run: tox -vv --notest -e benchmark
+
+      - name: Cache tox environment
+        uses: actions/cache/save@v4
+        with:
+          key:
+            tox-benchmark-${{hashFiles('tox.ini') }}
+          path: .tox
 
       - name: Run benchmark
         run: tox --skip-pkg-install -e benchmark
