@@ -132,7 +132,7 @@ class PoTeC(DatasetDefinition):
         default_factory=lambda: {
             'gaze': True,
             'precomputed_events': True,
-            'precomputed_reading_measures': False,
+            'precomputed_reading_measures': True,
         },
     )
 
@@ -152,6 +152,13 @@ class PoTeC(DatasetDefinition):
                     'md5': 'ecd9a998d07158922bb9b8cdd52f5688',
                 },
             ],
+            'precomputed_reading_measures': [
+                {
+                    'resource': 'https://osf.io/download/3ywhz/',
+                    'filename': 'reading_measures.zip',
+                    'md5': 'efafec5ce074d8f492cc2409b6c4d9eb',
+                },
+            ],
         },
     )
 
@@ -159,6 +166,7 @@ class PoTeC(DatasetDefinition):
         default_factory=lambda: {
             'gaze': True,
             'precomputed_events': True,
+            'precomputed_reading_measures': True,
         },
     )
 
@@ -178,6 +186,7 @@ class PoTeC(DatasetDefinition):
         default_factory=lambda: {
             'gaze': r'reader{subject_id:d}_{text_id}_raw_data.tsv',
             'precomputed_events': r'reader{subject_id:d}_{text_id}_uncorrected_fixations.tsv',
+            'precomputed_reading_measures': r'reader{subject_id:d}_{text_id}_merged.tsv',
         },
     )
 
@@ -188,6 +197,10 @@ class PoTeC(DatasetDefinition):
                 'text_id': str,
             },
             'precomputed_events': {
+                'subject_id': int,
+                'text_id': str,
+            },
+            'precomputed_reading_measures': {
                 'subject_id': int,
                 'text_id': str,
             },
@@ -218,6 +231,11 @@ class PoTeC(DatasetDefinition):
             'precomputed_events': {
                 'separator': '\t',
                 'null_values': '.',
+            },
+            'precomputed_reading_measures': {
+                'separator': '\t',
+                'null_values': '.',
+                'infer_schema_length': 10000,
             },
         },
     )
