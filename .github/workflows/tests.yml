@@ -185,7 +185,7 @@ jobs:
         with:
           pandoc-version: '2.19.2'
 
-      - name: Install base python for tox
+      - name: Setup python
         uses: actions/setup-python@v5
         with:
           python-version: "3.9"
