@@ -111,3 +111,18 @@ def test_sampling_rate_equality(experiment1, experiment2):
 def test_experiment_from_dict(dictionary, expected_experiment):
     experiment = Experiment.from_dict(dictionary)
     assert experiment == expected_experiment
+
+
+def test_experiment_to_dict_exclude_none():
+    experiment = Experiment(
+        1920, origin='upper left',
+        screen=Screen(), eyetracker=EyeTracker(),)
+    new_dict = experiment.to_dict()
+    assert 'screen_width_px' in new_dict
+    assert 'origin' not in new_dict
+    assert 'screen' not in new_dict
+    assert 'eyetracker' not in new_dict
+
+
+def test_experiment_bool_all_none():
+    assert not bool(Experiment())

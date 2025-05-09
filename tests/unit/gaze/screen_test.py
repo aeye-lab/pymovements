@@ -103,3 +103,15 @@ def test_pix2deg_without_attributes(missing_attribute, exception, exception_msg)
 def test_screen_init_without_attributes():
     screen = pm.Screen()
     assert isinstance(screen, pm.Screen)
+
+
+def test_screen_to_dict_exclude_none():
+    screen = pm.Screen(1920, None, origin='upper left',)
+    new_dict = screen.to_dict()
+    assert 'width_px' in new_dict
+    assert 'height_px' not in new_dict
+    assert 'origin' not in new_dict
+
+
+def test_screen_bool_all_none():
+    assert not bool(pm.Screen())

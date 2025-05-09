@@ -43,3 +43,14 @@ def test_eyetracker_without_sampling_rate():
         None, False, True, 'EyeLink 1000 Plus',
         '1.5.3', 'Arm Mount / Monocular / Remote',
     )
+
+
+def test_eyetracker_to_dict_exclude_none():
+    eyetracker = EyeTracker(None, False,)
+    new_dict = eyetracker.to_dict()
+    assert 'sampling_rate' not in new_dict
+    assert 'left' not in new_dict
+
+
+def test_eyetracker_bool_all_none():
+    assert not bool(EyeTracker())
