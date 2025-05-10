@@ -17,12 +17,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Setup python
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
+
       - name: Install pymovements
         run: python -m pip install -e ${{ github.workspace }}
+
       - name: Create matrix for all datasets
         id: create-matrix
         run: python -c "from pymovements import DatasetLibrary; print(f'matrix={DatasetLibrary.names()}')" >> $GITHUB_OUTPUT
@@ -73,6 +76,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
+
+      - name: Install pymovements
+        run: python -m pip install -e ${{ github.workspace }}
 
       - name: Write RST files
         run: python scripts/write_dataset_rst.py
