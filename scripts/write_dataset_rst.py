@@ -28,7 +28,7 @@ import pymovements as pm
 
 
 def write_docfiles_for_dataset(
-        dataset_name: str | None,
+        dataset_name: str,
         datasets_dirpath: Path,
         datasets_definition_dirname: str,
 ) -> None:
