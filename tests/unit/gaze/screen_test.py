@@ -114,4 +114,5 @@ def test_screen_to_dict_exclude_none():
 
 
 def test_screen_bool_all_none():
-    assert not bool(pm.Screen())
+    assert bool(pm.Screen())
+    assert not bool(pm.Screen(origin=None))

@@ -125,4 +125,5 @@ def test_experiment_to_dict_exclude_none():
 
 
 def test_experiment_bool_all_none():
-    assert not bool(Experiment())
+    assert bool(Experiment())
+    assert not bool(Experiment(origin=None))
