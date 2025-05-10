@@ -1,0 +1,2 @@
+.. datatemplate:yaml:: definitions/JuDo1000.yml
+       :template: dataset.rst
