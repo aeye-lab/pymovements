@@ -282,3 +282,6 @@ class Screen:
         _checks.check_is_not_none(**{key: value})
         assert isinstance(value, (int, float))
         _checks.check_is_greater_than_zero(**{key: value})
+
+    def __bool__(self):
+        return not all(not value for value in self.__dict__.values())

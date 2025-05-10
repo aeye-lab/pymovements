@@ -298,3 +298,6 @@ class Experiment:
     def __str__(self: Experiment) -> str:
         """Return Experiment string."""
         return f'{type(self).__name__}(screen={self.screen}, eyetracker={self.eyetracker})'
+    
+    def __bool__(self):
+        return not all(not value for value in self.__dict__.values())

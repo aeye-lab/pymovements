@@ -77,3 +77,6 @@ class EyeTracker:
         """Check that the sampling rate is a positive number."""
         if self.sampling_rate is not None:
             _checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
+    
+    def __bool__(self):
+        return not all(not value for value in self.__dict__.values())
