@@ -37,7 +37,7 @@ def write_docfiles_for_dataset(
     definition.to_yaml(datasets_dirpath / datasets_definition_dirname / f'{definition.name}.yml')
 
     rst_content = f'''.. datatemplate:yaml:: definitions/{definition.name}.yml
-       :template: dataset.rst'''
+    :template: dataset.rst'''
 
     with open(datasets_dirpath / f'{definition.name}.rst', 'w') as rst_file:
         rst_file.write(rst_content)

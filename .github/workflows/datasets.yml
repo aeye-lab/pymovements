@@ -56,7 +56,7 @@ jobs:
         run: tox --skip-pkg-install -e integration -- tests/integration/download_dataset_test.py::test_download_dataset[${{ matrix.dataset }}]
 
   docs:
-    name: docs ${{ matrix.dataset }}
+    name: docs
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' }}
     steps:
