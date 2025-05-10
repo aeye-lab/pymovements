@@ -1,2 +1,2 @@
 .. datatemplate:yaml:: definitions/BSC.yml
-   :template: dataset.rst
+       :template: dataset.rst

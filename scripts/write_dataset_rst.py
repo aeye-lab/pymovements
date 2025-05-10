@@ -27,8 +27,24 @@ import yaml
 import pymovements as pm
 
 
+def write_docfiles_for_dataset(
+        dataset_name: str | None,
+        datasets_dirpath: Path,
+        datasets_definition_dirname: str,
+) -> None:
+    definition = pm.DatasetLibrary.get(dataset_name)
+
+    definition.to_yaml(datasets_dirpath / datasets_definition_dirname / f'{definition.name}.yml')
+
+    rst_content = f'''.. datatemplate:yaml:: definitions/{definition.name}.yml
+       :template: dataset.rst'''
+
+    with open(datasets_dirpath / f'{definition.name}.rst', 'w') as rst_file:
+        rst_file.write(rst_content)
+
+
 def main(
-        dataset_name: str,
+        dataset_name: str | None,
         datasets_dirpath: str | Path = 'docs/source/datasets',
         datasets_yaml_filename: str = 'datasets.yml',
         datasets_definition_dirname: str = 'definitions',
@@ -41,22 +57,25 @@ def main(
     with open(datasets_dirpath / datasets_yaml_filename, 'w') as f:
         yaml.dump(dataset_names, f)
 
-    definition = pm.DatasetLibrary.get(dataset_name)
-
-    definition.to_yaml(datasets_dirpath / datasets_definition_dirname / f'{definition.name}.yml')
-
-    rst_content = f'''.. datatemplate:yaml:: definitions/{definition.name}.yml
-   :template: dataset.rst
-'''
-
-    with open(datasets_dirpath / f'{definition.name}.rst', 'w') as rst_file:
-        rst_file.write(rst_content)
+    if isinstance(dataset_name, str):
+        write_docfiles_for_dataset(
+            dataset_name=dataset_name,
+            datasets_dirpath=datasets_dirpath,
+            datasets_definition_dirname=datasets_definition_dirname,
+        )
+    else:
+        for dataset_name in dataset_names:
+            write_docfiles_for_dataset(
+                dataset_name=dataset_name,
+                datasets_dirpath=datasets_dirpath,
+                datasets_definition_dirname=datasets_definition_dirname,
+            )
 
     return 0
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset')
+    parser.add_argument('--dataset', default=None)
     args = parser.parse_args()
     raise SystemExit(main(dataset_name=args.dataset))
