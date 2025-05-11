@@ -21,7 +21,7 @@ experiment:
     width_cm: null
     height_cm: null
     distance_cm: null
-    origin: upper left
+    origin: null
   eyetracker:
     sampling_rate: null
     left: null
