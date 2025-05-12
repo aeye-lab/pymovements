@@ -281,13 +281,14 @@ class Experiment:
         """Compare equality to other Experiment."""
         return self.screen == other.screen and self.eyetracker == other.eyetracker
 
-    def to_dict(self, exclude_private: bool = True, exclude_none: bool = True) -> dict[str, Any | dict[str, str | float | None]]:
+    def to_dict(self, exclude_private: bool = True,
+                exclude_none: bool = True) -> dict[str, Any | dict[str, str | float | None]]:
         """Convert the experiment instance into a dictionary.
 
         Parameters
         ----------
         exclude_none: bool
-            Exclude attributes that are either ``None`` or that are objects that evaluate to 
+            Exclude attributes that are either ``None`` or that are objects that evaluate to
             ``False`` (e.g., ``[], {}, EyeTracker()``). Attributes of type ``bool``, ``int``, and ``float`` are not excluded.
         Returns
         -------

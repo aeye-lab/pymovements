@@ -46,21 +46,23 @@ def test_eyetracker_without_sampling_rate():
 
 
 def test_eyetracker_to_dict_exclude_none():
-<<<<<<< HEAD
-    eyetracker = EyeTracker(None, False)
-    new_dict = eyetracker.to_dict()
-    assert 'sampling_rate' not in new_dict
-    assert 'left' not in new_dict
-=======
-    eyetracker = EyeTracker(None, False,)
-    dict_default = eyetracker.to_dict()
-    assert 'sampling_rate' not in dict_default
-    assert 'left' not in dict_default
 
-    dict_non_default = eyetracker.to_dict(exclude_none=False)
-    assert 'sampling_rate' in dict_non_default
-    assert 'left' in dict_non_default
->>>>>>> d9f293f (made requested changes)
+
+<< << << < HEAD
+eyetracker = EyeTracker(None, False)
+new_dict = eyetracker.to_dict()
+assert 'sampling_rate' not in new_dict
+assert 'left' not in new_dict
+== == == =
+eyetracker = EyeTracker(None, False,)
+dict_default = eyetracker.to_dict()
+assert 'sampling_rate' not in dict_default
+assert 'left' not in dict_default
+
+dict_non_default = eyetracker.to_dict(exclude_none=False)
+assert 'sampling_rate' in dict_non_default
+assert 'left' in dict_non_default
+>>>>>> > d9f293f(made requested changes)
 
 
 def test_eyetracker_bool_all_none():

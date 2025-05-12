@@ -209,7 +209,7 @@ class DatasetDefinition:
         exclude_private: bool
             Exclude attributes that start with `_`.
         exclude_none: bool
-            Exclude attributes that are either ``None`` or that are objects that evaluate to 
+            Exclude attributes that are either ``None`` or that are objects that evaluate to
             ``False`` (e.g., ``[], {}, EyeTracker()``). Attributes of type ``bool``, ``int``, and ``float`` are not excluded.
         Returns
         -------
