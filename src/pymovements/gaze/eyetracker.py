@@ -92,7 +92,7 @@ class EyeTracker:
 
         # Delete fields that evaluate to False (False, None, [], {})
         if exclude_none:
-            for key, value in _dict.items():
+            for key, value in list(_dict.items()):
                 if not value:
                     del _dict[key]
 

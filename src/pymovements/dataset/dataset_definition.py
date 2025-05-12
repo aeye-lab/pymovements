@@ -229,9 +229,11 @@ class DatasetDefinition:
                 del data['experiment']
             else:
                 data['experiment'] = data['experiment'].to_dict()
-            for key, value in data.items():
+            for key, value in list(data.items()):
                 if not value:
                     del data[key]
+        else:
+            data['experiment'] = data['experiment'].to_dict()
 
         return data
 
