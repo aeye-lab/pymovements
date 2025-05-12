@@ -222,7 +222,7 @@ class DatasetDefinition:
             for key in list(data.keys()):
                 if key.startswith('_'):
                     del data[key]
-        
+
         # Delete fields that evaluate to False (False, None, [], {})
         if exclude_none:
             if not bool(self.experiment):

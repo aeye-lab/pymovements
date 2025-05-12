@@ -369,7 +369,7 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
 
 def test_dataset_to_dict_exclude_none():
     definition = DatasetDefinition(
-        name = 'Example',
+        name='Example',
         trial_columns=[],
     )
     new_dict = definition.to_dict()

@@ -20,7 +20,8 @@
 """Provides the Screen class."""
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict
+from dataclasses import asdict
+from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
@@ -292,7 +293,7 @@ class Screen:
         dict[str, Any]
             Screen as dictionary.
         """
-    
+
         _dict = asdict(self)
 
         # Delete fields that evaluate to False (False, None, [], {})

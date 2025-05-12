@@ -116,7 +116,8 @@ def test_experiment_from_dict(dictionary, expected_experiment):
 def test_experiment_to_dict_exclude_none():
     experiment = Experiment(
         1920, origin=None,
-        eyetracker=EyeTracker(),)
+        eyetracker=EyeTracker(),
+    )
     new_dict = experiment.to_dict()
     assert 'screen' in new_dict
     assert 'origin' not in new_dict

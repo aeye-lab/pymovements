@@ -20,7 +20,8 @@
 """Holds the EyeTracker class."""
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict
+from dataclasses import asdict
+from dataclasses import dataclass
 from typing import Any
 
 from pymovements._utils import _checks
@@ -78,7 +79,7 @@ class EyeTracker:
         """Check that the sampling rate is a positive number."""
         if self.sampling_rate is not None:
             _checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
-    
+
     def to_dict(self, exclude_none: bool = True) -> dict[str, Any]:
         """Convert the EyeTracker instance into a dictionary.
 
@@ -87,7 +88,7 @@ class EyeTracker:
         dict[str, Any ]
             EyeTracker as dictionary.
         """
-    
+
         _dict = asdict(self)
 
         # Delete fields that evaluate to False (False, None, [], {})
