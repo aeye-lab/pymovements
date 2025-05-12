@@ -124,8 +124,11 @@ def test_experiment_to_dict_exclude_none():
     assert 'origin' not in dict_default
     assert 'eyetracker' not in dict_default
 
-    experiment.eyetracker = EyeTracker(left=True)
     experiment.screen = Screen(origin=None)
+    bool_screen_false = experiment.to_dict()
+    assert 'screen' not in bool_screen_false
+
+    experiment.eyetracker = EyeTracker(left=True)
     dict_non_default = experiment.to_dict(exclude_none=False)
     assert 'eyetracker' in dict_non_default
     assert 'screen' in dict_non_default
