@@ -234,7 +234,7 @@ class DatasetDefinition:
                 if not isinstance(value, (bool, int, float)) and not value:
                     del data[key]
         else:
-            data['experiment'] = data['experiment'].to_dict()
+            data['experiment'] = data['experiment'].to_dict(exclude_private=exclude_private, exclude_none=exclude_none)
 
         return data
 
