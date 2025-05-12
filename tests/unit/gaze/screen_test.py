@@ -106,7 +106,7 @@ def test_screen_init_without_attributes():
 
 
 def test_screen_to_dict_exclude_none():
-    screen = pm.Screen(1920, None, origin='upper left',)
+    screen = pm.Screen(1920, None, origin='upper left')
     dict_default = screen.to_dict()
     assert 'width_px' in dict_default
     assert 'origin' in dict_default

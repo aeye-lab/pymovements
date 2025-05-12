@@ -46,7 +46,7 @@ def test_eyetracker_without_sampling_rate():
 
 
 def test_eyetracker_to_dict_exclude_none():
-    eyetracker = EyeTracker(None, False,)
+    eyetracker = EyeTracker(None, False)
     dict_default = eyetracker.to_dict()
     assert 'sampling_rate' not in dict_default
     assert 'left' not in dict_default
