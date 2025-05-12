@@ -299,10 +299,14 @@ class Experiment:
             Experiment as dictionary.
         """
         _dict: dict[str, dict[str, str | float | None]] = {}
-        if bool(self.screen):
-            _dict['screen'] = self.screen.to_dict(exclude_none)
-        if bool(self.eyetracker):
-            _dict['eyetracker'] = self.eyetracker.to_dict(exclude_none)
+        if exclude_none:
+            if bool(self.screen):
+                _dict['screen'] = self.screen.to_dict(exclude_none)
+            if bool(self.eyetracker):
+                _dict['eyetracker'] = self.eyetracker.to_dict(exclude_none)
+        else:
+            _dict['screen'] = self.screen.to_dict(exclude_none=False)
+            _dict['eyetracker'] = self.eyetracker.to_dict(exclude_none=False)
 
         return _dict
 

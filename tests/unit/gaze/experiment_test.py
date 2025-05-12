@@ -115,14 +115,20 @@ def test_experiment_from_dict(dictionary, expected_experiment):
 
 def test_experiment_to_dict_exclude_none():
     experiment = Experiment(
-        1920, origin=None,
+        origin = None,
+        screen = Screen(),
         eyetracker=EyeTracker(),
     )
-    new_dict = experiment.to_dict()
-    assert 'screen' in new_dict
-    assert 'origin' not in new_dict
-    assert 'eyetracker' not in new_dict
-    assert '_foobar' not in new_dict
+    dict_default = experiment.to_dict()
+    assert 'screen' in dict_default
+    assert 'origin' not in dict_default
+    assert 'eyetracker' not in dict_default
+
+    experiment.eyetracker = EyeTracker(left=True)
+    experiment.screen = Screen(origin=None)
+    dict_non_default = experiment.to_dict(exclude_none=False)
+    assert 'eyetracker' in dict_non_default
+    assert 'screen' in dict_non_default
 
 
 def test_experiment_bool_all_none():
