@@ -106,11 +106,24 @@ def test_screen_init_without_attributes():
 
 
 def test_screen_to_dict_exclude_none():
+<<<<<<< HEAD
     screen = pm.Screen(1920, None, origin='upper left')
     new_dict = screen.to_dict()
     assert 'width_px' in new_dict
     assert 'origin' in new_dict
     assert 'height_px' not in new_dict
+=======
+    screen = pm.Screen(1920, None, origin='upper left',)
+    dict_default = screen.to_dict()
+    assert 'width_px' in dict_default
+    assert 'origin' in dict_default
+    assert 'height_px' not in dict_default
+
+    dict_non_default = screen.to_dict(exclude_none=False)
+    assert 'width_px' not in dict_non_default
+    assert 'origin' not in dict_non_default
+    assert 'height_px' in dict_non_default
+>>>>>>> d9f293f (made requested changes)
 
 
 def test_screen_bool_all_none():

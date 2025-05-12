@@ -288,6 +288,11 @@ class Screen:
     def to_dict(self, exclude_none: bool = True) -> dict[str, Any]:
         """Convert the Screen instance into a dictionary.
 
+        Parameters
+        ----------
+        exclude_none: bool
+            Exclude attributes that are either ``None`` or that are objects that evaluate to 
+            ``False`` (e.g., ``[], {}, EyeTracker()``). Attributes of type ``bool``, ``int``, and ``float`` are not excluded.
         Returns
         -------
         dict[str, Any]
@@ -299,7 +304,7 @@ class Screen:
         # Delete fields that evaluate to False (False, None, [], {})
         if exclude_none:
             for key, value in list(_dict.items()):
-                if not value:
+                if not isinstance(value, (bool, int, float)) and not value:
                     del _dict[key]
 
         return _dict

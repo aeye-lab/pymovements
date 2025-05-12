@@ -209,7 +209,8 @@ class DatasetDefinition:
         exclude_private: bool
             Exclude attributes that start with `_`.
         exclude_none: bool
-            Exclude attributes that evaluate to False (False, None, [], {}).
+            Exclude attributes that are either ``None`` or that are objects that evaluate to 
+            ``False`` (e.g., ``[], {}, EyeTracker()``). Attributes of type ``bool``, ``int``, and ``float`` are not excluded.
         Returns
         -------
         dict[str, Any]
@@ -228,9 +229,9 @@ class DatasetDefinition:
             if not bool(self.experiment):
                 del data['experiment']
             else:
-                data['experiment'] = data['experiment'].to_dict()
+                data['experiment'] = data['experiment'].to_dict(exclude_private, exclude_none)
             for key, value in list(data.items()):
-                if not value:
+                if not isinstance(value, (bool, int, float)) and not value:
                     del data[key]
         else:
             data['experiment'] = data['experiment'].to_dict()
