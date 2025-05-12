@@ -235,11 +235,13 @@ class DatasetDefinition:
                     del data[key]
         else:
             data['experiment'] = data['experiment'].to_dict(
-                exclude_private=exclude_private, exclude_none=exclude_none)
+                exclude_private=exclude_private, exclude_none=exclude_none,
+            )
 
         return data
 
-    def to_yaml(self, path: str | Path, exclude_private: bool = True, exclude_none: bool = True) -> None:
+    def to_yaml(self, path: str | Path, exclude_private: bool = True,
+                exclude_none: bool = True) -> None:
         """Save a dataset definition to a YAML file.
 
         Parameters
