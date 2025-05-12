@@ -231,12 +231,12 @@ class DatasetDefinition:
             if not bool(self.experiment):
                 del data['experiment']
             else:
-                data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none,)
+                data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none)
             for key, value in list(data.items()):
                 if not isinstance(value, (bool, int, float)) and not value:
                     del data[key]
         else:
-            data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none,)
+            data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none)
 
         return data
 

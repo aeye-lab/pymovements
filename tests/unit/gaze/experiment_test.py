@@ -115,8 +115,8 @@ def test_experiment_from_dict(dictionary, expected_experiment):
 
 def test_experiment_to_dict_exclude_none():
     experiment = Experiment(
-        origin = None,
-        screen = Screen(),
+        origin=None,
+        screen=Screen(),
         eyetracker=EyeTracker(),
     )
     dict_default = experiment.to_dict()
