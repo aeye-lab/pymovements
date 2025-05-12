@@ -373,21 +373,12 @@ def test_dataset_to_dict_exclude_none():
         trial_columns=[],
     )
 
+    dict_default = definition.to_dict()
+    assert 'long_name' not in dict_default
+    assert 'trial_columns' not in dict_default
+    assert 'has_files' not in dict_default
 
-<< << << < HEAD
-new_dict = definition.to_dict()
-assert 'long_name' not in new_dict
-assert 'trial_columns' not in new_dict
-assert 'has_files' not in new_dict
-== == == =
-dict_default = definition.to_dict()
-assert 'long_name' not in dict_default
-assert 'trial_columns' not in dict_default
-assert 'has_files' not in dict_default
-
-dict_non_default = definition.to_dict(exclude_none=False)
-assert 'long_name' in dict_non_default
-assert 'trial_columns' in dict_non_default
-assert 'has_files' in dict_non_default
-
->>>>>> > d9f293f(made requested changes)
+    dict_non_default = definition.to_dict(exclude_none=False)
+    assert 'long_name' in dict_non_default
+    assert 'trial_columns' in dict_non_default
+    assert 'has_files' in dict_non_default
