@@ -20,7 +20,8 @@
 """Provides the Screen class."""
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
+from typing import Any
 
 import numpy as np
 
@@ -282,6 +283,25 @@ class Screen:
         _checks.check_is_not_none(**{key: value})
         assert isinstance(value, (int, float))
         _checks.check_is_greater_than_zero(**{key: value})
+
+    def to_dict(self, exclude_none: bool = True) -> dict[str, Any]:
+        """Convert the Screen instance into a dictionary.
+
+        Returns
+        -------
+        dict[str, Any]
+            Screen as dictionary.
+        """
+    
+        _dict = asdict(self)
+
+        # Delete fields that evaluate to False (False, None, [], {})
+        if exclude_none:
+            for key, value in _dict.items():
+                if not value:
+                    del _dict[key]
+
+        return _dict
 
     def __bool__(self):
         return not all(not value for value in self.__dict__.values())

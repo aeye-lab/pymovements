@@ -20,7 +20,8 @@
 """Holds the EyeTracker class."""
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
+from typing import Any
 
 from pymovements._utils import _checks
 from pymovements._utils._html import repr_html
@@ -78,5 +79,24 @@ class EyeTracker:
         if self.sampling_rate is not None:
             _checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
     
+    def to_dict(self, exclude_none: bool = True) -> dict[str, Any]:
+        """Convert the EyeTracker instance into a dictionary.
+
+        Returns
+        -------
+        dict[str, Any ]
+            EyeTracker as dictionary.
+        """
+    
+        _dict = asdict(self)
+
+        # Delete fields that evaluate to False (False, None, [], {})
+        if exclude_none:
+            for key, value in _dict.items():
+                if not value:
+                    del _dict[key]
+
+        return _dict
+
     def __bool__(self):
         return not all(not value for value in self.__dict__.values())

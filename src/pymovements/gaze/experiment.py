@@ -282,7 +282,7 @@ class Experiment:
         """Compare equality to other Experiment."""
         return self.screen == other.screen and self.eyetracker == other.eyetracker
 
-    def to_dict(self) -> dict[str, Any | dict[str, str | float | None]]:
+    def to_dict(self, exclude_none: bool = True) -> dict[str, Any | dict[str, str | float | None]]:
         """Convert the experiment instance into a dictionary.
 
         Returns
@@ -291,8 +291,11 @@ class Experiment:
             Experiment as dictionary.
         """
         _dict: dict[str, dict[str, str | float | None]] = {}
-        _dict['screen'] = asdict(self.screen)
-        _dict['eyetracker'] = asdict(self.eyetracker)
+        if bool(self.screen):
+            _dict['screen'] = self.screen.to_dict(exclude_none)
+        if bool(self.eyetracker):
+            _dict['eyetracker'] = self.eyetracker.to_dict(exclude_none)
+
         return _dict
 
     def __str__(self: Experiment) -> str:

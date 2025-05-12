@@ -201,14 +201,15 @@ class DatasetDefinition:
         # Initialize DatasetDefinition with YAML data
         return DatasetDefinition(**data)
 
-    def to_dict(self, exclude_private: bool = True) -> dict[str, Any]:
+    def to_dict(self, exclude_private: bool = True, exclude_none: bool = True) -> dict[str, Any]:
         """Return dictionary representation.
 
         Parameters
         ----------
         exclude_private: bool
             Exclude attributes that start with `_`.
-
+        exclude_none: bool
+            Exclude attributes that evaluate to False (False, None, [], {}).
         Returns
         -------
         dict[str, Any]
@@ -221,8 +222,16 @@ class DatasetDefinition:
             for key in list(data.keys()):
                 if key.startswith('_'):
                     del data[key]
-
-        data['experiment'] = data['experiment'].to_dict()
+        
+        # Delete fields that evaluate to False (False, None, [], {})
+        if exclude_none:
+            if not bool(self.experiment):
+                del data['experiment']
+            else:
+                data['experiment'] = data['experiment'].to_dict()
+            for key, value in data.items():
+                if not value:
+                    del data[key]
 
         return data
 
