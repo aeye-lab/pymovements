@@ -256,7 +256,8 @@ class DatasetDefinition:
             Exclude attributes that start with `_`.
         exclude_none: bool
             Exclude attributes that are either ``None`` or that are objects that evaluate to
-            ``False`` (e.g., ``[], {}, EyeTracker()``). Attributes of type ``bool``, ``int``, and ``float`` are not excluded.
+            ``False`` (e.g., ``[], {}, EyeTracker()``). Attributes of type ``bool``, ``int``,
+            and ``float`` are not excluded.
         """
         data = self.to_dict(exclude_private=exclude_private, exclude_none=exclude_none)
 

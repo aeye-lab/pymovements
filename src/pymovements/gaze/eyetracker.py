@@ -95,7 +95,6 @@ class EyeTracker:
         dict[str, Any]
             EyeTracker as dictionary.
         """
-
         _dict = asdict(self)
 
         # Delete fields that evaluate to False (False, None, [], {})

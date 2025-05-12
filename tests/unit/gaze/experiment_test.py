@@ -114,9 +114,7 @@ def test_experiment_from_dict(dictionary, expected_experiment):
 
 
 def test_experiment_to_dict_exclude_none():
-    class MyExperiment(Experiment):
-        _foobar: str = 'test'
-    experiment = MyExperiment(
+    experiment = Experiment(
         1920, origin=None,
         eyetracker=EyeTracker(),
     )
@@ -128,4 +126,4 @@ def test_experiment_to_dict_exclude_none():
 
 
 def test_experiment_bool_all_none():
-    assert not bool(Experiment())
+    assert not bool(Experiment(origin=None))

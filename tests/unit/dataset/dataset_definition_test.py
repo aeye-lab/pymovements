@@ -173,7 +173,7 @@ def test_dataset_definition_is_equal(init_kwargs):
     ],
 )
 def test_dataset_definition_to_dict_expected(definition, expected_dict):
-    assert definition.to_dict() == expected_dict
+    assert definition.to_dict(exclude_none=False) == expected_dict
 
 
 @pytest.mark.parametrize(
@@ -277,7 +277,7 @@ def test_dataset_definition_to_dict_exclude_private_expected(exclude_private, ex
 
     definition = MyDatasetDefinition()
 
-    assert definition.to_dict(exclude_private=exclude_private) == expected_dict
+    assert definition.to_dict(exclude_private=exclude_private, exclude_none=False) == expected_dict
 
 
 @pytest.mark.parametrize(
@@ -331,7 +331,7 @@ def test_dataset_definition_to_yaml_equal_dicts(definition, tmp_path):
 def test_write_yaml_already_existing_dataset_definition_w_tuple_screen(tmp_path):
     tmp_file = tmp_path / 'tmp.yaml'
     definition = DatasetLibrary.get('ToyDatasetEyeLink')
-    definition.to_yaml(tmp_file)
+    definition.to_yaml(tmp_file, exclude_none=False)
 
     with open(tmp_file, encoding='utf-8') as f:
         yaml.safe_load(f)

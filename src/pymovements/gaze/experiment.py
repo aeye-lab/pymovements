@@ -282,15 +282,12 @@ class Experiment:
         return self.screen == other.screen and self.eyetracker == other.eyetracker
 
     def to_dict(
-        self, exclude_private: bool = True,
-        exclude_none: bool = True,
+        self, exclude_none: bool = True,
     ) -> dict[str, Any | dict[str, str | float | None]]:
         """Convert the experiment instance into a dictionary.
 
         Parameters
         ----------
-        exclude_private: bool
-            Exclude attributes that start with `_`.
         exclude_none: bool
             Exclude attributes that are either ``None`` or that are objects that evaluate to
             ``False`` (e.g., ``[], {}, EyeTracker()``). Attributes of type ``bool``, ``int``,
@@ -306,12 +303,6 @@ class Experiment:
             _dict['screen'] = self.screen.to_dict(exclude_none)
         if bool(self.eyetracker):
             _dict['eyetracker'] = self.eyetracker.to_dict(exclude_none)
-
-        # Delete private fields from dictionary.
-        if exclude_private:
-            for key in list(_dict.keys()):
-                if key.startswith('_'):
-                    del _dict[key]
 
         return _dict
 

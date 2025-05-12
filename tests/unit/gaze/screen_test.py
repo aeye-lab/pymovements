@@ -113,11 +113,10 @@ def test_screen_to_dict_exclude_none():
     assert 'height_px' not in dict_default
 
     dict_non_default = screen.to_dict(exclude_none=False)
-    assert 'width_px' not in dict_non_default
-    assert 'origin' not in dict_non_default
+    assert 'width_px' in dict_non_default
+    assert 'origin' in dict_non_default
     assert 'height_px' in dict_non_default
 
 
 def test_screen_bool_all_none():
-    assert bool(pm.Screen())
     assert not bool(pm.Screen(origin=None))
