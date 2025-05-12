@@ -114,7 +114,9 @@ def test_experiment_from_dict(dictionary, expected_experiment):
 
 
 def test_experiment_to_dict_exclude_none():
-    experiment = Experiment(
+    class MyExperiment(Experiment):
+        _foobar: str = 'test'
+    experiment = MyExperiment(
         1920, origin=None,
         eyetracker=EyeTracker(),
     )
@@ -122,6 +124,7 @@ def test_experiment_to_dict_exclude_none():
     assert 'screen' in new_dict
     assert 'origin' not in new_dict
     assert 'eyetracker' not in new_dict
+    assert '_foobar' not in new_dict
 
 
 def test_experiment_bool_all_none():

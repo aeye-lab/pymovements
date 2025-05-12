@@ -289,9 +289,13 @@ class Experiment:
 
         Parameters
         ----------
+        exclude_private: bool
+            Exclude attributes that start with `_`.
         exclude_none: bool
             Exclude attributes that are either ``None`` or that are objects that evaluate to
-            ``False`` (e.g., ``[], {}, EyeTracker()``). Attributes of type ``bool``, ``int``, and ``float`` are not excluded.
+            ``False`` (e.g., ``[], {}, EyeTracker()``). Attributes of type ``bool``, ``int``,
+            and ``float`` are not excluded.
+
         Returns
         -------
         dict[str, Any | dict[str, str | float | None]]
@@ -315,5 +319,6 @@ class Experiment:
         """Return Experiment string."""
         return f'{type(self).__name__}(screen={self.screen}, eyetracker={self.eyetracker})'
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
+        """Return True if the experiment has data, else False."""
         return not all(not value for value in self.__dict__.values())

@@ -87,10 +87,12 @@ class EyeTracker:
         ----------
         exclude_none: bool
             Exclude attributes that are either ``None`` or that are objects that evaluate to
-            ``False`` (e.g., ``[], {}, EyeTracker()``). Attributes of type ``bool``, ``int``, and ``float`` are not excluded.
+            ``False`` (e.g., ``[], {}, EyeTracker()``). Attributes of type ``bool``, ``int``,
+            and ``float`` are not excluded.
+
         Returns
         -------
-        dict[str, Any ]
+        dict[str, Any]
             EyeTracker as dictionary.
         """
 
@@ -104,5 +106,6 @@ class EyeTracker:
 
         return _dict
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
+        """Return True if the experiment has data, else False."""
         return not all(not value for value in self.__dict__.values())
