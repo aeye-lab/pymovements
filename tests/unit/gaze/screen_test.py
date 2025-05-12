@@ -109,8 +109,8 @@ def test_screen_to_dict_exclude_none():
     screen = pm.Screen(1920, None, origin='upper left',)
     new_dict = screen.to_dict()
     assert 'width_px' in new_dict
+    assert 'origin' in new_dict
     assert 'height_px' not in new_dict
-    assert 'origin' not in new_dict
 
 
 def test_screen_bool_all_none():
