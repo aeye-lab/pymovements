@@ -161,7 +161,7 @@ def test_screen_to_dict_exclude_none(screen, expected_dict, exclude_none):
             id='height_cm_10',
         ),
         pytest.param(
-            pm.Screen(width_px=300.0),
+            pm.Screen(width_px=300),
             True,
             id='width_px_300',
         ),
