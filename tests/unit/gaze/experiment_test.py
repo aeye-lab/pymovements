@@ -134,5 +134,34 @@ def test_experiment_to_dict_exclude_none():
     assert 'screen' in dict_non_default
 
 
-def test_experiment_bool_all_none():
-    assert not bool(Experiment(origin=None))
+@pytest.mark.parametrize(
+    ('experiment', 'expected_bool'),
+    [
+        pytest.param(
+            Experiment(),
+            False,
+            marks=pytest.mark.xfail(reason="#1148")
+            id='default',
+        ),
+
+        pytest.param(
+            Experiment(origin=None),
+            False,
+            id='origin_none',
+        ),
+
+        pytest.param(
+            Experiment(origin='center'),
+            True,
+            id='origin_center',
+        ),
+
+        pytest.param(
+            Experiment(distance=60),
+            True,
+            id='distance_60',
+        ),
+    ],
+)
+def test_experiment_bool(experiment, expected_bool):
+    assert bool(experiment) == expected_bool
