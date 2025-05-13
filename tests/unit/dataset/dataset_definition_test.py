@@ -384,8 +384,11 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
         pytest.param(
             DatasetDefinition(
                 distance_column='test', extract={
-                    'test': True}, position_columns=[
-                    'test', 'foo', 'bar']),
+                    'test': True,
+                }, position_columns=[
+                    'test', 'foo', 'bar',
+                ],
+            ),
             {
                 'name': '.',
                 'experiment': {},
