@@ -140,7 +140,7 @@ def test_experiment_to_dict_exclude_none():
         pytest.param(
             Experiment(),
             False,
-            marks=pytest.mark.xfail(reason='#1148')
+            marks=pytest.mark.xfail(reason='#1148'),
             id='default',
         ),
 
