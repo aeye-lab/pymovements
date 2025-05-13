@@ -367,21 +367,62 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
     assert yaml_definition == expected_definition
 
 
-def test_dataset_to_dict_exclude_none():
-    definition = DatasetDefinition(
-        name='Example',
-        trial_columns=[],
-        experiment=Experiment(origin=None),
-    )
-
-    dict_default = definition.to_dict()
-    assert 'long_name' not in dict_default
-    assert 'trial_columns' not in dict_default
-    assert 'has_files' not in dict_default
-    assert 'experiment' not in dict_default
-
-    dict_non_default = definition.to_dict(exclude_none=False)
-    assert 'long_name' in dict_non_default
-    assert 'trial_columns' in dict_non_default
-    assert 'has_files' in dict_non_default
-    assert 'experiment' in dict_non_default
+@pytest.mark.parametrize(
+    ('dataset_definition', 'expected_dict', 'exclude_none'),
+    [
+        pytest.param(
+            DatasetDefinition(),
+            {
+                'name': '.',
+                'experiment': {},
+                'time_unit': 'ms',
+             },
+            True,
+            marks=pytest.mark.xfail(reason='#1148'),
+            id='default',
+        ),
+        pytest.param(
+            DatasetDefinition(distance_column='test', extract={'test': True}, position_columns=['test', 'foo', 'bar']),
+            {
+                'name': '.',
+                'experiment': {},
+                'extract': {'test': True},
+                'time_unit': 'ms',
+                'position_columns': ['test', 'foo', 'bar'],
+                'distance_column': 'test',
+             },
+            True,
+            marks=pytest.mark.xfail(reason='#1148'),
+            id='str_dict_list',
+        ),
+        pytest.param(
+            DatasetDefinition(),
+            {
+                'name': '.',
+                'long_name': None,
+                'has_files': {},
+                'mirrors': {},
+                'resources': {},
+                'experiment': None,
+                'extract': {},
+                'filename_format': {},
+                'filename_format_schema_overrides': {},
+                'custom_read_kwargs': {},
+                'column_map': {},
+                'trial_columns': None,
+                'time_column': None,
+                'time_unit': 'ms',
+                'pixel_columns': None,
+                'position_columns': None,
+                'velocity_columns': None,
+                'acceleration_columns': None,
+                'distance_column': None
+            },
+            False,
+            marks=pytest.mark.xfail(reason='#1148'),
+            id='all_none',
+        ),
+    ]
+)
+def test_dataset_to_dict_exclude_none(dataset_definition, expected_dict, exclude_none):
+    assert dataset_definition.to_dict(exclude_none=exclude_none) == expected_dict

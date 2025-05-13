@@ -113,25 +113,58 @@ def test_experiment_from_dict(dictionary, expected_experiment):
     assert experiment == expected_experiment
 
 
-def test_experiment_to_dict_exclude_none():
-    experiment = Experiment(
-        origin=None,
-        screen=Screen(),
-        eyetracker=EyeTracker(),
-    )
-    dict_default = experiment.to_dict()
-    assert 'screen' in dict_default
-    assert 'origin' not in dict_default
-    assert 'eyetracker' not in dict_default
-
-    experiment.screen = Screen(origin=None)
-    bool_screen_false = experiment.to_dict()
-    assert 'screen' not in bool_screen_false
-
-    experiment.eyetracker = EyeTracker(left=True)
-    dict_non_default = experiment.to_dict(exclude_none=False)
-    assert 'eyetracker' in dict_non_default
-    assert 'screen' in dict_non_default
+@pytest.mark.parametrize(
+    ('experiment', 'expected_dict', 'exclude_none'),
+    [
+        pytest.param(
+            Experiment(),
+            {},
+            True,
+            marks=pytest.mark.xfail(reason='#1148'),
+            id='default',
+        ),
+        pytest.param(
+            Experiment(sampling_rate=18.5),
+            {'sampling_rate': 18.5},
+            True,
+            marks=pytest.mark.xfail(reason='#1148'),
+            id='sampling_rate_18.5',
+        ),
+        pytest.param(
+            Experiment(screen=Screen(height_px=1080), eyetracker=EyeTracker(left=True)),
+            {
+                'screen': {
+                    'height_px': 1080,
+            },
+                'eyetracker': {
+                    'left': True,
+                }
+            },
+            True,
+            marks=pytest.mark.xfail(reason='#1148'),
+            id='screen_eyetracker',
+        ),
+        pytest.param(
+            Experiment(),
+            {
+                'screen_width_px': None,
+                'screen_height_px': None,
+                'screen_width_cm': None,
+                'screen_height_cm': None,
+                'distance_cm': None,
+                'origin': None,
+                'sampling_rate': None,
+                'screen': None,
+                'eyetracker': None
+            },
+            False,
+            marks=pytest.mark.xfail(reason='#1148'),
+            id='all_none',
+        ),
+    ]
+)
+def test_experiment_to_dict_exclude_none(experiment, expected_dict, exclude_none):
+    assert experiment.to_dict(exclude_none=exclude_none) == expected_dict
 
 
 @pytest.mark.parametrize(
@@ -157,7 +190,7 @@ def test_experiment_to_dict_exclude_none():
         ),
 
         pytest.param(
-            Experiment(distance=60),
+            Experiment(distance_cm=60),
             True,
             id='distance_60',
         ),
