@@ -290,8 +290,8 @@ class Experiment:
         ----------
         exclude_none: bool
             Exclude attributes that are either ``None`` or that are objects that evaluate to
-            ``False`` (e.g., ``[], {}, EyeTracker()``). Attributes of type ``bool``, ``int``,
-            and ``float`` are not excluded.
+            ``False`` (e.g., ``[]``, ``{}``, ``EyeTracker()``). Attributes of type ``bool``,
+            ``int``, and ``float`` are not excluded.
 
         Returns
         -------
@@ -300,10 +300,10 @@ class Experiment:
         """
         _dict: dict[str, dict[str, str | float | None]] = {}
         if exclude_none:
-            if bool(self.screen):
-                _dict['screen'] = self.screen.to_dict(exclude_none)
-            if bool(self.eyetracker):
-                _dict['eyetracker'] = self.eyetracker.to_dict(exclude_none)
+            if self.screen:
+                _dict['screen'] = self.screen.to_dict(exclude_none=exclude_none)
+            if self.eyetracker:
+                _dict['eyetracker'] = self.eyetracker.to_dict(exclude_none=exclude_none)
         else:
             _dict['screen'] = self.screen.to_dict(exclude_none=False)
             _dict['eyetracker'] = self.eyetracker.to_dict(exclude_none=False)
@@ -315,5 +315,5 @@ class Experiment:
         return f'{type(self).__name__}(screen={self.screen}, eyetracker={self.eyetracker})'
 
     def __bool__(self) -> bool:
-        """Return True if the experiment has data, else False."""
+        """Return True if the experiment has data defined, else False."""
         return not all(not value for value in self.__dict__.values())
