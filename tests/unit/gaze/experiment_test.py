@@ -135,10 +135,10 @@ def test_experiment_from_dict(dictionary, expected_experiment):
             {
                 'screen': {
                     'height_px': 1080,
-            },
+                },
                 'eyetracker': {
                     'left': True,
-                }
+                },
             },
             True,
             marks=pytest.mark.xfail(reason='#1148'),
@@ -155,13 +155,13 @@ def test_experiment_from_dict(dictionary, expected_experiment):
                 'origin': None,
                 'sampling_rate': None,
                 'screen': None,
-                'eyetracker': None
+                'eyetracker': None,
             },
             False,
             marks=pytest.mark.xfail(reason='#1148'),
             id='all_none',
         ),
-    ]
+    ],
 )
 def test_experiment_to_dict_exclude_none(experiment, expected_dict, exclude_none):
     assert experiment.to_dict(exclude_none=exclude_none) == expected_dict

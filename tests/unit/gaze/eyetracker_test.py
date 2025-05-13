@@ -98,7 +98,7 @@ def test_eyetracker_to_dict_exclude_none(eyetracker, expected_dict, exclude_none
             True,
             id='sampling_rate_2',
         ),
-    ]
+    ],
 )
 def test_eyetracker_bool_all_none(eyetracker, expected_bool):
     assert bool(eyetracker) == expected_bool

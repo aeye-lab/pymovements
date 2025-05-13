@@ -129,7 +129,7 @@ def test_screen_init_without_attributes():
                 'width_cm': None,
                 'height_cm': None,
                 'distance_cm': None,
-                'origin': None
+                'origin': None,
             },
             False,
             marks=pytest.mark.xfail(reason='#1148'),
@@ -165,7 +165,7 @@ def test_screen_to_dict_exclude_none(screen, expected_dict, exclude_none):
             True,
             id='width_px_300',
         ),
-    ]
+    ],
 )
 def test_screen_bool_all_none(screen, expected_bool):
     assert bool(screen) == expected_bool
