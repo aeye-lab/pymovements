@@ -49,8 +49,8 @@ def test_sampling_rate_setter():
             id='only_screen',
         ),
         pytest.param(
-            {'screen': Screen(1024, 768), 'eyetracker': EyeTracker(sampling_rate=1000)},
-            id='screen_and_eyetracker',
+            {'screen': Screen(1024, 768), '': (sampling_rate=1000)},
+            id='screen_and_',
         ),
 
     ],
@@ -66,8 +66,8 @@ def test_sampling_rate_trivial_equality(experiment_init_kwargs):
     [
         pytest.param(
             Experiment(sampling_rate=1000),
-            Experiment(eyetracker=EyeTracker(sampling_rate=1000)),
-            id='explicit_sampling_rate_and_eyetracker',
+            Experiment(=(sampling_rate=1000)),
+            id='explicit_sampling_rate_and_',
         ),
         pytest.param(
             Experiment(1024, 768),
@@ -85,7 +85,7 @@ def test_sampling_rate_equality(experiment1, experiment2):
     [
         pytest.param(
             {'sampling_rate': 1000},
-            Experiment(eyetracker=EyeTracker(sampling_rate=1000)),
+            Experiment(=(sampling_rate=1000)),
             id='sampling_rate',
         ),
 
@@ -186,8 +186,12 @@ def test_experiment_from_dict(dictionary, expected_experiment):
                 },
                 'eyetracker': {
                     'sampling_rate': None,
-                    'screen': None,
-                    'eyetracker': None,
+                    'vendor': None,
+                    'model': None,
+                    'version': None,
+                    'mount': None,
+                    'left': None,
+                    'right': None,
                 },
             },
             marks=pytest.mark.xfail(reason='#1148'),
@@ -207,8 +211,12 @@ def test_experiment_from_dict(dictionary, expected_experiment):
                 },
                 'eyetracker': {
                     'sampling_rate': None,
-                    'screen': None,
-                    'eyetracker': None,
+                    'vendor': None,
+                    'model': None,
+                    'version': None,
+                    'mount': None,
+                    'left': None,
+                    'right': None,
                 },
             },
             id='false_all_none',
