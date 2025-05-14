@@ -114,24 +114,37 @@ def test_experiment_from_dict(dictionary, expected_experiment):
 
 
 @pytest.mark.parametrize(
-    ('experiment', 'expected_dict', 'exclude_none'),
+    ('experiment', 'exclude_none', 'expected_dict'),
     [
         pytest.param(
             Experiment(),
-            {},
             True,
+            {},
             marks=pytest.mark.xfail(reason='#1148'),
-            id='default',
+            id='true_default',
+        ),
+        pytest.param(
+            Experiment(origin=None),
+            True,
+            {},
+            id='true_origin_none',
         ),
         pytest.param(
             Experiment(sampling_rate=18.5),
-            {'sampling_rate': 18.5},
             True,
+            {'eyetracker': {'sampling_rate': 18.5}},
             marks=pytest.mark.xfail(reason='#1148'),
-            id='sampling_rate_18.5',
+            id='true_sampling_rate_18.5',
+        ),
+        pytest.param(
+            Experiment(sampling_rate=18.5, origin=None),
+            True,
+            {'eyetracker': {'sampling_rate': 18.5}},
+            id='true_sampling_rate_18.5_origin_none',
         ),
         pytest.param(
             Experiment(screen=Screen(height_px=1080), eyetracker=EyeTracker(left=True)),
+            True,
             {
                 'screen': {
                     'height_px': 1080,
@@ -140,12 +153,28 @@ def test_experiment_from_dict(dictionary, expected_experiment):
                     'left': True,
                 },
             },
-            True,
             marks=pytest.mark.xfail(reason='#1148'),
-            id='screen_eyetracker',
+            id='true_screen_eyetracker',
+        ),
+        pytest.param(
+            Experiment(
+                screen=Screen(height_px=1080, origin=None),
+                eyetracker=EyeTracker(left=True),
+            ),
+            True,
+            {
+                'screen': {
+                    'height_px': 1080,
+                },
+                'eyetracker': {
+                    'left': True,
+                },
+            },
+            id='true_screen_origin_none_eyetracker',
         ),
         pytest.param(
             Experiment(),
+            False,
             {
                 'screen_width_px': None,
                 'screen_height_px': None,
@@ -157,9 +186,24 @@ def test_experiment_from_dict(dictionary, expected_experiment):
                 'screen': None,
                 'eyetracker': None,
             },
-            False,
             marks=pytest.mark.xfail(reason='#1148'),
-            id='all_none',
+            id='false_default',
+        ),
+        pytest.param(
+            Experiment(origin=None),
+            False,
+            {
+                'screen_width_px': None,
+                'screen_height_px': None,
+                'screen_width_cm': None,
+                'screen_height_cm': None,
+                'distance_cm': None,
+                'origin': None,
+                'sampling_rate': None,
+                'screen': None,
+                'eyetracker': None,
+            },
+            id='false_all_none',
         ),
     ],
 )
