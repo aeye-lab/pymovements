@@ -49,8 +49,8 @@ def test_sampling_rate_setter():
             id='only_screen',
         ),
         pytest.param(
-            {'screen': Screen(1024, 768), '': (sampling_rate=1000)},
-            id='screen_and_',
+            {'screen': Screen(1024, 768), 'eyetracker': EyeTracker(sampling_rate=1000)},
+            id='screen_and_eyetracker',
         ),
 
     ],
@@ -66,8 +66,8 @@ def test_sampling_rate_trivial_equality(experiment_init_kwargs):
     [
         pytest.param(
             Experiment(sampling_rate=1000),
-            Experiment(=(sampling_rate=1000)),
-            id='explicit_sampling_rate_and_',
+            Experiment(eyetracker=EyeTracker(sampling_rate=1000)),
+            id='explicit_sampling_rate_and_eyetracker',
         ),
         pytest.param(
             Experiment(1024, 768),
@@ -85,7 +85,7 @@ def test_sampling_rate_equality(experiment1, experiment2):
     [
         pytest.param(
             {'sampling_rate': 1000},
-            Experiment(=(sampling_rate=1000)),
+            Experiment(eyetracker=EyeTracker(sampling_rate=1000)),
             id='sampling_rate',
         ),
 
