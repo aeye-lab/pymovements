@@ -207,7 +207,7 @@ def test_experiment_from_dict(dictionary, expected_experiment):
         ),
     ],
 )
-def test_experiment_to_dict_exclude_none(experiment, expected_dict, exclude_none):
+def test_experiment_to_dict_exclude_none(experiment, exclude_none, expected_dict):
     assert experiment.to_dict(exclude_none=exclude_none) == expected_dict
 
 
