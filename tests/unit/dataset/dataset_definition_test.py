@@ -573,7 +573,7 @@ def test_dataset_definition_not_equal():
     definition2 = DatasetDefinition(resources={})
 
     assert definition1.has_resources != definition2.has_resources
-    
+
 
 @pytest.mark.parametrize(
     ('dataset_definition', 'exclude_none', 'expected_dict'),
