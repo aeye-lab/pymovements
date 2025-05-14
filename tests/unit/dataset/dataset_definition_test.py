@@ -484,7 +484,7 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
         ),
 
         pytest.param(
-            DatasetDefinition(experiment=Experiment(origin=None),
+            DatasetDefinition(experiment=Experiment(origin=None)),
             False,
             {
                 'name': '.',
