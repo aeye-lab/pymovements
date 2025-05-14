@@ -528,7 +528,6 @@ def test_loaded_gazes_do_not_share_experiment_with_definition(gaze_dataset_confi
     definition = gaze_dataset_configuration['init_kwargs']['definition']
 
     for result_gaze in dataset.gaze:
-        assert False, (result_gaze.experiment, definition.experiment)
         assert result_gaze.experiment is not definition.experiment
 
 
