@@ -201,13 +201,17 @@ class DatasetDefinition:
         # Initialize DatasetDefinition with YAML data
         return DatasetDefinition(**data)
 
-    def to_dict(self, exclude_private: bool = True) -> dict[str, Any]:
+    def to_dict(self, exclude_private: bool = True, exclude_none: bool = True) -> dict[str, Any]:
         """Return dictionary representation.
 
         Parameters
         ----------
         exclude_private: bool
-            Exclude attributes that start with `_`.
+            Exclude attributes that start with ``_``.
+        exclude_none: bool
+            Exclude attributes that are either ``None`` or that are objects that evaluate to
+            ``False`` (e.g., ``[]``, ``{}``, ``EyeTracker()``). Attributes of type ``bool``,
+            ``int``, and ``float`` are not excluded.
 
         Returns
         -------
@@ -222,11 +226,26 @@ class DatasetDefinition:
                 if key.startswith('_'):
                     del data[key]
 
-        data['experiment'] = data['experiment'].to_dict()
+        # Delete fields that evaluate to False (False, None, [], {})
+        if exclude_none:
+            if not self.experiment:
+                del data['experiment']
+            else:
+                data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none)
+
+            for key, value in list(data.items()):
+                if not isinstance(value, (bool, int, float)) and not value:
+                    del data[key]
+        else:
+            data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none)
 
         return data
 
-    def to_yaml(self, path: str | Path, exclude_private: bool = True) -> None:
+    def to_yaml(
+        self, path: str | Path,
+        exclude_private: bool = True,
+        exclude_none: bool = True,
+    ) -> None:
         """Save a dataset definition to a YAML file.
 
         Parameters
@@ -234,9 +253,13 @@ class DatasetDefinition:
         path: str | Path
             Path where to save the YAML file to.
         exclude_private: bool
-            Exclude attributes that start with `_`.
+            Exclude attributes that start with ``_``.
+        exclude_none: bool
+            Exclude attributes that are either ``None`` or that are objects that evaluate to
+            ``False`` (e.g., ``[]``, ``{}``, ``EyeTracker()``). Attributes of type ``bool``,
+            ``int``, and ``float`` are not excluded.
         """
-        data = self.to_dict(exclude_private=exclude_private)
+        data = self.to_dict(exclude_private=exclude_private, exclude_none=exclude_none)
 
         data = substitute_types(data)
 
