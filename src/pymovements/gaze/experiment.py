@@ -282,7 +282,7 @@ class Experiment:
         return self.screen == other.screen and self.eyetracker == other.eyetracker
 
     def to_dict(
-        self, exclude_none: bool = True,
+        self, *, exclude_none: bool = True,
     ) -> dict[str, Any | dict[str, str | float | None]]:
         """Convert the experiment instance into a dictionary.
 
