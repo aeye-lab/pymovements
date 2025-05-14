@@ -368,41 +368,68 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
 
 
 @pytest.mark.parametrize(
-    ('dataset_definition', 'expected_dict', 'exclude_none'),
+    ('dataset_definition', 'exclude_none', 'expected_dict'),
     [
         pytest.param(
             DatasetDefinition(),
+            True,
             {
                 'name': '.',
-                'experiment': {},
                 'time_unit': 'ms',
             },
-            True,
             marks=pytest.mark.xfail(reason='#1148'),
-            id='default',
+            id='true_default',
         ),
+
         pytest.param(
-            DatasetDefinition(
-                distance_column='test', extract={
-                    'test': True,
-                }, position_columns=[
-                    'test', 'foo', 'bar',
-                ],
-            ),
+            DatasetDefinition(experiment=Experiment(origin=None)),
+            True,
             {
                 'name': '.',
-                'experiment': {},
+                'time_unit': 'ms',
+            },
+            id='true_experiment_origin_none',
+        ),
+
+        pytest.param(
+            DatasetDefinition(
+                distance_column='test',
+                extract={'test': True},
+                position_columns=['test', 'foo', 'bar'],
+            ),
+            True,
+            {
+                'name': '.',
                 'extract': {'test': True},
                 'time_unit': 'ms',
                 'position_columns': ['test', 'foo', 'bar'],
                 'distance_column': 'test',
             },
-            True,
             marks=pytest.mark.xfail(reason='#1148'),
-            id='str_dict_list',
+            id='true_str_dict_list',
         ),
+
+        pytest.param(
+            DatasetDefinition(
+                experiment=Experiment(origin=None),
+                distance_column='test',
+                extract={'test': True},
+                position_columns=['test', 'foo', 'bar'],
+            ),
+            True,
+            {
+                'name': '.',
+                'extract': {'test': True},
+                'time_unit': 'ms',
+                'position_columns': ['test', 'foo', 'bar'],
+                'distance_column': 'test',
+            },
+            id='true_str_dict_list_experiment_origin_none',
+        ),
+
         pytest.param(
             DatasetDefinition(),
+            False,
             {
                 'name': '.',
                 'long_name': None,
@@ -424,11 +451,37 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
                 'acceleration_columns': None,
                 'distance_column': None,
             },
-            False,
             marks=pytest.mark.xfail(reason='#1148'),
-            id='all_none',
+            id='false_default',
+        ),
+
+        pytest.param(
+            DatasetDefinition(experiment=None),
+            False,
+            {
+                'name': '.',
+                'long_name': None,
+                'has_files': {},
+                'mirrors': {},
+                'resources': {},
+                'experiment': None,
+                'extract': {},
+                'filename_format': {},
+                'filename_format_schema_overrides': {},
+                'custom_read_kwargs': {},
+                'column_map': {},
+                'trial_columns': None,
+                'time_column': None,
+                'time_unit': 'ms',
+                'pixel_columns': None,
+                'position_columns': None,
+                'velocity_columns': None,
+                'acceleration_columns': None,
+                'distance_column': None,
+            },
+            id='false_all_none',
         ),
     ],
 )
-def test_dataset_to_dict_exclude_none(dataset_definition, expected_dict, exclude_none):
+def test_dataset_to_dict_exclude_none(dataset_definition, exclude_none, expected_dict):
     assert dataset_definition.to_dict(exclude_none=exclude_none) == expected_dict
