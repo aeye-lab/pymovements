@@ -375,7 +375,6 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
             True,
             {
                 'name': '.',
-                'time_unit': None,
             },
             marks=pytest.mark.xfail(reason='#1148'),
             id='true_default',
@@ -386,7 +385,6 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
             True,
             {
                 'name': '.',
-                'time_unit': None,
             },
             id='true_experiment_origin_none',
         ),
@@ -401,7 +399,6 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
             {
                 'name': '.',
                 'extract': {'test': True},
-                'time_unit': None,
                 'position_columns': ['test', 'foo', 'bar'],
                 'distance_column': 'test',
             },
@@ -420,7 +417,6 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
             {
                 'name': '.',
                 'extract': {'test': True},
-                'time_unit': None,
                 'position_columns': ['test', 'foo', 'bar'],
                 'distance_column': 'test',
             },
