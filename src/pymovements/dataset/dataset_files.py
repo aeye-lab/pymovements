@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import warnings
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -257,7 +258,7 @@ def load_gaze_files(
         gaze_df = load_gaze_file(
             filepath=filepath,
             fileinfo_row=fileinfo_row,
-            definition=definition,
+            definition=deepcopy(definition),
             preprocessed=preprocessed,
         )
         gaze_dfs.append(gaze_df)
