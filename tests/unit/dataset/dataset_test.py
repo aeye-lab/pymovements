@@ -527,20 +527,20 @@ def test_loaded_gazes_do_not_share_experiment_with_definition(gaze_dataset_confi
 
     definition = gaze_dataset_configuration['init_kwargs']['definition']
 
-    for result_gaze in dataset.gaze:
-        assert result_gaze.experiment is not definition.experiment
+    for gaze in dataset.gaze:
+        assert gaze.experiment is not definition.experiment
 
 
 def test_loaded_gazes_do_not_share_experiment_with_other(gaze_dataset_configuration):
     dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
 
-    for result_gaze1 in dataset.gaze:
-        for result_gaze2 in dataset.gaze:
-            if result_gaze1 == result_gaze2:
+    for gaze1 in dataset.gaze:
+        for gaze2 in dataset.gaze:
+            if gaze1 is gaze2:
                 continue
 
-            assert result_gaze1.experiment is not result_gaze2.experiment
+            assert gaze1.experiment is not gaze2.experiment
 
 
 def test_load_gaze_has_position_columns(gaze_dataset_configuration):
