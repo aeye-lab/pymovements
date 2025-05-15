@@ -80,7 +80,7 @@ class EyeTracker:
         if self.sampling_rate is not None:
             _checks.check_is_greater_than_zero(sampling_rate=self.sampling_rate)
 
-    def to_dict(self, exclude_none: bool = True) -> dict[str, Any]:
+    def to_dict(self, *, exclude_none: bool = True) -> dict[str, Any]:
         """Convert the EyeTracker instance into a dictionary.
 
         Parameters
