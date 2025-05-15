@@ -392,7 +392,8 @@ class GazeDataFrame:
             if 'origin' in method_kwargs and 'origin' not in kwargs:
                 self._check_experiment()
                 assert self.experiment is not None
-                kwargs['origin'] = self.experiment.screen.origin
+                if self.experiment.screen.origin is not None:
+                    kwargs['origin'] = self.experiment.screen.origin
 
             if 'screen_resolution' in method_kwargs and 'screen_resolution' not in kwargs:
                 self._check_experiment()
