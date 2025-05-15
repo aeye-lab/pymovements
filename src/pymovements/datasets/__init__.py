@@ -33,6 +33,7 @@
     DIDEC
     EMTeC
     FakeNewsPerception
+    Gaze4Hate
     GazeBase
     GazeBaseVR
     GazeGraph
@@ -67,6 +68,7 @@ from pymovements.datasets.daemons import DAEMONS
 from pymovements.datasets.didec import DIDEC
 from pymovements.datasets.emtec import EMTeC
 from pymovements.datasets.fakenews import FakeNewsPerception
+from pymovements.datasets.gaze4hate import Gaze4Hate
 from pymovements.datasets.gaze_graph import GazeGraph
 from pymovements.datasets.gaze_on_faces import GazeOnFaces
 from pymovements.datasets.gazebase import GazeBase
@@ -95,6 +97,7 @@ __all__ = [
     'DIDEC',
     'EMTeC',
     'FakeNewsPerception',
+    'Gaze4Hate',
     'GazeBase',
     'GazeBaseVR',
     'GazeGraph',
