@@ -31,9 +31,18 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 class OneStop(DatasetDefinition):
     """OneStop dataset :cite:p:`OneStop`.
 
-    This dataset eye tracking data from 360 participants.
-    The participant read several texts in different condition. Hunting for specific information
-    and gathering general knowledge from a text.
+    OneStop Eye Movements (in short OneStop) is an English corpus of eye movements
+    in reading with 360 L1 participants, 2.6 million word tokens and 152 hours of 
+    eye tracking data recorded with an EyeLink 1000 Plus eye tracker. 
+    OneStop comprises four sub-corpora with eye movement recordings from paragraph reading.
+    
+    To filter the data by reading regime or trial type, use the following column values:
+    
+    For ordinary reading trials, set question_preview to False.
+    For information seeking trials, set question_preview to True.
+    To exclude repeated reading trials, set repeated_reading_trial to False.
+    To include only repeated reading trials, set repeated_reading_trial to True.
+    To exclude practice trials, set practice_trial to False.
 
     For more information please consult :cite:p:`OneStop`.
 
