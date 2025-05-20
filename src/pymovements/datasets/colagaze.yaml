@@ -3,9 +3,6 @@ name: "CoLAGaze"
 long_name: 'Corpus of Eye Movements for Linguistic Acceptability'
 
 has_files:
-  # need to fix bug:
-  #     ValueError: Experiment metadata does not match the metadata in the ASC file:
-  #     - Right eye tracked: True != False
   gaze: true
   precomputed_events: true
   precomputed_reading_measures: true
