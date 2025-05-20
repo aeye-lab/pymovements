@@ -1,17 +1,15 @@
 name: "GazeBase"
 
+long_name: "GazeBase dataset"
+
 has_files:
   gaze: true
   precomputed_events: false
   precomputed_reading_measures: false
 
-mirrors:
-  gaze:
-    - "https://figshare.com/ndownloader/files/"
-
 resources:
   gaze:
-    - resource: "27039812"
+    - resource: "https://figshare.com/ndownloader/files/27039812"
       filename: "GazeBase_v2_0.zip"
       md5: "cb7eb895fb48f8661decf038ab998c9a"
 

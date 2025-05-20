@@ -202,6 +202,9 @@ def _get_redirected_url(url: str, max_hops: int = 3) -> str:
     """
     initial_url = url
     headers = {'Method': 'HEAD', 'User-Agent': USER_AGENT}
+    opener = urllib.request.build_opener()
+    opener.addheaders = [('User-Agent', USER_AGENT)]
+    urllib.request.install_opener(opener)
 
     for _ in range(max_hops + 1):
         with urllib.request.urlopen(urllib.request.Request(url, headers=headers)) as response:

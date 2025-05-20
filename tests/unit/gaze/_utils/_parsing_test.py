@@ -43,9 +43,10 @@ ASC_TEXT = r"""
 
 some
 lines
+MSG	2095865 DISPLAY_COORDS 0 0 1279 1023
 MSG	2154555 RECCFG CR 1000 2 1 L
 MSG	2154555 ELCLCFG BTABLER
-MSG	2095865 DISPLAY_COORDS 0 0 1279 1023
+MSG	2154555 GAZE_COORDS 0.00 0.00 1279.00 1023.00
 PRESCALER	1
 VPRESCALER	1
 PUPIL	AREA
@@ -166,6 +167,7 @@ EXPECTED_METADATA = {
     'calibrations': [],
     'validations': [],
     'resolution': (1280, 1024),
+    'DISPLAY_COORDS': (0.0, 0.0, 1279.0, 1023.0),
     'data_loss_ratio_blinks': 0.18181818181818182,
     'data_loss_ratio': 0.2727272727272727,
     'total_recording_duration_ms': 11.0,
@@ -194,6 +196,7 @@ EXPECTED_METADATA = {
             'timestamp': '2154555',
             'tracked_eye': 'L',
             'tracking_mode': 'CR',
+            'resolution': (1280.0, 1024.0),
         },
     ],
 }
@@ -369,7 +372,16 @@ def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_mo
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
             'MSG	2154556 RECCFG CR 2000 2 1 L\n',
             r"Found inconsistent values for 'sampling_rate': \['1000', '2000'\]",
-            id='inconsistent_reccfg',
+            id='inconsistent_sampling_rate',
+        ),
+        pytest.param(
+            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
+            'MSG	2154555 GAZE_COORDS 0 0 1919 1079\n'
+            'MSG	2154556 RECCFG CR 1000 2 1 L\n'
+            'MSG	2154556 GAZE_COORDS 0 0 1023 767\n',
+            "Found inconsistent values for 'resolution': "
+            r'\[\(1024.0, 768.0\), \(1920.0, 1080.0\)\]',
+            id='inconsistent_resolution',
         ),
     ],
 )
@@ -389,7 +401,6 @@ def test_metadata_warnings(tmp_path, metadata, expected_msg):
     ('metadata', 'expected_validation', 'expected_calibration'),
     [
         pytest.param(
-            'MSG	2095865 DISPLAY_COORDS 0 0 1279 1023\n'
             'MSG	7045618 !CAL \n'
             '>>>>>>> CALIBRATION (HV9,P-CR) FOR LEFT: <<<<<<<<<\n'
             'MSG	7045618 !CAL Calibration points:  \n'

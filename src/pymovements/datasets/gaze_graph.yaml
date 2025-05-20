@@ -1,17 +1,15 @@
 name: "GazeGraph"
 
+long_name: 'GazeGraph dataset'
+
 has_files:
   gaze: true
   precomputed_events: false
   precomputed_reading_measures: false
 
-mirrors:
-  gaze:
-    - "https://codeload.github.com/GazeGraphResource/GazeGraph/zip/refs/heads/"
-
 resources:
   gaze:
-    - resource: "master"
+    - resource: "https://codeload.github.com/GazeGraphResource/GazeGraph/zip/refs/heads/master"
       filename: "gaze_graph_data.zip"
       md5: "181f4b79477cee6e0267482d989610b0"
 

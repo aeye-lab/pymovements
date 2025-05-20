@@ -53,12 +53,12 @@ class GazeBase(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
@@ -126,6 +126,8 @@ class GazeBase(DatasetDefinition):
 
     name: str = 'GazeBase'
 
+    long_name: str = 'GazeBase dataset'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
@@ -134,17 +136,11 @@ class GazeBase(DatasetDefinition):
         },
     )
 
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda: {
-            'gaze': ['https://figshare.com/ndownloader/files/'],
-        },
-    )
-
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
             'gaze': [
                 {
-                    'resource': '27039812',
+                    'resource': 'https://figshare.com/ndownloader/files/27039812',
                     'filename': 'GazeBase_v2_0.zip',
                     'md5': 'cb7eb895fb48f8661decf038ab998c9a',
                 },

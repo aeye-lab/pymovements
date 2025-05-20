@@ -45,12 +45,12 @@ class ToyDataset(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
@@ -117,6 +117,8 @@ class ToyDataset(DatasetDefinition):
 
     name: str = 'ToyDataset'
 
+    long_name: str = 'pymovements Toy Dataset'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
@@ -125,17 +127,11 @@ class ToyDataset(DatasetDefinition):
         },
     )
 
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda: {
-            'gaze': ['http://github.com/aeye-lab/pymovements-toy-dataset/zipball/'],
-        },
-    )
-
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
             'gaze': [
                 {
-                    'resource': '6cb5d663317bf418cec0c9abe1dde5085a8a8ebd/',
+                    'resource': 'http://github.com/aeye-lab/pymovements-toy-dataset/zipball/6cb5d663317bf418cec0c9abe1dde5085a8a8ebd/',  # noqa: E501 # pylint: disable=line-too-long
                     'filename': 'pymovements-toy-dataset.zip',
                     'md5': '4da622457637a8181d86601fe17f3aa8',
                 },

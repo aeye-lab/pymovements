@@ -47,12 +47,12 @@ class JuDo1000(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
@@ -126,6 +126,8 @@ class JuDo1000(DatasetDefinition):
 
     name: str = 'JuDo1000'
 
+    long_name: str = 'Jumping Dots 1000 Hz dataset'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
@@ -133,23 +135,19 @@ class JuDo1000(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda: {
-            'gaze': ['https://osf.io/download/'],
-        },
-    )
 
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
             'gaze': [
                 {
-                    'resource': '4wy7s/',
+                    'resource': 'https://osf.io/download/4wy7s/',
                     'filename': 'JuDo1000.zip',
                     'md5': 'b8b9e5bb65b78d6f2bd260451cdd89f8',
                 },
             ],
         },
     )
+
     extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     experiment: Experiment = field(

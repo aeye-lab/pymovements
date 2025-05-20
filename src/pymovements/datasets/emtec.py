@@ -45,12 +45,12 @@ class EMTeC(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
@@ -120,34 +120,37 @@ class EMTeC(DatasetDefinition):
 
     name: str = 'EMTeC'
 
+    long_name: str = 'Eye movements on Machine-generated Texts Corpus'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
             'precomputed_events': True,
-            'precomputed_reading_measures': False,
+            'precomputed_reading_measures': True,
         },
     )
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda:
-            {
-                'gaze': ['https://osf.io/download/'],
-                'precomputed_events': ['https://osf.io/download/'],
-            },
-    )
+
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: {
             'gaze': [
                 {
-                    'resource': '374sk/',
+                    'resource': 'https://osf.io/download/374sk/',
                     'filename': 'subject_level_data.zip',
                     'md5': 'dca99e47ef43f3696acec4fd70967750',
                 },
             ],
             'precomputed_events': [
                 {
-                    'resource': '2hs8p/',
+                    'resource': 'https://osf.io/download/2hs8p/',
                     'filename': 'fixations.csv',
                     'md5': '5e05a364a1d8a044d8b36506aa91437e',
+                },
+            ],
+            'precomputed_reading_measures': [
+                {
+                    'resource': 'https://osf.io/download/s4ny8/',
+                    'filename': 'reading_measures.csv',
+                    'md5': '56880f50af20682558065ac2d26be827',
                 },
             ],
         },
@@ -156,6 +159,7 @@ class EMTeC(DatasetDefinition):
         default_factory=lambda: {
             'gaze': True,
             'precomputed_events': False,
+            'precomputed_reading_measures': False,
         },
     )
 
@@ -176,6 +180,7 @@ class EMTeC(DatasetDefinition):
             {
                 'gaze': r'ET_{subject_id:d}.csv',
                 'precomputed_events': r'fixations.csv',
+                'precomputed_reading_measures': r'reading_measures.csv',
             },
     )
 
@@ -184,6 +189,7 @@ class EMTeC(DatasetDefinition):
             {
                 'gaze': {'subject_id': int},
                 'precomputed_events': {},
+                'precomputed_reading_measures': {},
             },
     )
 
@@ -223,5 +229,6 @@ class EMTeC(DatasetDefinition):
                 },
             },
             'precomputed_events': {'separator': '\t'},
+            'precomputed_reading_measures': {'separator': '\t'},
         },
     )

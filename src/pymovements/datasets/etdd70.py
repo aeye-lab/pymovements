@@ -49,12 +49,12 @@ class ETDD70(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The long name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
@@ -118,6 +118,8 @@ class ETDD70(DatasetDefinition):
 
     name: str = 'ETDD70'
 
+    long_name: str = 'Eye-Tracking Dyslexia Dataset'
+
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
@@ -125,30 +127,19 @@ class ETDD70(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda:
-            {
-                'gaze': [
-                    'https://zenodo.org/api/records/13332134/files-archive',
-                ],
-                'precomputed_events': [
-                    'https://zenodo.org/api/records/13332134/files-archive',
-                ],
-            },
-    )
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda:
             {
                 'gaze': [
                     {
-                        'resource': '',
+                        'resource': 'https://zenodo.org/api/records/13332134/files-archive',
                         'filename': 'edd_raw.zip',
                         'md5': None,  # type: ignore
                     },
                 ],
                 'precomputed_events': [
                     {
-                        'resource': '',
+                        'resource': 'https://zenodo.org/api/records/13332134/files-archive',
                         'filename': 'edd_fix.zip',
                         'md5': None,  # type: ignore
                     },

@@ -1,5 +1,7 @@
 name: "PotsdamBingeWearablePVT"
 
+long_name: 'Potsdam Binge Wearable PVT dataset'
+
 has_files:
   gaze: true
   precomputed_events: false
