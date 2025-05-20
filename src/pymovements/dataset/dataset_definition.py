@@ -201,7 +201,12 @@ class DatasetDefinition:
         # Initialize DatasetDefinition with YAML data
         return DatasetDefinition(**data)
 
-    def to_dict(self, exclude_private: bool = True, exclude_none: bool = True) -> dict[str, Any]:
+    def to_dict(
+        self,
+        *,
+        exclude_private: bool = True,
+        exclude_none: bool = True,
+    ) -> dict[str, Any]:
         """Return dictionary representation.
 
         Parameters
@@ -242,7 +247,9 @@ class DatasetDefinition:
         return data
 
     def to_yaml(
-        self, path: str | Path,
+        self,
+        path: str | Path,
+        *,
         exclude_private: bool = True,
         exclude_none: bool = True,
     ) -> None:
