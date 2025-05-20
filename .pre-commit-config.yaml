@@ -119,7 +119,7 @@ repos:
         files: ^tests/
         args:
           [
-            '--ignore=D103,D107,D213',
+            '--ignore=D103,D107,D203,D213',
           ]
 -   repo: https://github.com/PyCQA/pylint
     rev: v3.3.6
@@ -144,7 +144,6 @@ repos:
         args:
           [
             '--output-format=parseable',
-            '--disable=duplicate-code',
             '--disable=missing-class-docstring',
             '--disable=missing-function-docstring',
             '--disable=protected-access',
