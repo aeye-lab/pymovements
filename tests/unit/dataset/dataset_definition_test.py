@@ -264,6 +264,7 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
                 'time_unit': None,
                 'trial_columns': None,
                 'velocity_columns': None,
+                '_has_resources': False,
             },
             id='False',
         ),
@@ -365,6 +366,213 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
     )
 
     assert yaml_definition == expected_definition
+
+
+@pytest.mark.parametrize(
+    ('resources', 'expected_has_resources'),
+    [
+        pytest.param(
+            None,
+            False,
+            id='none',
+        ),
+
+        pytest.param(
+            {},
+            False,
+            id='empty_resources_dict',
+        ),
+
+        pytest.param(
+            1,
+            False,
+            id='int_resources',
+        ),
+
+        pytest.param(
+            {'gaze': None},
+            False,
+            id='none_value_as_resources',
+        ),
+
+        pytest.param(
+            {'gaze': 1},
+            False,
+            id='int_as_resources_list',
+        ),
+
+        pytest.param(
+            {'gaze': []},
+            False,
+            id='empty_list_as_resources',
+        ),
+
+        pytest.param(
+            {'gaze': [{'resource': 'foo'}]},
+            True,
+            id='gaze_resources',
+        ),
+
+        pytest.param(
+            {'precomputed_events': [{'resource': 'foo'}]},
+            True,
+            id='precomputed_event_resources',
+        ),
+
+        pytest.param(
+            {'precomputed_reading_measures': [{'resource': 'foo'}]},
+            True,
+            id='precomputed_reading_measures_resources',
+        ),
+
+        pytest.param(
+            {
+                'gaze': [{'resource': 'foo'}],
+                'precomputed_events': [{'resource': 'foo'}],
+                'precomputed_reading_measures': [{'resource': 'foo'}],
+            },
+            True,
+            id='all_resources',
+        ),
+
+        pytest.param(
+            {
+                'foo': [{'resource': 'bar'}],
+            },
+            True,
+            id='custom_resources',
+        ),
+    ],
+)
+def test_dataset_definition_has_resources_boolean(resources, expected_has_resources):
+    definition = DatasetDefinition(resources=resources)
+
+    # there are multiple contexts of using booleans.
+    assert bool(definition.has_resources) == expected_has_resources
+    assert definition.has_resources == expected_has_resources
+    assert not (definition.has_resources and not expected_has_resources)
+    assert not (not definition.has_resources and expected_has_resources)
+
+
+@pytest.mark.parametrize(
+    ('resources', 'expected_resources'),
+    [
+        pytest.param(
+            {},
+            {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='empty_resources_dict',
+        ),
+
+        pytest.param(
+            1,
+            {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='int_resources',
+        ),
+
+        pytest.param(
+            {'gaze': None},
+            {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='none_value_as_resources',
+        ),
+
+        pytest.param(
+            {'gaze': 1},
+            {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='int_as_resources',
+        ),
+
+        pytest.param(
+            {'gaze': []},
+            {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='empty_list_as_resources',
+        ),
+
+        pytest.param(
+            {'gaze': [{'resource': 'foo'}]},
+            {
+                'gaze': True,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='gaze_resources',
+        ),
+
+        pytest.param(
+            {'precomputed_events': [{'resource': 'foo'}]},
+            {
+                'gaze': False,
+                'precomputed_events': True,
+                'precomputed_reading_measures': False,
+            },
+            id='precomputed_event_resources',
+        ),
+
+        pytest.param(
+            {'precomputed_reading_measures': [{'resource': 'foo'}]},
+            {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': True,
+            },
+            id='precomputed_reading_measures_resources',
+        ),
+
+        pytest.param(
+            {
+                'gaze': [{'resource': 'foo'}],
+                'precomputed_events': [{'resource': 'foo'}],
+                'precomputed_reading_measures': [{'resource': 'foo'}],
+            },
+            {'gaze': True, 'precomputed_events': True, 'precomputed_reading_measures': True},
+            id='all_resources',
+        ),
+
+        pytest.param(
+            {
+                'foo': [{'resource': 'bar'}],
+            },
+            {
+                'foo': True,
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='custom_resources',
+        ),
+    ],
+)
+def test_dataset_definition_has_resources_indexable(resources, expected_resources):
+    definition = DatasetDefinition(resources=resources)
+
+    for key, value in expected_resources.items():
+        assert definition.has_resources[key] == value
+
+
+def test_dataset_definition_not_equal():
+    definition1 = DatasetDefinition(resources={'gaze': [{'resource': 'foo'}]})
+    definition2 = DatasetDefinition(resources={})
+
+    assert definition1.has_resources != definition2.has_resources
 
 
 @pytest.mark.parametrize(
