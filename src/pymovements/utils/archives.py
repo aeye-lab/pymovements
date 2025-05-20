@@ -29,7 +29,7 @@ from pathlib import Path
 
 from deprecated.sphinx import deprecated
 
-from pymovements.dataset._archives import _extract_archive
+from pymovements.dataset._archives import extract_archive as _extract_archive
 
 
 @deprecated(
