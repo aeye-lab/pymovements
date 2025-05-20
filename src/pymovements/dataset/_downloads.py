@@ -37,7 +37,7 @@ from pymovements.dataset.dataset_paths import DatasetPaths
 USER_AGENT: str = f"pymovements/{get_versions()['version']}"
 
 
-def _download_dataset(
+def download_dataset(
         definition: DatasetDefinition,
         paths: DatasetPaths,
         *,
