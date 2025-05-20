@@ -246,6 +246,13 @@ def parse_eyelink(
     ------
     Warning
         If no metadata is found in the file.
+
+    Notes
+    -----
+    Event onsets and offsets are parsed as they are in the file. However, EyeLink calculates the
+    durations in a different way than pymovements, resulting in a difference of 1 sample duration.
+    For 1000 Hz recordings, durations calculated by pymovements are 1 ms shorter than the durations
+    reported in the asc file.
     """
     # pylint: disable=too-many-branches, too-many-statements
     if patterns is None:
@@ -337,9 +344,6 @@ def parse_eyelink(
 
         elif event := parse_eyelink_event_end(line):
             event_name, event_onset, event_offset = event
-            # See https://www.sr-research.com/support/thread-9411.html
-            sample_length = 1 / float(recording_config[-1]['sampling_rate']) * 1000
-            event_offset += sample_length
             events['name'].append(f'{event_name}_eyelink')
             events['onset'].append(event_onset)
             events['offset'].append(event_offset)
@@ -351,7 +355,8 @@ def parse_eyelink(
             current_event_additional[event_name] = {}
 
             if event_name == 'blink':
-                num_blink_samples += round((event_offset - event_onset) / sample_length)
+                sample_length = 1 / float(recording_config[-1]['sampling_rate']) * 1000
+                num_blink_samples += round((event_offset - event_onset) / sample_length) + 1
                 blinking = False
 
         elif match := RECORDING_CONFIG_REGEX.match(line):

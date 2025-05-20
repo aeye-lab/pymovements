@@ -778,8 +778,8 @@ def test_from_asc_has_expected_metadata(kwargs, expected_metadata):
                 data={
                     'name': ['fixation_eyelink', 'saccade_eyelink', 'fixation_eyelink'],
                     'onset': [2154563, 2339227, 2339246],
-                    'offset': [2154696, 2339246, 2339291],
-                    'duration': [133, 19, 45],
+                    'offset': [2154695, 2339245, 2339290],
+                    'duration': [132, 18, 44],
                 },
                 schema={
                     'name': pl.Utf8,
@@ -798,15 +798,15 @@ def test_from_asc_has_expected_metadata(kwargs, expected_metadata):
             pl.from_dict(
                 data={
                     'name': ['fixation_eyelink', 'saccade_eyelink', 'fixation_eyelink'],
-                    'onset': [2154563.0, 2339226.0, 2339246.0],
-                    'offset': [2154695.5, 2339245.5, 2339290.5],
-                    'duration': [132.5, 18.5, 44.5],
+                    'onset': [2154563, 2339227, 2339246],
+                    'offset': [2154695, 2339245, 2339290],
+                    'duration': [132, 18, 44],
                 },
                 schema={
                     'name': pl.Utf8,
-                    'onset': pl.Float64,
-                    'offset': pl.Float64,
-                    'duration': pl.Float64,
+                    'onset': pl.Int64,
+                    'offset': pl.Int64,
+                    'duration': pl.Int64,
                 },
             ),
             id='eyelink_asc_mono_2khz_with_events',

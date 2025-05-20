@@ -163,7 +163,7 @@ EXPECTED_EVENT_DF = pl.from_dict(
     {
         'name': ['fixation_eyelink', 'blink_eyelink', 'saccade_eyelink'],
         'onset': [10000000.0, 10000020.0, 10000011.0],
-        'offset': [10000009.0, 10000023.0, 10000023.0],
+        'offset': [10000008.0, 10000022.0, 10000022.0],
         'task': [None, None, 'B'],
         'trial_id': [None, None, '2'],
     },
