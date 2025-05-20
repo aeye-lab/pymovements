@@ -5,6 +5,10 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
 jobs:
   test:
     name: test ${{ matrix.tox_env }} (${{ matrix.os }})
@@ -51,16 +55,36 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Setup python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
+          cache: 'pip'
+
+      - name: Restore cached tox environment
+        uses: actions/cache/restore@v4
+        with:
+          key:
+            tox-${{ matrix.os }}-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
+          path: .tox
+
       - name: Install tox
         run: python -m pip install tox
+
       - name: Setup test environment
         run: tox -vv --notest -e ${{ matrix.tox_env }}
+
+      - name: Cache tox environment
+        uses: actions/cache/save@v4
+        with:
+          key:
+            tox-${{ matrix.os }}-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
+          path: .tox
+
       - name: Run test
         run: tox --skip-pkg-install -e ${{ matrix.tox_env }}
+
       - name: Upload coverage reports to Codecov
         if: success() || failure()
         uses: codecov/codecov-action@v5
@@ -74,14 +98,33 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Install base python for tox
+
+      - name: Setup python
         uses: actions/setup-python@v5
         with:
           python-version: "3.9"
+          cache: 'pip'
+
+      - name: Restore cached tox environment
+        uses: actions/cache/restore@v4
+        with:
+          key:
+            tox-pylint-${{hashFiles('tox.ini') }}
+          path: .tox
+
       - name: Install tox
         run: python -m pip install tox
+
       - name: Setup test environment
         run: tox -vv --notest -e pylint
+
+      - name: Cache tox environment
+        uses: actions/cache/save@v4
+        with:
+          key:
+            tox-pylint-${{hashFiles('tox.ini') }}
+          path: .tox
+
       - name: Run test
         run: tox --skip-pkg-install -e pylint
 
@@ -93,14 +136,32 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Setup python
         uses: actions/setup-python@v5
         with:
           python-version: "3.9"
+
+      - name: Restore cached tox environment
+        uses: actions/cache/restore@v4
+        with:
+          key:
+            tox-${{ matrix.os }}-minreq-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
+          path: .tox
+
       - name: Install tox
         run: python -m pip install tox-min-req
+
       - name: Setup test environment
         run: MIN_REQ=1 tox -vv --notest -e py39
+
+      - name: Cache tox environment
+        uses: actions/cache/save@v4
+        with:
+          key:
+            tox-${{ matrix.os }}-minreq-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
+          path: .tox
+
       - name: Run test
         run: MIN_REQ=1 tox --skip-pkg-install -e py39
 
@@ -118,20 +179,41 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Install pandoc
         uses: r-lib/actions/setup-pandoc@v2
         with:
           pandoc-version: '2.19.2'
-      - name: Install base python for tox
+
+      - name: Setup python
         uses: actions/setup-python@v5
         with:
           python-version: "3.9"
+          cache: 'pip'
+
+      - name: Restore cached tox environment
+        uses: actions/cache/restore@v4
+        with:
+          key:
+            tox-${{ matrix.os }}-docs-${{hashFiles('tox.ini') }}
+          path: .tox
+
       - name: Install tox
         run: python -m pip install tox
+
       - name: Setup test environment
         run: tox -vv --notest -e docs
+
+      - name: Cache tox environment
+        uses: actions/cache/save@v4
+        with:
+          key:
+            tox-${{ matrix.os }}-docs-${{hashFiles('tox.ini') }}
+          path: .tox
+
       - name: Run test
         run: tox --skip-pkg-install -e docs
+
       - name: Upload documentation
         uses: actions/upload-artifact@v4
         with:

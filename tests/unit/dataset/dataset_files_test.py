@@ -208,8 +208,8 @@ def test_load_eyelink_file(tmp_path, read_kwargs):
         definition=DatasetDefinition(
             experiment=pm.Experiment(1280, 1024, 38, 30, None, 'center', 1000),
             filename_format_schema_overrides={'gaze': {}, 'precomputed_events': {}},
+            custom_read_kwargs={'gaze': read_kwargs},
         ),
-        custom_read_kwargs=read_kwargs,
     )
 
     if read_kwargs is not None:
@@ -252,7 +252,6 @@ def test_load_precomputed_rm_file_xlsx():
         custom_read_kwargs={'sheet_name': 'Sheet 1'},
     )
     expected_df = pl.read_excel(filepath, sheet_name='Sheet 1')
-
     assert_frame_equal(reading_measure.frame, expected_df, check_column_order=False)
 
 
@@ -263,7 +262,8 @@ def test_load_precomputed_rm_file_unsupported_file_format():
         pm.dataset.dataset_files.load_precomputed_reading_measure_file(filepath)
 
     msg, = exc.value.args
-    assert msg == 'unsupported file format ".feather". Supported formats are: .csv, .tsv, .txt, .xlsx'
+    assert msg == 'unsupported file format ".feather". Supported formats are: .csv, .tsv, .txt'\
+        ', .xlsx'
 
 
 def test_load_precomputed_file():

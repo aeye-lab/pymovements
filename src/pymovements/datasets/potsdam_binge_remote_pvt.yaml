@@ -1,5 +1,7 @@
 name: "PotsdamBingeRemotePVT"
 
+long_name: 'Potsdam Binge Remote PVT dataset'
+
 has_files:
   gaze: true
   precomputed_events: false

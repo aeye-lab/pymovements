@@ -27,11 +27,13 @@ import numpy as np
 import polars as pl
 from tqdm import tqdm
 
+from pymovements._utils import _checks
+from pymovements._utils._html import repr_html
 from pymovements.events.properties import duration
 from pymovements.stimulus.text import TextStimulus
-from pymovements.utils import checks
 
 
+@repr_html(['frame', 'trial_columns'])
 class EventDataFrame:
     """A DataFrame for event data.
 
@@ -97,10 +99,10 @@ class EventDataFrame:
         self.trial_columns: list[str] | None  # otherwise mypy gets confused.
 
         if data is not None:
-            checks.check_is_mutual_exclusive(data=data, onsets=onsets)
-            checks.check_is_mutual_exclusive(data=data, offsets=offsets)
-            checks.check_is_mutual_exclusive(data=data, name=name)
-            checks.check_is_mutual_exclusive(data=data, name=trials)
+            _checks.check_is_mutual_exclusive(data=data, onsets=onsets)
+            _checks.check_is_mutual_exclusive(data=data, offsets=offsets)
+            _checks.check_is_mutual_exclusive(data=data, name=name)
+            _checks.check_is_mutual_exclusive(data=data, name=trials)
 
             data = data.clone()
             data = self._add_minimal_schema_columns(data)
@@ -118,7 +120,7 @@ class EventDataFrame:
 
         else:
             # Make sure that if either onsets or offsets is None, the other one is None too.
-            checks.check_is_none_is_mutual(onsets=onsets, offsets=offsets)
+            _checks.check_is_none_is_mutual(onsets=onsets, offsets=offsets)
 
             # Make sure lengths of onsets and offsets are equal.
             if onsets is not None:
@@ -126,10 +128,10 @@ class EventDataFrame:
                 # mypy does not get that offsets cannot be None (l. 87)
                 assert offsets is not None
 
-                checks.check_is_length_matching(onsets=onsets, offsets=offsets)
+                _checks.check_is_length_matching(onsets=onsets, offsets=offsets)
                 # In case name is given as a list, check that too.
                 if isinstance(name, Sequence) and not isinstance(name, str):
-                    checks.check_is_length_matching(onsets=onsets, name=name)
+                    _checks.check_is_length_matching(onsets=onsets, name=name)
 
                 # These reassignments are necessary for a correct conversion into a dataframe.
                 if len(onsets) == 0:
@@ -232,7 +234,7 @@ class EventDataFrame:
                 raise TypeError(
                     'data must be passed as a list of values in case of providing multiple columns',
                 )
-            checks.check_is_length_matching(column=column, data=data)
+            _checks.check_is_length_matching(column=column, data=data)
 
             trial_columns = dict(zip(column, data))
 
