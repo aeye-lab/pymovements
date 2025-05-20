@@ -28,17 +28,18 @@ from typing import Any
 
 import yaml
 
+from pymovements._utils._html import repr_html
+from pymovements.dataset._utils._resources import _HasResourcesIndexer
 from pymovements.dataset._utils._yaml import reverse_substitute_types
 from pymovements.dataset._utils._yaml import substitute_types
 from pymovements.dataset._utils._yaml import type_constructor
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.eyetracker import EyeTracker
-from pymovements.gaze.screen import Screen
 
 
 yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
 
 
+@repr_html()
 @dataclass
 class DatasetDefinition:
     """Definition to initialize a :py:class:`~pymovements.dataset.Dataset`.
@@ -143,6 +144,7 @@ class DatasetDefinition:
     """
 
     # pylint: disable=too-many-instance-attributes
+
     name: str = '.'
 
     long_name: str | None = None
@@ -169,12 +171,16 @@ class DatasetDefinition:
 
     trial_columns: list[str] | None = None
     time_column: str | None = None
-    time_unit: str | None = 'ms'
+    time_unit: str | None = None
     pixel_columns: list[str] | None = None
     position_columns: list[str] | None = None
     velocity_columns: list[str] | None = None
     acceleration_columns: list[str] | None = None
     distance_column: str | None = None
+
+    _has_resources: _HasResourcesIndexer = field(
+        default_factory=_HasResourcesIndexer, init=False, repr=False, compare=False, hash=False,
+    )
 
     @staticmethod
     def from_yaml(path: str | Path) -> DatasetDefinition:
@@ -195,31 +201,28 @@ class DatasetDefinition:
 
         # Convert experiment dict to Experiment object if present
         if 'experiment' in data:
-            if 'eyetracker' in data['experiment']:
-                eyetracker = EyeTracker(**data['experiment'].pop('eyetracker'))
-            else:
-                eyetracker = None
-            if 'screen' in data['experiment']:
-                screen = Screen(**data['experiment'].pop('screen'))
-            else:
-                screen = None
-            data['experiment'] = Experiment(
-                **data['experiment'],
-                screen=screen,
-                eyetracker=eyetracker,
-            )
+            data['experiment'] = Experiment.from_dict(data['experiment'])
 
         data = reverse_substitute_types(data)
         # Initialize DatasetDefinition with YAML data
         return DatasetDefinition(**data)
 
-    def to_dict(self, exclude_private: bool = True) -> dict[str, Any]:
+    def to_dict(
+        self,
+        *,
+        exclude_private: bool = True,
+        exclude_none: bool = True,
+    ) -> dict[str, Any]:
         """Return dictionary representation.
 
         Parameters
         ----------
         exclude_private: bool
-            Exclude attributes that start with `_`.
+            Exclude attributes that start with ``_``.
+        exclude_none: bool
+            Exclude attributes that are either ``None`` or that are objects that evaluate to
+            ``False`` (e.g., ``[]``, ``{}``, ``EyeTracker()``). Attributes of type ``bool``,
+            ``int``, and ``float`` are not excluded.
 
         Returns
         -------
@@ -234,11 +237,28 @@ class DatasetDefinition:
                 if key.startswith('_'):
                     del data[key]
 
-        data['experiment'] = data['experiment'].to_dict()
+        # Delete fields that evaluate to False (False, None, [], {})
+        if exclude_none:
+            if not self.experiment:
+                del data['experiment']
+            else:
+                data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none)
+
+            for key, value in list(data.items()):
+                if not isinstance(value, (bool, int, float)) and not value:
+                    del data[key]
+        else:
+            data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none)
 
         return data
 
-    def to_yaml(self, path: str | Path, exclude_private: bool = True) -> None:
+    def to_yaml(
+        self,
+        path: str | Path,
+        *,
+        exclude_private: bool = True,
+        exclude_none: bool = True,
+    ) -> None:
         """Save a dataset definition to a YAML file.
 
         Parameters
@@ -246,11 +266,53 @@ class DatasetDefinition:
         path: str | Path
             Path where to save the YAML file to.
         exclude_private: bool
-            Exclude attributes that start with `_`.
+            Exclude attributes that start with ``_``.
+        exclude_none: bool
+            Exclude attributes that are either ``None`` or that are objects that evaluate to
+            ``False`` (e.g., ``[]``, ``{}``, ``EyeTracker()``). Attributes of type ``bool``,
+            ``int``, and ``float`` are not excluded.
         """
-        data = self.to_dict(exclude_private=exclude_private)
+        data = self.to_dict(exclude_private=exclude_private, exclude_none=exclude_none)
 
         data = substitute_types(data)
 
         with open(path, 'w', encoding='utf-8') as f:
             yaml.dump(data, f, sort_keys=False)
+
+    @property
+    def has_resources(self) -> _HasResourcesIndexer:
+        """Checks for resources in :py:attr:`~pymovements.dataset.DatasetDefinition.resources`.
+
+        This read-only property checks if there are any resources set in
+        :py:attr:`~pymovements.dataset.DatasetDefinition.resources`. It can be used as a `bool` or
+        as an indexable class. In a boolean context it checks if there are any resources set in the
+        :py:cls:`~pymovements.dataset.DatasetDefinition`. Furthermore, you can index the property
+        to check if there are any resources set for a given content type.
+
+        Examples
+        --------
+        This custom :py:cls:`~pymovements.dataset.DatasetDefinition` has no resources defined:
+        >>> import pymovements as pm
+        >>> my_definition = pm.DatasetDefinition('MyDatasetWithoutOnlineResources', resources=None)
+        >>> my_definition.has_resources
+        False
+
+        A :py:cls:`~pymovements.dataset.DatasetDefinition` from our
+        :py:cls:`~pymovements.dataset.DatasetLibrary` will usually have some online resources
+        defined:
+        >>> definition = pm.DatasetLibrary.get('ToyDataset')
+        >>> definition.has_resources
+        True
+
+        You can also check if a specific content type is contained in the resources:
+        >>> definition.has_resources['gaze']
+        True
+
+        In this definition there are gaze resources defined, but no precomputed events.
+        >>> definition.has_resources['precomputed_events']
+        False
+        """
+        # Resources may have changed, so update indexer before returning.
+        # A better way to update the resources would be through a resources setter property.
+        self._has_resources.set_resources(self.resources)
+        return self._has_resources
