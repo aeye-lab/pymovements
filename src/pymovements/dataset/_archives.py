@@ -39,7 +39,7 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
 
 
-def _extract_dataset(
+def extract_dataset(
         definition: DatasetDefinition,
         paths: DatasetPaths,
         *,

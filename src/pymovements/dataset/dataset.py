@@ -32,7 +32,7 @@ from tqdm.auto import tqdm
 
 from pymovements._utils._html import repr_html
 from pymovements.dataset import dataset_files
-from pymovements.dataset._archives import _extract_dataset
+from pymovements.dataset._archives import extract_dataset
 from pymovements.dataset._downloads import _download_dataset
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import DatasetLibrary
@@ -1047,7 +1047,7 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
-        _extract_dataset(
+        extract_dataset(
             definition=self.definition,
             paths=self.paths,
             remove_finished=remove_finished,

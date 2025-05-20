@@ -30,7 +30,7 @@ from warnings import warn
 from tqdm.auto import tqdm
 
 from pymovements._version import get_versions
-from pymovements.dataset._archives import _extract_dataset
+from pymovements.dataset._archives import extract_dataset
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
 
@@ -106,7 +106,7 @@ def _download_dataset(
             )
 
     if extract:
-        _extract_dataset(
+        extract_dataset(
             definition=definition,
             paths=paths,
             remove_finished=remove_finished,
