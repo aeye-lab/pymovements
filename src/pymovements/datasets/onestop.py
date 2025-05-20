@@ -32,12 +32,12 @@ class OneStop(DatasetDefinition):
     """OneStop dataset :cite:p:`OneStop`.
 
     OneStop Eye Movements (in short OneStop) is an English corpus of eye movements
-    in reading with 360 L1 participants, 2.6 million word tokens and 152 hours of 
-    eye tracking data recorded with an EyeLink 1000 Plus eye tracker. 
+    in reading with 360 L1 participants, 2.6 million word tokens and 152 hours of
+    eye tracking data recorded with an EyeLink 1000 Plus eye tracker.
     OneStop comprises four sub-corpora with eye movement recordings from paragraph reading.
-    
+
     To filter the data by reading regime or trial type, use the following column values:
-    
+
     For ordinary reading trials, set question_preview to False.
     For information seeking trials, set question_preview to True.
     To exclude repeated reading trials, set repeated_reading_trial to False.
