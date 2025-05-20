@@ -118,16 +118,16 @@ class OneStop(DatasetDefinition):
             'precomputed_events': [
                 {
                     'resource':
-                    'https://osf.io/download/6jbge/',
+                    'https://osf.io/download/z3xd8/',
                     'filename': 'fixations_Paragraph.csv.zip',
-                    'md5': '0b05b59ac3e385c6608a1a57079dd25f',
+                    'md5': 'bb2cb3a43ae15c4da78eb3f0baf434a4',
                 },
             ],
             'precomputed_reading_measures': [
                 {
-                    'resource': 'https://osf.io/download/p97e5/',
+                    'resource': 'https://osf.io/download/d2aew/',
                     'filename': 'ia_Paragraph.csv.zip',
-                    'md5': '4e9408d61ddf590ee72528a2993d7549',
+                    'md5': 'cee97f13b113c5675757223238ef1bb4',
                 },
             ],
         },
