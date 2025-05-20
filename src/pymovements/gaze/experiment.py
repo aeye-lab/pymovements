@@ -21,7 +21,6 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from dataclasses import asdict
 from typing import Any
 
 import numpy as np
@@ -282,8 +281,17 @@ class Experiment:
         """Compare equality to other Experiment."""
         return self.screen == other.screen and self.eyetracker == other.eyetracker
 
-    def to_dict(self) -> dict[str, Any | dict[str, str | float | None]]:
+    def to_dict(
+        self, *, exclude_none: bool = True,
+    ) -> dict[str, Any | dict[str, str | float | None]]:
         """Convert the experiment instance into a dictionary.
+
+        Parameters
+        ----------
+        exclude_none: bool
+            Exclude attributes that are either ``None`` or that are objects that evaluate to
+            ``False`` (e.g., ``[]``, ``{}``, ``EyeTracker()``). Attributes of type ``bool``,
+            ``int``, and ``float`` are not excluded.
 
         Returns
         -------
@@ -291,10 +299,21 @@ class Experiment:
             Experiment as dictionary.
         """
         _dict: dict[str, dict[str, str | float | None]] = {}
-        _dict['screen'] = asdict(self.screen)
-        _dict['eyetracker'] = asdict(self.eyetracker)
+        if exclude_none:
+            if self.screen:
+                _dict['screen'] = self.screen.to_dict(exclude_none=exclude_none)
+            if self.eyetracker:
+                _dict['eyetracker'] = self.eyetracker.to_dict(exclude_none=exclude_none)
+        else:
+            _dict['screen'] = self.screen.to_dict(exclude_none=False)
+            _dict['eyetracker'] = self.eyetracker.to_dict(exclude_none=False)
+
         return _dict
 
     def __str__(self: Experiment) -> str:
         """Return Experiment string."""
         return f'{type(self).__name__}(screen={self.screen}, eyetracker={self.eyetracker})'
+
+    def __bool__(self) -> bool:
+        """Return True if the experiment has data defined, else False."""
+        return not all(not value for value in self.__dict__.values())

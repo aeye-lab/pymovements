@@ -100,7 +100,7 @@ def test_dataset_definition_is_equal(init_kwargs):
                 'position_columns': None,
                 'resources': {},
                 'time_column': None,
-                'time_unit': 'ms',
+                'time_unit': None,
                 'trial_columns': None,
                 'velocity_columns': None,
             },
@@ -164,7 +164,7 @@ def test_dataset_definition_is_equal(init_kwargs):
                 'position_columns': None,
                 'resources': {},
                 'time_column': None,
-                'time_unit': 'ms',
+                'time_unit': None,
                 'trial_columns': None,
                 'velocity_columns': None,
             },
@@ -173,7 +173,7 @@ def test_dataset_definition_is_equal(init_kwargs):
     ],
 )
 def test_dataset_definition_to_dict_expected(definition, expected_dict):
-    assert definition.to_dict() == expected_dict
+    assert definition.to_dict(exclude_none=False) == expected_dict
 
 
 @pytest.mark.parametrize(
@@ -216,7 +216,7 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
                 'position_columns': None,
                 'resources': {},
                 'time_column': None,
-                'time_unit': 'ms',
+                'time_unit': None,
                 'trial_columns': None,
                 'velocity_columns': None,
             },
@@ -261,7 +261,7 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
                 'position_columns': None,
                 'resources': {},
                 'time_column': None,
-                'time_unit': 'ms',
+                'time_unit': None,
                 'trial_columns': None,
                 'velocity_columns': None,
             },
@@ -277,7 +277,7 @@ def test_dataset_definition_to_dict_exclude_private_expected(exclude_private, ex
 
     definition = MyDatasetDefinition()
 
-    assert definition.to_dict(exclude_private=exclude_private) == expected_dict
+    assert definition.to_dict(exclude_private=exclude_private, exclude_none=False) == expected_dict
 
 
 @pytest.mark.parametrize(
@@ -331,7 +331,7 @@ def test_dataset_definition_to_yaml_equal_dicts(definition, tmp_path):
 def test_write_yaml_already_existing_dataset_definition_w_tuple_screen(tmp_path):
     tmp_file = tmp_path / 'tmp.yaml'
     definition = DatasetLibrary.get('ToyDatasetEyeLink')
-    definition.to_yaml(tmp_file)
+    definition.to_yaml(tmp_file, exclude_none=False)
 
     with open(tmp_file, encoding='utf-8') as f:
         yaml.safe_load(f)
@@ -365,3 +365,165 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
     )
 
     assert yaml_definition == expected_definition
+
+
+@pytest.mark.parametrize(
+    ('dataset_definition', 'exclude_none', 'expected_dict'),
+    [
+        pytest.param(
+            DatasetDefinition(),
+            True,
+            {
+                'name': '.',
+            },
+            marks=pytest.mark.xfail(reason='#1148'),
+            id='true_default',
+        ),
+
+        pytest.param(
+            DatasetDefinition(experiment=Experiment(origin=None)),
+            True,
+            {
+                'name': '.',
+            },
+            id='true_experiment_origin_none',
+        ),
+
+        pytest.param(
+            DatasetDefinition(
+                distance_column='test',
+                extract={'test': True},
+                position_columns=['test', 'foo', 'bar'],
+            ),
+            True,
+            {
+                'name': '.',
+                'extract': {'test': True},
+                'position_columns': ['test', 'foo', 'bar'],
+                'distance_column': 'test',
+            },
+            marks=pytest.mark.xfail(reason='#1148'),
+            id='true_str_dict_list',
+        ),
+
+        pytest.param(
+            DatasetDefinition(
+                experiment=Experiment(origin=None),
+                distance_column='test',
+                extract={'test': True},
+                position_columns=['test', 'foo', 'bar'],
+            ),
+            True,
+            {
+                'name': '.',
+                'extract': {'test': True},
+                'position_columns': ['test', 'foo', 'bar'],
+                'distance_column': 'test',
+            },
+            id='true_str_dict_list_experiment_origin_none',
+        ),
+
+        pytest.param(
+            DatasetDefinition(),
+            False,
+            {
+                'name': '.',
+                'long_name': None,
+                'has_files': {},
+                'mirrors': {},
+                'resources': {},
+                'experiment': None,
+                'extract': {},
+                'filename_format': {},
+                'filename_format_schema_overrides': {},
+                'custom_read_kwargs': {},
+                'column_map': {},
+                'trial_columns': None,
+                'time_column': None,
+                'time_unit': None,
+                'pixel_columns': None,
+                'position_columns': None,
+                'velocity_columns': None,
+                'acceleration_columns': None,
+                'distance_column': None,
+            },
+            marks=pytest.mark.xfail(reason='#1148'),
+            id='false_default',
+        ),
+
+        pytest.param(
+            DatasetDefinition(experiment=None),
+            False,
+            {
+                'name': '.',
+                'long_name': None,
+                'has_files': {},
+                'mirrors': {},
+                'resources': {},
+                'experiment': None,
+                'extract': {},
+                'filename_format': {},
+                'filename_format_schema_overrides': {},
+                'custom_read_kwargs': {},
+                'column_map': {},
+                'trial_columns': None,
+                'time_column': None,
+                'time_unit': None,
+                'pixel_columns': None,
+                'position_columns': None,
+                'velocity_columns': None,
+                'acceleration_columns': None,
+                'distance_column': None,
+            },
+            marks=pytest.mark.xfail(reason='#1148'),
+            id='false_experiment_none',
+        ),
+
+        pytest.param(
+            DatasetDefinition(experiment=Experiment(origin=None)),
+            False,
+            {
+                'name': '.',
+                'long_name': None,
+                'has_files': {},
+                'mirrors': {},
+                'resources': {},
+                'experiment': {
+                    'eyetracker': {
+                        'sampling_rate': None,
+                        'vendor': None,
+                        'model': None,
+                        'version': None,
+                        'mount': None,
+                        'left': None,
+                        'right': None,
+                    },
+                    'screen': {
+                        'height_cm': None,
+                        'width_cm': None,
+                        'height_px': None,
+                        'width_px': None,
+                        'distance_cm': None,
+                        'origin': None,
+                    },
+                },
+                'extract': {},
+                'filename_format': {},
+                'filename_format_schema_overrides': {},
+                'custom_read_kwargs': {},
+                'column_map': {},
+                'trial_columns': None,
+                'time_column': None,
+                'time_unit': None,
+                'pixel_columns': None,
+                'position_columns': None,
+                'velocity_columns': None,
+                'acceleration_columns': None,
+                'distance_column': None,
+            },
+            id='false_experiment_origin_none',
+        ),
+    ],
+)
+def test_dataset_to_dict_exclude_none(dataset_definition, exclude_none, expected_dict):
+    assert dataset_definition.to_dict(exclude_none=exclude_none) == expected_dict
