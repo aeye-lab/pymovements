@@ -61,55 +61,6 @@ def test_check_no_zeros_raises_error(variable, expected_error, expected_err_msg)
         assert msg == expected_err_msg
 
 
-@pytest.mark.parametrize(
-    ('arr', 'expected_error', 'expected_err_msg'),
-    [
-        pytest.param(
-            np.array([[1, 2], [3, 4]]),
-            None,
-            '',
-            id='no_nans_raises_no_error',
-        ),
-        pytest.param(
-            np.array([[1, 2], [np.nan, np.nan]]),
-            None,
-            '',
-            id='nans_same_time_steps_raises_no_error',
-        ),
-        pytest.param(
-            np.array([[np.nan, 2], [np.nan, 4]]),
-            ValueError,
-            'nans must occur at the same steps of horizontal and vertical direction',
-            id='nans_different_time_steps_raises_value_error',
-        ),
-        pytest.param(
-            np.array([[np.nan, 2], [3, 4]]),
-            ValueError,
-            'nans must occur at the same steps of horizontal and vertical direction',
-            id='nans_only_left_channel_raises_value_error',
-        ),
-        pytest.param(
-            np.array([[1, np.nan], [3, 4]]),
-            ValueError,
-            'nans must occur at the same steps of horizontal and vertical direction',
-            id='nans_only_right_channel_raises_value_error',
-        ),
-    ],
-)
-def test_check_nan_both_channels_raises_error(arr, expected_error, expected_err_msg):
-    """Test that check_nan_both_channels() raises an Exception.
-
-    Only iff all nans occur at the same time step for both channels.
-    """
-    if expected_error is None:
-        _checks.check_nan_both_channels(arr)
-    else:
-        with pytest.raises(expected_error) as excinfo:
-            _checks.check_nan_both_channels(arr)
-        msg, = excinfo.value.args
-        assert msg == expected_err_msg
-
-
 # Test check_shapes_positions_velocities
 @pytest.mark.parametrize(
     ('kwargs', 'expected_error', 'expected_err_msg'),

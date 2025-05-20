@@ -20,8 +20,6 @@
 """DatasetDefinition module."""
 from __future__ import annotations
 
-import builtins
-import importlib
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
@@ -30,15 +28,17 @@ from typing import Any
 
 import yaml
 
+from pymovements._utils._html import repr_html
+from pymovements.dataset._utils._yaml import reverse_substitute_types
+from pymovements.dataset._utils._yaml import substitute_types
 from pymovements.dataset._utils._yaml import type_constructor
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.eyetracker import EyeTracker
-from pymovements.gaze.screen import Screen
 
 
 yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
 
 
+@repr_html()
 @dataclass
 class DatasetDefinition:
     """Definition to initialize a :py:class:`~pymovements.dataset.Dataset`.
@@ -47,6 +47,8 @@ class DatasetDefinition:
     ----------
     name: str
         The name of the dataset. (default: '.')
+    long_name: str | None
+        The entire name of the dataset. (default: None)
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -142,6 +144,9 @@ class DatasetDefinition:
 
     # pylint: disable=too-many-instance-attributes
     name: str = '.'
+
+    long_name: str | None = None
+
     has_files: dict[str, bool] = field(default_factory=dict)
 
     mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] = field(default_factory=dict)
@@ -190,60 +195,71 @@ class DatasetDefinition:
 
         # Convert experiment dict to Experiment object if present
         if 'experiment' in data:
-            if 'eyetracker' in data['experiment']:
-                eyetracker = EyeTracker(**data['experiment'].pop('eyetracker'))
-            else:
-                eyetracker = None
-            if 'screen' in data['experiment']:
-                screen = Screen(**data['experiment'].pop('screen'))
-            else:
-                screen = None
-            data['experiment'] = Experiment(
-                **data['experiment'],
-                screen=screen,
-                eyetracker=eyetracker,
-            )
-
-        def reverse_substitute_types(d: Any) -> Any:
-            if isinstance(d, dict):
-                return {k: reverse_substitute_types(v) for k, v in d.items()}
-            if isinstance(d, list):
-                return [reverse_substitute_types(v) for v in d]
-            if isinstance(d, str) and d.startswith('!'):
-                type_name = d[1:]
-                if '.' in type_name:
-                    module_name, class_name = type_name.rsplit('.', 1)
-                    module = importlib.import_module(module_name)
-                    return getattr(module, class_name)
-                return getattr(builtins, type_name)
-            return d
+            data['experiment'] = Experiment.from_dict(data['experiment'])
 
         data = reverse_substitute_types(data)
         # Initialize DatasetDefinition with YAML data
         return DatasetDefinition(**data)
 
-    def to_yaml(self, path: str | Path) -> None:
+    def to_dict(self, exclude_private: bool = True, exclude_none: bool = True) -> dict[str, Any]:
+        """Return dictionary representation.
+
+        Parameters
+        ----------
+        exclude_private: bool
+            Exclude attributes that start with ``_``.
+        exclude_none: bool
+            Exclude attributes that are either ``None`` or that are objects that evaluate to
+            ``False`` (e.g., ``[]``, ``{}``, ``EyeTracker()``). Attributes of type ``bool``,
+            ``int``, and ``float`` are not excluded.
+
+        Returns
+        -------
+        dict[str, Any]
+            Dictionary representation of dataset definition.
+        """
+        data = asdict(self)
+
+        # Delete private fields from dictionary.
+        if exclude_private:
+            for key in list(data.keys()):
+                if key.startswith('_'):
+                    del data[key]
+
+        # Delete fields that evaluate to False (False, None, [], {})
+        if exclude_none:
+            if not self.experiment:
+                del data['experiment']
+            else:
+                data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none)
+
+            for key, value in list(data.items()):
+                if not isinstance(value, (bool, int, float)) and not value:
+                    del data[key]
+        else:
+            data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none)
+
+        return data
+
+    def to_yaml(
+        self, path: str | Path,
+        exclude_private: bool = True,
+        exclude_none: bool = True,
+    ) -> None:
         """Save a dataset definition to a YAML file.
 
         Parameters
         ----------
         path: str | Path
             Path where to save the YAML file to.
+        exclude_private: bool
+            Exclude attributes that start with ``_``.
+        exclude_none: bool
+            Exclude attributes that are either ``None`` or that are objects that evaluate to
+            ``False`` (e.g., ``[]``, ``{}``, ``EyeTracker()``). Attributes of type ``bool``,
+            ``int``, and ``float`` are not excluded.
         """
-        data = asdict(self)
-
-        def substitute_types(d: Any) -> Any:
-            if isinstance(d, dict):
-                return {k: substitute_types(v) for k, v in d.items()}
-            if isinstance(d, list):
-                return [substitute_types(v) for v in d]
-            if isinstance(d, type):
-                if d.__module__ == 'builtins':
-                    return f'!{d.__name__}'
-                return f'!{d.__module__}.{d.__name__}'
-            return d
-
-        data['experiment'] = data['experiment'].to_dict()
+        data = self.to_dict(exclude_private=exclude_private, exclude_none=exclude_none)
 
         data = substitute_types(data)
 

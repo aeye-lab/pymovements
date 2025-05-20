@@ -17,7 +17,11 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+# pylint: disable=cyclic-import
 """Provides utility functions.
+
+.. deprecated:: v0.22.0
+   This module will be removed in v0.27.0.
 
 .. rubric:: Modules
 
@@ -26,7 +30,6 @@
    :template: module.rst
 
     archives
-    checks
     downloads
     parsing
     paths
@@ -40,7 +43,6 @@ from pymovements.utils import paths
 __all__ = [
     'aois',
     'archives',
-    'checks',
     'downloads',
     'parsing',
     'plotting',

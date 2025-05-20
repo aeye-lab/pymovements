@@ -28,10 +28,12 @@ import polars as pl
 from tqdm import tqdm
 
 from pymovements._utils import _checks
+from pymovements._utils._html import repr_html
 from pymovements.events.properties import duration
 from pymovements.stimulus.text import TextStimulus
 
 
+@repr_html(['frame', 'trial_columns'])
 class EventDataFrame:
     """A DataFrame for event data.
 
@@ -324,7 +326,7 @@ class EventDataFrame:
         """
         self.unnest()
         aois = [
-            aoi_dataframe.get_aoi(row, 'location_x', 'location_y')
+            aoi_dataframe.get_aoi(row=row, x_eye='location_x', y_eye='location_y')
             for row in tqdm(self.frame.iter_rows(named=True))
         ]
         aoi_df = pl.concat(aois)

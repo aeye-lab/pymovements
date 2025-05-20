@@ -33,11 +33,14 @@ from tqdm import tqdm
 
 import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements._utils._checks import check_is_mutual_exclusive
+from pymovements._utils._html import repr_html
+from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
 from pymovements.stimulus.text import TextStimulus
 
 
+@repr_html(['frame', 'events', 'trial_columns', 'experiment'])
 class GazeDataFrame:
     """A DataFrame for gaze time series data.
 
@@ -52,8 +55,6 @@ class GazeDataFrame:
         The experiment definition. (default: None)
     events: pm.EventDataFrame | None
         A dataframe of events in the gaze signal. (default: None)
-    auto_column_detect: bool
-        Flag indicating if the column names should be inferred automatically. (default: False)
     trial_columns: str | list[str] | None
         The name of the trial columns in the input data frame. If the list is empty or None,
         the input data frame is assumed to contain only one trial. If the list is not empty,
@@ -88,6 +89,11 @@ class GazeDataFrame:
         in the input data frame. If specified, the column will be used for pixel to dva
         transformations. If not specified, the constant eye-to-screen distance will be taken
         from the experiment definition. This column will be renamed to ``distance``. (default: None)
+    auto_column_detect: bool
+        Flag indicating if the column names should be inferred automatically. (default: False)
+    definition: pm.DatasetDefinition | None
+        A dataset definition. Explicitly passed arguments take precedence over definition.
+        (default: None)
 
     Attributes
     ----------
@@ -210,7 +216,6 @@ class GazeDataFrame:
             experiment: Experiment | None = None,
             events: pm.EventDataFrame | None = None,
             *,
-            auto_column_detect: bool = False,
             trial_columns: str | list[str] | None = None,
             time_column: str | None = None,
             time_unit: str | None = None,
@@ -219,6 +224,8 @@ class GazeDataFrame:
             velocity_columns: list[str] | None = None,
             acceleration_columns: list[str] | None = None,
             distance_column: str | None = None,
+            auto_column_detect: bool = False,
+            definition: pm.DatasetDefinition | None = None,
     ):
         if data is None:
             data = pl.DataFrame()
@@ -229,7 +236,7 @@ class GazeDataFrame:
         # Set nan values to null.
         self.frame = self.frame.fill_nan(None)
 
-        self.experiment = experiment
+        self._init_experiment(experiment, definition)
 
         self._init_columns(
             trial_columns=trial_columns,
@@ -241,6 +248,7 @@ class GazeDataFrame:
             acceleration_columns=acceleration_columns,
             distance_column=distance_column,
             auto_column_detect=auto_column_detect,
+            definition=definition,
         )
 
         if events is None:
@@ -886,6 +894,57 @@ class GazeDataFrame:
                 how='diagonal',
             )
 
+    def compute_event_properties(
+            self,
+            event_properties: str | tuple[str, dict[str, Any]]
+            | list[str | tuple[str, dict[str, Any]]],
+            name: str | None = None,
+    ) -> None:
+        """Calculate event properties for given events.
+
+        The calculated event properties are added as columns to
+        :py:attr:`~pymovements.gaze.GazeDataFrame.events`.
+
+        Parameters
+        ----------
+        event_properties: str | tuple[str, dict[str, Any]] | list[str | tuple[str, dict[str, Any]]]
+            The event properties to compute.
+        name: str | None
+            Process only events that match the name. (default: None)
+
+        Raises
+        ------
+        InvalidProperty
+            If ``property_name`` is not a valid property. See
+            :py:mod:`pymovements.events.event_properties` for an overview of supported properties.
+        RuntimeError
+            If specified event name ``name`` is missing from ``events``.
+        ValueError
+            If the computed property already exists as a column in ``events``.
+        """
+        if len(self.events) == 0:
+            warnings.warn(
+                'No events available to compute event properties. '
+                'Did you forget to use detect()?',
+            )
+
+        identifiers = self.trial_columns if self.trial_columns is not None else []
+        processor = EventGazeProcessor(event_properties)
+
+        event_property_names = [property[0] for property in processor.event_properties]
+        existing_columns = set(self.events.columns) & set(event_property_names)
+        if existing_columns:
+            raise ValueError(
+                f"The following event properties already exist and cannot be recomputed: "
+                f"{existing_columns}. Please remove them first.",
+            )
+
+        new_properties = processor.process(
+            self.events, self, identifiers=identifiers, name=name,
+        )
+        join_on = identifiers + ['name', 'onset', 'offset']
+        self.events.add_event_properties(new_properties, join_on=join_on)
+
     def measure_samples(
             self,
             method: str | Callable[..., pl.Expr],
@@ -1024,7 +1083,7 @@ class GazeDataFrame:
             raise ValueError('neither position nor pixel in gaze dataframe, one needed for mapping')
 
         aois = [
-            aoi_dataframe.get_aoi(row, x_eye, y_eye)
+            aoi_dataframe.get_aoi(row=row, x_eye=x_eye, y_eye=y_eye)
             for row in tqdm(self.frame.iter_rows(named=True))
         ]
         aoi_df = pl.concat(aois)
@@ -1408,7 +1467,6 @@ class GazeDataFrame:
 
     def _init_columns(
             self,
-            auto_column_detect: bool = False,
             trial_columns: str | list[str] | None = None,
             time_column: str | None = None,
             time_unit: str | None = None,
@@ -1417,8 +1475,36 @@ class GazeDataFrame:
             velocity_columns: list[str] | None = None,
             acceleration_columns: list[str] | None = None,
             distance_column: str | None = None,
+            auto_column_detect: bool = False,
+            definition: pm.DatasetDefinition | None = None,
     ) -> None:
         """Initialize dataframe columns."""
+        # Explicit arguments take precedence over definition.
+        if definition:
+            if trial_columns is None:
+                trial_columns = definition.trial_columns
+
+            if time_column is None:
+                time_column = definition.time_column
+
+            if time_unit is None:
+                time_unit = definition.time_unit
+
+            if pixel_columns is None:
+                pixel_columns = definition.pixel_columns
+
+            if position_columns is None:
+                position_columns = definition.position_columns
+
+            if velocity_columns is None:
+                velocity_columns = definition.velocity_columns
+
+            if acceleration_columns is None:
+                acceleration_columns = definition.acceleration_columns
+
+            if distance_column is None:
+                distance_column = definition.distance_column
+
         # Initialize trial_columns.
         trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
         if trial_columns is not None and len(trial_columns) == 0:
@@ -1540,6 +1626,15 @@ class GazeDataFrame:
                 self.frame = self.frame.with_columns(
                     pl.col('time').cast(pl.Int64),
                 )
+
+    def _init_experiment(
+            self, experiment: Experiment | None, definition: pm.DatasetDefinition | None,
+    ) -> None:
+        """Explicitly passed experiment takes precedence over definition."""
+        if definition is not None and experiment is None:
+            self.experiment = definition.experiment
+        else:
+            self.experiment = experiment
 
     def __str__(self) -> str:
         """Return string representation of GazeDataFrame."""
