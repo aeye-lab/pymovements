@@ -600,13 +600,11 @@ def test_dataset_definition_not_equal():
         pytest.param(
             DatasetDefinition(
                 distance_column='test',
-                extract={'test': True},
                 position_columns=['test', 'foo', 'bar'],
             ),
             True,
             {
                 'name': '.',
-                'extract': {'test': True},
                 'position_columns': ['test', 'foo', 'bar'],
                 'distance_column': 'test',
             },
@@ -618,13 +616,11 @@ def test_dataset_definition_not_equal():
             DatasetDefinition(
                 experiment=Experiment(origin=None),
                 distance_column='test',
-                extract={'test': True},
                 position_columns=['test', 'foo', 'bar'],
             ),
             True,
             {
                 'name': '.',
-                'extract': {'test': True},
                 'position_columns': ['test', 'foo', 'bar'],
                 'distance_column': 'test',
             },
