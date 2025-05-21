@@ -919,8 +919,6 @@ from pymovements.synthetic import step_function
 )
 def test_gaze_detect(method, kwargs, gaze, expected):
     gaze.detect(method, **kwargs)
-    print(gaze.events.frame)
-    print(expected.frame)
     assert_frame_equal(gaze.events.frame, expected.frame, check_row_order=False)
 
 
