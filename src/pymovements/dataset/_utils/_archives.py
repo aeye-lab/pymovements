@@ -35,6 +35,7 @@ from typing import IO
 from tqdm import tqdm
 
 from pymovements._utils._paths import get_filepaths
+from pymovements.exceptions import UnknownFileType
 
 
 def extract_archive(
@@ -269,11 +270,11 @@ def _detect_file_type(filepath: Path) -> tuple[str | None, str | None]:
 
     Raises
     ------
-    RuntimeError
+    UnknownFileType
         If the file has no suffix or the suffix is not supported.
     """
     if not (suffixes := filepath.suffixes):
-        raise RuntimeError(
+        raise UnknownFileType(
             f"File '{filepath}' has no suffixes that could be used to detect the archive type or"
             ' compression.',
         )
@@ -296,7 +297,7 @@ def _detect_file_type(filepath: Path) -> tuple[str | None, str | None]:
 
             # Check if the second last suffix refers to an archive type.
             if (suffix2 := suffixes[-2]) not in _ARCHIVE_EXTRACTORS:
-                raise RuntimeError(
+                raise UnknownFileType(
                     f"Unsupported compression or archive type: '{suffix2}{suffix}'.\n"
                     f"Supported suffixes are: '{_get_valid_suffixes()}'.",
                 )
@@ -306,8 +307,14 @@ def _detect_file_type(filepath: Path) -> tuple[str | None, str | None]:
         # We detected a single compressed file not an archive.
         return None, suffix
 
-    # Return None as we didn't find a valid suffix.
-    return None, None
+    # Raise error as we didn't find a valid suffix.
+    valid_suffixes = sorted(
+        set(_ARCHIVE_TYPE_ALIASES) | set(_ARCHIVE_EXTRACTORS) | set(_COMPRESSED_FILE_OPENERS),
+    )
+    raise UnknownFileType(
+        f"Unsupported compression or archive type: '{suffix}'.\n"
+        f"Supported suffixes are: '{valid_suffixes}'.",
+    )
 
 
 def _decompress(
