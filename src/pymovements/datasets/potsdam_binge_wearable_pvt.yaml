@@ -23,9 +23,6 @@ resources:
       filename: "e.zip"
       md5: "a0d0203cbb273f6908c1b52a42750551"
 
-extract:
-  gaze: true
-
 experiment:
   screen:
     width_px: 1920

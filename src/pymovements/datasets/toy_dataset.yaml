@@ -13,9 +13,6 @@ resources:
       filename: "pymovements-toy-dataset.zip"
       md5: "4da622457637a8181d86601fe17f3aa8"
 
-extract:
-  gaze: true
-
 experiment:
   screen_width_px: 1280
   screen_height_px: 1024

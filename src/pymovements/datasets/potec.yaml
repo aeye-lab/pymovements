@@ -21,11 +21,6 @@ resources:
       filename: "reading_measures.zip"
       md5: "efafec5ce074d8f492cc2409b6c4d9eb"
 
-extract:
-  gaze: true
-  precomputed_events: true
-  precomputed_reading_measures: true
-
 experiment:
   screen_width_px: 1680
   screen_height_px: 1050
