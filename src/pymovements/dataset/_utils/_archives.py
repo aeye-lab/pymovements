@@ -278,6 +278,10 @@ def _detect_file_type(filepath: Path) -> tuple[str | None, str | None]:
             ' compression.',
         )
 
+    valid_suffixes = sorted(
+        set(_ARCHIVE_TYPE_ALIASES) | set(_ARCHIVE_EXTRACTORS) | set(_COMPRESSED_FILE_OPENERS),
+    )
+
     # Get last suffix only.
     suffix = suffixes[-1]
 
@@ -297,8 +301,8 @@ def _detect_file_type(filepath: Path) -> tuple[str | None, str | None]:
             # Check if the second last suffix refers to an archive type.
             if (suffix2 := suffixes[-2]) not in _ARCHIVE_EXTRACTORS:
                 raise RuntimeError(
-                    f"Unsupported archive type: '{suffix2}'.\n"
-                    f"Supported suffixes are: '{sorted(set(_ARCHIVE_EXTRACTORS))}'.",
+                    f"Unsupported compression or archive type: '{suffix2}{suffix}'.\n"
+                    f"Supported suffixes are: '{valid_suffixes}'.",
                 )
             # We detected a compressed archive file (e.g. tar.gz).
             return suffix2, suffix
@@ -307,9 +311,6 @@ def _detect_file_type(filepath: Path) -> tuple[str | None, str | None]:
         return None, suffix
 
     # Raise error as we didn't find a valid suffix.
-    valid_suffixes = sorted(
-        set(_ARCHIVE_TYPE_ALIASES) | set(_ARCHIVE_EXTRACTORS) | set(_COMPRESSED_FILE_OPENERS),
-    )
     raise RuntimeError(
         f"Unsupported compression or archive type: '{suffix}'.\n"
         f"Supported suffixes are: '{valid_suffixes}'.",
