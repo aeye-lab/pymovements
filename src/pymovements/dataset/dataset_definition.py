@@ -65,8 +65,10 @@ class DatasetDefinition:
         (default: field(default_factory=dict))
     experiment: Experiment | None
         The experiment definition. (default: None)
-    extract: dict[str, bool]
-        Decide whether to extract the data.
+    extract: dict[str, bool] | None
+        Decide whether to extract the data. (default: None)
+        .. deprecated:: v0.22.1
+        This field will be removed in v0.27.0.
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe. (default: field(default_factory=dict))
