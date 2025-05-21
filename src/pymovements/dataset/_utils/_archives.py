@@ -308,12 +308,9 @@ def _detect_file_type(filepath: Path) -> tuple[str | None, str | None]:
         return None, suffix
 
     # Raise error as we didn't find a valid suffix.
-    valid_suffixes = sorted(
-        set(_ARCHIVE_TYPE_ALIASES) | set(_ARCHIVE_EXTRACTORS) | set(_COMPRESSED_FILE_OPENERS),
-    )
     raise UnknownFileType(
         f"Unsupported compression or archive type: '{suffix}'.\n"
-        f"Supported suffixes are: '{valid_suffixes}'.",
+        f"Supported suffixes are: '{_get_valid_suffixes()}'.",
     )
 
 
