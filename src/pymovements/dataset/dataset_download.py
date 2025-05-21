@@ -154,10 +154,6 @@ def extract_dataset(
                 source_path = paths.downloads / resource['filename']
 
                 try:
-                    archive_type, compression_type = _detect_file_type(source_path)
-                except UnknownFileType as e:  # just copy file to target if not an archive.
-                    shutil.copy(source_path, destination_dirpath / resource['filename'])
-                else:
                     extract_archive(
                         source_path=source_path,
                         destination_path=destination_dirpath,
@@ -167,6 +163,8 @@ def extract_dataset(
                         resume=resume,
                         verbose=verbose,
                     )
+                except UnknownFileType as e:  # just copy file to target if not an archive.
+                    shutil.copy(source_path, destination_dirpath / resource['filename'])
 
 
 def _download_resources(
