@@ -31,9 +31,18 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 class OneStop(DatasetDefinition):
     """OneStop dataset :cite:p:`OneStop`.
 
-    This dataset eye tracking data from 360 participants.
-    The participant read several texts in different condition. Hunting for specific information
-    and gathering general knowledge from a text.
+    OneStop Eye Movements (in short OneStop) is an English corpus of eye movements
+    in reading with 360 L1 participants, 2.6 million word tokens and 152 hours of
+    eye tracking data recorded with an EyeLink 1000 Plus eye tracker.
+    OneStop comprises four sub-corpora with eye movement recordings from paragraph reading.
+
+    To filter the data by reading regime or trial type, use the following column values:
+
+    For ordinary reading trials, set question_preview to False.
+    For information seeking trials, set question_preview to True.
+    To exclude repeated reading trials, set repeated_reading_trial to False.
+    To include only repeated reading trials, set repeated_reading_trial to True.
+    To exclude practice trials, set practice_trial to False.
 
     For more information please consult :cite:p:`OneStop`.
 
@@ -109,16 +118,16 @@ class OneStop(DatasetDefinition):
             'precomputed_events': [
                 {
                     'resource':
-                    'https://osf.io/download/6jbge/',
+                    'https://osf.io/download/z3xd8/',
                     'filename': 'fixations_Paragraph.csv.zip',
-                    'md5': '0b05b59ac3e385c6608a1a57079dd25f',
+                    'md5': 'bb2cb3a43ae15c4da78eb3f0baf434a4',
                 },
             ],
             'precomputed_reading_measures': [
                 {
-                    'resource': 'https://osf.io/download/p97e5/',
+                    'resource': 'https://osf.io/download/d2aew/',
                     'filename': 'ia_Paragraph.csv.zip',
-                    'md5': '4e9408d61ddf590ee72528a2993d7549',
+                    'md5': 'cee97f13b113c5675757223238ef1bb4',
                 },
             ],
         },
