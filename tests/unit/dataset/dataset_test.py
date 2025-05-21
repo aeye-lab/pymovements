@@ -129,7 +129,7 @@ def mock_toy(
         }
 
     if extract is _UNSET:
-        extract = {'gaze': True, 'precomputed_events': True}
+        extract = None
 
     if filename_format_schema_overrides is _UNSET:
         filename_format_schema_overrides = {
