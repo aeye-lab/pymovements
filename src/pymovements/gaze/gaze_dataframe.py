@@ -1258,7 +1258,7 @@ class GazeDataFrame:
             raise AttributeError(
                 "No valid gaze columns found (e.g., 'pixel', 'position', etc.).\n"
                 "This usually happens if you did not specify 'pixel_columns', 'position_columns', etc. during initialization.\n"
-                "Please initialize the GazeDataFrame with appropriate column names."
+                'Please initialize the GazeDataFrame with appropriate column names.',
             )
 
     def _check_component_columns(self, **kwargs: list[str]) -> None:
@@ -1574,17 +1574,17 @@ class GazeDataFrame:
 
         self.n_components = self._infer_n_components(column_specifiers)
         # Emit a warning if the GazeDataFrame contains data but no gaze-related columns were provided.
-        # This can lead to failure in downstream methods that rely on those columns (e.g., transformations).
+        # This can lead to failure in downstream methods that rely on those
+        # columns (e.g., transformations).
         if (
             len(self.frame) > 0
             and not any(col in self.frame.columns for col in ['pixel', 'position', 'velocity', 'acceleration'])
         ):
             warnings.warn(
-                "GazeDataFrame contains data but no pixel/position/velocity/acceleration columns were specified.\n"
+                'GazeDataFrame contains data but no pixel/position/velocity/acceleration columns were specified.\n'
                 "Please specify 'pixel_columns', 'position_columns', 'velocity_columns' or 'acceleration_columns' "
-                "during initialization. Otherwise, transformations may fail."
+                'during initialization. Otherwise, transformations may fail.',
             )
-
 
     def _init_time_column(
             self,
