@@ -28,6 +28,7 @@ from pymovements import EventDataFrame
 from pymovements import Experiment
 from pymovements import GazeDataFrame
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 @pytest.mark.parametrize(
     ('init_kwargs', 'expected_frame', 'expected_n_components'),
@@ -1222,6 +1223,7 @@ def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, exp
     assert_frame_equal(gaze.frame, expected_frame)
     assert gaze.n_components == expected_n_components
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 @pytest.mark.parametrize(
     ('init_kwargs', 'expected_experiment'),
@@ -1257,6 +1259,7 @@ def test_init_gaze_dataframe_has_expected_experiment(init_kwargs, expected_exper
     gaze = GazeDataFrame(**init_kwargs)
     assert gaze.experiment == expected_experiment
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 @pytest.mark.parametrize(
     ('init_kwargs', 'expected_trial_columns'),
@@ -1340,6 +1343,7 @@ def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_tr
     gaze = GazeDataFrame(**init_kwargs)
     assert gaze.trial_columns == expected_trial_columns
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'exception_msg'),
@@ -1880,6 +1884,7 @@ def test_gaze_dataframe_init_exceptions(init_kwargs, exception, exception_msg):
     msg, = excinfo.value.args
     assert msg == exception_msg
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 def test_gaze_copy_init_has_same_n_components():
     """Tests if gaze initialization with frame with nested columns has correct n_components.
@@ -1894,6 +1899,7 @@ def test_gaze_copy_init_has_same_n_components():
 
     assert gaze.n_components == gaze_copy.n_components
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 @pytest.mark.parametrize(
     ('events', 'init_kwargs'),

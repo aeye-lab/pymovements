@@ -33,6 +33,7 @@ screen_cm_1d = 100
 screen_px_2d = [100, 100]
 screen_cm_2d = [100, 100]
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 @pytest.mark.parametrize(
     ('kwargs', 'expected_error'),
@@ -241,6 +242,7 @@ def test_pix2deg_raises_error(kwargs, expected_error):
     with pytest.raises(expected_error):
         pix2deg(**kwargs)
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 @pytest.mark.parametrize(
     ('kwargs', 'expected_value'),
@@ -449,6 +451,7 @@ def test_pix2deg_returns(kwargs, expected_value):
     actual_value = pix2deg(**kwargs)
     assert (actual_value == expected_value).all()
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 @pytest.mark.parametrize(
     ('kwargs', 'expected_error'),
@@ -483,6 +486,7 @@ def test_pos2acc_raises_error(kwargs, expected_error):
     with pytest.raises(expected_error):
         pos2acc(**kwargs)
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 @pytest.mark.parametrize(
     ('kwargs', 'padding', 'expected_value'),
@@ -515,6 +519,7 @@ def test_pos2acc_returns(kwargs, padding, expected_value):
         expected_value[padding[0]:padding[1]],
     )
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 @pytest.mark.parametrize(
     ('kwargs', 'expected_error'),
@@ -590,6 +595,7 @@ def test_pos2vel_raises_error(kwargs, expected_error):
     with pytest.raises(expected_error):
         pos2vel(**kwargs)
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 @pytest.mark.parametrize(
     'method',
@@ -599,6 +605,8 @@ def test_pos2vel_raises_error(kwargs, expected_error):
         pytest.param('preceding', id='method_preceding'),
     ],
 )
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
+
 @pytest.mark.parametrize(
     ('kwargs', 'padding', 'expected_value'),
     [
@@ -626,6 +634,7 @@ def test_pos2vel_returns(method, kwargs, padding, expected_value):
     actual_value = pos2vel(method=method, **kwargs)
     assert (actual_value[padding[0]:padding[1]] == expected_value[padding[0]:padding[1]]).all()
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 @pytest.mark.parametrize(
     ('params', 'expected_value'),
@@ -666,6 +675,7 @@ def test_pos2vel_stepped_input_returns(params, expected_value):
     lpad, rpad = 1, -1
     assert np.allclose(actual_value[lpad:rpad], expected_value[lpad:rpad])
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 @pytest.mark.parametrize(
     ('params', 'expected_value'),
@@ -700,6 +710,7 @@ def test_pos2vel_2d_stepped_input_returns(params, expected_value):
     lpad, rpad = 1, -1
     assert np.allclose(actual_value[lpad:rpad], expected_value[lpad:rpad])
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 @pytest.mark.parametrize(
     ('params', 'expected_value'),
@@ -737,6 +748,7 @@ def test_norm(params, expected_value):
     actual_value = norm(**params)
     assert np.allclose(actual_value, expected_value)
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 @pytest.mark.parametrize(
     ('params', 'expected_error'),
@@ -752,6 +764,7 @@ def test_norm_raises_exception(params, expected_error):
     with pytest.raises(expected_error):
         norm(**params)
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 @pytest.mark.parametrize(
     ('params', 'expected'),

@@ -26,9 +26,11 @@ from polars.testing import assert_frame_equal
 import pymovements as pm
 
 
+
 def my_test_measure(column: str) -> pl.Expr:
     return pl.col(column).len().cast(pl.Int64).alias('my_measure')
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 @pytest.mark.parametrize(
     ('gaze', 'method', 'kwargs', 'expected'),
@@ -266,6 +268,7 @@ def my_test_measure(column: str) -> pl.Expr:
         ),
     ],
 )
+
 def test_measure_samples(gaze, method, kwargs, expected):
     df = gaze.measure_samples(method, **kwargs)
     assert_frame_equal(df, expected)

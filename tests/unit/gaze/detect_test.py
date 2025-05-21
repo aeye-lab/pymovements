@@ -26,6 +26,7 @@ from polars.testing import assert_frame_equal
 import pymovements as pm
 from pymovements.synthetic import step_function
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 @pytest.mark.parametrize(
     ('method', 'kwargs', 'gaze', 'expected'),
