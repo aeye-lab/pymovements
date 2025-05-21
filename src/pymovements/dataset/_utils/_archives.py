@@ -80,17 +80,6 @@ def extract_archive(
     """
     archive_type, compression_type = _detect_file_type(source_path)
 
-    if not archive_type and not compression_type:
-        # Raise error as we didn't find a valid suffix.
-        suffixes = ''.join(source_path.suffixes[-2:])
-        valid_suffixes = sorted(
-            set(_ARCHIVE_TYPE_ALIASES) | set(_ARCHIVE_EXTRACTORS) | set(_COMPRESSED_FILE_OPENERS),
-        )
-        raise RuntimeError(
-            f"Unsupported compression or archive type: '{suffixes}'.\n"
-            f"Supported suffixes are: '{valid_suffixes}'.",
-        )
-
     if not archive_type:
         return _decompress(
             source_path=source_path,
