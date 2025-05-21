@@ -321,6 +321,7 @@ class DatasetDefinition:
         return self._has_resources
 
     def __post_init__(self) -> None:
+        """Initialization logic for treating special attributes."""
         if self.extract is not None:
             warn(
                 DeprecationWarning(
