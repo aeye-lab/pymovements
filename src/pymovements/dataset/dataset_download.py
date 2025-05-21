@@ -162,7 +162,7 @@ def extract_dataset(
                         resume=resume,
                         verbose=verbose,
                     )
-                except UnknownFileType as e:  # just copy file to target if not an archive.
+                except UnknownFileType:  # just copy file to target if not an archive.
                     shutil.copy(source_path, destination_dirpath / resource['filename'])
 
 
