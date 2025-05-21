@@ -521,6 +521,28 @@ def test_load_correct_raw_gaze_dfs(gaze_dataset_configuration):
         )
 
 
+def test_loaded_gazes_do_not_share_experiment_with_definition(gaze_dataset_configuration):
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset.load()
+
+    definition = gaze_dataset_configuration['init_kwargs']['definition']
+
+    for gaze in dataset.gaze:
+        assert gaze.experiment is not definition.experiment
+
+
+def test_loaded_gazes_do_not_share_experiment_with_other(gaze_dataset_configuration):
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset.load()
+
+    for gaze1 in dataset.gaze:
+        for gaze2 in dataset.gaze:
+            if gaze1 is gaze2:
+                continue
+
+            assert gaze1.experiment is not gaze2.experiment
+
+
 def test_load_gaze_has_position_columns(gaze_dataset_configuration):
     dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True)
@@ -901,7 +923,11 @@ def test_detect_events_auto_eye(detect_event_kwargs, gaze_dataset_configuration)
     dataset.detect_events(**detect_event_kwargs)
 
     expected_schema = {
-        'subject_id': pl.Int64, **events.EventDataFrame._minimal_schema, 'duration': pl.Int64,
+        'subject_id': pl.Int64,
+        'name': pl.Utf8,
+        'onset': pl.Int64,
+        'offset': pl.Int64,
+        'duration': pl.Int64,
     }
     for result_event_df in dataset.events:
         assert result_event_df.schema == expected_schema
@@ -945,7 +971,9 @@ def test_detect_events_explicit_eye(detect_event_kwargs, gaze_dataset_configurat
 
         expected_schema = {
             'subject_id': pl.Int64,
-            **events.EventDataFrame._minimal_schema,
+            'name': pl.Utf8,
+            'onset': pl.Int64,
+            'offset': pl.Int64,
             'duration': pl.Int64,
         }
 
@@ -973,7 +1001,9 @@ def test_detect_events_explicit_eye(detect_event_kwargs, gaze_dataset_configurat
             },
             {
                 'subject_id': pl.Int64,
-                **events.EventDataFrame._minimal_schema,
+                'name': pl.Utf8,
+                'onset': pl.Int64,
+                'offset': pl.Int64,
                 'duration': pl.Int64,
             },
             id='two-saccade-runs',
@@ -991,7 +1021,9 @@ def test_detect_events_explicit_eye(detect_event_kwargs, gaze_dataset_configurat
             },
             {
                 'subject_id': pl.Int64,
-                **events.EventDataFrame._minimal_schema,
+                'name': pl.Utf8,
+                'onset': pl.Int64,
+                'offset': pl.Int64,
                 'duration': pl.Int64,
             },
             id='one-saccade-one-fixation-run',
@@ -1697,7 +1729,9 @@ def test_event_dataframe_add_property_has_expected_height(
             {'event_properties': 'peak_velocity'},
             {
                 'subject_id': pl.Int64,
-                **events.EventDataFrame._minimal_schema,
+                'name': pl.Utf8,
+                'onset': pl.Int64,
+                'offset': pl.Int64,
                 'duration': pl.Int64,
                 'peak_velocity': pl.Float64,
             },
@@ -1707,7 +1741,9 @@ def test_event_dataframe_add_property_has_expected_height(
             {'event_properties': 'location'},
             {
                 'subject_id': pl.Int64,
-                **events.EventDataFrame._minimal_schema,
+                'name': pl.Utf8,
+                'onset': pl.Int64,
+                'offset': pl.Int64,
                 'duration': pl.Int64,
                 'location': pl.List(pl.Float64),
             },

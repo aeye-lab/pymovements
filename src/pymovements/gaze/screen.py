@@ -285,7 +285,7 @@ class Screen:
         assert isinstance(value, (int, float))
         _checks.check_is_greater_than_zero(**{key: value})
 
-    def to_dict(self, exclude_none: bool = True) -> dict[str, Any]:
+    def to_dict(self, *, exclude_none: bool = True) -> dict[str, Any]:
         """Convert the Screen instance into a dictionary.
 
         Parameters
