@@ -31,9 +31,8 @@ import polars as pl
 from tqdm.auto import tqdm
 
 from pymovements._utils._html import repr_html
+from pymovements.dataset import dataset_download
 from pymovements.dataset import dataset_files
-from pymovements.dataset._archives import extract_dataset
-from pymovements.dataset._downloads import download_dataset
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_paths import DatasetPaths
@@ -1008,7 +1007,7 @@ class Dataset:
         """
         logger.info(self._disclaimer())
 
-        download_dataset(
+        dataset_download.download_dataset(
             definition=self.definition,
             paths=self.paths,
             extract=extract,
@@ -1047,7 +1046,7 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
-        extract_dataset(
+        dataset_download.extract_dataset(
             definition=self.definition,
             paths=self.paths,
             remove_finished=remove_finished,

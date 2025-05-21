@@ -29,8 +29,8 @@ from pathlib import Path
 
 from deprecated.sphinx import deprecated
 
-from pymovements.dataset._archives import _extract_archive
-from pymovements.dataset._downloads import _download_file
+from pymovements.dataset._utils._archives import extract_archive as _extract_archive
+from pymovements.dataset._utils._downloads import download_file as _download_file
 
 
 @deprecated(
@@ -101,7 +101,6 @@ def download_and_extract_archive(
         recursive=recursive,
         remove_finished=remove_finished,
         remove_top_level=remove_top_level,
-        resume=resume,
         verbose=verbose,
     )
 

@@ -34,10 +34,12 @@
     parsing
     paths
 """
+from pymovements.utils import aois
 from pymovements.utils import archives
 from pymovements.utils import downloads
 from pymovements.utils import parsing
 from pymovements.utils import paths
+from pymovements.utils import plotting
 
 
 __all__ = [

@@ -24,9 +24,9 @@ from unittest import mock
 
 import pytest
 
-from pymovements.dataset._downloads import _download_file
-from pymovements.dataset._downloads import _DownloadProgressBar
-from pymovements.dataset._downloads import _get_redirected_url
+from pymovements.dataset._utils._downloads import _DownloadProgressBar
+from pymovements.dataset._utils._downloads import _get_redirected_url
+from pymovements.dataset._utils._downloads import download_file
 
 
 @pytest.mark.parametrize(
@@ -41,7 +41,7 @@ def test_download_file(tmp_path, verbose):
     filename = 'pymovements-0.4.0.tar.gz'
     md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
 
-    filepath = _download_file(url, tmp_path, filename, md5, verbose=verbose)
+    filepath = download_file(url, tmp_path, filename, md5, verbose=verbose)
 
     assert filepath.exists()
     assert filepath.name == filename
@@ -56,7 +56,7 @@ def test_download_file_md5_None(tmp_path):
     url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
     filename = 'pymovements-0.4.0.tar.gz'
 
-    filepath = _download_file(url, tmp_path, filename)
+    filepath = download_file(url, tmp_path, filename)
 
     assert filepath.exists()
     assert filepath.name == filename
@@ -69,7 +69,7 @@ def test_download_file_404(tmp_path):
     md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
 
     with pytest.raises(OSError):
-        _download_file(url, tmp_path, filename, md5)
+        download_file(url, tmp_path, filename, md5)
 
 
 @pytest.mark.parametrize(
@@ -85,11 +85,11 @@ def test_download_file_https_failure(tmp_path, verbose):
     md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
 
     with mock.patch(
-        'pymovements.dataset._downloads._download_url',
+        'pymovements.dataset._utils._downloads._download_url',
         side_effect=OSError(),
     ):
         with pytest.raises(OSError):
-            _download_file(url, tmp_path, filename, md5, verbose=verbose)
+            download_file(url, tmp_path, filename, md5, verbose=verbose)
 
 
 def test_download_file_http_failure(tmp_path):
@@ -98,11 +98,11 @@ def test_download_file_http_failure(tmp_path):
     md5 = '52bbf03a7c50ee7152ccb9d357c2bb30'
 
     with mock.patch(
-        'pymovements.dataset._downloads._download_url',
+        'pymovements.dataset._utils._downloads._download_url',
         side_effect=OSError(),
     ):
         with pytest.raises(OSError):
-            _download_file(url, tmp_path, filename, md5)
+            download_file(url, tmp_path, filename, md5)
 
 
 def test_download_file_with_invalid_md5(tmp_path):
@@ -111,7 +111,7 @@ def test_download_file_with_invalid_md5(tmp_path):
     md5 = '00000000000000000000000000000000'
 
     with pytest.raises(RuntimeError) as excinfo:
-        _download_file(url, tmp_path, filename, md5)
+        download_file(url, tmp_path, filename, md5)
 
     msg, = excinfo.value.args
     assert msg == f"File {os.path.join(tmp_path, 'pymovements-0.4.0.tar.gz')} "\

@@ -37,7 +37,6 @@ from pymovements._utils._html import repr_html
 from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
-from pymovements.stimulus.text import TextStimulus
 
 
 @repr_html(['frame', 'events', 'trial_columns', 'experiment'])
@@ -1020,7 +1019,7 @@ class GazeDataFrame:
 
     def map_to_aois(
             self,
-            aoi_dataframe: TextStimulus,
+            aoi_dataframe: pm.stimulus.TextStimulus,
             *,
             eye: str = 'auto',
             gaze_type: str = 'pixel',
@@ -1032,7 +1031,7 @@ class GazeDataFrame:
 
         Parameters
         ----------
-        aoi_dataframe: TextStimulus
+        aoi_dataframe: pm.stimulus.TextStimulus
             Area of interest dataframe.
         eye: str
             String specificer for inferring eye components. Supported values are: auto, mono, left

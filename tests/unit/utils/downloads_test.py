@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Tests deprecated utils.downloads."""
+import hashlib
+import os.path
 import re
 
 import pytest
@@ -54,6 +56,7 @@ def test_download_and_extract_archive(tmp_path):
         assert hashlib.md5(file_bytes).hexdigest() == md5
 
 
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
 @pytest.mark.parametrize(
     'verbose',
     [
@@ -96,6 +99,7 @@ def test_download_and_extract_archive_extract_dirpath_None(tmp_path, capsys, ver
         assert out == ''
 
 
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
 def test_download_and_extract_archive_invalid_md5(tmp_path):
     url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
     _download_filename = 'pymovements-0.4.0.tar.gz'
@@ -112,7 +116,7 @@ def test_download_and_extract_archive_invalid_md5(tmp_path):
 
 @pytest.mark.filterwarnings('ignore::DeprecationWarning')
 @pytest.mark.parametrize('download_function', [download_and_extract_archive, download_file])
-def test_download_file(download_function, tmp_path):
+def test_deprecated_download_function(download_function, tmp_path):
     url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
     filename = 'pymovements-0.4.0.tar.gz'
 
@@ -120,7 +124,7 @@ def test_download_file(download_function, tmp_path):
 
 
 @pytest.mark.parametrize('download_function', [download_and_extract_archive, download_file])
-def test_archive_extract_deprecated(download_function, tmp_path):
+def test_is_download_function_deprecated(download_function, tmp_path):
     url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
     filename = 'pymovements-0.4.0.tar.gz'
 
@@ -129,7 +133,7 @@ def test_archive_extract_deprecated(download_function, tmp_path):
 
 
 @pytest.mark.parametrize('download_function', [download_and_extract_archive, download_file])
-def test_archive_extract_removed(download_function, tmp_path):
+def test_is_download_function_removed(download_function, tmp_path):
     url = 'https://github.com/aeye-lab/pymovements/archive/refs/tags/v0.4.0.tar.gz'
     filename = 'pymovements-0.4.0.tar.gz'
 

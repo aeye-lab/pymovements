@@ -28,24 +28,24 @@ import zipfile
 
 import pytest
 
-from pymovements.dataset._archives import _decompress
-from pymovements.dataset._archives import _extract_archive
-from pymovements.dataset._archives import _ZIP_COMPRESSION_MAP
+from pymovements.dataset._utils._archives import _decompress
+from pymovements.dataset._utils._archives import _ZIP_COMPRESSION_MAP
+from pymovements.dataset._utils._archives import extract_archive
 
 
 def test_extract_archive_wrong_suffix():
-    """Test unsupported suffix for _extract_archive()."""
+    """Test unsupported suffix for extract_archive()."""
     with pytest.raises(RuntimeError) as excinfo:
-        _extract_archive(pathlib.Path('test.jpg'))
+        extract_archive(pathlib.Path('test.jpg'))
     msg, = excinfo.value.args
     assert msg == """Unsupported compression or archive type: '.jpg'.
 Supported suffixes are: '['.bz2', '.gz', '.tar', '.tbz', '.tbz2', '.tgz', '.xz', '.zip']'."""
 
 
 def test_detect_file_type_no_suffixes():
-    """Test _extract_archive() for no files with suffix."""
+    """Test extract_archive() for no files with suffix."""
     with pytest.raises(RuntimeError) as excinfo:
-        _extract_archive(pathlib.Path('test'))
+        extract_archive(pathlib.Path('test'))
     msg, = excinfo.value.args
     assert msg == "File 'test' has no suffixes that could be used to "\
         'detect the archive type or compression.'
@@ -276,7 +276,7 @@ def test_extract_archive_destination_path_None(
         expected_files,
         archive,
 ):
-    _extract_archive(
+    extract_archive(
         source_path=archive,
         destination_path=None,
         recursive=recursive,
@@ -305,7 +305,7 @@ def test_extract_archive_destination_path_None(
 def test_extract_compressed_file_destination_path_None(
         recursive, remove_finished, compressed_file,
 ):
-    _extract_archive(
+    extract_archive(
         source_path=compressed_file,
         destination_path=None,
         recursive=recursive,
@@ -341,7 +341,7 @@ def test_extract_unsupported_archive_destination_path_None(
         unsupported_archive,
 ):
     with pytest.raises(RuntimeError) as excinfo:
-        _extract_archive(
+        extract_archive(
             source_path=unsupported_archive,
             destination_path=None,
             recursive=recursive,
@@ -421,7 +421,7 @@ def test_extract_archive_destination_path_not_None(
         expected_files,
 ):
     destination_path = tmp_path / pathlib.Path('tmpfoo')
-    _extract_archive(
+    extract_archive(
         source_path=archive,
         destination_path=destination_path,
         recursive=recursive,
@@ -455,7 +455,7 @@ def test_extract_compressed_file_destination_path_not_None(
 ):
     destination_filename = 'tmpfoo'
     destination_path = tmp_path / pathlib.Path(destination_filename)
-    _extract_archive(
+    extract_archive(
         source_path=compressed_file,
         destination_path=destination_path,
         recursive=recursive,
@@ -493,7 +493,7 @@ def test_extract_unsupported_archive_destination_path_not_None(
 ):
     destination_path = tmp_path / pathlib.Path('tmpfoo')
     with pytest.raises(RuntimeError) as excinfo:
-        _extract_archive(
+        extract_archive(
             source_path=unsupported_archive,
             destination_path=destination_path,
             recursive=recursive,
@@ -562,7 +562,7 @@ def test_extract_archive_destination_path_not_None_no_remove_top_level_no_remove
         capsys,
 ):
     destination_path = tmp_path / pathlib.Path('tmp')
-    _extract_archive(
+    extract_archive(
         source_path=archive,
         destination_path=destination_path,
         recursive=recursive,
@@ -571,7 +571,7 @@ def test_extract_archive_destination_path_not_None_no_remove_top_level_no_remove
         resume=resume,
         verbose=verbose,
     )
-    _extract_archive(
+    extract_archive(
         source_path=archive,
         destination_path=destination_path,
         recursive=recursive,
