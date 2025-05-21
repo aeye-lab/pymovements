@@ -1929,7 +1929,6 @@ def precomputed_fixture_dataset(request, tmp_path):
                 'precomputed_events': True,
                 'precomputed_reading_measures': False,
             },
-            extract={'precomputed_events': False},
             filename_format_schema_overrides={'precomputed_events': {}},
         )
     else:
@@ -2001,7 +2000,6 @@ def precomputed_rm_fixture_dataset(request, tmp_path):
                 'precomputed_events': False,
                 'precomputed_reading_measures': True,
             },
-            extract={'precomputed_reading_measures': False},
             filename_format_schema_overrides={
                 'precomputed_events': {},
                 'precomputed_reading_measures': {},
