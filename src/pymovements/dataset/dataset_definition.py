@@ -324,5 +324,5 @@ class DatasetDefinition:
                 DeprecationWarning(
                     'DatasetDefinition.extract is deprecated since version v0.22.1. '
                     'This field will be removed in v0.27.0.',
-                )
+                ),
             )
