@@ -109,8 +109,8 @@ def test_from_pandas_with_trial_columnms():
     assert_frame_equal(gaze.frame, expected)
     assert gaze.trial_columns == ['trial_id']
 
-@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('df', 'events'),
     [

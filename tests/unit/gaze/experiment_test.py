@@ -24,8 +24,8 @@ from pymovements import Experiment
 from pymovements import EyeTracker
 from pymovements import Screen
 
-@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 def test_sampling_rate_setter():
     experiment = Experiment(1280, 1024, 38, 30, sampling_rate=1000.0)
     assert experiment.sampling_rate == 1000.0
@@ -33,8 +33,8 @@ def test_sampling_rate_setter():
     experiment.sampling_rate = 100.0
     assert experiment.sampling_rate == 100.0
 
-@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     'experiment_init_kwargs',
     [
@@ -62,8 +62,8 @@ def test_sampling_rate_trivial_equality(experiment_init_kwargs):
     experiment2 = Experiment(**experiment_init_kwargs)
     assert experiment1 == experiment2
 
-@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('experiment1', 'experiment2'),
     [
@@ -82,8 +82,8 @@ def test_sampling_rate_trivial_equality(experiment_init_kwargs):
 def test_sampling_rate_equality(experiment1, experiment2):
     assert experiment1 == experiment2
 
-@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('dictionary', 'expected_experiment'),
     [
