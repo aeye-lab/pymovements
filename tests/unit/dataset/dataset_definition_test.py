@@ -735,3 +735,21 @@ def test_dataset_definition_not_equal():
 )
 def test_dataset_to_dict_exclude_none(dataset_definition, exclude_none, expected_dict):
     assert dataset_definition.to_dict(exclude_none=exclude_none) == expected_dict
+
+
+@pytest.mark.parametrize(
+    'attribute_kwarg',
+    [
+        pytest.param(
+            {'extract': True},
+            id='extract_true',
+        ),
+        pytest.param(
+            {'extract': False},
+            id='extract_false',
+        ),
+    ],
+)
+def test_dataset_definition_attribute_is_deprecated(attribute_kwarg):
+    with pytest.raises(DeprecationWarning):
+        DatasetDefinition(**attribute_kwarg)

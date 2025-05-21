@@ -25,6 +25,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
 from typing import Any
+from warnings import warn
 
 import yaml
 
@@ -159,7 +160,7 @@ class DatasetDefinition:
 
     experiment: Experiment | None = field(default_factory=Experiment)
 
-    extract: dict[str, bool] = field(default_factory=dict)
+    extract: dict[str, bool] | None = None
 
     filename_format: dict[str, str] = field(default_factory=dict)
 
@@ -316,3 +317,12 @@ class DatasetDefinition:
         # A better way to update the resources would be through a resources setter property.
         self._has_resources.set_resources(self.resources)
         return self._has_resources
+
+    def __post_init__(self) -> None:
+        if self.extract is not None:
+            warn(
+                DeprecationWarning(
+                    'DatasetDefinition.extract is deprecated since version v0.22.1. '
+                    'This field will be removed in v0.27.0.',
+                )
+            )
