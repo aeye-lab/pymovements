@@ -24,9 +24,6 @@ from dataclasses import asdict
 from dataclasses import dataclass
 from typing import Literal
 
-from pymovements._utils._dataclasses import asdict_factory
-
-
 ContentType = Literal[
     'gaze',
     'precomputed_events',
@@ -51,9 +48,15 @@ class Resource:
         return Resource(**dictionary)
 
     def to_dict(self, *, exclude_none: bool = True) -> dict[str, str | None]:
-        _asdict_factory = asdict_factory(exclude_none=exclude_none)
-        data = asdict(self, dict_factory=_asdict_factory)
-        return data
+        _dict = asdict(self)
+
+        # Delete fields that evaluate to False (False, None, [], {})
+        if exclude_none:
+            for key, value in list(_dict.items()):
+                if not isinstance(value, (bool, int, float)) and not value:
+                    del _dict[key]
+
+        return _dict
 
 
 class Resources(tuple):

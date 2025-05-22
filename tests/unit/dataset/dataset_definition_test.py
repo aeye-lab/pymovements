@@ -66,7 +66,7 @@ def test_dataset_definition_is_equal(init_kwargs):
 
         pytest.param(
             {'resources': {}},
-            Resources(tuple()),
+            Resources(),
             id='empty_dict',
         ),
     ],
