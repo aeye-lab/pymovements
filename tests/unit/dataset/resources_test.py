@@ -29,7 +29,7 @@ from pymovements import Resources
     [
         pytest.param(
             {
-                'content':'gaze',
+                'content': 'gaze',
                 'filename': 'test.csv',
             },
             id='gaze_content_filename',
@@ -379,7 +379,7 @@ def test_resources_to_tuple_expected(resources, expected_tuple):
             Resources.from_dicts([{'filename': 'myfile.txt', 'content': 'gaze'}]),
             'gaze',
             (
-                    Resource(filename='myfile.txt', content='gaze'),
+                Resource(filename='myfile.txt', content='gaze'),
             ),
             id='single_gaze_resource_gaze',
         ),
@@ -395,7 +395,7 @@ def test_resources_to_tuple_expected(resources, expected_tuple):
             Resources.from_dicts([{'filename': 'events.csv', 'content': 'precomputed_events'}]),
             'precomputed_events',
             (
-                    Resource(filename='events.csv', content='precomputed_events'),
+                Resource(filename='events.csv', content='precomputed_events'),
             ),
             id='single_precomputed_events_resource_precomputed_events',
         ),

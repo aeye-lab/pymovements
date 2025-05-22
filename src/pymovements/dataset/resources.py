@@ -68,8 +68,8 @@ class Resources:
     @staticmethod
     def from_dict(
             dictionary: dict[str, list[dict[str, str | None]]]
-                        | dict[str, tuple[dict[str, str | None]], ...]
-                        | None,
+        | dict[str, tuple[dict[str, str | None]], ...]
+        | None,
     ) -> Resources:
         if dictionary is None:
             return Resources(None)
