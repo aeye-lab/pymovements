@@ -344,8 +344,8 @@ def test_resources_to_dicts_expected(resources, expected_tuple):
             ),
             None,
             (
-                    Resource(filename='myfile.txt', content='gaze'),
-                    Resource(filename='events.csv', content='precomputed_events'),
+                Resource(filename='myfile.txt', content='gaze'),
+                Resource(filename='events.csv', content='precomputed_events'),
             ),
             id='gaze_and_precomputed_events_filter_none',
         ),
@@ -359,7 +359,7 @@ def test_resources_to_dicts_expected(resources, expected_tuple):
             ),
             'gaze',
             (
-                    Resource(filename='myfile.txt', content='gaze'),
+                Resource(filename='myfile.txt', content='gaze'),
             ),
             id='gaze_and_precomputed_events_filter_gaze',
         ),
@@ -373,7 +373,7 @@ def test_resources_to_dicts_expected(resources, expected_tuple):
             ),
             'precomputed_events',
             (
-                    Resource(filename='events.csv', content='precomputed_events'),
+                Resource(filename='events.csv', content='precomputed_events'),
             ),
             id='gaze_and_precomputed_events_filter_precomputed_events',
         ),

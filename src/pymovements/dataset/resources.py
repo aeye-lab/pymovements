@@ -60,7 +60,7 @@ class Resources(tuple):
     def __new__(cls, *resources):
         if resources is None:
             return cls.__new__(tuple())
-        return super(Resources, cls).__new__(cls, resources)
+        return super().__new__(cls, resources)
 
     def filter(self, content: ContentType | None = None) -> tuple[dict[str, str | None], ...]:
         if content is None:
