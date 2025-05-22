@@ -276,6 +276,8 @@ def test_from_numpy_all_none():
     assert_frame_equal(gaze.frame, expected)
     assert gaze.n_components is None
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
+
 
 @pytest.mark.parametrize(
     'events',

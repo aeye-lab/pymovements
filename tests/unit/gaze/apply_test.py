@@ -245,6 +245,7 @@ def test_gaze_apply(method, kwargs, gaze, expected):
     assert_frame_equal(gaze.frame, expected.frame, check_column_order=check_column_order)
     assert_frame_equal(gaze.events.frame, expected.events.frame)
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 @pytest.mark.parametrize(
     ('method', 'kwargs', 'gaze', 'exception', 'exception_msg'),
