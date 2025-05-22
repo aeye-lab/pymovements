@@ -20,8 +20,11 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import asdict
 from dataclasses import dataclass
 from typing import Literal
+
+from pymovements._utils._dataclasses import asdict_factory
 
 
 ContentType = Literal[
@@ -47,23 +50,24 @@ class Resource:
 
         return Resource(**dictionary)
 
+    def to_dict(self, *, exclude_none: bool = True) -> dict[str, str | None]:
+        _asdict_factory = asdict_factory(exclude_none=exclude_none)
+        data = asdict(self, dict_factory=_asdict_factory)
+        return data
 
-@dataclass
-class Resources:
-    resources: tuple[Resource, ...] | None = None
 
-    def get(self, content: ContentType | None = None) -> tuple[dict[str, str | None], ...]:
-        if not self.resources:
-            return tuple()
+class Resources(tuple):
+    def __new__(cls, *resources):
+        if resources is None:
+            return cls.__new__(tuple())
+        return super(Resources, cls).__new__(cls, resources)
 
+    def filter(self, content: ContentType | None = None) -> tuple[dict[str, str | None], ...]:
         if content is None:
-            return self.resources
+            return self
 
-        return tuple(
-            [
-                resource for resource in self.resources if resource.content == content
-            ],
-        )
+        resources = [resource for resource in self if resource.content == content]
+        return Resources(*resources)
 
     @staticmethod
     def from_dict(
@@ -72,7 +76,7 @@ class Resources:
         | None,
     ) -> Resources:
         if dictionary is None:
-            return Resources(None)
+            return Resources()
 
         resources = []
         for content_type, content_dictionaries in dictionary.items():
@@ -82,7 +86,7 @@ class Resources:
                 resource = Resource.from_dict(content_dictionary)
                 resources.append(resource)
 
-        return Resources(tuple(resources))
+        return Resources(*resources)
 
     @staticmethod
     def from_dicts(
@@ -95,7 +99,7 @@ class Resources:
             Resource.from_dict(dictionary) for dictionary in dictionaries
         ]
 
-        return Resources(tuple(resources))
+        return Resources(*resources)
 
-    def to_tuple_of_dicts(self) -> tuple[dict[str, str | None], ...] | None:
-        return self.resources
+    def to_dicts(self) -> tuple[dict[str, str | None], ...] | None:
+        return tuple([resource.to_dict() for resource in self])

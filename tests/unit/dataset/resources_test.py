@@ -171,56 +171,12 @@ def test_resource_from_dict_expected(resource_dict, expected_resource):
 
 
 @pytest.mark.parametrize(
-    ('resources1', 'resources2'),
-    [
-        pytest.param(
-            Resources(),
-            Resources(),
-            id='default',
-        ),
-        pytest.param(
-            Resources(),
-            Resources(None),
-            id='default_equals_none',
-        ),
-        pytest.param(
-            Resources(tuple()),
-            Resources(tuple()),
-            id='empty_tuple',
-        ),
-    ],
-)
-def test_resources_is_equal(resources1, resources2):
-    assert resources1 == resources2
-
-
-@pytest.mark.parametrize(
-    ('resources1', 'resources2'),
-    [
-        pytest.param(
-            Resources(),
-            Resources(tuple()),
-            id='default_and_empty_tuple',
-        ),
-    ],
-)
-def test_resources_is_not_equal(resources1, resources2):
-    assert resources1 != resources2
-
-
-@pytest.mark.parametrize(
     ('init_resources', 'expected_resources'),
     [
         pytest.param(
             None,
-            Resources(resources=None),
+            Resources(),
             id='none',
-        ),
-
-        pytest.param(
-            {},
-            Resources(resources=tuple()),
-            id='empty_dict',
         ),
 
         pytest.param(
@@ -228,9 +184,7 @@ def test_resources_is_not_equal(resources1, resources2):
                 'gaze': [{'filename': 'myfile.txt'}],
             },
             Resources(
-                resources=(
-                    Resource(filename='myfile.txt', content='gaze'),
-                ),
+                Resource(filename='myfile.txt', content='gaze'),
             ),
             id='single_gaze_resource',
         ),
@@ -240,10 +194,8 @@ def test_resources_is_not_equal(resources1, resources2):
                 'gaze': [{'filename': 'myfile1.zip'}, {'filename': 'myfile2.zip'}],
             },
             Resources(
-                resources=(
-                    Resource(filename='myfile1.zip', content='gaze'),
-                    Resource(filename='myfile2.zip', content='gaze'),
-                ),
+                Resource(filename='myfile1.zip', content='gaze'),
+                Resource(filename='myfile2.zip', content='gaze'),
             ),
             id='two_gaze_resources',
         ),
@@ -253,9 +205,7 @@ def test_resources_is_not_equal(resources1, resources2):
                 'precomputed_events': [{'filename': 'myevents.csv'}],
             },
             Resources(
-                resources=(
-                    Resource(filename='myevents.csv', content='precomputed_events'),
-                ),
+                Resource(filename='myevents.csv', content='precomputed_events'),
             ),
             id='single_precomputed_events_resource',
         ),
@@ -265,12 +215,7 @@ def test_resources_is_not_equal(resources1, resources2):
                 'precomputed_reading_measures': [{'filename': 'reading_measures.csv'}],
             },
             Resources(
-                resources=(
-                    Resource(
-                        filename='reading_measures.csv',
-                        content='precomputed_reading_measures',
-                    ),
-                ),
+                Resource(filename='reading_measures.csv', content='precomputed_reading_measures'),
             ),
             id='single_precomputed_events_resource',
         ),
@@ -285,22 +230,14 @@ def test_resources_from_dict_expected(init_resources, expected_resources):
     ('resources', 'expected_tuple'),
     [
         pytest.param(
-            Resources(resources=None),
-            None,
-            id='none',
-        ),
-
-        pytest.param(
-            Resources(resources=tuple()),
+            Resources(),
             tuple(),
-            id='empty_dict',
+            id='default',
         ),
 
         pytest.param(
             Resources(
-                resources=(
-                    {'filename': 'myfile.txt', 'content': 'gaze'},
-                ),
+                Resource(filename='myfile.txt', content='gaze'),
             ),
             (
                 {'filename': 'myfile.txt', 'content': 'gaze'},
@@ -310,10 +247,8 @@ def test_resources_from_dict_expected(init_resources, expected_resources):
 
         pytest.param(
             Resources(
-                resources=(
-                    {'filename': 'myfile1.zip', 'content': 'gaze'},
-                    {'filename': 'myfile2.zip', 'content': 'gaze'},
-                ),
+                Resource(filename='myfile1.zip', content='gaze'),
+                Resource(filename='myfile2.zip', content='gaze'),
             ),
             (
                 {'filename': 'myfile1.zip', 'content': 'gaze'},
@@ -324,9 +259,7 @@ def test_resources_from_dict_expected(init_resources, expected_resources):
 
         pytest.param(
             Resources(
-                resources=(
-                    {'filename': 'myevents.csv', 'content': 'precomputed_events'},
-                ),
+                Resource(filename='myevents.csv', content='precomputed_events'),
             ),
             (
                 {'filename': 'myevents.csv', 'content': 'precomputed_events'},
@@ -336,12 +269,7 @@ def test_resources_from_dict_expected(init_resources, expected_resources):
 
         pytest.param(
             Resources(
-                resources=(
-                    {
-                        'filename': 'reading_measures.csv',
-                        'content': 'precomputed_reading_measures',
-                    },
-                ),
+                Resource(filename='reading_measures.csv', content='precomputed_reading_measures'),
             ),
             (
                 {
@@ -354,8 +282,8 @@ def test_resources_from_dict_expected(init_resources, expected_resources):
 
     ],
 )
-def test_resources_to_tuple_expected(resources, expected_tuple):
-    assert resources.to_tuple_of_dicts() == expected_tuple
+def test_resources_to_dicts_expected(resources, expected_tuple):
+    assert resources.to_dicts() == expected_tuple
 
 
 @pytest.mark.parametrize(
@@ -365,14 +293,14 @@ def test_resources_to_tuple_expected(resources, expected_tuple):
             Resources(),
             None,
             tuple(),
-            id='default_none',
+            id='default_filter_none',
         ),
 
         pytest.param(
             Resources(),
             'gaze',
             tuple(),
-            id='default_gaze',
+            id='default_filter_gaze',
         ),
 
         pytest.param(
@@ -381,14 +309,14 @@ def test_resources_to_tuple_expected(resources, expected_tuple):
             (
                 Resource(filename='myfile.txt', content='gaze'),
             ),
-            id='single_gaze_resource_gaze',
+            id='single_gaze_filter_gaze',
         ),
 
         pytest.param(
             Resources.from_dicts([{'filename': 'myfile.txt', 'content': 'gaze'}]),
             'precomputed_events',
             tuple(),
-            id='single_gaze_resource_precomputed_events',
+            id='single_gaze_filter_precomputed_events',
         ),
 
         pytest.param(
@@ -397,17 +325,60 @@ def test_resources_to_tuple_expected(resources, expected_tuple):
             (
                 Resource(filename='events.csv', content='precomputed_events'),
             ),
-            id='single_precomputed_events_resource_precomputed_events',
+            id='single_precomputed_events_filter_precomputed_events',
         ),
 
         pytest.param(
             Resources.from_dicts([{'filename': 'events.csv', 'content': 'precomputed_events'}]),
             'gaze',
             tuple(),
-            id='single_precomputed_events_resource_gaze',
+            id='single_precomputed_events_filter_gaze',
+        ),
+
+        pytest.param(
+            Resources.from_dicts(
+                [
+                    {'filename': 'myfile.txt', 'content': 'gaze'},
+                    {'filename': 'events.csv', 'content': 'precomputed_events'},
+                ],
+            ),
+            None,
+            (
+                    Resource(filename='myfile.txt', content='gaze'),
+                    Resource(filename='events.csv', content='precomputed_events'),
+            ),
+            id='gaze_and_precomputed_events_filter_none',
+        ),
+
+        pytest.param(
+            Resources.from_dicts(
+                [
+                    {'filename': 'myfile.txt', 'content': 'gaze'},
+                    {'filename': 'events.csv', 'content': 'precomputed_events'},
+                ],
+            ),
+            'gaze',
+            (
+                    Resource(filename='myfile.txt', content='gaze'),
+            ),
+            id='gaze_and_precomputed_events_filter_gaze',
+        ),
+
+        pytest.param(
+            Resources.from_dicts(
+                [
+                    {'filename': 'myfile.txt', 'content': 'gaze'},
+                    {'filename': 'events.csv', 'content': 'precomputed_events'},
+                ],
+            ),
+            'precomputed_events',
+            (
+                    Resource(filename='events.csv', content='precomputed_events'),
+            ),
+            id='gaze_and_precomputed_events_filter_precomputed_events',
         ),
 
     ],
 )
-def test_resources_get_expected(resources, content_type, expected_tuple):
-    assert resources.get(content_type) == expected_tuple
+def test_resources_filter_expected(resources, content_type, expected_tuple):
+    assert resources.filter(content_type) == expected_tuple
