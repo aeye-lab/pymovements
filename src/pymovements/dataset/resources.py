@@ -32,10 +32,27 @@ ContentType = Literal[
 
 
 @dataclass
-class Resources:
-    resources: tuple[dict[str, str]] | None = None
+class Resource:
+    content: ContentType
+    filename: str
+    url: str | None = None
+    md5: str | None = None
 
-    def get(self, content: ContentType | None = None) -> tuple[dict[str, str]]:
+    @staticmethod
+    def from_dict(dictionary: dict[str, str]) -> Resource:
+        if 'resource' in dictionary:
+            url = dictionary['resource']
+            dictionary = {key: value for key, value in dictionary.items() if key != 'resource'}
+            dictionary['url'] = url
+
+        return Resource(**dictionary)
+
+
+@dataclass
+class Resources:
+    resources: tuple[Resource, ...] | None = None
+
+    def get(self, content: ContentType | None = None) -> tuple[dict[str, str | None], ...]:
         if not self.resources:
             return tuple()
 
@@ -44,31 +61,41 @@ class Resources:
 
         return tuple(
             [
-                resource for resource in self.resources if resource['content'] == content
+                resource for resource in self.resources if resource.content == content
             ],
         )
 
     @staticmethod
-    def from_dict(dictionary: dict[str, list[dict[str, str]] | tuple[dict[str, str]]] | None):
+    def from_dict(
+            dictionary: dict[str, list[dict[str, str | None]]]
+                        | dict[str, tuple[dict[str, str | None]], ...]
+                        | None,
+    ) -> Resources:
         if dictionary is None:
             return Resources(None)
 
         resources = []
-        for content, content_resources in dictionary.items():
-            for content_resource in content_resources:
-                print(content_resource)
-                resource = deepcopy(content_resource)
-                resource['content'] = content
+        for content_type, content_dictionaries in dictionary.items():
+            for content_dictionary in content_dictionaries:
+                content_dictionary = deepcopy(content_dictionary)
+                content_dictionary['content'] = content_type
+                resource = Resource.from_dict(content_dictionary)
                 resources.append(resource)
 
         return Resources(tuple(resources))
 
     @staticmethod
-    def from_dicts(dictionaries: list[dict[str, str]] | tuple[dict[str, str]] | None):
+    def from_dicts(
+            dictionaries: list[dict[str, str | None]] | tuple[dict[str, str | None]] | None,
+    ) -> Resources:
         if dictionaries is None:
             return Resources(None)
 
-        return Resources(tuple(dictionaries))
+        resources = [
+            Resource.from_dict(dictionary) for dictionary in dictionaries
+        ]
 
-    def to_tuple_of_dicts(self) -> tuple[dict[str, str]] | None:
+        return Resources(tuple(resources))
+
+    def to_tuple_of_dicts(self) -> tuple[dict[str, str | None], ...] | None:
         return self.resources
