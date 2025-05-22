@@ -26,6 +26,7 @@ import yaml
 from pymovements import DatasetDefinition
 from pymovements import DatasetLibrary
 from pymovements import Experiment
+from pymovements import Resources
 
 
 @pytest.mark.parametrize(
@@ -46,6 +47,33 @@ def test_dataset_definition_is_equal(init_kwargs):
     definition2 = DatasetDefinition(**init_kwargs)
 
     assert definition1 == definition2
+
+
+@pytest.mark.parametrize(
+    ('init_kwargs', 'expected_resources'),
+    [
+        pytest.param(
+            {},
+            None,
+            id='default',
+        ),
+
+        pytest.param(
+            {'resources': None},
+            None,
+            id='none',
+        ),
+
+        pytest.param(
+            {'resources': {}},
+            Resources(tuple()),
+            id='empty_dict',
+        ),
+    ],
+)
+def test_dataset_definition_resources_init_expected(init_kwargs, expected_resources):
+    definition = DatasetDefinition(**init_kwargs)
+    assert definition.resources == expected_resources
 
 
 @pytest.mark.parametrize(
@@ -98,7 +126,7 @@ def test_dataset_definition_is_equal(init_kwargs):
                 'mirrors': {},
                 'pixel_columns': None,
                 'position_columns': None,
-                'resources': {},
+                'resources': None,
                 'time_column': None,
                 'time_unit': None,
                 'trial_columns': None,
@@ -162,7 +190,7 @@ def test_dataset_definition_is_equal(init_kwargs):
                 'mirrors': {},
                 'pixel_columns': None,
                 'position_columns': None,
-                'resources': {},
+                'resources': None,
                 'time_column': None,
                 'time_unit': None,
                 'trial_columns': None,
@@ -214,7 +242,7 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
                 'mirrors': {},
                 'pixel_columns': None,
                 'position_columns': None,
-                'resources': {},
+                'resources': None,
                 'time_column': None,
                 'time_unit': None,
                 'trial_columns': None,
@@ -259,7 +287,7 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
                 'mirrors': {},
                 'pixel_columns': None,
                 'position_columns': None,
-                'resources': {},
+                'resources': None,
                 'time_column': None,
                 'time_unit': None,
                 'trial_columns': None,
@@ -639,7 +667,7 @@ def test_dataset_definition_not_equal():
                 'long_name': None,
                 'has_files': {},
                 'mirrors': {},
-                'resources': {},
+                'resources': None,
                 'experiment': None,
                 'extract': {},
                 'filename_format': {},
@@ -667,7 +695,7 @@ def test_dataset_definition_not_equal():
                 'long_name': None,
                 'has_files': {},
                 'mirrors': {},
-                'resources': {},
+                'resources': None,
                 'experiment': None,
                 'extract': {},
                 'filename_format': {},
@@ -695,7 +723,7 @@ def test_dataset_definition_not_equal():
                 'long_name': None,
                 'has_files': {},
                 'mirrors': {},
-                'resources': {},
+                'resources': None,
                 'experiment': {
                     'eyetracker': {
                         'sampling_rate': None,

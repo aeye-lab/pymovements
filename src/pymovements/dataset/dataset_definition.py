@@ -33,11 +33,12 @@ from pymovements.dataset._utils._resources import _HasResourcesIndexer
 from pymovements.dataset._utils._yaml import reverse_substitute_types
 from pymovements.dataset._utils._yaml import substitute_types
 from pymovements.dataset._utils._yaml import type_constructor
+from pymovements.dataset.resources import Resources
+from pymovements.dataset.resources import ResourcesLike
 from pymovements.gaze.experiment import Experiment
 
 
 yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
-
 
 @repr_html()
 @dataclass
@@ -153,9 +154,7 @@ class DatasetDefinition:
 
     mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] = field(default_factory=dict)
 
-    resources: dict[str, list[dict[str, str]]] | dict[str, tuple[dict[str, str], ...]] = field(
-        default_factory=dict,
-    )
+    resources: ResourcesLike | None = None
 
     experiment: Experiment | None = field(default_factory=Experiment)
 
@@ -230,6 +229,8 @@ class DatasetDefinition:
             Dictionary representation of dataset definition.
         """
         data = asdict(self)
+
+        data['resources'] = list(data['resources']['resources'])
 
         # Delete private fields from dictionary.
         if exclude_private:
@@ -316,3 +317,10 @@ class DatasetDefinition:
         # A better way to update the resources would be through a resources setter property.
         self._has_resources.set_resources(self.resources)
         return self._has_resources
+
+    def __post_init__(self):
+        if self.resources is not None and not isinstance(self.resources, Resources):
+            if isinstance(self.resources, dict):
+                self.resources = Resources.from_dict(self.resources)
+            else:
+                self.resources = Resources.from_dicts(self.resources)
