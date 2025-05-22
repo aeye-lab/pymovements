@@ -17,29 +17,39 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Resources and Resource module."""
 from __future__ import annotations
 
+from collections.abc import Iterable
 from copy import deepcopy
 from dataclasses import asdict
 from dataclasses import dataclass
-from typing import Literal, Any
-
-ContentType = Literal[
-    'gaze',
-    'precomputed_events',
-    'precomputed_reading_measures',
-]
+from typing import Any
 
 
 @dataclass
 class Resource:
-    content: ContentType
+    """Resource definition."""
+
+    content: str
     filename: str | None = None
     url: str | None = None
     md5: str | None = None
 
     @staticmethod
-    def from_dict(dictionary: dict[str, str]) -> Resource:
+    def from_dict(dictionary: dict[str, Any]) -> Resource:
+        """Create a ``Resource`` instance from a dictionary.
+
+        Parameters
+        ----------
+        dictionary : dict[str, Any]
+            A dictionary containing Resource parameters.
+
+        Returns
+        -------
+        Resource
+            An initialized ``Resource`` instance.
+        """
         if 'resource' in dictionary:
             url = dictionary['resource']
             dictionary = {key: value for key, value in dictionary.items() if key != 'resource'}
@@ -47,7 +57,21 @@ class Resource:
 
         return Resource(**dictionary)
 
-    def to_dict(self, *, exclude_none: bool = True) -> dict[str, str | None]:
+    def to_dict(self, *, exclude_none: bool = True) -> dict[str, Any]:
+        """Convert the ``Resource`` instance into a dictionary.
+
+        Parameters
+        ----------
+        exclude_none: bool
+            Exclude attributes that are either ``None`` or that are objects that evaluate to
+            ``False`` (e.g., ``[]``, ``{}``). Attributes of type ``bool``, ``int``, and ``float``
+            are not excluded.
+
+        Returns
+        -------
+        dict[str, Any]
+            ``dict`` representation of ``Resource``.
+        """
         data = asdict(self)
 
         # Delete fields that evaluate to False (False, None, [], {})
@@ -60,12 +84,26 @@ class Resource:
 
 
 class Resources(list):
-    def __new__(cls, *resources):
-        if resources is None:
-            return cls.__new__(tuple())
-        return super().__new__(cls, resources)
+    """List of ``Resource`` instances."""
 
-    def filter(self, content: ContentType | None = None) -> tuple[dict[str, str | None], ...]:
+    def __init__(self, resources: Iterable[Resource]) -> Resources:
+        if resources is None:
+            super().__init__([])
+        super().__init__(resources)
+
+    def filter(self, content: str | None = None) -> Resources:
+        """Filter ``Resources`` for content type.
+
+        Parameters
+        ----------
+        content: str | None
+            The content type to filter for. If ``None``, then don't filter. (default: None)
+
+        Returns
+        -------
+        Resources
+            A new ``Resources`` instance that contains only resources of specified content type.
+        """
         if content is None:
             return self
 
@@ -74,10 +112,21 @@ class Resources(list):
 
     @staticmethod
     def from_dict(
-            dictionary: dict[str, list[dict[str, str | None]]]
-        | dict[str, tuple[dict[str, str | None]], ...]
+        dictionary: dict[str, list[dict[str, str | None] | tuple[dict[str, str | None]]]]
         | None,
     ) -> Resources:
+        """Create a ``Resources`` instance from a dictionary of lists of dictionaries.
+
+        Parameters
+        ----------
+        dictionary : dict[str, list[dict[str, str | None] | tuple[dict[str, str | None]]]] | None
+            A list of dictionaries containing ``Resource`` parameters.
+
+        Returns
+        -------
+        Resources
+            An initialized ``Resources`` instance.
+        """
         if dictionary is None:
             return Resources()
 
@@ -94,9 +143,19 @@ class Resources(list):
         return Resources(resources)
 
     @staticmethod
-    def from_dicts(
-            dictionaries: list[dict[str, str | None]] | tuple[dict[str, str | None]] | None,
-    ) -> Resources:
+    def from_dicts(dictionaries: list[dict[str, Any]] | None) -> Resources:
+        """Create a ``Resources`` instance from a list of dictionaries.
+
+        Parameters
+        ----------
+        dictionaries : list[dict[str, Any]] | None
+            A list of dictionaries containing ``Resource`` parameters.
+
+        Returns
+        -------
+        Resources
+            An initialized ``Resources`` instance.
+        """
         if dictionaries is None:
             return Resources()
 
@@ -104,15 +163,37 @@ class Resources(list):
 
         return Resources(resources)
 
-    def to_dicts(self, *, exclude_none: bool = True) -> list[dict[str, str | None]] | None:
+    def to_dicts(self, *, exclude_none: bool = True) -> list[dict[str, Any]]:
+        """Convert the ``Resources`` instance into a list of dictionaries.
+
+        Parameters
+        ----------
+        exclude_none: bool
+            Exclude attributes that are either ``None`` or that are objects that evaluate to
+            ``False`` (e.g., ``[]``, ``{}``). Attributes of type ``bool``, ``int``, and ``float``
+            are not excluded.
+
+        Returns
+        -------
+        list[dict[str, Any]]
+            ``Resource`` as a list of dictionaries.
+        """
         return [resource.to_dict(exclude_none=exclude_none) for resource in self]
 
-    def has_content(self, content: str):
-        # Check if any resources are actually set in dictionary.
-        for resource in self:
-            if resource.content == content:
-                return True
-        return False
+    def has_content(self, content: str) -> bool:
+        """Check if any ``Resource`` has specific content.
+
+        Parameters
+        ----------
+        content: str
+            content type
+
+        Returns
+        -------
+        bool
+            ``True`` if contains ``Resource`` of specific content type.
+        """
+        return any(resource.content == content for resource in self)
 
 
 class _HasResourcesIndexer:
@@ -125,7 +206,7 @@ class _HasResourcesIndexer:
     def __init__(self) -> None:
         self._resources: Resources = {}
 
-    def set_resources(self, resources: _Resources) -> None:
+    def set_resources(self, resources: Resources) -> None:
         """Set dataset definition resources for lookup."""
         self._resources = resources
 

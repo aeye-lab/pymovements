@@ -33,7 +33,8 @@ from pymovements._utils._html import repr_html
 from pymovements.dataset._utils._yaml import reverse_substitute_types
 from pymovements.dataset._utils._yaml import substitute_types
 from pymovements.dataset._utils._yaml import type_constructor
-from pymovements.dataset.resources import Resources, _HasResourcesIndexer
+from pymovements.dataset.resources import _HasResourcesIndexer
+from pymovements.dataset.resources import Resources
 from pymovements.gaze.experiment import Experiment
 
 
@@ -64,7 +65,7 @@ class DatasetDefinition:
     mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]]
         A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
         (default: field(default_factory=dict))
-    resources: dict[str, list[dict[str, str]]] | dict[str, tuple[dict[str, str], ...]]
+    resources: Resources | ResourceLike | None
         A list of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -235,8 +236,7 @@ class DatasetDefinition:
         dict[str, Any]
             Dictionary representation of dataset definition.
         """
-        dict_factory = asdict_factory(exclude_private=exclude_private, exclude_none=exclude_none)
-        data = asdict(self, dict_factory=dict_factory)
+        data = asdict(self)
 
         # Delete private fields from dictionary.
         if exclude_private:
@@ -324,43 +324,9 @@ class DatasetDefinition:
         return self._has_resources
 
     def __post_init__(self):
+        """Handle special attributes."""
         if self.resources is not None and not isinstance(self.resources, Resources):
             if isinstance(self.resources, dict):
                 self.resources = Resources.from_dict(self.resources)
             else:
                 self.resources = Resources.from_dicts(self.resources)
-
-
-def asdict_factory(
-    *,
-    exclude_private: bool = True,
-    exclude_none: bool = True,
-):
-    """Return asdict_factory for being used in dataclasses.asdict().
-    Parameters
-    ----------
-    exclude_private: bool
-        Exclude attributes that start with ``_``.
-    exclude_none: bool
-        Exclude attributes that are either ``None`` or that are objects that evaluate to
-        ``False`` (e.g., ``[]``, ``{}``, ``EyeTracker()``). Attributes of type ``bool``,
-        ``int``, and ``float`` are not excluded.
-    Returns
-    -------
-    dict[str, Any]
-        Dictionary representation of dataset definition.
-    """
-    def _is_included(key: str, value: Any):
-        # Exclude private fields from dictionary.
-        if exclude_private and key.startswith('_'):
-            return False
-        # Exclude fields that evaluate to False (False, None, [], {}).
-        if exclude_none and not isinstance(value, (bool, int, float)) and not value:
-            return False
-        # Otherwise include item.
-        return True
-
-    def _dict_factory(data: list[tuple[str, Any]]) -> dict[str, Any]:
-        return dict(item for item in data if _is_included(*item))
-
-    return _dict_factory
