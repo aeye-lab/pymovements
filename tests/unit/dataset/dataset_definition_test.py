@@ -412,21 +412,9 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
         ),
 
         pytest.param(
-            1,
-            False,
-            id='int_resources',
-        ),
-
-        pytest.param(
             {'gaze': None},
             False,
             id='none_value_as_resources',
-        ),
-
-        pytest.param(
-            {'gaze': 1},
-            False,
-            id='int_as_resources_list',
         ),
 
         pytest.param(
@@ -496,16 +484,6 @@ def test_dataset_definition_has_resources_boolean(resources, expected_has_resour
         ),
 
         pytest.param(
-            1,
-            {
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            id='int_resources',
-        ),
-
-        pytest.param(
             {'gaze': None},
             {
                 'gaze': False,
@@ -513,16 +491,6 @@ def test_dataset_definition_has_resources_boolean(resources, expected_has_resour
                 'precomputed_reading_measures': False,
             },
             id='none_value_as_resources',
-        ),
-
-        pytest.param(
-            {'gaze': 1},
-            {
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            id='int_as_resources',
         ),
 
         pytest.param(

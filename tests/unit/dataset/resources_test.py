@@ -107,6 +107,19 @@ def test_resource_is_not_equal(resource1, resource2):
         pytest.param(
             {
                 'content': 'gaze',
+            },
+            Resource(
+                content='gaze',
+                filename=None,
+                url=None,
+                md5=None,
+            ),
+            id='content',
+        ),
+
+        pytest.param(
+            {
+                'content': 'gaze',
                 'filename': 'test.csv',
             },
             Resource(
@@ -181,10 +194,28 @@ def test_resource_from_dict_expected(resource_dict, expected_resource):
 
         pytest.param(
             {
+                'gaze': None,
+            },
+            Resources(),
+            id='none_gaze_list',
+        ),
+
+        pytest.param(
+            {
+                'gaze': [],
+            },
+            Resources(),
+            id='empty_gaze_list',
+        ),
+
+        pytest.param(
+            {
                 'gaze': [{'filename': 'myfile.txt'}],
             },
             Resources(
-                Resource(filename='myfile.txt', content='gaze'),
+                [
+                    Resource(filename='myfile.txt', content='gaze'),
+                ],
             ),
             id='single_gaze_resource',
         ),
@@ -194,8 +225,10 @@ def test_resource_from_dict_expected(resource_dict, expected_resource):
                 'gaze': [{'filename': 'myfile1.zip'}, {'filename': 'myfile2.zip'}],
             },
             Resources(
+                [
                 Resource(filename='myfile1.zip', content='gaze'),
                 Resource(filename='myfile2.zip', content='gaze'),
+                ],
             ),
             id='two_gaze_resources',
         ),
@@ -205,7 +238,9 @@ def test_resource_from_dict_expected(resource_dict, expected_resource):
                 'precomputed_events': [{'filename': 'myevents.csv'}],
             },
             Resources(
+                [
                 Resource(filename='myevents.csv', content='precomputed_events'),
+                ],
             ),
             id='single_precomputed_events_resource',
         ),
@@ -215,7 +250,12 @@ def test_resource_from_dict_expected(resource_dict, expected_resource):
                 'precomputed_reading_measures': [{'filename': 'reading_measures.csv'}],
             },
             Resources(
-                Resource(filename='reading_measures.csv', content='precomputed_reading_measures'),
+                [
+                Resource(
+                    filename='reading_measures.csv',
+                    content='precomputed_reading_measures',
+                ),
+                ],
             ),
             id='single_precomputed_events_resource',
         ),
@@ -227,111 +267,119 @@ def test_resources_from_dict_expected(init_resources, expected_resources):
 
 
 @pytest.mark.parametrize(
-    ('resources', 'expected_tuple'),
+    ('resources', 'expected_dicts'),
     [
         pytest.param(
             Resources(),
-            tuple(),
+            [],
             id='default',
         ),
 
         pytest.param(
             Resources(
+                [
                 Resource(filename='myfile.txt', content='gaze'),
+                ],
             ),
-            (
+            [
                 {'filename': 'myfile.txt', 'content': 'gaze'},
-            ),
+            ],
             id='single_gaze_resource',
         ),
 
         pytest.param(
             Resources(
+                [
                 Resource(filename='myfile1.zip', content='gaze'),
                 Resource(filename='myfile2.zip', content='gaze'),
+                ],
             ),
-            (
+            [
                 {'filename': 'myfile1.zip', 'content': 'gaze'},
                 {'filename': 'myfile2.zip', 'content': 'gaze'},
-            ),
+            ],
             id='two_gaze_resources',
         ),
 
         pytest.param(
             Resources(
+                [
                 Resource(filename='myevents.csv', content='precomputed_events'),
+                ],
             ),
-            (
+            [
                 {'filename': 'myevents.csv', 'content': 'precomputed_events'},
-            ),
+            ],
             id='single_precomputed_events_resource',
         ),
 
         pytest.param(
             Resources(
+                [
                 Resource(filename='reading_measures.csv', content='precomputed_reading_measures'),
+                ],
             ),
-            (
+            [
                 {
                     'filename': 'reading_measures.csv',
                     'content': 'precomputed_reading_measures',
                 },
-            ),
+            ],
             id='single_precomputed_events_resource',
         ),
 
     ],
 )
-def test_resources_to_dicts_expected(resources, expected_tuple):
-    assert resources.to_dicts() == expected_tuple
+def test_resources_to_dicts_expected(resources, expected_dicts):
+    assert resources.to_dicts() == expected_dicts
 
 
 @pytest.mark.parametrize(
-    ('resources', 'content_type', 'expected_tuple'),
+    ('resources', 'content_type', 'expected_resources'),
     [
         pytest.param(
             Resources(),
             None,
-            tuple(),
+            list(),
             id='default_filter_none',
         ),
 
         pytest.param(
             Resources(),
             'gaze',
-            tuple(),
+            list(),
             id='default_filter_gaze',
         ),
 
         pytest.param(
             Resources.from_dicts([{'filename': 'myfile.txt', 'content': 'gaze'}]),
             'gaze',
-            (
+            [
                 Resource(filename='myfile.txt', content='gaze'),
-            ),
+            ],
             id='single_gaze_filter_gaze',
         ),
 
         pytest.param(
             Resources.from_dicts([{'filename': 'myfile.txt', 'content': 'gaze'}]),
             'precomputed_events',
-            tuple(),
+            list(),
             id='single_gaze_filter_precomputed_events',
         ),
 
         pytest.param(
             Resources.from_dicts([{'filename': 'events.csv', 'content': 'precomputed_events'}]),
             'precomputed_events',
-            (
+            [
                 Resource(filename='events.csv', content='precomputed_events'),
-            ),
+            ],
             id='single_precomputed_events_filter_precomputed_events',
         ),
 
         pytest.param(
             Resources.from_dicts([{'filename': 'events.csv', 'content': 'precomputed_events'}]),
             'gaze',
-            tuple(),
+            list(),
             id='single_precomputed_events_filter_gaze',
         ),
 
@@ -343,10 +391,10 @@ def test_resources_to_dicts_expected(resources, expected_tuple):
                 ],
             ),
             None,
-            (
+            [
                 Resource(filename='myfile.txt', content='gaze'),
                 Resource(filename='events.csv', content='precomputed_events'),
-            ),
+            ],
             id='gaze_and_precomputed_events_filter_none',
         ),
 
@@ -358,9 +406,9 @@ def test_resources_to_dicts_expected(resources, expected_tuple):
                 ],
             ),
             'gaze',
-            (
+            [
                 Resource(filename='myfile.txt', content='gaze'),
-            ),
+            ],
             id='gaze_and_precomputed_events_filter_gaze',
         ),
 
@@ -372,13 +420,98 @@ def test_resources_to_dicts_expected(resources, expected_tuple):
                 ],
             ),
             'precomputed_events',
-            (
+            [
                 Resource(filename='events.csv', content='precomputed_events'),
-            ),
+            ],
             id='gaze_and_precomputed_events_filter_precomputed_events',
         ),
 
     ],
 )
-def test_resources_filter_expected(resources, content_type, expected_tuple):
-    assert resources.filter(content_type) == expected_tuple
+def test_resources_filter_expected(resources, content_type, expected_resources):
+    assert resources.filter(content_type) == expected_resources
+
+
+@pytest.mark.parametrize(
+    ('resources', 'expected_has_content'),
+    [
+        pytest.param(
+            Resources(),
+            {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='default',
+        ),
+
+        pytest.param(
+            Resources([]),
+            {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='empty_list',
+        ),
+
+        pytest.param(
+            Resources([Resource(content='gaze')]),
+            {
+                'gaze': True,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='gaze_resources',
+        ),
+
+        pytest.param(
+            Resources([Resource(content='precomputed_events')]),
+            {
+                'gaze': False,
+                'precomputed_events': True,
+                'precomputed_reading_measures': False,
+            },
+            id='precomputed_event_resources',
+        ),
+
+        pytest.param(
+            Resources([Resource(content='precomputed_reading_measures')]),
+            {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': True,
+            },
+            id='precomputed_reading_measures_resources',
+        ),
+
+        pytest.param(
+            Resources([
+                Resource(content='gaze'),
+                Resource(content='precomputed_events'),
+                Resource(content='precomputed_reading_measures'),
+            ],
+            ),
+            {
+                'gaze': True,
+                'precomputed_events': True,
+                'precomputed_reading_measures': True,
+            },
+            id='all_resources',
+        ),
+
+        pytest.param(
+            Resources([Resource(content='foo')]),
+            {
+                'foo': True,
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='custom_content',
+        ),
+    ],
+)
+def test_resources_has_content_expected(resources, expected_has_content):
+    for key, value in expected_has_content.items():
+        assert resources.has_content(key) == value, (resources, value)

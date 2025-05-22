@@ -30,11 +30,10 @@ from typing import Union
 import yaml
 
 from pymovements._utils._html import repr_html
-from pymovements.dataset._utils._resources import _HasResourcesIndexer
 from pymovements.dataset._utils._yaml import reverse_substitute_types
 from pymovements.dataset._utils._yaml import substitute_types
 from pymovements.dataset._utils._yaml import type_constructor
-from pymovements.dataset.resources import Resources
+from pymovements.dataset.resources import Resources, _HasResourcesIndexer
 from pymovements.gaze.experiment import Experiment
 
 
@@ -236,7 +235,8 @@ class DatasetDefinition:
         dict[str, Any]
             Dictionary representation of dataset definition.
         """
-        data = asdict(self)
+        dict_factory = asdict_factory(exclude_private=exclude_private, exclude_none=exclude_none)
+        data = asdict(self, dict_factory=dict_factory)
 
         # Delete private fields from dictionary.
         if exclude_private:
@@ -246,16 +246,15 @@ class DatasetDefinition:
 
         # Delete fields that evaluate to False (False, None, [], {})
         if exclude_none:
-            if not self.experiment:
-                del data['experiment']
-            else:
-                data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none)
-
             for key, value in list(data.items()):
                 if not isinstance(value, (bool, int, float)) and not value:
                     del data[key]
-        else:
-            data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none)
+
+        # Convert those object fields.
+        if 'experiment' in data and data['experiment'] is not None:
+            data['experiment'] = self.experiment.to_dict(exclude_none=exclude_none)
+        if 'resources' in data and data['resources'] is not None:
+            data['resources'] = self.resources.to_dicts(exclude_none=exclude_none)
 
         return data
 
@@ -330,3 +329,38 @@ class DatasetDefinition:
                 self.resources = Resources.from_dict(self.resources)
             else:
                 self.resources = Resources.from_dicts(self.resources)
+
+
+def asdict_factory(
+    *,
+    exclude_private: bool = True,
+    exclude_none: bool = True,
+):
+    """Return asdict_factory for being used in dataclasses.asdict().
+    Parameters
+    ----------
+    exclude_private: bool
+        Exclude attributes that start with ``_``.
+    exclude_none: bool
+        Exclude attributes that are either ``None`` or that are objects that evaluate to
+        ``False`` (e.g., ``[]``, ``{}``, ``EyeTracker()``). Attributes of type ``bool``,
+        ``int``, and ``float`` are not excluded.
+    Returns
+    -------
+    dict[str, Any]
+        Dictionary representation of dataset definition.
+    """
+    def _is_included(key: str, value: Any):
+        # Exclude private fields from dictionary.
+        if exclude_private and key.startswith('_'):
+            return False
+        # Exclude fields that evaluate to False (False, None, [], {}).
+        if exclude_none and not isinstance(value, (bool, int, float)) and not value:
+            return False
+        # Otherwise include item.
+        return True
+
+    def _dict_factory(data: list[tuple[str, Any]]) -> dict[str, Any]:
+        return dict(item for item in data if _is_included(*item))
+
+    return _dict_factory

@@ -22,7 +22,7 @@ from __future__ import annotations
 from copy import deepcopy
 from dataclasses import asdict
 from dataclasses import dataclass
-from typing import Literal
+from typing import Literal, Any
 
 ContentType = Literal[
     'gaze',
@@ -34,7 +34,7 @@ ContentType = Literal[
 @dataclass
 class Resource:
     content: ContentType
-    filename: str
+    filename: str | None = None
     url: str | None = None
     md5: str | None = None
 
@@ -48,18 +48,18 @@ class Resource:
         return Resource(**dictionary)
 
     def to_dict(self, *, exclude_none: bool = True) -> dict[str, str | None]:
-        _dict = asdict(self)
+        data = asdict(self)
 
         # Delete fields that evaluate to False (False, None, [], {})
         if exclude_none:
-            for key, value in list(_dict.items()):
+            for key, value in list(data.items()):
                 if not isinstance(value, (bool, int, float)) and not value:
-                    del _dict[key]
+                    del data[key]
 
-        return _dict
+        return data
 
 
-class Resources(tuple):
+class Resources(list):
     def __new__(cls, *resources):
         if resources is None:
             return cls.__new__(tuple())
@@ -70,7 +70,7 @@ class Resources(tuple):
             return self
 
         resources = [resource for resource in self if resource.content == content]
-        return Resources(*resources)
+        return Resources(resources)
 
     @staticmethod
     def from_dict(
@@ -83,26 +83,69 @@ class Resources(tuple):
 
         resources = []
         for content_type, content_dictionaries in dictionary.items():
+            if not content_dictionaries:
+                continue
             for content_dictionary in content_dictionaries:
                 content_dictionary = deepcopy(content_dictionary)
                 content_dictionary['content'] = content_type
                 resource = Resource.from_dict(content_dictionary)
                 resources.append(resource)
 
-        return Resources(*resources)
+        return Resources(resources)
 
     @staticmethod
     def from_dicts(
             dictionaries: list[dict[str, str | None]] | tuple[dict[str, str | None]] | None,
     ) -> Resources:
         if dictionaries is None:
-            return Resources(None)
+            return Resources()
 
-        resources = [
-            Resource.from_dict(dictionary) for dictionary in dictionaries
-        ]
+        resources = [Resource.from_dict(dictionary) for dictionary in dictionaries]
 
-        return Resources(*resources)
+        return Resources(resources)
 
-    def to_dicts(self) -> tuple[dict[str, str | None], ...] | None:
-        return tuple([resource.to_dict() for resource in self])
+    def to_dicts(self, *, exclude_none: bool = True) -> list[dict[str, str | None]] | None:
+        return [resource.to_dict(exclude_none=exclude_none) for resource in self]
+
+    def has_content(self, content: str):
+        # Check if any resources are actually set in dictionary.
+        for resource in self:
+            if resource.content == content:
+                return True
+        return False
+
+
+class _HasResourcesIndexer:
+    """Helper class for :py:meth:`~pymovements.dataset.DatasetDefinition.has_resources` property.
+
+    Provides dynamic inference on the presence of any
+    :py:meth:`~pymovements.dataset.DatasetDefinition.resources`.
+    """
+
+    def __init__(self) -> None:
+        self._resources: Resources = {}
+
+    def set_resources(self, resources: _Resources) -> None:
+        """Set dataset definition resources for lookup."""
+        self._resources = resources
+
+    def __getitem__(self, key: str) -> bool:
+        """Lookup if resources of specific content are set."""
+        return self.__bool__() and self._resources.has_content(key)
+
+    def __bool__(self) -> bool:
+        """Lookup if resources of any content are set."""
+        return bool(self._resources)
+
+    def __eq__(self, other: Any) -> bool:
+        """Return self == other.
+
+        Automatically casts to bool if compared to a boolean.
+        """
+        if isinstance(other, bool):  # Needed to check equality against booleans.
+            return self.__bool__() == other
+        return super().__eq__(other)
+
+    def __repr__(self) -> str:
+        """Return string with boolean value wheter any resources are set."""
+        return str(self.__bool__())
