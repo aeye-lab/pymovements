@@ -107,7 +107,7 @@ def test_resources_is_not_equal(resources1, resources2):
             },
             Resources(
                 resources=(
-                        {'filename': 'myevents.csv', 'content': 'precomputed_events'},
+                    {'filename': 'myevents.csv', 'content': 'precomputed_events'},
                 ),
             ),
             id='single_precomputed_events_resource',
@@ -119,10 +119,10 @@ def test_resources_is_not_equal(resources1, resources2):
             },
             Resources(
                 resources=(
-                        {
-                            'filename': 'reading_measures.csv',
-                            'content': 'precomputed_reading_measures',
-                        },
+                    {
+                        'filename': 'reading_measures.csv',
+                        'content': 'precomputed_reading_measures',
+                    },
                 ),
             ),
             id='single_precomputed_events_resource',
@@ -156,7 +156,7 @@ def test_resources_from_dict_expected(init_resources, expected_resources):
                 ),
             ),
             (
-                    {'filename': 'myfile.txt', 'content': 'gaze'},
+                {'filename': 'myfile.txt', 'content': 'gaze'},
             ),
             id='single_gaze_resource',
         ),
@@ -169,8 +169,8 @@ def test_resources_from_dict_expected(init_resources, expected_resources):
                 ),
             ),
             (
-                    {'filename': 'myfile1.zip', 'content': 'gaze'},
-                    {'filename': 'myfile2.zip', 'content': 'gaze'},
+                {'filename': 'myfile1.zip', 'content': 'gaze'},
+                {'filename': 'myfile2.zip', 'content': 'gaze'},
             ),
             id='two_gaze_resources',
         ),
@@ -178,11 +178,11 @@ def test_resources_from_dict_expected(init_resources, expected_resources):
         pytest.param(
             Resources(
                 resources=(
-                        {'filename': 'myevents.csv', 'content': 'precomputed_events'},
+                    {'filename': 'myevents.csv', 'content': 'precomputed_events'},
                 ),
             ),
             (
-                    {'filename': 'myevents.csv', 'content': 'precomputed_events'},
+                {'filename': 'myevents.csv', 'content': 'precomputed_events'},
             ),
             id='single_precomputed_events_resource',
         ),
@@ -190,17 +190,17 @@ def test_resources_from_dict_expected(init_resources, expected_resources):
         pytest.param(
             Resources(
                 resources=(
-                        {
-                            'filename': 'reading_measures.csv',
-                            'content': 'precomputed_reading_measures',
-                        },
-                ),
-            ),
-            (
                     {
                         'filename': 'reading_measures.csv',
                         'content': 'precomputed_reading_measures',
                     },
+                ),
+            ),
+            (
+                {
+                    'filename': 'reading_measures.csv',
+                    'content': 'precomputed_reading_measures',
+                },
             ),
             id='single_precomputed_events_resource',
         ),

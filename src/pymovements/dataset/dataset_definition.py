@@ -40,6 +40,7 @@ from pymovements.gaze.experiment import Experiment
 
 yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
 
+
 @repr_html()
 @dataclass
 class DatasetDefinition:
