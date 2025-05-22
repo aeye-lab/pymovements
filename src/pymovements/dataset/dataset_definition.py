@@ -39,10 +39,10 @@ from pymovements.gaze.experiment import Experiment
 
 
 ResourcesLike = Union[
-    list[dict[str, str | None]],
-    tuple[dict[str, str | None]],
-    dict[str, list[dict[str, str | None]]],
-    dict[str, tuple[dict[str, str | None], ...]],
+    list[dict[str, Union[str, None]]],
+    tuple[dict[str, Union[str, None]]],
+    dict[str, list[dict[str, Union[str, None]]]],
+    dict[str, tuple[dict[str, Union[str, None]], ...]],
 ]
 
 yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
