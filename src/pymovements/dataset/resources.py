@@ -22,7 +22,6 @@ from __future__ import annotations
 from copy import deepcopy
 from dataclasses import dataclass
 from typing import Literal
-from typing import Union
 
 
 ContentType = Literal[
@@ -73,12 +72,3 @@ class Resources:
 
     def to_tuple_of_dicts(self) -> tuple[dict[str, str]] | None:
         return self.resources
-
-
-ResourcesLike = Union[
-    Resources,
-    list[dict[str, str]],
-    tuple[dict[str, str]],
-    dict[str, list[dict[str, str]]],
-    dict[str, tuple[dict[str, str], ...]],
-]

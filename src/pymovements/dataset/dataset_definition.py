@@ -25,6 +25,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
 from typing import Any
+from typing import Union
 
 import yaml
 
@@ -34,9 +35,15 @@ from pymovements.dataset._utils._yaml import reverse_substitute_types
 from pymovements.dataset._utils._yaml import substitute_types
 from pymovements.dataset._utils._yaml import type_constructor
 from pymovements.dataset.resources import Resources
-from pymovements.dataset.resources import ResourcesLike
 from pymovements.gaze.experiment import Experiment
 
+
+ResourcesLike = Union[
+    list[dict[str, str]],
+    tuple[dict[str, str]],
+    dict[str, list[dict[str, str]]],
+    dict[str, tuple[dict[str, str], ...]],
+]
 
 yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
 
@@ -155,7 +162,7 @@ class DatasetDefinition:
 
     mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] = field(default_factory=dict)
 
-    resources: ResourcesLike | None = None
+    resources: Resources | ResourcesLike | None = None
 
     experiment: Experiment | None = field(default_factory=Experiment)
 
