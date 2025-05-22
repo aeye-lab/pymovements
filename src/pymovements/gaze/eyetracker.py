@@ -95,9 +95,15 @@ class EyeTracker:
         dict[str, Any]
             EyeTracker as dictionary.
         """
-        _asdict_factory = asdict_factory(exclude_none=exclude_none)
-        data = asdict(self, dict_factory=_asdict_factory)
-        return data
+        _dict = asdict(self)
+
+        # Delete fields that evaluate to False (False, None, [], {})
+        if exclude_none:
+            for key, value in list(_dict.items()):
+                if not isinstance(value, (bool, int, float)) and not value:
+                    del _dict[key]
+
+        return _dict
 
     def __bool__(self) -> bool:
         """Return True if the eyetracker has data defined, else False."""

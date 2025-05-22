@@ -29,7 +29,6 @@ from typing import Union
 
 import yaml
 
-from pymovements._utils._dataclasses import asdict_factory
 from pymovements._utils._html import repr_html
 from pymovements.dataset._utils._resources import _HasResourcesIndexer
 from pymovements.dataset._utils._yaml import reverse_substitute_types
@@ -237,11 +236,27 @@ class DatasetDefinition:
         dict[str, Any]
             Dictionary representation of dataset definition.
         """
-        _asdict_factory = asdict_factory(
-            exclude_private=exclude_private,
-            exclude_none=exclude_none,
-        )
-        data = asdict(self, dict_factory=_asdict_factory)
+        data = asdict(self)
+
+        # Delete private fields from dictionary.
+        if exclude_private:
+            for key in list(data.keys()):
+                if key.startswith('_'):
+                    del data[key]
+
+        # Delete fields that evaluate to False (False, None, [], {})
+        if exclude_none:
+            if not self.experiment:
+                del data['experiment']
+            else:
+                data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none)
+
+            for key, value in list(data.items()):
+                if not isinstance(value, (bool, int, float)) and not value:
+                    del data[key]
+        else:
+            data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none)
+
         return data
 
     def to_yaml(

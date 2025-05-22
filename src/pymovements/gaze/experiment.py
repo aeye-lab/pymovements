@@ -288,8 +288,6 @@ class Experiment:
 
         Parameters
         ----------
-        exclude_private: bool
-            Exclude attributes that start with ``_``.
         exclude_none: bool
             Exclude attributes that are either ``None`` or that are objects that evaluate to
             ``False`` (e.g., ``[]``, ``{}``, ``EyeTracker()``). Attributes of type ``bool``,
@@ -300,9 +298,17 @@ class Experiment:
         dict[str, Any | dict[str, str | float | None]]
             Experiment as dictionary.
         """
-        _asdict_factory = asdict_factory(exclude_none=exclude_none)
-        data = asdict(self, dict_factory=_asdict_factory)
-        return data
+        _dict: dict[str, dict[str, str | float | None]] = {}
+        if exclude_none:
+            if self.screen:
+                _dict['screen'] = self.screen.to_dict(exclude_none=exclude_none)
+            if self.eyetracker:
+                _dict['eyetracker'] = self.eyetracker.to_dict(exclude_none=exclude_none)
+        else:
+            _dict['screen'] = self.screen.to_dict(exclude_none=False)
+            _dict['eyetracker'] = self.eyetracker.to_dict(exclude_none=False)
+
+        return _dict
 
     def __str__(self: Experiment) -> str:
         """Return Experiment string."""
