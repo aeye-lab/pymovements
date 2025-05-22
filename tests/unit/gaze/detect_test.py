@@ -934,8 +934,8 @@ def test_gaze_detect_custom_method_no_arguments():
     gaze.detect(custom_method)
     assert_frame_equal(gaze.events.frame, expected.frame)
 
-@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('method', 'kwargs', 'gaze', 'exception', 'exception_msg'),
     [
@@ -1051,9 +1051,9 @@ def test_gaze_detect_missing_trial_column_events_raises_exception():
         "trial columns ['trial'] missing from events, "
         "available columns: ['name', 'onset', 'offset', 'duration']"
     )
-@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('method', 'column'),
     [

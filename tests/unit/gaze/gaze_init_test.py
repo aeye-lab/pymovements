@@ -1962,11 +1962,12 @@ def test_gaze_init_events(events, init_kwargs):
     # We don't want the events point to the same reference.
     assert gaze.events.frame is not expected_events
 
+
 def test_gaze_init_warnings():
     with pytest.warns(UserWarning) as record:
         GazeDataFrame(data={'a': [1, 2, 3]})
 
     expected_msg_prefix = 'GazeDataFrame contains data but no pixel/position/velocity/acceleration columns were specified'
 
-	assert len(record) == 1
+    assert len(record) == 1
     assert record[0].message.args[0].startswith(expected_msg_prefix)
