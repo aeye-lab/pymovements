@@ -328,7 +328,7 @@ class DatasetDefinition:
         self.experiment = self._initialize_experiment(experiment)
         self.resources = self._initialize_resources(resources)
         self._has_resources = _HasResourcesIndexer(resources=self.resources)
-        
+
         if self.extract is not None:
             warn(
                 DeprecationWarning(
