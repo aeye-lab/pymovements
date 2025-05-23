@@ -27,6 +27,7 @@ from dataclasses import field
 from pathlib import Path
 from typing import Any
 from typing import Union
+from warnings import warn
 
 import yaml
 
@@ -74,6 +75,8 @@ class DatasetDefinition:
         The experiment definition. (default: Experiment())
     extract: dict[str, bool] | None
         Decide whether to extract the data. (default: None)
+        .. deprecated:: v0.22.1
+        This field will be removed in v0.27.0.
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe. (default: field(default_factory=dict))
@@ -241,7 +244,7 @@ class DatasetDefinition:
 
     experiment: Experiment = field(default_factory=Experiment)
 
-    extract: dict[str, bool] | None = field(default=None)
+    extract: dict[str, bool] | None = None
 
     filename_format: dict[str, str] = field(default_factory=dict)
 
@@ -325,6 +328,14 @@ class DatasetDefinition:
         self.experiment = self._initialize_experiment(experiment)
         self.resources = self._initialize_resources(resources)
         self._has_resources = _HasResourcesIndexer(resources=self.resources)
+        
+        if self.extract is not None:
+            warn(
+                DeprecationWarning(
+                    'DatasetDefinition.extract is deprecated since version v0.22.1. '
+                    'This field will be removed in v0.27.0.',
+                ),
+            )
 
     @staticmethod
     def from_yaml(path: str | Path) -> DatasetDefinition:
