@@ -52,7 +52,7 @@ class Screen:
         distance for each sample in millimeters. (default: None)
     origin: str | None
         Specifies the screen location of the origin of the pixel
-        coordinate system. (default: 'upper left')
+        coordinate system. (default: None)
 
     Examples
     --------
@@ -87,7 +87,7 @@ class Screen:
     width_cm: float | None = None
     height_cm: float | None = None
     distance_cm: float | None = None
-    origin: str | None = 'upper left'
+    origin: str | None = None
 
     def __post_init__(self) -> None:
         """Check fields for validity."""
