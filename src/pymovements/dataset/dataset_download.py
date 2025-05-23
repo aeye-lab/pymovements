@@ -78,9 +78,6 @@ def download_dataset(
     RuntimeError
         If downloading a resource failed for all given mirrors.
     """
-    if not definition.resources:
-        raise AttributeError('resources must be specified to download dataset.')
-
     for content in ('gaze', 'precomputed_events', 'precomputed_reading_measures'):
         if definition.has_files[content]:
             if not definition.mirrors:
@@ -163,7 +160,7 @@ def extract_dataset(
                         verbose=verbose,
                     )
                 except UnknownFileType:  # just copy file to target if not an archive.
-                    shutil.copy(source_path, destination_dirpath / resource['filename'])
+                    shutil.copy(source_path, destination_dirpath / resource.filename)
 
 
 def _download_resources(
@@ -199,7 +196,7 @@ def _download_resource_without_mirrors(
     # pylint: disable=overlapping-except
     except (URLError, OSError, RuntimeError) as error:
         raise RuntimeError(
-            f"downloading resource {resource['resource']} failed.",
+            f"downloading resource {resource.url} failed.",
         ) from error
 
 
@@ -213,15 +210,12 @@ def _download_resource_with_mirrors(
     success = False
 
     for mirror_idx, mirror in enumerate(mirrors):
-
-        url = f'{mirror}{resource["resource"]}'
-
         try:
             download_file(
-                url=url,
+                url=f'{mirror}{resource.url}',
                 dirpath=target_dirpath,
-                filename=resource['filename'],
-                md5=resource['md5'],
+                filename=resource.filename,
+                md5=resource.md5,
                 verbose=verbose,
             )
             success = True
@@ -242,5 +236,5 @@ def _download_resource_with_mirrors(
 
     if not success:
         raise RuntimeError(
-            f"downloading resource {resource['resource']} failed for all mirrors.",
+            f"downloading resource {resource.url} failed for all mirrors.",
         )
