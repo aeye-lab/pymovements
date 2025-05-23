@@ -131,16 +131,15 @@ class DIDEC(DatasetDefinition):
     )
 
     resources: Resources = field(
-        default_factory=lambda: Resources.from_dict(
-            {
-                'gaze': [
-                    {
-                        'resource': 'https://didec.uvt.nl/corpus/DIDEC_only_the_eyetracking_data.zip',
-                        'filename': 'DIDEC_only_the_eyetracking_data.zip',
-                        'md5': 'd572b0b41828986ca48a2fcf6966728a',
-                    },
-                ],
-            },
+        default_factory=lambda: Resources.from_dicts(
+            [
+                {
+                    'content': 'gaze',
+                    'resource': 'https://didec.uvt.nl/corpus/DIDEC_only_the_eyetracking_data.zip',
+                    'filename': 'DIDEC_only_the_eyetracking_data.zip',
+                    'md5': 'd572b0b41828986ca48a2fcf6966728a',
+                },
+            ],
         ),
     )
 
