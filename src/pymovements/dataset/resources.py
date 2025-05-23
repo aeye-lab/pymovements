@@ -39,7 +39,7 @@ class Resource:
     md5: str | None = None
 
     @staticmethod
-    def from_dict(dictionary: dict[str, Any]) -> Resource:
+    def from_dict(dictionary: Mapping[str, Any]) -> Resource:
         """Create a ``Resource`` instance from a dictionary.
 
         Parameters
@@ -115,7 +115,7 @@ class Resources(list):
 
     @staticmethod
     def from_dict(
-        dictionary: Mapping[str, Sequence[Mapping[str, str | None]]] | None,
+        dictionary: Mapping[str, Sequence[Mapping[str, Any]]] | None,
     ) -> Resources:
         """Create a ``Resources`` instance from a dictionary of lists of dictionaries.
 

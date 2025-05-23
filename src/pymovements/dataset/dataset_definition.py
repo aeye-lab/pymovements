@@ -267,7 +267,7 @@ class DatasetDefinition:
             self,
             name: str = '.',
             long_name: str | None = None,
-            has_files: dict[str, bool] = None,
+            has_files: dict[str, bool] | None = None,
             mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] | None = None,
             resources: Resources | ResourcesLike | None = None,
             experiment: Experiment | dict[str, Any] | None = None,
@@ -287,9 +287,10 @@ class DatasetDefinition:
     ) -> None:
         self.name = name
         self.long_name = long_name
-        self.has_files = has_files
+
         self.mirrors = mirrors
         self.extract = extract
+
         self.trial_columns = trial_columns
         self.time_column = time_column
         self.time_unit = time_unit
@@ -298,6 +299,11 @@ class DatasetDefinition:
         self.velocity_columns = velocity_columns
         self.acceleration_columns = acceleration_columns
         self.distance_column = distance_column
+
+        if has_files is None:
+            self.has_files = {}
+        else:
+            self.has_files = has_files
 
         if filename_format is None:
             self.filename_format = {}
@@ -462,7 +468,7 @@ class DatasetDefinition:
         if experiment is None:
             return Experiment()
         if isinstance(experiment, dict):
-            return Experiment.from_dict(self.resources)
+            return Experiment.from_dict(experiment)
         return experiment
 
     def _initialize_resources(self, resources: Resources | ResourcesLike | None) -> Resources:
