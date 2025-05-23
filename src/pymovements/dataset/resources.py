@@ -21,7 +21,6 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from collections.abc import Mapping
 from collections.abc import Sequence
 from copy import deepcopy
 from dataclasses import asdict
@@ -39,7 +38,7 @@ class Resource:
     md5: str | None = None
 
     @staticmethod
-    def from_dict(dictionary: Mapping[str, Any]) -> Resource:
+    def from_dict(dictionary: dict[str, Any]) -> Resource:
         """Create a ``Resource`` instance from a dictionary.
 
         Parameters
@@ -115,13 +114,13 @@ class Resources(list):
 
     @staticmethod
     def from_dict(
-        dictionary: Mapping[str, Sequence[Mapping[str, Any]]] | None,
+        dictionary: dict[str, Sequence[dict[str, Any]]] | None,
     ) -> Resources:
         """Create a ``Resources`` instance from a dictionary of lists of dictionaries.
 
         Parameters
         ----------
-        dictionary : Mapping[str, Sequence[Mapping[str, str | None]]] | None
+        dictionary : dict[str, Sequence[dict[str, Any]]] | None
             A list of dictionaries containing ``Resource`` parameters.
 
         Returns
@@ -137,20 +136,22 @@ class Resources(list):
             if not content_dictionaries:
                 continue
             for content_dictionary in content_dictionaries:
-                content_dictionary = deepcopy(content_dictionary)
-                content_dictionary['content'] = content_type
-                resource = Resource.from_dict(content_dictionary)
+                _dictionary: dict[str, Any] = {
+                    key: deepcopy(value) for key, value in content_dictionary.items()
+                }
+                _dictionary['content'] = content_type
+                resource = Resource.from_dict(_dictionary)
                 resources.append(resource)
 
         return Resources(resources)
 
     @staticmethod
-    def from_dicts(dictionaries: list[dict[str, Any]] | None) -> Resources:
+    def from_dicts(dictionaries: Sequence[dict[str, Any]] | None) -> Resources:
         """Create a ``Resources`` instance from a list of dictionaries.
 
         Parameters
         ----------
-        dictionaries : list[dict[str, Any]] | None
+        dictionaries : Sequence[dict[str, Any]] | None
             A list of dictionaries containing ``Resource`` parameters.
 
         Returns

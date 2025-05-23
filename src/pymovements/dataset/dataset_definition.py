@@ -20,7 +20,6 @@
 """DatasetDefinition module."""
 from __future__ import annotations
 
-from collections.abc import Mapping
 from collections.abc import Sequence
 from dataclasses import asdict
 from dataclasses import dataclass
@@ -41,10 +40,8 @@ from pymovements.gaze.experiment import Experiment
 
 
 ResourcesLike = Union[
-    list[dict[str, Union[str, None]]],
-    tuple[dict[str, Union[str, None]]],
-    dict[str, list[dict[str, Union[str, None]]]],
-    dict[str, tuple[dict[str, Union[str, None]], ...]],
+    Sequence[dict[str, Any]],
+    dict[str, Sequence[dict[str, Any]]],
 ]
 
 yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
@@ -137,9 +134,9 @@ class DatasetDefinition:
         The name of the dataset. (default: '.')
     long_name: str | None
         The entire name of the dataset. (default: None)
-    has_files: dict[str, bool]
+    has_files: dict[str, bool] | None
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
-        'precomputed_reading_measures'.
+        'precomputed_reading_measures'. (default: None)
     mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] | None
         A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
         (default: None)
@@ -473,10 +470,13 @@ class DatasetDefinition:
 
     def _initialize_resources(self, resources: Resources | ResourcesLike | None) -> Resources:
         """Initailize ``Resources`` instance if necessary."""
+        if isinstance(resources, Resources):
+            return resources
         if resources is None:
             return Resources()
-        if isinstance(resources, Mapping):
+        if isinstance(resources, dict):
             return Resources.from_dict(resources)
         if isinstance(resources, Sequence):
+            assert isinstance(resources, Sequence)
             return Resources.from_dicts(resources)
-        return resources
+        raise TypeError()
