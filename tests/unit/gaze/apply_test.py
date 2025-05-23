@@ -27,6 +27,7 @@ import pymovements as pm
 from pymovements.synthetic import step_function
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('method', 'kwargs', 'gaze', 'expected'),
     [
@@ -110,6 +111,9 @@ from pymovements.synthetic import step_function
                 ),
             ),
             id='fill_fixation_10_ms_break_then_saccade_until_end_single_fill',
+            marks=pytest.mark.filterwarnings(
+                'ignore:GazeDataFrame contains data but no.*:UserWarning',
+            ),
         ),
 
         pytest.param(
@@ -243,6 +247,7 @@ def test_gaze_apply(method, kwargs, gaze, expected):
     assert_frame_equal(gaze.events.frame, expected.events.frame)
 
 
+@pytest.mark.filterwarnings("ignore:GazeDataFrame contains data but no.*:UserWarning")
 @pytest.mark.parametrize(
     ('method', 'kwargs', 'gaze', 'exception', 'exception_msg'),
     [
