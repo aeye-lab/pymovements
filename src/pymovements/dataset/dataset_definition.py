@@ -20,7 +20,8 @@
 """DatasetDefinition module."""
 from __future__ import annotations
 
-from collections.abc import Sequence, Mapping
+from collections.abc import Mapping
+from collections.abc import Sequence
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
@@ -63,19 +64,19 @@ class DatasetDefinition:
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-    mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]]
+    mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] | None
         A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
-        (default: field(default_factory=dict))
+        (default: None)
     resources: Resources | ResourcesLike | None
         A list of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
-        (default: field(default_factory=dict))
+        (default: None)
     experiment: Experiment | None
         The experiment definition. (default: None)
-    extract: dict[str, bool]
-        Decide whether to extract the data.
+    extract: dict[str, bool] | None
+        Decide whether to extract the data. (default: None)
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe. (default: field(default_factory=dict))

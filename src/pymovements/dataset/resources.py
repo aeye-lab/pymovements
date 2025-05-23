@@ -112,13 +112,14 @@ class Resources(list):
         return Resources(resources)
 
     @staticmethod
-    def from_dict(dictionary: dict[str, list[dict[str, str | None]]] | None,
+    def from_dict(
+        dictionary: Mappable[str, Sequence[Mappable[str, str | None]]] | None,
     ) -> Resources:
         """Create a ``Resources`` instance from a dictionary of lists of dictionaries.
 
         Parameters
         ----------
-        dictionary : dict[str, list[dict[str, str | None] | tuple[dict[str, str | None]]]] | None
+        dictionary : Mappable[str, Sequence[Mappable[str, str | None]]] | None
             A list of dictionaries containing ``Resource`` parameters.
 
         Returns
