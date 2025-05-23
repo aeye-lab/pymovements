@@ -25,6 +25,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
 from typing import Any
+from warnings import warn
 
 import yaml
 
@@ -64,8 +65,10 @@ class DatasetDefinition:
         (default: field(default_factory=dict))
     experiment: Experiment | None
         The experiment definition. (default: None)
-    extract: dict[str, bool]
-        Decide whether to extract the data.
+    extract: dict[str, bool] | None
+        Decide whether to extract the data. (default: None)
+        .. deprecated:: v0.22.1
+        This field will be removed in v0.27.0.
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe. (default: field(default_factory=dict))
@@ -159,7 +162,7 @@ class DatasetDefinition:
 
     experiment: Experiment | None = field(default_factory=Experiment)
 
-    extract: dict[str, bool] = field(default_factory=dict)
+    extract: dict[str, bool] | None = None
 
     filename_format: dict[str, str] = field(default_factory=dict)
 
@@ -316,3 +319,13 @@ class DatasetDefinition:
         # A better way to update the resources would be through a resources setter property.
         self._has_resources.set_resources(self.resources)
         return self._has_resources
+
+    def __post_init__(self) -> None:
+        """Handle special attributes."""
+        if self.extract is not None:
+            warn(
+                DeprecationWarning(
+                    'DatasetDefinition.extract is deprecated since version v0.22.1. '
+                    'This field will be removed in v0.27.0.',
+                ),
+            )
