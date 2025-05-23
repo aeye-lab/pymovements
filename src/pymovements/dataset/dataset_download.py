@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import shutil
+from collections.abc import Sequence
 from pathlib import Path
 from urllib.error import URLError
 from warnings import warn
@@ -29,6 +30,8 @@ from pymovements.dataset._utils._archives import extract_archive
 from pymovements.dataset._utils._downloads import download_file
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
+from pymovements.dataset.resources import Resource
+from pymovements.dataset.resources import Resources
 from pymovements.exceptions import UnknownFileType
 
 
@@ -164,8 +167,8 @@ def extract_dataset(
 
 
 def _download_resources(
-        mirrors: list[str] | tuple[str, ...] | None,
-        resources: list[dict[str, str]] | tuple[dict[str, str], ...],
+        mirrors: Sequence[str] | None,
+        resources: Resources,
         target_dirpath: Path,
         verbose: bool,
 ) -> None:
@@ -179,11 +182,16 @@ def _download_resources(
 
 
 def _download_resource_without_mirrors(
-        resource: dict[str, str],
+        resource: Resource,
         target_dirpath: Path,
         verbose: bool,
 ) -> None:
-    """Download resouce without mirrors."""
+    """Download resource without mirrors."""
+    if resource.url is None:
+        raise TypeError()
+    if resource.filename is None:
+        raise TypeError()
+
     try:
         download_file(
             url=resource.url,
@@ -201,12 +209,17 @@ def _download_resource_without_mirrors(
 
 
 def _download_resource_with_mirrors(
-        mirrors: list[str] | tuple[str, ...],
-        resource: dict[str, str],
+        mirrors: Sequence[str],
+        resource: Resource,
         target_dirpath: Path,
         verbose: bool,
 ) -> None:
     """Download resource with mirrors."""
+    if resource.url is None:
+        raise TypeError()
+    if resource.filename is None:
+        raise TypeError()
+
     success = False
 
     for mirror_idx, mirror in enumerate(mirrors):

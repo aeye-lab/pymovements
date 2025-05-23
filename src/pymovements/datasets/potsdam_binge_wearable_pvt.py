@@ -20,6 +20,7 @@
 """Provides a definition for the PotsdamBingeWearablePVT dataset."""
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
@@ -57,7 +58,7 @@ class PotsdamBingeWearablePVT(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, list[str]]
+    mirrors: dict[str, Sequence[str]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: Resources
@@ -142,7 +143,8 @@ class PotsdamBingeWearablePVT(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-    mirrors: dict[str, list[str]] = field(
+
+    mirrors: dict[str, Sequence[str]] = field(
         default_factory=lambda: {
             'gaze': ['https://osf.io/download/'],
         },

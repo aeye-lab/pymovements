@@ -62,9 +62,9 @@ class DatasetDefinition:
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-    mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] | None
+    mirrors: dict[str, Sequence[str]]
         A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
-        (default: None)
+        (default: {})
     resources: Resources
         A list of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -140,7 +140,7 @@ class DatasetDefinition:
     has_files: dict[str, bool] | None
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'. (default: None)
-    mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] | None
+    mirrors: dict[str, Sequence[str]] | None
         A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
         (default: None)
     resources: Resources | ResourcesLike | None
@@ -268,7 +268,7 @@ class DatasetDefinition:
             name: str = '.',
             long_name: str | None = None,
             has_files: dict[str, bool] | None = None,
-            mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] | None = None,
+            mirrors: dict[str, Sequence[str]] | None = None,
             resources: Resources | ResourcesLike | None = None,
             experiment: Experiment | dict[str, Any] | None = None,
             extract: dict[str, bool] | None = None,
