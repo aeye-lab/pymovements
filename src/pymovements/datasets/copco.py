@@ -25,6 +25,7 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import Resources
 from pymovements.gaze.experiment import Experiment
 
 
@@ -134,7 +135,7 @@ class CopCo(DatasetDefinition):
     )
 
     resources: dict[str, list[dict[str, str | None]]] = field(
-        default_factory=lambda: {
+        default_factory=lambda: Resources.from_dict({
             'gaze': [
                 {
                     'resource': 'https://osf.io/download/bg9r4/',
@@ -159,6 +160,7 @@ class CopCo(DatasetDefinition):
                 },
             ],
         },
+        ),
     )
 
     experiment: Experiment = field(

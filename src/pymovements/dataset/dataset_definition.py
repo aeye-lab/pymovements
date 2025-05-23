@@ -238,7 +238,7 @@ class DatasetDefinition:
 
     has_files: dict[str, bool] = field(default_factory=dict)
 
-    mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] | None = field(default=None)
+    mirrors: dict[str, Sequence[str]] = field(default_factory=dict)
 
     resources: Resources = field(default_factory=Resources)
 
@@ -288,7 +288,6 @@ class DatasetDefinition:
         self.name = name
         self.long_name = long_name
 
-        self.mirrors = mirrors
         self.extract = extract
 
         self.trial_columns = trial_columns
@@ -304,6 +303,11 @@ class DatasetDefinition:
             self.has_files = {}
         else:
             self.has_files = has_files
+
+        if mirrors is None:
+            self.mirrors = {}
+        else:
+            self.mirrors = mirrors
 
         if filename_format is None:
             self.filename_format = {}

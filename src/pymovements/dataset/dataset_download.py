@@ -150,7 +150,7 @@ def extract_dataset(
             destination_dirpath = getattr(paths, content_directory)
             destination_dirpath.mkdir(parents=True, exist_ok=True)
             for resource in definition.resources.filter(content):
-                source_path = paths.downloads / resource['filename']
+                source_path = paths.downloads / resource.filename
 
                 try:
                     extract_archive(
@@ -189,10 +189,10 @@ def _download_resource_without_mirrors(
     """Download resouce without mirrors."""
     try:
         download_file(
-            url=resource['resource'],
+            url=resource.url,
             dirpath=target_dirpath,
-            filename=resource['filename'],
-            md5=resource['md5'],
+            filename=resource.filename,
+            md5=resource.md5,
             verbose=verbose,
         )
 
