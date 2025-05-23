@@ -28,6 +28,7 @@ from pymovements import __version__
 from pymovements import DatasetDefinition
 from pymovements import DatasetLibrary
 from pymovements import Experiment
+from pymovements import Resources
 
 
 @pytest.mark.parametrize(
@@ -48,6 +49,39 @@ def test_dataset_definition_is_equal(init_kwargs):
     definition2 = DatasetDefinition(**init_kwargs)
 
     assert definition1 == definition2
+
+
+@pytest.mark.parametrize(
+    ('init_kwargs', 'expected_resources'),
+    [
+        pytest.param(
+            {},
+            Resources(),
+            id='default',
+        ),
+
+        pytest.param(
+            {'resources': None},
+            Resources(),
+            id='none',
+        ),
+
+        pytest.param(
+            {'resources': {}},
+            Resources(),
+            id='empty_dict',
+        ),
+
+        pytest.param(
+            {'resources': []},
+            Resources(),
+            id='empty_list',
+        ),
+    ],
+)
+def test_dataset_definition_resources_init_expected(init_kwargs, expected_resources):
+    definition = DatasetDefinition(**init_kwargs)
+    assert definition.resources == expected_resources
 
 
 @pytest.mark.parametrize(
@@ -97,10 +131,10 @@ def test_dataset_definition_is_equal(init_kwargs):
                 'extract': None,
                 'filename_format': {},
                 'filename_format_schema_overrides': {},
-                'mirrors': {},
+                'mirrors': None,
                 'pixel_columns': None,
                 'position_columns': None,
-                'resources': {},
+                'resources': [],
                 'time_column': None,
                 'time_unit': None,
                 'trial_columns': None,
@@ -161,10 +195,10 @@ def test_dataset_definition_is_equal(init_kwargs):
                 'extract': None,
                 'filename_format': {},
                 'filename_format_schema_overrides': {},
-                'mirrors': {},
+                'mirrors': None,
                 'pixel_columns': None,
                 'position_columns': None,
-                'resources': {},
+                'resources': [],
                 'time_column': None,
                 'time_unit': None,
                 'trial_columns': None,
@@ -213,10 +247,10 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
                 'extract': None,
                 'filename_format': {},
                 'filename_format_schema_overrides': {},
-                'mirrors': {},
+                'mirrors': None,
                 'pixel_columns': None,
                 'position_columns': None,
-                'resources': {},
+                'resources': [],
                 'time_column': None,
                 'time_unit': None,
                 'trial_columns': None,
@@ -261,7 +295,7 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
                 'mirrors': {},
                 'pixel_columns': None,
                 'position_columns': None,
-                'resources': {},
+                'resources': None,
                 'time_column': None,
                 'time_unit': None,
                 'trial_columns': None,
@@ -386,21 +420,9 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
         ),
 
         pytest.param(
-            1,
-            False,
-            id='int_resources',
-        ),
-
-        pytest.param(
             {'gaze': None},
             False,
             id='none_value_as_resources',
-        ),
-
-        pytest.param(
-            {'gaze': 1},
-            False,
-            id='int_as_resources_list',
         ),
 
         pytest.param(
@@ -470,16 +492,6 @@ def test_dataset_definition_has_resources_boolean(resources, expected_has_resour
         ),
 
         pytest.param(
-            1,
-            {
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            id='int_resources',
-        ),
-
-        pytest.param(
             {'gaze': None},
             {
                 'gaze': False,
@@ -487,16 +499,6 @@ def test_dataset_definition_has_resources_boolean(resources, expected_has_resour
                 'precomputed_reading_measures': False,
             },
             id='none_value_as_resources',
-        ),
-
-        pytest.param(
-            {'gaze': 1},
-            {
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            id='int_as_resources',
         ),
 
         pytest.param(
@@ -637,7 +639,7 @@ def test_dataset_definition_not_equal():
                 'long_name': None,
                 'has_files': {},
                 'mirrors': {},
-                'resources': {},
+                'resources': None,
                 'experiment': None,
                 'extract': None,
                 'filename_format': {},
@@ -665,7 +667,7 @@ def test_dataset_definition_not_equal():
                 'long_name': None,
                 'has_files': {},
                 'mirrors': {},
-                'resources': {},
+                'resources': None,
                 'experiment': None,
                 'extract': None,
                 'filename_format': {},
@@ -693,7 +695,7 @@ def test_dataset_definition_not_equal():
                 'long_name': None,
                 'has_files': {},
                 'mirrors': {},
-                'resources': {},
+                'resources': None,
                 'experiment': {
                     'eyetracker': {
                         'sampling_rate': None,

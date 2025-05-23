@@ -88,14 +88,14 @@ def download_dataset(
             else:
                 mirrors = definition.mirrors.get(content, None)
 
-            if not definition.resources[content]:
+            if not definition.resources.filter(content):
                 raise AttributeError(
                     f"'{content}' resources must be specified to download dataset.",
                 )
 
             _download_resources(
                 mirrors=mirrors,
-                resources=definition.resources[content],
+                resources=definition.resources.filter(content),
                 target_dirpath=paths.downloads,
                 verbose=verbose,
             )
@@ -149,7 +149,7 @@ def extract_dataset(
         if definition.has_files[content]:
             destination_dirpath = getattr(paths, content_directory)
             destination_dirpath.mkdir(parents=True, exist_ok=True)
-            for resource in definition.resources[content]:
+            for resource in definition.resources.filter(content):
                 source_path = paths.downloads / resource['filename']
 
                 try:

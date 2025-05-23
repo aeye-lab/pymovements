@@ -29,6 +29,7 @@ import pytest
 from pymovements import Dataset
 from pymovements import DatasetDefinition
 from pymovements import DatasetPaths
+from pymovements import Resources
 
 
 @pytest.fixture(
@@ -1185,13 +1186,13 @@ def test_dataset_download_default_extract_precomputed(
                 'precomputed_events': False,
                 'precomputed_reading_measures': False,
             },
-            resources={
+            resources=Resources.from_dict({
                 'gaze': [{
                     'resource': 'test.gz.tar',
                     'filename': 'test.gz.tar',
                     'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                 }],
-            },
+            }),
         ),
         DatasetDefinition(
             name='CustomPublicDataset',
@@ -1200,13 +1201,13 @@ def test_dataset_download_default_extract_precomputed(
                 'precomputed_events': True,
                 'precomputed_reading_measures': False,
             },
-            resources={
+            resources=Resources.from_dict({
                 'precomputed_events': [{
                     'resource': 'test.gz.tar',
                     'filename': 'test.gz.tar',
                     'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                 }],
-            },
+            }),
         ),
         DatasetDefinition(
             name='CustomPublicDataset',
@@ -1215,13 +1216,13 @@ def test_dataset_download_default_extract_precomputed(
                 'precomputed_events': False,
                 'precomputed_reading_measures': True,
             },
-            resources={
+            resources=Resources.from_dict({
                 'precomputed_reading_measures': [{
                     'resource': 'test.gz.tar',
                     'filename': 'test.gz.tar',
                     'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                 }],
-            },
+            }),
         ),
     ],
 )

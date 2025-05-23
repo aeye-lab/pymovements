@@ -27,6 +27,7 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import Resources
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
 from pymovements.gaze.screen import Screen
@@ -59,7 +60,7 @@ class PotsdamBingeWearablePVT(DatasetDefinition):
     mirrors: dict[str, list[str]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources: dict[str, list[dict[str, str]]]
+    resources: Resources
         A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -147,26 +148,28 @@ class PotsdamBingeWearablePVT(DatasetDefinition):
         },
     )
 
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda: {
-            'gaze': [
-                {
-                    'resource': '9vbs8/',
-                    'filename': 'a.zip',
-                    'md5': '87c6c74a9a17cbd093b91f9415e8dd9d',
-                },
-                {
-                    'resource': 'yqukn/',
-                    'filename': 'b.zip',
-                    'md5': '54038547b1a373253b38999a227dde63',
-                },
-                {
-                    'resource': 'yf2xa/',
-                    'filename': 'e.zip',
-                    'md5': 'a0d0203cbb273f6908c1b52a42750551',
-                },
-            ],
-        },
+    resources: Resources = field(
+        default_factory=lambda: Resources.from_dict(
+            {
+                'gaze': [
+                    {
+                        'resource': '9vbs8/',
+                        'filename': 'a.zip',
+                        'md5': '87c6c74a9a17cbd093b91f9415e8dd9d',
+                    },
+                    {
+                        'resource': 'yqukn/',
+                        'filename': 'b.zip',
+                        'md5': '54038547b1a373253b38999a227dde63',
+                    },
+                    {
+                        'resource': 'yf2xa/',
+                        'filename': 'e.zip',
+                        'md5': 'a0d0203cbb273f6908c1b52a42750551',
+                    },
+                ],
+            },
+        ),
     )
 
     experiment: Experiment = field(
