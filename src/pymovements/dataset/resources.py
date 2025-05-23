@@ -86,10 +86,11 @@ class Resource:
 class Resources(list):
     """List of ``Resource`` instances."""
 
-    def __init__(self, resources: Iterable[Resource]) -> Resources:
+    def __init__(self, resources: Iterable[Resource] | None = None) -> None:
         if resources is None:
             super().__init__([])
-        super().__init__(resources)
+        else:
+            super().__init__(resources)
 
     def filter(self, content: str | None = None) -> Resources:
         """Filter ``Resources`` for content type.
@@ -111,9 +112,7 @@ class Resources(list):
         return Resources(resources)
 
     @staticmethod
-    def from_dict(
-        dictionary: dict[str, list[dict[str, str | None] | tuple[dict[str, str | None]]]]
-        | None,
+    def from_dict(dictionary: dict[str, list[dict[str, str | None]]] | None,
     ) -> Resources:
         """Create a ``Resources`` instance from a dictionary of lists of dictionaries.
 
@@ -203,8 +202,8 @@ class _HasResourcesIndexer:
     :py:meth:`~pymovements.dataset.DatasetDefinition.resources`.
     """
 
-    def __init__(self) -> None:
-        self._resources: Resources = {}
+    def __init__(self, resources: Resources) -> None:
+        self._resources = resources
 
     def set_resources(self, resources: Resources) -> None:
         """Set dataset definition resources for lookup."""

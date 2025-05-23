@@ -20,6 +20,7 @@
 """DatasetDefinition module."""
 from __future__ import annotations
 
+from collections.abc import Sequence, Mapping
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
@@ -65,7 +66,7 @@ class DatasetDefinition:
     mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]]
         A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
         (default: field(default_factory=dict))
-    resources: Resources | ResourceLike | None
+    resources: Resources | ResourcesLike | None
         A list of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -160,13 +161,13 @@ class DatasetDefinition:
 
     has_files: dict[str, bool] = field(default_factory=dict)
 
-    mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] = field(default_factory=dict)
+    mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] | None = field(default=None)
 
-    resources: Resources | ResourcesLike | None = None
+    resources: Resources = field(default_factory=Resources)
 
-    experiment: Experiment | None = field(default_factory=Experiment)
+    experiment: Experiment = field(default_factory=Experiment)
 
-    extract: dict[str, bool] = field(default_factory=dict)
+    extract: dict[str, bool] | None = field(default=None)
 
     filename_format: dict[str, str] = field(default_factory=dict)
 
@@ -185,9 +186,65 @@ class DatasetDefinition:
     acceleration_columns: list[str] | None = None
     distance_column: str | None = None
 
-    _has_resources: _HasResourcesIndexer = field(
-        default_factory=_HasResourcesIndexer, init=False, repr=False, compare=False, hash=False,
-    )
+    def __init__(
+            self,
+            name: str = '.',
+            long_name: str | None = None,
+            has_files: dict[str, bool] = None,
+            mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] | None = None,
+            resources: Resources | ResourcesLike | None = None,
+            experiment: Experiment | dict[str, Any] | None = None,
+            extract: dict[str, bool] | None = None,
+            filename_format: dict[str, str] | None = None,
+            filename_format_schema_overrides: dict[str, dict[str, type]] | None = None,
+            custom_read_kwargs: dict[str, dict[str, Any]] | None = None,
+            column_map: dict[str, str] | None = None,
+            trial_columns: list[str] | None = None,
+            time_column: str | None = None,
+            time_unit: str | None = None,
+            pixel_columns: list[str] | None = None,
+            position_columns: list[str] | None = None,
+            velocity_columns: list[str] | None = None,
+            acceleration_columns: list[str] | None = None,
+            distance_column: str | None = None,
+    ) -> None:
+        self.name = name
+        self.long_name = long_name
+        self.has_files = has_files
+        self.mirrors = mirrors
+        self.extract = extract
+        self.trial_columns = trial_columns
+        self.time_column = time_column
+        self.time_unit = time_unit
+        self.pixel_columns = pixel_columns
+        self.position_columns = position_columns
+        self.velocity_columns = velocity_columns
+        self.acceleration_columns = acceleration_columns
+        self.distance_column = distance_column
+
+        if filename_format is None:
+            self.filename_format = {}
+        else:
+            self.filename_format = filename_format
+
+        if filename_format_schema_overrides is None:
+            self.filename_format_schema_overrides = {}
+        else:
+            self.filename_format_schema_overrides = filename_format_schema_overrides
+
+        if custom_read_kwargs is None:
+            self.custom_read_kwargs = {}
+        else:
+            self.custom_read_kwargs = custom_read_kwargs
+
+        if column_map is None:
+            self.column_map = {}
+        else:
+            self.column_map = column_map
+
+        self.experiment = self._initialize_experiment(experiment)
+        self.resources = self._initialize_resources(resources)
+        self._has_resources = _HasResourcesIndexer(resources=self.resources)
 
     @staticmethod
     def from_yaml(path: str | Path) -> DatasetDefinition:
@@ -323,10 +380,20 @@ class DatasetDefinition:
         self._has_resources.set_resources(self.resources)
         return self._has_resources
 
-    def __post_init__(self):
-        """Handle special attributes."""
-        if self.resources is not None and not isinstance(self.resources, Resources):
-            if isinstance(self.resources, dict):
-                self.resources = Resources.from_dict(self.resources)
-            else:
-                self.resources = Resources.from_dicts(self.resources)
+    def _initialize_experiment(self, experiment: Experiment | dict[str, Any] | None) -> Experiment:
+        """"Initailize ``Experiment`` instance if necessary."""
+        if experiment is None:
+            return Experiment()
+        if isinstance(experiment, dict):
+            return Experiment.from_dict(self.resources)
+        return experiment
+
+    def _initialize_resources(self, resources: Resources | ResourcesLike | None) -> Resources:
+        """"Initailize ``Resources`` instance if necessary."""
+        if resources is None:
+            return Resources()
+        if isinstance(resources, Mapping):
+            return Resources.from_dict(resources)
+        if isinstance(resources, Sequence):
+            return Resources.from_dicts(resources)
+        return resources
