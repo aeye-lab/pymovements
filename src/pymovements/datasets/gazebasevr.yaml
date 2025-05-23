@@ -13,9 +13,6 @@ resources:
       filename: "gazebasevr.zip"
       md5: "048c04b00fd64347375cc8d37b451a22"
 
-extract:
-  gaze: true
-
 experiment:
   screen_width_px: 1680
   screen_height_px: 1050

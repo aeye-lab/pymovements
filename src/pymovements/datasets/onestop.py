@@ -65,9 +65,6 @@ class OneStop(DatasetDefinition):
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    extract: dict[str, bool]
-        Decide whether to extract the data.
-
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
@@ -130,13 +127,6 @@ class OneStop(DatasetDefinition):
                     'md5': 'cee97f13b113c5675757223238ef1bb4',
                 },
             ],
-        },
-    )
-
-    extract: dict[str, bool] = field(
-        default_factory=lambda: {
-            'precomputed_events': True,
-            'precomputed_reading_measures': True,
         },
     )
 
