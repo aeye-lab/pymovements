@@ -25,6 +25,7 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import Resources
 from pymovements.gaze.experiment import Experiment
 
 
@@ -64,9 +65,6 @@ class CopCo(DatasetDefinition):
 
     experiment: Experiment
         The experiment definition.
-
-    extract: dict[str, bool]
-        Decide whether to extract the data.
 
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
@@ -137,31 +135,33 @@ class CopCo(DatasetDefinition):
     )
 
     resources: dict[str, list[dict[str, str | None]]] = field(
-        default_factory=lambda: {
-            'gaze': [
-                {
-                    'resource': 'https://osf.io/download/bg9r4/',
-                    'filename': 'csvs.zip',
-                    'md5': '9dc3276714397b7fccac1e179a14c52b',  # type:ignore
-                },
-            ],
-            'precomputed_events': [
-                {
-                    'resource':
-                    'https://files.de-1.osf.io/v1/resources/ud8s5/providers/osfstorage/61e13174c99ebd02df017c14/?zip=',  # noqa: E501 # pylint: disable=line-too-long
-                    'filename': 'FixationReports.zip',
-                    'md5': None,  # type:ignore
-                },
-            ],
-            'precomputed_reading_measures': [
-                {
-                    'resource':
-                    'https://files.de-1.osf.io/v1/resources/ud8s5/providers/osfstorage/61e1317cc99ebd02df017c4f/?zip=',  # noqa: E501 # pylint: disable=line-too-long
-                    'filename': 'ReadingMeasures.zip',
-                    'md5': None,  # type:ignore
-                },
-            ],
-        },
+        default_factory=lambda: Resources.from_dict(
+            {
+                'gaze': [
+                    {
+                        'resource': 'https://osf.io/download/bg9r4/',
+                        'filename': 'csvs.zip',
+                        'md5': '9dc3276714397b7fccac1e179a14c52b',  # type:ignore
+                    },
+                ],
+                'precomputed_events': [
+                    {
+                        'resource':
+                        'https://files.de-1.osf.io/v1/resources/ud8s5/providers/osfstorage/61e13174c99ebd02df017c14/?zip=',  # noqa: E501 # pylint: disable=line-too-long
+                        'filename': 'FixationReports.zip',
+                        'md5': None,  # type:ignore
+                    },
+                ],
+                'precomputed_reading_measures': [
+                    {
+                        'resource':
+                        'https://files.de-1.osf.io/v1/resources/ud8s5/providers/osfstorage/61e1317cc99ebd02df017c4f/?zip=',  # noqa: E501 # pylint: disable=line-too-long
+                        'filename': 'ReadingMeasures.zip',
+                        'md5': None,  # type:ignore
+                    },
+                ],
+            },
+        ),
     )
 
     experiment: Experiment = field(
@@ -174,14 +174,6 @@ class CopCo(DatasetDefinition):
             origin='center',
             sampling_rate=1000,
         ),
-    )
-
-    extract: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': True,
-            'precomputed_reading_measures': True,
-        },
     )
 
     filename_format: dict[str, str] = field(

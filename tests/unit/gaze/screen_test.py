@@ -112,7 +112,6 @@ def test_screen_init_without_attributes():
             pm.Screen(),
             {},
             True,
-            marks=pytest.mark.xfail(reason='#1148'),
             id='default',
         ),
         pytest.param(
@@ -132,7 +131,6 @@ def test_screen_init_without_attributes():
                 'origin': None,
             },
             False,
-            marks=pytest.mark.xfail(reason='#1148'),
             id='all_none',
         ),
     ],
@@ -147,7 +145,6 @@ def test_screen_to_dict_exclude_none(screen, expected_dict, exclude_none):
         pytest.param(
             pm.Screen(),
             False,
-            marks=pytest.mark.xfail(reason='#1148'),
             id='default',
         ),
         pytest.param(

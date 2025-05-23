@@ -18,14 +18,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test dataset definition."""
+import re
 from dataclasses import dataclass
 
 import pytest
 import yaml
 
+from pymovements import __version__
 from pymovements import DatasetDefinition
 from pymovements import DatasetLibrary
 from pymovements import Experiment
+from pymovements import Resources
 
 
 @pytest.mark.parametrize(
@@ -46,6 +49,39 @@ def test_dataset_definition_is_equal(init_kwargs):
     definition2 = DatasetDefinition(**init_kwargs)
 
     assert definition1 == definition2
+
+
+@pytest.mark.parametrize(
+    ('init_kwargs', 'expected_resources'),
+    [
+        pytest.param(
+            {},
+            Resources(),
+            id='default',
+        ),
+
+        pytest.param(
+            {'resources': None},
+            Resources(),
+            id='none',
+        ),
+
+        pytest.param(
+            {'resources': {}},
+            Resources(),
+            id='empty_dict',
+        ),
+
+        pytest.param(
+            {'resources': []},
+            Resources(),
+            id='empty_list',
+        ),
+    ],
+)
+def test_dataset_definition_resources_init_expected(init_kwargs, expected_resources):
+    definition = DatasetDefinition(**init_kwargs)
+    assert definition.resources == expected_resources
 
 
 @pytest.mark.parametrize(
@@ -87,18 +123,18 @@ def test_dataset_definition_is_equal(init_kwargs):
                         'distance_cm': None,
                         'height_cm': None,
                         'height_px': None,
-                        'origin': 'upper left',
+                        'origin': None,
                         'width_cm': None,
                         'width_px': None,
                     },
                 },
-                'extract': {},
+                'extract': None,
                 'filename_format': {},
                 'filename_format_schema_overrides': {},
                 'mirrors': {},
                 'pixel_columns': None,
                 'position_columns': None,
-                'resources': {},
+                'resources': [],
                 'time_column': None,
                 'time_unit': None,
                 'trial_columns': None,
@@ -156,13 +192,13 @@ def test_dataset_definition_is_equal(init_kwargs):
                         'width_px': 1280,
                     },
                 },
-                'extract': {},
+                'extract': None,
                 'filename_format': {},
                 'filename_format_schema_overrides': {},
                 'mirrors': {},
                 'pixel_columns': None,
                 'position_columns': None,
-                'resources': {},
+                'resources': [],
                 'time_column': None,
                 'time_unit': None,
                 'trial_columns': None,
@@ -203,18 +239,18 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
                         'distance_cm': None,
                         'height_cm': None,
                         'height_px': None,
-                        'origin': 'upper left',
+                        'origin': None,
                         'width_cm': None,
                         'width_px': None,
                     },
                 },
-                'extract': {},
+                'extract': None,
                 'filename_format': {},
                 'filename_format_schema_overrides': {},
                 'mirrors': {},
                 'pixel_columns': None,
                 'position_columns': None,
-                'resources': {},
+                'resources': [],
                 'time_column': None,
                 'time_unit': None,
                 'trial_columns': None,
@@ -248,23 +284,22 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
                         'distance_cm': None,
                         'height_cm': None,
                         'height_px': None,
-                        'origin': 'upper left',
+                        'origin': None,
                         'width_cm': None,
                         'width_px': None,
                     },
                 },
-                'extract': {},
+                'extract': None,
                 'filename_format': {},
                 'filename_format_schema_overrides': {},
                 'mirrors': {},
                 'pixel_columns': None,
                 'position_columns': None,
-                'resources': {},
+                'resources': [],
                 'time_column': None,
                 'time_unit': None,
                 'trial_columns': None,
                 'velocity_columns': None,
-                '_has_resources': False,
             },
             id='False',
         ),
@@ -384,21 +419,9 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
         ),
 
         pytest.param(
-            1,
-            False,
-            id='int_resources',
-        ),
-
-        pytest.param(
             {'gaze': None},
             False,
             id='none_value_as_resources',
-        ),
-
-        pytest.param(
-            {'gaze': 1},
-            False,
-            id='int_as_resources_list',
         ),
 
         pytest.param(
@@ -468,16 +491,6 @@ def test_dataset_definition_has_resources_boolean(resources, expected_has_resour
         ),
 
         pytest.param(
-            1,
-            {
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            id='int_resources',
-        ),
-
-        pytest.param(
             {'gaze': None},
             {
                 'gaze': False,
@@ -485,16 +498,6 @@ def test_dataset_definition_has_resources_boolean(resources, expected_has_resour
                 'precomputed_reading_measures': False,
             },
             id='none_value_as_resources',
-        ),
-
-        pytest.param(
-            {'gaze': 1},
-            {
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            id='int_as_resources',
         ),
 
         pytest.param(
@@ -584,7 +587,6 @@ def test_dataset_definition_not_equal():
             {
                 'name': '.',
             },
-            marks=pytest.mark.xfail(reason='#1148'),
             id='true_default',
         ),
 
@@ -600,17 +602,14 @@ def test_dataset_definition_not_equal():
         pytest.param(
             DatasetDefinition(
                 distance_column='test',
-                extract={'test': True},
                 position_columns=['test', 'foo', 'bar'],
             ),
             True,
             {
                 'name': '.',
-                'extract': {'test': True},
                 'position_columns': ['test', 'foo', 'bar'],
                 'distance_column': 'test',
             },
-            marks=pytest.mark.xfail(reason='#1148'),
             id='true_str_dict_list',
         ),
 
@@ -618,13 +617,11 @@ def test_dataset_definition_not_equal():
             DatasetDefinition(
                 experiment=Experiment(origin=None),
                 distance_column='test',
-                extract={'test': True},
                 position_columns=['test', 'foo', 'bar'],
             ),
             True,
             {
                 'name': '.',
-                'extract': {'test': True},
                 'position_columns': ['test', 'foo', 'bar'],
                 'distance_column': 'test',
             },
@@ -639,9 +636,27 @@ def test_dataset_definition_not_equal():
                 'long_name': None,
                 'has_files': {},
                 'mirrors': {},
-                'resources': {},
-                'experiment': None,
-                'extract': {},
+                'resources': [],
+                'experiment': {
+                    'eyetracker': {
+                        'left': None,
+                        'model': None,
+                        'mount': None,
+                        'right': None,
+                        'sampling_rate': None,
+                        'vendor': None,
+                        'version': None,
+                    },
+                    'screen': {
+                        'distance_cm': None,
+                        'height_cm': None,
+                        'height_px': None,
+                        'origin': None,
+                        'width_cm': None,
+                        'width_px': None,
+                    },
+                },
+                'extract': None,
                 'filename_format': {},
                 'filename_format_schema_overrides': {},
                 'custom_read_kwargs': {},
@@ -655,7 +670,6 @@ def test_dataset_definition_not_equal():
                 'acceleration_columns': None,
                 'distance_column': None,
             },
-            marks=pytest.mark.xfail(reason='#1148'),
             id='false_default',
         ),
 
@@ -667,9 +681,27 @@ def test_dataset_definition_not_equal():
                 'long_name': None,
                 'has_files': {},
                 'mirrors': {},
-                'resources': {},
-                'experiment': None,
-                'extract': {},
+                'resources': [],
+                'experiment': {
+                    'eyetracker': {
+                        'left': None,
+                        'model': None,
+                        'mount': None,
+                        'right': None,
+                        'sampling_rate': None,
+                        'vendor': None,
+                        'version': None,
+                    },
+                    'screen': {
+                        'distance_cm': None,
+                        'height_cm': None,
+                        'height_px': None,
+                        'origin': None,
+                        'width_cm': None,
+                        'width_px': None,
+                    },
+                },
+                'extract': None,
                 'filename_format': {},
                 'filename_format_schema_overrides': {},
                 'custom_read_kwargs': {},
@@ -683,7 +715,6 @@ def test_dataset_definition_not_equal():
                 'acceleration_columns': None,
                 'distance_column': None,
             },
-            marks=pytest.mark.xfail(reason='#1148'),
             id='false_experiment_none',
         ),
 
@@ -695,7 +726,7 @@ def test_dataset_definition_not_equal():
                 'long_name': None,
                 'has_files': {},
                 'mirrors': {},
-                'resources': {},
+                'resources': [],
                 'experiment': {
                     'eyetracker': {
                         'sampling_rate': None,
@@ -715,7 +746,7 @@ def test_dataset_definition_not_equal():
                         'origin': None,
                     },
                 },
-                'extract': {},
+                'extract': None,
                 'filename_format': {},
                 'filename_format_schema_overrides': {},
                 'custom_read_kwargs': {},
@@ -735,3 +766,49 @@ def test_dataset_definition_not_equal():
 )
 def test_dataset_to_dict_exclude_none(dataset_definition, exclude_none, expected_dict):
     assert dataset_definition.to_dict(exclude_none=exclude_none) == expected_dict
+
+
+@pytest.mark.parametrize(
+    'attribute_kwarg',
+    [
+        pytest.param(
+            {'extract': True},
+            id='extract_true',
+        ),
+        pytest.param(
+            {'extract': False},
+            id='extract_false',
+        ),
+    ],
+)
+def test_dataset_definition_attribute_is_deprecated(attribute_kwarg):
+    with pytest.raises(DeprecationWarning):
+        DatasetDefinition(**attribute_kwarg)
+
+
+@pytest.mark.parametrize(
+    'attribute_kwarg',
+    [
+        pytest.param(
+            {'extract': True},
+            id='extract_true',
+        ),
+        pytest.param(
+            {'extract': False},
+            id='extract_false',
+        ),
+    ],
+)
+def test_dataset_definition_attribute_is_removed(attribute_kwarg):
+    with pytest.raises(DeprecationWarning) as info:
+        DatasetDefinition(**attribute_kwarg)
+
+    regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
+
+    msg = info.value.args[0]
+    remove_version = regex.match(msg).groupdict()['version']
+    current_version = __version__.split('+')[0]
+    assert current_version < remove_version, (
+        f'utils/parsing.py was planned to be removed in v{remove_version}. '
+        f'Current version is v{current_version}.'
+    )

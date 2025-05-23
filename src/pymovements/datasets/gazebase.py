@@ -27,6 +27,7 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import Resources
 from pymovements.gaze.experiment import Experiment
 
 
@@ -60,15 +61,12 @@ class GazeBase(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: dict[str, list[dict[str, str]]]
+    resources: Resources
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
-
-    extract: dict[str, bool]
-        Decide whether to extract the data.
 
     experiment: Experiment
         The experiment definition.
@@ -136,19 +134,19 @@ class GazeBase(DatasetDefinition):
         },
     )
 
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda: {
-            'gaze': [
-                {
-                    'resource': 'https://figshare.com/ndownloader/files/27039812',
-                    'filename': 'GazeBase_v2_0.zip',
-                    'md5': 'cb7eb895fb48f8661decf038ab998c9a',
-                },
-            ],
-        },
+    resources: Resources = field(
+        default_factory=lambda: Resources.from_dict(
+            {
+                'gaze': [
+                    {
+                        'resource': 'https://figshare.com/ndownloader/files/27039812',
+                        'filename': 'GazeBase_v2_0.zip',
+                        'md5': 'cb7eb895fb48f8661decf038ab998c9a',
+                    },
+                ],
+            },
+        ),
     )
-
-    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     experiment: Experiment = field(
         default_factory=lambda: Experiment(

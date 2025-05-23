@@ -20,6 +20,7 @@
 """Provides a definition for the PotsdamBingeRemotePVT dataset."""
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
@@ -27,6 +28,7 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import Resources
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
 from pymovements.gaze.screen import Screen
@@ -55,18 +57,15 @@ class PotsdamBingeRemotePVT(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, list[str]]
+    mirrors: dict[str, Sequence[str]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources: dict[str, list[dict[str, str]]]
+    resources: Resources
         A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
-
-    extract: dict[str, bool]
-        Decide whether to extract the data.
 
     experiment: Experiment
         The experiment definition.
@@ -143,34 +142,35 @@ class PotsdamBingeRemotePVT(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-    mirrors: dict[str, list[str]] = field(
+    mirrors: dict[str, Sequence[str]] = field(
         default_factory=lambda: {
             'gaze': ['https://osf.io/download/'],
         },
     )
 
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda: {
-            'gaze': [
-                {
-                    'resource': '9vbs8/',
-                    'filename': 'a.zip',
-                    'md5': '87c6c74a9a17cbd093b91f9415e8dd9d',
-                },
-                {
-                    'resource': 'yqukn/',
-                    'filename': 'b.zip',
-                    'md5': '54038547b1a373253b38999a227dde63',
-                },
-                {
-                    'resource': 'yf2xa/',
-                    'filename': 'e.zip',
-                    'md5': 'a0d0203cbb273f6908c1b52a42750551',
-                },
-            ],
-        },
+    resources: Resources = field(
+        default_factory=lambda: Resources.from_dict(
+            {
+                'gaze': [
+                    {
+                        'resource': '9vbs8/',
+                        'filename': 'a.zip',
+                        'md5': '87c6c74a9a17cbd093b91f9415e8dd9d',
+                    },
+                    {
+                        'resource': 'yqukn/',
+                        'filename': 'b.zip',
+                        'md5': '54038547b1a373253b38999a227dde63',
+                    },
+                    {
+                        'resource': 'yf2xa/',
+                        'filename': 'e.zip',
+                        'md5': 'a0d0203cbb273f6908c1b52a42750551',
+                    },
+                ],
+            },
+        ),
     )
-    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     experiment: Experiment = field(
         default_factory=lambda: Experiment(

@@ -25,6 +25,7 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import Resources
 from pymovements.gaze.experiment import Experiment
 
 
@@ -50,15 +51,12 @@ class CoLAGaze(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: dict[str, list[dict[str, str]]]
+    resources: Resources
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
-
-    extract: dict[str, bool]
-        Decide whether to extract the data.
 
     experiment: Experiment
         The experiment definition.
@@ -107,44 +105,38 @@ class CoLAGaze(DatasetDefinition):
         },
     )
 
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda: {
-            'gaze': [
-                {
-                    'resource':
-                    'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
-                    '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
-                    'filename': 'raw_data.zip',
-                    'md5': None,  # type: ignore
-                },
-            ],
-            'precomputed_events': [
-                {
-                    'resource':
-                    'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
-                    '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
-                    'filename': 'fixations.zip',
-                    'md5': None,  # type: ignore
-                },
-            ],
-            'precomputed_reading_measures': [
-                {
-                    'resource':
-                    'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
-                    '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
-                    'filename': 'measures.zip',
-                    'md5': None,  # type: ignore
-                },
-            ],
-        },
-    )
-
-    extract: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': True,
-            'precomputed_reading_measures': True,
-        },
+    resources: Resources = field(
+        default_factory=lambda: Resources.from_dict(
+            {
+                'gaze': [
+                    {
+                        'resource':
+                        'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
+                        '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
+                        'filename': 'raw_data.zip',
+                        'md5': None,  # type: ignore
+                    },
+                ],
+                'precomputed_events': [
+                    {
+                        'resource':
+                        'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
+                        '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
+                        'filename': 'fixations.zip',
+                        'md5': None,  # type: ignore
+                    },
+                ],
+                'precomputed_reading_measures': [
+                    {
+                        'resource':
+                        'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
+                        '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
+                        'filename': 'measures.zip',
+                        'md5': None,  # type: ignore
+                    },
+                ],
+            },
+        ),
     )
 
     experiment: Experiment = field(

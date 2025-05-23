@@ -25,6 +25,7 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import Resources
 from pymovements.gaze.experiment import Experiment
 
 
@@ -52,7 +53,7 @@ class FakeNewsPerception(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: dict[str, list[dict[str, str]]]
+    resources: Resources
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -61,9 +62,6 @@ class FakeNewsPerception(DatasetDefinition):
 
     experiment: Experiment
         The experiment definition.
-
-    extract: dict[str, bool]
-        Decide whether to extract the data.
 
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
@@ -92,16 +90,18 @@ class FakeNewsPerception(DatasetDefinition):
         },
     )
 
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda: {
-            'precomputed_events': [
-                {
-                    'resource': 'https://dataverse.harvard.edu/api/access/datafile/4200164',
-                    'filename': 'D3-Eye-movements-data.zip',
-                    'md5': 'ab009f28cd703f433e9b6c02b0bb38d2',
-                },
-            ],
-        },
+    resources: Resources = field(
+        default_factory=lambda: Resources.from_dict(
+            {
+                'precomputed_events': [
+                    {
+                        'resource': 'https://dataverse.harvard.edu/api/access/datafile/4200164',
+                        'filename': 'D3-Eye-movements-data.zip',
+                        'md5': 'ab009f28cd703f433e9b6c02b0bb38d2',
+                    },
+                ],
+            },
+        ),
     )
 
     experiment: Experiment = field(
@@ -115,8 +115,6 @@ class FakeNewsPerception(DatasetDefinition):
             sampling_rate=600,
         ),
     )
-
-    extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': True})
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {

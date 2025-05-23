@@ -98,7 +98,7 @@ class Experiment:
             screen_width_cm: float | None = None,
             screen_height_cm: float | None = None,
             distance_cm: float | None = None,
-            origin: str | None = 'upper left',
+            origin: str | None = None,
             sampling_rate: float | None = None,
             *,
             screen: Screen | None = None,
@@ -109,12 +109,8 @@ class Experiment:
         _checks.check_is_mutual_exclusive(screen_width_cm=screen_width_cm, screen=screen)
         _checks.check_is_mutual_exclusive(screen_height_cm=screen_height_cm, screen=screen)
         _checks.check_is_mutual_exclusive(distance_cm=distance_cm, screen=screen)
-        _checks.check_is_mutual_exclusive(sampling_rate=sampling_rate, eyetracker=eyetracker)
-
-        # the origin default value needs special care to not mess with a passed screen.
-        if origin == 'upper left' and screen is not None:
-            origin = None  # set origin to None to pass mutual exclusivity check
         _checks.check_is_mutual_exclusive(origin=origin, screen=screen)
+        _checks.check_is_mutual_exclusive(sampling_rate=sampling_rate, eyetracker=eyetracker)
 
         if screen is None:
             screen = Screen(
@@ -298,17 +294,14 @@ class Experiment:
         dict[str, Any | dict[str, str | float | None]]
             Experiment as dictionary.
         """
-        _dict: dict[str, dict[str, str | float | None]] = {}
-        if exclude_none:
-            if self.screen:
-                _dict['screen'] = self.screen.to_dict(exclude_none=exclude_none)
-            if self.eyetracker:
-                _dict['eyetracker'] = self.eyetracker.to_dict(exclude_none=exclude_none)
-        else:
-            _dict['screen'] = self.screen.to_dict(exclude_none=False)
-            _dict['eyetracker'] = self.eyetracker.to_dict(exclude_none=False)
+        data: dict[str, dict[str, str | float | None]] = {}
 
-        return _dict
+        if self.eyetracker or not exclude_none:
+            data['eyetracker'] = self.eyetracker.to_dict(exclude_none=exclude_none)
+        if self.screen or not exclude_none:
+            data['screen'] = self.screen.to_dict(exclude_none=exclude_none)
+
+        return data
 
     def __str__(self: Experiment) -> str:
         """Return Experiment string."""

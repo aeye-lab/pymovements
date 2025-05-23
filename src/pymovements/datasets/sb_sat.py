@@ -27,6 +27,7 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import Resources
 from pymovements.gaze.experiment import Experiment
 
 
@@ -54,15 +55,12 @@ class SBSAT(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: dict[str, list[dict[str, str]]]
+    resources: Resources
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
-
-    extract: dict[str, bool]
-        Decide whether to extract the data.
 
     experiment: Experiment
         The experiment definition.
@@ -135,30 +133,25 @@ class SBSAT(DatasetDefinition):
         },
     )
 
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda:
+    resources: Resources = field(
+        default_factory=lambda: Resources.from_dict(
             {
-                'gaze': [
-                    {
-                        'resource': 'https://osf.io/download/jgae7/',
-                        'filename': 'sbsat_csvs.zip',
-                        'md5': 'a6ef1fb0ecced683cdb489c3bd3e1a5c',
-                    },
-                ],
-                'precomputed_events': [
-                    {
-                        'resource': 'https://raw.githubusercontent.com/ahnchive/SB-SAT/master/fixation/18sat_fixfinal.csv',  # noqa: E501 # pylint: disable=line-too-long
-                        'filename': '18sat_fixfinal.csv',
-                        'md5': '4cf3212a71e6fc2fbe7041ce7c691927',
-                    },
-                ],
+                    'gaze': [
+                        {
+                            'resource': 'https://osf.io/download/jgae7/',
+                            'filename': 'sbsat_csvs.zip',
+                            'md5': 'a6ef1fb0ecced683cdb489c3bd3e1a5c',
+                        },
+                    ],
+                    'precomputed_events': [
+                        {
+                            'resource': 'https://raw.githubusercontent.com/ahnchive/SB-SAT/master/fixation/18sat_fixfinal.csv',  # noqa: E501 # pylint: disable=line-too-long
+                            'filename': '18sat_fixfinal.csv',
+                            'md5': '4cf3212a71e6fc2fbe7041ce7c691927',
+                        },
+                    ],
             },
-    )
-
-    extract: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True, 'precomputed_events': False,
-        },
+        ),
     )
 
     experiment: Experiment = field(

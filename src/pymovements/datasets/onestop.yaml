@@ -17,10 +17,6 @@ resources:
           filename: ia_Paragraph.csv.zip
           md5: cee97f13b113c5675757223238ef1bb4
 
-extract:
-    precomputed_events: true
-    precomputed_reading_measures: true
-
 filename_format:
     precomputed_events: fixations_Paragraph.csv
     precomputed_reading_measures: ia_Paragraph.csv
