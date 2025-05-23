@@ -21,6 +21,8 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from collections.abc import Mapping
+from collections.abc import Sequence
 from copy import deepcopy
 from dataclasses import asdict
 from dataclasses import dataclass
@@ -113,13 +115,13 @@ class Resources(list):
 
     @staticmethod
     def from_dict(
-        dictionary: Mappable[str, Sequence[Mappable[str, str | None]]] | None,
+        dictionary: Mapping[str, Sequence[Mapping[str, str | None]]] | None,
     ) -> Resources:
         """Create a ``Resources`` instance from a dictionary of lists of dictionaries.
 
         Parameters
         ----------
-        dictionary : Mappable[str, Sequence[Mappable[str, str | None]]] | None
+        dictionary : Mapping[str, Sequence[Mapping[str, str | None]]] | None
             A list of dictionaries containing ``Resource`` parameters.
 
         Returns
