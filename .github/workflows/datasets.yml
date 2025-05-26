@@ -9,6 +9,7 @@ on:
 jobs:
   prepare-matrix:
     name: prepare dataset matrix
+    if: startsWith(github.event.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     outputs:
       all_datasets: ${{ steps.create-matrix.outputs.matrix }}
