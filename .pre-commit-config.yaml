@@ -153,7 +153,7 @@ repos:
     hooks:
       - id: write-datasets-yaml
         name: write-datasets-yaml
-        entry: python .pre-commit/write_datasets_yaml.py
+        entry: python _scripts/write_datasets_yaml.py
         language: python
         verbose: true
         additional_dependencies:

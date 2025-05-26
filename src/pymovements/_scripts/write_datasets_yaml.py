@@ -19,6 +19,7 @@
 # SOFTWARE.
 from __future__ import annotations
 
+import io
 from pathlib import Path
 
 import yaml
@@ -28,20 +29,22 @@ def main(
         datasets_dirpath: str | Path = './src/pymovements/datasets',
         datasets_yaml_filename: str = 'datasets.yaml',
 ) -> int:
-    if isinstance(datasets_dirpath, str):
-        datasets_dirpath = Path(datasets_dirpath)
+    datasets_dirpath = Path(datasets_dirpath)
 
     dataset_filename_stems = sorted(
         [
             filepath.stem for filepath in datasets_dirpath.glob('*.yaml')
-            if filepath.name != datasets_yaml_filename  # Ignore datasets yaml file.
+            if filepath.name != datasets_yaml_filename  # Ignore datasets.yaml file.
         ],
     )
 
-    with open(datasets_dirpath / datasets_yaml_filename) as f:
-        dataset_yaml_content = yaml.safe_load(f)
+    try:
+        with open(datasets_dirpath / datasets_yaml_filename) as f:
+            dataset_yaml_content = yaml.safe_load(f)
+    except FileNotFoundError:
+        dataset_yaml_content = None
 
-    # File content looks good. Exit successfully.
+    # File content matches. Exit successfully.
     if dataset_filename_stems == dataset_yaml_content:
         return 0
 
@@ -53,7 +56,4 @@ def main(
 
 
 if __name__ == '__main__':
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument('--path')
-    # args = parser.parse_args()
     raise SystemExit(main())
