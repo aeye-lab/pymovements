@@ -110,8 +110,8 @@ def register_transform(method: TransformMethod) -> TransformMethod:
 def center_origin(
         *,
         screen_resolution: tuple[int, int],
+        n_components: int,
         origin: str = 'upper left',
-        n_components: int | None = None,
         pixel_column: str = 'pixel',
         output_column: str | None = None,
 ) -> pl.Expr:
@@ -123,11 +123,10 @@ def center_origin(
     ----------
     screen_resolution: tuple[int, int]
         Pixel screen resolution as tuple (width, height).
+    n_components: int
+        Number of components in input column.
     origin: str
-        The location of the pixel origin. Supported values: ``center``, ``upper left``.
-        (default: ``upper left``)
-    n_components: int | None
-        Number of components in input column. (default: None)
+        The location of the pixel origin. Supported values: ``center``, ``upper left``
     pixel_column: str
         Name of the input column with pixel data. (default: 'pixel')
     output_column: str | None
@@ -138,9 +137,6 @@ def center_origin(
     pl.Expr
         The respective polars expression.
     """
-    _checks.check_is_not_none(n_components=n_components)
-    assert n_components is not None  # make mypy happy.
-
     if output_column is None:
         output_column = pixel_column
 
@@ -224,8 +220,8 @@ def pix2deg(
         screen_resolution: tuple[int, int],
         screen_size: tuple[float, float],
         distance: float | str,
+        n_components: int,
         origin: str = 'upper left',
-        n_components: int | None = None,
         pixel_column: str = 'pixel',
         position_column: str = 'position',
 ) -> pl.Expr:
@@ -241,12 +237,11 @@ def pix2deg(
         Must be either a scalar or a string. If a scalar is passed, it is interpreted as the
         Eye-to-screen distance in centimeters. If a string is passed, it is interpreted as the name
         of a column containing the Eye-to-screen distance in millimiters for each sample.
+    n_components: int
+        Number of components in input column.
     origin: str
         The location of the pixel origin. Supported values: ``center``, ``upper left``. See also
         py:func:`~pymovements.gaze.transform.center_origin` for more information.
-        (default: ``upper left``)
-    n_components: int | None
-        Number of components in input column.  (default: None)
     pixel_column: str
         The input pixel column name. (default: 'pixel')
     position_column: str
@@ -259,8 +254,6 @@ def pix2deg(
     """
     _check_screen_resolution(screen_resolution)
     _check_screen_size(screen_size)
-    _checks.check_is_not_none(n_components=n_components)
-    assert n_components is not None  # make mypy happy.
 
     centered_pixels = center_origin(
         screen_resolution=screen_resolution,
@@ -302,8 +295,8 @@ def deg2pix(
         screen_resolution: tuple[int, int],
         screen_size: tuple[float, float],
         distance: float | str,
+        n_components: int,
         pixel_origin: str = 'upper left',
-        n_components: int | None = None,
         position_column: str = 'position',
         pixel_column: str = 'pixel',
 ) -> pl.Expr:
@@ -319,11 +312,11 @@ def deg2pix(
         Must be either a scalar or a string. If a scalar is passed, it is interpreted as the
         Eye-to-screen distance in centimeters. If a string is passed, it is interpreted as the name
         of a column containing the Eye-to-screen distance in millimiters for each sample.
+    n_components: int
+        Number of components in input column.
     pixel_origin: str
         The desired location of the pixel origin. (default: 'upper left')
         Supported values: ``center``, ``upper left``.
-    n_components: int | None
-        Number of components in input column.  (default: None)
     position_column: str
         The input position column name. (default: 'position')
     pixel_column: str
@@ -336,8 +329,6 @@ def deg2pix(
     """
     _check_screen_resolution(screen_resolution)
     _check_screen_size(screen_size)
-    _checks.check_is_not_none(n_components=n_components)
-    assert n_components is not None  # make mypy happy.
 
     if isinstance(distance, (float, int)):
         _check_distance(distance)
