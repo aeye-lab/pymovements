@@ -531,7 +531,7 @@ def pos2vel(
 
     * ``savitzky_golay``: velocity is calculated by a polynomial of fixed degree and window length.
       See :py:func:`~pymovements.gaze.transforms.savitzky_golay` for further details.
-    * ``five_point``: velocity is calculated from the difference of the mean values
+    * ``fivepoint``: velocity is calculated from the difference of the mean values
       of the subsequent two samples and the preceding two samples
     * ``neighbors``: velocity is calculated from difference of the subsequent
       sample and the preceding sample
