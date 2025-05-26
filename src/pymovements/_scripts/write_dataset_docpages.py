@@ -94,4 +94,4 @@ def main(
 
 
 if __name__ == '__main__':
-    raise SystemExit(main(dataset_name=args.dataset))
+    raise SystemExit(main())
