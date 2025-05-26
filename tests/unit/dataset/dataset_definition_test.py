@@ -92,9 +92,11 @@ def test_dataset_definition_is_equal(init_kwargs):
         ),
 
         pytest.param(
-            {'resources': [
-                {'content': 'gaze', 'filename_pattern': 'test.csv'},
-            ]},
+            {
+                'resources': [
+                    {'content': 'gaze', 'filename_pattern': 'test.csv'},
+                ],
+            },
             Resources([Resource(content='gaze', filename_pattern='test.csv')]),
             id='single_gaze_resource_filename_pattern',
         ),
@@ -116,12 +118,14 @@ def test_dataset_definition_is_equal(init_kwargs):
             'gaze': {
                 'subject_id': int,
             },
-        }
+                },
             },
             Resources([
-                Resource(content='gaze', filename_pattern='{subject_id:d}.csv', filename_pattern_schema_overrides={
-                'subject_id': int,
-            })
+                Resource(
+                    content='gaze', filename_pattern='{subject_id:d}.csv', filename_pattern_schema_overrides={
+                        'subject_id': int,
+                    },
+                ),
             ]),
             id='single_gaze_resource_filename_format_schema_overrides_legacy',
         ),
@@ -133,10 +137,12 @@ def test_dataset_definition_is_equal(init_kwargs):
         ),
 
         pytest.param(
-            {'resources': [
-                {'content': 'gaze'},
-                {'content': 'precomputed_events'},
-            ]},
+            {
+                'resources': [
+                    {'content': 'gaze'},
+                    {'content': 'precomputed_events'},
+                ],
+            },
             Resources([
                 Resource(content='gaze'),
                 Resource(content='precomputed_events'),
@@ -145,10 +151,12 @@ def test_dataset_definition_is_equal(init_kwargs):
         ),
 
         pytest.param(
-            {'resources': {
-                'gaze': [{'resource': 'www.example1.com'}],
-                'precomputed_events': [{'resource': 'www.example2.com'}],
-            }},
+            {
+                'resources': {
+                    'gaze': [{'resource': 'www.example1.com'}],
+                    'precomputed_events': [{'resource': 'www.example2.com'}],
+                },
+            },
             Resources([
                 Resource(content='gaze', url='www.example1.com'),
                 Resource(content='precomputed_events', url='www.example2.com'),
@@ -165,7 +173,7 @@ def test_dataset_definition_is_equal(init_kwargs):
                 'filename_format': {
                     'gaze': 'test1.csv',
                     'precomputed_events': 'test2.csv',
-                }
+                },
             },
             Resources([
                 Resource(content='gaze', url='www.example1.com', filename_pattern='test1.csv'),
@@ -173,7 +181,7 @@ def test_dataset_definition_is_equal(init_kwargs):
                     content='precomputed_events',
                     url='www.example2.com',
                     filename_pattern='test2.csv',
-                )
+                ),
             ]),
             id='two_resources_filename_format_legacy',
         ),

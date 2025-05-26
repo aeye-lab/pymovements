@@ -99,8 +99,10 @@ class FakeNewsPerception(DatasetDefinition):
                         'filename': 'D3-Eye-movements-data.zip',
                         'md5': 'ab009f28cd703f433e9b6c02b0bb38d2',
                         'filename_pattern': r'P{subject_id:d}_S{session_id:d}_{truth_value:s}.csv',
-                        'filename_pattern_schema_overrides': {'subject_id': int, 'session_id': int,
-                                               'truth_value': str},
+                        'filename_pattern_schema_overrides': {
+                            'subject_id': int, 'session_id': int,
+                            'truth_value': str,
+                        },
                     },
                 ],
             },

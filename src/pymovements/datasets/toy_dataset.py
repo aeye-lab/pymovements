@@ -138,7 +138,7 @@ class ToyDataset(DatasetDefinition):
                             'text_id': int,
                             'page_id': int,
                         },
-                     },
+                    },
                 ],
             },
         ),
