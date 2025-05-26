@@ -126,13 +126,7 @@ class CopCo(DatasetDefinition):
 
     long_name: str = 'Copenhagen Corpus of Eye-Tracking Recordings from Natural Reading'
 
-    has_files: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': True,
-            'precomputed_reading_measures': True,
-        },
-    )
+    has_files: dict[str, bool] | None = None
 
     resources: dict[str, list[dict[str, str | None]]] = field(
         default_factory=lambda: Resources.from_dict(

@@ -103,13 +103,7 @@ class OneStop(DatasetDefinition):
     long_name: str = 'OneStop: A 360-Participant English Eye Tracking Dataset with Different '\
         'Reading Regimes'
 
-    has_files: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': False,
-            'precomputed_events': True,
-            'precomputed_reading_measures': True,
-        },
-    )
+    has_files: dict[str, bool] | None = None
 
     resources: Resources = field(
         default_factory=lambda: Resources.from_dict(

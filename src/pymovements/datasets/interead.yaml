@@ -2,11 +2,6 @@ name: "InteRead"
 
 long_name: "Interrupted Reading dataset"
 
-has_files:
-  gaze: true
-  precomputed_events: true
-  precomputed_reading_measures: false
-
 resources:
   gaze:
     - resource: "https://osf.io/download/6ju3x/"

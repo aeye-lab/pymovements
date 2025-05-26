@@ -129,13 +129,7 @@ class GazeGraph(DatasetDefinition):
 
     long_name: str = 'GazeGraph dataset'
 
-    has_files: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': False,
-            'precomputed_reading_measures': False,
-        },
-    )
+    has_files: dict[str, bool] | None = None
 
     resources: Resources = field(
         default_factory=lambda: Resources.from_dict(

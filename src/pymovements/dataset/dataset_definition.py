@@ -296,11 +296,6 @@ class DatasetDefinition:
         self.acceleration_columns = acceleration_columns
         self.distance_column = distance_column
 
-        if has_files is None:
-            self.has_files = {}
-        else:
-            self.has_files = has_files
-
         if mirrors is None:
             self.mirrors = {}
         else:
@@ -324,6 +319,15 @@ class DatasetDefinition:
         )
         self._has_resources = _HasResourcesIndexer(resources=self.resources)
 
+        if has_files is not None:
+            warn(
+                DeprecationWarning(
+                    'DatasetDefinition.has_files is deprecated since version v0.23.0. '
+                    'Please specify Resource.filename_pattern instead. '
+                    'This field will be removed in v0.28.0.',
+                ),
+            )
+
         if self.extract is not None:
             warn(
                 DeprecationWarning(
@@ -331,6 +335,20 @@ class DatasetDefinition:
                     'This field will be removed in v0.27.0.',
                 ),
             )
+
+    @property
+    @deprecated(
+        reason='Please specify Resource.filename_pattern instead. '
+               'This field will be removed in v0.28.0.',
+        version='v0.23.0',
+    )
+    def has_files(self) -> dict[str, bool]:
+        data: dict[str, str] = {}
+        content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures')
+        return  {
+            content_type: self.resources.has_content(content_type)
+            for content_type in content_types
+        }
 
     @property
     @deprecated(
@@ -483,6 +501,11 @@ class DatasetDefinition:
             yaml.dump(data, f, sort_keys=False)
 
     @property
+    @deprecated(
+        reason='Please specify Resource.filename_pattern instead. '
+               'This field will be removed in v0.28.0.',
+        version='v0.23.0',
+    )
     def has_resources(self) -> _HasResourcesIndexer:
         """Checks for resources in :py:attr:`~pymovements.dataset.DatasetDefinition.resources`.
 

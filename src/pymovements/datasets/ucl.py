@@ -98,13 +98,7 @@ class UCL(DatasetDefinition):
 
     long_name: str = 'University College London corpus'
 
-    has_files: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': False,
-            'precomputed_events': True,
-            'precomputed_reading_measures': True,
-        },
-    )
+    has_files: dict[str, bool] | None = None
 
     resources: Resources = field(
         default_factory=lambda: Resources.from_dict({

@@ -101,13 +101,7 @@ class Provo(DatasetDefinition):
 
     long_name: str = 'Provo Corpus'
 
-    has_files: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': False,
-            'precomputed_events': True,
-            'precomputed_reading_measures': False,
-        },
-    )
+    has_files: dict[str, bool] | None = None
 
     resources: Resources = field(
         default_factory=lambda: Resources.from_dict(

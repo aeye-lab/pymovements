@@ -98,14 +98,6 @@ class CodeComprehension(DatasetDefinition):
 
     long_name: str = 'Code Comprehension dataset'
 
-    has_files: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': False,
-            'precomputed_events': True,
-            'precomputed_reading_measures': False,
-        },
-    )
-
     resources: Resources = field(
         default_factory=lambda: Resources.from_dict(
             {

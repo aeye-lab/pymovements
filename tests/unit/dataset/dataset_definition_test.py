@@ -92,9 +92,11 @@ def test_dataset_definition_is_equal(init_kwargs):
         ),
 
         pytest.param(
-            {'resources': [
-                {'content': 'gaze', 'filename_pattern': 'test.csv'},
-            ]},
+            {
+                'resources': [
+                    {'content': 'gaze', 'filename_pattern': 'test.csv'},
+                ],
+            },
             Resources([Resource(content='gaze', filename_pattern='test.csv')]),
             id='single_gaze_resource_filename_pattern',
         ),
@@ -116,12 +118,14 @@ def test_dataset_definition_is_equal(init_kwargs):
             'gaze': {
                 'subject_id': int,
             },
-        }
+                },
             },
             Resources([
-                Resource(content='gaze', filename_pattern='{subject_id:d}.csv', filename_pattern_schema_overrides={
-                'subject_id': int,
-            })
+                Resource(
+                    content='gaze', filename_pattern='{subject_id:d}.csv', filename_pattern_schema_overrides={
+                        'subject_id': int,
+                    },
+                ),
             ]),
             id='single_gaze_resource_filename_format_schema_overrides_legacy',
         ),
@@ -133,10 +137,12 @@ def test_dataset_definition_is_equal(init_kwargs):
         ),
 
         pytest.param(
-            {'resources': [
-                {'content': 'gaze'},
-                {'content': 'precomputed_events'},
-            ]},
+            {
+                'resources': [
+                    {'content': 'gaze'},
+                    {'content': 'precomputed_events'},
+                ],
+            },
             Resources([
                 Resource(content='gaze'),
                 Resource(content='precomputed_events'),
@@ -145,10 +151,12 @@ def test_dataset_definition_is_equal(init_kwargs):
         ),
 
         pytest.param(
-            {'resources': {
-                'gaze': [{'resource': 'www.example1.com'}],
-                'precomputed_events': [{'resource': 'www.example2.com'}],
-            }},
+            {
+                'resources': {
+                    'gaze': [{'resource': 'www.example1.com'}],
+                    'precomputed_events': [{'resource': 'www.example2.com'}],
+                },
+            },
             Resources([
                 Resource(content='gaze', url='www.example1.com'),
                 Resource(content='precomputed_events', url='www.example2.com'),
@@ -165,7 +173,7 @@ def test_dataset_definition_is_equal(init_kwargs):
                 'filename_format': {
                     'gaze': 'test1.csv',
                     'precomputed_events': 'test2.csv',
-                }
+                },
             },
             Resources([
                 Resource(content='gaze', url='www.example1.com', filename_pattern='test1.csv'),
@@ -173,7 +181,7 @@ def test_dataset_definition_is_equal(init_kwargs):
                     content='precomputed_events',
                     url='www.example2.com',
                     filename_pattern='test2.csv',
-                )
+                ),
             ]),
             id='two_resources_filename_format_legacy',
         ),
@@ -191,20 +199,10 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
             DatasetDefinition(
                 name='Example',
                 long_name='Example',
-                has_files={
-                    'gaze': False,
-                    'precomputed_events': False,
-                    'precomputed_reading_measures': False,
-                },
             ),
             {
                 'name': 'Example',
                 'long_name': 'Example',
-                'has_files': {
-                    'gaze': False,
-                    'precomputed_events': False,
-                    'precomputed_reading_measures': False,
-                },
                 'acceleration_columns': None,
                 'column_map': {},
                 'custom_read_kwargs': {},
@@ -244,11 +242,6 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
             DatasetDefinition(
                 name='Example',
                 long_name='Example',
-                has_files={
-                    'gaze': False,
-                    'precomputed_events': False,
-                    'precomputed_reading_measures': False,
-                },
                 experiment=Experiment(
                     screen_width_px=1280,
                     screen_height_px=1024,
@@ -262,11 +255,6 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
             {
                 'name': 'Example',
                 'long_name': 'Example',
-                'has_files': {
-                    'gaze': False,
-                    'precomputed_events': False,
-                    'precomputed_reading_measures': False,
-                },
                 'acceleration_columns': None,
                 'column_map': {},
                 'custom_read_kwargs': {},
@@ -316,7 +304,6 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
             {
                 'name': 'MyDatasetDefinition',
                 'long_name': None,
-                'has_files': {},
                 'acceleration_columns': None,
                 'column_map': {},
                 'custom_read_kwargs': {},
@@ -359,7 +346,6 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
                 'name': 'MyDatasetDefinition',
                 'long_name': None,
                 '_foobar': 'test',
-                'has_files': {},
                 'acceleration_columns': None,
                 'column_map': {},
                 'custom_read_kwargs': {},
@@ -414,11 +400,6 @@ def test_dataset_definition_to_dict_exclude_private_expected(exclude_private, ex
         pytest.param(
             DatasetDefinition(
                 name='Example',
-                has_files={
-                    'gaze': False,
-                    'precomputed_events': False,
-                    'precomputed_reading_measures': False,
-                },
             ),
             id='no_exp',
         ),
@@ -426,11 +407,6 @@ def test_dataset_definition_to_dict_exclude_private_expected(exclude_private, ex
         pytest.param(
             DatasetDefinition(
                 name='Example',
-                has_files={
-                    'gaze': False,
-                    'precomputed_events': False,
-                    'precomputed_reading_measures': False,
-                },
                 experiment=Experiment(
                     screen_width_px=1280,
                     screen_height_px=1024,
@@ -471,11 +447,6 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
     dictionary_tmp_file = tmp_path / 'dictionary.yaml'
     yaml_encoding = {
         'name': 'Example',
-        'has_files': {
-            'gaze': False,
-            'precomputed_events': False,
-            'precomputed_reading_measures': False,
-        },
     }
 
     with open(dictionary_tmp_file, 'w', encoding='utf-8') as f:
@@ -485,11 +456,6 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
 
     expected_definition = DatasetDefinition(
         name='Example',
-        has_files={
-            'gaze': False,
-            'precomputed_events': False,
-            'precomputed_reading_measures': False,
-        },
     )
 
     assert yaml_definition == expected_definition
@@ -726,7 +692,6 @@ def test_dataset_definition_not_equal():
             {
                 'name': '.',
                 'long_name': None,
-                'has_files': {},
                 'mirrors': {},
                 'resources': [],
                 'experiment': {
@@ -769,7 +734,6 @@ def test_dataset_definition_not_equal():
             {
                 'name': '.',
                 'long_name': None,
-                'has_files': {},
                 'mirrors': {},
                 'resources': [],
                 'experiment': {
@@ -812,7 +776,6 @@ def test_dataset_definition_not_equal():
             {
                 'name': '.',
                 'long_name': None,
-                'has_files': {},
                 'mirrors': {},
                 'resources': [],
                 'experiment': {
@@ -864,6 +827,10 @@ def test_dataset_to_dict_exclude_none(dataset_definition, exclude_none, expected
         pytest.param(
             {'extract': False},
             id='extract_false',
+        ),
+        pytest.param(
+            {'has_files': {'gaze': True}},
+            id='has_files',
         ),
     ],
 )

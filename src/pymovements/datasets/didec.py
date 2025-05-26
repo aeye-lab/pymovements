@@ -122,13 +122,7 @@ class DIDEC(DatasetDefinition):
 
     long_name: str = 'Dutch Image Description and Eye-tracking Corpus'
 
-    has_files: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': False,
-            'precomputed_reading_measures': False,
-        },
-    )
+    has_files: dict[str, bool] | None = None
 
     resources: Resources = field(
         default_factory=lambda: Resources.from_dicts(

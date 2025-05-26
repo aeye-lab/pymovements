@@ -135,13 +135,8 @@ class PotsdamBingeRemotePVT(DatasetDefinition):
 
     long_name: str = 'Potsdam Binge Remote PVT dataset'
 
-    has_files: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': False,
-            'precomputed_reading_measures': False,
-        },
-    )
+    has_files: dict[str, bool] | None = None
+
     mirrors: dict[str, Sequence[str]] = field(
         default_factory=lambda: {
             'gaze': ['https://osf.io/download/'],

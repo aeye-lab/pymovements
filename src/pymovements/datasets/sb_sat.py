@@ -125,13 +125,7 @@ class SBSAT(DatasetDefinition):
 
     long_name: str = 'Stony Brook SAT reading fixation dataset'
 
-    has_files: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': True,
-            'precomputed_reading_measures': False,
-        },
-    )
+    has_files: dict[str, bool] | None = None
 
     resources: Resources = field(
         default_factory=lambda: Resources.from_dict(
