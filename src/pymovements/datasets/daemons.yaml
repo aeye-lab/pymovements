@@ -13,9 +13,6 @@ resources:
       filename: "eye_movement.zip"
       md5: "2779b4c140a0b1e3c9976488994f08f3"
 
-extract:
-  precomputed_events: true
-
 filename_format:
   precomputed_events: "SAC_{data_split:s}.csv"
 

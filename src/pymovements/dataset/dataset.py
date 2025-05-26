@@ -159,7 +159,7 @@ class Dataset:
         if self.definition.has_files['precomputed_reading_measures']:
             self.load_precomputed_reading_measures()
 
-        # Events extracted previously by pymovements
+        # Events detected previously by pymovements
         if events:
             self.load_event_files(
                 events_dirname=events_dirname,
