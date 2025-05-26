@@ -17,14 +17,15 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Test write_datasets_yaml script."""
 import pytest
 import yaml
 
 from pymovements._scripts import write_datasets_yaml
 
 
-@pytest.fixture()
-def make_datasets_directory(request, tmp_path):
+@pytest.fixture(name='make_datasets_directory')
+def make_datasets_directory_fixture(tmp_path):
     def _make_datasets_directory(param: str, make_yaml: bool):
         datasets = []
         if param in {'single', 'two'}:
@@ -36,7 +37,7 @@ def make_datasets_directory(request, tmp_path):
             filepath.touch()
             datasets.append('second')
         if make_yaml:
-            with open(tmp_path / 'datasets.yaml', 'w') as f:
+            with open(tmp_path / 'datasets.yaml', 'w', encoding='utf-8') as f:
                 yaml.dump(datasets, f)
         return tmp_path
 
