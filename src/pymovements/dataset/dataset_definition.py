@@ -331,6 +331,23 @@ class DatasetDefinition:
                     'This field will be removed in v0.27.0.',
                 ),
             )
+        if filename_format is not None:
+            warn(
+                DeprecationWarning(
+                    'DatasetDefinition.filename_format is deprecated since version v0.23.0. '
+                    'Please use Resource.filename_pattern instead. '
+                    'This field will be removed in v0.28.0.',
+                ),
+            )
+        if filename_format_schema_overrides is not None:
+            warn(
+                DeprecationWarning(
+                    'DatasetDefinition.filename_format_schema_overrides is deprecated since version v0.23.0. '
+                    'Please use Resource.filename_pattern_schema_overrides instead. '
+                    'This field will be removed in v0.28.0.',
+                ),
+            )
+
 
     @property
     @deprecated(

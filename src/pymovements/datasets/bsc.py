@@ -120,25 +120,16 @@ class BSC(DatasetDefinition):
                         'resource': 'https://osf.io/download/xfe4s/',
                         'filename': 'BSC.EMD.zip',
                         'md5': 'c7118bfe48c91264d69c45d347f11416',
+                        'filename_pattern': 'BSC.EMD.txt',
                     },
                 ],
             },
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': 'BSC.EMD.txt',
-            },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': {},
-            },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     trial_columns: list[str] = field(
         default_factory=lambda: [

@@ -114,23 +114,17 @@ class CodeComprehension(DatasetDefinition):
                         'resource': 'https://zenodo.org/records/11123101/files/Predicting%20Code%20Comprehension%20Package.zip?download=1',  # noqa: E501 # pylint: disable=line-too-long
                         'filename': 'data.zip',
                         'md5': '3a3c6fb96550bc2c2ddcf5d458fb12a2',
+                        'filename_pattern': r'fix_report_P{subject_id:s}.txt',
+                        'filename_pattern_schema_overrides': {'subject_id': pl.String},
                     },
                 ],
             },
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'precomputed_events': r'fix_report_P{subject_id:s}.txt',
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'precomputed_events': {'subject_id': pl.Utf8},
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 

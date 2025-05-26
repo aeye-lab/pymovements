@@ -117,26 +117,17 @@ class Provo(DatasetDefinition):
                         'resource': 'https://osf.io/download/z3eh6/',
                         'filename': 'Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv',
                         'md5': '7aa239e51e5d78528e2430f84a23da3f',
+                        'filename_pattern':
+                            'Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv',
                     },
                 ],
             },
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events':
-                'Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv',
-            },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': {},
-            },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 

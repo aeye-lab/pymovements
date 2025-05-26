@@ -137,6 +137,11 @@ class GazeOnFaces(DatasetDefinition):
                         'resource': 'https://uncloud.univ-nantes.fr/index.php/s/8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip',  # noqa: E501 # pylint: disable=line-too-long
                         'filename': 'gaze_csv.zip',
                         'md5': 'fe219f07c9253cd9aaee6bd50233c034',
+                        'filename_pattern': r'gaze_sub{sub_id:d}_trial{trial_id:d}.csv',
+                        'filename_pattern_schema_overrides': {
+                            'sub_id': int,
+                            'trial_id': int,
+                        },
                     },
                 ],
             },
@@ -155,20 +160,9 @@ class GazeOnFaces(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze': r'gaze_sub{sub_id:d}_trial{trial_id:d}.csv',
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'sub_id': int,
-                'trial_id': int,
-            },
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     time_column: Any = None
 

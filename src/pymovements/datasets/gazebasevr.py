@@ -143,6 +143,16 @@ class GazeBaseVR(DatasetDefinition):
                         'resource': 'https://figshare.com/ndownloader/files/38844024',
                         'filename': 'gazebasevr.zip',
                         'md5': '048c04b00fd64347375cc8d37b451a22',
+                        'filename_pattern': (
+                            r'S_{round_id:1d}{subject_id:d}'
+                            r'_S{session_id:d}'
+                            r'_{task_name}.csv'
+                        ),
+                        'filename_pattern_schema_overrides': {
+                            'round_id': int,
+                            'subject_id': int,
+                            'session_id': int,
+                        },
                     },
                 ],
             },
@@ -161,25 +171,9 @@ class GazeBaseVR(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze': (
-                r'S_{round_id:1d}{subject_id:d}'
-                r'_S{session_id:d}'
-                r'_{task_name}.csv'
-            ),
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'round_id': int,
-                'subject_id': int,
-                'session_id': int,
-            },
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     time_column: str = 'n'
 

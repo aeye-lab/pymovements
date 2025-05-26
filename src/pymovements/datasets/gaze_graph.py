@@ -145,6 +145,11 @@ class GazeGraph(DatasetDefinition):
                         'resource': 'https://codeload.github.com/GazeGraphResource/GazeGraph/zip/refs/heads/master',  # noqa: E501 # pylint: disable=line-too-long
                         'filename': 'gaze_graph_data.zip',
                         'md5': '181f4b79477cee6e0267482d989610b0',
+                        'filename_pattern': r'P{subject_id}_{task}.csv',
+                        'filename_pattern_schema_overrides': {
+                            'subject_id': int,
+                            'task': str,
+                        },
                     },
                 ],
             },
@@ -164,20 +169,9 @@ class GazeGraph(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze': r'P{subject_id}_{task}.csv',
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'subject_id': int,
-                'task': str,
-            },
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     trial_columns: list[str] = field(default_factory=lambda: [])
 

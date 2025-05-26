@@ -138,6 +138,21 @@ class DIDEC(DatasetDefinition):
                     'resource': 'https://didec.uvt.nl/corpus/DIDEC_only_the_eyetracking_data.zip',
                     'filename': 'DIDEC_only_the_eyetracking_data.zip',
                     'md5': 'd572b0b41828986ca48a2fcf6966728a',
+                    'filename_pattern':
+                        (
+                            r'Ruud_exp{experiment:d}_'
+                            r'list{list:d}_v{version:d}_'
+                            r'ppn{participant:d}_{session:d}_'
+                            r'Trial{trial:d} Samples.txt'
+                        ),
+                    'filename_pattern_schema_overrides': {
+                        'experiment': int,
+                        'list': int,
+                        'version': int,
+                        'participant': int,
+                        'session': int,
+                        'trial': int,
+                    },
                 },
             ],
         ),
@@ -155,30 +170,9 @@ class DIDEC(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze':
-                (
-                    r'Ruud_exp{experiment:d}_'
-                    r'list{list:d}_v{version:d}_'
-                    r'ppn{participant:d}_{session:d}_'
-                    r'Trial{trial:d} Samples.txt'
-                ),
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'experiment': int,
-                'list': int,
-                'version': int,
-                'participant': int,
-                'session': int,
-                'trial': int,
-            },
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     trial_columns: list[str] = field(
         default_factory=lambda: ['Stimulus'],

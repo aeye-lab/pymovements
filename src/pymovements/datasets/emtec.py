@@ -136,6 +136,8 @@ class EMTeC(DatasetDefinition):
                         'resource': 'https://osf.io/download/374sk/',
                         'filename': 'subject_level_data.zip',
                         'md5': 'dca99e47ef43f3696acec4fd70967750',
+                        'filename_pattern': r'ET_{subject_id:d}.csv',
+                        'filename_pattern_schema_overrides': {'subject_id': int},
                     },
                 ],
                 'precomputed_events': [
@@ -143,6 +145,7 @@ class EMTeC(DatasetDefinition):
                         'resource': 'https://osf.io/download/2hs8p/',
                         'filename': 'fixations.csv',
                         'md5': '5e05a364a1d8a044d8b36506aa91437e',
+                        'filename_pattern': r'fixations.csv',
                     },
                 ],
                 'precomputed_reading_measures': [
@@ -150,6 +153,7 @@ class EMTeC(DatasetDefinition):
                         'resource': 'https://osf.io/download/s4ny8/',
                         'filename': 'reading_measures.csv',
                         'md5': '56880f50af20682558065ac2d26be827',
+                        'filename_pattern': r'reading_measures.csv',
                     },
                 ],
             },
@@ -168,23 +172,9 @@ class EMTeC(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda:
-            {
-                'gaze': r'ET_{subject_id:d}.csv',
-                'precomputed_events': r'fixations.csv',
-                'precomputed_reading_measures': r'reading_measures.csv',
-            },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda:
-            {
-                'gaze': {'subject_id': int},
-                'precomputed_events': {},
-                'precomputed_reading_measures': {},
-            },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     trial_columns: list[str] = field(default_factory=lambda: ['item_id'])
 

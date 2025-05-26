@@ -121,25 +121,16 @@ class BSCII(DatasetDefinition):
                         'resource': 'https://osf.io/download/2cuys/',
                         'filename': 'BSCII.EMD.rev.zip',
                         'md5': '4daad0fa922785d8c681a883b1197e1e',
+                        'filename_pattern': 'BSCII.EMD.rev.txt',
                     },
                 ],
             },
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': 'BSCII.EMD.rev.txt',
-            },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': {},
-            },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     trial_columns: list[str] = field(
         default_factory=lambda: [

@@ -495,6 +495,7 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
     assert yaml_definition == expected_definition
 
 
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
 @pytest.mark.parametrize(
     ('resources', 'expected_has_resources'),
     [
@@ -569,6 +570,7 @@ def test_dataset_definition_has_resources_boolean(resources, expected_has_resour
     assert not (not definition.has_resources and expected_has_resources)
 
 
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
 @pytest.mark.parametrize(
     ('resources', 'expected_resources'),
     [
@@ -663,6 +665,7 @@ def test_dataset_definition_has_resources_indexable(resources, expected_resource
         assert definition.has_resources[key] == value
 
 
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
 def test_dataset_definition_not_equal():
     definition1 = DatasetDefinition(resources={'gaze': [{'resource': 'foo'}]})
     definition2 = DatasetDefinition(resources={})

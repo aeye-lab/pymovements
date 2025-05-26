@@ -142,6 +142,13 @@ class GazeBase(DatasetDefinition):
                         'resource': 'https://figshare.com/ndownloader/files/27039812',
                         'filename': 'GazeBase_v2_0.zip',
                         'md5': 'cb7eb895fb48f8661decf038ab998c9a',
+                        'filename_pattern':
+                            (
+                                r'S_{round_id:1d}{subject_id:d}'
+                                r'_S{session_id:d}'
+                                r'_{task_name}.csv'
+                            ),
+                        'filename_pattern_schema_overrides': {'round_id': int, 'subject_id': int, 'session_id': int},
                     },
                 ],
             },
@@ -160,22 +167,9 @@ class GazeBase(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze':
-                (
-                    r'S_{round_id:1d}{subject_id:d}'
-                    r'_S{session_id:d}'
-                    r'_{task_name}.csv'
-                ),
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {'round_id': int, 'subject_id': int, 'session_id': int},
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     time_column: str = 'n'
 

@@ -12,12 +12,7 @@ resources:
     - resource: https://osf.io/download/xfe4s/
       filename: BSC.EMD.zip
       md5: c7118bfe48c91264d69c45d347f11416
-
-filename_format:
-  precomputed_events: BSC.EMD.txt
-
-filename_format_schema_overrides:
-  precomputed_events: {}
+      filename_pattern: BSC.EMD.txt
 
 trial_columns:
   - book_name
