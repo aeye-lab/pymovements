@@ -19,7 +19,6 @@
 # SOFTWARE.
 from __future__ import annotations
 
-import io
 from pathlib import Path
 
 import yaml
