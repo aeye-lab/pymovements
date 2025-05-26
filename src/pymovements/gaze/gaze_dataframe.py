@@ -33,11 +33,13 @@ from tqdm import tqdm
 
 import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements._utils._checks import check_is_mutual_exclusive
+from pymovements._utils._html import repr_html
 from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
 
 
+@repr_html(['frame', 'events', 'trial_columns', 'experiment'])
 class GazeDataFrame:
     """A DataFrame for gaze time series data.
 
@@ -841,7 +843,7 @@ class GazeDataFrame:
 
             self.events.frame = pl.concat(
                 [self.events.frame, new_events.frame],
-                how='diagonal',
+                how='diagonal_relaxed',
             )
         else:
             grouped_frames = self.frame.partition_by(

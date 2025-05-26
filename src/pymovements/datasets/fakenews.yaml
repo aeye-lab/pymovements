@@ -22,9 +22,6 @@ experiment:
   origin: null
   sampling_rate: 600
 
-extract:
-  precomputed_events: true
-
 filename_format:
   precomputed_events: 'P{subject_id:d}_S{session_id:d}_{truth_value:s}.csv'
 

@@ -71,9 +71,6 @@ class PoTeC(DatasetDefinition):
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    extract: dict[str, bool]
-        Decide whether to extract the data.
-
     experiment: Experiment
         The experiment definition.
 
@@ -131,8 +128,8 @@ class PoTeC(DatasetDefinition):
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
-            'precomputed_events': False,
-            'precomputed_reading_measures': False,
+            'precomputed_events': True,
+            'precomputed_reading_measures': True,
         },
     )
 
@@ -145,10 +142,22 @@ class PoTeC(DatasetDefinition):
                     'md5': 'cffd45039757c3777e2fd130e5d8a2ad',
                 },
             ],
+            'precomputed_events': [
+                {
+                    'resource': 'https://osf.io/download/d8pyg/',
+                    'filename': 'fixation.zip',
+                    'md5': 'ecd9a998d07158922bb9b8cdd52f5688',
+                },
+            ],
+            'precomputed_reading_measures': [
+                {
+                    'resource': 'https://osf.io/download/3ywhz/',
+                    'filename': 'reading_measures.zip',
+                    'md5': 'efafec5ce074d8f492cc2409b6c4d9eb',
+                },
+            ],
         },
     )
-
-    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     experiment: Experiment = field(
         default_factory=lambda: Experiment(
@@ -165,12 +174,22 @@ class PoTeC(DatasetDefinition):
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
             'gaze': r'reader{subject_id:d}_{text_id}_raw_data.tsv',
+            'precomputed_events': r'reader{subject_id:d}_{text_id}_uncorrected_fixations.tsv',
+            'precomputed_reading_measures': r'reader{subject_id:d}_{text_id}_merged.tsv',
         },
     )
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
             'gaze': {
+                'subject_id': int,
+                'text_id': str,
+            },
+            'precomputed_events': {
+                'subject_id': int,
+                'text_id': str,
+            },
+            'precomputed_reading_measures': {
                 'subject_id': int,
                 'text_id': str,
             },
@@ -197,6 +216,15 @@ class PoTeC(DatasetDefinition):
                     'pupil_diameter': pl.Float32,
                 },
                 'separator': '\t',
+            },
+            'precomputed_events': {
+                'separator': '\t',
+                'null_values': '.',
+            },
+            'precomputed_reading_measures': {
+                'separator': '\t',
+                'null_values': '.',
+                'infer_schema_length': 10000,
             },
         },
     )
