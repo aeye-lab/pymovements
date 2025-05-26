@@ -173,7 +173,7 @@ def fixture_experiment():
                 ),
                 pixel_columns=['x_pix', 'y_pix'],
             ),
-            id='center_origin_lower_left',
+            id='center_origin_upper_left',
         ),
 
         pytest.param(
@@ -284,7 +284,7 @@ def fixture_experiment():
                 pixel_columns=['x_pix', 'y_pix'],
                 position_columns=['x_dva', 'y_dva'],
             ),
-            id='pix2deg_origin_lower_left',
+            id='pix2deg_origin_upper_left',
         ),
 
         pytest.param(
@@ -444,7 +444,7 @@ def fixture_experiment():
                 position_columns=['x_dva', 'y_dva'],
                 distance_column='distance',
             ),
-            id='pix2deg_origin_lower_left_default_distance_column',
+            id='pix2deg_origin_upper_left_default_distance_column',
         ),
 
         pytest.param(
@@ -485,7 +485,7 @@ def fixture_experiment():
                 position_columns=['x_dva', 'y_dva'],
                 distance_column='distance',
             ),
-            id='pix2deg_origin_lower_left_from_experiment_distance_column',
+            id='pix2deg_origin_upper_left_from_experiment_distance_column',
         ),
 
         pytest.param(
@@ -558,7 +558,7 @@ def fixture_experiment():
                 pixel_columns=['x_pix', 'y_pix'],
                 position_columns=['x_dva', 'y_dva'],
             ),
-            id='deg2pix_origin_lower_left_default',
+            id='deg2pix_origin_upper_left_default',
         ),
 
         pytest.param(
@@ -595,7 +595,7 @@ def fixture_experiment():
                 pixel_columns=['x_pix', 'y_pix'],
                 position_columns=['x_dva', 'y_dva'],
             ),
-            id='deg2pix_origin_lower_left_from_experiment',
+            id='deg2pix_origin_upper_left_from_experiment',
         ),
 
         pytest.param(

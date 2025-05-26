@@ -126,7 +126,8 @@ def center_origin(
     n_components: int
         Number of components in input column.
     origin: str
-        The location of the pixel origin. Supported values: ``center``, ``upper left``
+        The location of the pixel origin. Supported values: ``center``, ``upper left``.
+        (default: ``upper left``)
     pixel_column: str
         Name of the input column with pixel data. (default: 'pixel')
     output_column: str | None
@@ -242,6 +243,7 @@ def pix2deg(
     origin: str
         The location of the pixel origin. Supported values: ``center``, ``upper left``. See also
         py:func:`~pymovements.gaze.transform.center_origin` for more information.
+        (default: ``upper left``)
     pixel_column: str
         The input pixel column name. (default: 'pixel')
     position_column: str
@@ -315,8 +317,8 @@ def deg2pix(
     n_components: int
         Number of components in input column.
     pixel_origin: str
-        The desired location of the pixel origin. (default: 'upper left')
-        Supported values: ``center``, ``upper left``.
+        The desired location of the pixel origin. Supported values: ``center``, ``upper left``.
+        (default: 'upper left')
     position_column: str
         The input position column name. (default: 'position')
     pixel_column: str
