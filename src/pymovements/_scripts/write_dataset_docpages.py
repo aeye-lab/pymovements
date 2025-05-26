@@ -17,6 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Write documentation pages for datasets."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -51,7 +52,7 @@ def write_docfiles_for_dataset(
     rst_content = f'''.. datatemplate:yaml:: meta/{definition.name}.yaml
     :template: dataset.rst\n'''
 
-    with open(doc_dirpath / f'{definition.name}.rst', 'w') as rst_file:
+    with open(doc_dirpath / f'{definition.name}.rst', 'w', encoding='utf-8') as rst_file:
         rst_file.write(rst_content)
 
 
@@ -80,7 +81,7 @@ def main(
 
     dataset_names = pm.DatasetLibrary.names()
 
-    with open(doc_dirpath / doc_yaml_filename, 'w') as f:
+    with open(doc_dirpath / doc_yaml_filename, 'w', encoding='utf-8') as f:
         yaml.dump(dataset_names, f)
 
     for dataset_name in dataset_names:
