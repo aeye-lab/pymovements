@@ -1,2 +1,2 @@
-.. datatemplate:yaml:: definitions/FakeNewsPerception.yml
+.. datatemplate:yaml:: meta/FakeNewsPerception.yaml
     :template: dataset.rst

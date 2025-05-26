@@ -1,2 +1,2 @@
-.. datatemplate:yaml:: definitions/CodeComprehension.yml
+.. datatemplate:yaml:: meta/CodeComprehension.yaml
     :template: dataset.rst

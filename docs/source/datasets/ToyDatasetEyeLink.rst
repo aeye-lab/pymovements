@@ -1,2 +1,2 @@
-.. datatemplate:yaml:: definitions/ToyDatasetEyeLink.yml
+.. datatemplate:yaml:: meta/ToyDatasetEyeLink.yaml
     :template: dataset.rst

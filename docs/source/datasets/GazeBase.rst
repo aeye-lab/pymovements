@@ -1,2 +1,2 @@
-.. datatemplate:yaml:: definitions/GazeBase.yml
+.. datatemplate:yaml:: meta/GazeBase.yaml
     :template: dataset.rst

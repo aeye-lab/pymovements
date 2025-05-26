@@ -1,2 +1,2 @@
-.. datatemplate:yaml:: definitions/PotsdamBingeWearablePVT.yml
+.. datatemplate:yaml:: meta/PotsdamBingeWearablePVT.yaml
     :template: dataset.rst

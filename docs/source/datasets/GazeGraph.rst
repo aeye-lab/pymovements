@@ -1,2 +1,2 @@
-.. datatemplate:yaml:: definitions/GazeGraph.yml
+.. datatemplate:yaml:: meta/GazeGraph.yaml
     :template: dataset.rst

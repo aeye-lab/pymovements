@@ -1,2 +1,2 @@
-.. datatemplate:yaml:: definitions/DAEMONS.yml
+.. datatemplate:yaml:: meta/DAEMONS.yaml
     :template: dataset.rst

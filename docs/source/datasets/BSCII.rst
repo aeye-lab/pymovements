@@ -1,2 +1,2 @@
-.. datatemplate:yaml:: definitions/BSCII.yml
+.. datatemplate:yaml:: meta/BSCII.yaml
     :template: dataset.rst

@@ -1,2 +1,2 @@
-.. datatemplate:yaml:: definitions/Provo.yml
+.. datatemplate:yaml:: meta/Provo.yaml
     :template: dataset.rst

@@ -1,2 +1,2 @@
-.. datatemplate:yaml:: definitions/DIDEC.yml
+.. datatemplate:yaml:: meta/DIDEC.yaml
     :template: dataset.rst

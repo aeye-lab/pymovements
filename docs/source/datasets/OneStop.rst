@@ -1,2 +1,2 @@
-.. datatemplate:yaml:: definitions/OneStop.yml
+.. datatemplate:yaml:: meta/OneStop.yaml
     :template: dataset.rst

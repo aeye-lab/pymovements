@@ -1,2 +1,2 @@
-.. datatemplate:yaml:: definitions/EMTeC.yml
+.. datatemplate:yaml:: meta/EMTeC.yaml
     :template: dataset.rst

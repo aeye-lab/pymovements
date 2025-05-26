@@ -1,2 +1,2 @@
-.. datatemplate:yaml:: definitions/PotsdamBingeRemotePVT.yml
+.. datatemplate:yaml:: meta/PotsdamBingeRemotePVT.yaml
     :template: dataset.rst

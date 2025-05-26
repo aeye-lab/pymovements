@@ -1,2 +1,2 @@
-.. datatemplate:yaml:: definitions/UCL.yml
+.. datatemplate:yaml:: meta/UCL.yaml
     :template: dataset.rst

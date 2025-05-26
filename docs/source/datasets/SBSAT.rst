@@ -1,2 +1,2 @@
-.. datatemplate:yaml:: definitions/SBSAT.yml
+.. datatemplate:yaml:: meta/SBSAT.yaml
     :template: dataset.rst

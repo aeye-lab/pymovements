@@ -1,2 +1,2 @@
-.. datatemplate:yaml:: definitions/PoTeC.yml
+.. datatemplate:yaml:: meta/PoTeC.yaml
     :template: dataset.rst

@@ -1,0 +1,26 @@
+name: BSCII
+long_name: Beijing Sentence Corpus II
+has_files:
+  gaze: false
+  precomputed_events: true
+  precomputed_reading_measures: false
+resources:
+  precomputed_events:
+  - resource: https://osf.io/download/2cuys/
+    filename: BSCII.EMD.rev.zip
+    md5: 4daad0fa922785d8c681a883b1197e1e
+experiment:
+  screen:
+    origin: upper left
+filename_format:
+  precomputed_events: BSCII.EMD.rev.txt
+filename_format_schema_overrides:
+  precomputed_events: {}
+custom_read_kwargs:
+  precomputed_events:
+    separator: "\t"
+    null_values:
+    - NA
+trial_columns:
+- book_name
+- screen_id

@@ -1,2 +1,2 @@
-.. datatemplate:yaml:: definitions/HBN.yml
+.. datatemplate:yaml:: meta/HBN.yaml
     :template: dataset.rst

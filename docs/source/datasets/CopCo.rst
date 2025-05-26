@@ -1,2 +1,2 @@
-.. datatemplate:yaml:: definitions/CopCo.yml
+.. datatemplate:yaml:: meta/CopCo.yaml
     :template: dataset.rst

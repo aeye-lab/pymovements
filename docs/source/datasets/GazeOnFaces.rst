@@ -1,2 +1,2 @@
-.. datatemplate:yaml:: definitions/GazeOnFaces.yml
+.. datatemplate:yaml:: meta/GazeOnFaces.yaml
     :template: dataset.rst
