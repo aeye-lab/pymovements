@@ -30,6 +30,7 @@ from typing import Union
 from warnings import warn
 
 import yaml
+from deprecated.sphinx import deprecated
 
 from pymovements._utils._html import repr_html
 from pymovements.dataset._utils._yaml import reverse_substitute_types
@@ -246,10 +247,6 @@ class DatasetDefinition:
 
     extract: dict[str, bool] | None = None
 
-    filename_format: dict[str, str] = field(default_factory=dict)
-
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(default_factory=dict)
-
     custom_read_kwargs: dict[str, dict[str, Any]] = field(default_factory=dict)
 
     column_map: dict[str, str] = field(default_factory=dict)
@@ -309,16 +306,6 @@ class DatasetDefinition:
         else:
             self.mirrors = mirrors
 
-        if filename_format is None:
-            self.filename_format = {}
-        else:
-            self.filename_format = filename_format
-
-        if filename_format_schema_overrides is None:
-            self.filename_format_schema_overrides = {}
-        else:
-            self.filename_format_schema_overrides = filename_format_schema_overrides
-
         if custom_read_kwargs is None:
             self.custom_read_kwargs = {}
         else:
@@ -330,7 +317,11 @@ class DatasetDefinition:
             self.column_map = column_map
 
         self.experiment = self._initialize_experiment(experiment)
-        self.resources = self._initialize_resources(resources)
+        self.resources = self._initialize_resources(
+            resources=resources,
+            filename_format=filename_format,
+            filename_format_schema_overrides=filename_format_schema_overrides,
+        )
         self._has_resources = _HasResourcesIndexer(resources=self.resources)
 
         if self.extract is not None:
@@ -340,6 +331,60 @@ class DatasetDefinition:
                     'This field will be removed in v0.27.0.',
                 ),
             )
+
+    @property
+    @deprecated(
+        reason='Please use Resource.filename_pattern instead. '
+               'This field will be removed in v0.28.0.',
+        version='v0.23.0',
+    )
+    def filename_format(self) -> dict[str, str]:
+        data: dict[str, str] = {}
+        content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures')
+        for content_type in content_types:
+            content_resources = self.resources.filter(content=content_type)
+            if content_resources:
+                assert len(content_resources) == 1
+                data[content_type] = content_resources[0].filename_pattern
+
+    @filename_format.setter
+    @deprecated(
+        reason='Please use Resource.filename_pattern instead. '
+               'This field will be removed in v0.28.0.',
+        version='v0.23.0',
+    )
+    def filename_format(self, data: dict[str, str]) -> None:
+        for content_type in data:
+            for resource in self.resources:
+                if resource.content == content_type:
+                    resource.filename_pattern = data[content_type]
+
+    @property
+    @deprecated(
+        reason='Please use Resource.filename_pattern_schema_overrides instead. '
+               'This field will be removed in v0.28.0.',
+        version='v0.23.0',
+    )
+    def filename_format_schema_overrides(self) -> dict[str, dict[str, type]]:
+        data: dict[str, dict[str, type]] = {}
+        content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures')
+        for content_type in content_types:
+            content_resources = self.resources.filter(content=content_type)
+            if content_resources:
+                assert len(content_resources) == 1
+                data[content_type] = content_resources[0].filename_pattern_schema_overrides
+
+    @filename_format_schema_overrides.setter
+    @deprecated(
+        reason='Please use Resource.filename_pattern instead. '
+               'This field will be removed in v0.28.0.',
+        version='v0.23.0',
+    )
+    def filename_format_schema_overrides(self, data: dict[str, dict[str, type]]) -> None:
+        for content_type in data:
+            for resource in self.resources:
+                if resource.content == content_type:
+                    resource.filename_pattern_schema_overrides = data[content_type]
 
     @staticmethod
     def from_yaml(path: str | Path) -> DatasetDefinition:
@@ -483,14 +528,33 @@ class DatasetDefinition:
             return Experiment.from_dict(experiment)
         return experiment
 
-    def _initialize_resources(self, resources: Resources | ResourcesLike | None) -> Resources:
+    def _initialize_resources(
+            self,
+            resources: Resources | ResourcesLike | None,
+            filename_format: dict[str, str],
+            filename_format_schema_overrides: dict[str, dict[str, type]] | None,
+    ) -> Resources:
         """Initailize ``Resources`` instance if necessary."""
         if isinstance(resources, Resources):
             return resources
+
         if resources is None:
             return Resources()
+
         if isinstance(resources, dict):
+            if filename_format:
+                for content_type in filename_format.keys():
+                    for resource in resources[content_type]:
+                        resource['filename_pattern'] = filename_format[content_type]
+
+            if filename_format_schema_overrides:
+                for content_type in filename_format.keys():
+                    for resource in resources[content_type]:
+                        content_overrides = filename_format_schema_overrides[content_type]
+                        resource['filename_pattern_schema_overrides'] = content_overrides
+
             return Resources.from_dict(resources)
+
         if isinstance(resources, Sequence):
             assert isinstance(resources, Sequence)
             return Resources.from_dicts(resources)

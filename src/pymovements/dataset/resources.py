@@ -33,6 +33,10 @@ class Resource:
     """Resource definition."""
 
     content: str
+
+    filename_pattern: str | None = None
+    filename_pattern_schema_overrides: str | None = None
+
     filename: str | None = None
     url: str | None = None
     md5: str | None = None
