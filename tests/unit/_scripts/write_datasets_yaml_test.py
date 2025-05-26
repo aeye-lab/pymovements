@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test write_datasets_yaml script."""
+from pathlib import Path
+
 import pytest
 import yaml
 
@@ -26,7 +28,7 @@ from pymovements._scripts import write_datasets_yaml
 
 @pytest.fixture(name='make_datasets_directory')
 def make_datasets_directory_fixture(tmp_path):
-    def _make_datasets_directory(param: str, make_yaml: bool):
+    def _make_datasets_directory(param: str, make_yaml: bool) -> Path:
         datasets = []
         if param in {'single', 'two'}:
             filepath = tmp_path / 'first.yaml'
@@ -101,7 +103,7 @@ def test_write_datasets_yaml(
         datasets_yaml_filename=datasets_yaml_filename,
     )
 
-    with open(datasets_dirpath / datasets_yaml_filename) as f:
+    with open(datasets_dirpath / datasets_yaml_filename, encoding='utf-8') as f:
         yaml_content = yaml.safe_load(f)
 
     assert return_value == expected_return
