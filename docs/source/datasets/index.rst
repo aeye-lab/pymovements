@@ -38,5 +38,5 @@ Download your dataset and load it into memory with these few lines of code:
    :widths: 65, 5, 5, 5, 5, 5, 5, 5
    :header-rows: 1
 
-.. datatemplate:yaml:: datasets.yml
+.. datatemplate:yaml:: datasets.yaml
    :template: datasets.rst

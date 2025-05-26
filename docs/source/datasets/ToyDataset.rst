@@ -1,2 +1,2 @@
-.. datatemplate:yaml:: definitions/ToyDataset.yml
+.. datatemplate:yaml:: meta/ToyDataset.yml
     :template: dataset.rst
