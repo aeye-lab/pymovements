@@ -4,3 +4,5 @@
 ------------------
 
 {{ data['long_name'] }}
+
+:py:class:`~pymovements.datasets.{{ data['name'] }}`

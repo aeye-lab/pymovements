@@ -1,9 +1,8 @@
-{% for item in data %}
 .. toctree::
 
     :hidden:
-    :maxdepth: 2
+    :maxdepth: 0
 
+    {% for item in data %}
     {{ item }}
-
-{% endfor %}
+    {% endfor %}
