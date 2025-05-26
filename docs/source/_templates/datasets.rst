@@ -1,7 +1,6 @@
 .. toctree::
-
     :hidden:
-    :maxdepth: 0
+    :maxdepth: 1
 
     {% for item in data %}
     {{ item }}
