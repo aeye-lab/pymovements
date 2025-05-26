@@ -5,7 +5,7 @@ long_name: "Potsdam Textbook Corpus"
 has_files:
   gaze: true
   precomputed_events: true
-  precomputed_reading_measures: false
+  precomputed_reading_measures: true
 
 resources:
   gaze:
@@ -16,10 +16,10 @@ resources:
     - resource: "https://osf.io/download/d8pyg/"
       filename: "fixation.zip"
       md5: "ecd9a998d07158922bb9b8cdd52f5688"
-
-extract:
-  gaze: true
-  precomputed_events: true
+  precomputed_reading_measures:
+    - resource: "https://osf.io/download/3ywhz/"
+      filename: "reading_measures.zip"
+      md5: "efafec5ce074d8f492cc2409b6c4d9eb"
 
 experiment:
   screen_width_px: 1680
@@ -33,12 +33,16 @@ experiment:
 filename_format:
   gaze: 'reader{subject_id:d}_{text_id}_raw_data.tsv'
   precomputed_events: 'reader{subject_id:d}_{text_id}_uncorrected_fixations.tsv'
+  precomputed_reading_measures: 'reader{subject_id:d}_{text_id}_merged.tsv'
 
 filename_format_schema_overrides:
   gaze:
     subject_id: !int
     text_id: !str
   precomputed_events:
+    subject_id: !int
+    text_id: !str
+  precomputed_reading_measures:
     subject_id: !int
     text_id: !str
 
@@ -61,3 +65,7 @@ custom_read_kwargs:
   precomputed_events:
     separator: "\t"
     null_values: '.'
+  precomputed_reading_measures:
+    separator: "\t"
+    null_values: '.'
+    infer_schema_length: 10000
