@@ -17,6 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Write datasets.yaml for DatasetLibrary."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -28,6 +29,21 @@ def main(
         datasets_dirpath: str | Path = './src/pymovements/datasets',
         datasets_yaml_filename: str = 'datasets.yaml',
 ) -> int:
+    """Write datasets yaml file for DatasetLibrary.
+
+    Parameters
+    ----------
+    datasets_dirpath: str | Path
+        The path to the directory containing dataset definition yaml files.
+        (default: './src/pymovements/datasets')
+    datasets_yaml_filename: str
+        The filename of the datasets yaml file. (default: 'datasets.yaml')
+
+    Returns
+    -------
+    int
+        ``0`` if no changes needed, ``1`` otherwise.
+    """
     datasets_dirpath = Path(datasets_dirpath)
 
     dataset_filename_stems = sorted(
@@ -38,7 +54,7 @@ def main(
     )
 
     try:
-        with open(datasets_dirpath / datasets_yaml_filename) as f:
+        with open(datasets_dirpath / datasets_yaml_filename, encoding='utf-8') as f:
             dataset_yaml_content = yaml.safe_load(f)
     except FileNotFoundError:
         dataset_yaml_content = None
@@ -48,7 +64,7 @@ def main(
         return 0
 
     # We have some updates in the datasets directory. Update the datasets yaml file.
-    with open(datasets_dirpath / datasets_yaml_filename, 'w') as f:
+    with open(datasets_dirpath / datasets_yaml_filename, 'w', encoding='utf-8') as f:
         yaml.dump(dataset_filename_stems, f)
 
     return 1
