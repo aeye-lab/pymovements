@@ -76,7 +76,7 @@ jobs:
         run: python -m pip install -e ${{ github.workspace }}
 
       - name: Write RST files
-        run: python scripts/write_dataset_rst.py
+        run: python _scripts/write_dataset_docpages.py
 
       - name: Commit dataset documentation changes
         uses: EndBug/add-and-commit@v9

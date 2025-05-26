@@ -29,53 +29,70 @@ import pymovements as pm
 
 def write_docfiles_for_dataset(
         dataset_name: str,
-        datasets_dirpath: Path,
-        datasets_definition_dirname: str,
+        doc_dirpath: Path,
+        doc_meta_dirname: str,
 ) -> None:
+    """Write sphinx documentation files for given dataset.
+
+    Parameters
+    ----------
+    dataset_name: str
+        Name of the dataset for which to write documentation files.
+    doc_dirpath: Path
+        Target dirpath for documentation files.
+    doc_meta_dirname: str
+        Name of the meta directory.
+    """
     definition = pm.DatasetLibrary.get(dataset_name)
 
-    definition.to_yaml(datasets_dirpath / datasets_definition_dirname / f'{definition.name}.yml')
+    meta_dirpath = doc_dirpath / doc_meta_dirname
+    meta_dirpath.mkdir(exist_ok=True)
+    definition.to_yaml(meta_dirpath / f'{definition.name}.yaml')
 
-    rst_content = f'''.. datatemplate:yaml:: definitions/{definition.name}.yml
+    rst_content = f'''.. datatemplate:yaml:: meta/{definition.name}.yaml
     :template: dataset.rst\n'''
 
-    with open(datasets_dirpath / f'{definition.name}.rst', 'w') as rst_file:
+    with open(doc_dirpath / f'{definition.name}.rst', 'w') as rst_file:
         rst_file.write(rst_content)
 
 
 def main(
-        dataset_name: str | None,
-        datasets_dirpath: str | Path = 'docs/source/datasets',
-        datasets_yaml_filename: str = 'datasets.yml',
-        datasets_definition_dirname: str = 'definitions',
+        doc_dirpath: str | Path = 'docs/source/datasets',
+        doc_yaml_filename: str = 'datasets.yaml',
+        doc_meta_dirname: str = 'meta',
 ) -> int:
-    if isinstance(datasets_dirpath, str):
-        datasets_dirpath = Path(datasets_dirpath)
+    """Write sphinx documentation files for all datasets.
 
-    dataset_names = [definition.name for definition in pm.DatasetLibrary.definitions.values()]
+    Parameters
+    ----------
+    doc_dirpath: str | Path
+        Target dirpath for documentation files.
+    doc_yaml_filename: str
+        Filename of the target yaml file containing the list of dataset names.
+    doc_meta_dirname: str
+        Name of the meta directory.
 
-    with open(datasets_dirpath / datasets_yaml_filename, 'w') as f:
+    Returns
+    -------
+    int
+        ``0`` if success.
+    """
+    doc_dirpath = Path(doc_dirpath)
+
+    dataset_names = pm.DatasetLibrary.names()
+
+    with open(doc_dirpath / doc_yaml_filename, 'w') as f:
         yaml.dump(dataset_names, f)
 
-    if isinstance(dataset_name, str):
+    for dataset_name in dataset_names:
         write_docfiles_for_dataset(
             dataset_name=dataset_name,
-            datasets_dirpath=datasets_dirpath,
-            datasets_definition_dirname=datasets_definition_dirname,
+            doc_dirpath=doc_dirpath,
+            doc_meta_dirname=doc_meta_dirname,
         )
-    else:
-        for dataset_name in dataset_names:
-            write_docfiles_for_dataset(
-                dataset_name=dataset_name,
-                datasets_dirpath=datasets_dirpath,
-                datasets_definition_dirname=datasets_definition_dirname,
-            )
 
     return 0
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', default=None)
-    args = parser.parse_args()
     raise SystemExit(main(dataset_name=args.dataset))
