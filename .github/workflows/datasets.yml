@@ -1,6 +1,6 @@
 name: datasets
 on:
-  pull_request:  # TODO: revert change
+  pull_request:
     branches: [main]
   push:
     tags:
@@ -34,7 +34,7 @@ jobs:
     name: test ${{ matrix.dataset }}
     runs-on: ubuntu-latest
     needs: [prepare-matrix]
-    if: ${{ github.event_name != 'pull_request' }}  # TODO: revert change
+    if: startsWith(github.event.ref, 'refs/tags/v')
     strategy:
       fail-fast: false
       matrix:
