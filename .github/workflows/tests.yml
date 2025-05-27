@@ -65,7 +65,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           key:
-            tox-${{ matrix.os }}-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
+            test-${{ matrix.os }}-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
           path: |
             ~/.cache
             ~/.tox
@@ -81,7 +81,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           key:
-            tox-${{ matrix.os }}-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
+            test-${{ matrix.os }}-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
           path: |
             ~/.cache
             ~/.tox
@@ -112,7 +112,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           key:
-            tox-pylint-${{hashFiles('tox.ini') }}
+            pylint-ubuntu-latest-py39-${{hashFiles('tox.ini') }}
           path: |
             ~/.cache
             ~/.tox
@@ -128,7 +128,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           key:
-            tox-pylint-${{hashFiles('tox.ini') }}
+            pylint-ubuntu-latest-py39-${{hashFiles('tox.ini') }}
           path: |
             ~/.cache
             ~/.tox
@@ -154,7 +154,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           key:
-            tox-${{ matrix.os }}-minreq-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
+            test-minreq-${{ matrix.os }}-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
           path: |
             ~/.cache
             ~/.tox
@@ -170,7 +170,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           key:
-            tox-${{ matrix.os }}-minreq-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
+            test-minreq-${{ matrix.os }}-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
           path: |
             ~/.cache
             ~/.tox
@@ -207,7 +207,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           key:
-            tox-${{ matrix.os }}-docs-${{hashFiles('tox.ini') }}
+            docs-${{ matrix.os }}-py39-${{hashFiles('tox.ini') }}
           path: |
             ~/.cache
             ~/.tox
@@ -223,7 +223,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           key:
-            tox-${{ matrix.os }}-docs-${{hashFiles('tox.ini') }}
+            docs-${{ matrix.os }}-py39-${{hashFiles('tox.ini') }}
           path: |
             ~/.cache
             ~/.tox

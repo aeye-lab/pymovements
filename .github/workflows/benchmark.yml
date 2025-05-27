@@ -28,7 +28,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           key:
-            tox-benchmark-${{hashFiles('tox.ini') }}
+            benchmark-ubuntu-latest-py313-${{hashFiles('tox.ini') }}
           path: |
             ~/.cache
             ~/.tox
@@ -44,7 +44,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           key:
-            tox-benchmark-${{hashFiles('tox.ini') }}
+            benchmark-ubuntu-latest-py313-${{hashFiles('tox.ini') }}
           path: |
             ~/.cache
             ~/.tox
