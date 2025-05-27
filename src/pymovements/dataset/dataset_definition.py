@@ -71,8 +71,8 @@ class DatasetDefinition:
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
         (default: ResourceDefinitions())
-    experiment: Experiment
-        The experiment definition. (default: Experiment())
+    experiment: Experiment | None
+        The experiment definition. (default: None)
     extract: dict[str, bool] | None
         Decide whether to extract the data. (default: None)
         .. deprecated:: v0.22.1
@@ -149,7 +149,7 @@ class DatasetDefinition:
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
         (default: None)
-    experiment: Experiment | dict[str, Any] | None
+    experiment: Experiment | None
         The experiment definition. (default: None)
     extract: dict[str, bool] | None
         Decide whether to extract the data. (default: None)
@@ -242,7 +242,7 @@ class DatasetDefinition:
 
     resources: ResourceDefinitions = field(default_factory=ResourceDefinitions)
 
-    experiment: Experiment = field(default_factory=Experiment)
+    experiment: Experiment | None = field(default_factory=Experiment)
 
     extract: dict[str, bool] | None = None
 
@@ -270,7 +270,7 @@ class DatasetDefinition:
             has_files: dict[str, bool] | None = None,
             mirrors: dict[str, Sequence[str]] | None = None,
             resources: ResourceDefinitions | ResourcesLike | None = None,
-            experiment: Experiment | dict[str, Any] | None = None,
+            experiment: Experiment | None = None,
             extract: dict[str, bool] | None = None,
             filename_format: dict[str, str] | None = None,
             filename_format_schema_overrides: dict[str, dict[str, type]] | None = None,
@@ -287,6 +287,8 @@ class DatasetDefinition:
     ) -> None:
         self.name = name
         self.long_name = long_name
+
+        self.experiment = experiment
 
         self.extract = extract
 
@@ -329,7 +331,6 @@ class DatasetDefinition:
         else:
             self.column_map = column_map
 
-        self.experiment = self._initialize_experiment(experiment)
         self.resources = self._initialize_resources(resources)
         self._has_resources = _HasResourcesIndexer(resources=self.resources)
 
@@ -404,7 +405,7 @@ class DatasetDefinition:
 
         # Convert those object fields.
         if 'experiment' in data and data['experiment'] is not None:
-            data['experiment'] = self.experiment.to_dict(exclude_none=exclude_none)
+            data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none)
         if 'resources' in data and data['resources'] is not None:
             data['resources'] = self.resources.to_dicts(exclude_none=exclude_none)
 
@@ -474,14 +475,6 @@ class DatasetDefinition:
         # A better way to update the resources would be through a resources setter property.
         self._has_resources.set_resources(self.resources)
         return self._has_resources
-
-    def _initialize_experiment(self, experiment: Experiment | dict[str, Any] | None) -> Experiment:
-        """Initailize ``Experiment`` instance if necessary."""
-        if experiment is None:
-            return Experiment()
-        if isinstance(experiment, dict):
-            return Experiment.from_dict(experiment)
-        return experiment
 
     def _initialize_resources(
         self, resources: ResourceDefinitions |
