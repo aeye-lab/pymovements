@@ -188,9 +188,9 @@ def _download_resource_without_mirrors(
 ) -> None:
     """Download resource without mirrors."""
     if resource.url is None:
-        raise AttributeError(f'Resource.url must not be None')
+        raise AttributeError('Resource.url must not be None')
     if resource.filename is None:
-        raise AttributeError(f'Resource.filename must not be None')
+        raise AttributeError('Resource.filename must not be None')
 
     try:
         download_file(
@@ -216,9 +216,9 @@ def _download_resource_with_mirrors(
 ) -> None:
     """Download resource with mirrors."""
     if resource.url is None:
-        raise AttributeError(f'Resource.url must not be None')
+        raise AttributeError('Resource.url must not be None')
     if resource.filename is None:
-        raise AttributeError(f'Resource.filename must not be None')
+        raise AttributeError('Resource.filename must not be None')
 
     success = False
 
