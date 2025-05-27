@@ -77,7 +77,6 @@ jobs:
 
       - name: Cache tox environment
         uses: actions/cache/save@v4
-        if: github.ref == 'refs/heads/main'
         with:
           key:
             tox-${{ matrix.os }}-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
@@ -121,7 +120,6 @@ jobs:
 
       - name: Cache tox environment
         uses: actions/cache/save@v4
-        if: github.ref == 'refs/heads/main'
         with:
           key:
             tox-pylint-${{hashFiles('tox.ini') }}
@@ -159,7 +157,6 @@ jobs:
 
       - name: Cache tox environment
         uses: actions/cache/save@v4
-        if: github.ref == 'refs/heads/main'
         with:
           key:
             tox-${{ matrix.os }}-minreq-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
@@ -209,7 +206,6 @@ jobs:
 
       - name: Cache tox environment
         uses: actions/cache/save@v4
-        if: github.ref == 'refs/heads/main'
         with:
           key:
             tox-${{ matrix.os }}-docs-${{hashFiles('tox.ini') }}
