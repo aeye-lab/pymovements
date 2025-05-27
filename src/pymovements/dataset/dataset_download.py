@@ -88,7 +88,7 @@ def download_dataset(
             else:
                 mirrors = definition.mirrors.get(content, None)
 
-            if not definition.resources.filter(content):
+            if not definition.resources.has_content(content):
                 raise AttributeError(
                     f"'{content}' resources must be specified to download dataset.",
                 )
