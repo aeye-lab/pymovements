@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-  "setuptools>=61.0.0",
+  "setuptools>=61.0.0,<80.9.0",
   "setuptools-git-versioning<3",
   "versioneer[toml]>=0.29,<1.0",
   "wheel"
@@ -55,7 +55,7 @@ docs = [
   "pandoc",
   "pybtex",
   "pydata-sphinx-theme>=0.12",
-  "setuptools>=61.0.0",
+  "setuptools>=61.0.0,<80.9.0",
   "sphinx>=7.0,<8.3",
   "sphinx-copybutton>=0.4.0",
   "sphinx-favicon>=1.0.1",
@@ -69,7 +69,7 @@ test = [
   "pytest>=6.0.0",
   "pytest-benchmark>=5.1.0",
   "pytest-cov>=4.0.0",
-  "setuptools>=61.0.0",
+  "setuptools>=61.0.0,<80.9.0",
   "types-tqdm>=4.64.0,<5"
 ]
 
