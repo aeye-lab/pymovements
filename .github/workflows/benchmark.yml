@@ -25,10 +25,11 @@ jobs:
           python-version: "3.13"
 
       - name: Restore cached environment
+        id: cache-restore
         uses: actions/cache/restore@v4
         with:
           key:
-            benchmark-ubuntu-latest-py313-${{hashFiles('tox.ini') }}
+            benchmark-ubuntu-latest-py313-${{ hashFiles('tox.ini', 'pyproject.toml', '.github/workflows/benchmark.yml') }}
           path: |
             ~/.cache
             ~/.tox
@@ -44,7 +45,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           key:
-            benchmark-ubuntu-latest-py313-${{hashFiles('tox.ini') }}
+            ${{ steps.cache-restore.outputs.cache-primary-key }}
           path: |
             ~/.cache
             ~/.tox

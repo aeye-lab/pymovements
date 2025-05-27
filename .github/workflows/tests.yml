@@ -62,10 +62,11 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Restore cached environment
+        id: cache-restore
         uses: actions/cache/restore@v4
         with:
           key:
-            test-${{ matrix.os }}-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
+            test-${{ matrix.os }}-${{ matrix.tox_env }}-${{ hashFiles('tox.ini', 'pyproject.toml', '.github/workflows/tests') }}
           path: |
             ~/.cache
             ~/.tox
@@ -81,7 +82,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           key:
-            test-${{ matrix.os }}-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
+            ${{ steps.cache-restore.outputs.cache-primary-key }}
           path: |
             ~/.cache
             ~/.tox
@@ -109,10 +110,11 @@ jobs:
           python-version: "3.9"
 
       - name: Restore cached tox environment
+        id: cache-restore
         uses: actions/cache/restore@v4
         with:
           key:
-            pylint-ubuntu-latest-py39-${{hashFiles('tox.ini') }}
+            pylint-ubuntu-latest-py39-${{ hashFiles('tox.ini', 'pyproject.toml', '.github/workflows/tests') }}
           path: |
             ~/.cache
             ~/.tox
@@ -128,7 +130,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           key:
-            pylint-ubuntu-latest-py39-${{hashFiles('tox.ini') }}
+            ${{ steps.cache-restore.outputs.cache-primary-key }}
           path: |
             ~/.cache
             ~/.tox
@@ -151,10 +153,11 @@ jobs:
           python-version: "3.9"
 
       - name: Restore cached tox environment
+        id: cache-restore
         uses: actions/cache/restore@v4
         with:
           key:
-            test-minreq-${{ matrix.os }}-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
+            test-minreq-${{ matrix.os }}-${{ matrix.tox_env }}-${{ hashFiles('tox.ini', 'pyproject.toml', '.github/workflows/tests') }}
           path: |
             ~/.cache
             ~/.tox
@@ -170,7 +173,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           key:
-            test-minreq-${{ matrix.os }}-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
+            ${{ steps.cache-restore.outputs.cache-primary-key }}
           path: |
             ~/.cache
             ~/.tox
@@ -204,10 +207,11 @@ jobs:
           python-version: "3.9"
 
       - name: Restore cached tox environment
+        id: cache-restore
         uses: actions/cache/restore@v4
         with:
           key:
-            docs-${{ matrix.os }}-py39-${{hashFiles('tox.ini') }}
+            docs-${{ matrix.os }}-py39-${{ hashFiles('tox.ini', 'pyproject.toml', '.github/workflows/tests') }}
           path: |
             ~/.cache
             ~/.tox
@@ -223,7 +227,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           key:
-            docs-${{ matrix.os }}-py39-${{hashFiles('tox.ini') }}
+            ${{ steps.cache-restore.outputs.cache-primary-key }}
           path: |
             ~/.cache
             ~/.tox
