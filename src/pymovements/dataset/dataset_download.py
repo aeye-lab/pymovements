@@ -187,11 +187,6 @@ def _download_resource_without_mirrors(
         verbose: bool,
 ) -> None:
     """Download resource without mirrors."""
-    if resource.url is None:
-        raise TypeError()
-    if resource.filename is None:
-        raise TypeError()
-
     try:
         download_file(
             url=resource.url,
@@ -215,11 +210,6 @@ def _download_resource_with_mirrors(
         verbose: bool,
 ) -> None:
     """Download resource with mirrors."""
-    if resource.url is None:
-        raise TypeError()
-    if resource.filename is None:
-        raise TypeError()
-
     success = False
 
     for mirror_idx, mirror in enumerate(mirrors):

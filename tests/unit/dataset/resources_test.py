@@ -523,3 +523,43 @@ def test_resources_filter_expected(resources, content_type, expected_resources):
 def test_resources_has_content_expected(resources, expected_has_content):
     for key, value in expected_has_content.items():
         assert resources.has_content(key) == value, (resources, value)
+
+
+@pytest.mark.parametrize(
+    ('dicts', 'expected_resources'),
+    [
+        pytest.param(
+            None,
+            [],
+            id='none',
+        ),
+
+        pytest.param(
+            [],
+            [],
+            id='empty_list',
+        ),
+
+        pytest.param(
+            [{'filename': 'myfile.txt', 'content': 'gaze'}],
+            [
+                ResourceDefinition(filename='myfile.txt', content='gaze'),
+            ],
+            id='single_resource',
+        ),
+
+        pytest.param(
+            [
+                {'filename': 'myfile.txt', 'content': 'gaze'},
+                {'filename': 'events.csv', 'content': 'precomputed_events'},
+            ],
+            [
+                ResourceDefinition(filename='myfile.txt', content='gaze'),
+                ResourceDefinition(filename='events.csv', content='precomputed_events'),
+            ],
+            id='two_resources',
+        ),
+    ],
+)
+def test_resources_from_dicts_expected(dicts, expected_resources):
+    assert ResourceDefinitions.from_dicts(dicts) == expected_resources

@@ -758,3 +758,22 @@ def test_dataset_definition_attribute_is_removed(attribute_kwarg):
         f'utils/parsing.py was planned to be removed in v{remove_version}. '
         f'Current version is v{current_version}.'
     )
+
+
+@pytest.mark.parametrize(
+    ('init_kwargs', 'exception', 'exception_msg'),
+    [
+        pytest.param(
+            {'resources': 1},
+            TypeError,
+            'resources is of type int but must be of type ResourceDefinitions, list, or dict.',
+            id='resources_int',
+        ),
+    ],
+)
+def test_dataset_definition_init_raises_exception(init_kwargs, exception, exception_msg):
+    with pytest.raises(exception) as excinfo:
+        DatasetDefinition(**init_kwargs)
+
+    msg, = excinfo.value.args
+    assert msg == exception_msg
