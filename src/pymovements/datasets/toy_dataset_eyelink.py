@@ -27,6 +27,7 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
 
@@ -53,7 +54,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: dict[str, list[dict[str, str]]]
+    resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -131,17 +132,19 @@ class ToyDatasetEyeLink(DatasetDefinition):
         },
     )
 
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda: {
-            'gaze':
-                [
-                    {
-                        'resource': 'http://github.com/aeye-lab/pymovements-toy-dataset-eyelink/zipball/a970d090588542dad745297866e794ab9dad8795/',  # noqa: E501 # pylint: disable=line-too-long
-                        'filename': 'pymovements-toy-dataset-eyelink.zip',
-                        'md5': 'b1d426751403752c8a154fc48d1670ce',
-                    },
-                ],
-        },
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict(
+            {
+                'gaze':
+                    [
+                        {
+                            'resource': 'http://github.com/aeye-lab/pymovements-toy-dataset-eyelink/zipball/a970d090588542dad745297866e794ab9dad8795/',  # noqa: E501 # pylint: disable=line-too-long
+                            'filename': 'pymovements-toy-dataset-eyelink.zip',
+                            'md5': 'b1d426751403752c8a154fc48d1670ce',
+                        },
+                    ],
+            },
+        ),
     )
 
     experiment: Experiment = field(

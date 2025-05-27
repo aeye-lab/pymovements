@@ -27,6 +27,7 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
@@ -64,7 +65,7 @@ class PoTeC(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: dict[str, list[dict[str, str]]]
+    resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -133,30 +134,32 @@ class PoTeC(DatasetDefinition):
         },
     )
 
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda: {
-            'gaze': [
-                {
-                    'resource': 'https://osf.io/download/tgd9q/',
-                    'filename': 'PoTeC.zip',
-                    'md5': 'cffd45039757c3777e2fd130e5d8a2ad',
-                },
-            ],
-            'precomputed_events': [
-                {
-                    'resource': 'https://osf.io/download/d8pyg/',
-                    'filename': 'fixation.zip',
-                    'md5': 'ecd9a998d07158922bb9b8cdd52f5688',
-                },
-            ],
-            'precomputed_reading_measures': [
-                {
-                    'resource': 'https://osf.io/download/3ywhz/',
-                    'filename': 'reading_measures.zip',
-                    'md5': 'efafec5ce074d8f492cc2409b6c4d9eb',
-                },
-            ],
-        },
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict(
+            {
+                'gaze': [
+                    {
+                        'resource': 'https://osf.io/download/tgd9q/',
+                        'filename': 'PoTeC.zip',
+                        'md5': 'cffd45039757c3777e2fd130e5d8a2ad',
+                    },
+                ],
+                'precomputed_events': [
+                    {
+                        'resource': 'https://osf.io/download/d8pyg/',
+                        'filename': 'fixation.zip',
+                        'md5': 'ecd9a998d07158922bb9b8cdd52f5688',
+                    },
+                ],
+                'precomputed_reading_measures': [
+                    {
+                        'resource': 'https://osf.io/download/3ywhz/',
+                        'filename': 'reading_measures.zip',
+                        'md5': 'efafec5ce074d8f492cc2409b6c4d9eb',
+                    },
+                ],
+            },
+        ),
     )
 
     experiment: Experiment = field(

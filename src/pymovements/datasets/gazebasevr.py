@@ -27,6 +27,7 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
@@ -61,7 +62,7 @@ class GazeBaseVR(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: dict[str, list[dict[str, str]]]
+    resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -134,16 +135,18 @@ class GazeBaseVR(DatasetDefinition):
         },
     )
 
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda: {
-            'gaze': [
-                {
-                    'resource': 'https://figshare.com/ndownloader/files/38844024',
-                    'filename': 'gazebasevr.zip',
-                    'md5': '048c04b00fd64347375cc8d37b451a22',
-                },
-            ],
-        },
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict(
+            {
+                'gaze': [
+                    {
+                        'resource': 'https://figshare.com/ndownloader/files/38844024',
+                        'filename': 'gazebasevr.zip',
+                        'md5': '048c04b00fd64347375cc8d37b451a22',
+                    },
+                ],
+            },
+        ),
     )
 
     experiment: Experiment = field(
