@@ -136,9 +136,7 @@ class Resources(list):
             if not content_dictionaries:
                 continue
             for content_dictionary in content_dictionaries:
-                _dictionary: dict[str, Any] = {
-                    key: deepcopy(value) for key, value in content_dictionary.items()
-                }
+                _dictionary = deepcopy(dictionary)
                 _dictionary['content'] = content_type
                 resource = Resource.from_dict(_dictionary)
                 resources.append(resource)
