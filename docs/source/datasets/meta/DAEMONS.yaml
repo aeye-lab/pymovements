@@ -9,9 +9,6 @@ resources:
   - resource: https://osf.io/download/ztgna/
     filename: eye_movement.zip
     md5: 2779b4c140a0b1e3c9976488994f08f3
-experiment:
-  screen:
-    origin: upper left
 filename_format:
   precomputed_events: SAC_{data_split:s}.csv
 filename_format_schema_overrides:
