@@ -748,7 +748,7 @@ def fixture_experiment():
                 position_columns=['x_dva', 'y_dva'],
                 velocity_columns=['x_vel', 'y_vel'],
             ),
-            id='pos2vel_five_point',
+            id='pos2vel_fivepoint',
         ),
 
         pytest.param(
