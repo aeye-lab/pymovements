@@ -492,6 +492,5 @@ class DatasetDefinition:
         if isinstance(resources, dict):
             return Resources.from_dict(resources)
         if isinstance(resources, Sequence):
-            assert isinstance(resources, Sequence)
             return Resources.from_dicts(resources)
         raise TypeError()
