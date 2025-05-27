@@ -372,7 +372,8 @@ def test_resources_to_dicts_expected(resources, expected_dicts):
 
         pytest.param(
             ResourceDefinitions.from_dicts(
-                [{'filename': 'events.csv', 'content': 'precomputed_events'}]),
+                [{'filename': 'events.csv', 'content': 'precomputed_events'}],
+            ),
             'precomputed_events',
             [
                 ResourceDefinition(filename='events.csv', content='precomputed_events'),
@@ -382,7 +383,8 @@ def test_resources_to_dicts_expected(resources, expected_dicts):
 
         pytest.param(
             ResourceDefinitions.from_dicts(
-                [{'filename': 'events.csv', 'content': 'precomputed_events'}]),
+                [{'filename': 'events.csv', 'content': 'precomputed_events'}],
+            ),
             'gaze',
             [],
             id='single_precomputed_events_filter_gaze',

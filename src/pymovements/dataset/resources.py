@@ -104,7 +104,8 @@ class ResourceDefinitions(list):
         Returns
         -------
         ResourceDefinitions
-            A new ``ResourceDefinitions`` instance that contains only resources of specified content type.
+            A new ``ResourceDefinitions`` instance that contains only resources of the specified
+            content type.
         """
         if content is None:
             return self
@@ -136,7 +137,7 @@ class ResourceDefinitions(list):
             if not content_dictionaries:
                 continue
             for content_dictionary in content_dictionaries:
-                _dictionary = deepcopy(dictionary)
+                _dictionary = deepcopy(content_dictionary)
                 _dictionary['content'] = content_type
                 resource = ResourceDefinition.from_dict(_dictionary)
                 resources.append(resource)
