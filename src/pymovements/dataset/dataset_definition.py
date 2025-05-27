@@ -242,17 +242,12 @@ class DatasetDefinition:
 
         # Delete fields that evaluate to False (False, None, [], {})
         if exclude_none:
-            if not self.experiment:
-                del data['experiment']
-            else:
-                data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none)
-
             for key, value in list(data.items()):
                 if not isinstance(value, (bool, int, float)) and not value:
                     del data[key]
-        else:
-            data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none)
 
+        if 'experiment' in data and data['experiment'] is not None:
+            data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none)
         return data
 
     def to_yaml(

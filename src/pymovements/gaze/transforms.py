@@ -110,8 +110,8 @@ def register_transform(method: TransformMethod) -> TransformMethod:
 def center_origin(
         *,
         screen_resolution: tuple[int, int],
-        origin: str,
         n_components: int,
+        origin: str = 'upper left',
         pixel_column: str = 'pixel',
         output_column: str | None = None,
 ) -> pl.Expr:
@@ -123,10 +123,11 @@ def center_origin(
     ----------
     screen_resolution: tuple[int, int]
         Pixel screen resolution as tuple (width, height).
-    origin: str
-        The location of the pixel origin. Supported values: ``center``, ``upper left``
     n_components: int
         Number of components in input column.
+    origin: str
+        The location of the pixel origin. Supported values: ``center``, ``upper left``.
+        (default: ``upper left``)
     pixel_column: str
         Name of the input column with pixel data. (default: 'pixel')
     output_column: str | None
@@ -220,8 +221,8 @@ def pix2deg(
         screen_resolution: tuple[int, int],
         screen_size: tuple[float, float],
         distance: float | str,
-        origin: str,
         n_components: int,
+        origin: str = 'upper left',
         pixel_column: str = 'pixel',
         position_column: str = 'position',
 ) -> pl.Expr:
@@ -237,11 +238,12 @@ def pix2deg(
         Must be either a scalar or a string. If a scalar is passed, it is interpreted as the
         Eye-to-screen distance in centimeters. If a string is passed, it is interpreted as the name
         of a column containing the Eye-to-screen distance in millimiters for each sample.
+    n_components: int
+        Number of components in input column.
     origin: str
         The location of the pixel origin. Supported values: ``center``, ``upper left``. See also
         py:func:`~pymovements.gaze.transform.center_origin` for more information.
-    n_components: int
-        Number of components in input column.
+        (default: ``upper left``)
     pixel_column: str
         The input pixel column name. (default: 'pixel')
     position_column: str
@@ -295,8 +297,8 @@ def deg2pix(
         screen_resolution: tuple[int, int],
         screen_size: tuple[float, float],
         distance: float | str,
-        pixel_origin: str = 'upper left',
         n_components: int,
+        pixel_origin: str = 'upper left',
         position_column: str = 'position',
         pixel_column: str = 'pixel',
 ) -> pl.Expr:
@@ -312,11 +314,11 @@ def deg2pix(
         Must be either a scalar or a string. If a scalar is passed, it is interpreted as the
         Eye-to-screen distance in centimeters. If a string is passed, it is interpreted as the name
         of a column containing the Eye-to-screen distance in millimiters for each sample.
-    pixel_origin: str
-        The desired location of the pixel origin. (default: 'upper left')
-        Supported values: ``center``, ``upper left``.
     n_components: int
         Number of components in input column.
+    pixel_origin: str
+        The desired location of the pixel origin. Supported values: ``center``, ``upper left``.
+        (default: 'upper left')
     position_column: str
         The input position column name. (default: 'position')
     pixel_column: str
