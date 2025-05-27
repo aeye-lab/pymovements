@@ -483,7 +483,8 @@ class DatasetDefinition:
             return Experiment.from_dict(experiment)
         return experiment
 
-    def _initialize_resources(self, resources: ResourceDefinitions | ResourcesLike | None) -> ResourceDefinitions:
+    def _initialize_resources(self, resources: ResourceDefinitions |
+                              ResourcesLike | None) -> ResourceDefinitions:
         """Initialize ``ResourceDefinitions`` instance if necessary."""
         if isinstance(resources, ResourceDefinitions):
             return resources
