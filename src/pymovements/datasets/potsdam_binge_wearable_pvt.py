@@ -28,7 +28,7 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.resources import Resources
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
 from pymovements.gaze.screen import Screen
@@ -61,7 +61,7 @@ class PotsdamBingeWearablePVT(DatasetDefinition):
     mirrors: dict[str, Sequence[str]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources: Resources
+    resources: ResourceDefinitions
         A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -150,8 +150,8 @@ class PotsdamBingeWearablePVT(DatasetDefinition):
         },
     )
 
-    resources: Resources = field(
-        default_factory=lambda: Resources.from_dict(
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict(
             {
                 'gaze': [
                     {

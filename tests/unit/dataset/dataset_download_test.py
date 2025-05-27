@@ -29,7 +29,7 @@ import pytest
 from pymovements import Dataset
 from pymovements import DatasetDefinition
 from pymovements import DatasetPaths
-from pymovements import Resources
+from pymovements import ResourceDefinitions
 
 
 @pytest.fixture(
@@ -1186,7 +1186,7 @@ def test_dataset_download_default_extract_precomputed(
                 'precomputed_events': False,
                 'precomputed_reading_measures': False,
             },
-            resources=Resources.from_dict({
+            resources=ResourceDefinitions.from_dict({
                 'gaze': [{
                     'resource': 'test.gz.tar',
                     'filename': 'test.gz.tar',
@@ -1201,7 +1201,7 @@ def test_dataset_download_default_extract_precomputed(
                 'precomputed_events': True,
                 'precomputed_reading_measures': False,
             },
-            resources=Resources.from_dict({
+            resources=ResourceDefinitions.from_dict({
                 'precomputed_events': [{
                     'resource': 'test.gz.tar',
                     'filename': 'test.gz.tar',
@@ -1216,7 +1216,7 @@ def test_dataset_download_default_extract_precomputed(
                 'precomputed_events': False,
                 'precomputed_reading_measures': True,
             },
-            resources=Resources.from_dict({
+            resources=ResourceDefinitions.from_dict({
                 'precomputed_reading_measures': [{
                     'resource': 'test.gz.tar',
                     'filename': 'test.gz.tar',

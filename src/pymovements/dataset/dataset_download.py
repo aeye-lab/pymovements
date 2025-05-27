@@ -30,8 +30,8 @@ from pymovements.dataset._utils._archives import extract_archive
 from pymovements.dataset._utils._downloads import download_file
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
-from pymovements.dataset.resources import Resource
-from pymovements.dataset.resources import Resources
+from pymovements.dataset.resources import ResourceDefinition
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.exceptions import UnknownFileType
 
 
@@ -168,7 +168,7 @@ def extract_dataset(
 
 def _download_resources(
         mirrors: Sequence[str] | None,
-        resources: Resources,
+        resources: ResourceDefinitions,
         target_dirpath: Path,
         verbose: bool,
 ) -> None:
@@ -182,7 +182,7 @@ def _download_resources(
 
 
 def _download_resource_without_mirrors(
-        resource: Resource,
+        resource: ResourceDefinition,
         target_dirpath: Path,
         verbose: bool,
 ) -> None:
@@ -210,7 +210,7 @@ def _download_resource_without_mirrors(
 
 def _download_resource_with_mirrors(
         mirrors: Sequence[str],
-        resource: Resource,
+        resource: ResourceDefinition,
         target_dirpath: Path,
         verbose: bool,
 ) -> None:

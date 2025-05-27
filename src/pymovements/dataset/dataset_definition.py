@@ -36,7 +36,7 @@ from pymovements.dataset._utils._yaml import reverse_substitute_types
 from pymovements.dataset._utils._yaml import substitute_types
 from pymovements.dataset._utils._yaml import type_constructor
 from pymovements.dataset.resources import _HasResourcesIndexer
-from pymovements.dataset.resources import Resources
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
@@ -65,12 +65,12 @@ class DatasetDefinition:
     mirrors: dict[str, Sequence[str]]
         A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
         (default: {})
-    resources: Resources
+    resources: ResourceDefinitions
         A list of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
-        (default: Resources())
+        (default: ResourceDefinitions())
     experiment: Experiment
         The experiment definition. (default: Experiment())
     extract: dict[str, bool] | None
@@ -143,7 +143,7 @@ class DatasetDefinition:
     mirrors: dict[str, Sequence[str]] | None
         A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
         (default: None)
-    resources: Resources | ResourcesLike | None
+    resources: ResourceDefinitions | ResourcesLike | None
         A list of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -240,7 +240,7 @@ class DatasetDefinition:
 
     mirrors: dict[str, Sequence[str]] = field(default_factory=dict)
 
-    resources: Resources = field(default_factory=Resources)
+    resources: ResourceDefinitions = field(default_factory=ResourceDefinitions)
 
     experiment: Experiment = field(default_factory=Experiment)
 
@@ -269,7 +269,7 @@ class DatasetDefinition:
             long_name: str | None = None,
             has_files: dict[str, bool] | None = None,
             mirrors: dict[str, Sequence[str]] | None = None,
-            resources: Resources | ResourcesLike | None = None,
+            resources: ResourceDefinitions | ResourcesLike | None = None,
             experiment: Experiment | dict[str, Any] | None = None,
             extract: dict[str, bool] | None = None,
             filename_format: dict[str, str] | None = None,
@@ -470,7 +470,7 @@ class DatasetDefinition:
         >>> definition.has_resources['precomputed_events']
         False
         """
-        # Resources may have changed, so update indexer before returning.
+        # ResourceDefinitions may have changed, so update indexer before returning.
         # A better way to update the resources would be through a resources setter property.
         self._has_resources.set_resources(self.resources)
         return self._has_resources
@@ -483,14 +483,14 @@ class DatasetDefinition:
             return Experiment.from_dict(experiment)
         return experiment
 
-    def _initialize_resources(self, resources: Resources | ResourcesLike | None) -> Resources:
-        """Initailize ``Resources`` instance if necessary."""
-        if isinstance(resources, Resources):
+    def _initialize_resources(self, resources: ResourceDefinitions | ResourcesLike | None) -> ResourceDefinitions:
+        """Initialize ``ResourceDefinitions`` instance if necessary."""
+        if isinstance(resources, ResourceDefinitions):
             return resources
         if resources is None:
-            return Resources()
+            return ResourceDefinitions()
         if isinstance(resources, dict):
-            return Resources.from_dict(resources)
+            return ResourceDefinitions.from_dict(resources)
         if isinstance(resources, Sequence):
-            return Resources.from_dicts(resources)
+            return ResourceDefinitions.from_dicts(resources)
         raise TypeError()

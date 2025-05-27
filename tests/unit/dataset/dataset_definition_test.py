@@ -28,7 +28,7 @@ from pymovements import __version__
 from pymovements import DatasetDefinition
 from pymovements import DatasetLibrary
 from pymovements import Experiment
-from pymovements import Resources
+from pymovements import ResourceDefinitions
 
 
 @pytest.mark.parametrize(
@@ -56,25 +56,25 @@ def test_dataset_definition_is_equal(init_kwargs):
     [
         pytest.param(
             {},
-            Resources(),
+            ResourceDefinitions(),
             id='default',
         ),
 
         pytest.param(
             {'resources': None},
-            Resources(),
+            ResourceDefinitions(),
             id='none',
         ),
 
         pytest.param(
             {'resources': {}},
-            Resources(),
+            ResourceDefinitions(),
             id='empty_dict',
         ),
 
         pytest.param(
             {'resources': []},
-            Resources(),
+            ResourceDefinitions(),
             id='empty_list',
         ),
     ],

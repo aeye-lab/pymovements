@@ -25,7 +25,7 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.resources import Resources
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
@@ -53,7 +53,7 @@ class DIDEC(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: Resources
+    resources: ResourceDefinitions
         A list of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -130,8 +130,8 @@ class DIDEC(DatasetDefinition):
         },
     )
 
-    resources: Resources = field(
-        default_factory=lambda: Resources.from_dicts(
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dicts(
             [
                 {
                     'content': 'gaze',
