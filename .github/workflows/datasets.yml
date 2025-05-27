@@ -64,6 +64,7 @@ jobs:
 
       - name: Cache tox environment
         uses: actions/cache/save@v4
+        if: github.ref == 'refs/heads/main'
         with:
           key:
             tox-integration-${{hashFiles('tox.ini') }}
