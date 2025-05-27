@@ -19,11 +19,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-
       - name: Restore cached environment
         id: cache-restore
         uses: actions/cache/restore@v4
@@ -33,6 +28,11 @@ jobs:
           path: |
             ~/.cache
             ~/.tox
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
 
       - name: Install tox
         run: python -m pip install tox

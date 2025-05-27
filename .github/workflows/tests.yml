@@ -56,11 +56,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python }}
-
       - name: Restore cached environment
         id: cache-restore
         uses: actions/cache/restore@v4
@@ -70,6 +65,11 @@ jobs:
           path: |
             ~/.cache
             ~/.tox
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
 
       - name: Install tox
         run: python -m pip install tox
@@ -104,12 +104,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.9"
-
-      - name: Restore cached tox environment
+      - name: Restore cached environment
         id: cache-restore
         uses: actions/cache/restore@v4
         with:
@@ -118,6 +113,11 @@ jobs:
           path: |
             ~/.cache
             ~/.tox
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
 
       - name: Install tox
         run: python -m pip install tox
@@ -147,12 +147,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.9"
-
-      - name: Restore cached tox environment
+      - name: Restore cached environment
         id: cache-restore
         uses: actions/cache/restore@v4
         with:
@@ -161,6 +156,11 @@ jobs:
           path: |
             ~/.cache
             ~/.tox
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
 
       - name: Install tox
         run: python -m pip install tox-min-req
@@ -196,6 +196,16 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Restore cached environment
+        id: cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          key:
+            docs-${{ matrix.os }}-py39-${{ hashFiles('tox.ini', 'pyproject.toml', '.github/workflows/tests') }}
+          path: |
+            ~/.cache
+            ~/.tox
+
       - name: Install pandoc
         uses: r-lib/actions/setup-pandoc@v2
         with:
@@ -205,16 +215,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.9"
-
-      - name: Restore cached tox environment
-        id: cache-restore
-        uses: actions/cache/restore@v4
-        with:
-          key:
-            docs-${{ matrix.os }}-py39-${{ hashFiles('tox.ini', 'pyproject.toml', '.github/workflows/tests') }}
-          path: |
-            ~/.cache
-            ~/.tox
 
       - name: Install tox
         run: python -m pip install tox
