@@ -62,12 +62,14 @@ jobs:
           python-version: ${{ matrix.python }}
           cache: 'pip'
 
-      - name: Restore cached tox environment
+      - name: Restore cached environment
         uses: actions/cache/restore@v4
         with:
           key:
             tox-${{ matrix.os }}-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
-          path: .tox
+          path: |
+            ~/.cache
+            ~/.tox
 
       - name: Install tox
         run: python -m pip install tox
@@ -75,13 +77,15 @@ jobs:
       - name: Setup test environment
         run: tox -vv --notest -e ${{ matrix.tox_env }}
 
-      - name: Cache tox environment
+      - name: Cache environment
         uses: actions/cache/save@v4
         if: github.ref == 'refs/heads/main'
         with:
           key:
             tox-${{ matrix.os }}-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
-          path: .tox
+          path: |
+            ~/.cache
+            ~/.tox
 
       - name: Run test
         run: tox --skip-pkg-install -e ${{ matrix.tox_env }}
@@ -111,7 +115,9 @@ jobs:
         with:
           key:
             tox-pylint-${{hashFiles('tox.ini') }}
-          path: .tox
+          path: |
+            ~/.cache
+            ~/.tox
 
       - name: Install tox
         run: python -m pip install tox
@@ -119,13 +125,15 @@ jobs:
       - name: Setup test environment
         run: tox -vv --notest -e pylint
 
-      - name: Cache tox environment
+      - name: Cache environment
         uses: actions/cache/save@v4
         if: github.ref == 'refs/heads/main'
         with:
           key:
             tox-pylint-${{hashFiles('tox.ini') }}
-          path: .tox
+          path: |
+            ~/.cache
+            ~/.tox
 
       - name: Run test
         run: tox --skip-pkg-install -e pylint
@@ -149,7 +157,9 @@ jobs:
         with:
           key:
             tox-${{ matrix.os }}-minreq-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
-          path: .tox
+          path: |
+            ~/.cache
+            ~/.tox
 
       - name: Install tox
         run: python -m pip install tox-min-req
@@ -157,13 +167,15 @@ jobs:
       - name: Setup test environment
         run: MIN_REQ=1 tox -vv --notest -e py39
 
-      - name: Cache tox environment
+      - name: Cache environment
         uses: actions/cache/save@v4
         if: github.ref == 'refs/heads/main'
         with:
           key:
             tox-${{ matrix.os }}-minreq-${{ matrix.tox_env }}-${{hashFiles('tox.ini') }}
-          path: .tox
+          path: |
+            ~/.cache
+            ~/.tox
 
       - name: Run test
         run: MIN_REQ=1 tox --skip-pkg-install -e py39
@@ -199,7 +211,9 @@ jobs:
         with:
           key:
             tox-${{ matrix.os }}-docs-${{hashFiles('tox.ini') }}
-          path: .tox
+          path: |
+            ~/.cache
+            ~/.tox
 
       - name: Install tox
         run: python -m pip install tox
@@ -207,13 +221,15 @@ jobs:
       - name: Setup test environment
         run: tox -vv --notest -e docs
 
-      - name: Cache tox environment
+      - name: Cache environment
         uses: actions/cache/save@v4
         if: github.ref == 'refs/heads/main'
         with:
           key:
             tox-${{ matrix.os }}-docs-${{hashFiles('tox.ini') }}
-          path: .tox
+          path: |
+            ~/.cache
+            ~/.tox
 
       - name: Run test
         run: tox --skip-pkg-install -e docs

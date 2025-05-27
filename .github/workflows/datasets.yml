@@ -49,12 +49,14 @@ jobs:
           python-version: "3.13"
           cache: pip
 
-      - name: Restore cached tox environment
+      - name: Restore cached environment
         uses: actions/cache/restore@v4
         with:
           key:
             tox-integration-${{hashFiles('tox.ini') }}
-          path: .tox
+          path: |
+            ~/.cache
+            ~/.tox
 
       - name: Install tox
         run: python -m pip install tox
@@ -62,13 +64,15 @@ jobs:
       - name: Setup test environment
         run: tox -vv --notest -e integration
 
-      - name: Cache tox environment
+      - name: Cache environment
         uses: actions/cache/save@v4
         if: github.ref == 'refs/heads/main'
         with:
           key:
             tox-integration-${{hashFiles('tox.ini') }}
-          path: .tox
+          path: |
+            ~/.cache
+            ~/.tox
 
       - name: Run dataset integration test
         run: tox --skip-pkg-install -e integration -- tests/integration/download_dataset_test.py::test_download_dataset[${{ matrix.dataset }}]
