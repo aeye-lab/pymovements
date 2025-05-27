@@ -147,8 +147,7 @@ addopts = "-ra -l --tb=long --doctest-modules"
 doctest_optionflags = "NORMALIZE_WHITESPACE"
 filterwarnings = [
   "error",
-  "ignore:pkg_resources is deprecated.*:UserWarning",
-  "ignore:pkg_resources is deprecated.*:DeprecationWarning",
+  "ignore:pkg_resources is deprecated.*:UserWarning:pybtex",
   "ignore:Deprecated call to `pkg_resources.declare_namespace.*:DeprecationWarning",
   "ignore:distutils Version classes are deprecated. Use packaging.version instead.:DeprecationWarning",
   "ignore:FigureCanvasAgg is non-interactive, and thus cannot be shown:UserWarning",
