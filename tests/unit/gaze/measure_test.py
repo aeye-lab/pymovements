@@ -30,6 +30,7 @@ def my_test_measure(column: str) -> pl.Expr:
     return pl.col(column).len().cast(pl.Int64).alias('my_measure')
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('gaze', 'method', 'kwargs', 'expected'),
     [

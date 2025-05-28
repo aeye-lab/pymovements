@@ -27,6 +27,7 @@ import pymovements as pm
 from pymovements.synthetic import step_function
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('method', 'kwargs', 'gaze', 'expected'),
     [
@@ -934,6 +935,7 @@ def test_gaze_detect_custom_method_no_arguments():
     assert_frame_equal(gaze.events.frame, expected.frame)
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('method', 'kwargs', 'gaze', 'exception', 'exception_msg'),
     [
@@ -1051,6 +1053,7 @@ def test_gaze_detect_missing_trial_column_events_raises_exception():
     )
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('method', 'column'),
     [
