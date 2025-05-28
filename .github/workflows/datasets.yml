@@ -20,7 +20,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
-          cache: pip
 
       - name: Install pymovements
         run: python -m pip install -e ${{ github.workspace }}
@@ -43,18 +42,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Restore cached environment
+        id: cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          key:
+            datasets-ubuntu-latest-py313-${{ hashFiles('tox.ini', 'pyproject.toml', '.github/workflows/datasets') }}
+          path: |
+            ~/.cache
+            ~/.tox
+
       - name: Setup python
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
-          cache: pip
-
-      - name: Restore cached tox environment
-        uses: actions/cache/restore@v4
-        with:
-          key:
-            tox-integration-${{hashFiles('tox.ini') }}
-          path: .tox
 
       - name: Install tox
         run: python -m pip install tox
@@ -62,12 +63,15 @@ jobs:
       - name: Setup test environment
         run: tox -vv --notest -e integration
 
-      - name: Cache tox environment
+      - name: Cache environment
         uses: actions/cache/save@v4
+        if: github.ref == 'refs/heads/main'
         with:
           key:
-            tox-integration-${{hashFiles('tox.ini') }}
-          path: .tox
+            ${{ steps.cache-restore.outputs.cache-primary-key }}
+          path: |
+            ~/.cache
+            ~/.tox
 
       - name: Run dataset integration test
         run: tox --skip-pkg-install -e integration -- tests/integration/download_dataset_test.py::test_download_dataset[${{ matrix.dataset }}]
