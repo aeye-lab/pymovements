@@ -848,6 +848,10 @@ def test_clip(gaze_dataset_configuration):
         assert result_gaze_df.schema == expected_schema
 
 
+def test_dataset_apply_pipeline():
+    assert False
+
+
 @pytest.mark.parametrize(
     'detect_event_kwargs',
     [
