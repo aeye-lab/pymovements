@@ -65,6 +65,7 @@ docs = [
   "sphinxcontrib.bibtex>=2.4.1"
 ]
 test = [
+  "pybtex<0.24.1",
   "pytest>=6.0.0",
   "pytest-benchmark>=5.1.0",
   "pytest-cov>=4.0.0",
