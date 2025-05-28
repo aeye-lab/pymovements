@@ -29,6 +29,8 @@
     DatasetDefinition
     DatasetLibrary
     DatasetPaths
+    ResourceDefinition
+    ResourceDefinitions
 
 .. rubric:: Decorators
 
@@ -43,6 +45,8 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_library import register_dataset
 from pymovements.dataset.dataset_paths import DatasetPaths
+from pymovements.dataset.resources import ResourceDefinition
+from pymovements.dataset.resources import ResourceDefinitions
 
 
 __all__ = [
@@ -51,4 +55,6 @@ __all__ = [
     'DatasetLibrary',
     'DatasetPaths',
     'register_dataset',
+    'ResourceDefinition',
+    'ResourceDefinitions',
 ]
