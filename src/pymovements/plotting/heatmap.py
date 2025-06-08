@@ -27,7 +27,7 @@ import numpy as np
 from matplotlib import colors
 
 from pymovements.gaze import Gaze
-from pymovements.utils.plotting import draw_image_stimulus
+from pymovements.stimulus.image import _draw_image_stimulus
 
 
 def heatmap(
@@ -158,7 +158,7 @@ def heatmap(
     # Create the plot
     if add_stimulus:
         assert path_to_image_stimulus
-        fig, ax = draw_image_stimulus(
+        fig, ax = _draw_image_stimulus(
             path_to_image_stimulus,
             origin=stimulus_origin,
             figsize=figsize,

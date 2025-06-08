@@ -18,11 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test dataset definition."""
+import re
 from dataclasses import dataclass
 
 import pytest
 import yaml
 
+from pymovements import __version__
 from pymovements import DatasetDefinition
 from pymovements import DatasetLibrary
 from pymovements import Experiment
@@ -87,12 +89,12 @@ def test_dataset_definition_is_equal(init_kwargs):
                         'distance_cm': None,
                         'height_cm': None,
                         'height_px': None,
-                        'origin': 'upper left',
+                        'origin': None,
                         'width_cm': None,
                         'width_px': None,
                     },
                 },
-                'extract': {},
+                'extract': None,
                 'filename_format': {},
                 'filename_format_schema_overrides': {},
                 'mirrors': {},
@@ -100,7 +102,7 @@ def test_dataset_definition_is_equal(init_kwargs):
                 'position_columns': None,
                 'resources': {},
                 'time_column': None,
-                'time_unit': 'ms',
+                'time_unit': None,
                 'trial_columns': None,
                 'velocity_columns': None,
             },
@@ -156,7 +158,7 @@ def test_dataset_definition_is_equal(init_kwargs):
                         'width_px': 1280,
                     },
                 },
-                'extract': {},
+                'extract': None,
                 'filename_format': {},
                 'filename_format_schema_overrides': {},
                 'mirrors': {},
@@ -164,7 +166,7 @@ def test_dataset_definition_is_equal(init_kwargs):
                 'position_columns': None,
                 'resources': {},
                 'time_column': None,
-                'time_unit': 'ms',
+                'time_unit': None,
                 'trial_columns': None,
                 'velocity_columns': None,
             },
@@ -173,7 +175,7 @@ def test_dataset_definition_is_equal(init_kwargs):
     ],
 )
 def test_dataset_definition_to_dict_expected(definition, expected_dict):
-    assert definition.to_dict() == expected_dict
+    assert definition.to_dict(exclude_none=False) == expected_dict
 
 
 @pytest.mark.parametrize(
@@ -203,12 +205,12 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
                         'distance_cm': None,
                         'height_cm': None,
                         'height_px': None,
-                        'origin': 'upper left',
+                        'origin': None,
                         'width_cm': None,
                         'width_px': None,
                     },
                 },
-                'extract': {},
+                'extract': None,
                 'filename_format': {},
                 'filename_format_schema_overrides': {},
                 'mirrors': {},
@@ -216,7 +218,7 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
                 'position_columns': None,
                 'resources': {},
                 'time_column': None,
-                'time_unit': 'ms',
+                'time_unit': None,
                 'trial_columns': None,
                 'velocity_columns': None,
             },
@@ -248,12 +250,12 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
                         'distance_cm': None,
                         'height_cm': None,
                         'height_px': None,
-                        'origin': 'upper left',
+                        'origin': None,
                         'width_cm': None,
                         'width_px': None,
                     },
                 },
-                'extract': {},
+                'extract': None,
                 'filename_format': {},
                 'filename_format_schema_overrides': {},
                 'mirrors': {},
@@ -261,9 +263,10 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
                 'position_columns': None,
                 'resources': {},
                 'time_column': None,
-                'time_unit': 'ms',
+                'time_unit': None,
                 'trial_columns': None,
                 'velocity_columns': None,
+                '_has_resources': False,
             },
             id='False',
         ),
@@ -277,7 +280,7 @@ def test_dataset_definition_to_dict_exclude_private_expected(exclude_private, ex
 
     definition = MyDatasetDefinition()
 
-    assert definition.to_dict(exclude_private=exclude_private) == expected_dict
+    assert definition.to_dict(exclude_private=exclude_private, exclude_none=False) == expected_dict
 
 
 @pytest.mark.parametrize(
@@ -331,7 +334,7 @@ def test_dataset_definition_to_yaml_equal_dicts(definition, tmp_path):
 def test_write_yaml_already_existing_dataset_definition_w_tuple_screen(tmp_path):
     tmp_file = tmp_path / 'tmp.yaml'
     definition = DatasetLibrary.get('ToyDatasetEyeLink')
-    definition.to_yaml(tmp_file)
+    definition.to_yaml(tmp_file, exclude_none=False)
 
     with open(tmp_file, encoding='utf-8') as f:
         yaml.safe_load(f)
@@ -365,3 +368,428 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
     )
 
     assert yaml_definition == expected_definition
+
+
+@pytest.mark.parametrize(
+    ('resources', 'expected_has_resources'),
+    [
+        pytest.param(
+            None,
+            False,
+            id='none',
+        ),
+
+        pytest.param(
+            {},
+            False,
+            id='empty_resources_dict',
+        ),
+
+        pytest.param(
+            1,
+            False,
+            id='int_resources',
+        ),
+
+        pytest.param(
+            {'gaze': None},
+            False,
+            id='none_value_as_resources',
+        ),
+
+        pytest.param(
+            {'gaze': 1},
+            False,
+            id='int_as_resources_list',
+        ),
+
+        pytest.param(
+            {'gaze': []},
+            False,
+            id='empty_list_as_resources',
+        ),
+
+        pytest.param(
+            {'gaze': [{'resource': 'foo'}]},
+            True,
+            id='gaze_resources',
+        ),
+
+        pytest.param(
+            {'precomputed_events': [{'resource': 'foo'}]},
+            True,
+            id='precomputed_event_resources',
+        ),
+
+        pytest.param(
+            {'precomputed_reading_measures': [{'resource': 'foo'}]},
+            True,
+            id='precomputed_reading_measures_resources',
+        ),
+
+        pytest.param(
+            {
+                'gaze': [{'resource': 'foo'}],
+                'precomputed_events': [{'resource': 'foo'}],
+                'precomputed_reading_measures': [{'resource': 'foo'}],
+            },
+            True,
+            id='all_resources',
+        ),
+
+        pytest.param(
+            {
+                'foo': [{'resource': 'bar'}],
+            },
+            True,
+            id='custom_resources',
+        ),
+    ],
+)
+def test_dataset_definition_has_resources_boolean(resources, expected_has_resources):
+    definition = DatasetDefinition(resources=resources)
+
+    # there are multiple contexts of using booleans.
+    assert bool(definition.has_resources) == expected_has_resources
+    assert definition.has_resources == expected_has_resources
+    assert not (definition.has_resources and not expected_has_resources)
+    assert not (not definition.has_resources and expected_has_resources)
+
+
+@pytest.mark.parametrize(
+    ('resources', 'expected_resources'),
+    [
+        pytest.param(
+            {},
+            {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='empty_resources_dict',
+        ),
+
+        pytest.param(
+            1,
+            {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='int_resources',
+        ),
+
+        pytest.param(
+            {'gaze': None},
+            {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='none_value_as_resources',
+        ),
+
+        pytest.param(
+            {'gaze': 1},
+            {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='int_as_resources',
+        ),
+
+        pytest.param(
+            {'gaze': []},
+            {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='empty_list_as_resources',
+        ),
+
+        pytest.param(
+            {'gaze': [{'resource': 'foo'}]},
+            {
+                'gaze': True,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='gaze_resources',
+        ),
+
+        pytest.param(
+            {'precomputed_events': [{'resource': 'foo'}]},
+            {
+                'gaze': False,
+                'precomputed_events': True,
+                'precomputed_reading_measures': False,
+            },
+            id='precomputed_event_resources',
+        ),
+
+        pytest.param(
+            {'precomputed_reading_measures': [{'resource': 'foo'}]},
+            {
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': True,
+            },
+            id='precomputed_reading_measures_resources',
+        ),
+
+        pytest.param(
+            {
+                'gaze': [{'resource': 'foo'}],
+                'precomputed_events': [{'resource': 'foo'}],
+                'precomputed_reading_measures': [{'resource': 'foo'}],
+            },
+            {'gaze': True, 'precomputed_events': True, 'precomputed_reading_measures': True},
+            id='all_resources',
+        ),
+
+        pytest.param(
+            {
+                'foo': [{'resource': 'bar'}],
+            },
+            {
+                'foo': True,
+                'gaze': False,
+                'precomputed_events': False,
+                'precomputed_reading_measures': False,
+            },
+            id='custom_resources',
+        ),
+    ],
+)
+def test_dataset_definition_has_resources_indexable(resources, expected_resources):
+    definition = DatasetDefinition(resources=resources)
+
+    for key, value in expected_resources.items():
+        assert definition.has_resources[key] == value
+
+
+def test_dataset_definition_not_equal():
+    definition1 = DatasetDefinition(resources={'gaze': [{'resource': 'foo'}]})
+    definition2 = DatasetDefinition(resources={})
+
+    assert definition1.has_resources != definition2.has_resources
+
+
+@pytest.mark.parametrize(
+    ('dataset_definition', 'exclude_none', 'expected_dict'),
+    [
+        pytest.param(
+            DatasetDefinition(),
+            True,
+            {
+                'name': '.',
+            },
+            id='true_default',
+        ),
+
+        pytest.param(
+            DatasetDefinition(experiment=Experiment(origin=None)),
+            True,
+            {
+                'name': '.',
+            },
+            id='true_experiment_origin_none',
+        ),
+
+        pytest.param(
+            DatasetDefinition(
+                distance_column='test',
+                position_columns=['test', 'foo', 'bar'],
+            ),
+            True,
+            {
+                'name': '.',
+                'position_columns': ['test', 'foo', 'bar'],
+                'distance_column': 'test',
+            },
+            id='true_str_dict_list',
+        ),
+
+        pytest.param(
+            DatasetDefinition(
+                experiment=Experiment(origin=None),
+                distance_column='test',
+                position_columns=['test', 'foo', 'bar'],
+            ),
+            True,
+            {
+                'name': '.',
+                'position_columns': ['test', 'foo', 'bar'],
+                'distance_column': 'test',
+            },
+            id='true_str_dict_list_experiment_origin_none',
+        ),
+
+        pytest.param(
+            DatasetDefinition(),
+            False,
+            {
+                'name': '.',
+                'long_name': None,
+                'has_files': {},
+                'mirrors': {},
+                'resources': {},
+                'experiment': {
+                    'eyetracker': {
+                        'left': None,
+                        'model': None,
+                        'mount': None,
+                        'right': None,
+                        'sampling_rate': None,
+                        'vendor': None,
+                        'version': None,
+                    },
+                    'screen': {
+                        'distance_cm': None,
+                        'height_cm': None,
+                        'height_px': None,
+                        'origin': None,
+                        'width_cm': None,
+                        'width_px': None,
+                    },
+                },
+                'extract': None,
+                'filename_format': {},
+                'filename_format_schema_overrides': {},
+                'custom_read_kwargs': {},
+                'column_map': {},
+                'trial_columns': None,
+                'time_column': None,
+                'time_unit': None,
+                'pixel_columns': None,
+                'position_columns': None,
+                'velocity_columns': None,
+                'acceleration_columns': None,
+                'distance_column': None,
+            },
+            id='false_default',
+        ),
+
+        pytest.param(
+            DatasetDefinition(experiment=None),
+            False,
+            {
+                'name': '.',
+                'long_name': None,
+                'has_files': {},
+                'mirrors': {},
+                'resources': {},
+                'experiment': None,
+                'extract': None,
+                'filename_format': {},
+                'filename_format_schema_overrides': {},
+                'custom_read_kwargs': {},
+                'column_map': {},
+                'trial_columns': None,
+                'time_column': None,
+                'time_unit': None,
+                'pixel_columns': None,
+                'position_columns': None,
+                'velocity_columns': None,
+                'acceleration_columns': None,
+                'distance_column': None,
+            },
+            id='false_experiment_none',
+        ),
+
+        pytest.param(
+            DatasetDefinition(experiment=Experiment(origin=None)),
+            False,
+            {
+                'name': '.',
+                'long_name': None,
+                'has_files': {},
+                'mirrors': {},
+                'resources': {},
+                'experiment': {
+                    'eyetracker': {
+                        'sampling_rate': None,
+                        'vendor': None,
+                        'model': None,
+                        'version': None,
+                        'mount': None,
+                        'left': None,
+                        'right': None,
+                    },
+                    'screen': {
+                        'height_cm': None,
+                        'width_cm': None,
+                        'height_px': None,
+                        'width_px': None,
+                        'distance_cm': None,
+                        'origin': None,
+                    },
+                },
+                'extract': None,
+                'filename_format': {},
+                'filename_format_schema_overrides': {},
+                'custom_read_kwargs': {},
+                'column_map': {},
+                'trial_columns': None,
+                'time_column': None,
+                'time_unit': None,
+                'pixel_columns': None,
+                'position_columns': None,
+                'velocity_columns': None,
+                'acceleration_columns': None,
+                'distance_column': None,
+            },
+            id='false_experiment_origin_none',
+        ),
+    ],
+)
+def test_dataset_to_dict_exclude_none(dataset_definition, exclude_none, expected_dict):
+    assert dataset_definition.to_dict(exclude_none=exclude_none) == expected_dict
+
+
+@pytest.mark.parametrize(
+    'attribute_kwarg',
+    [
+        pytest.param(
+            {'extract': True},
+            id='extract_true',
+        ),
+        pytest.param(
+            {'extract': False},
+            id='extract_false',
+        ),
+    ],
+)
+def test_dataset_definition_attribute_is_deprecated(attribute_kwarg):
+    with pytest.raises(DeprecationWarning):
+        DatasetDefinition(**attribute_kwarg)
+
+
+@pytest.mark.parametrize(
+    'attribute_kwarg',
+    [
+        pytest.param(
+            {'extract': True},
+            id='extract_true',
+        ),
+        pytest.param(
+            {'extract': False},
+            id='extract_false',
+        ),
+    ],
+)
+def test_dataset_definition_attribute_is_removed(attribute_kwarg):
+    with pytest.raises(DeprecationWarning) as info:
+        DatasetDefinition(**attribute_kwarg)
+
+    regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
+
+    msg = info.value.args[0]
+    remove_version = regex.match(msg).groupdict()['version']
+    current_version = __version__.split('+')[0]
+    assert current_version < remove_version, (
+        f'utils/parsing.py was planned to be removed in v{remove_version}. '
+        f'Current version is v{current_version}.'
+    )

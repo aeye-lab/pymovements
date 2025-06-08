@@ -31,7 +31,7 @@ and render plots to visually analyze your results.
 - **Bug reports:** https://github.com/aeye-lab/pymovements/issues
 - **Contributing:** https://github.com/aeye-lab/pymovements/blob/main/CONTRIBUTING.md
 - **Mailing list:** pymovements@python.org ([subscribe](https://mail.python.org/mailman3/lists/pymovements.python.org/))
-- **Discord:** https://discord.gg/Z7VMSbDm
+- **Discord:** https://discord.gg/K2uS2R6PNj
 
 
 ## Getting Started
@@ -46,7 +46,7 @@ dataset = pm.Dataset(
     path='data/judo100',         # setup your local dataset path
 )
 dataset.download()               # download a public dataset from our dataset library
-dataset.load()                   # download the dataset
+dataset.load()                   # load the dataset
 ```
 
 calculate velocities on the fly

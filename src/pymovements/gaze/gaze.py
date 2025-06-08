@@ -33,11 +33,13 @@ from tqdm import tqdm
 
 import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements._utils._checks import check_is_mutual_exclusive
+from pymovements._utils._html import repr_html
 from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
 
 
+@repr_html(['frame', 'events', 'trial_columns', 'experiment'])
 class Gaze:
     """Self-contained data structure containing gaze represented as samples or events.
 
@@ -392,7 +394,8 @@ class Gaze:
             if 'origin' in method_kwargs and 'origin' not in kwargs:
                 self._check_experiment()
                 assert self.experiment is not None
-                kwargs['origin'] = self.experiment.screen.origin
+                if self.experiment.screen.origin is not None:
+                    kwargs['origin'] = self.experiment.screen.origin
 
             if 'screen_resolution' in method_kwargs and 'screen_resolution' not in kwargs:
                 self._check_experiment()
@@ -843,7 +846,7 @@ class Gaze:
 
             self.events.frame = pl.concat(
                 [self.events.frame, new_events.frame],
-                how='diagonal',
+                how='diagonal_relaxed',
             )
         else:
             grouped_frames = self.frame.partition_by(

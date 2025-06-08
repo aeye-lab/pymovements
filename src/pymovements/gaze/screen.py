@@ -20,14 +20,18 @@
 """Provides the Screen class."""
 from __future__ import annotations
 
+from dataclasses import asdict
 from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 
 from pymovements._utils import _checks
+from pymovements._utils._html import repr_html
 from pymovements.gaze import transforms_numpy
 
 
+@repr_html()
 @dataclass
 class Screen:
     """Screen class for holding screen properties.
@@ -48,7 +52,7 @@ class Screen:
         distance for each sample in millimeters. (default: None)
     origin: str | None
         Specifies the screen location of the origin of the pixel
-        coordinate system. (default: 'upper left')
+        coordinate system. (default: None)
 
     Examples
     --------
@@ -83,7 +87,7 @@ class Screen:
     width_cm: float | None = None
     height_cm: float | None = None
     distance_cm: float | None = None
-    origin: str | None = 'upper left'
+    origin: str | None = None
 
     def __post_init__(self) -> None:
         """Check fields for validity."""
@@ -280,3 +284,32 @@ class Screen:
         _checks.check_is_not_none(**{key: value})
         assert isinstance(value, (int, float))
         _checks.check_is_greater_than_zero(**{key: value})
+
+    def to_dict(self, *, exclude_none: bool = True) -> dict[str, Any]:
+        """Convert the Screen instance into a dictionary.
+
+        Parameters
+        ----------
+        exclude_none: bool
+            Exclude attributes that are either ``None`` or that are objects that evaluate to
+            ``False`` (e.g., ``[]``, ``{}``, ``EyeTracker()``). Attributes of type ``bool``,
+            ``int``, and ``float`` are not excluded.
+
+        Returns
+        -------
+        dict[str, Any]
+            Screen as dictionary.
+        """
+        _dict = asdict(self)
+
+        # Delete fields that evaluate to False (False, None, [], {})
+        if exclude_none:
+            for key, value in list(_dict.items()):
+                if not isinstance(value, (bool, int, float)) and not value:
+                    del _dict[key]
+
+        return _dict
+
+    def __bool__(self) -> bool:
+        """Return True if the screen has data defined, else False."""
+        return not all(not value for value in self.__dict__.values())
