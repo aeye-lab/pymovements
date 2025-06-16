@@ -26,6 +26,7 @@ from polars.testing import assert_frame_equal
 import pymovements as pm
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 def test_from_pandas_additional_time_column():
     pandas_df = pd.DataFrame(
         {
@@ -110,7 +111,6 @@ def test_from_pandas_with_trial_columnms():
     assert gaze.trial_columns == ['trial_id']
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('df', 'events'),
     [

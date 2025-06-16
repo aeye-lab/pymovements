@@ -1241,22 +1241,25 @@ class GazeDataFrame:
     def _check_n_components(self) -> None:
         """Check that n_components is either 2, 4 or 6.
 
+        Ensure that the number of gaze components is valid.
+
+        Valid configurations are:
+            - 2 components: monocular data (e.g., x and y)
+            - 4 components: binocular data (e.g., x/y for left and right eye)
+            - 6 components: binocular + cyclopean data (x/y for left, right, and cyclopean eye)
+
+        If no valid gaze columns were specified (pixel, position, etc.), raise an error
+        with a helpful message to guide proper initialization.
+
         Raises
         ------
         AttributeError
             If n_components is not 2, 4 or 6.
         """
 
-        # Ensure that the number of gaze components is valid.
-        # Valid configurations are:
-        # - 2 components: monocular data (e.g., x and y)
-        # - 4 components: binocular data (e.g., x/y for left and right eye)
-        # - 6 components: binocular + cyclopean data (x/y for left, right, and cyclopean eye)
-        # If no valid gaze columns were specified (pixel, position, etc.), raise an error
-        # with a helpful message to guide proper initialization.
         if self.n_components not in {2, 4, 6}:
             raise AttributeError(
-                "No valid gaze columns found (e.g., 'pixel', 'position', etc.).\n"
+                "No valid gaze components found (e.g., 'pixel', 'position', etc.).\n"
                 "This usually happens if you did not specify 'pixel_columns', 'position_columns', etc. during initialization.\n"
                 'Please initialize the GazeDataFrame with appropriate column names.',
             )

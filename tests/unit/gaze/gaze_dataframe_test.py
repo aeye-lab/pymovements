@@ -25,7 +25,6 @@ from polars.testing import assert_frame_equal
 import pymovements as pm
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     'init_arg',
     [
@@ -44,7 +43,6 @@ def test_gaze_dataframe_init(init_arg):
     assert isinstance(gaze_df.frame, pl.DataFrame)
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_df', 'velocity_columns'),
     [
@@ -86,7 +84,6 @@ def test_gaze_dataframe_velocity_columns(init_df, velocity_columns):
     assert 'velocity' in gaze_df.columns
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_df', 'pixel_columns'),
     [
@@ -128,7 +125,6 @@ def test_gaze_dataframe_pixel_position_columns(init_df, pixel_columns):
     assert 'pixel' in gaze_df.columns
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_df', 'position_columns'),
     [
@@ -170,7 +166,6 @@ def test_gaze_dataframe_position_columns(init_df, position_columns):
     assert 'position' in gaze_df.columns
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 def test_gaze_dataframe_copy_with_experiment():
     gaze = pm.GazeDataFrame(
         pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
@@ -189,7 +184,6 @@ def test_gaze_dataframe_copy_with_experiment():
     assert gaze.experiment == gaze_copy.experiment
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 def test_gaze_dataframe_copy_no_experiment():
     gaze = pm.GazeDataFrame(
         pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
@@ -207,7 +201,6 @@ def test_gaze_dataframe_copy_no_experiment():
     assert gaze.experiment is gaze_copy.experiment
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 def test_gaze_dataframe_split():
     gaze = pm.GazeDataFrame(
         pl.DataFrame(
@@ -230,7 +223,6 @@ def test_gaze_dataframe_split():
     assert_frame_equal(gaze.frame.filter(pl.col('trial_id') == 2), split_gaze[2].frame)
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 def test_gaze_dataframe_compute_event_properties_no_events():
     gaze = pm.GazeDataFrame(
         pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64, 'trial_id': pl.Int8}),

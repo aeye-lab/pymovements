@@ -23,7 +23,6 @@ import pytest
 import pymovements as pm
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize('property_name', ['x_max_dva', 'y_max_dva', 'x_min_dva', 'y_min_dva'])
 def test_dva_properties_with_no_distance_cm(property_name):
     screen = pm.Screen(1920, 1080, 30, 20, None, 'upper left')
@@ -31,7 +30,6 @@ def test_dva_properties_with_no_distance_cm(property_name):
         getattr(screen, property_name)
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize('property_name', ['x_max_dva', 'y_max_dva', 'x_min_dva', 'y_min_dva'])
 def test_dva_properties_with_distance_cm(property_name):
     screen = pm.Screen(1920, 1080, 30, 20, 60, 'upper left')
@@ -50,7 +48,6 @@ def test_screen_pix2deg_with_distance_cm():
     screen.pix2deg([[0, 0]])
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('missing_attribute', 'exception', 'exception_msg'),
     [

@@ -29,7 +29,6 @@ from pymovements import Experiment
 from pymovements import GazeDataFrame
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_kwargs', 'expected_frame', 'expected_n_components'),
     [
@@ -1160,6 +1159,9 @@ from pymovements import GazeDataFrame
             },
             pl.from_dict({'time': [1.23]}, schema={'time': pl.Float64}),
             None,
+            marks=pytest.mark.filterwarnings(
+                'ignore:GazeDataFrame contains data but no.*:UserWarning',
+            ),
             id='df_single_row_time_column_dataset_definition',
         ),
 
@@ -1171,6 +1173,9 @@ from pymovements import GazeDataFrame
             },
             pl.from_dict({'time': [1.23]}, schema={'time': pl.Float64}),
             None,
+            marks=pytest.mark.filterwarnings(
+                'ignore:GazeDataFrame contains data but no.*:UserWarning',
+            ),
             id='df_single_row_time_column_overwrites_dataset_definition',
         ),
 
@@ -1181,6 +1186,9 @@ from pymovements import GazeDataFrame
             },
             pl.from_dict({'time': [1230]}, schema={'time': pl.Int64}),
             None,
+            marks=pytest.mark.filterwarnings(
+                'ignore:GazeDataFrame contains data but no.*:UserWarning',
+            ),
             id='df_single_row_time_unit_dataset_definition',
         ),
 
@@ -1192,6 +1200,9 @@ from pymovements import GazeDataFrame
             },
             pl.from_dict({'time': [4560]}, schema={'time': pl.Int64}),
             None,
+            marks=pytest.mark.filterwarnings(
+                'ignore:GazeDataFrame contains data but no.*:UserWarning',
+            ),
             id='df_single_row_time_unit_overwrites_dataset_definition',
         ),
 
@@ -1202,6 +1213,9 @@ from pymovements import GazeDataFrame
             },
             pl.from_dict({'distance': [1.23]}, schema={'distance': pl.Float64}),
             None,
+            marks=pytest.mark.filterwarnings(
+                'ignore:GazeDataFrame contains data but no.*:UserWarning',
+            ),
             id='df_single_row_distance_column_dataset_definition',
         ),
 
@@ -1213,6 +1227,9 @@ from pymovements import GazeDataFrame
             },
             pl.from_dict({'distance': [1.23]}, schema={'distance': pl.Float64}),
             None,
+            marks=pytest.mark.filterwarnings(
+                'ignore:GazeDataFrame contains data but no.*:UserWarning',
+            ),
             id='df_single_row_distance_column_overwrites_dataset_definition',
         ),
 
@@ -1224,7 +1241,6 @@ def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, exp
     assert gaze.n_components == expected_n_components
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_kwargs', 'expected_experiment'),
     [
@@ -1344,7 +1360,6 @@ def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_tr
     assert gaze.trial_columns == expected_trial_columns
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'exception_msg'),
     [
@@ -1885,7 +1900,6 @@ def test_gaze_dataframe_init_exceptions(init_kwargs, exception, exception_msg):
     assert msg == exception_msg
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 def test_gaze_copy_init_has_same_n_components():
     """Tests if gaze initialization with frame with nested columns has correct n_components.
 
@@ -1900,7 +1914,6 @@ def test_gaze_copy_init_has_same_n_components():
     assert gaze.n_components == gaze_copy.n_components
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('events', 'init_kwargs'),
     [
