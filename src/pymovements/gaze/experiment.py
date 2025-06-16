@@ -98,7 +98,7 @@ class Experiment:
             screen_width_cm: float | None = None,
             screen_height_cm: float | None = None,
             distance_cm: float | None = None,
-            origin: str | None = 'upper left',
+            origin: str | None = None,
             sampling_rate: float | None = None,
             *,
             screen: Screen | None = None,
@@ -109,12 +109,8 @@ class Experiment:
         _checks.check_is_mutual_exclusive(screen_width_cm=screen_width_cm, screen=screen)
         _checks.check_is_mutual_exclusive(screen_height_cm=screen_height_cm, screen=screen)
         _checks.check_is_mutual_exclusive(distance_cm=distance_cm, screen=screen)
-        _checks.check_is_mutual_exclusive(sampling_rate=sampling_rate, eyetracker=eyetracker)
-
-        # the origin default value needs special care to not mess with a passed screen.
-        if origin == 'upper left' and screen is not None:
-            origin = None  # set origin to None to pass mutual exclusivity check
         _checks.check_is_mutual_exclusive(origin=origin, screen=screen)
+        _checks.check_is_mutual_exclusive(sampling_rate=sampling_rate, eyetracker=eyetracker)
 
         if screen is None:
             screen = Screen(
@@ -162,7 +158,7 @@ class Experiment:
         ... })
         >>> print(experiment)
         Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38.0, height_cm=30.0,
-                                 distance_cm=68.0, origin='upper left'),
+                                 distance_cm=68.0, origin=None),
                    eyetracker=EyeTracker(sampling_rate=1000.0, left=None, right=None,
                                         model=None, version=None, vendor=None, mount=None))
 

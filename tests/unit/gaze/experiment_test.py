@@ -120,7 +120,6 @@ def test_experiment_from_dict(dictionary, expected_experiment):
             Experiment(),
             True,
             {},
-            marks=pytest.mark.xfail(reason='#1148'),
             id='true_default',
         ),
         pytest.param(
@@ -133,7 +132,6 @@ def test_experiment_from_dict(dictionary, expected_experiment):
             Experiment(sampling_rate=18.5),
             True,
             {'eyetracker': {'sampling_rate': 18.5}},
-            marks=pytest.mark.xfail(reason='#1148'),
             id='true_sampling_rate_18.5',
         ),
         pytest.param(
@@ -153,7 +151,6 @@ def test_experiment_from_dict(dictionary, expected_experiment):
                     'left': True,
                 },
             },
-            marks=pytest.mark.xfail(reason='#1148'),
             id='true_screen_eyetracker',
         ),
         pytest.param(
@@ -194,7 +191,6 @@ def test_experiment_from_dict(dictionary, expected_experiment):
                     'right': None,
                 },
             },
-            marks=pytest.mark.xfail(reason='#1148'),
             id='false_default',
         ),
         pytest.param(
@@ -233,7 +229,6 @@ def test_experiment_to_dict_exclude_none(experiment, exclude_none, expected_dict
         pytest.param(
             Experiment(),
             False,
-            marks=pytest.mark.xfail(reason='#1148'),
             id='default',
         ),
 

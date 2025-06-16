@@ -9,17 +9,13 @@ has_files:
 
 resources:
     precomputed_events:
-        - resource: https://osf.io/download/6jbge/
+        - resource: https://osf.io/download/dq935/
           filename: fixations_Paragraph.csv.zip
-          md5: 0b05b59ac3e385c6608a1a57079dd25f
+          md5: 3d3b6a3794a50e174e025f43735674bd
     precomputed_reading_measures:
-        - resource: https://osf.io/download/p97e5/
+        - resource: https://osf.io/download/4ajc8/
           filename: ia_Paragraph.csv.zip
-          md5: 4e9408d61ddf590ee72528a2993d7549
-
-extract:
-    precomputed_events: true
-    precomputed_reading_measures: true
+          md5: 9b9548e49efdc7dbf63d4f3a5dc3af22
 
 filename_format:
     precomputed_events: fixations_Paragraph.csv

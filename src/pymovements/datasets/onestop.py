@@ -31,9 +31,18 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 class OneStop(DatasetDefinition):
     """OneStop dataset :cite:p:`OneStop`.
 
-    This dataset eye tracking data from 360 participants.
-    The participant read several texts in different condition. Hunting for specific information
-    and gathering general knowledge from a text.
+    OneStop Eye Movements (in short OneStop) is an English corpus of eye movements
+    in reading with 360 L1 participants, 2.6 million word tokens and 152 hours of
+    eye tracking data recorded with an EyeLink 1000 Plus eye tracker.
+    OneStop comprises four sub-corpora with eye movement recordings from paragraph reading.
+
+    To filter the data by reading regime or trial type, use the following column values:
+
+    For ordinary reading trials, set question_preview to False.
+    For information seeking trials, set question_preview to True.
+    To exclude repeated reading trials, set repeated_reading_trial to False.
+    To include only repeated reading trials, set repeated_reading_trial to True.
+    To exclude practice trials, set practice_trial to False.
 
     For more information please consult :cite:p:`OneStop`.
 
@@ -55,9 +64,6 @@ class OneStop(DatasetDefinition):
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
-
-    extract: dict[str, bool]
-        Decide whether to extract the data.
 
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
@@ -109,25 +115,18 @@ class OneStop(DatasetDefinition):
             'precomputed_events': [
                 {
                     'resource':
-                    'https://osf.io/download/6jbge/',
+                    'https://osf.io/download/dq935/',
                     'filename': 'fixations_Paragraph.csv.zip',
-                    'md5': '0b05b59ac3e385c6608a1a57079dd25f',
+                    'md5': '3d3b6a3794a50e174e025f43735674bd',
                 },
             ],
             'precomputed_reading_measures': [
                 {
-                    'resource': 'https://osf.io/download/p97e5/',
+                    'resource': 'https://osf.io/download/4ajc8/',
                     'filename': 'ia_Paragraph.csv.zip',
-                    'md5': '4e9408d61ddf590ee72528a2993d7549',
+                    'md5': '9b9548e49efdc7dbf63d4f3a5dc3af22',
                 },
             ],
-        },
-    )
-
-    extract: dict[str, bool] = field(
-        default_factory=lambda: {
-            'precomputed_events': True,
-            'precomputed_reading_measures': True,
         },
     )
 

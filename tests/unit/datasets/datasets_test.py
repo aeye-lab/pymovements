@@ -34,6 +34,7 @@ from pymovements import DatasetLibrary
         pytest.param(pm.datasets.BSCII, 'BSCII', id='BSCII'),
         pytest.param(pm.datasets.ChineseReading, 'ChineseReading', id='ChineseReading'),
         pytest.param(pm.datasets.CodeComprehension, 'CodeComprehension', id='CodeComprehension'),
+        pytest.param(pm.datasets.CoLAGaze, 'CoLAGaze', id='CoLAGaze'),
         pytest.param(pm.datasets.CopCo, 'CopCo', id='CopCo'),
         pytest.param(pm.datasets.DAEMONS, 'DAEMONS', id='DAEMONS'),
         pytest.param(pm.datasets.DIDEC, 'DIDEC', id='DIDEC'),

@@ -71,9 +71,6 @@ class PoTeC(DatasetDefinition):
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    extract: dict[str, bool]
-        Decide whether to extract the data.
-
     experiment: Experiment
         The experiment definition.
 
@@ -159,14 +156,6 @@ class PoTeC(DatasetDefinition):
                     'md5': 'efafec5ce074d8f492cc2409b6c4d9eb',
                 },
             ],
-        },
-    )
-
-    extract: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': True,
-            'precomputed_reading_measures': True,
         },
     )
 
