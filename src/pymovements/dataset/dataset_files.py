@@ -410,7 +410,7 @@ def load_precomputed_reading_measure_file(
 ) -> ReadingMeasures:
     """Load precomputed reading measure from file.
 
-    This function supports both CSV-based (CSV, TSV, TXT) and Excel (.xlsx) formats for
+    This function supports both CSV-based (.csv, .tsv, .txt) and Excel (.xlsx) formats for
     reading preprocessed eye-tracking or behavioral data related to reading. File reading
     is customized via keyword arguments passed to Polars' reading functions. If an unsupported
     file format is encountered, a `ValueError` is raised.
