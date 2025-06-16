@@ -21,9 +21,6 @@ resources:
       filename: chinese_reading_measures.zip
       md5: null
 
-extract:
-  precomputed_events: true
-  precomputed_reading_measures: true
 
 filename_format:
   precomputed_events: 'Raw Data.txt'
