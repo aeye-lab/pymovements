@@ -1,0 +1,57 @@
+name: ETDD70
+
+has_files:
+  gaze: true
+  precomputed_events: true
+  precomputed_reading_measures: false
+
+mirrors:
+  gaze:
+      - https://zenodo.org/api/records/13332134/files-archive
+  precomputed_events:
+      - https://zenodo.org/api/records/13332134/files-archive
+
+resources:
+  gaze:
+    - resource: ''
+      filename: edd_raw.zip
+      md5: null
+  precomputed_events:
+    - resource: ''
+      filename: edd_fix.zip
+      md5: null
+
+extract:
+  gaze: true
+  precomputed_events: true
+
+experiment:
+  screen_width_px: 1680
+  screen_height_px: 1050
+  screen_width_cm: null
+  screen_height_cm: null
+  distance_cm: 65  # in the paper it is written (60-70cm)
+  origin: 'center'
+  sampling_rate: 250
+
+filename_format:
+  gaze: 'Subject_{subject_id:d}_{task:s}_raw.csv'
+  precomputed_events: 'Subject_{subject_id:d}_{task:s}_fixations.csv'
+
+filename_format_schema_overrides:
+  gaze: {}
+  precomputed_events: {}
+
+time_column: 'time'
+
+time_unit: 'ms'
+
+pixel_columns:
+  - gaze_x_left
+  - gaze_y_left
+  - gaze_x_right
+  - gaze_y_right
+
+custom_read_kwargs:
+  gaze: {}
+  precomputed_events: {}
