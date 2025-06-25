@@ -50,8 +50,8 @@ class Gaze4Hate(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+    resources: dict[str, list[dict[str, str]]]
+        A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
@@ -110,23 +110,23 @@ class Gaze4Hate(DatasetDefinition):
         },
     )
 
-    resources: dict[str, tuple[dict[str, str], ...]] = field(
+    resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda:
             {
-                'precomputed_events': (
+                'precomputed_events': [
                     {
                         'resource': 'https://osf.io/download/dbshf/',
                         'filename': 'gaze4hate_sentence_reading_fix_report.csv',
                         'md5': 'c8cc645d1fad659f9442d61795da5481',
                     },
-                ),
-                'precomputed_reading_measures': (
+                ],
+                'precomputed_reading_measures': [
                     {
                         'resource': 'https://osf.io/download/fgdjw/',
                         'filename': 'gaze4hate_sentence_reading_IA_report.csv',
                         'md5': 'e09e791e7d31d6ac3c69cd862d139c57',
                     },
-                ),
+                ],
             },
     )
 
