@@ -28,10 +28,12 @@ import polars as pl
 from tqdm import tqdm
 
 from pymovements._utils import _checks
+from pymovements._utils._html import repr_html
 from pymovements.events.properties import duration
 from pymovements.stimulus.text import TextStimulus
 
 
+@repr_html(['frame', 'trial_columns'])
 class EventDataFrame:
     """A DataFrame for event data.
 
@@ -44,9 +46,9 @@ class EventDataFrame:
         exclusive with all the other arguments. (default: None)
     name: str | list[str] | None
         Name of events. (default: None)
-    onsets: list[int] | np.ndarray | None
+    onsets: list[int | float] | np.ndarray | None
         List of onsets. (default: None)
-    offsets: list[int] | np.ndarray | None
+    offsets: list[int | float] | np.ndarray | None
         List of offsets. (default: None)
     trials: list[int | float | str] | np.ndarray | None
         List of trial identifiers. (default: None)
@@ -83,14 +85,14 @@ class EventDataFrame:
     └──────────┴─────────┴─────────┴──────────┘
     """
 
-    _minimal_schema = {'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64}
+    _minimal_schema = {'name': pl.Utf8, 'onset': pl.Float64, 'offset': pl.Float64}
 
     def __init__(
             self,
             data: pl.DataFrame | None = None,
             name: str | list[str] | None = None,
-            onsets: list[int] | np.ndarray | None = None,
-            offsets: list[int] | np.ndarray | None = None,
+            onsets: list[int | float] | np.ndarray | None = None,
+            offsets: list[int | float] | np.ndarray | None = None,
             trials: list[int | float | str] | np.ndarray | None = None,
             trial_columns: list[str] | str | None = None,
     ):
@@ -141,8 +143,8 @@ class EventDataFrame:
 
                 data_dict = {
                     'name': pl.Series(name, dtype=pl.Utf8),
-                    'onset': pl.Series(onsets, dtype=pl.Int64),
-                    'offset': pl.Series(offsets, dtype=pl.Int64),
+                    'onset': pl.Series(onsets, dtype=pl.Float64),
+                    'offset': pl.Series(offsets, dtype=pl.Float64),
                 }
 
                 if trials is not None:
@@ -154,8 +156,8 @@ class EventDataFrame:
             else:
                 data_dict = {
                     'name': pl.Series([], dtype=pl.Utf8),
-                    'onset': pl.Series([], dtype=pl.Int64),
-                    'offset': pl.Series([], dtype=pl.Int64),
+                    'onset': pl.Series([], dtype=pl.Float64),
+                    'offset': pl.Series([], dtype=pl.Float64),
                 }
                 self.trial_columns = None
 
@@ -164,6 +166,19 @@ class EventDataFrame:
         # Ensure column order: trial columns, name, onset, offset.
         if self.trial_columns is not None:
             self.frame = self.frame.select([*self.trial_columns, *self._minimal_schema.keys()])
+
+        # Convert to int if possible.
+        all_decimals = self.frame.select(
+            pl.all_horizontal(
+                pl.col('onset', 'offset').round()
+                .eq(pl.col('onset', 'offset'))
+                .all(),
+            ),
+        ).item()
+        if all_decimals:
+            self.frame = self.frame.with_columns(
+                pl.col('onset', 'offset').cast(pl.Int64),
+            )
 
         if 'duration' not in self.frame.columns:
             self._add_duration_property()
