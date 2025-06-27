@@ -303,15 +303,22 @@ class GazeDataFrame:
             A list of new GazeDataFrame instances, each containing a partition of the
             original data with all metadata and configurations preserved.
         """
+        frames = self.frame.partition_by(by=by)
+        # we cannot directly zip because we need to check if by is in events columns
+        events_list = self.events.split(by) if by in self.events.columns else [
+            pm.EventDataFrame(),
+        ] * len(frames)
+
         return [
             GazeDataFrame(
-                new_frame,
+                frame,
                 experiment=self.experiment,
                 trial_columns=self.trial_columns,
                 time_column='time',
                 distance_column='distance',
+                events=events,
             )
-            for new_frame in self.frame.partition_by(by=by)
+            for frame, events in zip(frames, events_list)
         ]
 
     def transform(
