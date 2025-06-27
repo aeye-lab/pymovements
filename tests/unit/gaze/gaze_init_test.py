@@ -29,6 +29,7 @@ from pymovements import Experiment
 from pymovements import GazeDataFrame
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_kwargs', 'expected_frame', 'expected_n_components'),
     [
@@ -1223,6 +1224,7 @@ def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, exp
     assert gaze.n_components == expected_n_components
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_kwargs', 'expected_experiment'),
     [
@@ -1258,6 +1260,7 @@ def test_init_gaze_dataframe_has_expected_experiment(init_kwargs, expected_exper
     assert gaze.experiment == expected_experiment
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_kwargs', 'expected_trial_columns'),
     [
@@ -1341,6 +1344,7 @@ def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_tr
     assert gaze.trial_columns == expected_trial_columns
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'exception_msg'),
     [
@@ -1881,6 +1885,7 @@ def test_gaze_dataframe_init_exceptions(init_kwargs, exception, exception_msg):
     assert msg == exception_msg
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 def test_gaze_copy_init_has_same_n_components():
     """Tests if gaze initialization with frame with nested columns has correct n_components.
 
@@ -1895,6 +1900,7 @@ def test_gaze_copy_init_has_same_n_components():
     assert gaze.n_components == gaze_copy.n_components
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('events', 'init_kwargs'),
     [
@@ -1955,3 +1961,13 @@ def test_gaze_init_events(events, init_kwargs):
     assert_frame_equal(gaze.events.frame, expected_events)
     # We don't want the events point to the same reference.
     assert gaze.events.frame is not expected_events
+
+
+def test_gaze_init_warnings():
+    with pytest.warns(UserWarning) as record:
+        GazeDataFrame(data={'a': [1, 2, 3]})
+
+    expected_msg_prefix = 'GazeDataFrame contains data but no pixel/position/velocity/acceleration columns were specified'
+
+    assert len(record) == 1
+    assert record[0].message.args[0].startswith(expected_msg_prefix)

@@ -25,6 +25,7 @@ from polars.testing import assert_frame_equal
 import pymovements as pm
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_data', 'unnest_kwargs', 'expected'),
     [
@@ -235,6 +236,7 @@ def test_gaze_dataframe_unnest_has_expected_frame(init_data, unnest_kwargs, expe
     assert_frame_equal(gaze.frame, expected)
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_data', 'unnest_kwargs', 'expected'),
     [
@@ -359,6 +361,7 @@ def test_gaze_dataframe_unnest_has_expected_frame_multiple_unnest(
     assert_frame_equal(gaze.frame, expected)
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_data', 'unnest_kwargs', 'exception', 'exception_msg'),
     [
@@ -452,6 +455,7 @@ def test_gaze_dataframe_unnest_errors(init_data, unnest_kwargs, exception, excep
     assert msg == exception_msg
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_data', 'unnest_kwargs', 'n_components', 'exception', 'exception_msg'),
     [

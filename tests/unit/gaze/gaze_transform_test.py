@@ -31,6 +31,7 @@ def fixture_experiment():
     return pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000)
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('gaze_init_kwargs', 'transform_method', 'transform_kwargs', 'expected'),
     [
@@ -881,6 +882,7 @@ def test_gaze_transform_expected_frame(
     assert_frame_equal(gaze.frame, expected.frame, check_column_order=check_column_order)
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     (
         'gaze_init_kwargs',
@@ -943,6 +945,7 @@ def test_gaze_transfrom_expected_frame_warning(
         assert_frame_equal(gaze.frame, expected_result.frame)
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'exception_msg'),
     [
@@ -965,6 +968,7 @@ def test_gaze_transform_raises_exception(init_kwargs, exception, exception_msg):
     assert msg == exception_msg
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('data', 'pixel_columns'),
     [
@@ -1000,6 +1004,7 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
     assert 'position' in gaze.columns
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'expected_msg'),
     [
@@ -1072,6 +1077,7 @@ def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg)
     assert msg == expected_msg
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_kwargs', 'warning', 'expected_msg'),
     [
@@ -1101,6 +1107,7 @@ def test_gaze_dataframe_pix2deg_warnings(init_kwargs, warning, expected_msg):
     assert msg == expected_msg
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'expected_msg'),
     [
@@ -1172,6 +1179,7 @@ def test_gaze_dataframe_deg2pix_exceptions(init_kwargs, exception, expected_msg)
     assert msg == expected_msg
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('data', 'position_columns'),
     [
@@ -1207,6 +1215,7 @@ def test_gaze_dataframe_pos2acc_creates_acceleration_column(data, experiment, po
     assert 'acceleration' in gaze.columns
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'expected_msg'),
     [
@@ -1273,6 +1282,7 @@ def test_gaze_dataframe_pos2acc_exceptions(init_kwargs, exception, expected_msg)
     assert msg == expected_msg
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('data', 'position_columns'),
     [
@@ -1330,6 +1340,7 @@ def test_gaze_dataframe_clip_creates_new_column(experiment):
     assert 'pixel_new' in gaze.columns
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_kwargs', 'exception', 'expected_msg'),
     [
@@ -1396,6 +1407,7 @@ def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg)
     assert msg == expected_msg
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('gaze_init_kwargs', 'kwargs', 'expected'),
     [
@@ -1470,6 +1482,7 @@ def test_gaze_dataframe_smooth_expected_column(
     assert_frame_equal(gaze.frame, expected.frame)
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('gaze_init_kwargs', 'kwargs', 'expected_frame'),
     [
@@ -1668,6 +1681,7 @@ def test_gaze_dataframe_resample_expected(
     assert_frame_equal(gaze.frame, expected_frame)
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 def test_gaze_dataframe_resample_changes_experiemnt_sampling_rate(experiment):
     gaze = pm.GazeDataFrame(
         data=pl.from_dict(
