@@ -1590,7 +1590,7 @@ class GazeDataFrame:
                 ' and the content could not be autodetected from the column names. \n'
                 "Please specify 'pixel_columns', 'position_columns', 'velocity_columns'"
                 " or 'acceleration_columns' explicitly during initialization."
-                " Otherwise, transformation methods may fail.',
+                ' Otherwise, transformation methods may fail.',
             )
 
     def _init_time_column(
