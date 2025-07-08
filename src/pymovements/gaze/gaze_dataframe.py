@@ -970,7 +970,10 @@ class GazeDataFrame:
         --------
         Let's initialize an example GazeDataFrame first:
         >>> gaze = pm.gaze.from_numpy(
-        ...     pixel=np.concatenate([np.zeros((40, 2)), np.full((10, 2), np.nan), np.ones((50, 2))]),
+        ...     pixel=np.concatenate(
+        ...         [np.zeros((2, 40)), np.full((2, 10), np.nan), np.ones((2, 50))],
+        ...         axis=1,
+        ...     ),
         ... )
 
         You can calculate measures, for example the null ratio like this:
