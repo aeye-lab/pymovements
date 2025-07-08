@@ -27,7 +27,6 @@ import pymovements as pm
 from pymovements.synthetic import step_function
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('method', 'kwargs', 'gaze', 'expected'),
     [
@@ -722,6 +721,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
+                position=np.zeros((2, 100)),
                 events=pm.EventDataFrame(name='fixation', onsets=[0], offsets=[100]),
             ),
             pm.EventDataFrame(name='fixation', onsets=[0], offsets=[100]),
@@ -733,6 +733,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
+                position=np.zeros((2, 100)),
                 events=pm.EventDataFrame(name='fixation', onsets=[10], offsets=[100]),
             ),
             pm.EventDataFrame(
@@ -748,6 +749,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
+                position=np.zeros((2, 100)),
                 events=pm.EventDataFrame(name='fixation', onsets=[0], offsets=[90]),
             ),
             pm.EventDataFrame(
@@ -763,6 +765,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
+                position=np.zeros((2, 100)),
                 events=pm.EventDataFrame(name='fixation', onsets=[0, 50], offsets=[40, 100]),
             ),
             pm.EventDataFrame(
@@ -778,6 +781,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
+                position=np.zeros((2, 100)),
                 events=pm.EventDataFrame(
                     name=['fixation', 'saccade'], onsets=[0, 50], offsets=[40, 100],
                 ),
@@ -796,6 +800,7 @@ from pymovements.synthetic import step_function
             pm.gaze.from_numpy(
                 trial=np.array([1] * 50 + [2] * 50),
                 time=np.arange(0, 100),
+                position=np.zeros((2, 100)),
                 events=pm.EventDataFrame(
                     name='fixation', onsets=[0, 90], offsets=[10, 100], trials=[1, 2],
                 ),
@@ -815,6 +820,7 @@ from pymovements.synthetic import step_function
             pm.gaze.from_numpy(
                 trial=np.array([1] * 50 + [2] * 50),
                 time=np.concatenate((np.arange(0, 50), np.arange(0, 50))),
+                position=np.zeros((2, 100)),
                 events=pm.EventDataFrame(
                     name='fixation', onsets=[0, 40], offsets=[10, 50], trials=[1, 2],
                 ),
@@ -838,6 +844,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(100, 200),
+                position=np.zeros((2, 100)),
                 events=pm.EventDataFrame(
                     name=['fixation', 'saccade'], onsets=[0, 50], offsets=[40, 100],
                 ),
@@ -855,6 +862,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(0, 200),
+                position=np.zeros((2, 100)),
                 events=pm.EventDataFrame(
                     name=['fixation', 'saccade'], onsets=[210, 250], offsets=[240, 300],
                 ),
@@ -872,6 +880,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(100, 200),
+                position=np.zeros((2, 100)),
                 events=pm.EventDataFrame(
                     name=['fixation', 'fixation'], onsets=[0, 120], offsets=[110, 220],
                 ),
@@ -935,7 +944,6 @@ def test_gaze_detect_custom_method_no_arguments():
     assert_frame_equal(gaze.events.frame, expected.frame)
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('method', 'kwargs', 'gaze', 'exception', 'exception_msg'),
     [
@@ -1053,7 +1061,6 @@ def test_gaze_detect_missing_trial_column_events_raises_exception():
     )
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('method', 'column'),
     [

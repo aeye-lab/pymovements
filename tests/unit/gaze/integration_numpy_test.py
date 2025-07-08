@@ -26,6 +26,7 @@ from polars.testing import assert_frame_equal
 import pymovements as pm
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 def test_from_numpy():
     array = np.array(
         [
@@ -277,7 +278,6 @@ def test_from_numpy_all_none():
     assert gaze.n_components is None
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     'events',
     [
