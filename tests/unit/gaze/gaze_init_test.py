@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test GazeDataFrame initialization."""
+"""Test Gaze initialization."""
 import numpy as np
 import polars as pl
 import pytest
@@ -26,7 +26,7 @@ from polars.testing import assert_frame_equal
 from pymovements import DatasetDefinition
 from pymovements import EventDataFrame
 from pymovements import Experiment
-from pymovements import GazeDataFrame
+from pymovements import Gaze
 
 
 @pytest.mark.parametrize(
@@ -1217,8 +1217,8 @@ from pymovements import GazeDataFrame
 
     ],
 )
-def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, expected_n_components):
-    gaze = GazeDataFrame(**init_kwargs)
+def test_init_gaze_has_expected_attrs(init_kwargs, expected_frame, expected_n_components):
+    gaze = Gaze(**init_kwargs)
     assert_frame_equal(gaze.frame, expected_frame)
     assert gaze.n_components == expected_n_components
 
@@ -1253,8 +1253,8 @@ def test_init_gaze_dataframe_has_expected_attrs(init_kwargs, expected_frame, exp
 
     ],
 )
-def test_init_gaze_dataframe_has_expected_experiment(init_kwargs, expected_experiment):
-    gaze = GazeDataFrame(**init_kwargs)
+def test_init_gaze_has_expected_experiment(init_kwargs, expected_experiment):
+    gaze = Gaze(**init_kwargs)
     assert gaze.experiment == expected_experiment
 
 
@@ -1336,8 +1336,8 @@ def test_init_gaze_dataframe_has_expected_experiment(init_kwargs, expected_exper
 
     ],
 )
-def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_trial_columns):
-    gaze = GazeDataFrame(**init_kwargs)
+def test_init_gaze_has_expected_trial_columns(init_kwargs, expected_trial_columns):
+    gaze = Gaze(**init_kwargs)
     assert gaze.trial_columns == expected_trial_columns
 
 
@@ -1873,9 +1873,9 @@ def test_init_gaze_dataframe_has_expected_trial_columns(init_kwargs, expected_tr
 
     ],
 )
-def test_gaze_dataframe_init_exceptions(init_kwargs, exception, exception_msg):
+def test_gaze_init_exceptions(init_kwargs, exception, exception_msg):
     with pytest.raises(exception) as excinfo:
-        GazeDataFrame(**init_kwargs)
+        Gaze(**init_kwargs)
 
     msg, = excinfo.value.args
     assert msg == exception_msg
@@ -1887,10 +1887,10 @@ def test_gaze_copy_init_has_same_n_components():
     Refers to issue #514.
     """
     df_orig = pl.from_numpy(np.zeros((3, 1000)), orient='col', schema=['t', 'x', 'y'])
-    gaze = GazeDataFrame(df_orig, position_columns=['x', 'y'], time_column='t')
+    gaze = Gaze(df_orig, position_columns=['x', 'y'], time_column='t')
 
     df_copy = gaze.frame.clone()
-    gaze_copy = GazeDataFrame(df_copy)
+    gaze_copy = Gaze(df_copy)
 
     assert gaze.n_components == gaze_copy.n_components
 
@@ -1950,7 +1950,7 @@ def test_gaze_init_events(events, init_kwargs):
     else:
         expected_events = events.frame
 
-    gaze = GazeDataFrame(events=events, **init_kwargs)
+    gaze = Gaze(events=events, **init_kwargs)
 
     assert_frame_equal(gaze.events.frame, expected_events)
     # We don't want the events point to the same reference.
