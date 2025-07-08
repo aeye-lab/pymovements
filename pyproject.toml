@@ -53,7 +53,7 @@ docs = [
   "nbconvert>=7.0.0,<7.17",
   "nbsphinx>=0.8.8,<0.10",
   "pandoc",
-  "pybtex<0.25.1",
+  "pybtex<0.25.2",
   "pydata-sphinx-theme>=0.12",
   "setuptools>=61.0.0,<81",
   "sphinx>=7.0,<8.3",
@@ -65,7 +65,7 @@ docs = [
   "sphinxcontrib.bibtex>=2.4.1"
 ]
 test = [
-  "pybtex<0.25.1",
+  "pybtex<0.25.2",
   "pytest>=6.0.0",
   "pytest-benchmark>=5.1.0",
   "pytest-cov>=4.0.0",
