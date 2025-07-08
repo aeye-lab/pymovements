@@ -1978,7 +1978,7 @@ def test_gaze_init_events(events, init_kwargs):
 
 def test_gaze_init_warnings():
     with pytest.warns(UserWarning) as record:
-        GazeDataFrame(data={'a': [1, 2, 3]})
+        GazeDataFrame(data=pl.from_dict({'a': [1, 2, 3]}))
 
     expected_msg_prefix = 'GazeDataFrame contains data but no pixel/position/velocity/acceleration columns were specified'
 
