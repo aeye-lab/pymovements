@@ -2,6 +2,7 @@ Dataset,Citation,Samples,Events,Reading Measures,# Subjects,# Sessions per Subje
 :py:class:`~pymovements.datasets.BSC`,:cite:p:`BSC`,,X,,60,1,500 Hz,Text (sentences)
 :py:class:`~pymovements.datasets.BSCII`,:cite:p:`BSCII`,,X,,60,1,1000 Hz,Text (sentences)
 :py:class:`~pymovements.datasets.CodeComprehension`,:cite:p:`CodeComprehension`,,X,,27,1-2,2000 Hz,Text (code)
+:py:class:`~pymovements.datasets.CoLAGaze`,:cite:p:`CoLAGaze`,,X,X,42,1,2000 Hz,Text (sentences)
 :py:class:`~pymovements.datasets.CopCo`,":cite:p:`CopCoL1Hollenstein,CopCoL1DysBjornsdottir,CopCoL2`",X,X,X,58,1,1000 Hz,Text (documents)
 :py:class:`~pymovements.datasets.DAEMONS`,:cite:p:`DAEMONS`,,X,,250,1,1000 Hz,Image
 :py:class:`~pymovements.datasets.DIDEC`,:cite:p:`DIDEC`,X,,,112,1,250 Hz,Image
@@ -21,4 +22,4 @@ Dataset,Citation,Samples,Events,Reading Measures,# Subjects,# Sessions per Subje
 :py:class:`~pymovements.datasets.PotsdamBingeWearablePVT`,:cite:p:`PotsdamBingePVT`,X,,,57,2,200 Hz (upsampled to 1000 Hz),Dots (PVT test)
 :py:class:`~pymovements.datasets.Provo`,:cite:p:`Provo`,,X,,470,1,1000 Hz,Text (documents)
 :py:class:`~pymovements.datasets.SBSAT`,:cite:p:`SB-SAT`,X,X,,95,1,1000 Hz,Text (documents)
-:py:class:`~pymovements.datasets.UCL`,:cite:p:`UCL`,,X,X,117,1,500 Hz,Text (sentences)
+:py:class:`~pymovements.datasets.UCL`,:cite:p:`UCL`,,X,X,43,1,500 Hz,Text (sentences)

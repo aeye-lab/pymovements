@@ -21,7 +21,6 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from dataclasses import asdict
 from typing import Any
 
 import numpy as np
@@ -99,7 +98,7 @@ class Experiment:
             screen_width_cm: float | None = None,
             screen_height_cm: float | None = None,
             distance_cm: float | None = None,
-            origin: str | None = 'upper left',
+            origin: str | None = None,
             sampling_rate: float | None = None,
             *,
             screen: Screen | None = None,
@@ -110,12 +109,8 @@ class Experiment:
         _checks.check_is_mutual_exclusive(screen_width_cm=screen_width_cm, screen=screen)
         _checks.check_is_mutual_exclusive(screen_height_cm=screen_height_cm, screen=screen)
         _checks.check_is_mutual_exclusive(distance_cm=distance_cm, screen=screen)
-        _checks.check_is_mutual_exclusive(sampling_rate=sampling_rate, eyetracker=eyetracker)
-
-        # the origin default value needs special care to not mess with a passed screen.
-        if origin == 'upper left' and screen is not None:
-            origin = None  # set origin to None to pass mutual exclusivity check
         _checks.check_is_mutual_exclusive(origin=origin, screen=screen)
+        _checks.check_is_mutual_exclusive(sampling_rate=sampling_rate, eyetracker=eyetracker)
 
         if screen is None:
             screen = Screen(
@@ -163,7 +158,7 @@ class Experiment:
         ... })
         >>> print(experiment)
         Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38.0, height_cm=30.0,
-                                 distance_cm=68.0, origin='upper left'),
+                                 distance_cm=68.0, origin=None),
                    eyetracker=EyeTracker(sampling_rate=1000.0, left=None, right=None,
                                         model=None, version=None, vendor=None, mount=None))
 
@@ -282,8 +277,17 @@ class Experiment:
         """Compare equality to other Experiment."""
         return self.screen == other.screen and self.eyetracker == other.eyetracker
 
-    def to_dict(self) -> dict[str, Any | dict[str, str | float | None]]:
+    def to_dict(
+        self, *, exclude_none: bool = True,
+    ) -> dict[str, Any | dict[str, str | float | None]]:
         """Convert the experiment instance into a dictionary.
+
+        Parameters
+        ----------
+        exclude_none: bool
+            Exclude attributes that are either ``None`` or that are objects that evaluate to
+            ``False`` (e.g., ``[]``, ``{}``, ``EyeTracker()``). Attributes of type ``bool``,
+            ``int``, and ``float`` are not excluded.
 
         Returns
         -------
@@ -291,10 +295,21 @@ class Experiment:
             Experiment as dictionary.
         """
         _dict: dict[str, dict[str, str | float | None]] = {}
-        _dict['screen'] = asdict(self.screen)
-        _dict['eyetracker'] = asdict(self.eyetracker)
+        if exclude_none:
+            if self.screen:
+                _dict['screen'] = self.screen.to_dict(exclude_none=exclude_none)
+            if self.eyetracker:
+                _dict['eyetracker'] = self.eyetracker.to_dict(exclude_none=exclude_none)
+        else:
+            _dict['screen'] = self.screen.to_dict(exclude_none=False)
+            _dict['eyetracker'] = self.eyetracker.to_dict(exclude_none=False)
+
         return _dict
 
     def __str__(self: Experiment) -> str:
         """Return Experiment string."""
         return f'{type(self).__name__}(screen={self.screen}, eyetracker={self.eyetracker})'
+
+    def __bool__(self) -> bool:
+        """Return True if the experiment has data defined, else False."""
+        return not all(not value for value in self.__dict__.values())

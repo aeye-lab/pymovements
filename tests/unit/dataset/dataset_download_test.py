@@ -81,10 +81,6 @@ def dataset_definition_fixture(request):
                     },
                 ),
             },
-            extract={
-                'gaze': True,
-                'precomputed_events': True,
-            },
         )
 
     if request.param == 'CustomGazeAndPrecomputedNoMirror':
@@ -111,10 +107,6 @@ def dataset_definition_fixture(request):
                     },
                 ),
             },
-            extract={
-                'gaze': True,
-                'precomputed_events': True,
-            },
         )
 
     if request.param == 'CustomGazeOnly':
@@ -140,9 +132,6 @@ def dataset_definition_fixture(request):
                     },
                 ),
             },
-            extract={
-                'gaze': True,
-            },
         )
 
     if request.param == 'CustomGazeOnlyNoMirror':
@@ -161,9 +150,6 @@ def dataset_definition_fixture(request):
                         'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                     },
                 ),
-            },
-            extract={
-                'gaze': True,
             },
         )
 
@@ -190,9 +176,6 @@ def dataset_definition_fixture(request):
                     },
                 ),
             },
-            extract={
-                'precomputed_events': True,
-            },
         )
 
     if request.param == 'CustomPrecomputedOnlyNoMirror':
@@ -211,9 +194,6 @@ def dataset_definition_fixture(request):
                         'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                     },
                 ),
-            },
-            extract={
-                'precomputed_events': True,
             },
         )
 
@@ -240,9 +220,6 @@ def dataset_definition_fixture(request):
                     },
                 ),
             },
-            extract={
-                'precomputed_events': True,
-            },
         )
 
     if request.param == 'CustomPrecomputedOnlyNoExtractNoMirror':
@@ -261,9 +238,6 @@ def dataset_definition_fixture(request):
                         'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                     },
                 ),
-            },
-            extract={
-                'precomputed_events': False,
             },
         )
 
@@ -290,9 +264,6 @@ def dataset_definition_fixture(request):
                     },
                 ),
             },
-            extract={
-                'precomputed_reading_measures': True,
-            },
         )
 
     if request.param == 'CustomPrecomputedRMOnlyNoMirror':
@@ -311,9 +282,6 @@ def dataset_definition_fixture(request):
                         'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                     },
                 ),
-            },
-            extract={
-                'precomputed_reading_measures': True,
             },
         )
 
@@ -1360,9 +1328,6 @@ def test_extract_dataset_precomputed_move_single_file(tmp_path):
                 },
             ),
         },
-        extract={
-            'precomputed_events': False,
-        },
     )
 
     # Create directory and copy test file.
@@ -1398,9 +1363,6 @@ def test_extract_dataset_precomputed_rm_move_single_file(tmp_path):
                 },
             ),
         },
-        extract={
-            'precomputed_reading_measures': False,
-        },
     )
 
     # Create directory and copy test file.
@@ -1428,9 +1390,6 @@ def test_dataset_download_no_precomputed_rm_resources_raises_exception(tmp_path)
                 'https://another_example.com/',
             ),
         },
-        extract={
-            'precomputed_reading_measures': (),
-        },
     )
 
     with pytest.raises(AttributeError) as excinfo:
@@ -1438,5 +1397,5 @@ def test_dataset_download_no_precomputed_rm_resources_raises_exception(tmp_path)
 
     msg, = excinfo.value.args
 
-    expected_msg = "'precomputed_reading_measures' resources must be specified to download dataset."
+    expected_msg = 'resources must be specified to download dataset.'
     assert msg == expected_msg
