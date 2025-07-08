@@ -1259,12 +1259,13 @@ class GazeDataFrame:
         AttributeError
             If n_components is not 2, 4 or 6.
         """
-
         if self.n_components not in {2, 4, 6}:
             raise AttributeError(
-                "No valid gaze components found (e.g., 'pixel', 'position', etc.).\n"
-                "This usually happens if you did not specify 'pixel_columns', 'position_columns', etc. during initialization.\n"
-                'Please initialize the GazeDataFrame with appropriate column names.',
+                'Number of components required but no gaze components could be inferred.\n'
+                'This usually happens if you did not specify any column content'
+                ' and the content could not be autodetected from the column names. \n'
+                "Please specify 'pixel_columns', 'position_columns', 'velocity_columns'"
+                " or 'acceleration_columns' explicitly during initialization."
             )
 
     def _check_component_columns(self, **kwargs: list[str]) -> None:
@@ -1579,17 +1580,17 @@ class GazeDataFrame:
             column_specifiers.append(acceleration_columns)
 
         self.n_components = self._infer_n_components(column_specifiers)
-        # Emit a warning if the GazeDataFrame contains data but no gaze-related columns were provided.
-        # This can lead to failure in downstream methods that rely on those
-        # columns (e.g., transformations).
-        if (
-            len(self.frame) > 0
-            and not any(col in self.frame.columns for col in ['pixel', 'position', 'velocity', 'acceleration'])
-        ):
+        # Warning if contains data but no gaze-related columns were provided.
+        # This can lead to failure in downstream methods that rely on those columns
+        # (e.g., transformations).
+        if not self.n_components:
             warnings.warn(
-                'GazeDataFrame contains data but no pixel/position/velocity/acceleration columns were specified.\n'
-                "Please specify 'pixel_columns', 'position_columns', 'velocity_columns' or 'acceleration_columns' "
-                'during initialization. Otherwise, transformations may fail.',
+                'GazeDataFrame contains data but no components could be inferred. \n'
+                'This usually happens if you did not specify any column content'
+                ' and the content could not be autodetected from the column names. \n'
+                "Please specify 'pixel_columns', 'position_columns', 'velocity_columns'"
+                " or 'acceleration_columns' explicitly during initialization."
+                " Otherwise, transformation methods may fail.',
             )
 
     def _init_time_column(
