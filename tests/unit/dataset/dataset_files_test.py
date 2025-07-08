@@ -251,8 +251,12 @@ def test_load_precomputed_rm_file_xlsx():
         filepath,
         custom_read_kwargs={'sheet_name': 'Sheet 1'},
     )
-    expected_df = pl.read_excel(filepath, sheet_name='Sheet 1')
-    assert_frame_equal(reading_measure.frame, expected_df, check_column_order=False)
+
+    assert_frame_equal(
+        reading_measure.frame,
+        pl.read_excel(filepath, sheet_name='Sheet 1'),
+        check_column_order=False,
+    )
 
 
 def test_load_precomputed_rm_file_unsupported_file_format():
