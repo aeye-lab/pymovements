@@ -53,18 +53,12 @@ class ETDD70(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
-
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
-
-    extract: dict[str, bool]
-        Decide whether to extract the data.
 
     experiment: Experiment
         The experiment definition.
@@ -125,41 +119,24 @@ class ETDD70(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda:
-            {
-                'gaze': [
-                    'https://zenodo.org/api/records/13332134/files-archive',
-                ],
-                'precomputed_events': [
-                    'https://zenodo.org/api/records/13332134/files-archive',
-                ],
-            },
-    )
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda:
             {
                 'gaze': [
                     {
-                        'resource': '',
+                        'resource': 'https://zenodo.org/api/records/13332134/files-archive',
                         'filename': 'edd_raw.zip',
                         'md5': None,  # type: ignore
                     },
                 ],
                 'precomputed_events': [
                     {
-                        'resource': '',
+                        'resource': 'https://zenodo.org/api/records/13332134/files-archive',
                         'filename': 'edd_fix.zip',
                         'md5': None,  # type: ignore
                     },
                 ],
             },
-    )
-    extract: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': True,
-        },
     )
 
     experiment: Experiment = field(
