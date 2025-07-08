@@ -1265,7 +1265,7 @@ class GazeDataFrame:
                 'This usually happens if you did not specify any column content'
                 ' and the content could not be autodetected from the column names. \n'
                 "Please specify 'pixel_columns', 'position_columns', 'velocity_columns'"
-                " or 'acceleration_columns' explicitly during initialization."
+                " or 'acceleration_columns' explicitly during initialization.",
             )
 
     def _check_component_columns(self, **kwargs: list[str]) -> None:
