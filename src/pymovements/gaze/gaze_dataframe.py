@@ -1584,7 +1584,7 @@ class GazeDataFrame:
         # Warning if contains data but no gaze-related columns were provided.
         # This can lead to failure in downstream methods that rely on those columns
         # (e.g., transformations).
-        if len(self.frame) > 1 not self.n_components:
+        if len(self.frame) > 1 and not self.n_components:
             warnings.warn(
                 'GazeDataFrame contains data but no components could be inferred. \n'
                 'This usually happens if you did not specify any column content'
