@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the IITBHGC dataset."""
+"""Provides a definition for the IITB_HGC dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -28,14 +28,14 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 
 
 @dataclass
-class IITBHGC(DatasetDefinition):
-    """IITBHGC dataset :cite:p:`IITBHGC`.
+class IITB_HGC(DatasetDefinition):
+    """IITB_HGC dataset :cite:p:`IITB_HGC`.
 
     This dataset includes monocular eye tracking data from 5 participants in a single
     session. Recording both eyes at 2000 Hz, each participant read 500 generated paragraphs
     and judges whether it was hallucinated or not.
 
-    Check the respective paper for details :cite:p:`IITBHGC`.
+    Check the respective paper for details :cite:p:`IITB_HGC`.
 
     Attributes
     ----------
@@ -82,11 +82,11 @@ class IITBHGC(DatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
-    :py:class:`~pymovements.datasets.IITBHGC` definition:
+    :py:class:`~pymovements.datasets.IITB_HGC` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("IITBHGC", path='data/IITBHGC')
+    >>> dataset = pm.Dataset("IITB_HGC", path='data/IITB_HGC')
 
     Download the dataset resources:
 
@@ -100,9 +100,9 @@ class IITBHGC(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'IITBHGC'
+    name: str = 'IITB_HGC'
 
-    long_name: str = 'IITB-Hallucination Gaze corpus'
+    long_name: str = 'IITB-Hallucination Gaze Corpus'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {

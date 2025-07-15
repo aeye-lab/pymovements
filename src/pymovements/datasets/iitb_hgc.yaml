@@ -1,6 +1,6 @@
-name: IITBHGC
+name: IITB_HGC
 
-long_name: 'IITB-Hallucination Gaze corpus'
+long_name: 'IITB-Hallucination Gaze Corpus'
 
 has_files:
   gaze: false
