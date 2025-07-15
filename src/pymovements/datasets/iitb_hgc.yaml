@@ -13,9 +13,6 @@ resources:
       filename: IITB_HGC.jsonl
       md5: cde5dd88534e87d9b2f1ab6e47133b5c
 
-extract:
-  precomputed_events: false
-
 filename_format:
   precomputed_events: IITB_HGC.jsonl
 

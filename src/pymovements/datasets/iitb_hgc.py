@@ -56,9 +56,6 @@ class IITB_HGC(DatasetDefinition):
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    extract: dict[str, bool]
-        Decide whether to extract the data.
-
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
@@ -122,12 +119,6 @@ class IITB_HGC(DatasetDefinition):
                     'md5': 'cde5dd88534e87d9b2f1ab6e47133b5c',
                 },
             ],
-        },
-    )
-
-    extract: dict[str, bool] = field(
-        default_factory=lambda: {
-            'precomputed_events': False,
         },
     )
 
