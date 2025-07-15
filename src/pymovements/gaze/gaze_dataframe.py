@@ -971,11 +971,14 @@ class GazeDataFrame:
         --------
         Let's initialize an example GazeDataFrame first:
         >>> gaze = pm.gaze.from_numpy(
-        ...     distance=np.concatenate([np.zeros(40), np.full(10, np.nan), np.ones(50)]),
+        ...     pixel=np.concatenate(
+        ...         [np.zeros((2, 40)), np.full((2, 10), np.nan), np.ones((2, 50))],
+        ...         axis=1,
+        ...     ),
         ... )
 
         You can calculate measures, for example the null ratio like this:
-        >>> gaze.measure_samples('null_ratio', column='distance')
+        >>> gaze.measure_samples('null_ratio', column='pixel')
         shape: (1, 1)
         ┌────────────┐
         │ null_ratio │
@@ -1242,6 +1245,16 @@ class GazeDataFrame:
     def _check_n_components(self) -> None:
         """Check that n_components is either 2, 4 or 6.
 
+        Ensure that the number of gaze components is valid.
+
+        Valid configurations are:
+            - 2 components: monocular data (e.g., x and y)
+            - 4 components: binocular data (e.g., x/y for left and right eye)
+            - 6 components: binocular + cyclopean data (x/y for left, right, and cyclopean eye)
+
+        If no valid gaze columns were specified (pixel, position, etc.), raise an error
+        with a helpful message to guide proper initialization.
+
         Raises
         ------
         AttributeError
@@ -1249,7 +1262,11 @@ class GazeDataFrame:
         """
         if self.n_components not in {2, 4, 6}:
             raise AttributeError(
-                f'n_components must be either 2, 4 or 6 but is {self.n_components}',
+                'Number of components required but no gaze components could be inferred.\n'
+                'This usually happens if you did not specify any column content'
+                ' and the content could not be autodetected from the column names. \n'
+                "Please specify 'pixel_columns', 'position_columns', 'velocity_columns'"
+                " or 'acceleration_columns' explicitly during initialization.",
             )
 
     def _check_component_columns(self, **kwargs: list[str]) -> None:
@@ -1564,6 +1581,18 @@ class GazeDataFrame:
             column_specifiers.append(acceleration_columns)
 
         self.n_components = self._infer_n_components(column_specifiers)
+        # Warning if contains data but no gaze-related columns were provided.
+        # This can lead to failure in downstream methods that rely on those columns
+        # (e.g., transformations).
+        if len(self.frame) > 1 and not self.n_components:
+            warnings.warn(
+                'GazeDataFrame contains data but no components could be inferred. \n'
+                'This usually happens if you did not specify any column content'
+                ' and the content could not be autodetected from the column names. \n'
+                "Please specify 'pixel_columns', 'position_columns', 'velocity_columns'"
+                " or 'acceleration_columns' explicitly during initialization."
+                ' Otherwise, transformation methods may fail.',
+            )
 
     def _init_time_column(
             self,

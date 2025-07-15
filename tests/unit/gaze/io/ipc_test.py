@@ -46,7 +46,10 @@ import pymovements as pm
                 'column_map': {'pixel': 'pixel_coordinates'},
             },
             (10, 2),
-            id='feather_bino_shape',
+            marks=pytest.mark.filterwarnings(
+                'ignore:GazeDataFrame contains data but no.*:UserWarning',
+            ),
+            id='feather_mono_shape_column_map',
         ),
     ],
 )
