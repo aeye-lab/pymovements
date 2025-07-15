@@ -34,7 +34,7 @@ class ChineseReading(DatasetDefinition):
     This dataset includes eye tracking data from more than 300 participants recorded in a single
     session. Precomputed events and word-level reading measures are reported.
 
-    The participant is instructed to read several sentences.
+    Each participant is instructed to read several sentences.
 
     Check the respective paper for details :cite:p:`ChineseReading`.
 
@@ -46,9 +46,6 @@ class ChineseReading(DatasetDefinition):
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
@@ -107,30 +104,23 @@ class ChineseReading(DatasetDefinition):
             'precomputed_reading_measures': True,
         },
     )
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': [
-                    'https://files.de-1.osf.io/v1/resources/94wue/providers/osfstorage/',
-                ],
-                'precomputed_reading_measures': [
-                    'https://files.de-1.osf.io/v1/resources/94wue/providers/osfstorage/',
-                ],
-            },
-    )
+
     resources: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda:
             {
                 'precomputed_events': [
                     {
-                        'resource': '?zip=',
-                        'filename': 'chinese_reading_events.zip',
+                        'resource':
+                        'https://files.osf.io/v1/resources/94wue/'
+                        'providers/osfstorage/6253cb37840dd726e75c831a',
+                        'filename': 'Raw Data.txt',
                         'md5': None,  # type: ignore
                     },
                 ],
                 'precomputed_reading_measures': [
                     {
-                        'resource': '?zip=',
+                        'resource':
+                        'https://files.osf.io/v1/resources/94wue/providers/osfstorage/?zip=',
                         'filename': 'chinese_reading_measures.zip',
                         'md5': None,  # type: ignore
                     },
