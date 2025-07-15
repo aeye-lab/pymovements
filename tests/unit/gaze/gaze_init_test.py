@@ -1980,7 +1980,7 @@ def test_gaze_init_warnings():
     with pytest.warns(UserWarning) as record:
         GazeDataFrame(data=pl.from_dict({'a': [1, 2, 3]}))
 
-    expected_msg_prefix = 'GazeDataFrame contains data but no pixel/position/velocity/acceleration columns were specified'
+    expected_msg_prefix = 'GazeDataFrame contains data but no components could be inferred.'
 
     assert len(record) == 1
     assert record[0].message.args[0].startswith(expected_msg_prefix)
