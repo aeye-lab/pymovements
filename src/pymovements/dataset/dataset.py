@@ -236,7 +236,22 @@ class Dataset:
         return self
 
     def load_precomputed_events(self) -> None:
-        """Load precomputed events."""
+        """Load precomputed events.
+
+        This method checks that the file information for precomputed events is available,
+        then loads each event file listed in `self.fileinfo['precomputed_events']` using
+        the dataset definition and path settings. The resulting list of
+        `PrecomputedEventDataFrame` objects is assigned to `self.precomputed_events`.
+
+        Supported file extensions:
+        - CSV-like: .csv, .tsv, .txt
+        - JSON lines: .jsonl, .ndjson
+
+        Raises
+        ------
+        ValueError
+            If the file info is missing or improperly formatted.
+        """
         self._check_fileinfo()
         self.precomputed_events = dataset_files.load_precomputed_event_files(
             self.definition,
