@@ -978,7 +978,7 @@ class GazeDataFrame:
         ... )
 
         You can calculate measures, for example the null ratio like this:
-        >>> gaze.measure_samples('null_ratio', column='distance')
+        >>> gaze.measure_samples('null_ratio', column='pixel')
         shape: (1, 1)
         ┌────────────┐
         │ null_ratio │
