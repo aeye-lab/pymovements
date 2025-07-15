@@ -463,7 +463,7 @@ def test_gaze_dataframe_unnest_errors(init_data, unnest_kwargs, exception, excep
             {'input_columns': 'pixel', 'output_suffixes': ['_x', '_y']},
             1,
             AttributeError,
-            'No valid gaze components found',
+            'Number of components required but no gaze components could be inferred.',
             id='df_single_row_two_pixel_component_invalid_number_of_components',
         ),
     ],
