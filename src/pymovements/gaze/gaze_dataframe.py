@@ -1227,6 +1227,7 @@ class GazeDataFrame:
         gaze = GazeDataFrame(
             data=self.frame.clone(),
             experiment=deepcopy(self.experiment),
+            events=self.events.copy(),
         )
         gaze.n_components = self.n_components
         return gaze

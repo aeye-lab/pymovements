@@ -282,7 +282,10 @@ class EventDataFrame:
         EventDataFrame
             A copy of the EventDataFrame.
         """
-        return EventDataFrame(data=self.frame.clone())
+        return EventDataFrame(
+            data=self.frame.clone(),
+            trial_columns=self.trial_columns,
+        )
 
     def _add_minimal_schema_columns(self, df: pl.DataFrame) -> pl.DataFrame:
         """Add minimal schema columns to :py:class:`polars.DataFrame` if they are missing.
