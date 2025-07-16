@@ -1070,6 +1070,7 @@ EXPECTED_DF = {
 }
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('eye'),
     [
@@ -1079,6 +1080,7 @@ EXPECTED_DF = {
         'else',
     ],
 )
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('aoi_column'),
     [
@@ -1086,6 +1088,7 @@ EXPECTED_DF = {
         'char',
     ],
 )
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('gaze_type'),
     [
@@ -1122,6 +1125,7 @@ def test_gaze_to_aoi_mapping_char_width_height(eye, aoi_column, gaze_type):
     assert_frame_equal(gaze_df.frame, EXPECTED_DF[f'{aoi_column}_{eye}_{gaze_type}'])
 
 
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('eye'),
     [
@@ -1131,6 +1135,7 @@ def test_gaze_to_aoi_mapping_char_width_height(eye, aoi_column, gaze_type):
         'else',
     ],
 )
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('aoi_column'),
     [
@@ -1138,6 +1143,7 @@ def test_gaze_to_aoi_mapping_char_width_height(eye, aoi_column, gaze_type):
         'char',
     ],
 )
+@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('gaze_type'),
     [

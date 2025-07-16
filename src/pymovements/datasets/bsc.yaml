@@ -13,9 +13,6 @@ resources:
       filename: BSC.EMD.zip
       md5: c7118bfe48c91264d69c45d347f11416
 
-extract:
-  precomputed_events: true
-
 filename_format:
   precomputed_events: BSC.EMD.txt
 

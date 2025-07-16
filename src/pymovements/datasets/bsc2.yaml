@@ -13,9 +13,6 @@ resources:
       filename: "BSCII.EMD.rev.zip"
       md5: "4daad0fa922785d8c681a883b1197e1e"
 
-extract:
-  precomputed_events: true
-
 filename_format:
   precomputed_events: "BSCII.EMD.rev.txt"
 

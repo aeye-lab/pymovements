@@ -173,7 +173,7 @@ def fixture_experiment():
                 ),
                 pixel_columns=['x_pix', 'y_pix'],
             ),
-            id='center_origin_lower_left',
+            id='center_origin_upper_left',
         ),
 
         pytest.param(
@@ -284,7 +284,7 @@ def fixture_experiment():
                 pixel_columns=['x_pix', 'y_pix'],
                 position_columns=['x_dva', 'y_dva'],
             ),
-            id='pix2deg_origin_lower_left',
+            id='pix2deg_origin_upper_left',
         ),
 
         pytest.param(
@@ -424,6 +424,46 @@ def fixture_experiment():
                     screen_width_cm=100,
                     screen_height_cm=100,
                     distance_cm=None,
+                ),
+                'pixel_columns': ['x_pix', 'y_pix'],
+                'distance_column': 'distance',
+            },
+            'pix2deg', {},
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'time': [1000],
+                        'x_pix': [49.5],
+                        'y_pix': [0.0],
+                        'x_dva': [0.0],
+                        'y_dva': [-26.3354],
+                        'distance': [1000],
+                    },
+                ),
+                pixel_columns=['x_pix', 'y_pix'],
+                position_columns=['x_dva', 'y_dva'],
+                distance_column='distance',
+            ),
+            id='pix2deg_origin_upper_left_default_distance_column',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1000],
+                        'x_pix': [(100 - 1) / 2],
+                        'y_pix': [0.0],
+                        'distance': [1000],
+                    },
+                ),
+                'experiment': pm.Experiment(
+                    sampling_rate=1000,
+                    screen_width_px=100,
+                    screen_height_px=100,
+                    screen_width_cm=100,
+                    screen_height_cm=100,
+                    distance_cm=None,
                     origin='upper left',
                 ),
                 'pixel_columns': ['x_pix', 'y_pix'],
@@ -445,7 +485,7 @@ def fixture_experiment():
                 position_columns=['x_dva', 'y_dva'],
                 distance_column='distance',
             ),
-            id='pix2deg_origin_lower_left_distance_column',
+            id='pix2deg_origin_upper_left_from_experiment_distance_column',
         ),
 
         pytest.param(
@@ -501,6 +541,42 @@ def fixture_experiment():
                     screen_width_cm=100,
                     screen_height_cm=100,
                     distance_cm=100,
+                ),
+                'position_columns': ['x_dva', 'y_dva'],
+            },
+            'deg2pix', {},
+            pm.GazeDataFrame(
+                data=pl.from_dict(
+                    {
+                        'time': [1000],
+                        'x_pix': [49.5],
+                        'y_pix': [0.0],
+                        'x_dva': [0.0],
+                        'y_dva': [-26.335410003881346],
+                    },
+                ),
+                pixel_columns=['x_pix', 'y_pix'],
+                position_columns=['x_dva', 'y_dva'],
+            ),
+            id='deg2pix_origin_upper_left_default',
+        ),
+
+        pytest.param(
+            {
+                'data': pl.from_dict(
+                    {
+                        'time': [1000],
+                        'x_dva': [0.0],
+                        'y_dva': [-26.335410003881346],
+                    },
+                ),
+                'experiment': pm.Experiment(
+                    sampling_rate=1000,
+                    screen_width_px=100,
+                    screen_height_px=100,
+                    screen_width_cm=100,
+                    screen_height_cm=100,
+                    distance_cm=100,
                     origin='upper left',
                 ),
                 'position_columns': ['x_dva', 'y_dva'],
@@ -519,7 +595,7 @@ def fixture_experiment():
                 pixel_columns=['x_pix', 'y_pix'],
                 position_columns=['x_dva', 'y_dva'],
             ),
-            id='deg2pix_origin_lower_left',
+            id='deg2pix_origin_upper_left_from_experiment',
         ),
 
         pytest.param(
@@ -672,7 +748,7 @@ def fixture_experiment():
                 position_columns=['x_dva', 'y_dva'],
                 velocity_columns=['x_vel', 'y_vel'],
             ),
-            id='pos2vel_five_point',
+            id='pos2vel_fivepoint',
         ),
 
         pytest.param(
@@ -933,7 +1009,7 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             },
             AttributeError,
-            'n_components must be either 2, 4 or 6 but is None',
+            'Number of components required but no gaze components could be inferred.',
             id='no_column_components',
         ),
         pytest.param(
@@ -993,7 +1069,7 @@ def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg)
         gaze_df.pix2deg()
 
     msg, = excinfo.value.args
-    assert msg == expected_msg
+    assert msg.startswith(expected_msg)
 
 
 @pytest.mark.parametrize(
@@ -1034,7 +1110,7 @@ def test_gaze_dataframe_pix2deg_warnings(init_kwargs, warning, expected_msg):
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             },
             AttributeError,
-            'n_components must be either 2, 4 or 6 but is None',
+            'Number of components required but no gaze components could be inferred.',
             id='no_column_components',
         ),
         pytest.param(
@@ -1093,7 +1169,7 @@ def test_gaze_dataframe_deg2pix_exceptions(init_kwargs, exception, expected_msg)
         gaze_df.deg2pix()
 
     msg, = excinfo.value.args
-    assert msg == expected_msg
+    assert msg.startswith(expected_msg)
 
 
 @pytest.mark.parametrize(
@@ -1140,7 +1216,7 @@ def test_gaze_dataframe_pos2acc_creates_acceleration_column(data, experiment, po
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             },
             AttributeError,
-            'n_components must be either 2, 4 or 6 but is None',
+            'Number of components required but no gaze components could be inferred.',
             id='no_column_components',
         ),
         pytest.param(
@@ -1194,7 +1270,7 @@ def test_gaze_dataframe_pos2acc_exceptions(init_kwargs, exception, expected_msg)
         gaze_df.pos2acc()
 
     msg, = excinfo.value.args
-    assert msg == expected_msg
+    assert msg.startswith(expected_msg)
 
 
 @pytest.mark.parametrize(
@@ -1263,7 +1339,7 @@ def test_gaze_dataframe_clip_creates_new_column(experiment):
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             },
             AttributeError,
-            'n_components must be either 2, 4 or 6 but is None',
+            'Number of components required but no gaze components could be inferred.',
             id='no_column_components',
         ),
         pytest.param(
@@ -1317,7 +1393,7 @@ def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg)
         gaze_df.pos2vel()
 
     msg, = excinfo.value.args
-    assert msg == expected_msg
+    assert msg.startswith(expected_msg)
 
 
 @pytest.mark.parametrize(

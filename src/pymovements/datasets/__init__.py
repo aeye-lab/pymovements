@@ -28,6 +28,7 @@
     BSC
     BSCII
     CodeComprehension
+    CoLAGaze
     CopCo
     DAEMONS
     DIDEC
@@ -42,6 +43,7 @@
     JuDo1000
     MECOL1W1
     MouseCursor
+    OneStop
     PoTeC
     PotsdamBingeRemotePVT
     PotsdamBingeWearablePVT
@@ -62,6 +64,7 @@
 from pymovements.datasets.bsc import BSC
 from pymovements.datasets.bsc2 import BSCII
 from pymovements.datasets.codecomprehension import CodeComprehension
+from pymovements.datasets.colagaze import CoLAGaze
 from pymovements.datasets.copco import CopCo
 from pymovements.datasets.daemons import DAEMONS
 from pymovements.datasets.didec import DIDEC
@@ -78,6 +81,7 @@ from pymovements.datasets.mecol1w1 import MECOL1W1
 from pymovements.datasets.mecol2w1 import MECOL2W1
 from pymovements.datasets.mecol2w2 import MECOL2W2
 from pymovements.datasets.mousecursor import MouseCursor
+from pymovements.datasets.onestop import OneStop
 from pymovements.datasets.potec import PoTeC
 from pymovements.datasets.potsdam_binge_remote_pvt import PotsdamBingeRemotePVT
 from pymovements.datasets.potsdam_binge_wearable_pvt import PotsdamBingeWearablePVT
@@ -92,6 +96,7 @@ __all__ = [
     'BSC',
     'BSCII',
     'CodeComprehension',
+    'CoLAGaze',
     'CopCo',
     'DAEMONS',
     'DIDEC',
@@ -108,6 +113,7 @@ __all__ = [
     'MECOL1W1',
     'MECOL2W1',
     'MECOL2W2',
+    'OneStop',
     'PoTeC',
     'PotsdamBingeRemotePVT',
     'PotsdamBingeWearablePVT',

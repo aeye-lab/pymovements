@@ -29,6 +29,7 @@ from pymovements.dataset._utils._archives import extract_archive
 from pymovements.dataset._utils._downloads import download_file
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
+from pymovements.exceptions import UnknownFileType
 
 
 def download_dataset(
@@ -77,57 +78,27 @@ def download_dataset(
     RuntimeError
         If downloading a resource failed for all given mirrors.
     """
-    if definition.has_files['gaze']:
-        if not definition.mirrors or not definition.mirrors['gaze']:
-            mirrors = None
-        else:
-            mirrors = definition.mirrors['gaze']
+    if not definition.resources:
+        raise AttributeError('resources must be specified to download dataset.')
 
-        if not definition.resources or not definition.resources['gaze']:
-            raise AttributeError("'gaze' resources must be specified to download dataset.")
+    for content in ('gaze', 'precomputed_events', 'precomputed_reading_measures'):
+        if definition.has_files[content]:
+            if not definition.mirrors:
+                mirrors = None
+            else:
+                mirrors = definition.mirrors.get(content, None)
 
-        _download_resources(
-            mirrors=mirrors,
-            resources=definition.resources['gaze'],
-            target_dirpath=paths.downloads,
-            verbose=verbose,
-        )
+            if not definition.resources[content]:
+                raise AttributeError(
+                    f"'{content}' resources must be specified to download dataset.",
+                )
 
-    if definition.has_files['precomputed_events']:
-        if not definition.mirrors or not definition.mirrors['precomputed_events']:
-            mirrors = None
-        else:
-            mirrors = definition.mirrors['precomputed_events']
-
-        if not definition.resources or not definition.resources['precomputed_events']:
-            raise AttributeError(
-                "'precomputed_events' resources must be specified to download dataset.",
+            _download_resources(
+                mirrors=mirrors,
+                resources=definition.resources[content],
+                target_dirpath=paths.downloads,
+                verbose=verbose,
             )
-
-        _download_resources(
-            mirrors=mirrors,
-            resources=definition.resources['precomputed_events'],
-            target_dirpath=paths.downloads,
-            verbose=verbose,
-        )
-
-    if definition.has_files['precomputed_reading_measures']:
-        if not definition.mirrors or not definition.mirrors['precomputed_reading_measures']:
-            mirrors = None
-        else:
-            mirrors = definition.mirrors['precomputed_reading_measures']
-
-        if not definition.resources or not definition.resources['precomputed_reading_measures']:
-            raise AttributeError(
-                "'precomputed_reading_measures' resources must be specified to download dataset.",
-            )
-
-        _download_resources(
-            mirrors=mirrors,
-            resources=definition.resources['precomputed_reading_measures'],
-            target_dirpath=paths.downloads,
-            verbose=verbose,
-        )
 
     if extract:
         extract_dataset(
@@ -168,59 +139,31 @@ def extract_dataset(
         messages for recursive archives. (2) Print messages for extracting each dataset resource and
         each recursive archive extract. (default: 1)
     """
-    if definition.has_files['gaze'] and definition.extract['gaze']:
-        paths.raw.mkdir(parents=True, exist_ok=True)
-        for resource in definition.resources['gaze']:
-            source_path = paths.downloads / resource['filename']
-            destination_path = paths.raw
+    content_dirnames = {
+        'gaze': 'raw',
+        'precomputed_events': 'precomputed_events',
+        'precomputed_reading_measures': 'precomputed_reading_measures',
+    }
 
-            extract_archive(
-                source_path=source_path,
-                destination_path=destination_path,
-                recursive=True,
-                remove_finished=remove_finished,
-                remove_top_level=remove_top_level,
-                resume=resume,
-                verbose=verbose,
-            )
+    for content, content_directory in content_dirnames.items():
+        if definition.has_files[content]:
+            destination_dirpath = getattr(paths, content_directory)
+            destination_dirpath.mkdir(parents=True, exist_ok=True)
+            for resource in definition.resources[content]:
+                source_path = paths.downloads / resource['filename']
 
-    if definition.has_files['precomputed_events']:
-        paths.precomputed_events.mkdir(parents=True, exist_ok=True)
-        for resource in definition.resources['precomputed_events']:
-            source_path = paths.downloads / resource['filename']
-            destination_path = paths.precomputed_events
-
-            if definition.extract['precomputed_events']:
-                extract_archive(
-                    source_path=source_path,
-                    destination_path=destination_path,
-                    recursive=True,
-                    remove_finished=remove_finished,
-                    remove_top_level=remove_top_level,
-                    resume=resume,
-                    verbose=verbose,
-                )
-            else:
-                shutil.copy(source_path, destination_path / resource['filename'])
-
-    if definition.has_files['precomputed_reading_measures']:
-        paths.precomputed_reading_measures.mkdir(parents=True, exist_ok=True)
-        for resource in definition.resources['precomputed_reading_measures']:
-            source_path = paths.downloads / resource['filename']
-            destination_path = paths.precomputed_reading_measures
-
-            if definition.extract['precomputed_reading_measures']:
-                extract_archive(
-                    source_path=source_path,
-                    destination_path=destination_path,
-                    recursive=True,
-                    remove_finished=remove_finished,
-                    remove_top_level=remove_top_level,
-                    resume=resume,
-                    verbose=verbose,
-                )
-            else:
-                shutil.move(source_path, destination_path / resource['filename'])
+                try:
+                    extract_archive(
+                        source_path=source_path,
+                        destination_path=destination_dirpath,
+                        recursive=True,
+                        remove_finished=remove_finished,
+                        remove_top_level=remove_top_level,
+                        resume=resume,
+                        verbose=verbose,
+                    )
+                except UnknownFileType:  # just copy file to target if not an archive.
+                    shutil.copy(source_path, destination_dirpath / resource['filename'])
 
 
 def _download_resources(
