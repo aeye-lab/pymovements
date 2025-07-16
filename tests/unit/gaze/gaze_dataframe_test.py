@@ -201,6 +201,37 @@ def test_gaze_dataframe_copy_no_experiment():
     assert gaze.experiment is gaze_copy.experiment
 
 
+def test_gaze_is_copy():
+    gaze = pm.GazeDataFrame(
+        pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+        experiment=None,
+        position_columns=['x', 'y'],
+    )
+
+    gaze_copy = gaze.clone()
+
+    assert gaze_copy is not gaze
+    assert_frame_equal(gaze.frame, gaze_copy.frame)
+
+
+def test_gaze_copy_events():
+    gaze = pm.GazeDataFrame(
+        pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+        experiment=None,
+        position_columns=['x', 'y'],
+        events=pm.EventDataFrame(
+            name='saccade',
+            onsets=[0],
+            offsets=[123],
+        ),
+    )
+
+    gaze_copy = gaze.clone()
+
+    assert gaze_copy.events is not gaze.events
+    assert_frame_equal(gaze.events.frame, gaze_copy.events.frame)
+
+
 def test_gaze_dataframe_split():
     gaze = pm.GazeDataFrame(
         pl.DataFrame(
