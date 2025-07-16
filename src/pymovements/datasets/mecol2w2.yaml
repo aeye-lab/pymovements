@@ -5,7 +5,7 @@ long_name: 'Multilingual Eye-tracking Corpus second language reader second wave'
 has_files:
   gaze: false
   precomputed_events: true
-  precomputed_reading_measures: tru
+  precomputed_reading_measures: true
 
 resources:
   precomputed_events:

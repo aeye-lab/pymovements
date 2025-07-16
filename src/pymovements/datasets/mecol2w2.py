@@ -105,7 +105,7 @@ class MECOL2W2(DatasetDefinition):
         default_factory=lambda: {
             'gaze': False,
             'precomputed_events': True,
-            'precomputed_reading_measures': False,
+            'precomputed_reading_measures': True,
         },
     )
 
@@ -118,18 +118,27 @@ class MECOL2W2(DatasetDefinition):
                     'md5': 'f7eaf80ac5916d79351419fd4f1da2f6',
                 },
             ],
+            'precomputed_reading_measures': [
+                {
+                    'resource': 'https://osf.io/download/tma46/',
+                    'filename': 'joint_data_trimmed_L2_wave2_2025_01_03.rda',
+                    'md5': '87077697db7f09172a3431615397a5e9',
+                },
+            ],
         },
     )
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
             'precomputed_events': 'joint_fix_trimmed_L2_wave2.rda',
+            'precomputed_reading_measures': 'joint_data_trimmed_L2_wave2_2025_01_03.rda',
         },
     )
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
             'precomputed_events': {},
+            'precomputed_reading_measures': {},
         },
     )
 
@@ -145,5 +154,6 @@ class MECOL2W2(DatasetDefinition):
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
             'precomputed_events': {'r_dataframe_key': 'joint.fix.l2_w2'},
+            'precomputed_reading_measures': {'r_dataframe_key': 'joint.data'},
         },
     )
