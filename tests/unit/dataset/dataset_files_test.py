@@ -252,7 +252,8 @@ def test_load_precomputed_rm_file_unsupported_file_format():
         pm.dataset.dataset_files.load_precomputed_reading_measure_file(filepath)
 
     msg, = exc.value.args
-    assert msg == 'unsupported file format ".feather". Supported formats are: .csv, .tsv, .txt'
+    assert msg == 'unsupported file format ".feather". Supported formats are: .csv, .rda, '\
+        '.tsv, .txt'
 
 
 def test_load_precomputed_file():
