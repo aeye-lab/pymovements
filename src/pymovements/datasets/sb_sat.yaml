@@ -17,10 +17,6 @@ resources:
       filename: 18sat_fixfinal.csv
       md5: 4cf3212a71e6fc2fbe7041ce7c691927
 
-extract:
-  gaze: true
-  precomputed_events: false
-
 experiment:
   screen_width_px: 1024
   screen_height_px: 768

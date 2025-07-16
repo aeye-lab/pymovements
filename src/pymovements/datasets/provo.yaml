@@ -13,9 +13,6 @@ resources:
       filename: "Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv"
       md5: "7aa239e51e5d78528e2430f84a23da3f"
 
-extract:
-  precomputed_events: false
-
 filename_format:
   precomputed_events: "Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv"
 

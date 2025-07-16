@@ -62,9 +62,6 @@ class FakeNewsPerception(DatasetDefinition):
     experiment: Experiment
         The experiment definition.
 
-    extract: dict[str, bool]
-        Decide whether to extract the data.
-
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
@@ -115,8 +112,6 @@ class FakeNewsPerception(DatasetDefinition):
             sampling_rate=600,
         ),
     )
-
-    extract: dict[str, bool] = field(default_factory=lambda: {'precomputed_events': True})
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {

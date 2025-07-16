@@ -58,9 +58,6 @@ class BSC(DatasetDefinition):
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    extract: dict[str, bool]
-        Decide whether to extract the data.
-
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
@@ -125,12 +122,6 @@ class BSC(DatasetDefinition):
                     },
                 ],
             },
-    )
-
-    extract: dict[str, bool] = field(
-        default_factory=lambda: {
-            'precomputed_events': True,
-        },
     )
 
     filename_format: dict[str, str] = field(

@@ -17,10 +17,6 @@ resources:
       filename: "UCL_measures.zip"
       md5: "77e3c0cacccb0a074a55d23aa8531ca5"
 
-extract:
-  precomputed_events: true
-  precomputed_reading_measures: true
-
 filename_format:
   precomputed_events: "eyetracking.fix"
   precomputed_reading_measures: "eyetracking.RT"

@@ -54,13 +54,14 @@ EVENTS	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2
 SAMPLES	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2	INPUT
 the next line has all additional trial columns set to None
 START	10000000 	RIGHT	SAMPLES	EVENTS
+SFIX	R	10000000
 10000000	  850.7	  717.5	  714.0	    0.0	...
 END	10000001 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000001 START_A
 START	10000002 	RIGHT	SAMPLES	EVENTS
 the next line now should have the task column set to A
 10000002	  850.7	  717.5	  714.0	    0.0	...
-END	10000002 	SAMPLES	EVENTS	RES	  38.54	  31.12
+END	10000003 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000003 STOP_A
 the task should be set to None again
 START	10000004 	RIGHT	SAMPLES	EVENTS
@@ -76,11 +77,13 @@ MSG 10000007 START_TRIAL_1
 the next line now should have the trial column set to 1
 START	10000008 	RIGHT	SAMPLES	EVENTS
 10000008	  850.7	  717.5	  714.0	    0.0	...
+EFIX	R	10000000	10000008	9	850.7	717.5	714.0
 END	10000009 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000009 STOP_TRIAL_1
 MSG 10000010 START_TRIAL_2
 the next line now should have the trial column set to 2
 START	10000011 	RIGHT	SAMPLES	EVENTS
+SSACC	R	10000011
 10000011	  850.7	  717.5	  714.0	    0.0	...
 END	10000012 	SAMPLES	EVENTS	RES	  38.54	  31.12
 MSG 10000012 STOP_TRIAL_2
@@ -96,12 +99,13 @@ MSG 10000016 STOP_B
 task and trial should be set to None again
 MSG 10000017 METADATA_3
 START	10000017 	RIGHT	SAMPLES	EVENTS
-10000017	  850.7	  717.5	  .	    0.0	...
-SBLINK R 10000018
-10000019	   .	   .	    0.0	    0.0	...
+10000017	  850.7	  717.5	  714.0	    0.0	...
+10000019	  850.7	  717.5	  .	    0.0	...
+SBLINK R 10000020
 10000020	   .	   .	    0.0	    0.0	...
-EBLINK R 10000018	10000020	2
 10000021	   .	   .	    0.0	    0.0	...
+EBLINK R 10000020	10000022	3
+ESACC	R	10000011	10000022	12	850.7	717.5	850.7	717.5	19.00	590
 END	10000022 	SAMPLES	EVENTS	RES	  38.54	  31.12
 """
 
@@ -137,17 +141,31 @@ METADATA_PATTERNS = [
     {'pattern': r'METADATA_4', 'key': 'metadata_4', 'value': True},
 ]
 
-EXPECTED_DF = pl.from_dict(
+EXPECTED_GAZE_DF = pl.from_dict(
     {
         'time': [
             10000000.0, 10000002.0, 10000004.0, 10000006.0, 10000008.0, 10000011.0, 10000014.0,
             10000017.0, 10000019.0, 10000020.0, 10000021.0,
         ],
-        'x_pix': [850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, np.nan, np.nan, np.nan],
-        'y_pix': [717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, np.nan, np.nan, np.nan],
-        'pupil': [714.0, 714.0, 714.0, 714.0, 714.0, 714.0, 714.0, np.nan, 0.0, 0.0, 0.0],
+        'x_pix': [
+            850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, np.nan, np.nan,
+        ],
+        'y_pix': [
+            717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, np.nan, np.nan,
+        ],
+        'pupil': [714.0, 714.0, 714.0, 714.0, 714.0, 714.0, 714.0, 714.0, np.nan, 0.0, 0.0],
         'task': [None, 'A', None, 'B', 'B', 'B', 'B', None, None, None, None],
         'trial_id': [None, None, None, None, '1', '2', '3', None, None, None, None],
+    },
+)
+
+EXPECTED_EVENT_DF = pl.from_dict(
+    {
+        'name': ['fixation_eyelink', 'blink_eyelink', 'saccade_eyelink'],
+        'onset': [10000000.0, 10000020.0, 10000011.0],
+        'offset': [10000008.0, 10000022.0, 10000022.0],
+        'task': [None, None, 'B'],
+        'trial_id': [None, None, '2'],
     },
 )
 
@@ -168,16 +186,10 @@ EXPECTED_METADATA = {
     'validations': [],
     'resolution': (1280, 1024),
     'DISPLAY_COORDS': (0.0, 0.0, 1279.0, 1023.0),
-    'data_loss_ratio_blinks': 0.18181818181818182,
-    'data_loss_ratio': 0.2727272727272727,
-    'total_recording_duration_ms': 11.0,
+    'data_loss_ratio_blinks': 3 / 12,
+    'data_loss_ratio': 4 / 12,
+    'total_recording_duration_ms': 12.0,
     'datetime': datetime.datetime(2023, 3, 8, 9, 25, 20),
-    'blinks': [{
-        'duration_ms': 2,
-        'num_samples': 2,
-        'start_timestamp': 10000018,
-        'stop_timestamp': 10000020,
-    }],
     'mount_configuration': {
         'mount_type': 'Desktop',
         'head_stabilization': 'stabilized',
@@ -206,13 +218,14 @@ def test_parse_eyelink(tmp_path):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(ASC_TEXT)
 
-    df, metadata = pm.gaze._utils.parsing.parse_eyelink(
+    gaze_df, event_df, metadata = pm.gaze._utils.parsing.parse_eyelink(
         filepath,
         patterns=PATTERNS,
         metadata_patterns=METADATA_PATTERNS,
     )
 
-    assert_frame_equal(df, EXPECTED_DF, check_column_order=False)
+    assert_frame_equal(gaze_df, EXPECTED_GAZE_DF, check_column_order=False, rtol=0)
+    assert_frame_equal(event_df, EXPECTED_EVENT_DF, check_column_order=False, rtol=0)
     assert metadata == EXPECTED_METADATA
 
 
@@ -246,7 +259,7 @@ def test_parse_eyelink(tmp_path):
     ],
 )
 def test_from_asc_metadata_patterns(kwargs, expected_metadata):
-    _, metadata = pm.gaze._utils.parsing.parse_eyelink(**kwargs)
+    _, _, metadata = pm.gaze._utils.parsing.parse_eyelink(**kwargs)
 
     for key, value in expected_metadata.items():
         assert metadata[key] == value
@@ -347,7 +360,7 @@ def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_mo
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, metadata = pm.gaze._utils.parsing.parse_eyelink(
+    _, _, metadata = pm.gaze._utils.parsing.parse_eyelink(
         filepath,
     )
 
@@ -392,7 +405,7 @@ def test_metadata_warnings(tmp_path, metadata, expected_msg):
     filepath.write_text(metadata)
 
     with pytest.warns(Warning, match=expected_msg):
-        _, metadata = pm.gaze._utils.parsing.parse_eyelink(
+        _, _, metadata = pm.gaze._utils.parsing.parse_eyelink(
             filepath,
         )
 
@@ -449,7 +462,7 @@ def test_val_cal_eyelink(tmp_path, metadata, expected_validation, expected_calib
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
+    _, _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
 
     assert parsed_metadata['calibrations'] == expected_calibration
     assert parsed_metadata['validations'] == expected_validation
@@ -458,7 +471,7 @@ def test_val_cal_eyelink(tmp_path, metadata, expected_validation, expected_calib
 def test_parse_val_cal_eyelink_monocular_file():
     example_asc_monocular_path = Path('tests/files/eyelink_monocular_example.asc')
 
-    _, metadata = pm.gaze._utils.parsing.parse_eyelink(example_asc_monocular_path)
+    _, _, metadata = pm.gaze._utils.parsing.parse_eyelink(example_asc_monocular_path)
 
     expected_validation = [{
         'error': 'GOOD ERROR',
@@ -477,114 +490,15 @@ def test_parse_val_cal_eyelink_monocular_file():
 
 
 @pytest.mark.parametrize(
-    ('metadata', 'expected_blinks'),
-    [
-        pytest.param(
-            'EVENTS	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2\n'
-            'SBLINK R 10000018\n'
-            '10000019	   .	   .	    0.0	    0.0	...\n'
-            '10000020	   .	   .	    0.0	    0.0	...\n'
-            'EBLINK R 10000018	10000020	2\n',
-            [{
-                'duration_ms': 2,
-                'num_samples': 2,
-                'start_timestamp': 10000018,
-                'stop_timestamp': 10000020,
-            }],
-            id='blink',
-        ),
-        pytest.param(
-            'EVENTS	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2\n'
-            'SBLINK R 10000018\n'
-            '10000019	   .	   .	    0.0	    0.0	...\n'
-            '10000020	   .	   .	    0.0	    0.0	...\n'
-            'EBLINK R 10000018	10000020	2\n'
-            'SBLINK R 10000021\n'
-            '10000021	   .	   .	    0.0	    0.0	...\n'
-            '10000022	   .	   .	    0.0	    0.0	...\n'
-            '10000023	   .	   .	    0.0	    0.0	...\n'
-            '10000024	   .	   .	    0.0	    0.0	...\n'
-            'EBLINK R 10000021	10000024	4\n',
-            [
-                {
-                    'duration_ms': 2,
-                    'num_samples': 2,
-                    'start_timestamp': 10000018,
-                    'stop_timestamp': 10000020,
-                },
-                {
-                    'duration_ms': 4,
-                    'num_samples': 4,
-                    'start_timestamp': 10000021,
-                    'stop_timestamp': 10000024,
-                },
-            ],
-            id='multiple_blinks',
-        ),
-        pytest.param(
-            'EVENTS	GAZE	LEFT	RATE	1000.00	TRACKING	CR	FILTER	2\n'
-            'SBLINK R 10000018\n'
-            '10000019	   .	   .	    0.0	...\n'
-            '10000020	   .	   .	    0.0	...\n'
-            'EBLINK R 10000018	10000020	2\n'
-            'SBLINK R 10000021\n'
-            '10000021	   .	   .	    0.0	...\n'
-            '10000022	   .	   .	    0.0 ...\n'
-            '10000023	   .	   .	    0.0	...\n'
-            '10000024	   .	   .	    0.0	...\n'
-            'EBLINK R 10000021	10000024	4\n',
-            [
-                {
-                    'duration_ms': 2,
-                    'num_samples': 2,
-                    'start_timestamp': 10000018,
-                    'stop_timestamp': 10000020,
-                },
-                {
-                    'duration_ms': 4,
-                    'num_samples': 4,
-                    'start_timestamp': 10000021,
-                    'stop_timestamp': 10000024,
-                },
-            ],
-            id='multiple_blinks_no_dummy',
-        ),
-        pytest.param(
-            'SBLINK R 10000018\n'
-            '10000019	   .	   .	    0.0	    0.0	...\n'
-            '10000020	   .	   .	    0.0	    0.0	...\n'
-            'EBLINK R 10000018	10000020	2\n',
-            [{
-                'duration_ms': 2,
-                'num_samples': 2,
-                'start_timestamp': 10000018,
-                'stop_timestamp': 10000020,
-            }],
-            id='blinks_no_sampling_rate',
-        ),
-    ],
-)
-@pytest.mark.filterwarnings('ignore:No metadata found.')
-@pytest.mark.filterwarnings('ignore:No recording configuration found.')
-def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
-    filepath = tmp_path / 'sub.asc'
-    filepath.write_text(metadata)
-
-    _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
-
-    assert parsed_metadata['blinks'] == expected_blinks
-
-
-@pytest.mark.parametrize(
     ('metadata', 'expected_blink_ratio', 'expected_overall_ratio'),
     [
         pytest.param(
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
             'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
-            'SBLINK R 10000018\n'
+            'SBLINK R 10000019\n'
             '10000019	   .	   .	    0.0	    0.0	...\n'
             '10000020	   .	   .	    0.0	    0.0	...\n'
-            'EBLINK R 10000018	10000020	2\n'
+            'EBLINK R 10000019	10000020	2\n'
             'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
             1,
             1,
@@ -593,25 +507,14 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
         pytest.param(
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
             'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
-            'SBLINK R 10000018\n'
+            'SBLINK R 10000019\n'
             '10000019	   .	   .	    0.0	...\n'
             '10000020	   .	   .	    0.0	...\n'
-            'EBLINK R 10000018	10000020	2\n'
+            'EBLINK R 10000019	10000020	2\n'
             'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
             1,
             1,
             id='only_blinks_no_dummy',
-        ),
-        pytest.param(
-            'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
-            'SBLINK R 10000018\n'
-            '10000019	   .	   .	    0.0	    0.0	...\n'
-            '10000020	   .	   .	    0.0	    0.0	...\n'
-            'EBLINK R 10000018	10000020	2\n'
-            'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
-            'unknown',
-            'unknown',
-            id='unknown_sampling_rate_only_blinks',
         ),
         pytest.param(
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
@@ -625,23 +528,14 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
         pytest.param(
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
             'START	10000018 	RIGHT	SAMPLES	EVENTS\n'
-            'SBLINK R 10000018\n'
+            'SBLINK R 10000019\n'
             '10000019	   .	   .	    0.0	    0.0	...\n'
-            'EBLINK R 10000018	10000019	1\n'
+            'EBLINK R 10000019	10000019	1\n'
             '10000020	   .	   .	    0.0	    0.0	...\n'
             'END	10000020 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
             0.5,
             1.0,
             id='blinks_and_lost_samples',
-        ),
-        pytest.param(
-            'START	10000021 	RIGHT	SAMPLES	EVENTS\n'
-            '10000021	   .	   .	    0.0	    0.0	...\n'
-            '10000022	   .	   .	    0.0	    0.0	...\n'
-            'END	10000022 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
-            'unknown',
-            'unknown',
-            id='lost_samples_no_sampling_rate',
         ),
         pytest.param(
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
@@ -670,25 +564,13 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
             'START	10000020 	RIGHT	SAMPLES	EVENTS\n'
             '10000020	   850.7	  717.5	  714.0	    0.0	...\n'
             '10000022	   .	   .	    0.0	    0.0	...\n'
-            'SBLINK R 10000023\n'
+            'SBLINK R 10000024\n'
             '10000024	   .	   .	    0.0	    0.0	...\n'
-            'EBLINK R 10000023	10000024	1\n'
+            'EBLINK R 10000024	10000024	1\n'
             'END	10000024 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
             0.25,
             0.75,
             id='missing_timestamps_lost_samples_blink',
-        ),
-        pytest.param(
-            'MSG	2154555 RECCFG CR 1000 2 1 L\n'
-            'SBLINK R 10000018\n'
-            '10000019	   .	   .	    0.0	    0.0	...\n'
-            '10000020	   .	   .	    0.0	    0.0	...\n'
-            'EBLINK R 10000018	10000020	2\n'
-            '10000021	   .	   .	    0.0	    0.0	...\n'
-            '10000022	   .	   .	    0.0	    0.0	...\n',
-            'unknown',
-            'unknown',
-            id='blinks_and_lost_samples_no_start_end',
         ),
         pytest.param(
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
@@ -698,17 +580,48 @@ def test_parse_eyelink_blinks(tmp_path, metadata, expected_blinks):
             1,
             id='no_samples',
         ),
+        pytest.param(
+            'MSG	10000018.0 RECCFG CR 1000 2 1 L\n'
+            'START	10000018.0 	RIGHT	SAMPLES	EVENTS\n'
+            '10000019.0	   850.7	  717.5	  714.0	    0.0	...\n'
+            '10000020.0	   850.7	  717.5	  714.0	    0.0	...\n'
+            'END	10000020.0 	SAMPLES	EVENTS	RES	  38.54	  31.12\n'
+            'MSG	10000021.0 RECCFG CR 2000 2 1 L\n'
+            'START	10000021.0 	RIGHT	SAMPLES	EVENTS\n'
+            'END	10000023.0 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            0,
+            2 / 3,
+            id='varying_sampling_rate',
+        ),
+        pytest.param(
+            'MSG	10000018.0 RECCFG CR 1000 2 1 L\n'
+            'START	10000018.0 	RIGHT	SAMPLES	EVENTS\n'
+            '10000019.0	   850.7	  717.5	  714.0	    0.0	...\n'
+            '10000020.0	   850.7	  717.5	  714.0	    0.0	...\n'
+            'END	10000020.0 	SAMPLES	EVENTS	RES	  38.54	  31.12\n'
+            'MSG	10000021.0 RECCFG CR 2000 2 1 L\n'
+            'START	10000021.0 	RIGHT	SAMPLES	EVENTS\n'
+            'SBLINK R 10000020.0\n'
+            '10000020.0	   .	   .	    0.0	    0.0	...\n'
+            '10000021.0	   .	   .	    0.0	    0.0	...\n'
+            'EBLINK R 10000020.0	10000021.5	2.0\n'
+            'END	10000023.0 	SAMPLES	EVENTS	RES	  38.54	  31.12\n',
+            2 / 3,
+            2 / 3,
+            id='varying_sampling_rate_blink',
+        ),
     ],
 )
 @pytest.mark.filterwarnings('ignore:No metadata found.')
 @pytest.mark.filterwarnings('ignore:No recording configuration found.')
+@pytest.mark.filterwarnings("ignore:Found inconsistent values for 'sampling_rate':")
 def test_parse_eyelink_data_loss_ratio(
         tmp_path, metadata, expected_blink_ratio, expected_overall_ratio,
 ):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
+    _, _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
 
     assert parsed_metadata['data_loss_ratio_blinks'] == expected_blink_ratio
     assert parsed_metadata['data_loss_ratio'] == expected_overall_ratio
@@ -723,7 +636,7 @@ def test_parse_eyelink_datetime(tmp_path):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
+    _, _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
 
     assert parsed_metadata['datetime'] == expected_datetime
 
@@ -905,7 +818,7 @@ def test_parse_eyelink_mount_config(tmp_path, metadata, expected_mount_config):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
+    _, _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
 
     assert parsed_metadata['mount_configuration'] == expected_mount_config
 
@@ -932,7 +845,7 @@ def test_parse_eyelink_encoding(tmp_path, bytestring, encoding, expected_text):
     filepath = tmp_path / 'sub.asc'
     filepath.write_bytes(bytestring)
 
-    _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(
+    _, _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(
         filepath,
         metadata_patterns=[r'(?P<text>.+)'],
         encoding=encoding,

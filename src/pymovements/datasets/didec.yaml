@@ -22,9 +22,6 @@ experiment:
   origin: "upper left"
   sampling_rate: 1000
 
-extract:
-  gaze: true
-
 filename_format:
   gaze: 'Ruud_exp{experiment:d}_list{list:d}_v{version:d}_ppn{participant:d}_{session:d}_Trial{trial:d} Samples.txt'
 

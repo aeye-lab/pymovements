@@ -30,11 +30,6 @@ experiment:
   origin: "center"
   sampling_rate: 1000
 
-extract:
-  gaze: true
-  precomputed_events: true
-  precomputed_reading_measures: true
-
 filename_format:
   gaze: 'P{subject_id:d}.csv'
   precomputed_events: 'FIX_report_P{subject_id:d}.txt'

@@ -13,9 +13,6 @@ resources:
       filename: "pymovements-toy-dataset-eyelink.zip"
       md5: "b1d426751403752c8a154fc48d1670ce"
 
-extract:
-  gaze: true
-
 experiment:
   screen_width_px: 1280
   screen_height_px: 1024

@@ -17,10 +17,6 @@ resources:
       filename: "resumption_fixation.csv"
       md5: "44edb7c58318ad76af1fa6f1bc1f1ceb"
 
-extract:
-  gaze: true
-  precomputed_events: false
-
 experiment:
   screen_width_px: 1920
   screen_height_px: 1080

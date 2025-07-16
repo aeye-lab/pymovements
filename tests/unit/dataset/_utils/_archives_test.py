@@ -348,8 +348,8 @@ def test_extract_unsupported_archive_destination_path_None(
             remove_finished=remove_finished,
         )
     msg, = excinfo.value.args
-    assert msg == """Unsupported archive type: '.jpg'.
-Supported suffixes are: '['.tar', '.zip']'."""
+    assert msg == """Unsupported compression or archive type: '.jpg.xz'.
+Supported suffixes are: '['.bz2', '.gz', '.tar', '.tbz', '.tbz2', '.tgz', '.xz', '.zip']'."""
 
 
 @pytest.mark.parametrize(
@@ -500,8 +500,8 @@ def test_extract_unsupported_archive_destination_path_not_None(
             remove_finished=remove_finished,
         )
     msg, = excinfo.value.args
-    assert msg == """Unsupported archive type: '.jpg'.
-Supported suffixes are: '['.tar', '.zip']'."""
+    assert msg == """Unsupported compression or archive type: '.jpg.xz'.
+Supported suffixes are: '['.bz2', '.gz', '.tar', '.tbz', '.tbz2', '.tgz', '.xz', '.zip']'."""
 
 
 def test_decompress_unknown_compression_suffix():

@@ -13,9 +13,6 @@ resources:
       filename: "mousecursor.zip"
       md5: "7885e8fd44f14f02f60e9f62431aea63"
 
-extract:
-  gaze: true
-
 experiment:
   screen_width_px: 1920
   screen_height_px: 1080

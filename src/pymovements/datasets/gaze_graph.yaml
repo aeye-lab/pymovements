@@ -22,9 +22,6 @@ experiment:
   origin: "center"
   sampling_rate: 30
 
-extract:
-  gaze: true
-
 filename_format:
   gaze: 'P{subject_id}_{task}.csv'
 

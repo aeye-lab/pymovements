@@ -13,9 +13,6 @@ resources:
       filename: "data.zip"
       md5: "2c523e911022ffc0eab700e34e9f7f30"
 
-extract:
-  gaze: true
-
 experiment:
   screen_width_px: 800
   screen_height_px: 600

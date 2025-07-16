@@ -13,9 +13,6 @@ resources:
       filename: "GazeBase_v2_0.zip"
       md5: "cb7eb895fb48f8661decf038ab998c9a"
 
-extract:
-  gaze: true
-
 experiment:
   screen_width_px: 1680
   screen_height_px: 1050

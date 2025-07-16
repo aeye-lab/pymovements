@@ -13,9 +13,6 @@ resources:
       filename: "gaze_csv.zip"
       md5: "fe219f07c9253cd9aaee6bd50233c034"
 
-extract:
-  gaze: true
-
 experiment:
   screen_width_px: 1280
   screen_height_px: 1024

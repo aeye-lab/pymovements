@@ -743,3 +743,77 @@ def test_from_asc_has_expected_metadata(kwargs, expected_metadata):
     for key, value in expected_metadata.items():
         assert key in gaze._metadata
         assert gaze._metadata[key] == value
+
+
+@pytest.mark.parametrize(
+    ('kwargs', 'expected_event_frame'),
+    [
+        pytest.param(
+            {
+                'file': 'tests/files/eyelink_monocular_example.asc',
+                'events': False,
+            },
+            pl.from_dict(
+                data={
+                    'name': [],
+                    'onset': [],
+                    'offset': [],
+                    'duration': [],
+                },
+                schema={
+                    'name': pl.Utf8,
+                    'onset': pl.Int64,
+                    'offset': pl.Int64,
+                    'duration': pl.Int64,
+                },
+            ),
+            id='eyelink_asc_mono_without_events',
+        ),
+        pytest.param(
+            {
+                'file': 'tests/files/eyelink_monocular_example.asc',
+                'events': True,
+            },
+            pl.from_dict(
+                data={
+                    'name': ['fixation_eyelink', 'saccade_eyelink', 'fixation_eyelink'],
+                    'onset': [2154563, 2339227, 2339246],
+                    'offset': [2154695, 2339245, 2339290],
+                    'duration': [132, 18, 44],
+                },
+                schema={
+                    'name': pl.Utf8,
+                    'onset': pl.Int64,
+                    'offset': pl.Int64,
+                    'duration': pl.Int64,
+                },
+            ),
+            id='eyelink_asc_mono_with_events',
+        ),
+        pytest.param(
+            {
+                'file': 'tests/files/eyelink_monocular_2khz_example.asc',
+                'events': True,
+            },
+            pl.from_dict(
+                data={
+                    'name': ['fixation_eyelink', 'saccade_eyelink', 'fixation_eyelink'],
+                    'onset': [2154563, 2339227, 2339246],
+                    'offset': [2154695, 2339245, 2339290],
+                    'duration': [132, 18, 44],
+                },
+                schema={
+                    'name': pl.Utf8,
+                    'onset': pl.Int64,
+                    'offset': pl.Int64,
+                    'duration': pl.Int64,
+                },
+            ),
+            id='eyelink_asc_mono_2khz_with_events',
+        ),
+    ],
+)
+def test_from_asc_events(kwargs, expected_event_frame):
+    gaze = from_asc(**kwargs)
+
+    assert_frame_equal(gaze.events.frame, expected_event_frame, check_column_order=False)

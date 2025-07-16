@@ -59,9 +59,6 @@ class InteRead(DatasetDefinition):
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    extract: dict[str, bool]
-        Decide whether to extract the data.
-
     experiment: Experiment
         The experiment definition.
 
@@ -150,13 +147,6 @@ class InteRead(DatasetDefinition):
                     'md5': '44edb7c58318ad76af1fa6f1bc1f1ceb',
                 },
             ],
-        },
-    )
-
-    extract: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': False,
         },
     )
 

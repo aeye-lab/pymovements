@@ -67,9 +67,6 @@ class GazeBase(DatasetDefinition):
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    extract: dict[str, bool]
-        Decide whether to extract the data.
-
     experiment: Experiment
         The experiment definition.
 
@@ -147,8 +144,6 @@ class GazeBase(DatasetDefinition):
             ],
         },
     )
-
-    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     experiment: Experiment = field(
         default_factory=lambda: Experiment(

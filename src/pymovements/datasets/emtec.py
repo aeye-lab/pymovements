@@ -59,9 +59,6 @@ class EMTeC(DatasetDefinition):
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    extract: dict[str, bool]
-        Decide whether to extract the data.
-
     experiment: Experiment
         The experiment definition.
 
@@ -153,13 +150,6 @@ class EMTeC(DatasetDefinition):
                     'md5': '56880f50af20682558065ac2d26be827',
                 },
             ],
-        },
-    )
-    extract: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': False,
-            'precomputed_reading_measures': False,
         },
     )
 
