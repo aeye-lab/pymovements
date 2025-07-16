@@ -17,10 +17,6 @@ resources:
       filename: "sentence_data_version1.3.csv"
       md5: "609f82b6f45b7c98a0769c6ce14ee6e9"
 
-extract:
-  precomputed_events: false
-  precomputed_reading_measures: false
-
 filename_format:
   precomputed_events: "joint_l1_fixation_version1.3.rda"
   precomputed_reading_measures: sentence_data_version1.3.csv

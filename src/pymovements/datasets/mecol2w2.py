@@ -57,9 +57,6 @@ class MECOL2W2(DatasetDefinition):
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    extract: dict[str, bool]
-        Decide whether to extract the data.
-
     filename_format: dict[str, str]
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
@@ -121,12 +118,6 @@ class MECOL2W2(DatasetDefinition):
                     'md5': 'f7eaf80ac5916d79351419fd4f1da2f6',
                 },
             ],
-        },
-    )
-
-    extract: dict[str, bool] = field(
-        default_factory=lambda: {
-            'precomputed_events': False,
         },
     )
 
