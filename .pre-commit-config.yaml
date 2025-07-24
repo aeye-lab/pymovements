@@ -94,7 +94,6 @@ repos:
     rev: v2.3.2
     hooks:
     -   id: autopep8
-        args: [--global-config=.flake8]
 -   repo: https://github.com/PyCQA/autoflake
     rev: v2.3.1
     hooks:
