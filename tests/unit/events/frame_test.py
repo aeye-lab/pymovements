@@ -409,6 +409,13 @@ def test_event_dataframe_copy():
     assert_frame_equal(events.frame, events_copy.frame)
 
 
+def test_event_dataframe_copies_trial_columns():
+    events = pm.EventDataFrame(data=pl.DataFrame({'trial': 'trial'}), trial_columns='trial')
+    events_copy = events.copy()
+
+    assert events.trial_columns == events_copy.trial_columns
+
+
 @pytest.mark.parametrize(
     ('events', 'kwargs', 'expected_df'),
     [

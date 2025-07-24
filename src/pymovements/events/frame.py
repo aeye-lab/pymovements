@@ -282,7 +282,10 @@ class EventDataFrame:
         EventDataFrame
             A copy of the EventDataFrame.
         """
-        return EventDataFrame(data=self.frame.clone())
+        return EventDataFrame(
+            data=self.frame.clone(),
+            trial_columns=self.trial_columns,
+        )
 
     def split(self, by: Sequence[str]) -> list[EventDataFrame]:
         """Split the EventDataFrame into multiple frames based on specified column(s).

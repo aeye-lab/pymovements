@@ -244,6 +244,19 @@ def test_load_precomputed_rm_file_no_kwargs():
     assert_frame_equal(reading_measure.frame, expected_df, check_column_order=False)
 
 
+def test_load_precomputed_rm_file_xlsx():
+    filepath = 'tests/files/Sentences.xlsx'
+
+    reading_measure = pm.dataset.dataset_files.load_precomputed_reading_measure_file(
+        filepath,
+        custom_read_kwargs={'sheet_name': 'Sheet 1'},
+    )
+
+    expected_df = pl.from_dict({'test': ['foo', 'bar'], 'id': [0, 1]})
+
+    assert_frame_equal(reading_measure.frame, expected_df, check_column_order=True)
+
+
 def test_load_precomputed_rm_file_unsupported_file_format():
     filepath = 'tests/files/copco_rm_dummy.feather'
 
@@ -251,10 +264,11 @@ def test_load_precomputed_rm_file_unsupported_file_format():
         pm.dataset.dataset_files.load_precomputed_reading_measure_file(filepath)
 
     msg, = exc.value.args
-    assert msg == 'unsupported file format ".feather". Supported formats are: .csv, .tsv, .txt'
+    assert msg == 'unsupported file format ".feather". Supported formats are: .csv, .tsv, .txt'\
+        ', .xlsx'
 
 
-def test_load_precomputed_file():
+def test_load_precomputed_file_csv():
     filepath = 'tests/files/18sat_fixfinal.csv'
 
     gaze = pm.dataset.dataset_files.load_precomputed_event_file(
@@ -266,6 +280,15 @@ def test_load_precomputed_file():
     assert_frame_equal(gaze.frame, expected_df, check_column_order=False)
 
 
+def test_load_precomputed_file_json():
+    filepath = 'tests/files/test.jsonl'
+
+    gaze = pm.dataset.dataset_files.load_precomputed_event_file(filepath)
+    expected_df = pl.read_ndjson(filepath)
+
+    assert_frame_equal(gaze.frame, expected_df, check_column_order=False)
+
+
 def test_load_precomputed_file_unsupported_file_format():
     filepath = 'tests/files/18sat_fixfinal.feather'
 
@@ -273,4 +296,5 @@ def test_load_precomputed_file_unsupported_file_format():
         pm.dataset.dataset_files.load_precomputed_event_file(filepath)
 
     msg, = exc.value.args
-    assert msg == 'unsupported file format ".feather". Supported formats are: .csv, .tsv, .txt'
+    assert msg == 'unsupported file format ".feather". Supported formats are: .csv, '\
+        '.jsonl, .ndjson, .tsv, .txt'
