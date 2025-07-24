@@ -376,7 +376,7 @@ def load_precomputed_reading_measures(
         fileinfo: pl.DataFrame,
         paths: DatasetPaths,
 ) -> list[ReadingMeasures]:
-    """Load text stimulus from file.
+    """Load reading measures files.
 
     Parameters
     ----------
@@ -408,7 +408,12 @@ def load_precomputed_reading_measure_file(
         data_path: str | Path,
         custom_read_kwargs: dict[str, Any] | None = None,
 ) -> ReadingMeasures:
-    """Load precomputed events from files.
+    """Load precomputed reading measure from file.
+
+    This function supports both CSV-based (.csv, .tsv, .txt) and Excel (.xlsx) formats for
+    reading preprocessed eye-tracking or behavioral data related to reading. File reading
+    is customized via keyword arguments passed to Polars' reading functions. If an unsupported
+    file format is encountered, a `ValueError` is raised.
 
     Parameters
     ----------
@@ -421,14 +426,26 @@ def load_precomputed_reading_measure_file(
     -------
     ReadingMeasures
         Returns the text stimulus file.
+
+    Raises
+    ------
+    ValueError
+        Raises ValueError if unsupported file type is encountered.
     """
     data_path = Path(data_path)
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
 
-    valid_extensions = {'.csv', '.tsv', '.txt'}
-    if data_path.suffix in valid_extensions:
+    csv_extensions = {'.csv', '.tsv', '.txt'}
+    excel_extensions = {'.xlsx'}
+    valid_extensions = csv_extensions | excel_extensions
+    if data_path.suffix in csv_extensions:
         precomputed_reading_measure_df = pl.read_csv(data_path, **custom_read_kwargs)
+    elif data_path.suffix in excel_extensions:
+        precomputed_reading_measure_df = pl.read_excel(
+            data_path,
+            sheet_name=custom_read_kwargs['sheet_name'],
+        )
     else:
         raise ValueError(
             f'unsupported file format "{data_path.suffix}". '
