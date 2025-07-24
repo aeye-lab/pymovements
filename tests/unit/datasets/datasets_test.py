@@ -39,6 +39,7 @@ from pymovements import DatasetLibrary
         pytest.param(pm.datasets.DAEMONS, 'DAEMONS', id='DAEMONS'),
         pytest.param(pm.datasets.DIDEC, 'DIDEC', id='DIDEC'),
         pytest.param(pm.datasets.EMTeC, 'EMTeC', id='EMTeC'),
+        pytest.param(pm.datasets.ETDD70, 'ETDD70', id='ETDD70'),
         pytest.param(pm.datasets.FakeNewsPerception, 'FakeNewsPerception', id='FakeNewsPerception'),
         pytest.param(pm.datasets.GazeBase, 'GazeBase', id='GazeBase'),
         pytest.param(pm.datasets.GazeBaseVR, 'GazeBaseVR', id='GazeBaseVR'),

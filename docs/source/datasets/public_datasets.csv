@@ -8,6 +8,7 @@ Dataset,Citation,Samples,Events,Reading Measures,# Subjects,# Sessions per Subje
 :py:class:`~pymovements.datasets.DAEMONS`,:cite:p:`DAEMONS`,,X,,250,1,1000 Hz,Image
 :py:class:`~pymovements.datasets.DIDEC`,:cite:p:`DIDEC`,X,,,112,1,250 Hz,Image
 :py:class:`~pymovements.datasets.EMTeC`,:cite:p:`EMTeC`,X,X,,107,1,2000 Hz,Text (documents)
+:py:class:`~pymovements.datasets.ETDD70`,:cite:p:`ETDD70`,X,X,,70,1,250 Hz,Text (documents)
 :py:class:`~pymovements.datasets.FakeNewsPerception`,:cite:p:`FakeNewsPerception`,,X,,25,1,600 Hz,"Text (documents), Image"
 :py:class:`~pymovements.datasets.GazeGraph`,:cite:p:`GazeGraph`,X,,,8,1,30 Hz,Various
 :py:class:`~pymovements.datasets.GazeOnFaces`,:cite:p:`GazeOnFaces`,X,,,405,1,250 Hz,Video
