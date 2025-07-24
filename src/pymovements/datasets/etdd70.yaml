@@ -1,5 +1,7 @@
 name: ETDD70
 
+long_name: 'Eye-Tracking Dyslexia Dataset'
+
 has_files:
   gaze: true
   precomputed_events: true
