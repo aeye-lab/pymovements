@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the OneStop dataset."""
+"""Provides a definition for the IITB_HGC dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -25,27 +25,17 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.resources import ResourceDefinitions
 
 
 @dataclass
-class OneStop(DatasetDefinition):
-    """OneStop dataset :cite:p:`OneStop`.
+class IITB_HGC(DatasetDefinition):
+    """IITB-Hallucination Gaze Corpus :cite:p:`IITB_HGC`.
 
-    OneStop Eye Movements (in short OneStop) is an English corpus of eye movements
-    in reading with 360 L1 participants, 2.6 million word tokens and 152 hours of
-    eye tracking data recorded with an EyeLink 1000 Plus eye tracker.
-    OneStop comprises four sub-corpora with eye movement recordings from paragraph reading.
+    This dataset includes monocular eye tracking data from 5 participants in a single
+    session. Recording both eyes at 2000 Hz, each participant reads 500 generated paragraphs
+    and judges whether it was hallucinated or not.
 
-    To filter the data by reading regime or trial type, use the following column values:
-
-    For ordinary reading trials, set question_preview to False.
-    For information seeking trials, set question_preview to True.
-    To exclude repeated reading trials, set repeated_reading_trial to False.
-    To include only repeated reading trials, set repeated_reading_trial to True.
-    To exclude practice trials, set practice_trial to False.
-
-    For more information please consult :cite:p:`OneStop`.
+    Check the respective paper for details :cite:p:`IITB_HGC`.
 
     Attributes
     ----------
@@ -59,7 +49,7 @@ class OneStop(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: ResourceDefinitions
+    resources: dict[str, list[dict[str, str]]]
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -74,17 +64,26 @@ class OneStop(DatasetDefinition):
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
-    custom_read_kwargs: dict[str, Any]
+    trial_columns: list[str]
+            The name of the trial columns in the input data frame. If the list is empty or None,
+            the input data frame is assumed to contain only one trial. If the list is not empty,
+            the input data frame is assumed to contain multiple trials and the transformation
+            methods will be applied to each trial separately.
+
+    column_map: dict[str, str]
+        The keys are the columns to read, the values are the names to which they should be renamed.
+
+    custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function.
 
     Examples
     --------
     Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
-    :py:class:`~pymovements.datasets.OneStop` definition:
+    :py:class:`~pymovements.datasets.IITB_HGC` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("OneStop", path='data/OneStop')
+    >>> dataset = pm.Dataset("IITB_HGC", path='data/IITB_HGC')
 
     Download the dataset resources:
 
@@ -98,58 +97,54 @@ class OneStop(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'OneStop'
+    name: str = 'IITB_HGC'
 
-    long_name: str = 'OneStop: A 360-Participant English Eye Tracking Dataset with Different '\
-        'Reading Regimes'
+    long_name: str = 'IITB-Hallucination Gaze Corpus'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': False,
             'precomputed_events': True,
-            'precomputed_reading_measures': True,
+            'precomputed_reading_measures': False,
         },
     )
 
-    resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'precomputed_events': [
-                    {
-                        'resource':
-                        'https://osf.io/download/dq935/',
-                        'filename': 'fixations_Paragraph.csv.zip',
-                        'md5': '3d3b6a3794a50e174e025f43735674bd',
-                    },
-                ],
-                'precomputed_reading_measures': [
-                    {
-                        'resource': 'https://osf.io/download/4ajc8/',
-                        'filename': 'ia_Paragraph.csv.zip',
-                        'md5': '9b9548e49efdc7dbf63d4f3a5dc3af22',
-                    },
-                ],
-            },
-        ),
+    resources: dict[str, list[dict[str, str]]] = field(
+        default_factory=lambda: {
+            'precomputed_events': [
+                {
+                    'resource': 'https://huggingface.co/datasets/cfilt/IITB-HGC/'
+                    'resolve/main/IITB_HGC.jsonl?download=true',
+                    'filename': 'IITB_HGC.jsonl',
+                    'md5': 'cde5dd88534e87d9b2f1ab6e47133b5c',
+                },
+            ],
+        },
     )
 
     filename_format: dict[str, str] = field(
         default_factory=lambda: {
-            'precomputed_events': 'fixations_Paragraph.csv',
-            'precomputed_reading_measures': 'ia_Paragraph.csv',
+            'precomputed_events': 'IITB_HGC.jsonl',
         },
     )
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda: {
             'precomputed_events': {},
-            'precomputed_reading_measures': {},
         },
     )
 
-    custom_read_kwargs: dict[str, Any] = field(
+    trial_columns: list[str] = field(
+        default_factory=lambda: [
+            'participant_id',
+            'trial_id',
+        ],
+    )
+
+    column_map: dict[str, str] = field(default_factory=lambda: {})
+
+    custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
-            'precomputed_events': {'null_values': '.'},
-            'precomputed_reading_measures': {'null_values': '.'},
+            'precomputed_events': {},
         },
     )
