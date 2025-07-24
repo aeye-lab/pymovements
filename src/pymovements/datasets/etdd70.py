@@ -30,7 +30,7 @@ from pymovements.gaze.experiment import Experiment
 
 @dataclass
 class ETDD70(DatasetDefinition):
-    """ETDD70 dataset :cite:p:`ETDD70`.
+    """Eye-Tracking Dyslexia Dataset (ETDD70) :cite:p:`ETDD70`.
 
     This dataset includes binocular eye tracking data from 70 Czech children age 9-10.
     Eye movements are recorded at a sampling frequency of 250 Hz eye tracker and
@@ -49,6 +49,9 @@ class ETDD70(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+        
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
@@ -111,6 +114,8 @@ class ETDD70(DatasetDefinition):
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'ETDD70'
+
+    long_name: str = 'Eye-Tracking Dyslexia Dataset'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
