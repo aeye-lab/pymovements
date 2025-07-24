@@ -20,22 +20,30 @@
 """DatasetDefinition module."""
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
 from typing import Any
+from typing import Union
 from warnings import warn
 
 import yaml
 
 from pymovements._utils._html import repr_html
-from pymovements.dataset._utils._resources import _HasResourcesIndexer
 from pymovements.dataset._utils._yaml import reverse_substitute_types
 from pymovements.dataset._utils._yaml import substitute_types
 from pymovements.dataset._utils._yaml import type_constructor
+from pymovements.dataset.resources import _HasResourcesIndexer
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
+
+ResourcesLike = Union[
+    Sequence[dict[str, Any]],
+    dict[str, Sequence[dict[str, Any]]],
+]
 
 yaml.add_multi_constructor('!', type_constructor, Loader=yaml.SafeLoader)
 
@@ -54,15 +62,15 @@ class DatasetDefinition:
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-    mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]]
+    mirrors: dict[str, Sequence[str]]
         A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
-        (default: field(default_factory=dict))
-    resources: dict[str, list[dict[str, str]]] | dict[str, tuple[dict[str, str], ...]]
+        (default: {})
+    resources: ResourceDefinitions
         A list of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
-        (default: field(default_factory=dict))
+        (default: ResourceDefinitions())
     experiment: Experiment | None
         The experiment definition. (default: None)
     extract: dict[str, bool] | None
@@ -86,6 +94,82 @@ class DatasetDefinition:
     column_map : dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
         (default: field(default_factory=dict))
+    trial_columns: list[str] | None
+            The name of the trial columns in the input data frame. If the list is empty or None,
+            the input data frame is assumed to contain only one trial. If the list is not empty,
+            the input data frame is assumed to contain multiple trials and the transformation
+            methods will be applied to each trial separately. (default: None)
+    time_column: str | None
+        The name of the timestamp column in the input data frame. This column will be renamed to
+        ``time``. (default: None)
+
+    time_unit: str | None
+        The unit of the timestamps in the timestamp column in the input data frame. Supported
+        units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
+        'step' the experiment definition must be specified. All timestamps will be converted to
+        milliseconds. (default: 'ms')
+
+    pixel_columns: list[str] | None
+        The name of the pixel position columns in the input data frame. These columns will be
+        nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
+        column will not be created. (default: None)
+    position_columns: list[str] | None
+        The name of the dva position columns in the input data frame. These columns will be
+        nested into the column ``position``. If the list is empty or None, the nested
+        ``position`` column will not be created. (default: None)
+    velocity_columns: list[str] | None
+        The name of the velocity columns in the input data frame. These columns will be nested
+        into the column ``velocity``. If the list is empty or None, the nested ``velocity``
+        column will not be created. (default: None)
+    acceleration_columns: list[str] | None
+        The name of the acceleration columns in the input data frame. These columns will be
+        nested into the column ``acceleration``. If the list is empty or None, the nested
+        ``acceleration`` column will not be created. (default: None)
+    distance_column : str | None
+        The name of the column containing eye-to-screen distance in millimeters for each sample
+        in the input data frame. If specified, the column will be used for pixel to dva
+        transformations. If not specified, the constant eye-to-screen distance will be taken from
+        the experiment definition. This column will be renamed to ``distance``. (default: None)
+
+    Parameters
+    ----------
+    name: str
+        The name of the dataset. (default: '.')
+    long_name: str | None
+        The entire name of the dataset. (default: None)
+    has_files: dict[str, bool] | None
+        Indicate whether the dataset contains 'gaze', 'precomputed_events', and
+        'precomputed_reading_measures'. (default: None)
+    mirrors: dict[str, Sequence[str]] | None
+        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
+        (default: None)
+    resources: ResourceDefinitions | ResourcesLike | None
+        A list of dataset resources. Each list entry must be a dictionary with the following keys:
+        - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
+        - `filename`: The filename under which the file is saved as.
+        - `md5`: The MD5 checksum of the respective file.
+        (default: None)
+    experiment: Experiment | None
+        The experiment definition. (default: None)
+    extract: dict[str, bool] | None
+        Decide whether to extract the data. (default: None)
+    filename_format: dict[str, str] | None
+        Regular expression which will be matched before trying to load the file. Namedgroups will
+        appear in the `fileinfo` dataframe. (default: None)
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
+        If named groups are present in the `filename_format`, this makes it possible to cast
+        specific named groups to a particular datatype. (default: None)
+    custom_read_kwargs: dict[str, dict[str, Any]] | None
+        If specified, these keyword arguments will be passed to the file reading function. The
+        behavior of this argument depends on the file extension of the dataset files.
+        If the file extension is `.csv` the keyword arguments will be passed
+        to :py:func:`polars.read_csv`. If the file extension is`.asc` the keyword arguments
+        will be passed to :py:func:`pymovements.utils.parsing.parse_eyelink`.
+        See Notes for more details on how to use this argument.
+        (default: None)
+    column_map : dict[str, str] | None
+        The keys are the columns to read, the values are the names to which they should be renamed.
+        (default: None)
     trial_columns: list[str] | None
             The name of the trial columns in the input data frame. If the list is empty or None,
             the input data frame is assumed to contain only one trial. If the list is not empty,
@@ -154,11 +238,9 @@ class DatasetDefinition:
 
     has_files: dict[str, bool] = field(default_factory=dict)
 
-    mirrors: dict[str, list[str]] | dict[str, tuple[str, ...]] = field(default_factory=dict)
+    mirrors: dict[str, Sequence[str]] = field(default_factory=dict)
 
-    resources: dict[str, list[dict[str, str]]] | dict[str, tuple[dict[str, str], ...]] = field(
-        default_factory=dict,
-    )
+    resources: ResourceDefinitions = field(default_factory=ResourceDefinitions)
 
     experiment: Experiment | None = field(default_factory=Experiment)
 
@@ -181,9 +263,84 @@ class DatasetDefinition:
     acceleration_columns: list[str] | None = None
     distance_column: str | None = None
 
-    _has_resources: _HasResourcesIndexer = field(
-        default_factory=_HasResourcesIndexer, init=False, repr=False, compare=False, hash=False,
-    )
+    def __init__(
+            self,
+            name: str = '.',
+            long_name: str | None = None,
+            has_files: dict[str, bool] | None = None,
+            mirrors: dict[str, Sequence[str]] | None = None,
+            resources: ResourceDefinitions | ResourcesLike | None = None,
+            experiment: Experiment | None = None,
+            extract: dict[str, bool] | None = None,
+            filename_format: dict[str, str] | None = None,
+            filename_format_schema_overrides: dict[str, dict[str, type]] | None = None,
+            custom_read_kwargs: dict[str, dict[str, Any]] | None = None,
+            column_map: dict[str, str] | None = None,
+            trial_columns: list[str] | None = None,
+            time_column: str | None = None,
+            time_unit: str | None = None,
+            pixel_columns: list[str] | None = None,
+            position_columns: list[str] | None = None,
+            velocity_columns: list[str] | None = None,
+            acceleration_columns: list[str] | None = None,
+            distance_column: str | None = None,
+    ) -> None:
+        self.name = name
+        self.long_name = long_name
+
+        self.experiment = experiment
+
+        self.extract = extract
+
+        self.trial_columns = trial_columns
+        self.time_column = time_column
+        self.time_unit = time_unit
+        self.pixel_columns = pixel_columns
+        self.position_columns = position_columns
+        self.velocity_columns = velocity_columns
+        self.acceleration_columns = acceleration_columns
+        self.distance_column = distance_column
+
+        if has_files is None:
+            self.has_files = {}
+        else:
+            self.has_files = has_files
+
+        if mirrors is None:
+            self.mirrors = {}
+        else:
+            self.mirrors = mirrors
+
+        if filename_format is None:
+            self.filename_format = {}
+        else:
+            self.filename_format = filename_format
+
+        if filename_format_schema_overrides is None:
+            self.filename_format_schema_overrides = {}
+        else:
+            self.filename_format_schema_overrides = filename_format_schema_overrides
+
+        if custom_read_kwargs is None:
+            self.custom_read_kwargs = {}
+        else:
+            self.custom_read_kwargs = custom_read_kwargs
+
+        if column_map is None:
+            self.column_map = {}
+        else:
+            self.column_map = column_map
+
+        self.resources = self._initialize_resources(resources)
+        self._has_resources = _HasResourcesIndexer(resources=self.resources)
+
+        if self.extract is not None:
+            warn(
+                DeprecationWarning(
+                    'DatasetDefinition.extract is deprecated since version v0.22.1. '
+                    'This field will be removed in v0.27.0.',
+                ),
+            )
 
     @staticmethod
     def from_yaml(path: str | Path) -> DatasetDefinition:
@@ -246,8 +403,12 @@ class DatasetDefinition:
                 if not isinstance(value, (bool, int, float)) and not value:
                     del data[key]
 
+        # Convert those object fields.
         if 'experiment' in data and data['experiment'] is not None:
             data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none)
+        if 'resources' in data and data['resources'] is not None:
+            data['resources'] = self.resources.to_dicts(exclude_none=exclude_none)
+
         return data
 
     def to_yaml(
@@ -310,17 +471,25 @@ class DatasetDefinition:
         >>> definition.has_resources['precomputed_events']
         False
         """
-        # Resources may have changed, so update indexer before returning.
+        # ResourceDefinitions may have changed, so update indexer before returning.
         # A better way to update the resources would be through a resources setter property.
         self._has_resources.set_resources(self.resources)
         return self._has_resources
 
-    def __post_init__(self) -> None:
-        """Handle special attributes."""
-        if self.extract is not None:
-            warn(
-                DeprecationWarning(
-                    'DatasetDefinition.extract is deprecated since version v0.22.1. '
-                    'This field will be removed in v0.27.0.',
-                ),
-            )
+    def _initialize_resources(
+        self, resources: ResourceDefinitions |
+        ResourcesLike | None,
+    ) -> ResourceDefinitions:
+        """Initialize ``ResourceDefinitions`` instance if necessary."""
+        if isinstance(resources, ResourceDefinitions):
+            return resources
+        if resources is None:
+            return ResourceDefinitions()
+        if isinstance(resources, dict):
+            return ResourceDefinitions.from_dict(resources)
+        if isinstance(resources, Sequence):
+            return ResourceDefinitions.from_dicts(resources)
+        raise TypeError(
+            f'resources is of type {type(resources).__name__} but must be of type'
+            ' ResourceDefinitions, list, or dict.',
+        )
