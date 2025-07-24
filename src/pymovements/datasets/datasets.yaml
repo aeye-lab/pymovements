@@ -1,5 +1,6 @@
 - bsc
 - bsc2
+- chinese_reading
 - codecomprehension
 - colagaze
 - copco
@@ -13,6 +14,7 @@
 - gazebase
 - gazebasevr
 - hbn
+- iitb_hgc
 - interead
 - judo1000
 - mousecursor
