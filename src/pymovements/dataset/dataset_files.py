@@ -460,16 +460,23 @@ def load_precomputed_event_files(
         fileinfo: pl.DataFrame,
         paths: DatasetPaths,
 ) -> list[PrecomputedEventDataFrame]:
-    """Load text stimulus from file.
+    """Load precomputed event dataframes from files.
+
+    For each file listed in `fileinfo`, construct the full path using `paths.precomputed_events`,
+    and load it with `load_precomputed_event_file` using any custom read arguments defined
+    in `definition.custom_read_kwargs['precomputed_events']`.
 
     Parameters
     ----------
     definition:  DatasetDefinition
         Dataset definition to load precomputed events.
+
     fileinfo: pl.DataFrame
-        Information about the files.
+        Information about the files, including a 'filepath' column with relative paths.
+        Valid extensions: .csv, .tsv, .txt, .jsonl, and .ndjson.
+
     paths: DatasetPaths
-        Adjustable paths to extract datasets.
+        Adjustable paths to extract datasets, specifically the precomputed_events directory.
 
     Returns
     -------
@@ -492,27 +499,43 @@ def load_precomputed_event_file(
         data_path: str | Path,
         custom_read_kwargs: dict[str, Any] | None = None,
 ) -> PrecomputedEventDataFrame:
-    """Load precomputed events from files.
+    """Load precomputed events from a single file.
+
+    File format is inferred from the extension:
+        - CSV-like: .csv, .tsv, .txt
+        - JSON-like: jsonl, .ndjson
+
+    Raises a ValueError for unsupported formats.
 
     Parameters
     ----------
     data_path:  str | Path
         Path to file to be read.
+
     custom_read_kwargs: dict[str, Any] | None
         Custom read keyword arguments for polars. (default: None)
 
     Returns
     -------
     PrecomputedEventDataFrame
-        Returns the text stimulus file.
+        Returns the precomputed event dataframe.
+
+    Raises
+    ------
+    ValueError
+        If the file format is unsupported based on its extension.
     """
     data_path = Path(data_path)
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
 
-    valid_extensions = {'.csv', '.tsv', '.txt'}
-    if data_path.suffix in valid_extensions:
+    csv_extensions = {'.csv', '.tsv', '.txt'}
+    json_extensions = {'.jsonl', '.ndjson'}
+    valid_extensions = csv_extensions.union(json_extensions)
+    if data_path.suffix in csv_extensions:
         precomputed_event_df = pl.read_csv(data_path, **custom_read_kwargs)
+    elif data_path.suffix in json_extensions:
+        precomputed_event_df = pl.read_ndjson(data_path, **custom_read_kwargs)
     else:
         raise ValueError(
             f'unsupported file format "{data_path.suffix}". '

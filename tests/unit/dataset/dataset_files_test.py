@@ -268,7 +268,7 @@ def test_load_precomputed_rm_file_unsupported_file_format():
         ', .xlsx'
 
 
-def test_load_precomputed_file():
+def test_load_precomputed_file_csv():
     filepath = 'tests/files/18sat_fixfinal.csv'
 
     gaze = pm.dataset.dataset_files.load_precomputed_event_file(
@@ -280,6 +280,15 @@ def test_load_precomputed_file():
     assert_frame_equal(gaze.frame, expected_df, check_column_order=False)
 
 
+def test_load_precomputed_file_json():
+    filepath = 'tests/files/test.jsonl'
+
+    gaze = pm.dataset.dataset_files.load_precomputed_event_file(filepath)
+    expected_df = pl.read_ndjson(filepath)
+
+    assert_frame_equal(gaze.frame, expected_df, check_column_order=False)
+
+
 def test_load_precomputed_file_unsupported_file_format():
     filepath = 'tests/files/18sat_fixfinal.feather'
 
@@ -287,4 +296,5 @@ def test_load_precomputed_file_unsupported_file_format():
         pm.dataset.dataset_files.load_precomputed_event_file(filepath)
 
     msg, = exc.value.args
-    assert msg == 'unsupported file format ".feather". Supported formats are: .csv, .tsv, .txt'
+    assert msg == 'unsupported file format ".feather". Supported formats are: .csv, '\
+        '.jsonl, .ndjson, .tsv, .txt'
