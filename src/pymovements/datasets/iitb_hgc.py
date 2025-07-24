@@ -32,7 +32,7 @@ class IITB_HGC(DatasetDefinition):
     """IITB-Hallucination Gaze Corpus :cite:p:`IITB_HGC`.
 
     This dataset includes monocular eye tracking data from 5 participants in a single
-    session. Recording both eyes at 2000 Hz, each participant read 500 generated paragraphs
+    session. Recording both eyes at 2000 Hz, each participant reads 500 generated paragraphs
     and judges whether it was hallucinated or not.
 
     Check the respective paper for details :cite:p:`IITB_HGC`.
