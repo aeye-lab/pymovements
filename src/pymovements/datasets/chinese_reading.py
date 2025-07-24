@@ -105,8 +105,8 @@ class ChineseReading(DatasetDefinition):
         },
     )
 
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda:
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict(
             {
                 'precomputed_events': [
                     {
@@ -126,6 +126,7 @@ class ChineseReading(DatasetDefinition):
                     },
                 ],
             },
+        ),
     )
 
     filename_format: dict[str, str] = field(

@@ -109,17 +109,19 @@ class IITB_HGC(DatasetDefinition):
         },
     )
 
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda: {
-            'precomputed_events': [
-                {
-                    'resource': 'https://huggingface.co/datasets/cfilt/IITB-HGC/'
-                    'resolve/main/IITB_HGC.jsonl?download=true',
-                    'filename': 'IITB_HGC.jsonl',
-                    'md5': 'cde5dd88534e87d9b2f1ab6e47133b5c',
-                },
-            ],
-        },
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict(
+            {
+                'precomputed_events': [
+                    {
+                        'resource': 'https://huggingface.co/datasets/cfilt/IITB-HGC/'
+                        'resolve/main/IITB_HGC.jsonl?download=true',
+                        'filename': 'IITB_HGC.jsonl',
+                        'md5': 'cde5dd88534e87d9b2f1ab6e47133b5c',
+                    },
+                ],
+            },
+        ),
     )
 
     filename_format: dict[str, str] = field(

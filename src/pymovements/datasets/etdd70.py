@@ -124,8 +124,9 @@ class ETDD70(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda:
+
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict(
             {
                 'gaze': [
                     {
@@ -142,6 +143,7 @@ class ETDD70(DatasetDefinition):
                     },
                 ],
             },
+        ),
     )
 
     experiment: Experiment = field(
