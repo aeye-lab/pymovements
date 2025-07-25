@@ -134,11 +134,11 @@ class Gaze4Hate(DatasetDefinition):
         default_factory=lambda: Experiment(
             screen_width_px=2560,
             screen_height_px=1440,
-            screen_width_cm=59.8,  # Calculated from diagonal
-            screen_height_cm=33.6,  # Calculated from diagonal
-            distance_cm=None,  # TODO
+            screen_width_cm=59.8,
+            screen_height_cm=33.6,
+            distance_cm=78.0,
             origin='center',
-            sampling_rate=1000,  # TODO
+            sampling_rate=1000,
         ),
     )
 
