@@ -22,7 +22,7 @@ experiment:
   screen_height_px: 1440
   screen_width_cm: 59.8
   screen_height_cm: 33.6
-  distance_cm: null # TODO
+  distance_cm: 78.0
   origin: center
   sampling_rate: 1000
 
