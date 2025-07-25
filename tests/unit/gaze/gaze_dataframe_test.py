@@ -201,6 +201,37 @@ def test_gaze_dataframe_copy_no_experiment():
     assert gaze.experiment is gaze_copy.experiment
 
 
+def test_gaze_is_copy():
+    gaze = pm.GazeDataFrame(
+        pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+        experiment=None,
+        position_columns=['x', 'y'],
+    )
+
+    gaze_copy = gaze.clone()
+
+    assert gaze_copy is not gaze
+    assert_frame_equal(gaze.frame, gaze_copy.frame)
+
+
+def test_gaze_copy_events():
+    gaze = pm.GazeDataFrame(
+        pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+        experiment=None,
+        position_columns=['x', 'y'],
+        events=pm.EventDataFrame(
+            name='saccade',
+            onsets=[0],
+            offsets=[123],
+        ),
+    )
+
+    gaze_copy = gaze.clone()
+
+    assert gaze_copy.events is not gaze.events
+    assert_frame_equal(gaze.events.frame, gaze_copy.events.frame)
+
+
 def test_gaze_dataframe_split():
     gaze = pm.GazeDataFrame(
         pl.DataFrame(
@@ -223,6 +254,31 @@ def test_gaze_dataframe_split():
     assert_frame_equal(gaze.frame.filter(pl.col('trial_id') == 2), split_gaze[2].frame)
 
 
+def test_gaze_dataframe_split_list():
+    gaze = pm.GazeDataFrame(
+        pl.DataFrame(
+            {
+                'x': [0, 1, 2, 3],
+                'y': [1, 1, 0, 0],
+                'trial_ida': [0, 1, 1, 2],
+                'trial_idb': ['a', 'b', 'c', 'c'],
+            },
+            schema={
+                'x': pl.Float64,
+                'y': pl.Float64,
+                'trial_ida': pl.Int8,
+                'trial_idb': pl.Utf8,
+            },
+        ),
+        experiment=None,
+        position_columns=['x', 'y'],
+    )
+
+    split_gaze = gaze.split(['trial_ida', 'trial_idb'])
+    assert all(gaze_df.frame.n_unique(['trial_ida', 'trial_idb']) == 1 for gaze_df in split_gaze)
+    assert len(split_gaze) == 4
+
+
 def test_gaze_dataframe_compute_event_properties_no_events():
     gaze = pm.GazeDataFrame(
         pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64, 'trial_id': pl.Int8}),
@@ -235,3 +291,66 @@ def test_gaze_dataframe_compute_event_properties_no_events():
         match='No events available to compute event properties. Did you forget to use detect()?',
     ):
         gaze.compute_event_properties('amplitude')
+
+
+def test_gaze_dataframe_split_events():
+    gaze = pm.GazeDataFrame(
+        pl.DataFrame(
+            {
+                'x': [0, 1, 2, 3],
+                'y': [1, 1, 0, 0],
+                'trial_id': [0, 1, 1, 2],
+            },
+            schema={'x': pl.Float64, 'y': pl.Float64, 'trial_id': pl.Int8},
+        ),
+        experiment=None,
+        position_columns=['x', 'y'],
+        events=pm.EventDataFrame(
+            pl.DataFrame(
+                {
+                    'name': ['fixation', 'fixation', 'saccade', 'fixation'],
+                    'onset': [0, 1, 2, 3],
+                    'offset': [1, 2, 3, 4],
+                    'trial_id': [0, 1, 1, 2],
+                },
+            ),
+        ),
+    )
+
+    by = 'trial_id'
+    split_gaze = gaze.split(by)
+    assert all(gaze_df.events.frame.n_unique(by) == 1 for gaze_df in split_gaze)
+    assert_frame_equal(gaze.events.frame.filter(pl.col(by) == 0), split_gaze[0].events.frame)
+    assert_frame_equal(gaze.events.frame.filter(pl.col(by) == 1), split_gaze[1].events.frame)
+    assert_frame_equal(gaze.events.frame.filter(pl.col(by) == 2), split_gaze[2].events.frame)
+
+
+def test_gaze_dataframe_split_events_list():
+    gaze = pm.GazeDataFrame(
+        pl.DataFrame(
+            {
+                'x': [0, 1, 2, 3],
+                'y': [1, 1, 0, 0],
+                'trial_ida': [0, 1, 1, 2],
+                'trial_idb': [0, 1, 2, 2],
+            },
+        ),
+        experiment=None,
+        position_columns=['x', 'y'],
+        events=pm.EventDataFrame(
+            pl.DataFrame(
+                {
+                    'name': ['fixation', 'fixation', 'saccade', 'fixation'],
+                    'onset': [0, 1, 2, 3],
+                    'offset': [1, 2, 3, 4],
+                    'trial_ida': [0, 1, 1, 2],
+                    'trial_idb': [0, 1, 2, 2],
+                },
+            ),
+        ),
+    )
+
+    by = ['trial_ida', 'trial_idb']
+    split_gaze = gaze.split(by)
+    assert len(split_gaze) == 4
+    assert all(gaze_df.events.frame.n_unique(by) == 1 for gaze_df in split_gaze)

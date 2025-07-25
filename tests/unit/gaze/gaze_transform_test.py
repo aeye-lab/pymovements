@@ -1009,7 +1009,7 @@ def test_gaze_dataframe_pix2deg_creates_position_column(data, experiment, pixel_
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             },
             AttributeError,
-            'n_components must be either 2, 4 or 6 but is None',
+            'Number of components required but no gaze components could be inferred.',
             id='no_column_components',
         ),
         pytest.param(
@@ -1069,7 +1069,7 @@ def test_gaze_dataframe_pix2deg_exceptions(init_kwargs, exception, expected_msg)
         gaze_df.pix2deg()
 
     msg, = excinfo.value.args
-    assert msg == expected_msg
+    assert msg.startswith(expected_msg)
 
 
 @pytest.mark.parametrize(
@@ -1110,7 +1110,7 @@ def test_gaze_dataframe_pix2deg_warnings(init_kwargs, warning, expected_msg):
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             },
             AttributeError,
-            'n_components must be either 2, 4 or 6 but is None',
+            'Number of components required but no gaze components could be inferred.',
             id='no_column_components',
         ),
         pytest.param(
@@ -1169,7 +1169,7 @@ def test_gaze_dataframe_deg2pix_exceptions(init_kwargs, exception, expected_msg)
         gaze_df.deg2pix()
 
     msg, = excinfo.value.args
-    assert msg == expected_msg
+    assert msg.startswith(expected_msg)
 
 
 @pytest.mark.parametrize(
@@ -1216,7 +1216,7 @@ def test_gaze_dataframe_pos2acc_creates_acceleration_column(data, experiment, po
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             },
             AttributeError,
-            'n_components must be either 2, 4 or 6 but is None',
+            'Number of components required but no gaze components could be inferred.',
             id='no_column_components',
         ),
         pytest.param(
@@ -1270,7 +1270,7 @@ def test_gaze_dataframe_pos2acc_exceptions(init_kwargs, exception, expected_msg)
         gaze_df.pos2acc()
 
     msg, = excinfo.value.args
-    assert msg == expected_msg
+    assert msg.startswith(expected_msg)
 
 
 @pytest.mark.parametrize(
@@ -1339,7 +1339,7 @@ def test_gaze_dataframe_clip_creates_new_column(experiment):
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             },
             AttributeError,
-            'n_components must be either 2, 4 or 6 but is None',
+            'Number of components required but no gaze components could be inferred.',
             id='no_column_components',
         ),
         pytest.param(
@@ -1393,7 +1393,7 @@ def test_gaze_dataframe_pos2vel_exceptions(init_kwargs, exception, expected_msg)
         gaze_df.pos2vel()
 
     msg, = excinfo.value.args
-    assert msg == expected_msg
+    assert msg.startswith(expected_msg)
 
 
 @pytest.mark.parametrize(

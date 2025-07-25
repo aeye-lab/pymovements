@@ -27,12 +27,14 @@
 
     BSC
     BSCII
+    ChineseReading
     CodeComprehension
     CoLAGaze
     CopCo
     DAEMONS
     DIDEC
     EMTeC
+    ETDD70
     FakeNewsPerception
     Gaze4Hate
     GazeBase
@@ -40,6 +42,7 @@
     GazeGraph
     GazeOnFaces
     HBN
+    IITB_HGC
     InteRead
     JuDo1000
     MouseCursor
@@ -63,12 +66,14 @@
 """
 from pymovements.datasets.bsc import BSC
 from pymovements.datasets.bsc2 import BSCII
+from pymovements.datasets.chinese_reading import ChineseReading
 from pymovements.datasets.codecomprehension import CodeComprehension
 from pymovements.datasets.colagaze import CoLAGaze
 from pymovements.datasets.copco import CopCo
 from pymovements.datasets.daemons import DAEMONS
 from pymovements.datasets.didec import DIDEC
 from pymovements.datasets.emtec import EMTeC
+from pymovements.datasets.etdd70 import ETDD70
 from pymovements.datasets.fakenews import FakeNewsPerception
 from pymovements.datasets.gaze4hate import Gaze4Hate
 from pymovements.datasets.gaze_graph import GazeGraph
@@ -76,6 +81,7 @@ from pymovements.datasets.gaze_on_faces import GazeOnFaces
 from pymovements.datasets.gazebase import GazeBase
 from pymovements.datasets.gazebasevr import GazeBaseVR
 from pymovements.datasets.hbn import HBN
+from pymovements.datasets.iitb_hgc import IITB_HGC
 from pymovements.datasets.interead import InteRead
 from pymovements.datasets.judo1000 import JuDo1000
 from pymovements.datasets.mousecursor import MouseCursor
@@ -93,12 +99,14 @@ from pymovements.datasets.ucl import UCL
 __all__ = [
     'BSC',
     'BSCII',
+    'ChineseReading',
     'CodeComprehension',
     'CoLAGaze',
     'CopCo',
     'DAEMONS',
     'DIDEC',
     'EMTeC',
+    'ETDD70',
     'FakeNewsPerception',
     'Gaze4Hate',
     'GazeBase',
@@ -106,6 +114,7 @@ __all__ = [
     'GazeGraph',
     'GazeOnFaces',
     'HBN',
+    'IITB_HGC',
     'InteRead',
     'JuDo1000',
     'MouseCursor',
