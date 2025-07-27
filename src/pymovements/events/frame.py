@@ -25,6 +25,7 @@ from typing import Any
 
 import numpy as np
 import polars as pl
+from deprecated.sphinx import deprecated
 from tqdm import tqdm
 
 from pymovements._utils import _checks
@@ -274,7 +275,7 @@ class EventDataFrame:
         event_property_columns -= set(self._additional_columns)
         return list(event_property_columns)
 
-    def copy(self) -> EventDataFrame:
+    def clone(self) -> EventDataFrame:
         """Return a copy of the EventDataFrame.
 
         Returns
@@ -286,6 +287,25 @@ class EventDataFrame:
             data=self.frame.clone(),
             trial_columns=self.trial_columns,
         )
+
+    @deprecated(
+        reason='Please use EventDataFrame.clone() instead. '
+               'This function will be removed in v0.27.0.',
+        version='v0.22.2',
+    )
+    def copy(self) -> EventDataFrame:
+        """Return a copy of the EventDataFrame.
+
+        .. deprecated:: v0.22.2
+           Please use :py:meth:`~pymovements.events.EventDataFrame.clone()` instead.
+           This function will be removed in v0.27.0.
+
+        Returns
+        -------
+        EventDataFrame
+            A copy of the EventDataFrame.
+        """
+        return self.clone()
 
     def split(self, by: Sequence[str]) -> list[EventDataFrame]:
         """Split the EventDataFrame into multiple frames based on specified column(s).
