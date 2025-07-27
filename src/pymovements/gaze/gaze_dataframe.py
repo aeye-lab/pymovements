@@ -261,7 +261,7 @@ class GazeDataFrame:
                     trial_columns=self.trial_columns,
                 )
         else:
-            self.events = events.copy()
+            self.events = events.clone()
 
         # Remove this attribute once #893 is fixed
         self._metadata: dict[str, Any] | None = None
@@ -1239,7 +1239,7 @@ class GazeDataFrame:
         gaze = GazeDataFrame(
             data=self.frame.clone(),
             experiment=deepcopy(self.experiment),
-            events=self.events.copy(),
+            events=self.events.clone(),
         )
         gaze.n_components = self.n_components
         return gaze

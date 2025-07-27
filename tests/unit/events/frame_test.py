@@ -399,9 +399,9 @@ def test_event_dataframe_columns_same_as_frame():
     assert event_df.columns == event_df.frame.columns
 
 
-def test_event_dataframe_copy():
+def test_event_dataframe_clone():
     events = pm.EventDataFrame(name='saccade', onsets=[0], offsets=[123])
-    events_copy = events.copy()
+    events_copy = events.clone()
 
     # We want to have separate dataframes but with the exact same data.
     assert events is not events_copy
@@ -411,7 +411,7 @@ def test_event_dataframe_copy():
 
 def test_event_dataframe_copies_trial_columns():
     events = pm.EventDataFrame(data=pl.DataFrame({'trial': 'trial'}), trial_columns='trial')
-    events_copy = events.copy()
+    events_copy = events.clone()
 
     assert events.trial_columns == events_copy.trial_columns
 
