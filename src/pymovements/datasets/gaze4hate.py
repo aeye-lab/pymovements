@@ -131,7 +131,7 @@ class Gaze4Hate(DatasetDefinition):
             },
         ),
     )
-    
+
     experiment: Experiment = field(
         default_factory=lambda: Experiment(
             screen_width_px=2560,
@@ -143,7 +143,7 @@ class Gaze4Hate(DatasetDefinition):
             sampling_rate=1000,
         ),
     )
-    
+
     filename_format: dict[str, str] = field(
         default_factory=lambda:
         {
@@ -151,7 +151,7 @@ class Gaze4Hate(DatasetDefinition):
             'precomputed_reading_measures': 'gaze4hate_sentence_reading_IA_report.csv',
         },
     )
-    
+
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
         default_factory=lambda:
         {
@@ -159,14 +159,14 @@ class Gaze4Hate(DatasetDefinition):
             'precomputed_reading_measures': {},
         },
     )
-    
+
     trial_columns: list[str] = field(
         default_factory=lambda: [
             'pno',
             'sno',
         ],
     )
-    
+
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda:
         {
