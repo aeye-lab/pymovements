@@ -1,9 +1,11 @@
 name: tests
 
 on:
-  - push
+  - push:
+    branches: [main] 
   - pull_request:
-      types:
+    branches: [main]
+    types:
         - opened
         - synchronize
         - edited
