@@ -9,10 +9,6 @@ on:
         - edited
         - ready_for_review
   - workflow_dispatch
-  - workflow_run:
-      workflows: ["datasets"]
-      types:
-        - completed
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
