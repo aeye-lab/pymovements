@@ -1,16 +1,16 @@
 name: tests
 
 on:
-  - push:
-    branches: [main] 
-  - pull_request:
+  push:
+    branches: [main]
+  pull_request:
     branches: [main]
     types:
         - opened
         - synchronize
         - edited
         - ready_for_review
-  - workflow_dispatch:
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
