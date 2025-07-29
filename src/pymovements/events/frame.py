@@ -292,11 +292,11 @@ class EventDataFrame:
 
         Parameters
         ----------
-        by: Sequence[str] | None, default=None
+        by: Sequence[str] | None
             Column name(s) to split the DataFrame by. If a single string is provided,
             it will be used as a single column name. If a list is provided, the DataFrame
             will be split by unique combinations of values in all specified columns.
-            If None, uses trial_columns.
+            If None, uses trial_columns. (default: None)
 
         Returns
         -------
@@ -307,6 +307,8 @@ class EventDataFrame:
         # Use trial_columns if by is None
         if by is None:
             by = self.trial_columns
+            if by is None:
+                raise TypeError("Either 'by' or 'self.trial_columns' must be specified")
 
         event_pl_df_list = list(self.frame.partition_by(by=by))
 

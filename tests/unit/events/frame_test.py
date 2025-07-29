@@ -578,3 +578,19 @@ def test_event_dataframe_split_default():
     assert_frame_equal(event_df.frame.filter(pl.col('trial_id') == 0), split_event[0].frame)
     assert_frame_equal(event_df.frame.filter(pl.col('trial_id') == 1), split_event[1].frame)
     assert_frame_equal(event_df.frame.filter(pl.col('trial_id') == 2), split_event[2].frame)
+
+
+def test_event_dataframe_split_default_no_trial_columns():
+    event_df = pm.EventDataFrame(
+        pl.DataFrame(
+            {
+                'trial_id': [0, 1, 1, 2],
+                'name': ['fixation', 'fixation', 'fixation', 'fixation'],
+                'onset': [0, 1, 2, 3],
+                'offset': [1, 2, 44, 1340],
+                'duration': [1, 1, 42, 1337],
+            },
+        ),
+    )
+    with pytest.raises(TypeError):
+        event_df.split()
