@@ -1,5 +1,4 @@
 name: tests
-
 on:
   push:
     branches: [main]
@@ -8,7 +7,6 @@ on:
     types:
         - opened
         - synchronize
-        - edited
         - ready_for_review
   workflow_dispatch:
 
