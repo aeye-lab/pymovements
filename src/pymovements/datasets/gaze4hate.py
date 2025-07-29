@@ -111,71 +111,72 @@ class Gaze4Hate(DatasetDefinition):
         },
     )
 
+
 resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'precomputed_events': [
-                    {
-                        'resource': 'https://osf.io/download/dbshf/',
-                        'filename': 'gaze4hate_sentence_reading_fix_report.csv',
-                        'md5': 'c8cc645d1fad659f9442d61795da5481',
-                    },
-                ],
-                'precomputed_reading_measures': [
-                    {
-                        'resource': 'https://osf.io/download/fgdjw/',
-                        'filename': 'gaze4hate_sentence_reading_IA_report.csv',
-                        'md5': 'e09e791e7d31d6ac3c69cd862d139c57',
-                    },
-                ],
-            },
-        ),
-    )
-
-    experiment: Experiment = field(
-        default_factory=lambda: Experiment(
-            screen_width_px=2560,
-            screen_height_px=1440,
-            screen_width_cm=59.8,
-            screen_height_cm=33.6,
-            distance_cm=78.0,
-            origin='center',
-            sampling_rate=1000,
-        ),
-    )
-
-    filename_format: dict[str, str] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': 'gaze4hate_sentence_reading_fix_report.csv',
-                'precomputed_reading_measures': 'gaze4hate_sentence_reading_IA_report.csv',
-            },
-    )
-
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': {},
-                'precomputed_reading_measures': {},
-            },
-    )
-
-    trial_columns: list[str] = field(
-        default_factory=lambda: [
-            'pno',
-            'sno',
-        ],
-    )
-
-    custom_read_kwargs: dict[str, dict[str, Any]] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': {
-                    'separator': '\t',
-                    'null_values': '.',
+    default_factory=lambda: ResourceDefinitions.from_dict(
+        {
+            'precomputed_events': [
+                {
+                    'resource': 'https://osf.io/download/dbshf/',
+                    'filename': 'gaze4hate_sentence_reading_fix_report.csv',
+                    'md5': 'c8cc645d1fad659f9442d61795da5481',
                 },
-                'precomputed_reading_measures': {
-                    'separator': '\t',
+            ],
+            'precomputed_reading_measures': [
+                {
+                    'resource': 'https://osf.io/download/fgdjw/',
+                    'filename': 'gaze4hate_sentence_reading_IA_report.csv',
+                    'md5': 'e09e791e7d31d6ac3c69cd862d139c57',
                 },
-            },
-    )
+            ],
+        },
+    ),
+)
+
+experiment: Experiment = field(
+    default_factory=lambda: Experiment(
+        screen_width_px=2560,
+        screen_height_px=1440,
+        screen_width_cm=59.8,
+        screen_height_cm=33.6,
+        distance_cm=78.0,
+        origin='center',
+        sampling_rate=1000,
+    ),
+)
+
+filename_format: dict[str, str] = field(
+    default_factory=lambda:
+    {
+        'precomputed_events': 'gaze4hate_sentence_reading_fix_report.csv',
+        'precomputed_reading_measures': 'gaze4hate_sentence_reading_IA_report.csv',
+    },
+)
+
+filename_format_schema_overrides: dict[str, dict[str, type]] = field(
+    default_factory=lambda:
+    {
+        'precomputed_events': {},
+        'precomputed_reading_measures': {},
+    },
+)
+
+trial_columns: list[str] = field(
+    default_factory=lambda: [
+        'pno',
+        'sno',
+    ],
+)
+
+custom_read_kwargs: dict[str, dict[str, Any]] = field(
+    default_factory=lambda:
+    {
+        'precomputed_events': {
+            'separator': '\t',
+            'null_values': '.',
+        },
+        'precomputed_reading_measures': {
+            'separator': '\t',
+        },
+    },
+)
