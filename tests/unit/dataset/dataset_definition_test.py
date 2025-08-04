@@ -187,7 +187,8 @@ def test_dataset_definition_is_equal(init_kwargs):
                 ResourceDefinition(
                     content='gaze',
                     url='www.example1.com',
-                    filename_pattern='test1.csv'),
+                    filename_pattern='test1.csv',
+                ),
                 ResourceDefinition(
                     content='precomputed_events',
                     url='www.example2.com',
