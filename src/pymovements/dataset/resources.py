@@ -62,7 +62,7 @@ class ResourceDefinition:
 
         try:
             return ResourceDefinition(**dictionary)
-        except:
+        except BaseException:
             print(dictionary)
             assert False
 
