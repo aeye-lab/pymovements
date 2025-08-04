@@ -66,9 +66,10 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
     # Get all filepaths that match regular expression.
     _fileinfo_dicts = {}
     if definition.has_files['gaze']:
+        filename_pattern = definition.resources.filter('gaze')[0].filename_pattern
         fileinfo_dicts = match_filepaths(
             path=paths.raw,
-            regex=curly_to_regex(definition.filename_format['gaze']),
+            regex=curly_to_regex(filename_pattern),
             relative=True,
         )
         if not fileinfo_dicts:

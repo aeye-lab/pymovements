@@ -12,12 +12,7 @@ resources:
     - resource: https://huggingface.co/datasets/cfilt/IITB-HGC/resolve/main/IITB_HGC.jsonl?download=true
       filename: IITB_HGC.jsonl
       md5: cde5dd88534e87d9b2f1ab6e47133b5c
-
-filename_format:
-  precomputed_events: IITB_HGC.jsonl
-
-filename_format_schema_overrides:
-  precomputed_events: {}
+      filename_pattern: IITB_HGC.jsonl
 
 trial_columns:
 - participant_id

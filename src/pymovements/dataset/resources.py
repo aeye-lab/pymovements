@@ -60,7 +60,11 @@ class ResourceDefinition:
             dictionary = {key: value for key, value in dictionary.items() if key != 'resource'}
             dictionary['url'] = url
 
-        return ResourceDefinition(**dictionary)
+        try:
+            return ResourceDefinition(**dictionary)
+        except:
+            print(dictionary)
+            assert False
 
     def to_dict(self, *, exclude_none: bool = True) -> dict[str, Any]:
         """Convert the ``ResourceDefinition`` instance into a dictionary.

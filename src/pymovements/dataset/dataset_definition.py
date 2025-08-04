@@ -382,16 +382,6 @@ class DatasetDefinition:
         else:
             self.mirrors = mirrors
 
-        if filename_format is None:
-            self.filename_format = {}
-        else:
-            self.filename_format = filename_format
-
-        if filename_format_schema_overrides is None:
-            self.filename_format_schema_overrides = {}
-        else:
-            self.filename_format_schema_overrides = filename_format_schema_overrides
-
         if custom_read_kwargs is None:
             self.custom_read_kwargs = {}
         else:
@@ -401,9 +391,6 @@ class DatasetDefinition:
             self.column_map = {}
         else:
             self.column_map = column_map
-
-        self.resources = self._initialize_resources(resources)
-        self._has_resources = _HasResourcesIndexer(resources=self.resources)
 
         self.experiment = self._initialize_experiment(experiment)
         self.resources = self._initialize_resources(

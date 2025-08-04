@@ -13,7 +13,7 @@ resources:
       filename: "PoTeC.zip"
       md5: "cffd45039757c3777e2fd130e5d8a2ad"
       filename_pattern: 'reader{subject_id:d}_{text_id}_raw_data.tsv'
-      gaze:
+      filename_pattern_schema_overrides:
         subject_id: !int
         text_id: !str
   precomputed_events:
@@ -21,7 +21,7 @@ resources:
       filename: "fixation.zip"
       md5: "ecd9a998d07158922bb9b8cdd52f5688"
       filename_pattern: 'reader{subject_id:d}_{text_id}_uncorrected_fixations.tsv'
-      precomputed_events:
+      filename_pattern_schema_overrides:
         subject_id: !int
         text_id: !str
   precomputed_reading_measures:

@@ -24,6 +24,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
 
+import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.resources import ResourceDefinitions
@@ -91,7 +92,7 @@ class CodeComprehension(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'CodeComprehension'
 
@@ -113,6 +114,8 @@ class CodeComprehension(DatasetDefinition):
                         'resource': 'https://zenodo.org/records/11123101/files/Predicting%20Code%20Comprehension%20Package.zip?download=1',  # noqa: E501 # pylint: disable=line-too-long
                         'filename': 'data.zip',
                         'md5': '3a3c6fb96550bc2c2ddcf5d458fb12a2',
+                        'filename_pattern': 'fix_report_P{subject_id:s}.txt',
+                        'filename_pattern_schema_overrides': {'subject_id': pl.String},
                     },
                 ],
             },

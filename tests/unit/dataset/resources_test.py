@@ -182,7 +182,7 @@ def test_resource_is_not_equal(resource1, resource2):
                 'content': 'gaze',
                 'filename_pattern': 'test.csv',
             },
-            Resource(
+            ResourceDefinition(
                 content='gaze',
                 filename=None,
                 url=None,
@@ -198,7 +198,7 @@ def test_resource_is_not_equal(resource1, resource2):
                 'filename_pattern': '{subject_id:d}.csv',
                 'filename_pattern_schema_overrides': {'subject_id': int},
             },
-            Resource(
+            ResourceDefinition(
                 content='gaze',
                 filename=None,
                 url=None,

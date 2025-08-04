@@ -17,7 +17,6 @@ resources:
         subject_id: !int
         session_id: !int
 
-
 experiment:
   screen_width_px: 1280
   screen_height_px: 1024

@@ -96,7 +96,7 @@ class IITB_HGC(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'IITB_HGC'
 
@@ -119,22 +119,11 @@ class IITB_HGC(DatasetDefinition):
                         'resolve/main/IITB_HGC.jsonl?download=true',
                         'filename': 'IITB_HGC.jsonl',
                         'md5': 'cde5dd88534e87d9b2f1ab6e47133b5c',
+                        'filename_pattern': 'IITB_HGC.jsonl',
                     },
                 ],
             },
         ),
-    )
-
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'precomputed_events': 'IITB_HGC.jsonl',
-        },
-    )
-
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'precomputed_events': {},
-        },
     )
 
     trial_columns: list[str] = field(

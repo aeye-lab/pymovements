@@ -28,6 +28,7 @@ from pymovements import __version__
 from pymovements import DatasetDefinition
 from pymovements import DatasetLibrary
 from pymovements import Experiment
+from pymovements import ResourceDefinition
 from pymovements import ResourceDefinitions
 
 
@@ -89,37 +90,37 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
     [
         pytest.param(
             {},
-            Resources(),
+            ResourceDefinitions(),
             id='default',
         ),
 
         pytest.param(
             {'resources': None},
-            Resources(),
+            ResourceDefinitions(),
             id='none',
         ),
 
         pytest.param(
             {'resources': {}},
-            Resources(),
+            ResourceDefinitions(),
             id='empty_dict',
         ),
 
         pytest.param(
             {'resources': []},
-            Resources(),
+            ResourceDefinitions(),
             id='empty_list',
         ),
 
         pytest.param(
             {'resources': [{'content': 'gaze'}]},
-            Resources([Resource(content='gaze')]),
+            ResourceDefinitions([ResourceDefinition(content='gaze')]),
             id='single_gaze_resource',
         ),
 
         pytest.param(
             {'resources': {'gaze': [{'resource': 'www.example.com'}]}},
-            Resources([Resource(content='gaze', url='www.example.com')]),
+            ResourceDefinitions([ResourceDefinition(content='gaze', url='www.example.com')]),
             id='single_gaze_resource_legacy',
         ),
 
@@ -129,7 +130,7 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
                     {'content': 'gaze', 'filename_pattern': 'test.csv'},
                 ],
             },
-            Resources([Resource(content='gaze', filename_pattern='test.csv')]),
+            ResourceDefinitions([ResourceDefinition(content='gaze', filename_pattern='test.csv')]),
             id='single_gaze_resource_filename_pattern',
         ),
 
@@ -138,7 +139,7 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
                 'resources': {'gaze': [{'content': 'gaze'}]},
                 'filename_format': {'gaze': 'test.csv'},
             },
-            Resources([Resource(content='gaze', filename_pattern='test.csv')]),
+            ResourceDefinitions([ResourceDefinition(content='gaze', filename_pattern='test.csv')]),
             id='single_gaze_resource_filename_format_legacy',
         ),
 
@@ -152,8 +153,8 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
                     },
                 },
             },
-            Resources([
-                Resource(
+            ResourceDefinitions([
+                ResourceDefinition(
                     content='gaze', filename_pattern='{subject_id:d}.csv', filename_pattern_schema_overrides={
                         'subject_id': int,
                     },
@@ -164,7 +165,7 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
 
         pytest.param(
             {'resources': [{'content': 'precomputed_events'}]},
-            Resources([Resource(content='precomputed_events')]),
+            ResourceDefinitions([ResourceDefinition(content='precomputed_events')]),
             id='single_precomputed_events_resource',
         ),
 
@@ -175,9 +176,9 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
                     {'content': 'precomputed_events'},
                 ],
             },
-            Resources([
-                Resource(content='gaze'),
-                Resource(content='precomputed_events'),
+            ResourceDefinitions([
+                ResourceDefinition(content='gaze'),
+                ResourceDefinition(content='precomputed_events'),
             ]),
             id='two_resources',
         ),
@@ -189,9 +190,9 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
                     'precomputed_events': [{'resource': 'www.example2.com'}],
                 },
             },
-            Resources([
-                Resource(content='gaze', url='www.example1.com'),
-                Resource(content='precomputed_events', url='www.example2.com'),
+            ResourceDefinitions([
+                ResourceDefinition(content='gaze', url='www.example1.com'),
+                ResourceDefinition(content='precomputed_events', url='www.example2.com'),
             ]),
             id='two_resources_legacy',
         ),
@@ -207,9 +208,9 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
                     'precomputed_events': 'test2.csv',
                 },
             },
-            Resources([
-                Resource(content='gaze', url='www.example1.com', filename_pattern='test1.csv'),
-                Resource(
+            ResourceDefinitions([
+                ResourceDefinition(content='gaze', url='www.example1.com', filename_pattern='test1.csv'),
+                ResourceDefinition(
                     content='precomputed_events',
                     url='www.example2.com',
                     filename_pattern='test2.csv',
@@ -249,10 +250,26 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
                 'column_map': {},
                 'custom_read_kwargs': {},
                 'distance_column': None,
-                'experiment': None,
+                'experiment': {
+                    'eyetracker': {
+                        'left': None,
+                        'model': None,
+                        'mount': None,
+                        'right': None,
+                        'sampling_rate': None,
+                        'vendor': None,
+                        'version': None,
+                    },
+                    'screen': {
+                        'distance_cm': None,
+                        'height_cm': None,
+                        'height_px': None,
+                        'origin': None,
+                        'width_cm': None,
+                        'width_px': None,
+                    },
+                },
                 'extract': None,
-                'filename_format': {},
-                'filename_format_schema_overrides': {},
                 'mirrors': {},
                 'pixel_columns': None,
                 'position_columns': None,
@@ -315,8 +332,6 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
                     },
                 },
                 'extract': None,
-                'filename_format': {},
-                'filename_format_schema_overrides': {},
                 'mirrors': {},
                 'pixel_columns': None,
                 'position_columns': None,
@@ -367,8 +382,6 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
                     },
                 },
                 'extract': None,
-                'filename_format': {},
-                'filename_format_schema_overrides': {},
                 'mirrors': {},
                 'pixel_columns': None,
                 'position_columns': None,
@@ -412,8 +425,6 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
                     },
                 },
                 'extract': None,
-                'filename_format': {},
-                'filename_format_schema_overrides': {},
                 'mirrors': {},
                 'pixel_columns': None,
                 'position_columns': None,
@@ -782,8 +793,6 @@ def test_dataset_definition_not_equal():
                     },
                 },
                 'extract': None,
-                'filename_format': {},
-                'filename_format_schema_overrides': {},
                 'custom_read_kwargs': {},
                 'column_map': {},
                 'trial_columns': None,
@@ -827,8 +836,6 @@ def test_dataset_definition_not_equal():
                     },
                 },
                 'extract': None,
-                'filename_format': {},
-                'filename_format_schema_overrides': {},
                 'custom_read_kwargs': {},
                 'column_map': {},
                 'trial_columns': None,
@@ -872,8 +879,6 @@ def test_dataset_definition_not_equal():
                     },
                 },
                 'extract': None,
-                'filename_format': {},
-                'filename_format_schema_overrides': {},
                 'custom_read_kwargs': {},
                 'column_map': {},
                 'trial_columns': None,

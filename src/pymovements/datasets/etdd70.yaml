@@ -12,10 +12,12 @@ resources:
     - resource: https://zenodo.org/api/records/13332134/files-archive
       filename: edd_raw.zip
       md5: null
+      filename_pattern: 'Subject_{subject_id:d}_{task:s}_raw.csv'
   precomputed_events:
     - resource: https://zenodo.org/api/records/13332134/files-archive
       filename: edd_fix.zip
       md5: null
+      filename_pattern: 'Subject_{subject_id:d}_{task:s}_fixations.csv'
 
 experiment:
   screen_width_px: 1680
@@ -25,14 +27,6 @@ experiment:
   distance_cm: 65  # in the paper it is written (60-70cm)
   origin: 'center'
   sampling_rate: 250
-
-filename_format:
-  gaze: 'Subject_{subject_id:d}_{task:s}_raw.csv'
-  precomputed_events: 'Subject_{subject_id:d}_{task:s}_fixations.csv'
-
-filename_format_schema_overrides:
-  gaze: {}
-  precomputed_events: {}
 
 time_column: 'time'
 
