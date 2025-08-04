@@ -32,7 +32,7 @@ from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
 
 
-@dataclass
+@dataclass(init=False)
 class ToyDatasetEyeLink(DatasetDefinition):
     """Example toy dataset with EyeLink data.
 
@@ -63,14 +63,6 @@ class ToyDatasetEyeLink(DatasetDefinition):
 
     experiment: Experiment
         The experiment definition.
-
-    filename_format: dict[str, str]
-        Regular expression which will be matched before trying to load the file. Namedgroups will
-        appear in the `fileinfo` dataframe.
-
-    filename_format_schema_overrides: dict[str, dict[str, type]]
-        If named groups are present in the `filename_format`, this makes it possible to cast
-        specific named groups to a particular datatype.
 
     trial_columns: list[str] | None
             The name of the trial columns in the input data frame. If the list is empty or None,
@@ -170,9 +162,9 @@ class ToyDatasetEyeLink(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] | None = None
+    
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
+    
 
     trial_columns: list[str] | None = field(
         default_factory=lambda: ['task', 'trial_id'],

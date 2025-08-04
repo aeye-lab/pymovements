@@ -29,7 +29,7 @@ from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
-@dataclass
+@dataclass(init=False)
 class Gaze4Hate(DatasetDefinition):
     """Gaze4Hate dataset :cite:p:`Gaze4Hate`.
 
@@ -60,14 +60,6 @@ class Gaze4Hate(DatasetDefinition):
 
     experiment: Experiment
         The experiment definition.
-
-    filename_format: dict[str, str]
-        Regular expression which will be matched before trying to load the file. Namedgroups will
-        appear in the `fileinfo` dataframe.
-
-    filename_format_schema_overrides: dict[str, dict[str, type]]
-        If named groups are present in the `filename_format`, this makes it possible to cast
-        specific named groups to a particular datatype.
 
     trial_columns: list[str]
             The name of the trial columns in the input data frame. If the list is empty or None,

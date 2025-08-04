@@ -31,7 +31,7 @@ from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
-@dataclass
+@dataclass(init=False)
 class GazeOnFaces(DatasetDefinition):
     """GazeOnFaces dataset :cite:p:`GazeOnFaces`.
 
@@ -160,9 +160,9 @@ class GazeOnFaces(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] | None = None
+    
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
+    
 
     time_column: Any = None
 

@@ -29,7 +29,7 @@ from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
-@dataclass
+@dataclass(init=False)
 class ETDD70(DatasetDefinition):
     """Eye-Tracking Dyslexia Dataset (ETDD70) :cite:p:`ETDD70`.
 
@@ -66,14 +66,6 @@ class ETDD70(DatasetDefinition):
 
     experiment: Experiment
         The experiment definition.
-
-    filename_format: dict[str, str]
-        Regular expression which will be matched before trying to load the file. Namedgroups will
-        appear in the `fileinfo` dataframe.
-
-    filename_format_schema_overrides: dict[str, dict[str, type]]
-        If named groups are present in the `filename_format`, this makes it possible to cast
-        specific named groups to a particular datatype.
 
     time_column: str
         The name of the timestamp column in the input data frame. This column will be renamed to

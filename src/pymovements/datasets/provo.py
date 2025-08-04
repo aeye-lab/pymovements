@@ -30,7 +30,7 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.resources import ResourceDefinitions
 
 
-@dataclass
+@dataclass(init=False)
 class Provo(DatasetDefinition):
     """Provo dataset :cite:p:`Provo`.
 
@@ -61,14 +61,6 @@ class Provo(DatasetDefinition):
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
-
-    filename_format: dict[str, str]
-        Regular expression which will be matched before trying to load the file. Namedgroups will
-        appear in the `fileinfo` dataframe.
-
-    filename_format_schema_overrides: dict[str, dict[str, type]]
-        If named groups are present in the `filename_format`, this makes it possible to cast
-        specific named groups to a particular datatype.
 
     column_map: dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
@@ -125,9 +117,9 @@ class Provo(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] | None = None
+    
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
+    
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 

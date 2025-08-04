@@ -29,7 +29,7 @@ from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
-@dataclass
+@dataclass(init=False)
 class CoLAGaze(DatasetDefinition):
     """CoLAGaze dataset :cite:p:`CoLAGaze`.
 
@@ -60,14 +60,6 @@ class CoLAGaze(DatasetDefinition):
 
     experiment: Experiment
         The experiment definition.
-
-    filename_format: dict[str, str]
-        Regular expression which will be matched before trying to load the file. Namedgroups will
-        appear in the `fileinfo` dataframe.
-
-    filename_format_schema_overrides: dict[str, dict[str, type]]
-        If named groups are present in the `filename_format`, this makes it possible to cast
-        specific named groups to a particular datatype.
 
     custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function.
@@ -157,9 +149,9 @@ class CoLAGaze(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] | None = None
+    
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
+    
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
