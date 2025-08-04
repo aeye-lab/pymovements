@@ -28,7 +28,6 @@ from pymovements import __version__
 from pymovements import DatasetDefinition
 from pymovements import DatasetLibrary
 from pymovements import Experiment
-from pymovements import ResourceDefinition
 from pymovements import ResourceDefinitions
 
 
@@ -148,9 +147,9 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
                 'resources': {'gaze': [{'content': 'gaze'}]},
                 'filename_format': {'gaze': '{subject_id:d}.csv'},
                 'filename_format_schema_overrides': {
-            'gaze': {
-                'subject_id': int,
-            },
+                    'gaze': {
+                        'subject_id': int,
+                    },
                 },
             },
             Resources([
@@ -808,7 +807,7 @@ def test_dataset_definition_not_equal():
                 'has_files': {},
                 'mirrors': {},
                 'resources': [],
-                'experiment':  {
+                'experiment': {
                     'eyetracker': {
                         'left': None,
                         'model': None,
@@ -972,6 +971,7 @@ def test_dataset_definition_init_raises_exception(init_kwargs, exception, except
 def test_dataset_definition_get_attribute_is_deprecated(definition, attribute):
     with pytest.raises(DeprecationWarning):
         getattr(definition, attribute)
+
 
 @pytest.mark.parametrize(
     ('definition', 'attribute', 'value'),

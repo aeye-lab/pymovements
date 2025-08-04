@@ -148,8 +148,10 @@ class GazeBase(DatasetDefinition):
                                 r'_S{session_id:d}'
                                 r'_{task_name}.csv'
                             ),
-                        'filename_pattern_schema_overrides': {'round_id': int, 'subject_id': int,
-                                                              'session_id': int},
+                        'filename_pattern_schema_overrides': {
+                            'round_id': int, 'subject_id': int,
+                            'session_id': int,
+                        },
                     },
                 ],
             },

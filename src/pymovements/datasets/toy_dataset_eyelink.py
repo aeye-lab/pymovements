@@ -174,9 +174,8 @@ class ToyDatasetEyeLink(DatasetDefinition):
 
     filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
-
     trial_columns: list[str] | None = field(
-            default_factory=lambda: ['task', 'trial_id'],
+        default_factory=lambda: ['task', 'trial_id'],
     )
 
     time_column: str = 'time'
