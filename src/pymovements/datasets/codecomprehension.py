@@ -114,10 +114,6 @@ class CodeComprehension(DatasetDefinition):
         ),
     )
 
-    
-
-    
-
     column_map: dict[str, str] = field(default_factory=lambda: {})
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(

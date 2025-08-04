@@ -148,10 +148,6 @@ class ToyDataset(DatasetDefinition):
         ),
     )
 
-    
-
-    
-
     time_column: str = 'timestamp'
 
     time_unit: str = 'ms'

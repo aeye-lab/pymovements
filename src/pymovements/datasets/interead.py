@@ -159,10 +159,6 @@ class InteRead(DatasetDefinition):
         ),
     )
 
-    
-
-    
-
     trial_columns: list[str] = field(
         default_factory=lambda: [
             'participant_id',

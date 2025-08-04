@@ -163,10 +163,6 @@ class GazeBaseVR(DatasetDefinition):
         ),
     )
 
-    
-
-    
-
     time_column: str = 'n'
 
     time_unit: str = 'ms'

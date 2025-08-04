@@ -144,7 +144,7 @@ class DIDEC(DatasetDefinition):
                         'participant': int,
                         'session': int,
                         'trial': int,
-                    },
+                        },
                 },
             ],
         ),
@@ -161,10 +161,6 @@ class DIDEC(DatasetDefinition):
             sampling_rate=1000,
         ),
     )
-
-    
-
-    
 
     trial_columns: list[str] = field(
         default_factory=lambda: ['Stimulus'],

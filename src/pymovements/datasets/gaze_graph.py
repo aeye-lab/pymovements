@@ -161,10 +161,6 @@ class GazeGraph(DatasetDefinition):
         ),
     )
 
-    
-
-    
-
     trial_columns: list[str] = field(default_factory=lambda: [])
 
     time_column: Any = None

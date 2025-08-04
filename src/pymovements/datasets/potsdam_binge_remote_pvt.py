@@ -203,10 +203,6 @@ class PotsdamBingeRemotePVT(DatasetDefinition):
         ),
     )
 
-    
-
-    
-
     trial_columns: list[str] = field(
         default_factory=lambda: [
             'trial_id',

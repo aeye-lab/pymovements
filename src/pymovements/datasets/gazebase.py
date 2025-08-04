@@ -143,7 +143,7 @@ class GazeBase(DatasetDefinition):
                         'filename_pattern_schema_overrides': {
                             'round_id': int, 'subject_id': int,
                             'session_id': int,
-                        },
+                            },
                     },
                 ],
             },
@@ -161,10 +161,6 @@ class GazeBase(DatasetDefinition):
             sampling_rate=1000,
         ),
     )
-
-    
-
-    
 
     time_column: str = 'n'
 

@@ -149,10 +149,6 @@ class CoLAGaze(DatasetDefinition):
         ),
     )
 
-    
-
-    
-
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
             'gaze': {},

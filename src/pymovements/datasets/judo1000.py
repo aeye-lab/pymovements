@@ -157,10 +157,6 @@ class JuDo1000(DatasetDefinition):
         ),
     )
 
-    
-
-    
-
     trial_columns: list[str] = field(default_factory=lambda: ['trial_id'])
 
     time_column: str = 'time'

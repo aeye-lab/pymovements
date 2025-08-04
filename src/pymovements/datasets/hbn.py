@@ -151,10 +151,6 @@ class HBN(DatasetDefinition):
         ),
     )
 
-    
-
-    
-
     time_column: str = 'time'
 
     time_unit: str = 'step'

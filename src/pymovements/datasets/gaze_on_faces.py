@@ -160,10 +160,6 @@ class GazeOnFaces(DatasetDefinition):
         ),
     )
 
-    
-
-    
-
     time_column: Any = None
 
     time_unit: Any = None

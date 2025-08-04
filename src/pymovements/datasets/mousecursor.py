@@ -160,10 +160,6 @@ class MouseCursor(DatasetDefinition):
         ),
     )
 
-    
-
-    
-
     trial_columns: list[str] = field(default_factory=lambda: ['Trial', 'Participant'])
 
     time_column: str = 'Time'
