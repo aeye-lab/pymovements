@@ -78,12 +78,6 @@ class DatasetDefinition:
         Decide whether to extract the data. (default: None)
         .. deprecated:: v0.22.1
         This field will be removed in v0.27.0.
-    filename_format: dict[str, str]
-        Regular expression which will be matched before trying to load the file. Namedgroups will
-        appear in the `fileinfo` dataframe. (default: field(default_factory=dict))
-    filename_format_schema_overrides: dict[str, dict[str, type]]
-        If named groups are present in the `filename_format`, this makes it possible to cast
-        specific named groups to a particular datatype. (default: field(default_factory=dict))
     custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function. The
         behavior of this argument depends on the file extension of the dataset files.
@@ -95,82 +89,6 @@ class DatasetDefinition:
     column_map : dict[str, str]
         The keys are the columns to read, the values are the names to which they should be renamed.
         (default: field(default_factory=dict))
-    trial_columns: list[str] | None
-            The name of the trial columns in the input data frame. If the list is empty or None,
-            the input data frame is assumed to contain only one trial. If the list is not empty,
-            the input data frame is assumed to contain multiple trials and the transformation
-            methods will be applied to each trial separately. (default: None)
-    time_column: str | None
-        The name of the timestamp column in the input data frame. This column will be renamed to
-        ``time``. (default: None)
-
-    time_unit: str | None
-        The unit of the timestamps in the timestamp column in the input data frame. Supported
-        units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
-        'step' the experiment definition must be specified. All timestamps will be converted to
-        milliseconds. (default: 'ms')
-
-    pixel_columns: list[str] | None
-        The name of the pixel position columns in the input data frame. These columns will be
-        nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
-        column will not be created. (default: None)
-    position_columns: list[str] | None
-        The name of the dva position columns in the input data frame. These columns will be
-        nested into the column ``position``. If the list is empty or None, the nested
-        ``position`` column will not be created. (default: None)
-    velocity_columns: list[str] | None
-        The name of the velocity columns in the input data frame. These columns will be nested
-        into the column ``velocity``. If the list is empty or None, the nested ``velocity``
-        column will not be created. (default: None)
-    acceleration_columns: list[str] | None
-        The name of the acceleration columns in the input data frame. These columns will be
-        nested into the column ``acceleration``. If the list is empty or None, the nested
-        ``acceleration`` column will not be created. (default: None)
-    distance_column : str | None
-        The name of the column containing eye-to-screen distance in millimeters for each sample
-        in the input data frame. If specified, the column will be used for pixel to dva
-        transformations. If not specified, the constant eye-to-screen distance will be taken from
-        the experiment definition. This column will be renamed to ``distance``. (default: None)
-
-    Parameters
-    ----------
-    name: str
-        The name of the dataset. (default: '.')
-    long_name: str | None
-        The entire name of the dataset. (default: None)
-    has_files: dict[str, bool] | None
-        Indicate whether the dataset contains 'gaze', 'precomputed_events', and
-        'precomputed_reading_measures'. (default: None)
-    mirrors: dict[str, Sequence[str]] | None
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
-        (default: None)
-    resources: Resources | ResourcesLike | None
-        A list of dataset resources. Each list entry must be a dictionary with the following keys:
-        - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
-        - `filename`: The filename under which the file is saved as.
-        - `md5`: The MD5 checksum of the respective file.
-        (default: None)
-    experiment: Experiment | dict[str, Any] | None
-        The experiment definition. (default: None)
-    extract: dict[str, bool] | None
-        Decide whether to extract the data. (default: None)
-    filename_format: dict[str, str] | None
-        Regular expression which will be matched before trying to load the file. Namedgroups will
-        appear in the `fileinfo` dataframe. (default: None)
-    filename_format_schema_overrides: dict[str, dict[str, type]] | None
-        If named groups are present in the `filename_format`, this makes it possible to cast
-        specific named groups to a particular datatype. (default: None)
-    custom_read_kwargs: dict[str, dict[str, Any]] | None
-        If specified, these keyword arguments will be passed to the file reading function. The
-        behavior of this argument depends on the file extension of the dataset files.
-        If the file extension is `.csv` the keyword arguments will be passed
-        to :py:func:`polars.read_csv`. If the file extension is`.asc` the keyword arguments
-        will be passed to :py:func:`pymovements.utils.parsing.parse_eyelink`.
-        See Notes for more details on how to use this argument.
-        (default: None)
-    column_map : dict[str, str] | None
-        The keys are the columns to read, the values are the names to which they should be renamed.
-        (default: None)
     trial_columns: list[str] | None
             The name of the trial columns in the input data frame. If the list is empty or None,
             the input data frame is assumed to contain only one trial. If the list is not empty,
@@ -422,6 +340,7 @@ class DatasetDefinition:
             if content_resources:
                 assert len(content_resources) == 1
                 data[content_type] = content_resources[0].filename_pattern
+        return data
 
     @filename_format.setter
     @deprecated(
@@ -449,6 +368,7 @@ class DatasetDefinition:
             if content_resources:
                 assert len(content_resources) == 1
                 data[content_type] = content_resources[0].filename_pattern_schema_overrides
+        return data
 
     @filename_format_schema_overrides.setter
     @deprecated(
@@ -613,23 +533,35 @@ class DatasetDefinition:
         """Initialize ``ResourceDefinitions`` instance if necessary."""
         if isinstance(resources, ResourceDefinitions):
             return resources
+
         if resources is None:
-            return ResourceDefinitions()
+            # some legacy definitions may have defined filename format but no resources.
+            # create legacy formatted resource dict to contain filename pattern.
+            if filename_format:
+                resources = {
+                    content_type: [{'filename_pattern': filename_format[content_type]}]
+                    for content_type in filename_format.keys()
+                }
+            else:
+                return ResourceDefinitions()
+
+        # this calls deprecated methods and will be removed in the future.
         if isinstance(resources, dict):
             if filename_format:
                 for content_type in filename_format.keys():
-                    for resource in resources[content_type]:
-                        resource['filename_pattern'] = filename_format[content_type]
-
+                    for resource_dict in resources[content_type]:
+                        resource_dict['filename_pattern'] = filename_format[content_type]
             if filename_format_schema_overrides:
-                for content_type in filename_format.keys():
-                    for resource in resources[content_type]:
-                        content_overrides = filename_format_schema_overrides[content_type]
-                        resource['filename_pattern_schema_overrides'] = content_overrides
+                for content_type in filename_format_schema_overrides.keys():
+                    for resource_dict in resources[content_type]:
+                        _schema_overrides = filename_format_schema_overrides[content_type]
+                        resource_dict['filename_pattern_schema_overrides'] = _schema_overrides
             return ResourceDefinitions.from_dict(resources)
+
         if isinstance(resources, Sequence):
             assert isinstance(resources, Sequence)
             return ResourceDefinitions.from_dicts(resources)
+
         raise TypeError(
             f'resources is of type {type(resources).__name__} but must be of type'
             ' ResourceDefinitions, list, or dict.',

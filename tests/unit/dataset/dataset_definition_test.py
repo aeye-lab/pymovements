@@ -78,39 +78,6 @@ def test_dataset_definition_is_equal(init_kwargs):
             ResourceDefinitions(),
             id='empty_list',
         ),
-    ],
-)
-def test_dataset_definition_resources_init_expected(init_kwargs, expected_resources):
-    definition = DatasetDefinition(**init_kwargs)
-    assert definition.resources == expected_resources
-
-
-@pytest.mark.parametrize(
-    ('init_kwargs', 'expected_resources'),
-    [
-        pytest.param(
-            {},
-            ResourceDefinitions(),
-            id='default',
-        ),
-
-        pytest.param(
-            {'resources': None},
-            ResourceDefinitions(),
-            id='none',
-        ),
-
-        pytest.param(
-            {'resources': {}},
-            ResourceDefinitions(),
-            id='empty_dict',
-        ),
-
-        pytest.param(
-            {'resources': []},
-            ResourceDefinitions(),
-            id='empty_list',
-        ),
 
         pytest.param(
             {'resources': [{'content': 'gaze'}]},
@@ -141,6 +108,14 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
             },
             ResourceDefinitions([ResourceDefinition(content='gaze', filename_pattern='test.csv')]),
             id='single_gaze_resource_filename_format_legacy',
+        ),
+
+        pytest.param(
+            {
+                'filename_format': {'gaze': 'test.csv'},
+            },
+            ResourceDefinitions([ResourceDefinition(content='gaze', filename_pattern='test.csv')]),
+            id='filename_format_without_resources_legacy',
         ),
 
         pytest.param(
