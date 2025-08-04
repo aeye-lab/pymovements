@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the FakeNewsPerception dataset."""
+"""Provides a definition for the Gaze4Hate dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -30,16 +30,14 @@ from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
-class FakeNewsPerception(DatasetDefinition):
-    """FakeNewsPerception dataset :cite:p:`FakeNewsPerception`.
+class Gaze4Hate(DatasetDefinition):
+    """Gaze4Hate dataset :cite:p:`Gaze4Hate`.
 
-    FakeNewsPerception dataset consists of eye movements during reading,
-    perceived believability scores, and questionnaires including Cognitive Reflection Test (CRT)
-    and News-Find-Me (NFM) perception, collected from 25 participants with 60 news items.
-    Eye movements are recorded to provide objective measures
-    of information processing during news reading.
+    This dataset includes monocular eye tracking data from 43 participants annotating sentences for
+    hate speech. Eye movements are recorded at a sampling frequency of 1,000 Hz using an EyeLink
+    1000 Plus eye tracker and are provided as pixel coordinates.
 
-    For more details see :cite:p:`FakeNewsPerception`.
+    Check the respective paper for details :cite:p:`Gaze4Hate`.
 
     Attributes
     ----------
@@ -71,22 +69,45 @@ class FakeNewsPerception(DatasetDefinition):
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
-    column_map: dict[str, str]
-        The keys are the columns to read, the values are the names to which they should be renamed.
+    trial_columns: list[str]
+            The name of the trial columns in the input data frame. If the list is empty or None,
+            the input data frame is assumed to contain only one trial. If the list is not empty,
+            the input data frame is assumed to contain multiple trials and the transformation
+            methods will be applied to each trial separately.
 
-    custom_read_kwargs: dict[str, Any]
+    custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function.
+
+    Examples
+    --------
+    Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
+    :py:class:`~pymovements.datasets.Gaze4Hate` definition:
+
+    >>> import pymovements as pm
+    >>>
+    >>> dataset = pm.Dataset("Gaze4Hate", path='data/Gaze4Hate')
+
+    Download the dataset resources:
+
+    >>> dataset.download()# doctest: +SKIP
+
+    Load the data into memory:
+
+    >>> dataset.load()# doctest: +SKIP
     """
 
-    name: str = 'FakeNewsPerception'
+    # pylint: disable=similarities
+    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    long_name: str = 'Fake News Perception Eye Tracking Corpus'
+    name: str = 'Gaze4Hate'
+
+    long_name: str = 'Gaze4Hate dataset'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': False,
             'precomputed_events': True,
-            'precomputed_reading_measures': False,
+            'precomputed_reading_measures': True,
         },
     )
 
@@ -95,14 +116,16 @@ class FakeNewsPerception(DatasetDefinition):
             {
                 'precomputed_events': [
                     {
-                        'resource': 'https://dataverse.harvard.edu/api/access/datafile/4200164',
-                        'filename': 'D3-Eye-movements-data.zip',
-                        'md5': 'ab009f28cd703f433e9b6c02b0bb38d2',
-                        'filename_pattern': r'P{subject_id:d}_S{session_id:d}_{truth_value:s}.csv',
-                        'filename_pattern_schema_overrides': {
-                            'subject_id': int, 'session_id': int,
-                            'truth_value': str,
-                        },
+                        'resource': 'https://osf.io/download/dbshf/',
+                        'filename': 'gaze4hate_sentence_reading_fix_report.csv',
+                        'md5': 'c8cc645d1fad659f9442d61795da5481',
+                    },
+                ],
+                'precomputed_reading_measures': [
+                    {
+                        'resource': 'https://osf.io/download/fgdjw/',
+                        'filename': 'gaze4hate_sentence_reading_IA_report.csv',
+                        'md5': 'e09e791e7d31d6ac3c69cd862d139c57',
                     },
                 ],
             },
@@ -111,27 +134,48 @@ class FakeNewsPerception(DatasetDefinition):
 
     experiment: Experiment = field(
         default_factory=lambda: Experiment(
-            screen_width_px=1920,
-            screen_height_px=1080,
-            screen_width_cm=52.7,
-            screen_height_cm=29.6,
-            distance_cm=None,
-            origin=None,
-            sampling_rate=600,
+            screen_width_px=2560,
+            screen_height_px=1440,
+            screen_width_cm=59.8,
+            screen_height_cm=33.6,
+            distance_cm=78.0,
+            origin='center',
+            sampling_rate=1000,
         ),
     )
 
-    filename_format: dict[str, str] | None = None
+    filename_format: dict[str, str] = field(
+        default_factory=lambda:
+        {
+            'precomputed_events': 'gaze4hate_sentence_reading_fix_report.csv',
+            'precomputed_reading_measures': 'gaze4hate_sentence_reading_IA_report.csv',
+        },
+    )
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
+    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
+        default_factory=lambda:
+        {
+            'precomputed_events': {},
+            'precomputed_reading_measures': {},
+        },
+    )
 
-    column_map: dict[str, str] = field(default_factory=lambda: {})
+    trial_columns: list[str] = field(
+        default_factory=lambda: [
+            'pno',
+            'sno',
+        ],
+    )
 
-    custom_read_kwargs: dict[str, Any] = field(
-        default_factory=lambda: {
+    custom_read_kwargs: dict[str, dict[str, Any]] = field(
+        default_factory=lambda:
+        {
             'precomputed_events': {
-                'null_values': 'NA',
-                'quote_char': '"',
+                'separator': '\t',
+                'null_values': '.',
+            },
+            'precomputed_reading_measures': {
+                'separator': '\t',
             },
         },
     )

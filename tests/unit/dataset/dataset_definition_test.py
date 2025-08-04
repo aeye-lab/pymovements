@@ -28,8 +28,8 @@ from pymovements import __version__
 from pymovements import DatasetDefinition
 from pymovements import DatasetLibrary
 from pymovements import Experiment
-from pymovements import Resource
-from pymovements import Resources
+from pymovements import ResourceDefinition
+from pymovements import ResourceDefinitions
 
 
 @pytest.mark.parametrize(
@@ -50,6 +50,39 @@ def test_dataset_definition_is_equal(init_kwargs):
     definition2 = DatasetDefinition(**init_kwargs)
 
     assert definition1 == definition2
+
+
+@pytest.mark.parametrize(
+    ('init_kwargs', 'expected_resources'),
+    [
+        pytest.param(
+            {},
+            ResourceDefinitions(),
+            id='default',
+        ),
+
+        pytest.param(
+            {'resources': None},
+            ResourceDefinitions(),
+            id='none',
+        ),
+
+        pytest.param(
+            {'resources': {}},
+            ResourceDefinitions(),
+            id='empty_dict',
+        ),
+
+        pytest.param(
+            {'resources': []},
+            ResourceDefinitions(),
+            id='empty_list',
+        ),
+    ],
+)
+def test_dataset_definition_resources_init_expected(init_kwargs, expected_resources):
+    definition = DatasetDefinition(**init_kwargs)
+    assert definition.resources == expected_resources
 
 
 @pytest.mark.parametrize(
@@ -217,25 +250,7 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
                 'column_map': {},
                 'custom_read_kwargs': {},
                 'distance_column': None,
-                'experiment': {
-                    'eyetracker': {
-                        'left': None,
-                        'model': None,
-                        'mount': None,
-                        'right': None,
-                        'sampling_rate': None,
-                        'vendor': None,
-                        'version': None,
-                    },
-                    'screen': {
-                        'distance_cm': None,
-                        'height_cm': None,
-                        'height_px': None,
-                        'origin': None,
-                        'width_cm': None,
-                        'width_px': None,
-                    },
-                },
+                'experiment': None,
                 'extract': None,
                 'filename_format': {},
                 'filename_format_schema_overrides': {},
@@ -923,6 +938,25 @@ def test_dataset_definition_attribute_is_removed(attribute_kwarg):
         f'utils/parsing.py was planned to be removed in v{remove_version}. '
         f'Current version is v{current_version}.'
     )
+
+
+@pytest.mark.parametrize(
+    ('init_kwargs', 'exception', 'exception_msg'),
+    [
+        pytest.param(
+            {'resources': 1},
+            TypeError,
+            'resources is of type int but must be of type ResourceDefinitions, list, or dict.',
+            id='resources_int',
+        ),
+    ],
+)
+def test_dataset_definition_init_raises_exception(init_kwargs, exception, exception_msg):
+    with pytest.raises(exception) as excinfo:
+        DatasetDefinition(**init_kwargs)
+
+    msg, = excinfo.value.args
+    assert msg == exception_msg
 
 
 @pytest.mark.parametrize(

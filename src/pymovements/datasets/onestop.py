@@ -25,7 +25,7 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.resources import Resources
+from pymovements.dataset.resources import ResourceDefinitions
 
 
 @dataclass
@@ -59,7 +59,7 @@ class OneStop(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: Resources
+    resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -111,23 +111,23 @@ class OneStop(DatasetDefinition):
         },
     )
 
-    resources: Resources = field(
-        default_factory=lambda: Resources.from_dict(
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict(
             {
                 'precomputed_events': [
                     {
                         'resource':
-                        'https://osf.io/download/z3xd8/',
+                        'https://osf.io/download/dq935/',
                         'filename': 'fixations_Paragraph.csv.zip',
-                        'md5': 'bb2cb3a43ae15c4da78eb3f0baf434a4',
+                        'md5': '3d3b6a3794a50e174e025f43735674bd',
                         'filename_pattern': 'fixations_Paragraph.csv',
                     },
                 ],
                 'precomputed_reading_measures': [
                     {
-                        'resource': 'https://osf.io/download/d2aew/',
+                        'resource': 'https://osf.io/download/4ajc8/',
                         'filename': 'ia_Paragraph.csv.zip',
-                        'md5': 'cee97f13b113c5675757223238ef1bb4',
+                        'md5': '9b9548e49efdc7dbf63d4f3a5dc3af22',
                         'filename_pattern': 'ia_Paragraph.csv',
                     },
                 ],

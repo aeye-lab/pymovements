@@ -37,7 +37,7 @@ from pymovements.dataset._utils._yaml import reverse_substitute_types
 from pymovements.dataset._utils._yaml import substitute_types
 from pymovements.dataset._utils._yaml import type_constructor
 from pymovements.dataset.resources import _HasResourcesIndexer
-from pymovements.dataset.resources import Resources
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
@@ -66,14 +66,14 @@ class DatasetDefinition:
     mirrors: dict[str, Sequence[str]]
         A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
         (default: {})
-    resources: Resources
+    resources: ResourceDefinitions
         A list of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
-        (default: Resources())
-    experiment: Experiment
-        The experiment definition. (default: Experiment())
+        (default: ResourceDefinitions())
+    experiment: Experiment | None
+        The experiment definition. (default: None)
     extract: dict[str, bool] | None
         Decide whether to extract the data. (default: None)
         .. deprecated:: v0.22.1
@@ -208,6 +208,82 @@ class DatasetDefinition:
         transformations. If not specified, the constant eye-to-screen distance will be taken from
         the experiment definition. This column will be renamed to ``distance``. (default: None)
 
+    Parameters
+    ----------
+    name: str
+        The name of the dataset. (default: '.')
+    long_name: str | None
+        The entire name of the dataset. (default: None)
+    has_files: dict[str, bool] | None
+        Indicate whether the dataset contains 'gaze', 'precomputed_events', and
+        'precomputed_reading_measures'. (default: None)
+    mirrors: dict[str, Sequence[str]] | None
+        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
+        (default: None)
+    resources: ResourceDefinitions | ResourcesLike | None
+        A list of dataset resources. Each list entry must be a dictionary with the following keys:
+        - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
+        - `filename`: The filename under which the file is saved as.
+        - `md5`: The MD5 checksum of the respective file.
+        (default: None)
+    experiment: Experiment | None
+        The experiment definition. (default: None)
+    extract: dict[str, bool] | None
+        Decide whether to extract the data. (default: None)
+    filename_format: dict[str, str] | None
+        Regular expression which will be matched before trying to load the file. Namedgroups will
+        appear in the `fileinfo` dataframe. (default: None)
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
+        If named groups are present in the `filename_format`, this makes it possible to cast
+        specific named groups to a particular datatype. (default: None)
+    custom_read_kwargs: dict[str, dict[str, Any]] | None
+        If specified, these keyword arguments will be passed to the file reading function. The
+        behavior of this argument depends on the file extension of the dataset files.
+        If the file extension is `.csv` the keyword arguments will be passed
+        to :py:func:`polars.read_csv`. If the file extension is`.asc` the keyword arguments
+        will be passed to :py:func:`pymovements.utils.parsing.parse_eyelink`.
+        See Notes for more details on how to use this argument.
+        (default: None)
+    column_map : dict[str, str] | None
+        The keys are the columns to read, the values are the names to which they should be renamed.
+        (default: None)
+    trial_columns: list[str] | None
+            The name of the trial columns in the input data frame. If the list is empty or None,
+            the input data frame is assumed to contain only one trial. If the list is not empty,
+            the input data frame is assumed to contain multiple trials and the transformation
+            methods will be applied to each trial separately. (default: None)
+    time_column: str | None
+        The name of the timestamp column in the input data frame. This column will be renamed to
+        ``time``. (default: None)
+
+    time_unit: str | None
+        The unit of the timestamps in the timestamp column in the input data frame. Supported
+        units are 's' for seconds, 'ms' for milliseconds and 'step' for steps. If the unit is
+        'step' the experiment definition must be specified. All timestamps will be converted to
+        milliseconds. (default: 'ms')
+
+    pixel_columns: list[str] | None
+        The name of the pixel position columns in the input data frame. These columns will be
+        nested into the column ``pixel``. If the list is empty or None, the nested ``pixel``
+        column will not be created. (default: None)
+    position_columns: list[str] | None
+        The name of the dva position columns in the input data frame. These columns will be
+        nested into the column ``position``. If the list is empty or None, the nested
+        ``position`` column will not be created. (default: None)
+    velocity_columns: list[str] | None
+        The name of the velocity columns in the input data frame. These columns will be nested
+        into the column ``velocity``. If the list is empty or None, the nested ``velocity``
+        column will not be created. (default: None)
+    acceleration_columns: list[str] | None
+        The name of the acceleration columns in the input data frame. These columns will be
+        nested into the column ``acceleration``. If the list is empty or None, the nested
+        ``acceleration`` column will not be created. (default: None)
+    distance_column : str | None
+        The name of the column containing eye-to-screen distance in millimeters for each sample
+        in the input data frame. If specified, the column will be used for pixel to dva
+        transformations. If not specified, the constant eye-to-screen distance will be taken from
+        the experiment definition. This column will be renamed to ``distance``. (default: None)
+
     Notes
     -----
     When working with the ``gaze_custom_read_kwargs`` attribute there are specific use cases and
@@ -241,7 +317,7 @@ class DatasetDefinition:
 
     mirrors: dict[str, Sequence[str]] = field(default_factory=dict)
 
-    resources: Resources = field(default_factory=Resources)
+    resources: ResourceDefinitions = field(default_factory=ResourceDefinitions)
 
     experiment: Experiment = field(default_factory=Experiment)
 
@@ -266,8 +342,8 @@ class DatasetDefinition:
             long_name: str | None = None,
             has_files: dict[str, bool] | None = None,
             mirrors: dict[str, Sequence[str]] | None = None,
-            resources: Resources | ResourcesLike | None = None,
-            experiment: Experiment | dict[str, Any] | None = None,
+            resources: ResourceDefinitions | ResourcesLike | None = None,
+            experiment: Experiment | None = None,
             extract: dict[str, bool] | None = None,
             filename_format: dict[str, str] | None = None,
             filename_format_schema_overrides: dict[str, dict[str, type]] | None = None,
@@ -306,6 +382,16 @@ class DatasetDefinition:
         else:
             self.mirrors = mirrors
 
+        if filename_format is None:
+            self.filename_format = {}
+        else:
+            self.filename_format = filename_format
+
+        if filename_format_schema_overrides is None:
+            self.filename_format_schema_overrides = {}
+        else:
+            self.filename_format_schema_overrides = filename_format_schema_overrides
+
         if custom_read_kwargs is None:
             self.custom_read_kwargs = {}
         else:
@@ -315,6 +401,9 @@ class DatasetDefinition:
             self.column_map = {}
         else:
             self.column_map = column_map
+
+        self.resources = self._initialize_resources(resources)
+        self._has_resources = _HasResourcesIndexer(resources=self.resources)
 
         self.experiment = self._initialize_experiment(experiment)
         self.resources = self._initialize_resources(
@@ -331,23 +420,6 @@ class DatasetDefinition:
                     'This field will be removed in v0.27.0.',
                 ),
             )
-        if filename_format is not None:
-            warn(
-                DeprecationWarning(
-                    'DatasetDefinition.filename_format is deprecated since version v0.23.0. '
-                    'Please use Resource.filename_pattern instead. '
-                    'This field will be removed in v0.28.0.',
-                ),
-            )
-        if filename_format_schema_overrides is not None:
-            warn(
-                DeprecationWarning(
-                    'DatasetDefinition.filename_format_schema_overrides is deprecated since version v0.23.0. '
-                    'Please use Resource.filename_pattern_schema_overrides instead. '
-                    'This field will be removed in v0.28.0.',
-                ),
-            )
-
 
     @property
     @deprecated(
@@ -532,7 +604,7 @@ class DatasetDefinition:
         >>> definition.has_resources['precomputed_events']
         False
         """
-        # Resources may have changed, so update indexer before returning.
+        # ResourceDefinitions may have changed, so update indexer before returning.
         # A better way to update the resources would be through a resources setter property.
         self._has_resources.set_resources(self.resources)
         return self._has_resources
@@ -547,17 +619,15 @@ class DatasetDefinition:
 
     def _initialize_resources(
             self,
-            resources: Resources | ResourcesLike | None,
+            resources: ResourceDefinitions | ResourcesLike | None,
             filename_format: dict[str, str],
             filename_format_schema_overrides: dict[str, dict[str, type]] | None,
-    ) -> Resources:
-        """Initailize ``Resources`` instance if necessary."""
-        if isinstance(resources, Resources):
+    ) -> ResourceDefinitions:
+        """Initialize ``ResourceDefinitions`` instance if necessary."""
+        if isinstance(resources, ResourceDefinitions):
             return resources
-
         if resources is None:
-            return Resources()
-
+            return ResourceDefinitions()
         if isinstance(resources, dict):
             if filename_format:
                 for content_type in filename_format.keys():
@@ -569,20 +639,11 @@ class DatasetDefinition:
                     for resource in resources[content_type]:
                         content_overrides = filename_format_schema_overrides[content_type]
                         resource['filename_pattern_schema_overrides'] = content_overrides
-
-            return Resources.from_dict(resources)
-
+            return ResourceDefinitions.from_dict(resources)
         if isinstance(resources, Sequence):
             assert isinstance(resources, Sequence)
-            return Resources.from_dicts(resources)
-        raise TypeError()
-
-    def __post_init__(self) -> None:
-        """Handle special attributes."""
-        if self.extract is not None:
-            warn(
-                DeprecationWarning(
-                    'DatasetDefinition.extract is deprecated since version v0.22.1. '
-                    'This field will be removed in v0.27.0.',
-                ),
-            )
+            return ResourceDefinitions.from_dicts(resources)
+        raise TypeError(
+            f'resources is of type {type(resources).__name__} but must be of type'
+            ' ResourceDefinitions, list, or dict.',
+        )

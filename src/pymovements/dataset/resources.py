@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Resources and Resource module."""
+"""ResourceDefinitions and ResourceDefinition module."""
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -29,8 +29,8 @@ from typing import Any
 
 
 @dataclass
-class Resource:
-    """Resource definition."""
+class ResourceDefinition:
+    """ResourceDefinition definition."""
 
     content: str
 
@@ -42,7 +42,7 @@ class Resource:
     md5: str | None = None
 
     @staticmethod
-    def from_dict(dictionary: dict[str, Any]) -> Resource:
+    def from_dict(dictionary: dict[str, Any]) -> ResourceDefinition:
         """Create a ``Resource`` instance from a dictionary.
 
         Parameters
@@ -52,7 +52,7 @@ class Resource:
 
         Returns
         -------
-        Resource
+        ResourceDefinition
             An initialized ``Resource`` instance.
         """
         if 'resource' in dictionary:
@@ -60,10 +60,10 @@ class Resource:
             dictionary = {key: value for key, value in dictionary.items() if key != 'resource'}
             dictionary['url'] = url
 
-        return Resource(**dictionary)
+        return ResourceDefinition(**dictionary)
 
     def to_dict(self, *, exclude_none: bool = True) -> dict[str, Any]:
-        """Convert the ``Resource`` instance into a dictionary.
+        """Convert the ``ResourceDefinition`` instance into a dictionary.
 
         Parameters
         ----------
@@ -75,7 +75,7 @@ class Resource:
         Returns
         -------
         dict[str, Any]
-            ``dict`` representation of ``Resource``.
+            ``dict`` representation of ``ResourceDefinition``.
         """
         data = asdict(self)
 
@@ -88,17 +88,17 @@ class Resource:
         return data
 
 
-class Resources(list):
-    """List of ``Resource`` instances."""
+class ResourceDefinitions(list):
+    """List of ``ResourceDefinition`` instances."""
 
-    def __init__(self, resources: Iterable[Resource] | None = None) -> None:
+    def __init__(self, resources: Iterable[ResourceDefinition] | None = None) -> None:
         if resources is None:
             super().__init__([])
         else:
             super().__init__(resources)
 
-    def filter(self, content: str | None = None) -> Resources:
-        """Filter ``Resources`` for content type.
+    def filter(self, content: str | None = None) -> ResourceDefinitions:
+        """Filter ``ResourceDefinitions`` for content type.
 
         Parameters
         ----------
@@ -107,71 +107,70 @@ class Resources(list):
 
         Returns
         -------
-        Resources
-            A new ``Resources`` instance that contains only resources of specified content type.
+        ResourceDefinitions
+            A new ``ResourceDefinitions`` instance that contains only resources of the specified
+            content type.
         """
         if content is None:
             return self
 
         resources = [resource for resource in self if resource.content == content]
-        return Resources(resources)
+        return ResourceDefinitions(resources)
 
     @staticmethod
     def from_dict(
         dictionary: dict[str, Sequence[dict[str, Any]]] | None,
-    ) -> Resources:
-        """Create a ``Resources`` instance from a dictionary of lists of dictionaries.
+    ) -> ResourceDefinitions:
+        """Create a ``ResourceDefinitions`` instance from a dictionary of lists of dictionaries.
 
         Parameters
         ----------
         dictionary : dict[str, Sequence[dict[str, Any]]] | None
-            A list of dictionaries containing ``Resource`` parameters.
+            A list of dictionaries containing ``ResourceDefinition`` parameters.
 
         Returns
         -------
-        Resources
-            An initialized ``Resources`` instance.
+        ResourceDefinitions
+            An initialized ``ResourceDefinitions`` instance.
         """
         if dictionary is None:
-            return Resources()
+            return ResourceDefinitions()
 
         resources = []
         for content_type, content_dictionaries in dictionary.items():
             if not content_dictionaries:
                 continue
             for content_dictionary in content_dictionaries:
-                _dictionary: dict[str, Any] = {
-                    key: deepcopy(value) for key, value in content_dictionary.items()
-                }
+                _dictionary = deepcopy(content_dictionary)
                 _dictionary['content'] = content_type
-                resource = Resource.from_dict(_dictionary)
+                resource = ResourceDefinition.from_dict(_dictionary)
                 resources.append(resource)
 
-        return Resources(resources)
+        return ResourceDefinitions(resources)
 
     @staticmethod
-    def from_dicts(dictionaries: Sequence[dict[str, Any]] | None) -> Resources:
-        """Create a ``Resources`` instance from a list of dictionaries.
+    def from_dicts(dictionaries: Sequence[dict[str, Any]] | None) -> ResourceDefinitions:
+        """Create a ``ResourceDefinitions`` instance from a list of dictionaries.
 
         Parameters
         ----------
         dictionaries : Sequence[dict[str, Any]] | None
-            A list of dictionaries containing ``Resource`` parameters.
+            A list of dictionaries containing ``ResourceDefinition`` parameters.
 
         Returns
         -------
-        Resources
-            An initialized ``Resources`` instance.
+        ResourceDefinitions
+            An initialized ``ResourceDefinitions`` instance.
         """
         if dictionaries is None:
-            return Resources()
+            return ResourceDefinitions()
 
-        resources = [Resource.from_dict(dictionary) for dictionary in dictionaries]
+        resources = [ResourceDefinition.from_dict(dictionary) for dictionary in dictionaries]
 
-        return Resources(resources)
+        return ResourceDefinitions(resources)
 
     def to_dicts(self, *, exclude_none: bool = True) -> list[dict[str, Any]]:
-        """Convert the ``Resources`` instance into a list of dictionaries.
+        """Convert the ``ResourceDefinitions`` instance into a list of dictionaries.
 
         Parameters
         ----------
@@ -183,12 +182,12 @@ class Resources(list):
         Returns
         -------
         list[dict[str, Any]]
-            ``Resource`` as a list of dictionaries.
+            ``ResourceDefinition`` as a list of dictionaries.
         """
         return [resource.to_dict(exclude_none=exclude_none) for resource in self]
 
     def has_content(self, content: str) -> bool:
-        """Check if any ``Resource`` has specific content.
+        """Check if any ``ResourceDefinition`` has specific content.
 
         Parameters
         ----------
@@ -198,7 +197,7 @@ class Resources(list):
         Returns
         -------
         bool
-            ``True`` if contains ``Resource`` of specific content type.
+            ``True`` if contains ``ResourceDefinition`` of specific content type.
         """
         return any(resource.content == content for resource in self)
 
@@ -210,10 +209,10 @@ class _HasResourcesIndexer:
     :py:meth:`~pymovements.dataset.DatasetDefinition.resources`.
     """
 
-    def __init__(self, resources: Resources) -> None:
+    def __init__(self, resources: ResourceDefinitions) -> None:
         self._resources = resources
 
-    def set_resources(self, resources: Resources) -> None:
+    def set_resources(self, resources: ResourceDefinitions) -> None:
         """Set dataset definition resources for lookup."""
         self._resources = resources
 

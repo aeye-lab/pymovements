@@ -25,7 +25,7 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.resources import Resources
+from pymovements.dataset.resources import ResourceDefinitions
 
 
 @dataclass
@@ -52,7 +52,7 @@ class UCL(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: Resources
+    resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -106,8 +106,8 @@ class UCL(DatasetDefinition):
         },
     )
 
-    resources: Resources = field(
-        default_factory=lambda: Resources.from_dict({
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict({
             'precomputed_events': [
                 {
                     'resource': 'https://static-content.springer.com/esm/art%3A10.3758%2Fs13428-012-0313-y/MediaObjects/13428_2012_313_MOESM1_ESM.zip',  # noqa: E501 # pylint: disable=line-too-long
