@@ -294,7 +294,7 @@ class GazeDataFrame:
         ----------
         by: Sequence[str]
             Column name(s) to split the DataFrame by. If a single string is provided,
-            it will be used as a single column name. If a list is provided, the DataFrame
+            it will be used as a single column name. If a sequence is provided, the DataFrame
             will be split by unique combinations of values in all specified columns.
 
         Returns
@@ -303,15 +303,27 @@ class GazeDataFrame:
             A list of new GazeDataFrame instances, each containing a partition of the
             original data with all metadata and configurations preserved.
         """
+        # Convert single string to list for consistent handling
+        by = [by] if isinstance(by, str) else by
+        frames = self.frame.partition_by(by=by)
+
+        # Check if all columns in 'by' are in events columns
+        events_list = (
+            self.events.split(by)
+            if all(col in self.events.columns for col in by)
+            else [pm.EventDataFrame()] * len(frames)
+        )
+
         return [
             GazeDataFrame(
-                new_frame,
+                frame,
                 experiment=self.experiment,
                 trial_columns=self.trial_columns,
                 time_column='time',
                 distance_column='distance',
+                events=events,
             )
-            for new_frame in self.frame.partition_by(by=by)
+            for frame, events in zip(frames, events_list)
         ]
 
     def transform(
@@ -1227,6 +1239,7 @@ class GazeDataFrame:
         gaze = GazeDataFrame(
             data=self.frame.clone(),
             experiment=deepcopy(self.experiment),
+            events=self.events.copy(),
         )
         gaze.n_components = self.n_components
         return gaze

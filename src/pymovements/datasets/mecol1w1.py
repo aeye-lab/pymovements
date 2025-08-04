@@ -25,6 +25,7 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import ResourceDefinitions
 
 
 @dataclass
@@ -50,7 +51,7 @@ class MECOL1W1(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: dict[str, list[dict[str, str]]]
+    resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -109,23 +110,25 @@ class MECOL1W1(DatasetDefinition):
         },
     )
 
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda: {
-            'precomputed_events': [
-                {
-                    'resource': 'https://osf.io/download/67dc6027920cab9abae48b83/',
-                    'filename': 'joint_l1_fixation_version1.3.rda',
-                    'md5': '3c969a930a71cd62c67b936426dd079b',
-                },
-            ],
-            'precomputed_reading_measures': [
-                {
-                    'resource': 'https://osf.io/download/n5pvh/',
-                    'filename': 'sentence_data_version1.3.csv',
-                    'md5': '609f82b6f45b7c98a0769c6ce14ee6e9',
-                },
-            ],
-        },
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict(
+            {
+                'precomputed_events': [
+                    {
+                        'resource': 'https://osf.io/download/67dc6027920cab9abae48b83/',
+                        'filename': 'joint_l1_fixation_version1.3.rda',
+                        'md5': '3c969a930a71cd62c67b936426dd079b',
+                    },
+                ],
+                'precomputed_reading_measures': [
+                    {
+                        'resource': 'https://osf.io/download/n5pvh/',
+                        'filename': 'sentence_data_version1.3.csv',
+                        'md5': '609f82b6f45b7c98a0769c6ce14ee6e9',
+                    },
+                ],
+            },
+        ),
     )
 
     filename_format: dict[str, str] = field(

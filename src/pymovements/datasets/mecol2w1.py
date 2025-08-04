@@ -25,6 +25,7 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import ResourceDefinitions
 
 
 @dataclass
@@ -50,7 +51,7 @@ class MECOL2W1(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: dict[str, list[dict[str, str]]]
+    resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -109,23 +110,25 @@ class MECOL2W1(DatasetDefinition):
         },
     )
 
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda: {
-            'precomputed_events': [
-                {
-                    'resource': 'https://osf.io/download/8rygu/',
-                    'filename': 'joint_l2_fixation_trimmed_report_2.0.rda',
-                    'md5': '1ff32c5823eb70c22bab725499fbbf87',
-                },
-            ],
-            'precomputed_reading_measures': [
-                {
-                    'resource': 'https://osf.io/download/re7uy/',
-                    'filename': 'joint_data_l2_trimmed_version2.0.rda',
-                    'md5': '3d10225781faf413467104dcc4e071e0',
-                },
-            ],
-        },
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict(
+            {
+                'precomputed_events': [
+                    {
+                        'resource': 'https://osf.io/download/8rygu/',
+                        'filename': 'joint_l2_fixation_trimmed_report_2.0.rda',
+                        'md5': '1ff32c5823eb70c22bab725499fbbf87',
+                    },
+                ],
+                'precomputed_reading_measures': [
+                    {
+                        'resource': 'https://osf.io/download/re7uy/',
+                        'filename': 'joint_data_l2_trimmed_version2.0.rda',
+                        'md5': '3d10225781faf413467104dcc4e071e0',
+                    },
+                ],
+            },
+        ),
     )
 
     filename_format: dict[str, str] = field(

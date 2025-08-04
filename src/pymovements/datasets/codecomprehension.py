@@ -27,6 +27,7 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import ResourceDefinitions
 
 
 @dataclass
@@ -51,7 +52,7 @@ class CodeComprehension(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: dict[str, list[dict[str, str]]]
+    resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -105,16 +106,18 @@ class CodeComprehension(DatasetDefinition):
         },
     )
 
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda: {
-            'precomputed_events': [
-                {
-                    'resource': 'https://zenodo.org/records/11123101/files/Predicting%20Code%20Comprehension%20Package.zip?download=1',  # noqa: E501 # pylint: disable=line-too-long
-                    'filename': 'data.zip',
-                    'md5': '3a3c6fb96550bc2c2ddcf5d458fb12a2',
-                },
-            ],
-        },
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict(
+            {
+                'precomputed_events': [
+                    {
+                        'resource': 'https://zenodo.org/records/11123101/files/Predicting%20Code%20Comprehension%20Package.zip?download=1',  # noqa: E501 # pylint: disable=line-too-long
+                        'filename': 'data.zip',
+                        'md5': '3a3c6fb96550bc2c2ddcf5d458fb12a2',
+                    },
+                ],
+            },
+        ),
     )
 
     filename_format: dict[str, str] = field(

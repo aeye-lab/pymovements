@@ -294,17 +294,14 @@ class Experiment:
         dict[str, Any | dict[str, str | float | None]]
             Experiment as dictionary.
         """
-        _dict: dict[str, dict[str, str | float | None]] = {}
-        if exclude_none:
-            if self.screen:
-                _dict['screen'] = self.screen.to_dict(exclude_none=exclude_none)
-            if self.eyetracker:
-                _dict['eyetracker'] = self.eyetracker.to_dict(exclude_none=exclude_none)
-        else:
-            _dict['screen'] = self.screen.to_dict(exclude_none=False)
-            _dict['eyetracker'] = self.eyetracker.to_dict(exclude_none=False)
+        data: dict[str, dict[str, str | float | None]] = {}
 
-        return _dict
+        if self.eyetracker or not exclude_none:
+            data['eyetracker'] = self.eyetracker.to_dict(exclude_none=exclude_none)
+        if self.screen or not exclude_none:
+            data['screen'] = self.screen.to_dict(exclude_none=exclude_none)
+
+        return data
 
     def __str__(self: Experiment) -> str:
         """Return Experiment string."""

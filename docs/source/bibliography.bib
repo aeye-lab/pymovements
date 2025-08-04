@@ -392,6 +392,25 @@ doi = {10.1016/j.dib.2021.106909}
     doi = {10.3758/s13428-012-0313-y},
 }
 
+@inproceedings{Gaze4Hate,
+    title = "Eyes Don`t Lie: Subjective Hate Annotation and Detection with Gaze",
+    author = {Alacam, {\"O}zge  and
+      Hoeken, Sanne  and
+      Zarrie{\ss}, Sina},
+    editor = "Al-Onaizan, Yaser  and
+      Bansal, Mohit  and
+      Chen, Yun-Nung",
+    booktitle = "Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing",
+    month = nov,
+    year = "2024",
+    address = "Miami, Florida, USA",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2024.emnlp-main.11/",
+    doi = "10.18653/v1/2024.emnlp-main.11",
+    pages = "187--205",
+    abstract = "Hate speech is a complex and subjective phenomenon. In this paper, we present a dataset (GAZE4HATE) that provides gaze data collected in a hate speech annotation experiment. We study whether the gaze of an annotator provides predictors of their subjective hatefulness rating, and how gaze features can improve Hate Speech Detection (HSD). We conduct experiments on statistical modeling of subjective hate ratings and gaze and analyze to what extent rationales derived from hate speech models correspond to human gaze and explanations in our data. Finally, we introduce MEANION, a first gaze-integrated HSD model. Our experiments show that particular gaze features like dwell time or fixation counts systematically correlate with annotators' subjective hate ratings and improve predictions of text-only hate speech models."
+}
+
 @inproceedings{PotsdamBingePVT,
     author = {
         Prasse, Paul and
@@ -452,6 +471,40 @@ doi={10.3758/s13428-021-01772-6}
     pages={1–19}
 }
 
+@inproceedings{IITB_HGC,
+    title = "Eyes Show the Way: Modelling Gaze Behaviour for Hallucination Detection",
+    author = "Maharaj, Kishan  and
+      Saxena, Ashita  and
+      Kumar, Raja  and
+      Mishra, Abhijit  and
+      Bhattacharyya, Pushpak",
+    editor = "Bouamor, Houda  and
+      Pino, Juan  and
+      Bali, Kalika",
+    booktitle = "Findings of the Association for Computational Linguistics: EMNLP 2023",
+    month = dec,
+    year = "2023",
+    address = "Singapore",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2023.findings-emnlp.764/",
+    doi = "10.18653/v1/2023.findings-emnlp.764",
+    pages = "11424--11438",
+    abstract = "Detecting hallucinations in natural language processing (NLP) is a critical undertaking that demands a deep understanding of both the semantic and pragmatic aspects of languages. Cognitive approaches that leverage users' behavioural signals, such as gaze, have demonstrated effectiveness in addressing NLP tasks with similar linguistic complexities. However, their potential in the context of hallucination detection remains largely unexplored. In this paper, we propose a novel cognitive approach for hallucination detection that leverages gaze signals from humans. We first collect and introduce an eye tracking corpus (IITB-HGC: IITB-Hallucination Gaze corpus) consisting of 500 instances, annotated by five annotators for hallucination detection. Our analysis reveals that humans selectively attend to relevant parts of the text based on distributional similarity, similar to the attention bias phenomenon in psychology. We identify two attention strategies employed by humans: global attention, which focuses on the most informative sentence, and local attention, which focuses on important words within a sentence. Leveraging these insights, we propose a novel cognitive framework for hallucination detection that incorporates these attention biases. Experimental evaluations on the FactCC dataset demonstrate the efficacy of our approach, obtaining a balanced accuracy of 87.1{\%}. Our study highlights the potential of gaze-based approaches in addressing the task of hallucination detection and sheds light on the cognitive processes employed by humans in identifying inconsistencies."
+}
+
+@article{ChineseReading,
+  title = {The database of eye-movement measures on words in {Chinese} reading},
+  volume = {9},
+  number={1},
+  ISSN = {2052–4463},
+  DOI = {10.1038/s41597-022-01464-6},
+  journal = {Scientific Data},
+  publisher = {Springer Science and Business Media LLC},
+  author = {Zhang,  Guangyao and Yao,  Panpan and Ma,  Guojie and Wang,  Jingwen and Zhou,  Junyi and Huang,  Linjieqiong and Xu,  Pingping and Chen,  Lijing and Chen,  Songlin and Gu,  Junjuan and Wei,  Wei and Cheng,  Xi and Hua,  Huimin and Liu,  Pingping and Lou,  Ya and Shen,  Wei and Bao,  Yaqian and Liu,  Jiayu and Lin,  Nan and Li,  Xingshan},
+  year = {2022},
+  pages={1-8}
+}
+
 @inproceedings{CoLAGaze,
     author = {Bondar, Anna and Reich, David R. and J\"{a}ger, Lena A.},
     title = {CoLAGaze: A Corpus of Eye Movements for Linguistic Acceptability},
@@ -472,4 +525,17 @@ doi={10.3758/s13428-021-01772-6}
     author={Berzak, Yevgeni and Malmaud, Jonathan and Shubi, Omer and Meiri, Yoav and Lion, Ella and Levy, Roger},
     journal={PsyArXiv preprint},
     year={2025}
+}
+
+@InProceedings{ETDD70,
+    author={Sedmidubsky, Jan and Dostalova, Nicol and Svaricek, Roman and Culemann, Wolf},
+    editor={Ch{\'a}vez, Edgar and Kimia, Benjamin and Loko{\v{c}}, Jakub and Patella, Marco and Sedmidubsky, Jan},
+    title="ETDD70: Eye-Tracking Dataset for Classification of Dyslexia Using AI-Based Methods",
+    booktitle="Similarity Search and Applications",
+    year="2025",
+    publisher="Springer Nature Switzerland",
+    address="Cham",
+    pages="34--48",
+    abstract="Dyslexia, a specific learning disorder, poses challenges in reading and language processing. Traditional diagnostic methods often rely on subjective assessments, leading to inaccuracies and delays in intervention. This work proposes classifying dyslexia using AI-based methods applied to eye-tracking data captured during text reading tasks. To facilitate future research in this domain, we collect a novel dataset (ETDD70) comprising eye-tracking recordings of 70 individuals for three reading tasks. In particular, the dataset contains high-frequency and accurate time series of 2D positions of eye movements and many derived characteristics extracted from eye movement patterns. By leveraging similarity-search approaches and deep learning models, we demonstrate the utility of such data in training several classification models, the best of which can distinguish between dyslexic and non-dyslexic individuals with an accuracy of around 90 {\%}. Both the dataset and evaluated models provide a valuable resource for researchers to further advance AI-based methods for dyslexia classification.",
+    isbn="978-3-031-75823-2"
 }

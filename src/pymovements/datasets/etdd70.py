@@ -17,14 +17,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides a definition for the PoTeC dataset."""
+"""Provides a definition for the ETDD70 dataset."""
 from __future__ import annotations
 
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
-
-import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.resources import ResourceDefinitions
@@ -32,26 +30,20 @@ from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
-class PoTeC(DatasetDefinition):
-    """PoTeC dataset :cite:p:`PoTeC`.
+class ETDD70(DatasetDefinition):
+    """Eye-Tracking Dyslexia Dataset (ETDD70) :cite:p:`ETDD70`.
 
-    The Potsdam Textbook Corpus (PoTeC) is a naturalistic eye-tracking-while-reading
-    corpus containing data from 75 participants reading 12 scientific texts.
-    PoTeC is the first naturalistic eye-tracking-while-reading corpus that contains
-    eye-movements from domain-experts as well as novices in a within-participant
-    manipulation: It is based on a 2×2×2 fully-crossed factorial design which includes
-    the participants' level of study and the participants' discipline of study as
-    between-subject factors and the text domain as a within-subject factor. The
-    participants' reading comprehension was assessed by a series of text comprehension
-    questions and their domain knowledge was tested by text-independent
-    background questions for each of the texts. The materials are annotated for a
-    variety of linguistic features at different levels. We envision PoTeC to be used
-    for a wide range of studies including but not limited to analyses of expert and
-    non-expert reading strategies.
+    This dataset includes binocular eye tracking data from 70 Czech children age 9-10.
+    Eye movements are recorded at a sampling frequency of 250 Hz eye tracker and
+    precomputed events are reported.
 
-    The corpus and all the accompanying data at all
-    stages of the preprocessing pipeline and all code used to preprocess the data are
-    made available via `GitHub. <https://github.com/DiLi-Lab/PoTeC>`_
+    Each participant is instructed to read three texts:
+        - Task called Syllables contains 90 syllables arranged in a 9 x 10 matrix
+        - Task called MeaningfulText consists of a passage about
+          a young boy who watches a squirrel from his window.
+        - Task called PseudoText comprises fictional, meaningless words.
+
+    Check the respective paper for details :cite:p:`ETDD70`.
 
     Attributes
     ----------
@@ -104,11 +96,11 @@ class PoTeC(DatasetDefinition):
     Examples
     --------
     Initialize your :py:class:`~pymovements.dataset.Dataset` object with the
-    :py:class:`~pymovements.datasets.PoTeC` definition:
+    :py:class:`~pymovements.datasets.ETDD70` definition:
 
     >>> import pymovements as pm
     >>>
-    >>> dataset = pm.Dataset("PoTeC", path='data/PoTeC')
+    >>> dataset = pm.Dataset("ETDD70", path='data/ETDD70')
 
     Download the dataset resources:
 
@@ -122,15 +114,15 @@ class PoTeC(DatasetDefinition):
     # pylint: disable=similarities
     # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
 
-    name: str = 'PoTeC'
+    name: str = 'ETDD70'
 
-    long_name: str = 'Potsdam Textbook Corpus'
+    long_name: str = 'Eye-Tracking Dyslexia Dataset'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
             'gaze': True,
             'precomputed_events': True,
-            'precomputed_reading_measures': True,
+            'precomputed_reading_measures': False,
         },
     )
 
@@ -139,23 +131,16 @@ class PoTeC(DatasetDefinition):
             {
                 'gaze': [
                     {
-                        'resource': 'https://osf.io/download/tgd9q/',
-                        'filename': 'PoTeC.zip',
-                        'md5': 'cffd45039757c3777e2fd130e5d8a2ad',
+                        'resource': 'https://zenodo.org/api/records/13332134/files-archive',
+                        'filename': 'edd_raw.zip',
+                        'md5': None,  # type: ignore
                     },
                 ],
                 'precomputed_events': [
                     {
-                        'resource': 'https://osf.io/download/d8pyg/',
-                        'filename': 'fixation.zip',
-                        'md5': 'ecd9a998d07158922bb9b8cdd52f5688',
-                    },
-                ],
-                'precomputed_reading_measures': [
-                    {
-                        'resource': 'https://osf.io/download/3ywhz/',
-                        'filename': 'reading_measures.zip',
-                        'md5': 'efafec5ce074d8f492cc2409b6c4d9eb',
+                        'resource': 'https://zenodo.org/api/records/13332134/files-archive',
+                        'filename': 'edd_fix.zip',
+                        'md5': None,  # type: ignore
                     },
                 ],
             },
@@ -166,37 +151,28 @@ class PoTeC(DatasetDefinition):
         default_factory=lambda: Experiment(
             screen_width_px=1680,
             screen_height_px=1050,
-            screen_width_cm=47.5,
-            screen_height_cm=30,
-            distance_cm=65,
-            origin='upper left',
-            sampling_rate=1000,
+            screen_width_cm=None,
+            screen_height_cm=None,
+            distance_cm=65,  # in the paper it is written (60-70cm)
+            origin='center',
+            sampling_rate=250,
         ),
     )
 
     filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze': r'reader{subject_id:d}_{text_id}_raw_data.tsv',
-            'precomputed_events': r'reader{subject_id:d}_{text_id}_uncorrected_fixations.tsv',
-            'precomputed_reading_measures': r'reader{subject_id:d}_{text_id}_merged.tsv',
-        },
+        default_factory=lambda:
+            {
+                'gaze': r'Subject_{subject_id:d}_{task:s}_raw.csv',
+                'precomputed_events': r'Subject_{subject_id:d}_{task:s}_fixations.csv',
+            },
     )
 
     filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'subject_id': int,
-                'text_id': str,
+        default_factory=lambda:
+            {
+                'gaze': {},
+                'precomputed_events': {},
             },
-            'precomputed_events': {
-                'subject_id': int,
-                'text_id': str,
-            },
-            'precomputed_reading_measures': {
-                'subject_id': int,
-                'text_id': str,
-            },
-        },
     )
 
     time_column: str = 'time'
@@ -205,29 +181,14 @@ class PoTeC(DatasetDefinition):
 
     pixel_columns: list[str] = field(
         default_factory=lambda: [
-            'x', 'y',
+            'gaze_x_left', 'gaze_y_left', 'gaze_x_right', 'gaze_y_right',
         ],
     )
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'schema_overrides': {
-                    'time': pl.Int64,
-                    'x': pl.Float32,
-                    'y': pl.Float32,
-                    'pupil_diameter': pl.Float32,
-                },
-                'separator': '\t',
+        default_factory=lambda:
+            {
+                'gaze': {},
+                'precomputed_events': {},
             },
-            'precomputed_events': {
-                'separator': '\t',
-                'null_values': '.',
-            },
-            'precomputed_reading_measures': {
-                'separator': '\t',
-                'null_values': '.',
-                'infer_schema_length': 10000,
-            },
-        },
     )
