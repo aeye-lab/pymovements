@@ -237,6 +237,8 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
                     },
                 },
                 'extract': None,
+                'filename_format': {},
+                'filename_format_schema_overrides': {},
                 'mirrors': {},
                 'pixel_columns': None,
                 'position_columns': None,
@@ -299,6 +301,8 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
                     },
                 },
                 'extract': None,
+                'filename_format': {},
+                'filename_format_schema_overrides': {},
                 'mirrors': {},
                 'pixel_columns': None,
                 'position_columns': None,
@@ -349,6 +353,8 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
                     },
                 },
                 'extract': None,
+                'filename_format': {},
+                'filename_format_schema_overrides': {},
                 'mirrors': {},
                 'pixel_columns': None,
                 'position_columns': None,
@@ -392,6 +398,8 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
                     },
                 },
                 'extract': None,
+                'filename_format': {},
+                'filename_format_schema_overrides': {},
                 'mirrors': {},
                 'pixel_columns': None,
                 'position_columns': None,
@@ -760,6 +768,8 @@ def test_dataset_definition_not_equal():
                     },
                 },
                 'extract': None,
+                'filename_format': {},
+                'filename_format_schema_overrides': {},
                 'custom_read_kwargs': {},
                 'column_map': {},
                 'trial_columns': None,
@@ -783,7 +793,7 @@ def test_dataset_definition_not_equal():
                 'has_files': {},
                 'mirrors': {},
                 'resources': [],
-                'experiment': {
+                'experiment':  {
                     'eyetracker': {
                         'left': None,
                         'model': None,
@@ -803,6 +813,8 @@ def test_dataset_definition_not_equal():
                     },
                 },
                 'extract': None,
+                'filename_format': {},
+                'filename_format_schema_overrides': {},
                 'custom_read_kwargs': {},
                 'column_map': {},
                 'trial_columns': None,
@@ -846,6 +858,8 @@ def test_dataset_definition_not_equal():
                     },
                 },
                 'extract': None,
+                'filename_format': {},
+                'filename_format_schema_overrides': {},
                 'custom_read_kwargs': {},
                 'column_map': {},
                 'trial_columns': None,
@@ -866,7 +880,7 @@ def test_dataset_to_dict_exclude_none(dataset_definition, exclude_none, expected
 
 
 @pytest.mark.parametrize(
-    'init_kwargs',
+    'attribute_kwarg',
     [
         pytest.param(
             {'extract': True},
@@ -878,13 +892,13 @@ def test_dataset_to_dict_exclude_none(dataset_definition, exclude_none, expected
         ),
     ],
 )
-def test_dataset_definition_init_parameter_is_deprecated(init_kwargs):
+def test_dataset_definition_attribute_is_deprecated(attribute_kwarg):
     with pytest.raises(DeprecationWarning):
-        DatasetDefinition(**init_kwargs)
+        DatasetDefinition(**attribute_kwarg)
 
 
 @pytest.mark.parametrize(
-    'init_kwargs',
+    'attribute_kwarg',
     [
         pytest.param(
             {'extract': True},
@@ -896,9 +910,9 @@ def test_dataset_definition_init_parameter_is_deprecated(init_kwargs):
         ),
     ],
 )
-def test_dataset_definition_parameter_is_removed(init_kwargs):
+def test_dataset_definition_attribute_is_removed(attribute_kwarg):
     with pytest.raises(DeprecationWarning) as info:
-        DatasetDefinition(**init_kwargs)
+        DatasetDefinition(**attribute_kwarg)
 
     regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
 

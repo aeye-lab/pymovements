@@ -409,6 +409,13 @@ def test_event_dataframe_copy():
     assert_frame_equal(events.frame, events_copy.frame)
 
 
+def test_event_dataframe_copies_trial_columns():
+    events = pm.EventDataFrame(data=pl.DataFrame({'trial': 'trial'}), trial_columns='trial')
+    events_copy = events.copy()
+
+    assert events.trial_columns == events_copy.trial_columns
+
+
 @pytest.mark.parametrize(
     ('events', 'kwargs', 'expected_df'),
     [
@@ -486,3 +493,66 @@ def test_event_dataframe_add_trial_column_raises_exception(events, kwargs, excep
         events.add_trial_column(**kwargs)
 
     assert message == excinfo.value.args[0]
+
+
+def test_eventdataframe_split():
+    event_df = pm.EventDataFrame(
+        pl.DataFrame(
+            {
+                'trial_id': [0, 1, 1, 2],
+                'name': ['fixation', 'fixation', 'fixation', 'fixation'],
+                'onset': [0, 1, 2, 3],
+                'offset': [1, 2, 44, 1340],
+                'duration': [1, 1, 42, 1337],
+            },
+        ),
+    )
+
+    split_event = event_df.split('trial_id')
+    assert all(event_df.frame.n_unique('trial_id') == 1 for event_df in split_event)
+    assert len(split_event) == 3
+    assert_frame_equal(event_df.frame.filter(pl.col('trial_id') == 0), split_event[0].frame)
+    assert_frame_equal(event_df.frame.filter(pl.col('trial_id') == 1), split_event[1].frame)
+    assert_frame_equal(event_df.frame.filter(pl.col('trial_id') == 2), split_event[2].frame)
+
+
+def test_eventdataframe_split_by_str():
+    event_df = pm.EventDataFrame(
+        pl.DataFrame(
+            {
+                'trial_id': [0, 1, 1, 2],
+                'name': ['fixation', 'fixation', 'fixation', 'fixation'],
+                'onset': [0, 1, 2, 3],
+                'offset': [1, 2, 44, 1340],
+                'duration': [1, 1, 42, 1337],
+            },
+        ),
+        trial_columns='trial_id',
+    )
+
+    split_event = event_df.split('trial_id')
+    assert all(event_df.frame.n_unique('trial_id') == 1 for event_df in split_event)
+    assert len(split_event) == 3
+    assert_frame_equal(event_df.frame.filter(pl.col('trial_id') == 0), split_event[0].frame)
+    assert_frame_equal(event_df.frame.filter(pl.col('trial_id') == 1), split_event[1].frame)
+    assert_frame_equal(event_df.frame.filter(pl.col('trial_id') == 2), split_event[2].frame)
+
+
+def test_eventdataframe_split_by_list():
+    event_df = pm.EventDataFrame(
+        pl.DataFrame(
+            {
+                'trial_ida': [0, 1, 1, 2],
+                'trial_idb': [0, 1, 2, 3],
+                'name': ['fixation', 'fixation', 'fixation', 'fixation'],
+                'onset': [0, 1, 2, 3],
+                'offset': [1, 2, 44, 1340],
+                'duration': [1, 1, 42, 1337],
+            },
+        ),
+        trial_columns=['trial_ida', 'trial_idb'],
+    )
+
+    split_event = event_df.split(['trial_ida', 'trial_idb'])
+    assert all(event_df.frame.n_unique(['trial_ida', 'trial_idb']) == 1 for event_df in split_event)
+    assert len(split_event) == 4

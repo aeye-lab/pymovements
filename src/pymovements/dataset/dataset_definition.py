@@ -576,3 +576,13 @@ class DatasetDefinition:
             assert isinstance(resources, Sequence)
             return Resources.from_dicts(resources)
         raise TypeError()
+
+    def __post_init__(self) -> None:
+        """Handle special attributes."""
+        if self.extract is not None:
+            warn(
+                DeprecationWarning(
+                    'DatasetDefinition.extract is deprecated since version v0.22.1. '
+                    'This field will be removed in v0.27.0.',
+                ),
+            )

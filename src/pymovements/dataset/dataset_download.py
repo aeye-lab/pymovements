@@ -81,6 +81,9 @@ def download_dataset(
     RuntimeError
         If downloading a resource failed for all given mirrors.
     """
+    if not definition.resources:
+        raise AttributeError('resources must be specified to download dataset.')
+
     for content in ('gaze', 'precomputed_events', 'precomputed_reading_measures'):
         if definition.has_files[content]:
             if not definition.mirrors:
@@ -149,8 +152,8 @@ def extract_dataset(
         if definition.has_files[content]:
             destination_dirpath = getattr(paths, content_directory)
             destination_dirpath.mkdir(parents=True, exist_ok=True)
-            for resource in definition.resources.filter(content):
-                source_path = paths.downloads / resource.filename
+            for resource in definition.resources[content]:
+                source_path = paths.downloads / resource['filename']
 
                 try:
                     extract_archive(
@@ -163,7 +166,7 @@ def extract_dataset(
                         verbose=verbose,
                     )
                 except UnknownFileType:  # just copy file to target if not an archive.
-                    shutil.copy(source_path, destination_dirpath / resource.filename)
+                    shutil.copy(source_path, destination_dirpath / resource['filename'])
 
 
 def _download_resources(

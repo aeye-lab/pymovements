@@ -9,21 +9,21 @@ ci:
 
 repos:
 -   repo: https://github.com/asottile/add-trailing-comma
-    rev: v3.1.0
+    rev: v3.2.0
     hooks:
     -   id: add-trailing-comma
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v3.19.1
+    rev: v3.20.0
     hooks:
     -   id: pyupgrade
         args: [--py39-plus]
 -   repo: https://github.com/asottile/reorder-python-imports
-    rev: v3.14.0
+    rev: v3.15.0
     hooks:
     -   id: reorder-python-imports
         args: [--application-directories=src, --py39-plus]
 -   repo: https://github.com/asottile/reorder-python-imports
-    rev: v3.14.0
+    rev: v3.15.0
     hooks:
     -   id: reorder-python-imports
         files: ^src/
@@ -68,7 +68,7 @@ repos:
     -   id: nbqa-pyupgrade
         args: ["--py39-plus"]
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.15.0
+    rev: v1.17.0
     hooks:
     -   id: mypy
         additional_dependencies: [pandas-stubs, types-tqdm, types-PyYAML]
@@ -99,11 +99,11 @@ repos:
     hooks:
     -   id: autoflake
 -   repo: https://github.com/PyCQA/doc8
-    rev: v1.1.2
+    rev: v2.0.0
     hooks:
     -   id: doc8
 -   repo: https://github.com/PyCQA/flake8
-    rev: 7.2.0
+    rev: 7.3.0
     hooks:
     -   id: flake8
 -   repo: https://github.com/pycqa/pydocstyle
@@ -149,3 +149,12 @@ repos:
             '--disable=protected-access',
             '--rcfile=pylintrc',
           ]
+-   repo: local
+    hooks:
+      - id: write-datasets-yaml
+        name: write-datasets-yaml
+        entry: python src/pymovements/_scripts/write_datasets_yaml.py
+        language: python
+        verbose: true
+        additional_dependencies:
+        - pyyaml

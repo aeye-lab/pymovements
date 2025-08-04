@@ -1398,5 +1398,5 @@ def test_dataset_download_no_precomputed_rm_resources_raises_exception(tmp_path)
 
     msg, = excinfo.value.args
 
-    expected_msg = "'precomputed_reading_measures' resources must be specified to download dataset."
+    expected_msg = 'resources must be specified to download dataset.'
     assert msg == expected_msg
