@@ -53,10 +53,6 @@ experiment:
     vendor: "Pupil Labs"
     mount: "Wearable"
 
-trial_columns:
-  - "trial_id"
-  - "subject_id"
-
 time_column: "eyelink_timestamp"
 
 time_unit: "ms"

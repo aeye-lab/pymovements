@@ -204,12 +204,7 @@ class PotsdamBingeWearablePVT(DatasetDefinition):
         ),
     )
 
-    trial_columns: list[str] = field(
-        default_factory=lambda: [
-            'trial_id',
-            'subject_id',
-        ],
-    )
+    trial_columns: list[str] | None = None
 
     time_column: str = 'eyelink_timestamp'
 
