@@ -144,7 +144,7 @@ class DIDEC(DatasetDefinition):
                         'participant': int,
                         'session': int,
                         'trial': int,
-                        },
+                    },
                 },
             ],
         ),
