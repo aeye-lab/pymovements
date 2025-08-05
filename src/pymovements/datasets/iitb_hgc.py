@@ -57,11 +57,11 @@ class IITB_HGC(DatasetDefinition):
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -128,7 +128,7 @@ class IITB_HGC(DatasetDefinition):
 
     filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None | None = None
 
     trial_columns: list[str] = field(
         default_factory=lambda: [
