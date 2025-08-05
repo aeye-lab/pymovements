@@ -1020,3 +1020,26 @@ def test_dataset_definition_get_attribute_is_deprecated(definition, attribute):
 def test_dataset_definition_set_attribute_is_deprecated(definition, attribute, value):
     with pytest.warns(DeprecationWarning):
         setattr(definition, attribute, value)
+
+
+@pytest.mark.parametrize(
+    'attribute',
+    [
+        'filename_format',
+        'filename_format_schema_overrides',
+    ],
+)
+def test_dataset_definition_get_attribute_is_removed(attribute):
+    definition = DatasetDefinition()
+    with pytest.raises(DeprecationWarning) as info:
+        getattr(definition, attribute)
+
+    regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
+
+    msg = info.value.args[0]
+    remove_version = regex.match(msg).groupdict()['version']
+    current_version = __version__.split('+')[0]
+    assert current_version < remove_version, (
+        f'DatasetDefinition.{attribute} was planned to be removed in v{remove_version}. '
+        f'Current version is v{current_version}.'
+    )
