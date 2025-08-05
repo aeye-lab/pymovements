@@ -2093,3 +2093,26 @@ def test_load_split_gaze(gaze_dataset_configuration, by, expected_len):
     dataset.load()
     dataset.split_gaze_data(by)
     assert len(dataset.gaze) == expected_len
+
+
+def test_two_resources_same_content_different_filename_pattern(tmp_path):
+    definition = DatasetDefinition(
+        name='example',
+        resources=[
+            {'content': 'precomputed_events', 'filename_pattern': 'foo.csv'},
+            {'content': 'precomputed_events', 'filename_pattern': 'bar.csv'},
+        ],
+    )
+
+    dirpath = tmp_path / 'precomputed_events'
+    dirpath.mkdir()
+
+    # create empty files
+    open(dirpath / 'foo.csv', 'a').close()
+    open(dirpath / 'bar.csv', 'a').close()
+
+    dataset = Dataset(definition=definition, path=tmp_path)
+
+    dataset.scan()
+
+    assert dataset.fileinfo['precomputed_events']['filepath'].to_list() == ['foo.csv', 'bar.csv']
