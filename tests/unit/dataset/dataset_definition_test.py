@@ -455,6 +455,7 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
     assert yaml_definition == expected_definition
 
 
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
 @pytest.mark.parametrize(
     ('resources', 'expected_has_resources'),
     [
@@ -529,6 +530,7 @@ def test_dataset_definition_has_resources_boolean(resources, expected_has_resour
     assert not (not definition.has_resources and expected_has_resources)
 
 
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
 @pytest.mark.parametrize(
     ('resources', 'expected_resources'),
     [
@@ -623,7 +625,8 @@ def test_dataset_definition_has_resources_indexable(resources, expected_resource
         assert definition.has_resources[key] == value
 
 
-def test_dataset_definition_not_equal():
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+def test_dataset_definition_has_resources_not_equal():
     definition1 = DatasetDefinition(resources={'gaze': [{'resource': 'foo'}]})
     definition2 = DatasetDefinition(resources={})
 
@@ -808,6 +811,10 @@ def test_dataset_definition_attribute_is_deprecated(attribute_kwarg):
             {'extract': False},
             id='extract_false',
         ),
+        pytest.param(
+            {'has_files': {'gaze': True}},
+            id='has_files',
+        ),
     ],
 )
 def test_dataset_definition_attribute_is_removed(attribute_kwarg):
@@ -819,8 +826,9 @@ def test_dataset_definition_attribute_is_removed(attribute_kwarg):
     msg = info.value.args[0]
     remove_version = regex.match(msg).groupdict()['version']
     current_version = __version__.split('+')[0]
+    attribute_name = list(attribute_kwarg.keys())[0]
     assert current_version < remove_version, (
-        f'utils/parsing.py was planned to be removed in v{remove_version}. '
+        f'{attribute_name} is scheduled to be removed in v{remove_version}. '
         f'Current version is v{current_version}.'
     )
 
@@ -1002,3 +1010,13 @@ def test_dataset_definition_get_attribute_is_removed(attribute):
         f'DatasetDefinition.{attribute} was planned to be removed in v{remove_version}. '
         f'Current version is v{current_version}.'
     )
+
+
+def test_add_single_definition():
+    class CustomDatasetDefinition(DatasetDefinition):
+        name: str = 'CustomDatasetDefinition'
+
+    if CustomDatasetDefinition():
+        print('a')
+
+

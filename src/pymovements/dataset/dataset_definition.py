@@ -24,6 +24,7 @@ from collections.abc import Sequence
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
+from operator import eq
 from pathlib import Path
 from typing import Any
 from typing import Union
@@ -60,7 +61,7 @@ class DatasetDefinition:
         The name of the dataset. (default: '.')
     long_name: str | None
         The entire name of the dataset. (default: None)
-    has_files: dict[str, bool]
+    has_files: dict[str, bool] | None
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
     mirrors: dict[str, Sequence[str]]
@@ -230,8 +231,6 @@ class DatasetDefinition:
     name: str = '.'
 
     long_name: str | None = None
-
-    has_files: dict[str, bool] = field(default_factory=dict)
 
     mirrors: dict[str, Sequence[str]] = field(default_factory=dict)
 
@@ -527,7 +526,7 @@ class DatasetDefinition:
 
     @property
     @deprecated(
-        reason='Please specify Resource.filename_pattern instead. '
+        reason='Please use DatasetDefinition.resources.has_content() instead. '
                'This field will be removed in v0.28.0.',
         version='v0.23.0',
     )

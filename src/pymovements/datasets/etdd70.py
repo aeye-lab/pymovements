@@ -53,7 +53,7 @@ class ETDD70(DatasetDefinition):
     long_name: str
         The entire name of the dataset.
 
-    has_files: dict[str, bool]
+    has_files: dict[str, bool] | None
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
@@ -117,14 +117,6 @@ class ETDD70(DatasetDefinition):
     name: str = 'ETDD70'
 
     long_name: str = 'Eye-Tracking Dyslexia Dataset'
-
-    has_files: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': True,
-            'precomputed_reading_measures': False,
-        },
-    )
 
     resources: ResourceDefinitions = field(
         default_factory=lambda: ResourceDefinitions.from_dict(
