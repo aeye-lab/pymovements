@@ -258,10 +258,7 @@ def fixture_dataset_init_kwargs(request):
 
 
 def test_dataset_save_load_preprocessed(dataset):
-    try:
-        dataset.load()
-    except BaseException:
-        breakpoint()
+    dataset.load()
 
     if 'pixel' in dataset.gaze[0].frame.columns:
         dataset.pix2deg()

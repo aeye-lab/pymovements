@@ -130,9 +130,9 @@ def test_dataset_definition_is_equal(init_kwargs):
             },
             ResourceDefinitions([
                 ResourceDefinition(
-                    content='gaze', filename_pattern='{subject_id:d}.csv', filename_pattern_schema_overrides={
-                        'subject_id': int,
-                    },
+                    content='gaze',
+                    filename_pattern='{subject_id:d}.csv',
+                    filename_pattern_schema_overrides={'subject_id': int},
                 ),
             ]),
             id='single_gaze_resource_filename_format_schema_overrides_legacy',
@@ -911,6 +911,6 @@ def test_dataset_definition_get_attribute_is_deprecated(definition, attribute):
         ),
     ],
 )
-def test_dataset_definition_get_attribute_is_deprecated(definition, attribute, value):
+def test_dataset_definition_set_attribute_is_deprecated(definition, attribute, value):
     with pytest.raises(DeprecationWarning):
         setattr(definition, attribute, value)

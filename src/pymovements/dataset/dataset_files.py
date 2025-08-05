@@ -41,7 +41,7 @@ from pymovements.gaze.io import from_ipc
 from pymovements.reading_measures import ReadingMeasures
 
 
-def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataFrame:
+def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> dict[str, pl.DataFrame]:
     """Infer information from filepaths and filenames.
 
     Parameters
@@ -53,8 +53,8 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
 
     Returns
     -------
-    pl.DataFrame
-        File information dataframe.
+    dict[str, pl.DataFrame]
+        File information dataframe for each content type.
 
     Raises
     ------
@@ -64,7 +64,7 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
         If an error occurred during matching filenames or no files have been found.
     """
     # Get all filepaths that match regular expression.
-    _fileinfo_dicts = {}
+    _fileinfo_dicts: dict[str, pl.DataFrame] = {}
 
     for resource_definition in definition.resources:
         content = resource_definition.content

@@ -546,7 +546,7 @@ class DatasetDefinition:
     def _initialize_resources(
             self,
             resources: ResourceDefinitions | ResourcesLike | None,
-            filename_format: dict[str, str],
+            filename_format: dict[str, str] | None,
             filename_format_schema_overrides: dict[str, dict[str, type]] | None,
     ) -> ResourceDefinitions:
         """Initialize ``ResourceDefinitions`` instance if necessary."""
