@@ -885,6 +885,80 @@ def test_dataset_definition_init_raises_exception(init_kwargs, exception, except
     assert msg == exception_msg
 
 
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+@pytest.mark.parametrize(
+    ('definition', 'expected'),
+    [
+        pytest.param(
+            DatasetDefinition(
+                resources=[{'content': 'gaze', 'filename_pattern': 'abc'}],
+            ),
+            {'gaze': 'abc'},
+            id='single_gaze',
+        ),
+    ],
+)
+def test_dataset_definition_get_filename_format_expected(definition, expected):
+    assert definition.filename_format == expected
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+@pytest.mark.parametrize(
+    ('definition', 'new_value', 'expected'),
+    [
+        pytest.param(
+            DatasetDefinition(
+                resources=[{'content': 'gaze', 'filename_pattern': 'abc'}],
+            ),
+            {'gaze': 'def'},
+            ResourceDefinitions([ResourceDefinition(content='gaze', filename_pattern='def')]),
+            id='single_gaze',
+        ),
+    ],
+)
+def test_dataset_definition_set_filename_format_expected(definition, new_value, expected):
+    definition.filename_format = new_value
+    assert definition.resources == expected
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+@pytest.mark.parametrize(
+    ('definition', 'expected'),
+    [
+        pytest.param(
+            DatasetDefinition(
+                resources=[{'content': 'gaze', 'filename_pattern_schema_overrides': {'a': int}}],
+            ),
+            {'gaze': {'a': int}},
+            id='single_gaze',
+        ),
+    ],
+)
+def test_dataset_definition_filename_get_format_schema_expected(definition, expected):
+    assert definition.filename_format_schema_overrides == expected
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+@pytest.mark.parametrize(
+    ('definition', 'new_value', 'expected'),
+    [
+        pytest.param(
+            DatasetDefinition(
+                resources=[{'content': 'gaze', 'filename_pattern_schema_overrides': {'a': int}}],
+            ),
+            {'gaze': {'b': str}},
+            ResourceDefinitions(
+                [ResourceDefinition(content='gaze', filename_pattern_schema_overrides={'b': str})],
+            ),
+            id='single_gaze',
+        ),
+    ],
+)
+def test_dataset_definition_set_filename_format_schema_expected(definition, new_value, expected):
+    definition.filename_format_schema_overrides = new_value
+    assert definition.resources == expected
+
+
 @pytest.mark.parametrize(
     ('definition', 'attribute'),
     [
