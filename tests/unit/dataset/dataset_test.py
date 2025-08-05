@@ -2108,8 +2108,10 @@ def test_two_resources_same_content_different_filename_pattern(tmp_path):
     dirpath.mkdir()
 
     # create empty files
-    open(dirpath / 'foo.csv', 'a').close()
-    open(dirpath / 'bar.csv', 'a').close()
+    with open(dirpath / 'foo.csv', 'a') as f:
+        f.close()
+    with open(dirpath / 'bar.csv', 'a') as f:
+        f.close()
 
     dataset = Dataset(definition=definition, path=tmp_path)
 
@@ -2126,5 +2128,5 @@ def test_unsupported_content_type(tmp_path):
     dataset = Dataset(definition=definition, path=tmp_path)
 
     expected_msg = 'content type foobar is not supported'
-    with pytest.warns(UserWarning, match=expected_msg) as record:
+    with pytest.warns(UserWarning, match=expected_msg):
         dataset.scan()

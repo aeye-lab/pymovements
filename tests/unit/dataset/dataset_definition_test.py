@@ -912,7 +912,21 @@ def test_dataset_definition_get_filename_format_expected(definition, expected):
             ),
             {'gaze': 'def'},
             ResourceDefinitions([ResourceDefinition(content='gaze', filename_pattern='def')]),
-            id='single_gaze',
+            id='gaze_resource',
+        ),
+        pytest.param(
+            DatasetDefinition(
+                resources=[
+                    {'content': 'gaze', 'filename_pattern': 'abc'},
+                    {'content': 'precomputed_events', 'filename_pattern': 'cba'},
+                ],
+            ),
+            {'gaze': 'def'},
+            ResourceDefinitions([
+                ResourceDefinition(content='gaze', filename_pattern='def'),
+                ResourceDefinition(content='precomputed_events', filename_pattern='cba'),
+            ]),
+            id='two_resources',
         ),
     ],
 )
@@ -950,7 +964,25 @@ def test_dataset_definition_filename_get_format_schema_expected(definition, expe
             ResourceDefinitions(
                 [ResourceDefinition(content='gaze', filename_pattern_schema_overrides={'b': str})],
             ),
-            id='single_gaze',
+            id='gaze_resource',
+        ),
+        pytest.param(
+            DatasetDefinition(
+                resources=[
+                    {'content': 'gaze', 'filename_pattern_schema_overrides': {'a': int}},
+                    {'content': 'precomputed_events'},
+                ],
+            ),
+            {'gaze': {'b': str}},
+            ResourceDefinitions(
+                [
+                    ResourceDefinition(
+                        content='gaze', filename_pattern_schema_overrides={'b': str},
+                    ),
+                    ResourceDefinition(content='precomputed_events'),
+                ],
+            ),
+            id='two_resources',
         ),
     ],
 )

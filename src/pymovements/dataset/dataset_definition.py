@@ -352,7 +352,8 @@ class DatasetDefinition:
         for content_type in content_types:
             content_resources = self.resources.filter(content=content_type)
             if content_resources:
-                assert len(content_resources) == 1
+                # take first resource with matching content type.
+                # deprecated property supports only one value per content type.
                 data[content_type] = content_resources[0].filename_pattern
         return data
 
@@ -393,7 +394,8 @@ class DatasetDefinition:
         for content_type in content_types:
             content_resources = self.resources.filter(content=content_type)
             if content_resources:
-                assert len(content_resources) == 1
+                # take first resource with matching content type.
+                # deprecated property supports only one dict per content type.
                 data[content_type] = content_resources[0].filename_pattern_schema_overrides
         return data
 
