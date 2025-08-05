@@ -63,6 +63,14 @@ class HBN(DatasetDefinition):
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
+    filename_format: dict[str, str]
+        Regular expression which will be matched before trying to load the file. Namedgroups will
+        appear in the `fileinfo` dataframe.
+
+    filename_format_schema_overrides: dict[str, dict[str, type]]
+        If named groups are present in the `filename_format`, this makes it possible to cast
+        specific named groups to a particular datatype.
+
     experiment: Experiment
         The experiment definition.
 
@@ -150,6 +158,10 @@ class HBN(DatasetDefinition):
             sampling_rate=120,
         ),
     )
+
+    filename_format: dict[str, str] | None = None
+
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     time_column: str = 'time'
 
