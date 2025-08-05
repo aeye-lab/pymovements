@@ -27,7 +27,7 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.resources import Resources
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
@@ -56,7 +56,7 @@ class MouseCursor(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: Resources
+    resources: ResourceDefinitions
         A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -66,11 +66,11 @@ class MouseCursor(DatasetDefinition):
     experiment: Experiment
         The experiment definition.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -129,14 +129,18 @@ class MouseCursor(DatasetDefinition):
 
     has_files: dict[str, bool] | None = None
 
-    resources: Resources = field(
-        default_factory=lambda: Resources.from_dict(
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict(
             {
                 'gaze': [
                     {
                         'resource': 'https://ars.els-cdn.com/content/image/1-s2.0-S2352340921000160-mmc1.zip',  # noqa: E501 # pylint: disable=line-too-long
                         'filename': 'mousecursor.zip',
                         'md5': '7885e8fd44f14f02f60e9f62431aea63',
+                        'filename_pattern': r'Experiment {experiment_id:d}.csv',
+                        'filename_pattern_schema_overrides': {
+                            'experiment_id': int,
+                        },
                     },
                 ],
             },
@@ -158,19 +162,9 @@ class MouseCursor(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze': r'Experiment {experiment_id:d}.csv',
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'experiment_id': int,
-            },
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     trial_columns: list[str] = field(default_factory=lambda: ['Trial', 'Participant'])
 

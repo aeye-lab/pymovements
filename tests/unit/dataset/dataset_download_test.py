@@ -29,7 +29,7 @@ import pytest
 from pymovements import Dataset
 from pymovements import DatasetDefinition
 from pymovements import DatasetPaths
-from pymovements import Resources
+from pymovements import ResourceDefinitions
 
 
 @pytest.fixture(
@@ -1177,64 +1177,158 @@ def test_dataset_download_default_extract_precomputed(
 
 
 @pytest.mark.parametrize(
-    'dataset_definition',
+    ('dataset_definition', 'expected_exception', 'expected_msg_prefix'),
     [
-        DatasetDefinition(
-            name='CustomPublicDataset',
-            has_files={
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            resources=Resources.from_dict({
-                'gaze': [{
-                    'resource': 'test.gz.tar',
-                    'filename': 'test.gz.tar',
-                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                }],
-            }),
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                has_files={
+                    'gaze': True,
+                    'precomputed_events': False,
+                    'precomputed_reading_measures': False,
+                },
+                mirrors={'gaze': ['https://example.com/']},
+                resources=ResourceDefinitions.from_dict({
+                    'gaze': [{
+                        'resource': None,
+                        'filename': 'test.gz.tar',
+                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                    }],
+                }),
+            ),
+            AttributeError,
+            'Resource.url must not be None',
+            id='mirrors_url_none',
         ),
-        DatasetDefinition(
-            name='CustomPublicDataset',
-            has_files={
-                'gaze': False,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
-            resources=Resources.from_dict({
-                'precomputed_events': [{
-                    'resource': 'test.gz.tar',
-                    'filename': 'test.gz.tar',
-                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                }],
-            }),
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                has_files={
+                    'gaze': True,
+                    'precomputed_events': False,
+                    'precomputed_reading_measures': False,
+                },
+                mirrors={'gaze': ['https://example.com/']},
+                resources=ResourceDefinitions.from_dict({
+                    'gaze': [{
+                        'resource': 'https://example.com/test.gz.tar',
+                        'filename': None,
+                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                    }],
+                }),
+            ),
+            AttributeError,
+            'Resource.filename must not be None',
+            id='mirrors_filename_none',
         ),
-        DatasetDefinition(
-            name='CustomPublicDataset',
-            has_files={
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': True,
-            },
-            resources=Resources.from_dict({
-                'precomputed_reading_measures': [{
-                    'resource': 'test.gz.tar',
-                    'filename': 'test.gz.tar',
-                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                }],
-            }),
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                has_files={
+                    'gaze': True,
+                    'precomputed_events': False,
+                    'precomputed_reading_measures': False,
+                },
+                resources=ResourceDefinitions.from_dict({
+                    'gaze': [{
+                        'resource': None,
+                        'filename': 'test.gz.tar',
+                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                    }],
+                }),
+            ),
+            AttributeError,
+            'Resource.url must not be None',
+            id='no_mirrors_url_none',
+        ),
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                has_files={
+                    'gaze': True,
+                    'precomputed_events': False,
+                    'precomputed_reading_measures': False,
+                },
+                resources=ResourceDefinitions.from_dict({
+                    'gaze': [{
+                        'resource': 'https://example.com/test.gz.tar',
+                        'filename': None,
+                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                    }],
+                }),
+            ),
+            AttributeError,
+            'Resource.filename must not be None',
+            id='no_mirrors_filename_none',
+        ),
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                has_files={
+                    'gaze': True,
+                    'precomputed_events': False,
+                    'precomputed_reading_measures': False,
+                },
+                resources=ResourceDefinitions.from_dict({
+                    'gaze': [{
+                        'resource': 'test.gz.tar',
+                        'filename': 'test.gz.tar',
+                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                    }],
+                }),
+            ),
+            ValueError,
+            'unknown url type: ',
+            id='no_mirrors_no_http_resource_gaze',
+        ),
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                has_files={
+                    'gaze': False,
+                    'precomputed_events': True,
+                    'precomputed_reading_measures': False,
+                },
+                resources=ResourceDefinitions.from_dict({
+                    'precomputed_events': [{
+                        'resource': 'test.gz.tar',
+                        'filename': 'test.gz.tar',
+                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                    }],
+                }),
+            ),
+            ValueError,
+            'unknown url type: ',
+            id='no_mirrors_no_http_resource_events',
+        ),
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                has_files={
+                    'gaze': False,
+                    'precomputed_events': False,
+                    'precomputed_reading_measures': True,
+                },
+                resources=ResourceDefinitions.from_dict({
+                    'precomputed_reading_measures': [{
+                        'resource': 'test.gz.tar',
+                        'filename': 'test.gz.tar',
+                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                    }],
+                }),
+            ),
+            ValueError,
+            'unknown url type: ',
+            id='no_mirrors_no_http_resource_measures',
         ),
     ],
 )
-def test_dataset_download_no_mirrors_no_http_resource_raises_exception(
-        dataset_definition, tmp_path,
+def test_dataset_download_raises_exception(
+        dataset_definition, expected_exception, expected_msg_prefix, tmp_path,
 ):
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(expected_exception) as excinfo:
         Dataset(dataset_definition, path=tmp_path).download()
-
     msg, = excinfo.value.args
-
-    expected_msg_prefix = 'unknown url type: '
     assert msg.startswith(expected_msg_prefix)
 
 
@@ -1300,9 +1394,6 @@ def test_public_dataset_registered_correct_attributes(tmp_path, dataset_definiti
     assert dataset.definition.mirrors == dataset_definition.mirrors
     assert dataset.definition.resources == dataset_definition.resources
     assert dataset.definition.experiment == dataset_definition.experiment
-    assert dataset.definition.filename_format == dataset_definition.filename_format
-    assert dataset.definition.filename_format_schema_overrides \
-        == dataset_definition.filename_format_schema_overrides
 
 
 def test_extract_dataset_precomputed_move_single_file(tmp_path):

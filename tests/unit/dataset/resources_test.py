@@ -20,8 +20,8 @@
 """Test dataset resources."""
 import pytest
 
-from pymovements import Resource
-from pymovements import Resources
+from pymovements import ResourceDefinition
+from pymovements import ResourceDefinitions
 
 
 @pytest.mark.parametrize(
@@ -56,38 +56,38 @@ from pymovements import Resources
     ],
 )
 def test_resource_is_equal(kwargs):
-    assert Resource(**kwargs) == Resource(**kwargs)
+    assert ResourceDefinition(**kwargs) == ResourceDefinition(**kwargs)
 
 
 @pytest.mark.parametrize(
     ('resource1', 'resource2'),
     [
         pytest.param(
-            Resource(content='gaze', filename='test1.csv'),
-            Resource(content='gaze', filename='test2.csv'),
+            ResourceDefinition(content='gaze', filename='test1.csv'),
+            ResourceDefinition(content='gaze', filename='test2.csv'),
             id='different_filename',
         ),
 
         pytest.param(
-            Resource(content='gaze', filename='test.csv'),
-            Resource(content='precomputed_events', filename='test.csv'),
+            ResourceDefinition(content='gaze', filename='test.csv'),
+            ResourceDefinition(content='precomputed_events', filename='test.csv'),
             id='different_content',
         ),
 
         pytest.param(
-            Resource(content='gaze', filename='test.csv', url='https://example.com'),
-            Resource(content='gaze', filename='test.csv', url='https://examples.com'),
+            ResourceDefinition(content='gaze', filename='test.csv', url='https://example.com'),
+            ResourceDefinition(content='gaze', filename='test.csv', url='https://examples.com'),
             id='different_url',
         ),
 
         pytest.param(
-            Resource(
+            ResourceDefinition(
                 content='gaze',
                 filename='test.csv',
                 url='https://example.com',
                 md5='abcdefgh',
             ),
-            Resource(
+            ResourceDefinition(
                 content='gaze',
                 filename='test.csv',
                 url='https://example.com',
@@ -108,7 +108,7 @@ def test_resource_is_not_equal(resource1, resource2):
             {
                 'content': 'gaze',
             },
-            Resource(
+            ResourceDefinition(
                 content='gaze',
                 filename=None,
                 url=None,
@@ -122,7 +122,7 @@ def test_resource_is_not_equal(resource1, resource2):
                 'content': 'gaze',
                 'filename': 'test.csv',
             },
-            Resource(
+            ResourceDefinition(
                 content='gaze',
                 filename='test.csv',
                 url=None,
@@ -137,7 +137,7 @@ def test_resource_is_not_equal(resource1, resource2):
                 'filename': 'test.csv',
                 'url': 'https://example.com',
             },
-            Resource(
+            ResourceDefinition(
                 content='gaze',
                 filename='test.csv',
                 url='https://example.com',
@@ -153,7 +153,7 @@ def test_resource_is_not_equal(resource1, resource2):
                 'url': 'https://example.com',
                 'md5': 'abcdefgh',
             },
-            Resource(
+            ResourceDefinition(
                 content='gaze',
                 filename='test.csv',
                 url='https://example.com',
@@ -168,7 +168,7 @@ def test_resource_is_not_equal(resource1, resource2):
                 'filename': 'test.csv',
                 'resource': 'https://example.com',
             },
-            Resource(
+            ResourceDefinition(
                 content='gaze',
                 filename='test.csv',
                 url='https://example.com',
@@ -182,7 +182,7 @@ def test_resource_is_not_equal(resource1, resource2):
                 'content': 'gaze',
                 'filename_pattern': 'test.csv',
             },
-            Resource(
+            ResourceDefinition(
                 content='gaze',
                 filename=None,
                 url=None,
@@ -198,7 +198,7 @@ def test_resource_is_not_equal(resource1, resource2):
                 'filename_pattern': '{subject_id:d}.csv',
                 'filename_pattern_schema_overrides': {'subject_id': int},
             },
-            Resource(
+            ResourceDefinition(
                 content='gaze',
                 filename=None,
                 url=None,
@@ -212,7 +212,7 @@ def test_resource_is_not_equal(resource1, resource2):
     ],
 )
 def test_resource_from_dict_expected(resource_dict, expected_resource):
-    assert Resource.from_dict(resource_dict) == expected_resource
+    assert ResourceDefinition.from_dict(resource_dict) == expected_resource
 
 
 @pytest.mark.parametrize(
@@ -220,7 +220,7 @@ def test_resource_from_dict_expected(resource_dict, expected_resource):
     [
         pytest.param(
             None,
-            Resources(),
+            ResourceDefinitions(),
             id='none',
         ),
 
@@ -228,7 +228,7 @@ def test_resource_from_dict_expected(resource_dict, expected_resource):
             {
                 'gaze': None,
             },
-            Resources(),
+            ResourceDefinitions(),
             id='none_gaze_list',
         ),
 
@@ -236,7 +236,7 @@ def test_resource_from_dict_expected(resource_dict, expected_resource):
             {
                 'gaze': [],
             },
-            Resources(),
+            ResourceDefinitions(),
             id='empty_gaze_list',
         ),
 
@@ -244,9 +244,9 @@ def test_resource_from_dict_expected(resource_dict, expected_resource):
             {
                 'gaze': [{'filename': 'myfile.txt'}],
             },
-            Resources(
+            ResourceDefinitions(
                 [
-                    Resource(filename='myfile.txt', content='gaze'),
+                    ResourceDefinition(filename='myfile.txt', content='gaze'),
                 ],
             ),
             id='single_gaze_resource',
@@ -256,10 +256,10 @@ def test_resource_from_dict_expected(resource_dict, expected_resource):
             {
                 'gaze': [{'filename': 'myfile1.zip'}, {'filename': 'myfile2.zip'}],
             },
-            Resources(
+            ResourceDefinitions(
                 [
-                    Resource(filename='myfile1.zip', content='gaze'),
-                    Resource(filename='myfile2.zip', content='gaze'),
+                    ResourceDefinition(filename='myfile1.zip', content='gaze'),
+                    ResourceDefinition(filename='myfile2.zip', content='gaze'),
                 ],
             ),
             id='two_gaze_resources',
@@ -269,9 +269,9 @@ def test_resource_from_dict_expected(resource_dict, expected_resource):
             {
                 'precomputed_events': [{'filename': 'myevents.csv'}],
             },
-            Resources(
+            ResourceDefinitions(
                 [
-                    Resource(filename='myevents.csv', content='precomputed_events'),
+                    ResourceDefinition(filename='myevents.csv', content='precomputed_events'),
                 ],
             ),
             id='single_precomputed_events_resource',
@@ -281,9 +281,9 @@ def test_resource_from_dict_expected(resource_dict, expected_resource):
             {
                 'precomputed_reading_measures': [{'filename': 'reading_measures.csv'}],
             },
-            Resources(
+            ResourceDefinitions(
                 [
-                    Resource(
+                    ResourceDefinition(
                         filename='reading_measures.csv',
                         content='precomputed_reading_measures',
                     ),
@@ -295,22 +295,22 @@ def test_resource_from_dict_expected(resource_dict, expected_resource):
     ],
 )
 def test_resources_from_dict_expected(init_resources, expected_resources):
-    assert Resources.from_dict(init_resources) == expected_resources
+    assert ResourceDefinitions.from_dict(init_resources) == expected_resources
 
 
 @pytest.mark.parametrize(
     ('resources', 'expected_dicts'),
     [
         pytest.param(
-            Resources(),
+            ResourceDefinitions(),
             [],
             id='default',
         ),
 
         pytest.param(
-            Resources(
+            ResourceDefinitions(
                 [
-                    Resource(filename='myfile.txt', content='gaze'),
+                    ResourceDefinition(filename='myfile.txt', content='gaze'),
                 ],
             ),
             [
@@ -320,10 +320,10 @@ def test_resources_from_dict_expected(init_resources, expected_resources):
         ),
 
         pytest.param(
-            Resources(
+            ResourceDefinitions(
                 [
-                    Resource(filename='myfile1.zip', content='gaze'),
-                    Resource(filename='myfile2.zip', content='gaze'),
+                    ResourceDefinition(filename='myfile1.zip', content='gaze'),
+                    ResourceDefinition(filename='myfile2.zip', content='gaze'),
                 ],
             ),
             [
@@ -334,9 +334,9 @@ def test_resources_from_dict_expected(init_resources, expected_resources):
         ),
 
         pytest.param(
-            Resources(
+            ResourceDefinitions(
                 [
-                    Resource(filename='myevents.csv', content='precomputed_events'),
+                    ResourceDefinition(filename='myevents.csv', content='precomputed_events'),
                 ],
             ),
             [
@@ -346,9 +346,9 @@ def test_resources_from_dict_expected(init_resources, expected_resources):
         ),
 
         pytest.param(
-            Resources(
+            ResourceDefinitions(
                 [
-                    Resource(
+                    ResourceDefinition(
                         filename='reading_measures.csv',
                         content='precomputed_reading_measures',
                     ),
@@ -373,53 +373,57 @@ def test_resources_to_dicts_expected(resources, expected_dicts):
     ('resources', 'content_type', 'expected_resources'),
     [
         pytest.param(
-            Resources(),
+            ResourceDefinitions(),
             None,
             [],
             id='default_filter_none',
         ),
 
         pytest.param(
-            Resources(),
+            ResourceDefinitions(),
             'gaze',
             [],
             id='default_filter_gaze',
         ),
 
         pytest.param(
-            Resources.from_dicts([{'filename': 'myfile.txt', 'content': 'gaze'}]),
+            ResourceDefinitions.from_dicts([{'filename': 'myfile.txt', 'content': 'gaze'}]),
             'gaze',
             [
-                Resource(filename='myfile.txt', content='gaze'),
+                ResourceDefinition(filename='myfile.txt', content='gaze'),
             ],
             id='single_gaze_filter_gaze',
         ),
 
         pytest.param(
-            Resources.from_dicts([{'filename': 'myfile.txt', 'content': 'gaze'}]),
+            ResourceDefinitions.from_dicts([{'filename': 'myfile.txt', 'content': 'gaze'}]),
             'precomputed_events',
             [],
             id='single_gaze_filter_precomputed_events',
         ),
 
         pytest.param(
-            Resources.from_dicts([{'filename': 'events.csv', 'content': 'precomputed_events'}]),
+            ResourceDefinitions.from_dicts(
+                [{'filename': 'events.csv', 'content': 'precomputed_events'}],
+            ),
             'precomputed_events',
             [
-                Resource(filename='events.csv', content='precomputed_events'),
+                ResourceDefinition(filename='events.csv', content='precomputed_events'),
             ],
             id='single_precomputed_events_filter_precomputed_events',
         ),
 
         pytest.param(
-            Resources.from_dicts([{'filename': 'events.csv', 'content': 'precomputed_events'}]),
+            ResourceDefinitions.from_dicts(
+                [{'filename': 'events.csv', 'content': 'precomputed_events'}],
+            ),
             'gaze',
             [],
             id='single_precomputed_events_filter_gaze',
         ),
 
         pytest.param(
-            Resources.from_dicts(
+            ResourceDefinitions.from_dicts(
                 [
                     {'filename': 'myfile.txt', 'content': 'gaze'},
                     {'filename': 'events.csv', 'content': 'precomputed_events'},
@@ -427,14 +431,14 @@ def test_resources_to_dicts_expected(resources, expected_dicts):
             ),
             None,
             [
-                Resource(filename='myfile.txt', content='gaze'),
-                Resource(filename='events.csv', content='precomputed_events'),
+                ResourceDefinition(filename='myfile.txt', content='gaze'),
+                ResourceDefinition(filename='events.csv', content='precomputed_events'),
             ],
             id='gaze_and_precomputed_events_filter_none',
         ),
 
         pytest.param(
-            Resources.from_dicts(
+            ResourceDefinitions.from_dicts(
                 [
                     {'filename': 'myfile.txt', 'content': 'gaze'},
                     {'filename': 'events.csv', 'content': 'precomputed_events'},
@@ -442,13 +446,13 @@ def test_resources_to_dicts_expected(resources, expected_dicts):
             ),
             'gaze',
             [
-                Resource(filename='myfile.txt', content='gaze'),
+                ResourceDefinition(filename='myfile.txt', content='gaze'),
             ],
             id='gaze_and_precomputed_events_filter_gaze',
         ),
 
         pytest.param(
-            Resources.from_dicts(
+            ResourceDefinitions.from_dicts(
                 [
                     {'filename': 'myfile.txt', 'content': 'gaze'},
                     {'filename': 'events.csv', 'content': 'precomputed_events'},
@@ -456,7 +460,7 @@ def test_resources_to_dicts_expected(resources, expected_dicts):
             ),
             'precomputed_events',
             [
-                Resource(filename='events.csv', content='precomputed_events'),
+                ResourceDefinition(filename='events.csv', content='precomputed_events'),
             ],
             id='gaze_and_precomputed_events_filter_precomputed_events',
         ),
@@ -471,7 +475,7 @@ def test_resources_filter_expected(resources, content_type, expected_resources):
     ('resources', 'expected_has_content'),
     [
         pytest.param(
-            Resources(),
+            ResourceDefinitions(),
             {
                 'gaze': False,
                 'precomputed_events': False,
@@ -481,7 +485,7 @@ def test_resources_filter_expected(resources, content_type, expected_resources):
         ),
 
         pytest.param(
-            Resources([]),
+            ResourceDefinitions([]),
             {
                 'gaze': False,
                 'precomputed_events': False,
@@ -491,7 +495,7 @@ def test_resources_filter_expected(resources, content_type, expected_resources):
         ),
 
         pytest.param(
-            Resources([Resource(content='gaze')]),
+            ResourceDefinitions([ResourceDefinition(content='gaze')]),
             {
                 'gaze': True,
                 'precomputed_events': False,
@@ -501,7 +505,7 @@ def test_resources_filter_expected(resources, content_type, expected_resources):
         ),
 
         pytest.param(
-            Resources([Resource(content='precomputed_events')]),
+            ResourceDefinitions([ResourceDefinition(content='precomputed_events')]),
             {
                 'gaze': False,
                 'precomputed_events': True,
@@ -511,7 +515,7 @@ def test_resources_filter_expected(resources, content_type, expected_resources):
         ),
 
         pytest.param(
-            Resources([Resource(content='precomputed_reading_measures')]),
+            ResourceDefinitions([ResourceDefinition(content='precomputed_reading_measures')]),
             {
                 'gaze': False,
                 'precomputed_events': False,
@@ -521,11 +525,11 @@ def test_resources_filter_expected(resources, content_type, expected_resources):
         ),
 
         pytest.param(
-            Resources(
+            ResourceDefinitions(
                 [
-                    Resource(content='gaze'),
-                    Resource(content='precomputed_events'),
-                    Resource(content='precomputed_reading_measures'),
+                    ResourceDefinition(content='gaze'),
+                    ResourceDefinition(content='precomputed_events'),
+                    ResourceDefinition(content='precomputed_reading_measures'),
                 ],
             ),
             {
@@ -537,7 +541,7 @@ def test_resources_filter_expected(resources, content_type, expected_resources):
         ),
 
         pytest.param(
-            Resources([Resource(content='foo')]),
+            ResourceDefinitions([ResourceDefinition(content='foo')]),
             {
                 'foo': True,
                 'gaze': False,
@@ -551,3 +555,43 @@ def test_resources_filter_expected(resources, content_type, expected_resources):
 def test_resources_has_content_expected(resources, expected_has_content):
     for key, value in expected_has_content.items():
         assert resources.has_content(key) == value, (resources, value)
+
+
+@pytest.mark.parametrize(
+    ('dicts', 'expected_resources'),
+    [
+        pytest.param(
+            None,
+            [],
+            id='none',
+        ),
+
+        pytest.param(
+            [],
+            [],
+            id='empty_list',
+        ),
+
+        pytest.param(
+            [{'filename': 'myfile.txt', 'content': 'gaze'}],
+            [
+                ResourceDefinition(filename='myfile.txt', content='gaze'),
+            ],
+            id='single_resource',
+        ),
+
+        pytest.param(
+            [
+                {'filename': 'myfile.txt', 'content': 'gaze'},
+                {'filename': 'events.csv', 'content': 'precomputed_events'},
+            ],
+            [
+                ResourceDefinition(filename='myfile.txt', content='gaze'),
+                ResourceDefinition(filename='events.csv', content='precomputed_events'),
+            ],
+            id='two_resources',
+        ),
+    ],
+)
+def test_resources_from_dicts_expected(dicts, expected_resources):
+    assert ResourceDefinitions.from_dicts(dicts) == expected_resources

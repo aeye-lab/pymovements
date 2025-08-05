@@ -30,8 +30,8 @@ from pymovements.dataset._utils._archives import extract_archive
 from pymovements.dataset._utils._downloads import download_file
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
-from pymovements.dataset.resources import Resource
-from pymovements.dataset.resources import Resources
+from pymovements.dataset.resources import ResourceDefinition
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.exceptions import UnknownFileType
 
 
@@ -88,7 +88,7 @@ def download_dataset(
             else:
                 mirrors = definition.mirrors.get(content, None)
 
-            if not definition.resources.filter(content):
+            if not definition.resources.has_content(content):
                 raise AttributeError(
                     f"'{content}' resources must be specified to download dataset.",
                 )
@@ -168,7 +168,7 @@ def extract_dataset(
 
 def _download_resources(
         mirrors: Sequence[str] | None,
-        resources: Resources,
+        resources: ResourceDefinitions,
         target_dirpath: Path,
         verbose: bool,
 ) -> None:
@@ -182,15 +182,15 @@ def _download_resources(
 
 
 def _download_resource_without_mirrors(
-        resource: Resource,
+        resource: ResourceDefinition,
         target_dirpath: Path,
         verbose: bool,
 ) -> None:
     """Download resource without mirrors."""
     if resource.url is None:
-        raise TypeError()
+        raise AttributeError('Resource.url must not be None')
     if resource.filename is None:
-        raise TypeError()
+        raise AttributeError('Resource.filename must not be None')
 
     try:
         download_file(
@@ -210,15 +210,15 @@ def _download_resource_without_mirrors(
 
 def _download_resource_with_mirrors(
         mirrors: Sequence[str],
-        resource: Resource,
+        resource: ResourceDefinition,
         target_dirpath: Path,
         verbose: bool,
 ) -> None:
     """Download resource with mirrors."""
     if resource.url is None:
-        raise TypeError()
+        raise AttributeError('Resource.url must not be None')
     if resource.filename is None:
-        raise TypeError()
+        raise AttributeError('Resource.filename must not be None')
 
     success = False
 

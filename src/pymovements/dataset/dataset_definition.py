@@ -37,7 +37,7 @@ from pymovements.dataset._utils._yaml import reverse_substitute_types
 from pymovements.dataset._utils._yaml import substitute_types
 from pymovements.dataset._utils._yaml import type_constructor
 from pymovements.dataset.resources import _HasResourcesIndexer
-from pymovements.dataset.resources import Resources
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
@@ -66,24 +66,18 @@ class DatasetDefinition:
     mirrors: dict[str, Sequence[str]]
         A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
         (default: {})
-    resources: Resources
+    resources: ResourceDefinitions
         A list of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
-        (default: Resources())
-    experiment: Experiment
-        The experiment definition. (default: Experiment())
+        (default: ResourceDefinitions())
+    experiment: Experiment | None
+        The experiment definition. (default: None)
     extract: dict[str, bool] | None
         Decide whether to extract the data. (default: None)
         .. deprecated:: v0.22.1
         This field will be removed in v0.27.0.
-    filename_format: dict[str, str]
-        Regular expression which will be matched before trying to load the file. Namedgroups will
-        appear in the `fileinfo` dataframe. (default: field(default_factory=dict))
-    filename_format_schema_overrides: dict[str, dict[str, type]]
-        If named groups are present in the `filename_format`, this makes it possible to cast
-        specific named groups to a particular datatype. (default: field(default_factory=dict))
     custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function. The
         behavior of this argument depends on the file extension of the dataset files.
@@ -144,13 +138,13 @@ class DatasetDefinition:
     mirrors: dict[str, Sequence[str]] | None
         A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
         (default: None)
-    resources: Resources | ResourcesLike | None
+    resources: ResourceDefinitions | ResourcesLike | None
         A list of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
         (default: None)
-    experiment: Experiment | dict[str, Any] | None
+    experiment: Experiment | None
         The experiment definition. (default: None)
     extract: dict[str, bool] | None
         Decide whether to extract the data. (default: None)
@@ -241,9 +235,9 @@ class DatasetDefinition:
 
     mirrors: dict[str, Sequence[str]] = field(default_factory=dict)
 
-    resources: Resources = field(default_factory=Resources)
+    resources: ResourceDefinitions = field(default_factory=ResourceDefinitions)
 
-    experiment: Experiment = field(default_factory=Experiment)
+    experiment: Experiment | None = field(default_factory=Experiment)
 
     extract: dict[str, bool] | None = None
 
@@ -266,8 +260,8 @@ class DatasetDefinition:
             long_name: str | None = None,
             has_files: dict[str, bool] | None = None,
             mirrors: dict[str, Sequence[str]] | None = None,
-            resources: Resources | ResourcesLike | None = None,
-            experiment: Experiment | dict[str, Any] | None = None,
+            resources: ResourceDefinitions | ResourcesLike | None = None,
+            experiment: Experiment | None = None,
             extract: dict[str, bool] | None = None,
             filename_format: dict[str, str] | None = None,
             filename_format_schema_overrides: dict[str, dict[str, type]] | None = None,
@@ -284,6 +278,8 @@ class DatasetDefinition:
     ) -> None:
         self.name = name
         self.long_name = long_name
+
+        self.experiment = experiment
 
         self.extract = extract
 
@@ -311,7 +307,6 @@ class DatasetDefinition:
         else:
             self.column_map = column_map
 
-        self.experiment = self._initialize_experiment(experiment)
         self.resources = self._initialize_resources(
             resources=resources,
             filename_format=filename_format,
@@ -353,22 +348,37 @@ class DatasetDefinition:
     @property
     @deprecated(
         reason='Please use Resource.filename_pattern instead. '
-               'This field will be removed in v0.28.0.',
+               'This property will be removed in v0.28.0.',
         version='v0.23.0',
     )
     def filename_format(self) -> dict[str, str]:
+        """Regular expression which will be matched before trying to load the file.
+
+        Namedgroups will appear in the `fileinfo` dataframe.
+
+        .. deprecated:: v0.23.0
+        Please use Resource.filename_pattern instead.
+        This property will be removed in v0.28.0.
+
+        Returns
+        -------
+        dict[str, str]
+            filename format for each content type
+        """
         data: dict[str, str] = {}
         content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures')
         for content_type in content_types:
             content_resources = self.resources.filter(content=content_type)
             if content_resources:
-                assert len(content_resources) == 1
+                # take first resource with matching content type.
+                # deprecated property supports only one value per content type.
                 data[content_type] = content_resources[0].filename_pattern
+        return data
 
     @filename_format.setter
     @deprecated(
         reason='Please use Resource.filename_pattern instead. '
-               'This field will be removed in v0.28.0.',
+               'This property will be removed in v0.28.0.',
         version='v0.23.0',
     )
     def filename_format(self, data: dict[str, str]) -> None:
@@ -380,22 +390,37 @@ class DatasetDefinition:
     @property
     @deprecated(
         reason='Please use Resource.filename_pattern_schema_overrides instead. '
-               'This field will be removed in v0.28.0.',
+               'This property will be removed in v0.28.0.',
         version='v0.23.0',
     )
     def filename_format_schema_overrides(self) -> dict[str, dict[str, type]]:
+        """Specifies datatypes of named groups in the filename pattern.
+
+        This casts specific named groups to a particular datatype.
+
+        .. deprecated:: v0.23.0
+        Please use Resource.filename_pattern_schema_overrides instead.
+        This property will be removed in v0.28.0.
+
+        Returns
+        -------
+        dict[str, dict[str, type]]
+            filename format schema overrides for each content type
+        """
         data: dict[str, dict[str, type]] = {}
         content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures')
         for content_type in content_types:
             content_resources = self.resources.filter(content=content_type)
             if content_resources:
-                assert len(content_resources) == 1
+                # take first resource with matching content type.
+                # deprecated property supports only one dict per content type.
                 data[content_type] = content_resources[0].filename_pattern_schema_overrides
+        return data
 
     @filename_format_schema_overrides.setter
     @deprecated(
         reason='Please use Resource.filename_pattern instead. '
-               'This field will be removed in v0.28.0.',
+               'This property will be removed in v0.28.0.',
         version='v0.23.0',
     )
     def filename_format_schema_overrides(self, data: dict[str, dict[str, type]]) -> None:
@@ -467,7 +492,7 @@ class DatasetDefinition:
 
         # Convert those object fields.
         if 'experiment' in data and data['experiment'] is not None:
-            data['experiment'] = self.experiment.to_dict(exclude_none=exclude_none)
+            data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none)
         if 'resources' in data and data['resources'] is not None:
             data['resources'] = self.resources.to_dicts(exclude_none=exclude_none)
 
@@ -538,47 +563,50 @@ class DatasetDefinition:
         >>> definition.has_resources['precomputed_events']
         False
         """
-        # Resources may have changed, so update indexer before returning.
+        # ResourceDefinitions may have changed, so update indexer before returning.
         # A better way to update the resources would be through a resources setter property.
         self._has_resources.set_resources(self.resources)
         return self._has_resources
 
-    def _initialize_experiment(self, experiment: Experiment | dict[str, Any] | None) -> Experiment:
-        """Initailize ``Experiment`` instance if necessary."""
-        if experiment is None:
-            return Experiment()
-        if isinstance(experiment, dict):
-            return Experiment.from_dict(experiment)
-        return experiment
-
     def _initialize_resources(
             self,
-            resources: Resources | ResourcesLike | None,
-            filename_format: dict[str, str],
+            resources: ResourceDefinitions | ResourcesLike | None,
+            filename_format: dict[str, str] | None,
             filename_format_schema_overrides: dict[str, dict[str, type]] | None,
-    ) -> Resources:
-        """Initailize ``Resources`` instance if necessary."""
-        if isinstance(resources, Resources):
+    ) -> ResourceDefinitions:
+        """Initialize ``ResourceDefinitions`` instance if necessary."""
+        if isinstance(resources, ResourceDefinitions):
             return resources
 
         if resources is None:
-            return Resources()
+            # some legacy definitions may have defined filename format but no resources.
+            # create legacy formatted resource dict to contain filename pattern.
+            if filename_format:
+                resources = {
+                    content_type: [{'filename_pattern': filename_format[content_type]}]
+                    for content_type in filename_format.keys()
+                }
+            else:
+                return ResourceDefinitions()
 
+        # this calls deprecated methods and will be removed in the future.
         if isinstance(resources, dict):
             if filename_format:
                 for content_type in filename_format.keys():
-                    for resource in resources[content_type]:
-                        resource['filename_pattern'] = filename_format[content_type]
-
+                    for resource_dict in resources[content_type]:
+                        resource_dict['filename_pattern'] = filename_format[content_type]
             if filename_format_schema_overrides:
-                for content_type in filename_format.keys():
-                    for resource in resources[content_type]:
-                        content_overrides = filename_format_schema_overrides[content_type]
-                        resource['filename_pattern_schema_overrides'] = content_overrides
-
-            return Resources.from_dict(resources)
+                for content_type in filename_format_schema_overrides.keys():
+                    for resource_dict in resources[content_type]:
+                        _schema_overrides = filename_format_schema_overrides[content_type]
+                        resource_dict['filename_pattern_schema_overrides'] = _schema_overrides
+            return ResourceDefinitions.from_dict(resources)
 
         if isinstance(resources, Sequence):
             assert isinstance(resources, Sequence)
-            return Resources.from_dicts(resources)
-        raise TypeError()
+            return ResourceDefinitions.from_dicts(resources)
+
+        raise TypeError(
+            f'resources is of type {type(resources).__name__} but must be of type'
+            ' ResourceDefinitions, list, or dict.',
+        )

@@ -282,7 +282,41 @@ class EventDataFrame:
         EventDataFrame
             A copy of the EventDataFrame.
         """
-        return EventDataFrame(data=self.frame.clone())
+        return EventDataFrame(
+            data=self.frame.clone(),
+            trial_columns=self.trial_columns,
+        )
+
+    def split(self, by: Sequence[str]) -> list[EventDataFrame]:
+        """Split the EventDataFrame into multiple frames based on specified column(s).
+
+        Parameters
+        ----------
+        by: Sequence[str]
+            Column name(s) to split the DataFrame by. If a single string is provided,
+            it will be used as a single column name. If a list is provided, the DataFrame
+            will be split by unique combinations of values in all specified columns.
+
+        Returns
+        -------
+        list[EventDataFrame]
+            A list of new EventDataFrame instances, each containing a partition of the
+            original data with all metadata and configurations preserved.
+        """
+        event_pl_df_list = list(self.frame.partition_by(by=by))
+
+        # Ensure column order: trial columns, name, onset, offset.
+        if self.trial_columns is not None:
+            event_pl_df_list = [
+                frame.select([*self.trial_columns, *self._minimal_schema.keys()])
+                for frame in event_pl_df_list
+            ]
+        return [
+            EventDataFrame(
+                frame,
+                trial_columns=self.trial_columns,
+            ) for frame in event_pl_df_list
+        ]
 
     def _add_minimal_schema_columns(self, df: pl.DataFrame) -> pl.DataFrame:
         """Add minimal schema columns to :py:class:`polars.DataFrame` if they are missing.

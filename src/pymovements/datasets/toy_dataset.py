@@ -27,7 +27,7 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.resources import Resources
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
@@ -53,7 +53,7 @@ class ToyDataset(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: Resources
+    resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -63,11 +63,11 @@ class ToyDataset(DatasetDefinition):
     experiment: Experiment
         The experiment definition.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -111,7 +111,7 @@ class ToyDataset(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'ToyDataset'
 
@@ -119,14 +119,19 @@ class ToyDataset(DatasetDefinition):
 
     has_files: dict[str, bool] | None = None
 
-    resources: Resources = field(
-        default_factory=lambda: Resources.from_dict(
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict(
             {
                 'gaze': [
                     {
                         'resource': 'http://github.com/aeye-lab/pymovements-toy-dataset/zipball/6cb5d663317bf418cec0c9abe1dde5085a8a8ebd/',  # noqa: E501 # pylint: disable=line-too-long
                         'filename': 'pymovements-toy-dataset.zip',
                         'md5': '4da622457637a8181d86601fe17f3aa8',
+                        'filename_pattern': r'trial_{text_id:d}_{page_id:d}.csv',
+                        'filename_pattern_schema_overrides': {
+                            'text_id': int,
+                            'page_id': int,
+                        },
                     },
                 ],
             },
@@ -145,18 +150,9 @@ class ToyDataset(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {'gaze': r'trial_{text_id:d}_{page_id:d}.csv'},
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'text_id': int,
-                'page_id': int,
-            },
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     time_column: str = 'timestamp'
 

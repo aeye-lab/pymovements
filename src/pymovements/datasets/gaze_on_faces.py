@@ -27,7 +27,7 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.resources import Resources
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
@@ -57,7 +57,7 @@ class GazeOnFaces(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: Resources
+    resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -67,11 +67,11 @@ class GazeOnFaces(DatasetDefinition):
     experiment: Experiment
         The experiment definition.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides : dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -115,7 +115,7 @@ class GazeOnFaces(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'GazeOnFaces'
 
@@ -123,14 +123,19 @@ class GazeOnFaces(DatasetDefinition):
 
     has_files: dict[str, bool] | None = None
 
-    resources: Resources = field(
-        default_factory=lambda: Resources.from_dict(
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict(
             {
                 'gaze': [
                     {
                         'resource': 'https://uncloud.univ-nantes.fr/index.php/s/8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip',  # noqa: E501 # pylint: disable=line-too-long
                         'filename': 'gaze_csv.zip',
                         'md5': 'fe219f07c9253cd9aaee6bd50233c034',
+                        'filename_pattern': r'gaze_sub{sub_id:d}_trial{trial_id:d}.csv',
+                        'filename_pattern_schema_overrides': {
+                            'sub_id': int,
+                            'trial_id': int,
+                        },
                     },
                 ],
             },
@@ -149,20 +154,9 @@ class GazeOnFaces(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze': r'gaze_sub{sub_id:d}_trial{trial_id:d}.csv',
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'sub_id': int,
-                'trial_id': int,
-            },
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     time_column: Any = None
 

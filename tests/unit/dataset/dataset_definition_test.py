@@ -28,8 +28,8 @@ from pymovements import __version__
 from pymovements import DatasetDefinition
 from pymovements import DatasetLibrary
 from pymovements import Experiment
-from pymovements import Resource
-from pymovements import Resources
+from pymovements import ResourceDefinition
+from pymovements import ResourceDefinitions
 
 
 @pytest.mark.parametrize(
@@ -57,37 +57,37 @@ def test_dataset_definition_is_equal(init_kwargs):
     [
         pytest.param(
             {},
-            Resources(),
+            ResourceDefinitions(),
             id='default',
         ),
 
         pytest.param(
             {'resources': None},
-            Resources(),
+            ResourceDefinitions(),
             id='none',
         ),
 
         pytest.param(
             {'resources': {}},
-            Resources(),
+            ResourceDefinitions(),
             id='empty_dict',
         ),
 
         pytest.param(
             {'resources': []},
-            Resources(),
+            ResourceDefinitions(),
             id='empty_list',
         ),
 
         pytest.param(
             {'resources': [{'content': 'gaze'}]},
-            Resources([Resource(content='gaze')]),
+            ResourceDefinitions([ResourceDefinition(content='gaze')]),
             id='single_gaze_resource',
         ),
 
         pytest.param(
             {'resources': {'gaze': [{'resource': 'www.example.com'}]}},
-            Resources([Resource(content='gaze', url='www.example.com')]),
+            ResourceDefinitions([ResourceDefinition(content='gaze', url='www.example.com')]),
             id='single_gaze_resource_legacy',
         ),
 
@@ -97,7 +97,7 @@ def test_dataset_definition_is_equal(init_kwargs):
                     {'content': 'gaze', 'filename_pattern': 'test.csv'},
                 ],
             },
-            Resources([Resource(content='gaze', filename_pattern='test.csv')]),
+            ResourceDefinitions([ResourceDefinition(content='gaze', filename_pattern='test.csv')]),
             id='single_gaze_resource_filename_pattern',
         ),
 
@@ -106,8 +106,16 @@ def test_dataset_definition_is_equal(init_kwargs):
                 'resources': {'gaze': [{'content': 'gaze'}]},
                 'filename_format': {'gaze': 'test.csv'},
             },
-            Resources([Resource(content='gaze', filename_pattern='test.csv')]),
+            ResourceDefinitions([ResourceDefinition(content='gaze', filename_pattern='test.csv')]),
             id='single_gaze_resource_filename_format_legacy',
+        ),
+
+        pytest.param(
+            {
+                'filename_format': {'gaze': 'test.csv'},
+            },
+            ResourceDefinitions([ResourceDefinition(content='gaze', filename_pattern='test.csv')]),
+            id='filename_format_without_resources_legacy',
         ),
 
         pytest.param(
@@ -115,16 +123,16 @@ def test_dataset_definition_is_equal(init_kwargs):
                 'resources': {'gaze': [{'content': 'gaze'}]},
                 'filename_format': {'gaze': '{subject_id:d}.csv'},
                 'filename_format_schema_overrides': {
-            'gaze': {
-                'subject_id': int,
-            },
-                },
-            },
-            Resources([
-                Resource(
-                    content='gaze', filename_pattern='{subject_id:d}.csv', filename_pattern_schema_overrides={
+                    'gaze': {
                         'subject_id': int,
                     },
+                },
+            },
+            ResourceDefinitions([
+                ResourceDefinition(
+                    content='gaze',
+                    filename_pattern='{subject_id:d}.csv',
+                    filename_pattern_schema_overrides={'subject_id': int},
                 ),
             ]),
             id='single_gaze_resource_filename_format_schema_overrides_legacy',
@@ -132,7 +140,7 @@ def test_dataset_definition_is_equal(init_kwargs):
 
         pytest.param(
             {'resources': [{'content': 'precomputed_events'}]},
-            Resources([Resource(content='precomputed_events')]),
+            ResourceDefinitions([ResourceDefinition(content='precomputed_events')]),
             id='single_precomputed_events_resource',
         ),
 
@@ -143,9 +151,9 @@ def test_dataset_definition_is_equal(init_kwargs):
                     {'content': 'precomputed_events'},
                 ],
             },
-            Resources([
-                Resource(content='gaze'),
-                Resource(content='precomputed_events'),
+            ResourceDefinitions([
+                ResourceDefinition(content='gaze'),
+                ResourceDefinition(content='precomputed_events'),
             ]),
             id='two_resources',
         ),
@@ -157,9 +165,9 @@ def test_dataset_definition_is_equal(init_kwargs):
                     'precomputed_events': [{'resource': 'www.example2.com'}],
                 },
             },
-            Resources([
-                Resource(content='gaze', url='www.example1.com'),
-                Resource(content='precomputed_events', url='www.example2.com'),
+            ResourceDefinitions([
+                ResourceDefinition(content='gaze', url='www.example1.com'),
+                ResourceDefinition(content='precomputed_events', url='www.example2.com'),
             ]),
             id='two_resources_legacy',
         ),
@@ -175,9 +183,13 @@ def test_dataset_definition_is_equal(init_kwargs):
                     'precomputed_events': 'test2.csv',
                 },
             },
-            Resources([
-                Resource(content='gaze', url='www.example1.com', filename_pattern='test1.csv'),
-                Resource(
+            ResourceDefinitions([
+                ResourceDefinition(
+                    content='gaze',
+                    url='www.example1.com',
+                    filename_pattern='test1.csv',
+                ),
+                ResourceDefinition(
                     content='precomputed_events',
                     url='www.example2.com',
                     filename_pattern='test2.csv',
@@ -207,25 +219,7 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
                 'column_map': {},
                 'custom_read_kwargs': {},
                 'distance_column': None,
-                'experiment': {
-                    'eyetracker': {
-                        'left': None,
-                        'model': None,
-                        'mount': None,
-                        'right': None,
-                        'sampling_rate': None,
-                        'vendor': None,
-                        'version': None,
-                    },
-                    'screen': {
-                        'distance_cm': None,
-                        'height_cm': None,
-                        'height_px': None,
-                        'origin': None,
-                        'width_cm': None,
-                        'width_px': None,
-                    },
-                },
+                'experiment': None,
                 'extract': None,
                 'mirrors': {},
                 'pixel_columns': None,
@@ -694,25 +688,7 @@ def test_dataset_definition_not_equal():
                 'long_name': None,
                 'mirrors': {},
                 'resources': [],
-                'experiment': {
-                    'eyetracker': {
-                        'left': None,
-                        'model': None,
-                        'mount': None,
-                        'right': None,
-                        'sampling_rate': None,
-                        'vendor': None,
-                        'version': None,
-                    },
-                    'screen': {
-                        'distance_cm': None,
-                        'height_cm': None,
-                        'height_px': None,
-                        'origin': None,
-                        'width_cm': None,
-                        'width_px': None,
-                    },
-                },
+                'experiment': None,
                 'extract': None,
                 'custom_read_kwargs': {},
                 'column_map': {},
@@ -736,25 +712,7 @@ def test_dataset_definition_not_equal():
                 'long_name': None,
                 'mirrors': {},
                 'resources': [],
-                'experiment': {
-                    'eyetracker': {
-                        'left': None,
-                        'model': None,
-                        'mount': None,
-                        'right': None,
-                        'sampling_rate': None,
-                        'vendor': None,
-                        'version': None,
-                    },
-                    'screen': {
-                        'distance_cm': None,
-                        'height_cm': None,
-                        'height_px': None,
-                        'origin': None,
-                        'width_cm': None,
-                        'width_px': None,
-                    },
-                },
+                'experiment': None,
                 'extract': None,
                 'custom_read_kwargs': {},
                 'column_map': {},
@@ -818,7 +776,7 @@ def test_dataset_to_dict_exclude_none(dataset_definition, exclude_none, expected
 
 
 @pytest.mark.parametrize(
-    'init_kwargs',
+    'attribute_kwarg',
     [
         pytest.param(
             {'extract': True},
@@ -834,13 +792,13 @@ def test_dataset_to_dict_exclude_none(dataset_definition, exclude_none, expected
         ),
     ],
 )
-def test_dataset_definition_init_parameter_is_deprecated(init_kwargs):
+def test_dataset_definition_attribute_is_deprecated(attribute_kwarg):
     with pytest.raises(DeprecationWarning):
-        DatasetDefinition(**init_kwargs)
+        DatasetDefinition(**attribute_kwarg)
 
 
 @pytest.mark.parametrize(
-    'init_kwargs',
+    'attribute_kwarg',
     [
         pytest.param(
             {'extract': True},
@@ -852,9 +810,9 @@ def test_dataset_definition_init_parameter_is_deprecated(init_kwargs):
         ),
     ],
 )
-def test_dataset_definition_parameter_is_removed(init_kwargs):
+def test_dataset_definition_attribute_is_removed(attribute_kwarg):
     with pytest.raises(DeprecationWarning) as info:
-        DatasetDefinition(**init_kwargs)
+        DatasetDefinition(**attribute_kwarg)
 
     regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
 
@@ -868,6 +826,131 @@ def test_dataset_definition_parameter_is_removed(init_kwargs):
 
 
 @pytest.mark.parametrize(
+    ('init_kwargs', 'exception', 'exception_msg'),
+    [
+        pytest.param(
+            {'resources': 1},
+            TypeError,
+            'resources is of type int but must be of type ResourceDefinitions, list, or dict.',
+            id='resources_int',
+        ),
+    ],
+)
+def test_dataset_definition_init_raises_exception(init_kwargs, exception, exception_msg):
+    with pytest.raises(exception) as excinfo:
+        DatasetDefinition(**init_kwargs)
+
+    msg, = excinfo.value.args
+    assert msg == exception_msg
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+@pytest.mark.parametrize(
+    ('definition', 'expected'),
+    [
+        pytest.param(
+            DatasetDefinition(
+                resources=[{'content': 'gaze', 'filename_pattern': 'abc'}],
+            ),
+            {'gaze': 'abc'},
+            id='single_gaze',
+        ),
+    ],
+)
+def test_dataset_definition_get_filename_format_expected(definition, expected):
+    assert definition.filename_format == expected
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+@pytest.mark.parametrize(
+    ('definition', 'new_value', 'expected'),
+    [
+        pytest.param(
+            DatasetDefinition(
+                resources=[{'content': 'gaze', 'filename_pattern': 'abc'}],
+            ),
+            {'gaze': 'def'},
+            ResourceDefinitions([ResourceDefinition(content='gaze', filename_pattern='def')]),
+            id='gaze_resource',
+        ),
+        pytest.param(
+            DatasetDefinition(
+                resources=[
+                    {'content': 'gaze', 'filename_pattern': 'abc'},
+                    {'content': 'precomputed_events', 'filename_pattern': 'cba'},
+                ],
+            ),
+            {'gaze': 'def'},
+            ResourceDefinitions([
+                ResourceDefinition(content='gaze', filename_pattern='def'),
+                ResourceDefinition(content='precomputed_events', filename_pattern='cba'),
+            ]),
+            id='two_resources',
+        ),
+    ],
+)
+def test_dataset_definition_set_filename_format_expected(definition, new_value, expected):
+    definition.filename_format = new_value
+    assert definition.resources == expected
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+@pytest.mark.parametrize(
+    ('definition', 'expected'),
+    [
+        pytest.param(
+            DatasetDefinition(
+                resources=[{'content': 'gaze', 'filename_pattern_schema_overrides': {'a': int}}],
+            ),
+            {'gaze': {'a': int}},
+            id='single_gaze',
+        ),
+    ],
+)
+def test_dataset_definition_filename_get_format_schema_expected(definition, expected):
+    assert definition.filename_format_schema_overrides == expected
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+@pytest.mark.parametrize(
+    ('definition', 'new_value', 'expected'),
+    [
+        pytest.param(
+            DatasetDefinition(
+                resources=[{'content': 'gaze', 'filename_pattern_schema_overrides': {'a': int}}],
+            ),
+            {'gaze': {'b': str}},
+            ResourceDefinitions(
+                [ResourceDefinition(content='gaze', filename_pattern_schema_overrides={'b': str})],
+            ),
+            id='gaze_resource',
+        ),
+        pytest.param(
+            DatasetDefinition(
+                resources=[
+                    {'content': 'gaze', 'filename_pattern_schema_overrides': {'a': int}},
+                    {'content': 'precomputed_events'},
+                ],
+            ),
+            {'gaze': {'b': str}},
+            ResourceDefinitions(
+                [
+                    ResourceDefinition(
+                        content='gaze', filename_pattern_schema_overrides={'b': str},
+                    ),
+                    ResourceDefinition(content='precomputed_events'),
+                ],
+            ),
+            id='two_resources',
+        ),
+    ],
+)
+def test_dataset_definition_set_filename_format_schema_expected(definition, new_value, expected):
+    definition.filename_format_schema_overrides = new_value
+    assert definition.resources == expected
+
+
+@pytest.mark.parametrize(
     ('definition', 'attribute'),
     [
         pytest.param(
@@ -878,8 +961,9 @@ def test_dataset_definition_parameter_is_removed(init_kwargs):
     ],
 )
 def test_dataset_definition_get_attribute_is_deprecated(definition, attribute):
-    with pytest.raises(DeprecationWarning):
+    with pytest.warns(DeprecationWarning):
         getattr(definition, attribute)
+
 
 @pytest.mark.parametrize(
     ('definition', 'attribute', 'value'),
@@ -892,6 +976,29 @@ def test_dataset_definition_get_attribute_is_deprecated(definition, attribute):
         ),
     ],
 )
-def test_dataset_definition_get_attribute_is_deprecated(definition, attribute, value):
-    with pytest.raises(DeprecationWarning):
+def test_dataset_definition_set_attribute_is_deprecated(definition, attribute, value):
+    with pytest.warns(DeprecationWarning):
         setattr(definition, attribute, value)
+
+
+@pytest.mark.parametrize(
+    'attribute',
+    [
+        'filename_format',
+        'filename_format_schema_overrides',
+    ],
+)
+def test_dataset_definition_get_attribute_is_removed(attribute):
+    definition = DatasetDefinition()
+    with pytest.raises(DeprecationWarning) as info:
+        getattr(definition, attribute)
+
+    regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
+
+    msg = info.value.args[0]
+    remove_version = regex.match(msg).groupdict()['version']
+    current_version = __version__.split('+')[0]
+    assert current_version < remove_version, (
+        f'DatasetDefinition.{attribute} was planned to be removed in v{remove_version}. '
+        f'Current version is v{current_version}.'
+    )
