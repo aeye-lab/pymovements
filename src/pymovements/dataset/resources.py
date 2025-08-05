@@ -30,16 +30,34 @@ from typing import Any
 
 @dataclass
 class ResourceDefinition:
-    """ResourceDefinition definition."""
+    """ResourceDefinition definition.
+
+    Attributes
+    ----------
+    content: str
+        The content type of the resource.
+    filename: str | None
+        The target filename of the downloadable resource. This may be an archive. (default: None)
+    url: str | None
+        The URL to the downloadable resource. (default: None)
+    md5: str | None
+        The MD5 checksum of the downloadable resource. (default: None)
+    filename_pattern: str | None
+        The filename pattern of the resource files. Named groups will
+        be parsed as metadata will appear in the `fileinfo` dataframe. (default: None)
+    filename_pattern_schema_overrides: dict[str, type] | None
+        If named groups are present in the `filename_pattern`, this specifies their particular
+        datatypes. (default: None)
+    """
 
     content: str
-
-    filename_pattern: str | None = None
-    filename_pattern_schema_overrides: str | None = None
 
     filename: str | None = None
     url: str | None = None
     md5: str | None = None
+
+    filename_pattern: str | None = None
+    filename_pattern_schema_overrides: dict[str, type] | None = None
 
     @staticmethod
     def from_dict(dictionary: dict[str, Any]) -> ResourceDefinition:

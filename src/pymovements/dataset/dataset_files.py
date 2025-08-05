@@ -67,13 +67,29 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
     _fileinfo_dicts = {}
 
     for resource_definition in definition.resources:
+        content = resource_definition.content
+
+        if content == 'gaze':
+            resource_dirpath = paths.raw
+        elif content == 'precomputed_events':
+            resource_dirpath = paths.precomputed_events
+        elif content == 'precomputed_reading_measures':
+            resource_dirpath = paths.precomputed_reading_measures
+        else:
+            warnings.warn(
+                'content type {content} is not supported. '
+                'supported contents are: gaze, precomputed_events, precomputed_reading_measures. '
+                'skipping this resource definition during scan.'
+            )
+
         fileinfo_dicts = match_filepaths(
             path=paths.raw,
             regex=curly_to_regex(resource_definition.filename_pattern),
             relative=True,
         )
+
         if not fileinfo_dicts:
-            raise RuntimeError(f'no matching files found in {paths.raw}')
+            raise RuntimeError(f'no matching files found in {resource_dirpath}')
 
         fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
         fileinfo_df = fileinfo_df.sort(by='filepath')
@@ -85,7 +101,6 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
                 for fileinfo_key, fileinfo_dtype in items
             ])
 
-        content = resource_definition.content
         if resource_definition.content in _fileinfo_dicts:
             _fileinfo_dicts[content] = pl.concat([_fileinfo_dicts[content], fileinfo_df])
         else:

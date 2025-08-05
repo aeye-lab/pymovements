@@ -237,7 +237,7 @@ class DatasetDefinition:
 
     resources: ResourceDefinitions = field(default_factory=ResourceDefinitions)
 
-    experiment: Experiment = field(default_factory=Experiment)
+    experiment: Experiment | None = field(default_factory=Experiment)
 
     extract: dict[str, bool] | None = None
 
@@ -279,6 +279,8 @@ class DatasetDefinition:
         self.name = name
         self.long_name = long_name
 
+        self.experiment = experiment
+
         self.extract = extract
 
         self.trial_columns = trial_columns
@@ -310,7 +312,7 @@ class DatasetDefinition:
         else:
             self.column_map = column_map
 
-        self.experiment = self._initialize_experiment(experiment)
+
         self.resources = self._initialize_resources(
             resources=resources,
             filename_format=filename_format,
@@ -329,10 +331,18 @@ class DatasetDefinition:
     @property
     @deprecated(
         reason='Please use Resource.filename_pattern instead. '
-               'This field will be removed in v0.28.0.',
+               'This property will be removed in v0.28.0.',
         version='v0.23.0',
     )
     def filename_format(self) -> dict[str, str]:
+        """Regular expression which will be matched before trying to load the file.
+
+        Namedgroups will appear in the `fileinfo` dataframe.
+
+        .. deprecated:: v0.23.0
+        Please use Resource.filename_pattern instead.
+        This property will be removed in v0.28.0.
+        """
         data: dict[str, str] = {}
         content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures')
         for content_type in content_types:
@@ -345,7 +355,7 @@ class DatasetDefinition:
     @filename_format.setter
     @deprecated(
         reason='Please use Resource.filename_pattern instead. '
-               'This field will be removed in v0.28.0.',
+               'This property will be removed in v0.28.0.',
         version='v0.23.0',
     )
     def filename_format(self, data: dict[str, str]) -> None:
@@ -357,10 +367,18 @@ class DatasetDefinition:
     @property
     @deprecated(
         reason='Please use Resource.filename_pattern_schema_overrides instead. '
-               'This field will be removed in v0.28.0.',
+               'This property will be removed in v0.28.0.',
         version='v0.23.0',
     )
     def filename_format_schema_overrides(self) -> dict[str, dict[str, type]]:
+        """Specifies datatypes of named groups in the filename pattern.
+
+        This casts specific named groups to a particular datatype.
+
+        .. deprecated:: v0.23.0
+        Please use Resource.filename_pattern_schema_overrides instead.
+        This property will be removed in v0.28.0.
+        """
         data: dict[str, dict[str, type]] = {}
         content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures')
         for content_type in content_types:
@@ -373,7 +391,7 @@ class DatasetDefinition:
     @filename_format_schema_overrides.setter
     @deprecated(
         reason='Please use Resource.filename_pattern instead. '
-               'This field will be removed in v0.28.0.',
+               'This property will be removed in v0.28.0.',
         version='v0.23.0',
     )
     def filename_format_schema_overrides(self, data: dict[str, dict[str, type]]) -> None:
@@ -445,7 +463,7 @@ class DatasetDefinition:
 
         # Convert those object fields.
         if 'experiment' in data and data['experiment'] is not None:
-            data['experiment'] = self.experiment.to_dict(exclude_none=exclude_none)
+            data['experiment'] = data['experiment'].to_dict(exclude_none=exclude_none)
         if 'resources' in data and data['resources'] is not None:
             data['resources'] = self.resources.to_dicts(exclude_none=exclude_none)
 
@@ -515,14 +533,6 @@ class DatasetDefinition:
         # A better way to update the resources would be through a resources setter property.
         self._has_resources.set_resources(self.resources)
         return self._has_resources
-
-    def _initialize_experiment(self, experiment: Experiment | dict[str, Any] | None) -> Experiment:
-        """Initailize ``Experiment`` instance if necessary."""
-        if experiment is None:
-            return Experiment()
-        if isinstance(experiment, dict):
-            return Experiment.from_dict(experiment)
-        return experiment
 
     def _initialize_resources(
             self,
