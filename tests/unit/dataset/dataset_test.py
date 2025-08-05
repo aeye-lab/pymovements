@@ -2108,9 +2108,9 @@ def test_two_resources_same_content_different_filename_pattern(tmp_path):
     dirpath.mkdir()
 
     # create empty files
-    with open(dirpath / 'foo.csv', 'a') as f:
+    with open(dirpath / 'foo.csv', 'a', encoding='ascii') as f:
         f.close()
-    with open(dirpath / 'bar.csv', 'a') as f:
+    with open(dirpath / 'bar.csv', 'a', encoding='ascii') as f:
         f.close()
 
     dataset = Dataset(definition=definition, path=tmp_path)
