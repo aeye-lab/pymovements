@@ -2116,3 +2116,15 @@ def test_two_resources_same_content_different_filename_pattern(tmp_path):
     dataset.scan()
 
     assert dataset.fileinfo['precomputed_events']['filepath'].to_list() == ['foo.csv', 'bar.csv']
+
+
+def test_unsupported_content_type(tmp_path):
+    definition = DatasetDefinition(
+        name='example',
+        resources=[{'content': 'foobar'}],
+    )
+    dataset = Dataset(definition=definition, path=tmp_path)
+
+    expected_msg = 'content type foobar is not supported'
+    with pytest.warns(UserWarning, match=expected_msg) as record:
+        dataset.scan()

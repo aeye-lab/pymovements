@@ -77,7 +77,7 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> dict[str
             resource_dirpath = paths.precomputed_reading_measures
         else:
             warnings.warn(
-                'content type {content} is not supported. '
+                f'content type {content_type} is not supported. '
                 'supported contents are: gaze, precomputed_events, precomputed_reading_measures. '
                 'skipping this resource definition during scan.',
             )
