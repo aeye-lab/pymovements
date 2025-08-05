@@ -20,10 +20,10 @@
 """Test basic preprocessing on various datasets."""
 import pytest
 
-from pymovements import datasets 
 from pymovements import Dataset
 from pymovements import DatasetDefinition
 from pymovements import DatasetPaths
+from pymovements import datasets
 from pymovements import Experiment
 from pymovements import ResourceDefinitions
 
@@ -260,7 +260,7 @@ def fixture_dataset_init_kwargs(request):
 def test_dataset_save_load_preprocessed(dataset):
     try:
         dataset.load()
-    except:
+    except BaseException:
         breakpoint()
 
     if 'pixel' in dataset.gaze[0].frame.columns:
