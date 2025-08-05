@@ -31,7 +31,7 @@ from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
-@dataclass(init=False)
+@dataclass
 class GazeBaseVR(DatasetDefinition):
     """GazeBaseVR dataset :cite:p:`GazeBaseVR`.
 

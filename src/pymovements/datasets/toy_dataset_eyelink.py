@@ -32,7 +32,7 @@ from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
 
 
-@dataclass(init=False)
+@dataclass
 class ToyDatasetEyeLink(DatasetDefinition):
     """Example toy dataset with EyeLink data.
 

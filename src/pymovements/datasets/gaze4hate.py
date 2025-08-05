@@ -29,7 +29,7 @@ from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
-@dataclass(init=False)
+@dataclass
 class Gaze4Hate(DatasetDefinition):
     """Gaze4Hate dataset :cite:p:`Gaze4Hate`.
 

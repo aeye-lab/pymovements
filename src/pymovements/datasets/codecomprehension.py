@@ -30,7 +30,7 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.resources import ResourceDefinitions
 
 
-@dataclass(init=False)
+@dataclass
 class CodeComprehension(DatasetDefinition):
     """CodeComprehension dataset :cite:p:`CodeComprehension`.
 

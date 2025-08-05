@@ -34,7 +34,7 @@ from pymovements.gaze.eyetracker import EyeTracker
 from pymovements.gaze.screen import Screen
 
 
-@dataclass(init=False)
+@dataclass
 class PotsdamBingeWearablePVT(DatasetDefinition):
     """PotsdamBingeWearablePVT dataset :cite:p:`PotsdamBingePVT`.
 

@@ -31,7 +31,7 @@ from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
-@dataclass(init=False)
+@dataclass
 class ToyDataset(DatasetDefinition):
     """Example toy dataset.
 

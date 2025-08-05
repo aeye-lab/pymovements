@@ -28,7 +28,7 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.resources import ResourceDefinitions
 
 
-@dataclass(init=False)
+@dataclass
 class OneStop(DatasetDefinition):
     """OneStop dataset :cite:p:`OneStop`.
 

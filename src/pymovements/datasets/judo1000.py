@@ -31,7 +31,7 @@ from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
-@dataclass(init=False)
+@dataclass
 class JuDo1000(DatasetDefinition):
     """JuDo1000 dataset :cite:p:`JuDo1000`.
 

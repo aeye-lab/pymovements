@@ -29,7 +29,7 @@ from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
-@dataclass(init=False)
+@dataclass
 class ETDD70(DatasetDefinition):
     """Eye-Tracking Dyslexia Dataset (ETDD70) :cite:p:`ETDD70`.
 
