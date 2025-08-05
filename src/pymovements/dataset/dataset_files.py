@@ -67,13 +67,13 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> dict[str
     _fileinfo_dicts: dict[str, pl.DataFrame] = {}
 
     for resource_definition in definition.resources:
-        content = resource_definition.content
+        content_type = resource_definition.content
 
-        if content == 'gaze':
+        if content_type == 'gaze':
             resource_dirpath = paths.raw
-        elif content == 'precomputed_events':
+        elif content_type == 'precomputed_events':
             resource_dirpath = paths.precomputed_events
-        elif content == 'precomputed_reading_measures':
+        elif content_type == 'precomputed_reading_measures':
             resource_dirpath = paths.precomputed_reading_measures
         else:
             warnings.warn(
@@ -83,16 +83,16 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> dict[str
             )
             continue
 
-        fileinfo_dicts = match_filepaths(
-            path=paths.raw,
+        filepaths = match_filepaths(
+            path=resource_dirpath,
             regex=curly_to_regex(resource_definition.filename_pattern),
             relative=True,
         )
 
-        if not fileinfo_dicts:
+        if not filepaths:
             raise RuntimeError(f'no matching files found in {resource_dirpath}')
 
-        fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
+        fileinfo_df = pl.from_dicts(data=filepaths, infer_schema_length=1)
         fileinfo_df = fileinfo_df.sort(by='filepath')
 
         if resource_definition.filename_pattern_schema_overrides:
@@ -103,9 +103,9 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> dict[str
             ])
 
         if resource_definition.content in _fileinfo_dicts:
-            _fileinfo_dicts[content] = pl.concat([_fileinfo_dicts[content], fileinfo_df])
+            _fileinfo_dicts[content_type] = pl.concat([_fileinfo_dicts[content_type], fileinfo_df])
         else:
-            _fileinfo_dicts[content] = fileinfo_df
+            _fileinfo_dicts[content_type] = fileinfo_df
 
     return _fileinfo_dicts
 

@@ -761,7 +761,7 @@ def test_load_no_files_raises_exception(gaze_dataset_configuration):
     dataset.paths.raw.mkdir()
 
     with pytest.raises(RuntimeError):
-        dataset.load()
+        dataset.scan()
 
 
 @pytest.mark.parametrize(
@@ -1952,8 +1952,8 @@ def test_load_no_files_precomputed_raises_exception(precomputed_dataset_configur
     shutil.rmtree(dataset.paths.precomputed_events, ignore_errors=True)
     dataset.paths.precomputed_events.mkdir()
 
-    with pytest.raises(FileNotFoundError):
-        dataset.load()
+    with pytest.raises(RuntimeError):
+        dataset.scan()
 
 
 @pytest.fixture(
@@ -2027,8 +2027,8 @@ def test_load_no_files_precomputed_rm_raises_exception(precomputed_rm_dataset_co
     shutil.rmtree(dataset.paths.precomputed_reading_measures, ignore_errors=True)
     dataset.paths.precomputed_reading_measures.mkdir()
 
-    with pytest.raises(FileNotFoundError):
-        dataset.load()
+    with pytest.raises(RuntimeError):
+        dataset.scan()
 
 
 @pytest.mark.parametrize(
