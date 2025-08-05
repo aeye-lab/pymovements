@@ -312,7 +312,6 @@ class DatasetDefinition:
         else:
             self.column_map = column_map
 
-
         self.resources = self._initialize_resources(
             resources=resources,
             filename_format=filename_format,

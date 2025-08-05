@@ -79,7 +79,7 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
             warnings.warn(
                 'content type {content} is not supported. '
                 'supported contents are: gaze, precomputed_events, precomputed_reading_measures. '
-                'skipping this resource definition during scan.'
+                'skipping this resource definition during scan.',
             )
 
         fileinfo_dicts = match_filepaths(
