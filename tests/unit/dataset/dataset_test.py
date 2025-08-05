@@ -1952,7 +1952,7 @@ def test_load_no_files_precomputed_raises_exception(precomputed_dataset_configur
     shutil.rmtree(dataset.paths.precomputed_events, ignore_errors=True)
     dataset.paths.precomputed_events.mkdir()
 
-    with pytest.raises(RuntimeError):
+    with pytest.raises(FileNotFoundError):
         dataset.load()
 
 
@@ -2027,7 +2027,7 @@ def test_load_no_files_precomputed_rm_raises_exception(precomputed_rm_dataset_co
     shutil.rmtree(dataset.paths.precomputed_reading_measures, ignore_errors=True)
     dataset.paths.precomputed_reading_measures.mkdir()
 
-    with pytest.raises(RuntimeError):
+    with pytest.raises(FileNotFoundError):
         dataset.load()
 
 

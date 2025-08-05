@@ -78,7 +78,6 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
         fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
         fileinfo_df = fileinfo_df.sort(by='filepath')
 
-
         if resource_definition.filename_pattern_schema_overrides:
             items = resource_definition.filename_pattern_schema_overrides.items()
             fileinfo_df = fileinfo_df.with_columns([
@@ -272,6 +271,12 @@ def load_gaze_file(
         column: fileinfo_row[column] for column in
         [column for column in fileinfo_row.keys() if column != 'filepath']
     }
+    # overrides types in fileinfo_columns that are later passed via add_columns.
+    gaze_resource_definitions = definition.resources.filter('gaze')
+    if gaze_resource_definitions:
+        column_schema_overrides = gaze_resource_definitions[0].filename_pattern_schema_overrides
+    else:
+        column_schema_overrides = None
 
     # check if we have any trial columns specified.
     if not definition.trial_columns:
@@ -301,8 +306,7 @@ def load_gaze_file(
                 auto_column_detect=True,
                 trial_columns=trial_columns,  # this includes all fileinfo_columns.
                 add_columns=fileinfo_columns,
-                # column_schema_overrides is used for fileinfo_columns passed as add_columns.
-                column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
+                column_schema_overrides=column_schema_overrides,
             )
         else:
             gaze_df = from_csv(
@@ -311,7 +315,7 @@ def load_gaze_file(
                 trial_columns=trial_columns,  # this includes all fileinfo_columns.
                 add_columns=fileinfo_columns,
                 # column_schema_overrides is used for fileinfo_columns passed as add_columns.
-                column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
+                column_schema_overrides=column_schema_overrides,
             )
     elif filepath.suffix == '.feather':
         gaze_df = from_ipc(
@@ -320,7 +324,7 @@ def load_gaze_file(
             trial_columns=trial_columns,  # this includes all fileinfo_columns.
             add_columns=fileinfo_columns,
             # column_schema_overrides is used for fileinfo_columns passed as add_columns.
-            column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
+            column_schema_overrides=column_schema_overrides,
         )
     elif filepath.suffix == '.asc':
         gaze_df = from_asc(
@@ -329,7 +333,7 @@ def load_gaze_file(
             trial_columns=trial_columns,  # this includes all fileinfo_columns.
             add_columns=fileinfo_columns,
             # column_schema_overrides is used for fileinfo_columns passed as add_columns.
-            column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
+            column_schema_overrides=column_schema_overrides,
         )
     else:
         valid_extensions = ['csv', 'tsv', 'txt', 'feather', 'asc']
@@ -545,11 +549,16 @@ def add_fileinfo(
     )
 
     # Cast columns from fileinfo according to specification.
-    _schema_overrides = definition.filename_format_schema_overrides['gaze']
-    df = df.with_columns([
-        pl.col(fileinfo_key).cast(fileinfo_dtype)
-        for fileinfo_key, fileinfo_dtype in _schema_overrides.items()
-    ])
+    resource_definitions = definition.resources.filter('gaze')
+    if resource_definitions:
+        # overrides types in fileinfo_columns.
+        _schema_overrides = resource_definitions[0].filename_pattern_schema_overrides
+
+        df = df.with_columns([
+            pl.col(fileinfo_key).cast(fileinfo_dtype)
+            for fileinfo_key, fileinfo_dtype in _schema_overrides.items()
+        ])
+
     return df
 
 
