@@ -896,7 +896,7 @@ def test_dataset_definition_init_raises_exception(init_kwargs, exception, except
     ],
 )
 def test_dataset_definition_get_attribute_is_deprecated(definition, attribute):
-    with pytest.raises(DeprecationWarning):
+    with pytest.warns(DeprecationWarning):
         getattr(definition, attribute)
 
 
@@ -912,5 +912,5 @@ def test_dataset_definition_get_attribute_is_deprecated(definition, attribute):
     ],
 )
 def test_dataset_definition_set_attribute_is_deprecated(definition, attribute, value):
-    with pytest.raises(DeprecationWarning):
+    with pytest.warns(DeprecationWarning):
         setattr(definition, attribute, value)
