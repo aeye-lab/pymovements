@@ -566,14 +566,12 @@ def add_fileinfo(
 
     # Cast columns from fileinfo according to specification.
     resource_definitions = definition.resources.filter('gaze')
-    if resource_definitions:
-        # overrides types in fileinfo_columns.
-        _schema_overrides = resource_definitions[0].filename_pattern_schema_overrides
-
-        df = df.with_columns([
-            pl.col(fileinfo_key).cast(fileinfo_dtype)
-            for fileinfo_key, fileinfo_dtype in _schema_overrides.items()
-        ])
+    # overrides types in fileinfo_columns.
+    _schema_overrides = resource_definitions[0].filename_pattern_schema_overrides
+    df = df.with_columns([
+        pl.col(fileinfo_key).cast(fileinfo_dtype)
+        for fileinfo_key, fileinfo_dtype in _schema_overrides.items()
+    ])
 
     return df
 
