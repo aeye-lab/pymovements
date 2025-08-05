@@ -341,6 +341,11 @@ class DatasetDefinition:
         .. deprecated:: v0.23.0
         Please use Resource.filename_pattern instead.
         This property will be removed in v0.28.0.
+
+        Returns
+        -------
+        dict[str, str]
+            filename format for each content type
         """
         data: dict[str, str] = {}
         content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures')
@@ -377,6 +382,11 @@ class DatasetDefinition:
         .. deprecated:: v0.23.0
         Please use Resource.filename_pattern_schema_overrides instead.
         This property will be removed in v0.28.0.
+
+        Returns
+        -------
+        dict[str, dict[str, type]]
+            filename format schema overrides for each content type
         """
         data: dict[str, dict[str, type]] = {}
         content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures')

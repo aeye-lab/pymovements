@@ -146,7 +146,7 @@ class PoTeC(DatasetDefinition):
                         'resource': 'https://osf.io/download/d8pyg/',
                         'filename': 'fixation.zip',
                         'md5': 'ecd9a998d07158922bb9b8cdd52f5688',
-                        'filename_pattern': r'reader{subject_id:d}_{text_id}_uncorrected_fixations.tsv',
+                        'filename_pattern': r'reader{subject_id:d}_{text_id}_uncorrected_fixations.tsv',  # noqa: E501 # pylint: disable=line-too-long
                         'filename_pattern_schema_overrides': {
                             'subject_id': int,
                             'text_id': str,

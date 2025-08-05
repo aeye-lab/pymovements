@@ -81,6 +81,7 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
                 'supported contents are: gaze, precomputed_events, precomputed_reading_measures. '
                 'skipping this resource definition during scan.',
             )
+            continue
 
         fileinfo_dicts = match_filepaths(
             path=paths.raw,
