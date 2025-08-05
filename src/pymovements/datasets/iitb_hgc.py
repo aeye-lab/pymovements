@@ -128,7 +128,7 @@ class IITB_HGC(DatasetDefinition):
 
     filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] | None | None = None
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     trial_columns: list[str] = field(
         default_factory=lambda: [

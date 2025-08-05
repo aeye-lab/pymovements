@@ -159,7 +159,7 @@ class CoLAGaze(DatasetDefinition):
 
     filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] | None | None = None
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {

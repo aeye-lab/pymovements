@@ -163,7 +163,7 @@ class ETDD70(DatasetDefinition):
 
     filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] | None | None = None
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     time_column: str = 'time'
 
