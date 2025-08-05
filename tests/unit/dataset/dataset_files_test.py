@@ -207,7 +207,6 @@ def test_load_eyelink_file(tmp_path, read_kwargs):
         fileinfo_row={},
         definition=DatasetDefinition(
             experiment=pm.Experiment(1280, 1024, 38, 30, None, 'center', 1000),
-            filename_format_schema_overrides={'gaze': {}, 'precomputed_events': {}},
             custom_read_kwargs={'gaze': read_kwargs},
         ),
     )

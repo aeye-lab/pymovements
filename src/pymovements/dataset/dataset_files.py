@@ -65,11 +65,11 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
     """
     # Get all filepaths that match regular expression.
     _fileinfo_dicts = {}
-    if definition.has_files['gaze']:
-        filename_pattern = definition.resources.filter('gaze')[0].filename_pattern
+
+    for resource_definition in definition.resources:
         fileinfo_dicts = match_filepaths(
             path=paths.raw,
-            regex=curly_to_regex(filename_pattern),
+            regex=curly_to_regex(resource_definition.filename_pattern),
             relative=True,
         )
         if not fileinfo_dicts:
@@ -77,51 +77,20 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> pl.DataF
 
         fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
         fileinfo_df = fileinfo_df.sort(by='filepath')
-        if definition.filename_format_schema_overrides['gaze']:
-            items = definition.filename_format_schema_overrides['gaze'].items()
-            fileinfo_df = fileinfo_df.with_columns([
-                pl.col(fileinfo_key).cast(fileinfo_dtype)
-                for fileinfo_key, fileinfo_dtype in items
-            ])
-        _fileinfo_dicts['gaze'] = fileinfo_df
 
-    if definition.has_files['precomputed_events']:
-        fileinfo_dicts = match_filepaths(
-            path=paths.precomputed_events,
-            regex=curly_to_regex(definition.filename_format['precomputed_events']),
-            relative=True,
-        )
-        if not fileinfo_dicts:
-            raise RuntimeError(f'no matching files found in {paths.precomputed_events}')
-        fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
-        fileinfo_df = fileinfo_df.sort(by='filepath')
-        if definition.filename_format_schema_overrides['precomputed_events']:
-            items = definition.filename_format_schema_overrides['precomputed_events'].items()
-            fileinfo_df = fileinfo_df.with_columns([
-                pl.col(fileinfo_key).cast(fileinfo_dtype)
-                for fileinfo_key, fileinfo_dtype in items
-            ])
-        _fileinfo_dicts['precomputed_events'] = fileinfo_df
 
-    pc_rm = 'precomputed_reading_measures'
-    if definition.has_files[pc_rm]:
-        fileinfo_dicts = match_filepaths(
-            path=paths.precomputed_reading_measures,
-            regex=curly_to_regex(definition.filename_format[pc_rm]),
-            relative=True,
-        )
-        if not fileinfo_dicts:
-            raise RuntimeError(f'no matching files found in {paths.precomputed_reading_measures}')
-        fileinfo_df = pl.from_dicts(data=fileinfo_dicts, infer_schema_length=1)
-        fileinfo_df = fileinfo_df.sort(by='filepath')
-        if definition.filename_format_schema_overrides[pc_rm]:
-            _schema_overrides = definition.filename_format_schema_overrides[pc_rm]
-            items = _schema_overrides.items()
+        if resource_definition.filename_pattern_schema_overrides:
+            items = resource_definition.filename_pattern_schema_overrides.items()
             fileinfo_df = fileinfo_df.with_columns([
                 pl.col(fileinfo_key).cast(fileinfo_dtype)
                 for fileinfo_key, fileinfo_dtype in items
             ])
-        _fileinfo_dicts[pc_rm] = fileinfo_df
+
+        content = resource_definition.content
+        if resource_definition.content in _fileinfo_dicts:
+            _fileinfo_dicts[content] = pl.concat([_fileinfo_dicts[content], fileinfo_df])
+        else:
+            _fileinfo_dicts[content] = fileinfo_df
 
     return _fileinfo_dicts
 
