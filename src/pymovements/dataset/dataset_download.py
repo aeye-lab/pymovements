@@ -81,6 +81,9 @@ def download_dataset(
     RuntimeError
         If downloading a resource failed for all given mirrors.
     """
+    if not definition.resources:
+        raise AttributeError('resources must be specified to download a dataset.')
+
     for content in ('gaze', 'precomputed_events', 'precomputed_reading_measures'):
         if definition.resources.has_content(content):
             if not definition.mirrors:

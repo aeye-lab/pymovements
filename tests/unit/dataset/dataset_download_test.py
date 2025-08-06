@@ -1247,49 +1247,60 @@ def test_dataset_download_raises_exception(
     assert msg.startswith(expected_msg_prefix)
 
 
-def test_dataset_download_no_resources_raises_exception(tmp_path):
-    definition = DatasetDefinition(
-        name='CustomPublicDataset',
-        mirrors={
-            'gaze': (
-                'https://example.com/',
-                'https://another_example.com/',
+@pytest.mark.parametrize(
+    'definition',
+    [
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                mirrors={
+                    'gaze': (
+                        'https://example.com/',
+                        'https://another_example.com/',
+                    ),
+                },
+                resources={
+                    'gaze': (),
+                },
             ),
-        },
-        resources={
-            'gaze': (),
-        },
-    )
-
+            id='gaze',
+        ),
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                mirrors={
+                    'precomputed_events': (
+                        'https://example.com/',
+                        'https://another_example.com/',
+                    ),
+                },
+                resources={
+                    'precomputed_events': (),
+                },
+            ),
+            id='precomputed_events',
+        ),
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                mirrors={
+                    'precomputed_reading_measures': (
+                        'https://example.com/',
+                        'https://another_example.com/',
+                    ),
+                },
+            ),
+            id='precomputed_reading_measures',
+        ),
+    ],
+)
+def test_dataset_download_no_resources_raises_exception(definition, tmp_path):
     with pytest.raises(AttributeError) as excinfo:
         Dataset(definition, path=tmp_path).download()
 
     msg, = excinfo.value.args
 
-    expected_msg = "'gaze' resources must be specified to download dataset."
-    assert msg == expected_msg
-
-
-def test_dataset_download_no_precomputed_event_resources_raises_exception(tmp_path):
-    definition = DatasetDefinition(
-        name='CustomPublicDataset',
-        mirrors={
-            'precomputed_events': (
-                'https://example.com/',
-                'https://another_example.com/',
-            ),
-        },
-        resources={
-            'precomputed_events': (),
-        },
-    )
-
-    with pytest.raises(AttributeError) as excinfo:
-        Dataset(definition, path=tmp_path).download()
-
-    msg, = excinfo.value.args
-
-    expected_msg = "'precomputed_events' resources must be specified to download dataset."
+    expected_msg = 'resources must be specified to download a dataset.'
     assert msg == expected_msg
 
 
@@ -1360,23 +1371,3 @@ def test_extract_dataset_precomputed_rm_move_single_file(tmp_path):
     )
 
     Dataset(definition, path=tmp_path).extract()
-
-
-def test_dataset_download_no_precomputed_rm_resources_raises_exception(tmp_path):
-    definition = DatasetDefinition(
-        name='CustomPublicDataset',
-        mirrors={
-            'precomputed_reading_measures': (
-                'https://example.com/',
-                'https://another_example.com/',
-            ),
-        },
-    )
-
-    with pytest.raises(AttributeError) as excinfo:
-        Dataset(definition, path=tmp_path).download()
-
-    msg, = excinfo.value.args
-
-    expected_msg = "'precomputed_reading_measures' resources must be specified to download dataset."
-    assert msg == expected_msg

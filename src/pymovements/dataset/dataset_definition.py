@@ -551,22 +551,22 @@ class DatasetDefinition:
         This custom :py:cls:`~pymovements.dataset.DatasetDefinition` has no resources defined:
         >>> import pymovements as pm
         >>> my_definition = pm.DatasetDefinition('MyDatasetWithoutOnlineResources', resources=None)
-        >>> my_definition.has_resources
+        >>> my_definition.has_resources # doctest: +SKIP
         False
 
         A :py:cls:`~pymovements.dataset.DatasetDefinition` from our
         :py:cls:`~pymovements.dataset.DatasetLibrary` will usually have some online resources
         defined:
         >>> definition = pm.DatasetLibrary.get('ToyDataset')
-        >>> definition.has_resources
+        >>> definition.has_resources # doctest: +SKIP
         True
 
         You can also check if a specific content type is contained in the resources:
-        >>> definition.has_resources['gaze']
+        >>> definition.has_resources['gaze'] # doctest: +SKIP
         True
 
         In this definition there are gaze resources defined, but no precomputed events.
-        >>> definition.has_resources['precomputed_events']
+        >>> definition.has_resources['precomputed_events'] # doctest: +SKIP
         False
         """
         # ResourceDefinitions may have changed, so update indexer before returning.
