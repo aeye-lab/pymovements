@@ -24,7 +24,6 @@ from collections.abc import Sequence
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
-from operator import eq
 from pathlib import Path
 from typing import Any
 from typing import Union
@@ -61,9 +60,6 @@ class DatasetDefinition:
         The name of the dataset. (default: '.')
     long_name: str | None
         The entire name of the dataset. (default: None)
-    has_files: dict[str, bool] | None
-        Indicate whether the dataset contains 'gaze', 'precomputed_events', and
-        'precomputed_reading_measures'.
     mirrors: dict[str, Sequence[str]]
         A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
         (default: {})
@@ -332,14 +328,20 @@ class DatasetDefinition:
 
     @property
     @deprecated(
-        reason='Please specify Resource.filename_pattern instead. '
+        reason='Please use ResourceDefinition.has_content() instead.'
                'This field will be removed in v0.28.0.',
         version='v0.23.0',
     )
     def has_files(self) -> dict[str, bool]:
-        data: dict[str, str] = {}
+        """Indicate whether the dataset contains a particular type of content.
+
+        Returns
+        -------
+        dict[str, bool]
+            Dictionary with the key referring to the content type.
+        """
         content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures')
-        return  {
+        return {
             content_type: self.resources.has_content(content_type)
             for content_type in content_types
         }
@@ -538,6 +540,11 @@ class DatasetDefinition:
         as an indexable class. In a boolean context it checks if there are any resources set in the
         :py:cls:`~pymovements.dataset.DatasetDefinition`. Furthermore, you can index the property
         to check if there are any resources set for a given content type.
+
+        Returns
+        -------
+        _HasResourcesIndexer
+            indexable helper class to check for resources of each content type.
 
         Examples
         --------

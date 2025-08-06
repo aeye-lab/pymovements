@@ -1018,5 +1018,3 @@ def test_add_single_definition():
 
     if CustomDatasetDefinition():
         print('a')
-
-
