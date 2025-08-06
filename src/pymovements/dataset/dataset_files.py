@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import Any
 
 import polars as pl
+import pyreadr
 from tqdm.auto import tqdm
 
 from pymovements._utils._paths import match_filepaths
@@ -427,10 +428,20 @@ def load_precomputed_reading_measure_file(
         custom_read_kwargs = {}
 
     csv_extensions = {'.csv', '.tsv', '.txt'}
+    r_extensions = {'.rda'}
     excel_extensions = {'.xlsx'}
-    valid_extensions = csv_extensions | excel_extensions
+    valid_extensions = csv_extensions | r_extensions | excel_extensions
     if data_path.suffix in csv_extensions:
         precomputed_reading_measure_df = pl.read_csv(data_path, **custom_read_kwargs)
+    elif data_path.suffix in r_extensions:
+        if 'r_dataframe_key' in custom_read_kwargs:
+            precomputed_r = pyreadr.read_r(data_path)
+            # convert to polars DataFrame because read_r has no .clone().
+            precomputed_reading_measure_df = pl.DataFrame(
+                precomputed_r[custom_read_kwargs['r_dataframe_key']],
+            )
+        else:
+            raise ValueError('please specify r_dataframe_key in custom_read_kwargs')
     elif data_path.suffix in excel_extensions:
         precomputed_reading_measure_df = pl.read_excel(
             data_path,
@@ -520,10 +531,20 @@ def load_precomputed_event_file(
         custom_read_kwargs = {}
 
     csv_extensions = {'.csv', '.tsv', '.txt'}
+    r_extensions = {'.rda'}
     json_extensions = {'.jsonl', '.ndjson'}
-    valid_extensions = csv_extensions.union(json_extensions)
+    valid_extensions = csv_extensions | r_extensions | json_extensions
     if data_path.suffix in csv_extensions:
         precomputed_event_df = pl.read_csv(data_path, **custom_read_kwargs)
+    elif data_path.suffix in r_extensions:
+        if 'r_dataframe_key' in custom_read_kwargs:
+            precomputed_r = pyreadr.read_r(data_path)
+            # convert to polars DataFrame because read_r has no .clone().
+            precomputed_event_df = pl.DataFrame(
+                precomputed_r[custom_read_kwargs['r_dataframe_key']],
+            )
+        else:
+            raise ValueError('please specify r_dataframe_key in custom_read_kwargs')
     elif data_path.suffix in json_extensions:
         precomputed_event_df = pl.read_ndjson(data_path, **custom_read_kwargs)
     else:
