@@ -52,6 +52,7 @@
     PotsdamBingeWearablePVT
     Provo
     SBSAT
+    TECO
     UCL
 
 
@@ -91,6 +92,7 @@ from pymovements.datasets.potsdam_binge_remote_pvt import PotsdamBingeRemotePVT
 from pymovements.datasets.potsdam_binge_wearable_pvt import PotsdamBingeWearablePVT
 from pymovements.datasets.provo import Provo
 from pymovements.datasets.sb_sat import SBSAT
+from pymovements.datasets.teco import TECO
 from pymovements.datasets.toy_dataset import ToyDataset
 from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
 from pymovements.datasets.ucl import UCL
@@ -124,6 +126,7 @@ __all__ = [
     'PotsdamBingeWearablePVT',
     'Provo',
     'SBSAT',
+    'TECO',
     'ToyDataset',
     'ToyDatasetEyeLink',
     'UCL',
