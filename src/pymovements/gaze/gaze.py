@@ -296,7 +296,7 @@ class Gaze:
         ----------
         by: Sequence[str]
             Column name(s) to split the DataFrame by. If a single string is provided,
-            it will be used as a single column name. If a list is provided, the DataFrame
+            it will be used as a single column name. If a sequence is provided, the DataFrame
             will be split by unique combinations of values in all specified columns.
 
         Returns
@@ -305,15 +305,27 @@ class Gaze:
             A list of new Gaze instances, each containing a partition of the
             original data with all metadata and configurations preserved.
         """
+        # Convert single string to list for consistent handling
+        by = [by] if isinstance(by, str) else by
+        frames = self.frame.partition_by(by=by)
+
+        # Check if all columns in 'by' are in events columns
+        events_list = (
+            self.events.split(by)
+            if all(col in self.events.columns for col in by)
+            else [pm.EventDataFrame()] * len(frames)
+        )
+
         return [
             Gaze(
-                new_frame,
+                data=frame,
                 experiment=self.experiment,
                 trial_columns=self.trial_columns,
                 time_column='time',
                 distance_column='distance',
+                events=events,
             )
-            for new_frame in self.frame.partition_by(by=by)
+            for frame, events in zip(frames, events_list)
         ]
 
     def transform(
@@ -973,11 +985,14 @@ class Gaze:
         --------
         Let's initialize an example Gaze first:
         >>> gaze = pm.gaze.from_numpy(
-        ...     distance=np.concatenate([np.zeros(40), np.full(10, np.nan), np.ones(50)]),
+        ...     pixel=np.concatenate(
+        ...         [np.zeros((2, 40)), np.full((2, 10), np.nan), np.ones((2, 50))],
+        ...         axis=1,
+        ...     ),
         ... )
 
         You can calculate measures, for example the null ratio like this:
-        >>> gaze.measure_samples('null_ratio', column='distance')
+        >>> gaze.measure_samples('null_ratio', column='pixel')
         shape: (1, 1)
         ┌────────────┐
         │ null_ratio │
@@ -1226,6 +1241,7 @@ class Gaze:
         gaze = Gaze(
             data=self.frame.clone(),
             experiment=deepcopy(self.experiment),
+            events=self.events.copy(),
         )
         gaze.n_components = self.n_components
         return gaze
@@ -1244,6 +1260,16 @@ class Gaze:
     def _check_n_components(self) -> None:
         """Check that n_components is either 2, 4 or 6.
 
+        Ensure that the number of gaze components is valid.
+
+        Valid configurations are:
+            - 2 components: monocular data (e.g., x and y)
+            - 4 components: binocular data (e.g., x/y for left and right eye)
+            - 6 components: binocular + cyclopean data (x/y for left, right, and cyclopean eye)
+
+        If no valid gaze columns were specified (pixel, position, etc.), raise an error
+        with a helpful message to guide proper initialization.
+
         Raises
         ------
         AttributeError
@@ -1251,7 +1277,11 @@ class Gaze:
         """
         if self.n_components not in {2, 4, 6}:
             raise AttributeError(
-                f'n_components must be either 2, 4 or 6 but is {self.n_components}',
+                'Number of components required but no gaze components could be inferred.\n'
+                'This usually happens if you did not specify any column content'
+                ' and the content could not be autodetected from the column names. \n'
+                "Please specify 'pixel_columns', 'position_columns', 'velocity_columns'"
+                " or 'acceleration_columns' explicitly during initialization.",
             )
 
     def _check_component_columns(self, **kwargs: list[str]) -> None:
@@ -1566,6 +1596,18 @@ class Gaze:
             column_specifiers.append(acceleration_columns)
 
         self.n_components = self._infer_n_components(column_specifiers)
+        # Warning if contains data but no gaze-related columns were provided.
+        # This can lead to failure in downstream methods that rely on those columns
+        # (e.g., transformations).
+        if len(self.frame) > 1 and not self.n_components:
+            warnings.warn(
+                'Gaze contains data but no components could be inferred. \n'
+                'This usually happens if you did not specify any column content'
+                ' and the content could not be autodetected from the column names. \n'
+                "Please specify 'pixel_columns', 'position_columns', 'velocity_columns'"
+                " or 'acceleration_columns' explicitly during initialization."
+                ' Otherwise, transformation methods may fail.',
+            )
 
     def _init_time_column(
             self,

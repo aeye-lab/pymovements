@@ -1159,6 +1159,9 @@ from pymovements import Gaze
             },
             pl.from_dict({'time': [1.23]}, schema={'time': pl.Float64}),
             None,
+            marks=pytest.mark.filterwarnings(
+                'ignore:Gaze contains data but no.*:UserWarning',
+            ),
             id='df_single_row_time_column_dataset_definition',
         ),
 
@@ -1170,6 +1173,9 @@ from pymovements import Gaze
             },
             pl.from_dict({'time': [1.23]}, schema={'time': pl.Float64}),
             None,
+            marks=pytest.mark.filterwarnings(
+                'ignore:Gaze contains data but no.*:UserWarning',
+            ),
             id='df_single_row_time_column_overwrites_dataset_definition',
         ),
 
@@ -1180,6 +1186,9 @@ from pymovements import Gaze
             },
             pl.from_dict({'time': [1230]}, schema={'time': pl.Int64}),
             None,
+            marks=pytest.mark.filterwarnings(
+                'ignore:Gaze contains data but no.*:UserWarning',
+            ),
             id='df_single_row_time_unit_dataset_definition',
         ),
 
@@ -1191,6 +1200,9 @@ from pymovements import Gaze
             },
             pl.from_dict({'time': [4560]}, schema={'time': pl.Int64}),
             None,
+            marks=pytest.mark.filterwarnings(
+                'ignore:Gaze contains data but no.*:UserWarning',
+            ),
             id='df_single_row_time_unit_overwrites_dataset_definition',
         ),
 
@@ -1201,6 +1213,9 @@ from pymovements import Gaze
             },
             pl.from_dict({'distance': [1.23]}, schema={'distance': pl.Float64}),
             None,
+            marks=pytest.mark.filterwarnings(
+                'ignore:Gaze contains data but no.*:UserWarning',
+            ),
             id='df_single_row_distance_column_dataset_definition',
         ),
 
@@ -1212,6 +1227,9 @@ from pymovements import Gaze
             },
             pl.from_dict({'distance': [1.23]}, schema={'distance': pl.Float64}),
             None,
+            marks=pytest.mark.filterwarnings(
+                'ignore:Gaze contains data but no.*:UserWarning',
+            ),
             id='df_single_row_distance_column_overwrites_dataset_definition',
         ),
 
@@ -1258,6 +1276,7 @@ def test_init_gaze_has_expected_experiment(init_kwargs, expected_experiment):
     assert gaze.experiment == expected_experiment
 
 
+@pytest.mark.filterwarnings('ignore:Gaze contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('init_kwargs', 'expected_trial_columns'),
     [
@@ -1955,3 +1974,13 @@ def test_gaze_init_events(events, init_kwargs):
     assert_frame_equal(gaze.events.frame, expected_events)
     # We don't want the events point to the same reference.
     assert gaze.events.frame is not expected_events
+
+
+def test_gaze_init_warnings():
+    with pytest.warns(UserWarning) as record:
+        Gaze(data=pl.from_dict({'a': [1, 2, 3]}))
+
+    expected_msg_prefix = 'Gaze contains data but no components could be inferred.'
+
+    assert len(record) == 1
+    assert record[0].message.args[0].startswith(expected_msg_prefix)

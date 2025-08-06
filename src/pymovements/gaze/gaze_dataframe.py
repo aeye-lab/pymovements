@@ -1,4 +1,4 @@
-# Copyright (c) 2025 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -19,7 +19,7 @@
 # SOFTWARE.
 """GazeDataFrame implementation.
 
-.. deprecated:: v0.22.0
+.. deprecated:: v0.22.3
    Please use :py:class:`~pymovements.Gaze` instead.
    This module will be removed in v0.27.0.
 """
@@ -38,7 +38,7 @@ from pymovements.gaze.gaze import Gaze
 class GazeDataFrame(metaclass=DeprecatedMetaClass):
     """Self-contained data structure containing gaze represented as samples or events.
 
-    .. deprecated:: v0.22.1
+    .. deprecated:: v0.22.3
        Please use :py:class:`~pymovements.Gaze` instead.
        This module will be removed in v0.27.0.
 

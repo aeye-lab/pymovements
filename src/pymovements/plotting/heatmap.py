@@ -153,7 +153,10 @@ def heatmap(
     # Convert heatmap values from sample count to seconds
     heatmap_value /= gaze.experiment.sampling_rate
 
-    extent = [x_edges[0], x_edges[-1], y_edges[0], y_edges[-1]]
+    if origin == 'upper':
+        extent = [x_edges[0], x_edges[-1], y_edges[0], y_edges[-1]]
+    else:
+        extent = [x_edges[0], x_edges[-1], y_edges[-1], y_edges[0]]
 
     # Create the plot
     if add_stimulus:

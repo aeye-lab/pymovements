@@ -26,6 +26,7 @@ from polars.testing import assert_frame_equal
 import pymovements as pm
 
 
+@pytest.mark.filterwarnings('ignore:Gaze contains data but no.*:UserWarning')
 def test_from_numpy():
     array = np.array(
         [

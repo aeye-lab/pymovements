@@ -25,6 +25,7 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import ResourceDefinitions
 
 
 @dataclass
@@ -58,7 +59,7 @@ class OneStop(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: dict[str, list[dict[str, str]]]
+    resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -110,24 +111,26 @@ class OneStop(DatasetDefinition):
         },
     )
 
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda: {
-            'precomputed_events': [
-                {
-                    'resource':
-                    'https://osf.io/download/dq935/',
-                    'filename': 'fixations_Paragraph.csv.zip',
-                    'md5': '3d3b6a3794a50e174e025f43735674bd',
-                },
-            ],
-            'precomputed_reading_measures': [
-                {
-                    'resource': 'https://osf.io/download/4ajc8/',
-                    'filename': 'ia_Paragraph.csv.zip',
-                    'md5': '9b9548e49efdc7dbf63d4f3a5dc3af22',
-                },
-            ],
-        },
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict(
+            {
+                'precomputed_events': [
+                    {
+                        'resource':
+                        'https://osf.io/download/dq935/',
+                        'filename': 'fixations_Paragraph.csv.zip',
+                        'md5': '3d3b6a3794a50e174e025f43735674bd',
+                    },
+                ],
+                'precomputed_reading_measures': [
+                    {
+                        'resource': 'https://osf.io/download/4ajc8/',
+                        'filename': 'ia_Paragraph.csv.zip',
+                        'md5': '9b9548e49efdc7dbf63d4f3a5dc3af22',
+                    },
+                ],
+            },
+        ),
     )
 
     filename_format: dict[str, str] = field(
