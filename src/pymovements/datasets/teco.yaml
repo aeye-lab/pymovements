@@ -2,11 +2,6 @@ name: "TECO"
 
 long_name: 'Tsukuba Eye-tracking Corpus'
 
-has_files:
-  gaze: false
-  precomputed_events: false
-  precomputed_reading_measures: true
-
 resources:
   precomputed_reading_measures:
     - resource: "https://osf.io/download/xmt3k/"
