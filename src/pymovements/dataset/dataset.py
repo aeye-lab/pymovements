@@ -272,7 +272,7 @@ class Dataset:
             self,
             by: Sequence[str],
     ) -> None:
-        """Split gaze data into separated Gaze's.
+        """Split gaze data into separated Gaze objects.
 
         Parameters
         ----------
