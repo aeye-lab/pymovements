@@ -301,16 +301,6 @@ def test_load_precomputed_file_unsupported_file_format():
         'Supported formats are: .csv, .jsonl, .ndjson, .rda, .tsv, .txt'
 
 
-def test_load_precomputed_file_rda_raise_value_error():
-    filepath = 'tests/files/rda_test_file.rda'
-
-    with pytest.raises(ValueError) as exc:
-        pm.dataset.dataset_files.load_precomputed_event_file(filepath)
-
-    msg, = exc.value.args
-    assert msg == 'please specify r_dataframe_key in custom_read_kwargs'
-
-
 def test_load_precomputed_file_rda():
     filepath = 'tests/files/rda_test_file.rda'
 
@@ -326,3 +316,40 @@ def test_load_precomputed_file_rda():
         pl.DataFrame(expected_df['joint.fix']),
         check_column_order=False,
     )
+
+
+def test_load_precomputed_file_rda_raise_value_error():
+    filepath = 'tests/files/rda_test_file.rda'
+
+    with pytest.raises(ValueError) as exc:
+        pm.dataset.dataset_files.load_precomputed_event_file(filepath)
+
+    msg, = exc.value.args
+    assert msg == 'please specify r_dataframe_key in custom_read_kwargs'
+
+
+def test_load_precomputed_rm_file_rda():
+    filepath = 'tests/files/rda_test_file.rda'
+
+    gaze = pm.dataset.dataset_files.load_precomputed_reading_measure_file(
+        filepath,
+        custom_read_kwargs={'r_dataframe_key': 'joint.fix'},
+    )
+
+    expected_df = pyreadr.read_r('tests/files/rda_test_file.rda')
+
+    assert_frame_equal(
+        gaze.frame,
+        pl.DataFrame(expected_df['joint.fix']),
+        check_column_order=False,
+    )
+
+
+def test_load_precomputed_rm_file_rda_raise_value_error():
+    filepath = 'tests/files/rda_test_file.rda'
+
+    with pytest.raises(ValueError) as exc:
+        pm.dataset.dataset_files.load_precomputed_reading_measure_file(filepath)
+
+    msg, = exc.value.args
+    assert msg == 'please specify r_dataframe_key in custom_read_kwargs'
