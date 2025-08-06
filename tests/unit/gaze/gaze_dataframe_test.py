@@ -354,3 +354,64 @@ def test_gaze_dataframe_split_events_list():
     split_gaze = gaze.split(by)
     assert len(split_gaze) == 4
     assert all(gaze_df.events.frame.n_unique(by) == 1 for gaze_df in split_gaze)
+
+
+def test_gaze_dataframe_split_default():
+    gaze = pm.GazeDataFrame(
+        pl.DataFrame(
+            {
+                'x': [0, 1, 2, 3],
+                'y': [1, 1, 0, 0],
+                'trial_id': [0, 1, 1, 2],
+            },
+            schema={'x': pl.Float64, 'y': pl.Float64, 'trial_id': pl.Int8},
+        ),
+        experiment=None,
+        position_columns=['x', 'y'],
+        events=pm.EventDataFrame(
+            pl.DataFrame(
+                {
+                    'name': ['fixation', 'fixation', 'saccade', 'fixation'],
+                    'onset': [0, 1, 2, 3],
+                    'offset': [1, 2, 3, 4],
+                    'trial_id': [0, 1, 1, 2],
+                },
+            ),
+        ),
+        trial_columns=['trial_id'],
+    )
+
+    by = 'trial_id'
+    split_gaze = gaze.split()
+    assert all(gaze_df.events.frame.n_unique(by) == 1 for gaze_df in split_gaze)
+    assert_frame_equal(gaze.events.frame.filter(pl.col(by) == 0), split_gaze[0].events.frame)
+    assert_frame_equal(gaze.events.frame.filter(pl.col(by) == 1), split_gaze[1].events.frame)
+    assert_frame_equal(gaze.events.frame.filter(pl.col(by) == 2), split_gaze[2].events.frame)
+
+
+def test_gaze_dataframe_split_default_no_trial_columns():
+    gaze = pm.GazeDataFrame(
+        pl.DataFrame(
+            {
+                'x': [0, 1, 2, 3],
+                'y': [1, 1, 0, 0],
+                'trial_id': [0, 1, 1, 2],
+            },
+            schema={'x': pl.Float64, 'y': pl.Float64, 'trial_id': pl.Int8},
+        ),
+        experiment=None,
+        position_columns=['x', 'y'],
+        events=pm.EventDataFrame(
+            pl.DataFrame(
+                {
+                    'name': ['fixation', 'fixation', 'saccade', 'fixation'],
+                    'onset': [0, 1, 2, 3],
+                    'offset': [1, 2, 3, 4],
+                    'trial_id': [0, 1, 1, 2],
+                },
+            ),
+        ),
+    )
+
+    with pytest.raises(TypeError):
+        gaze.split()
