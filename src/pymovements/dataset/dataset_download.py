@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import shutil
+from collections.abc import Sequence
 from pathlib import Path
 from urllib.error import URLError
 from warnings import warn
@@ -29,6 +30,8 @@ from pymovements.dataset._utils._archives import extract_archive
 from pymovements.dataset._utils._downloads import download_file
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
+from pymovements.dataset.resources import ResourceDefinition
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.exceptions import UnknownFileType
 
 
@@ -78,9 +81,6 @@ def download_dataset(
     RuntimeError
         If downloading a resource failed for all given mirrors.
     """
-    if not definition.resources:
-        raise AttributeError('resources must be specified to download dataset.')
-
     for content in ('gaze', 'precomputed_events', 'precomputed_reading_measures'):
         if definition.has_files[content]:
             if not definition.mirrors:
@@ -88,14 +88,14 @@ def download_dataset(
             else:
                 mirrors = definition.mirrors.get(content, None)
 
-            if not definition.resources[content]:
+            if not definition.resources.has_content(content):
                 raise AttributeError(
                     f"'{content}' resources must be specified to download dataset.",
                 )
 
             _download_resources(
                 mirrors=mirrors,
-                resources=definition.resources[content],
+                resources=definition.resources.filter(content),
                 target_dirpath=paths.downloads,
                 verbose=verbose,
             )
@@ -149,8 +149,8 @@ def extract_dataset(
         if definition.has_files[content]:
             destination_dirpath = getattr(paths, content_directory)
             destination_dirpath.mkdir(parents=True, exist_ok=True)
-            for resource in definition.resources[content]:
-                source_path = paths.downloads / resource['filename']
+            for resource in definition.resources.filter(content):
+                source_path = paths.downloads / resource.filename
 
                 try:
                     extract_archive(
@@ -163,12 +163,12 @@ def extract_dataset(
                         verbose=verbose,
                     )
                 except UnknownFileType:  # just copy file to target if not an archive.
-                    shutil.copy(source_path, destination_dirpath / resource['filename'])
+                    shutil.copy(source_path, destination_dirpath / resource.filename)
 
 
 def _download_resources(
-        mirrors: list[str] | tuple[str, ...] | None,
-        resources: list[dict[str, str]] | tuple[dict[str, str], ...],
+        mirrors: Sequence[str] | None,
+        resources: ResourceDefinitions,
         target_dirpath: Path,
         verbose: bool,
 ) -> None:
@@ -182,46 +182,53 @@ def _download_resources(
 
 
 def _download_resource_without_mirrors(
-        resource: dict[str, str],
+        resource: ResourceDefinition,
         target_dirpath: Path,
         verbose: bool,
 ) -> None:
-    """Download resouce without mirrors."""
+    """Download resource without mirrors."""
+    if resource.url is None:
+        raise AttributeError('Resource.url must not be None')
+    if resource.filename is None:
+        raise AttributeError('Resource.filename must not be None')
+
     try:
         download_file(
-            url=resource['resource'],
+            url=resource.url,
             dirpath=target_dirpath,
-            filename=resource['filename'],
-            md5=resource['md5'],
+            filename=resource.filename,
+            md5=resource.md5,
             verbose=verbose,
         )
 
     # pylint: disable=overlapping-except
     except (URLError, OSError, RuntimeError) as error:
         raise RuntimeError(
-            f"downloading resource {resource['resource']} failed.",
+            f"downloading resource {resource.url} failed.",
         ) from error
 
 
 def _download_resource_with_mirrors(
-        mirrors: list[str] | tuple[str, ...],
-        resource: dict[str, str],
+        mirrors: Sequence[str],
+        resource: ResourceDefinition,
         target_dirpath: Path,
         verbose: bool,
 ) -> None:
     """Download resource with mirrors."""
+    if resource.url is None:
+        raise AttributeError('Resource.url must not be None')
+    if resource.filename is None:
+        raise AttributeError('Resource.filename must not be None')
+
     success = False
 
     for mirror_idx, mirror in enumerate(mirrors):
-
-        url = f'{mirror}{resource["resource"]}'
-
         try:
             download_file(
-                url=url,
+                url=f'{mirror}{resource.url}',
                 dirpath=target_dirpath,
-                filename=resource['filename'],
-                md5=resource['md5'],
+                filename=resource.filename,
+                md5=resource.md5,
                 verbose=verbose,
             )
             success = True
@@ -242,5 +249,5 @@ def _download_resource_with_mirrors(
 
     if not success:
         raise RuntimeError(
-            f"downloading resource {resource['resource']} failed for all mirrors.",
+            f"downloading resource {resource.url} failed for all mirrors.",
         )
