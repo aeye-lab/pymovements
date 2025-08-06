@@ -19,9 +19,9 @@
 # SOFTWARE.
 """GazeDataFrame implementation.
 
-.. deprecated:: v0.22.3
+.. deprecated:: v0.23.0
    Please use :py:class:`~pymovements.Gaze` instead.
-   This module will be removed in v0.27.0.
+   This module will be removed in v0.28.0.
 """
 from __future__ import annotations
 
@@ -40,7 +40,7 @@ class GazeDataFrame(metaclass=DeprecatedMetaClass):
 
     .. deprecated:: v0.22.3
        Please use :py:class:`~pymovements.Gaze` instead.
-       This module will be removed in v0.27.0.
+       This module will be removed in v0.28.0.
 
     Includes metadata on the experiment and recording setup.
 
@@ -201,8 +201,8 @@ class GazeDataFrame(metaclass=DeprecatedMetaClass):
     """
 
     _DeprecatedMetaClass__alias = Gaze
-    _DeprecatedMetaClass__version_deprecated = 'v0.22.1'
-    _DeprecatedMetaClass__version_removed = 'v0.27.0'
+    _DeprecatedMetaClass__version_deprecated = 'v0.23.0'
+    _DeprecatedMetaClass__version_removed = 'v0.28.0'
 
     frame: pl.DataFrame
 
