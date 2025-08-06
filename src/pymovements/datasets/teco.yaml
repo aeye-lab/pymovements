@@ -12,12 +12,7 @@ resources:
     - resource: "https://osf.io/download/xmt3k/"
       filename: "wordmeasure_v1.csv"
       md5: "61502321a757c0ffee01c0047b29a22b"
-
-filename_format:
-  precomputed_reading_measures: "wordmeasure_v1.csv"
-
-filename_format_schema_overrides:
-  precomputed_reading_measures: {}
+      filename_pattern: "wordmeasure_v1.csv"
 
 trial_columns:
   - book

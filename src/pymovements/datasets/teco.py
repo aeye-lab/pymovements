@@ -50,10 +50,6 @@ class TECO(DatasetDefinition):
     long_name: str
         The entire name of the dataset.
 
-    has_files: dict[str, bool]
-        Indicate whether the dataset contains 'gaze', 'precomputed_events', and
-        'precomputed_reading_measures'.
-
     resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
@@ -61,11 +57,11 @@ class TECO(DatasetDefinition):
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -105,14 +101,6 @@ class TECO(DatasetDefinition):
 
     long_name: str = 'Tsukuba Eye-tracking Corpus'
 
-    has_files: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': False,
-            'precomputed_events': False,
-            'precomputed_reading_measures': True,
-        },
-    )
-
     resources: ResourceDefinitions = field(
         default_factory=lambda: ResourceDefinitions.from_dict(
             {
@@ -121,23 +109,16 @@ class TECO(DatasetDefinition):
                         'resource': 'https://osf.io/download/xmt3k/',
                         'filename': 'wordmeasure_v1.csv',
                         'md5': '61502321a757c0ffee01c0047b29a22b',
+                        'filename_pattern': 'wordmeasure_v1.csv',
                     },
                 ],
             },
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'precomputed_reading_measures': 'wordmeasure_v1.csv',
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'precomputed_reading_measures': {},
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     trial_columns: list[str] = field(
         default_factory=lambda: [
