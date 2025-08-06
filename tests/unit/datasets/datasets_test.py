@@ -64,6 +64,11 @@ from pymovements import DatasetLibrary
         ),
         pytest.param(pm.datasets.Provo, 'Provo', id='Provo'),
         pytest.param(pm.datasets.SBSAT, 'SBSAT', id='SBSAT'),
+        pytest.param(
+            pm.datasets.SpanishShortStories,
+            'SpanishShortStories',
+            id='SpanishShortStories',
+        ),
         pytest.param(pm.datasets.ToyDataset, 'ToyDataset', id='ToyDataset'),
         pytest.param(pm.datasets.ToyDatasetEyeLink, 'ToyDatasetEyeLink', id='ToyDatasetEyeLink'),
         pytest.param(pm.datasets.UCL, 'UCL', id='UCL'),
