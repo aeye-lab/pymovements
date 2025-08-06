@@ -289,15 +289,16 @@ class Gaze:
         else:
             raise ValueError(f"unsupported method '{function}'")
 
-    def split(self, by: Sequence[str]) -> list[Gaze]:
+    def split(self, by: Sequence[str] | None = None) -> list[Gaze]:
         """Split the Gaze into multiple frames based on specified column(s).
 
         Parameters
         ----------
-        by: Sequence[str]
+        by: Sequence[str] | None
             Column name(s) to split the DataFrame by. If a single string is provided,
             it will be used as a single column name. If a sequence is provided, the DataFrame
             will be split by unique combinations of values in all specified columns.
+            If None, uses trial_columns. (default=None)
 
         Returns
         -------
@@ -305,6 +306,12 @@ class Gaze:
             A list of new Gaze instances, each containing a partition of the
             original data with all metadata and configurations preserved.
         """
+        # Use trial_columns if by is None
+        if by is None:
+            by = self.trial_columns
+            if by is None:
+                raise TypeError("Either 'by' or 'self.trial_columns' must be specified")
+
         # Convert single string to list for consistent handling
         by = [by] if isinstance(by, str) else by
         frames = self.frame.partition_by(by=by)

@@ -245,7 +245,8 @@ class Dataset:
 
         Supported file extensions:
         - CSV-like: .csv, .tsv, .txt
-        - JSON lines: .jsonl, .ndjson
+        - JSON like: .jsonl, .ndjson
+        - RDA like: .rda
 
         Raises
         ------
@@ -260,7 +261,24 @@ class Dataset:
         )
 
     def load_precomputed_reading_measures(self) -> None:
-        """Load precomputed events."""
+        """Load precomputed reading reading measures.
+
+        This method checks that the file information for precomputed reading measures are
+        available, then loads each event file listed in
+        `self.fileinfo['precomputed_reading_measures']` using the dataset definition and
+        path settings. The resulting list of `ReadingMeasures` objects is assigned to
+        `self.reading_measures`.
+
+        Supported file extensions:
+        - CSV-like: .csv, .tsv, .txt
+        - Excel-like: .xlsx
+        - RDA like: .rda
+
+        Raises
+        ------
+        ValueError
+            If the file info is missing or improperly formatted.
+        """
         self._check_fileinfo()
         self.precomputed_reading_measures = dataset_files.load_precomputed_reading_measures(
             self.definition,

@@ -45,6 +45,7 @@
     IITB_HGC
     InteRead
     JuDo1000
+    MECOL1W1
     MouseCursor
     OneStop
     PoTeC
@@ -52,6 +53,7 @@
     PotsdamBingeWearablePVT
     Provo
     SBSAT
+    TECO
     UCL
 
 
@@ -84,6 +86,9 @@ from pymovements.datasets.hbn import HBN
 from pymovements.datasets.iitb_hgc import IITB_HGC
 from pymovements.datasets.interead import InteRead
 from pymovements.datasets.judo1000 import JuDo1000
+from pymovements.datasets.mecol1w1 import MECOL1W1
+from pymovements.datasets.mecol2w1 import MECOL2W1
+from pymovements.datasets.mecol2w2 import MECOL2W2
 from pymovements.datasets.mousecursor import MouseCursor
 from pymovements.datasets.onestop import OneStop
 from pymovements.datasets.potec import PoTeC
@@ -91,6 +96,7 @@ from pymovements.datasets.potsdam_binge_remote_pvt import PotsdamBingeRemotePVT
 from pymovements.datasets.potsdam_binge_wearable_pvt import PotsdamBingeWearablePVT
 from pymovements.datasets.provo import Provo
 from pymovements.datasets.sb_sat import SBSAT
+from pymovements.datasets.teco import TECO
 from pymovements.datasets.toy_dataset import ToyDataset
 from pymovements.datasets.toy_dataset_eyelink import ToyDatasetEyeLink
 from pymovements.datasets.ucl import UCL
@@ -118,12 +124,16 @@ __all__ = [
     'InteRead',
     'JuDo1000',
     'MouseCursor',
+    'MECOL1W1',
+    'MECOL2W1',
+    'MECOL2W2',
     'OneStop',
     'PoTeC',
     'PotsdamBingeRemotePVT',
     'PotsdamBingeWearablePVT',
     'Provo',
     'SBSAT',
+    'TECO',
     'ToyDataset',
     'ToyDatasetEyeLink',
     'UCL',
