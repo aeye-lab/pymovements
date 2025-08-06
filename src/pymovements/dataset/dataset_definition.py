@@ -330,17 +330,17 @@ class DatasetDefinition:
     @property
     @deprecated(
         reason='Please use Resource.filename_pattern instead. '
-               'This property will be removed in v0.28.0.',
-        version='v0.23.0',
+               'This property will be removed in v0.27.0.',
+        version='v0.22.3',
     )
     def filename_format(self) -> dict[str, str]:
         """Regular expression which will be matched before trying to load the file.
 
         Namedgroups will appear in the `fileinfo` dataframe.
 
-        .. deprecated:: v0.23.0
+        .. deprecated:: v0.22.3
         Please use Resource.filename_pattern instead.
-        This property will be removed in v0.28.0.
+        This property will be removed in v0.27.0.
 
         Returns
         -------
@@ -360,8 +360,8 @@ class DatasetDefinition:
     @filename_format.setter
     @deprecated(
         reason='Please use Resource.filename_pattern instead. '
-               'This property will be removed in v0.28.0.',
-        version='v0.23.0',
+               'This property will be removed in v0.27.0.',
+        version='v0.22.3',
     )
     def filename_format(self, data: dict[str, str]) -> None:
         for content_type in data:
@@ -372,17 +372,17 @@ class DatasetDefinition:
     @property
     @deprecated(
         reason='Please use Resource.filename_pattern_schema_overrides instead. '
-               'This property will be removed in v0.28.0.',
-        version='v0.23.0',
+               'This property will be removed in v0.27.0.',
+        version='v0.22.3',
     )
     def filename_format_schema_overrides(self) -> dict[str, dict[str, type]]:
         """Specifies datatypes of named groups in the filename pattern.
 
         This casts specific named groups to a particular datatype.
 
-        .. deprecated:: v0.23.0
+        .. deprecated:: v0.22.3
         Please use Resource.filename_pattern_schema_overrides instead.
-        This property will be removed in v0.28.0.
+        This property will be removed in v0.27.0.
 
         Returns
         -------
@@ -402,8 +402,8 @@ class DatasetDefinition:
     @filename_format_schema_overrides.setter
     @deprecated(
         reason='Please use Resource.filename_pattern instead. '
-               'This property will be removed in v0.28.0.',
-        version='v0.23.0',
+               'This property will be removed in v0.27.0.',
+        version='v0.22.3',
     )
     def filename_format_schema_overrides(self, data: dict[str, dict[str, type]]) -> None:
         for content_type in data:
