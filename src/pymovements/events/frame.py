@@ -307,15 +307,16 @@ class EventDataFrame:
         """
         return self.clone()
 
-    def split(self, by: Sequence[str]) -> list[EventDataFrame]:
+    def split(self, by: Sequence[str] | None = None) -> list[EventDataFrame]:
         """Split the EventDataFrame into multiple frames based on specified column(s).
 
         Parameters
         ----------
-        by: Sequence[str]
+        by: Sequence[str] | None
             Column name(s) to split the DataFrame by. If a single string is provided,
             it will be used as a single column name. If a list is provided, the DataFrame
             will be split by unique combinations of values in all specified columns.
+            If None, uses trial_columns. (default: None)
 
         Returns
         -------
@@ -323,6 +324,12 @@ class EventDataFrame:
             A list of new EventDataFrame instances, each containing a partition of the
             original data with all metadata and configurations preserved.
         """
+        # Use trial_columns if by is None
+        if by is None:
+            by = self.trial_columns
+            if by is None:
+                raise TypeError("Either 'by' or 'self.trial_columns' must be specified")
+
         event_pl_df_list = list(self.frame.partition_by(by=by))
 
         # Ensure column order: trial columns, name, onset, offset.

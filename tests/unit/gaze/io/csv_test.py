@@ -310,7 +310,7 @@ from pymovements.gaze import from_csv
     ],
 )
 def test_from_csv_gaze_has_expected_shape_and_columns(kwargs, expected_shape, expected_schema):
-    gaze_dataframe = from_csv(**kwargs)
+    gaze = from_csv(**kwargs)
 
-    assert gaze_dataframe.frame.shape == expected_shape
-    assert gaze_dataframe.frame.schema == expected_schema
+    assert gaze.frame.shape == expected_shape
+    assert gaze.frame.schema == expected_schema
