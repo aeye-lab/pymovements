@@ -116,7 +116,6 @@ def mock_toy(
         rootpath,
         raw_fileformat,
         eyes,
-        samples=True,
         remote=False,
         extract=_UNSET,
         filename_format_schema_overrides=_UNSET,
