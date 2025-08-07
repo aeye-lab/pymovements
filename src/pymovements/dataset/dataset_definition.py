@@ -30,6 +30,7 @@ from typing import Union
 from warnings import warn
 
 import yaml
+from deprecated.sphinx import deprecated
 
 from pymovements._utils._html import repr_html
 from pymovements.dataset._utils._yaml import reverse_substitute_types
@@ -77,12 +78,6 @@ class DatasetDefinition:
         Decide whether to extract the data. (default: None)
         .. deprecated:: v0.22.1
         This field will be removed in v0.27.0.
-    filename_format: dict[str, str]
-        Regular expression which will be matched before trying to load the file. Namedgroups will
-        appear in the `fileinfo` dataframe. (default: field(default_factory=dict))
-    filename_format_schema_overrides: dict[str, dict[str, type]]
-        If named groups are present in the `filename_format`, this makes it possible to cast
-        specific named groups to a particular datatype. (default: field(default_factory=dict))
     custom_read_kwargs: dict[str, dict[str, Any]]
         If specified, these keyword arguments will be passed to the file reading function. The
         behavior of this argument depends on the file extension of the dataset files.
@@ -246,10 +241,6 @@ class DatasetDefinition:
 
     extract: dict[str, bool] | None = None
 
-    filename_format: dict[str, str] = field(default_factory=dict)
-
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(default_factory=dict)
-
     custom_read_kwargs: dict[str, dict[str, Any]] = field(default_factory=dict)
 
     column_map: dict[str, str] = field(default_factory=dict)
@@ -311,16 +302,6 @@ class DatasetDefinition:
         else:
             self.mirrors = mirrors
 
-        if filename_format is None:
-            self.filename_format = {}
-        else:
-            self.filename_format = filename_format
-
-        if filename_format_schema_overrides is None:
-            self.filename_format_schema_overrides = {}
-        else:
-            self.filename_format_schema_overrides = filename_format_schema_overrides
-
         if custom_read_kwargs is None:
             self.custom_read_kwargs = {}
         else:
@@ -331,7 +312,11 @@ class DatasetDefinition:
         else:
             self.column_map = column_map
 
-        self.resources = self._initialize_resources(resources)
+        self.resources = self._initialize_resources(
+            resources=resources,
+            filename_format=filename_format,
+            filename_format_schema_overrides=filename_format_schema_overrides,
+        )
         self._has_resources = _HasResourcesIndexer(resources=self.resources)
 
         if self.extract is not None:
@@ -341,6 +326,86 @@ class DatasetDefinition:
                     'This field will be removed in v0.27.0.',
                 ),
             )
+
+    @property
+    @deprecated(
+        reason='Please use Resource.filename_pattern instead. '
+               'This property will be removed in v0.28.0.',
+        version='v0.23.0',
+    )
+    def filename_format(self) -> dict[str, str]:
+        """Regular expression which will be matched before trying to load the file.
+
+        Namedgroups will appear in the `fileinfo` dataframe.
+
+        .. deprecated:: v0.23.0
+        Please use Resource.filename_pattern instead.
+        This property will be removed in v0.28.0.
+
+        Returns
+        -------
+        dict[str, str]
+            filename format for each content type
+        """
+        data: dict[str, str] = {}
+        content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures')
+        for content_type in content_types:
+            if content_resources := self.resources.filter(content=content_type):
+                # take first resource with matching content type.
+                # deprecated property supports only one value per content type.
+                data[content_type] = content_resources[0].filename_pattern
+        return data
+
+    @filename_format.setter
+    @deprecated(
+        reason='Please use Resource.filename_pattern instead. '
+               'This property will be removed in v0.28.0.',
+        version='v0.23.0',
+    )
+    def filename_format(self, data: dict[str, str]) -> None:
+        for resource in self.resources:
+            if resource.content in data:
+                resource.filename_pattern = data[resource.content]
+
+    @property
+    @deprecated(
+        reason='Please use Resource.filename_pattern_schema_overrides instead. '
+               'This property will be removed in v0.28.0.',
+        version='v0.23.0',
+    )
+    def filename_format_schema_overrides(self) -> dict[str, dict[str, type]]:
+        """Specifies datatypes of named groups in the filename pattern.
+
+        This casts specific named groups to a particular datatype.
+
+        .. deprecated:: v0.23.0
+        Please use Resource.filename_pattern_schema_overrides instead.
+        This property will be removed in v0.28.0.
+
+        Returns
+        -------
+        dict[str, dict[str, type]]
+            filename format schema overrides for each content type
+        """
+        data: dict[str, dict[str, type]] = {}
+        content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures')
+        for content_type in content_types:
+            if content_resources := self.resources.filter(content=content_type):
+                # take first resource with matching content type.
+                # deprecated property supports only one dict per content type.
+                data[content_type] = content_resources[0].filename_pattern_schema_overrides
+        return data
+
+    @filename_format_schema_overrides.setter
+    @deprecated(
+        reason='Please use Resource.filename_pattern instead. '
+               'This property will be removed in v0.28.0.',
+        version='v0.23.0',
+    )
+    def filename_format_schema_overrides(self, data: dict[str, dict[str, type]]) -> None:
+        for resource in self.resources:
+            if resource.content in data:
+                resource.filename_pattern_schema_overrides = data[resource.content]
 
     @staticmethod
     def from_yaml(path: str | Path) -> DatasetDefinition:
@@ -393,6 +458,8 @@ class DatasetDefinition:
 
         # Delete private fields from dictionary.
         if exclude_private:
+            # we need a separate list of keys here or else we get a
+            # RuntimeError: dictionary changed size during iteration
             for key in list(data.keys()):
                 if key.startswith('_'):
                     del data[key]
@@ -477,18 +544,43 @@ class DatasetDefinition:
         return self._has_resources
 
     def _initialize_resources(
-        self, resources: ResourceDefinitions |
-        ResourcesLike | None,
+            self,
+            resources: ResourceDefinitions | ResourcesLike | None,
+            filename_format: dict[str, str] | None,
+            filename_format_schema_overrides: dict[str, dict[str, type]] | None,
     ) -> ResourceDefinitions:
         """Initialize ``ResourceDefinitions`` instance if necessary."""
         if isinstance(resources, ResourceDefinitions):
             return resources
+
         if resources is None:
-            return ResourceDefinitions()
+            # some legacy definitions may have defined filename format but no resources.
+            # create legacy formatted resource dict to contain filename pattern.
+            if filename_format:
+                resources = {
+                    content_type: [{'filename_pattern': filename_format[content_type]}]
+                    for content_type in filename_format
+                }
+            else:
+                return ResourceDefinitions()
+
+        # this calls deprecated methods and will be removed in the future.
         if isinstance(resources, dict):
+            if filename_format:
+                for content_type in filename_format:
+                    for resource_dict in resources[content_type]:
+                        resource_dict['filename_pattern'] = filename_format[content_type]
+            if filename_format_schema_overrides:
+                for content_type in filename_format_schema_overrides:
+                    for resource_dict in resources[content_type]:
+                        _schema_overrides = filename_format_schema_overrides[content_type]
+                        resource_dict['filename_pattern_schema_overrides'] = _schema_overrides
             return ResourceDefinitions.from_dict(resources)
+
         if isinstance(resources, Sequence):
+            assert isinstance(resources, Sequence)
             return ResourceDefinitions.from_dicts(resources)
+
         raise TypeError(
             f'resources is of type {type(resources).__name__} but must be of type'
             ' ResourceDefinitions, list, or dict.',

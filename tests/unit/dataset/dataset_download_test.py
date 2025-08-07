@@ -1394,9 +1394,6 @@ def test_public_dataset_registered_correct_attributes(tmp_path, dataset_definiti
     assert dataset.definition.mirrors == dataset_definition.mirrors
     assert dataset.definition.resources == dataset_definition.resources
     assert dataset.definition.experiment == dataset_definition.experiment
-    assert dataset.definition.filename_format == dataset_definition.filename_format
-    assert dataset.definition.filename_format_schema_overrides \
-        == dataset_definition.filename_format_schema_overrides
     assert dataset.definition.has_files == dataset_definition.has_files
 
 

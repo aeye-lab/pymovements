@@ -59,11 +59,11 @@ class UCL(DatasetDefinition):
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -92,7 +92,7 @@ class UCL(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'UCL'
 
@@ -113,6 +113,7 @@ class UCL(DatasetDefinition):
                     'resource': 'https://static-content.springer.com/esm/art%3A10.3758%2Fs13428-012-0313-y/MediaObjects/13428_2012_313_MOESM1_ESM.zip',  # noqa: E501 # pylint: disable=line-too-long
                     'filename': 'UCL_events.zip',
                     'md5': '77e3c0cacccb0a074a55d23aa8531ca5',
+                    'filename_pattern': r'eyetracking.fix',
                 },
             ],
             'precomputed_reading_measures': [
@@ -120,24 +121,15 @@ class UCL(DatasetDefinition):
                     'resource': 'https://static-content.springer.com/esm/art%3A10.3758%2Fs13428-012-0313-y/MediaObjects/13428_2012_313_MOESM1_ESM.zip',  # noqa: E501 # pylint: disable=line-too-long
                     'filename': 'UCL_measures.zip',
                     'md5': '77e3c0cacccb0a074a55d23aa8531ca5',
+                    'filename_pattern': r'eyetracking.RT',
                 },
             ],
         }),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'precomputed_events': r'eyetracking.fix',
-            'precomputed_reading_measures': r'eyetracking.RT',
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'precomputed_events': {},
-            'precomputed_reading_measures': {},
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 

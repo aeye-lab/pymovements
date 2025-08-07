@@ -55,11 +55,11 @@ class ChineseReading(DatasetDefinition):
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -94,7 +94,7 @@ class ChineseReading(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'ChineseReading'
 
@@ -116,6 +116,7 @@ class ChineseReading(DatasetDefinition):
                         'providers/osfstorage/6253cb37840dd726e75c831a',
                         'filename': 'Raw Data.txt',
                         'md5': None,  # type: ignore
+                        'filename_pattern': 'Raw Data.txt',
                     },
                 ],
                 'precomputed_reading_measures': [
@@ -124,27 +125,16 @@ class ChineseReading(DatasetDefinition):
                         'https://files.osf.io/v1/resources/94wue/providers/osfstorage/?zip=',
                         'filename': 'chinese_reading_measures.zip',
                         'md5': None,  # type: ignore
+                        'filename_pattern': r'{measure_type:s} Measures.xlsx',
                     },
                 ],
             },
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': 'Raw Data.txt',
-                'precomputed_reading_measures': r'{measure_type:s} Measures.xlsx',
-            },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': {},
-                'precomputed_reading_measures': {},
-            },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     trial_columns: list[str] = field(
         default_factory=lambda: [

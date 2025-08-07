@@ -10,19 +10,12 @@ resources:
     - resource: 'https://files.osf.io/v1/resources/94wue/providers/osfstorage/6253cb37840dd726e75c831a'
       filename: Raw Data.txt
       md5: null
+      filename_pattern: 'Raw Data.txt'
   precomputed_reading_measures:
     - resource: 'https://files.osf.io/v1/resources/94wue/providers/osfstorage/?zip='
       filename: chinese_reading_measures.zip
       md5: null
-
-
-filename_format:
-  precomputed_events: 'Raw Data.txt'
-  precomputed_reading_measures: '{measure_type:s} Measures.xlsx'
-
-filename_format_schema_overrides:
-  precomputed_events: {}
-  precomputed_reading_measures: {}
+      filename_pattern: '{measure_type:s} Measures.xlsx'
 
 trial_columns:
   - Subject

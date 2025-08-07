@@ -62,11 +62,11 @@ class Provo(DatasetDefinition):
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -95,7 +95,7 @@ class Provo(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'Provo'
 
@@ -117,26 +117,17 @@ class Provo(DatasetDefinition):
                         'resource': 'https://osf.io/download/z3eh6/',
                         'filename': 'Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv',
                         'md5': '7aa239e51e5d78528e2430f84a23da3f',
+                        'filename_pattern':
+                            'Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv',
                     },
                 ],
             },
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events':
-                'Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv',
-            },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': {},
-            },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 

@@ -57,11 +57,11 @@ class IITB_HGC(DatasetDefinition):
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -96,7 +96,7 @@ class IITB_HGC(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'IITB_HGC'
 
@@ -119,23 +119,16 @@ class IITB_HGC(DatasetDefinition):
                         'resolve/main/IITB_HGC.jsonl?download=true',
                         'filename': 'IITB_HGC.jsonl',
                         'md5': 'cde5dd88534e87d9b2f1ab6e47133b5c',
+                        'filename_pattern': 'IITB_HGC.jsonl',
                     },
                 ],
             },
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'precomputed_events': 'IITB_HGC.jsonl',
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'precomputed_events': {},
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     trial_columns: list[str] = field(
         default_factory=lambda: [

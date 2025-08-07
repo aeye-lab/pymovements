@@ -177,6 +177,38 @@ def test_resource_is_not_equal(resource1, resource2):
             id='deprecated_resource_key',
         ),
 
+        pytest.param(
+            {
+                'content': 'gaze',
+                'filename_pattern': 'test.csv',
+            },
+            ResourceDefinition(
+                content='gaze',
+                filename=None,
+                url=None,
+                md5=None,
+                filename_pattern='test.csv',
+            ),
+            id='filename_pattern',
+        ),
+
+        pytest.param(
+            {
+                'content': 'gaze',
+                'filename_pattern': '{subject_id:d}.csv',
+                'filename_pattern_schema_overrides': {'subject_id': int},
+            },
+            ResourceDefinition(
+                content='gaze',
+                filename=None,
+                url=None,
+                md5=None,
+                filename_pattern='{subject_id:d}.csv',
+                filename_pattern_schema_overrides={'subject_id': int},
+            ),
+            id='filename_pattern_schema_overrides',
+        ),
+
     ],
 )
 def test_resource_from_dict_expected(resource_dict, expected_resource):

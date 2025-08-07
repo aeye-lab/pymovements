@@ -71,15 +71,15 @@ class PotsdamBingeWearablePVT(DatasetDefinition):
     experiment: Experiment
         The experiment definition.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
-    trial_columns: list[str]
+    trial_columns: list[str] | None
             The name of the trial columns in the input data frame. If the list is empty or None,
             the input data frame is assumed to contain only one trial. If the list is not empty,
             the input data frame is assumed to contain multiple trials and the transformation
@@ -130,7 +130,7 @@ class PotsdamBingeWearablePVT(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'PotsdamBingeWearablePVT'
 
@@ -158,16 +158,34 @@ class PotsdamBingeWearablePVT(DatasetDefinition):
                         'resource': '9vbs8/',
                         'filename': 'a.zip',
                         'md5': '87c6c74a9a17cbd093b91f9415e8dd9d',
+                        'filename_pattern': r'{subject_id:d}_{session_id:d}_{condition:s}_{trial_id:d}_{block_id:d}.csv',  # noqa: E501 # pylint: disable=line-too-long
+                        'filename_pattern_schema_overrides': {
+                            'subject_id': int,
+                            'trial_id': int,
+                            'block_id': int,
+                        },
                     },
                     {
                         'resource': 'yqukn/',
                         'filename': 'b.zip',
                         'md5': '54038547b1a373253b38999a227dde63',
+                        'filename_pattern': r'{subject_id:d}_{session_id:d}_{condition:s}_{trial_id:d}_{block_id:d}.csv',  # noqa: E501 # pylint: disable=line-too-long
+                        'filename_pattern_schema_overrides': {
+                            'subject_id': int,
+                            'trial_id': int,
+                            'block_id': int,
+                        },
                     },
                     {
                         'resource': 'yf2xa/',
                         'filename': 'e.zip',
                         'md5': 'a0d0203cbb273f6908c1b52a42750551',
+                        'filename_pattern': r'{subject_id:d}_{session_id:d}_{condition:s}_{trial_id:d}_{block_id:d}.csv',  # noqa: E501 # pylint: disable=line-too-long
+                        'filename_pattern_schema_overrides': {
+                            'subject_id': int,
+                            'trial_id': int,
+                            'block_id': int,
+                        },
                     },
                 ],
             },
@@ -194,28 +212,11 @@ class PotsdamBingeWearablePVT(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze': r'{subject_id:d}_{session_id:d}_{condition:s}_{trial_id:d}_{block_id:d}.csv',
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'subject_id': int,
-                'trial_id': int,
-                'block_id': int,
-            },
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
-    trial_columns: list[str] = field(
-        default_factory=lambda: [
-            'trial_id',
-            'subject_id',
-        ],
-    )
+    trial_columns: list[str] | None = None
 
     time_column: str = 'eyelink_timestamp'
 

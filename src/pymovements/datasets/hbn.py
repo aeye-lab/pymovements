@@ -66,11 +66,11 @@ class HBN(DatasetDefinition):
     experiment: Experiment
         The experiment definition.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -114,7 +114,7 @@ class HBN(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'HBN'
 
@@ -136,6 +136,11 @@ class HBN(DatasetDefinition):
                         'resource': 'https://files.osf.io/v1/resources/qknuv/providers/osfstorage/651190031e76a453918a9971',  # noqa: E501 # pylint: disable=line-too-long
                         'filename': 'data.zip',
                         'md5': '2c523e911022ffc0eab700e34e9f7f30',
+                        'filename_pattern': r'{subject_id:12}_{video_id}.csv',
+                        'filename_pattern_schema_overrides': {
+                            'subject_id': str,
+                            'video_id': str,
+                        },
                     },
                 ],
             },
@@ -154,20 +159,9 @@ class HBN(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze': r'{subject_id:12}_{video_id}.csv',
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'subject_id': str,
-                'video_id': str,
-            },
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     time_column: str = 'time'
 

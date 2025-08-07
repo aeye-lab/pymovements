@@ -58,11 +58,11 @@ class MECOL2W1(DatasetDefinition):
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -118,6 +118,7 @@ class MECOL2W1(DatasetDefinition):
                         'resource': 'https://osf.io/download/8rygu/',
                         'filename': 'joint_l2_fixation_trimmed_report_2.0.rda',
                         'md5': '1ff32c5823eb70c22bab725499fbbf87',
+                        'filename_pattern': 'joint_l2_fixation_trimmed_report_2.0.rda',
                     },
                 ],
                 'precomputed_reading_measures': [
@@ -125,25 +126,16 @@ class MECOL2W1(DatasetDefinition):
                         'resource': 'https://osf.io/download/re7uy/',
                         'filename': 'joint_data_l2_trimmed_version2.0.rda',
                         'md5': '3d10225781faf413467104dcc4e071e0',
+                        'filename_pattern': 'joint_data_l2_trimmed_version2.0.rda',
                     },
                 ],
             },
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'precomputed_events': 'joint_l2_fixation_trimmed_report_2.0.rda',
-            'precomputed_reading_measures': 'joint_data_l2_trimmed_version2.0.rda',
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'precomputed_events': {},
-            'precomputed_reading_measures': {},
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     trial_columns: list[str] = field(
         default_factory=lambda: [

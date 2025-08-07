@@ -67,11 +67,11 @@ class ETDD70(DatasetDefinition):
     experiment: Experiment
         The experiment definition.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -112,7 +112,7 @@ class ETDD70(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'ETDD70'
 
@@ -134,6 +134,7 @@ class ETDD70(DatasetDefinition):
                         'resource': 'https://zenodo.org/api/records/13332134/files-archive',
                         'filename': 'edd_raw.zip',
                         'md5': None,  # type: ignore
+                        'filename_pattern': r'Subject_{subject_id:d}_{task:s}_raw.csv',
                     },
                 ],
                 'precomputed_events': [
@@ -141,6 +142,7 @@ class ETDD70(DatasetDefinition):
                         'resource': 'https://zenodo.org/api/records/13332134/files-archive',
                         'filename': 'edd_fix.zip',
                         'md5': None,  # type: ignore
+                        'filename_pattern': r'Subject_{subject_id:d}_{task:s}_fixations.csv',
                     },
                 ],
             },
@@ -159,21 +161,9 @@ class ETDD70(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda:
-            {
-                'gaze': r'Subject_{subject_id:d}_{task:s}_raw.csv',
-                'precomputed_events': r'Subject_{subject_id:d}_{task:s}_fixations.csv',
-            },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda:
-            {
-                'gaze': {},
-                'precomputed_events': {},
-            },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     time_column: str = 'time'
 

@@ -61,11 +61,11 @@ class Gaze4Hate(DatasetDefinition):
     experiment: Experiment
         The experiment definition.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -97,7 +97,7 @@ class Gaze4Hate(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'Gaze4Hate'
 
@@ -119,6 +119,7 @@ class Gaze4Hate(DatasetDefinition):
                         'resource': 'https://osf.io/download/dbshf/',
                         'filename': 'gaze4hate_sentence_reading_fix_report.csv',
                         'md5': 'c8cc645d1fad659f9442d61795da5481',
+                        'filename_pattern': 'gaze4hate_sentence_reading_fix_report.csv',
                     },
                 ],
                 'precomputed_reading_measures': [
@@ -126,6 +127,7 @@ class Gaze4Hate(DatasetDefinition):
                         'resource': 'https://osf.io/download/fgdjw/',
                         'filename': 'gaze4hate_sentence_reading_IA_report.csv',
                         'md5': 'e09e791e7d31d6ac3c69cd862d139c57',
+                        'filename_pattern': 'gaze4hate_sentence_reading_IA_report.csv',
                     },
                 ],
             },
@@ -144,21 +146,9 @@ class Gaze4Hate(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda:
-        {
-            'precomputed_events': 'gaze4hate_sentence_reading_fix_report.csv',
-            'precomputed_reading_measures': 'gaze4hate_sentence_reading_IA_report.csv',
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda:
-        {
-            'precomputed_events': {},
-            'precomputed_reading_measures': {},
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     trial_columns: list[str] = field(
         default_factory=lambda: [

@@ -12,6 +12,14 @@ resources:
     - resource: "https://didec.uvt.nl/corpus/DIDEC_only_the_eyetracking_data.zip"
       filename: "DIDEC_only_the_eyetracking_data.zip"
       md5: "d572b0b41828986ca48a2fcf6966728a"
+      filename_pattern: 'Ruud_exp{experiment:d}_list{list:d}_v{version:d}_ppn{participant:d}_{session:d}_Trial{trial:d} Samples.txt'
+      filename_pattern_schema_overrides:
+        experiment: !int
+        list: !int
+        version: !int
+        participant: !int
+        session: !int
+        trial: !int
 
 experiment:
   screen_width_px: 1680
@@ -21,18 +29,6 @@ experiment:
   distance_cm: 70
   origin: "upper left"
   sampling_rate: 1000
-
-filename_format:
-  gaze: 'Ruud_exp{experiment:d}_list{list:d}_v{version:d}_ppn{participant:d}_{session:d}_Trial{trial:d} Samples.txt'
-
-filename_format_schema_overrides:
-  gaze:
-    experiment: !int
-    list: !int
-    version: !int
-    participant: !int
-    session: !int
-    trial: !int
 
 trial_columns:
   - "Stimulus"

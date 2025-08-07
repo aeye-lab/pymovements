@@ -75,11 +75,11 @@ class PoTeC(DatasetDefinition):
     experiment: Experiment
         The experiment definition.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -120,7 +120,7 @@ class PoTeC(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'PoTeC'
 
@@ -142,6 +142,11 @@ class PoTeC(DatasetDefinition):
                         'resource': 'https://osf.io/download/tgd9q/',
                         'filename': 'PoTeC.zip',
                         'md5': 'cffd45039757c3777e2fd130e5d8a2ad',
+                        'filename_pattern': r'reader{subject_id:d}_{text_id}_raw_data.tsv',
+                        'filename_pattern_schema_overrides': {
+                            'subject_id': int,
+                            'text_id': str,
+                        },
                     },
                 ],
                 'precomputed_events': [
@@ -149,6 +154,11 @@ class PoTeC(DatasetDefinition):
                         'resource': 'https://osf.io/download/d8pyg/',
                         'filename': 'fixation.zip',
                         'md5': 'ecd9a998d07158922bb9b8cdd52f5688',
+                        'filename_pattern': r'reader{subject_id:d}_{text_id}_uncorrected_fixations.tsv',  # noqa: E501 # pylint: disable=line-too-long
+                        'filename_pattern_schema_overrides': {
+                            'subject_id': int,
+                            'text_id': str,
+                        },
                     },
                 ],
                 'precomputed_reading_measures': [
@@ -156,6 +166,11 @@ class PoTeC(DatasetDefinition):
                         'resource': 'https://osf.io/download/3ywhz/',
                         'filename': 'reading_measures.zip',
                         'md5': 'efafec5ce074d8f492cc2409b6c4d9eb',
+                        'filename_pattern': r'reader{subject_id:d}_{text_id}_merged.tsv',
+                        'filename_pattern_schema_overrides': {
+                            'subject_id': int,
+                            'text_id': str,
+                        },
                     },
                 ],
             },
@@ -174,30 +189,9 @@ class PoTeC(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze': r'reader{subject_id:d}_{text_id}_raw_data.tsv',
-            'precomputed_events': r'reader{subject_id:d}_{text_id}_uncorrected_fixations.tsv',
-            'precomputed_reading_measures': r'reader{subject_id:d}_{text_id}_merged.tsv',
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'subject_id': int,
-                'text_id': str,
-            },
-            'precomputed_events': {
-                'subject_id': int,
-                'text_id': str,
-            },
-            'precomputed_reading_measures': {
-                'subject_id': int,
-                'text_id': str,
-            },
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     time_column: str = 'time'
 
