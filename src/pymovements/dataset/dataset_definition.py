@@ -350,8 +350,7 @@ class DatasetDefinition:
         data: dict[str, str] = {}
         content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures')
         for content_type in content_types:
-            content_resources = self.resources.filter(content=content_type)
-            if content_resources:
+            if content_resources := self.resources.filter(content=content_type):
                 # take first resource with matching content type.
                 # deprecated property supports only one value per content type.
                 data[content_type] = content_resources[0].filename_pattern
@@ -364,10 +363,9 @@ class DatasetDefinition:
         version='v0.23.0',
     )
     def filename_format(self, data: dict[str, str]) -> None:
-        for content_type in data:
-            for resource in self.resources:
-                if resource.content == content_type:
-                    resource.filename_pattern = data[content_type]
+        for resource in self.resources:
+            if resource.content in data:
+                resource.filename_pattern = data[resource.content]
 
     @property
     @deprecated(
@@ -392,8 +390,7 @@ class DatasetDefinition:
         data: dict[str, dict[str, type]] = {}
         content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures')
         for content_type in content_types:
-            content_resources = self.resources.filter(content=content_type)
-            if content_resources:
+            if content_resources := self.resources.filter(content=content_type):
                 # take first resource with matching content type.
                 # deprecated property supports only one dict per content type.
                 data[content_type] = content_resources[0].filename_pattern_schema_overrides
@@ -406,10 +403,9 @@ class DatasetDefinition:
         version='v0.23.0',
     )
     def filename_format_schema_overrides(self, data: dict[str, dict[str, type]]) -> None:
-        for content_type in data:
-            for resource in self.resources:
-                if resource.content == content_type:
-                    resource.filename_pattern_schema_overrides = data[content_type]
+        for resource in self.resources:
+            if resource.content in data:
+                resource.filename_pattern_schema_overrides = data[resource.content]
 
     @staticmethod
     def from_yaml(path: str | Path) -> DatasetDefinition:
@@ -462,6 +458,8 @@ class DatasetDefinition:
 
         # Delete private fields from dictionary.
         if exclude_private:
+            # we need a separate list of keys here or else we get a
+            # RuntimeError: dictionary changed size during iteration
             for key in list(data.keys()):
                 if key.startswith('_'):
                     del data[key]
@@ -561,7 +559,7 @@ class DatasetDefinition:
             if filename_format:
                 resources = {
                     content_type: [{'filename_pattern': filename_format[content_type]}]
-                    for content_type in filename_format.keys()
+                    for content_type in filename_format
                 }
             else:
                 return ResourceDefinitions()
@@ -569,11 +567,11 @@ class DatasetDefinition:
         # this calls deprecated methods and will be removed in the future.
         if isinstance(resources, dict):
             if filename_format:
-                for content_type in filename_format.keys():
+                for content_type in filename_format:
                     for resource_dict in resources[content_type]:
                         resource_dict['filename_pattern'] = filename_format[content_type]
             if filename_format_schema_overrides:
-                for content_type in filename_format_schema_overrides.keys():
+                for content_type in filename_format_schema_overrides:
                     for resource_dict in resources[content_type]:
                         _schema_overrides = filename_format_schema_overrides[content_type]
                         resource_dict['filename_pattern_schema_overrides'] = _schema_overrides
