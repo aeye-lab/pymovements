@@ -2,11 +2,6 @@ name: "PoTeC"
 
 long_name: "Potsdam Textbook Corpus"
 
-has_files:
-  gaze: true
-  precomputed_events: true
-  precomputed_reading_measures: true
-
 resources:
   gaze:
     - resource: "https://osf.io/download/tgd9q/"

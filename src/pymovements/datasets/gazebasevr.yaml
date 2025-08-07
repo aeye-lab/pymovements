@@ -2,11 +2,6 @@ name: "GazeBaseVR"
 
 long_name: 'GazeBaseVR dataset'
 
-has_files:
-  gaze: true
-  precomputed_events: false
-  precomputed_reading_measures: false
-
 resources:
   gaze:
     - resource: "https://figshare.com/ndownloader/files/38844024"

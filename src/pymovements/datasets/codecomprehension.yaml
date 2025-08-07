@@ -2,11 +2,6 @@ name: CodeComprehension
 
 long_name: "Code Comprehension dataset"
 
-has_files:
-  gaze: false
-  precomputed_events: true
-  precomputed_reading_measures: false
-
 resources:
   precomputed_events:
     - resource: "https://zenodo.org/records/11123101/files/Predicting%20Code%20Comprehension%20Package.zip?download=1"

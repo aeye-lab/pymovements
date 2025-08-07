@@ -2,11 +2,6 @@ name: "MouseCursor"
 
 long_name: "Mouse Cursor dataset"
 
-has_files:
-  gaze: true
-  precomputed_events: false
-  precomputed_reading_measures: false
-
 resources:
   gaze:
     - resource: "https://ars.els-cdn.com/content/image/1-s2.0-S2352340921000160-mmc1.zip"

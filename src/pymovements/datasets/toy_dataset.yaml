@@ -2,11 +2,6 @@ name: "ToyDataset"
 
 long_name: "pymovements Toy Dataset"
 
-has_files:
-  gaze: true
-  precomputed_events: false
-  precomputed_reading_measures: false
-
 resources:
   gaze:
     - resource: "http://github.com/aeye-lab/pymovements-toy-dataset/zipball/6cb5d663317bf418cec0c9abe1dde5085a8a8ebd/"
