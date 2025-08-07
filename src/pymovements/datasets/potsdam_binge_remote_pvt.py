@@ -20,6 +20,7 @@
 """Provides a definition for the PotsdamBingeRemotePVT dataset."""
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
@@ -27,6 +28,7 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.eyetracker import EyeTracker
 from pymovements.gaze.screen import Screen
@@ -55,31 +57,28 @@ class PotsdamBingeRemotePVT(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, list[str]]
+    mirrors: dict[str, Sequence[str]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
-    resources: dict[str, list[dict[str, str]]]
+    resources: ResourceDefinitions
         A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    extract: dict[str, bool]
-        Decide whether to extract the data.
-
     experiment: Experiment
         The experiment definition.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
-    trial_columns: list[str]
+    trial_columns: list[str] | None
             The name of the trial columns in the input data frame. If the list is empty or None,
             the input data frame is assumed to contain only one trial. If the list is not empty,
             the input data frame is assumed to contain multiple trials and the transformation
@@ -130,7 +129,7 @@ class PotsdamBingeRemotePVT(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'PotsdamBingeRemotePVT'
 
@@ -143,34 +142,53 @@ class PotsdamBingeRemotePVT(DatasetDefinition):
             'precomputed_reading_measures': False,
         },
     )
-    mirrors: dict[str, list[str]] = field(
+    mirrors: dict[str, Sequence[str]] = field(
         default_factory=lambda: {
             'gaze': ['https://osf.io/download/'],
         },
     )
 
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda: {
-            'gaze': [
-                {
-                    'resource': '9vbs8/',
-                    'filename': 'a.zip',
-                    'md5': '87c6c74a9a17cbd093b91f9415e8dd9d',
-                },
-                {
-                    'resource': 'yqukn/',
-                    'filename': 'b.zip',
-                    'md5': '54038547b1a373253b38999a227dde63',
-                },
-                {
-                    'resource': 'yf2xa/',
-                    'filename': 'e.zip',
-                    'md5': 'a0d0203cbb273f6908c1b52a42750551',
-                },
-            ],
-        },
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict(
+            {
+                'gaze': [
+                    {
+                        'resource': '9vbs8/',
+                        'filename': 'a.zip',
+                        'md5': '87c6c74a9a17cbd093b91f9415e8dd9d',
+                        'filename_pattern': r'{subject_id:d}_{session_id:d}_{condition:s}_{trial_id:d}_{block_id:d}.csv',  # noqa: E501 # pylint: disable=line-too-long
+                        'filename_pattern_schema_overrides': {
+                            'subject_id': int,
+                            'trial_id': int,
+                            'block_id': int,
+                        },
+                    },
+                    {
+                        'resource': 'yqukn/',
+                        'filename': 'b.zip',
+                        'md5': '54038547b1a373253b38999a227dde63',
+                        'filename_pattern': r'{subject_id:d}_{session_id:d}_{condition:s}_{trial_id:d}_{block_id:d}.csv',  # noqa: E501 # pylint: disable=line-too-long
+                        'filename_pattern_schema_overrides': {
+                            'subject_id': int,
+                            'trial_id': int,
+                            'block_id': int,
+                        },
+                    },
+                    {
+                        'resource': 'yf2xa/',
+                        'filename': 'e.zip',
+                        'md5': 'a0d0203cbb273f6908c1b52a42750551',
+                        'filename_pattern': r'{subject_id:d}_{session_id:d}_{condition:s}_{trial_id:d}_{block_id:d}.csv',  # noqa: E501 # pylint: disable=line-too-long
+                        'filename_pattern_schema_overrides': {
+                            'subject_id': int,
+                            'trial_id': int,
+                            'block_id': int,
+                        },
+                    },
+                ],
+            },
+        ),
     )
-    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     experiment: Experiment = field(
         default_factory=lambda: Experiment(
@@ -193,28 +211,11 @@ class PotsdamBingeRemotePVT(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze': r'{subject_id:d}_{session_id:d}_{condition:s}_{trial_id:d}_{block_id:d}.csv',
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'subject_id': int,
-                'trial_id': int,
-                'block_id': int,
-            },
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
-    trial_columns: list[str] = field(
-        default_factory=lambda: [
-            'trial_id',
-            'subject_id',
-        ],
-    )
+    trial_columns: list[str] | None = None
 
     time_column: str = 'eyelink_timestamp'
 

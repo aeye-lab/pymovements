@@ -90,5 +90,5 @@ class EventDataFrame(metaclass=DeprecatedMetaClass):
     trial_columns: list[str] | None
 
     _DeprecatedMetaClass__alias = Events
-    _DeprecatedMetaClass__version_deprecated = 'v0.22.0'
-    _DeprecatedMetaClass__version_removed = 'v0.27.0'
+    _DeprecatedMetaClass__version_deprecated = 'v0.23.0'
+    _DeprecatedMetaClass__version_removed = 'v0.28.0'

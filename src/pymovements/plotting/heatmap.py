@@ -27,7 +27,7 @@ import numpy as np
 from matplotlib import colors
 
 from pymovements.gaze import Gaze
-from pymovements.utils.plotting import draw_image_stimulus
+from pymovements.stimulus.image import _draw_image_stimulus
 
 
 def heatmap(
@@ -153,12 +153,15 @@ def heatmap(
     # Convert heatmap values from sample count to seconds
     heatmap_value /= gaze.experiment.sampling_rate
 
-    extent = [x_edges[0], x_edges[-1], y_edges[0], y_edges[-1]]
+    if origin == 'upper':
+        extent = [x_edges[0], x_edges[-1], y_edges[0], y_edges[-1]]
+    else:
+        extent = [x_edges[0], x_edges[-1], y_edges[-1], y_edges[0]]
 
     # Create the plot
     if add_stimulus:
         assert path_to_image_stimulus
-        fig, ax = draw_image_stimulus(
+        fig, ax = _draw_image_stimulus(
             path_to_image_stimulus,
             origin=stimulus_origin,
             figsize=figsize,

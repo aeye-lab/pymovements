@@ -129,7 +129,7 @@ def mock_toy(
         }
 
     if extract is _UNSET:
-        extract = {'gaze': True, 'precomputed_events': True}
+        extract = None
 
     if filename_format_schema_overrides is _UNSET:
         filename_format_schema_overrides = {
@@ -521,6 +521,28 @@ def test_load_correct_raw_gazes(gaze_dataset_configuration):
         )
 
 
+def test_loaded_gazes_do_not_share_experiment_with_definition(gaze_dataset_configuration):
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset.load()
+
+    definition = gaze_dataset_configuration['init_kwargs']['definition']
+
+    for gaze in dataset.gaze:
+        assert gaze.experiment is not definition.experiment
+
+
+def test_loaded_gazes_do_not_share_experiment_with_other(gaze_dataset_configuration):
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset.load()
+
+    for gaze1 in dataset.gaze:
+        for gaze2 in dataset.gaze:
+            if gaze1 is gaze2:
+                continue
+
+            assert gaze1.experiment is not gaze2.experiment
+
+
 def test_load_gaze_has_position_columns(gaze_dataset_configuration):
     dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True)
@@ -739,7 +761,7 @@ def test_load_no_files_raises_exception(gaze_dataset_configuration):
     dataset.paths.raw.mkdir()
 
     with pytest.raises(RuntimeError):
-        dataset.load()
+        dataset.scan()
 
 
 @pytest.mark.parametrize(
@@ -901,7 +923,11 @@ def test_detect_events_auto_eye(detect_event_kwargs, gaze_dataset_configuration)
     dataset.detect_events(**detect_event_kwargs)
 
     expected_schema = {
-        'subject_id': pl.Int64, **events.Events._minimal_schema, 'duration': pl.Int64,
+        'subject_id': pl.Int64,
+        'name': pl.Utf8,
+        'onset': pl.Int64,
+        'offset': pl.Int64,
+        'duration': pl.Int64,
     }
     for result_event_df in dataset.events:
         assert result_event_df.schema == expected_schema
@@ -945,7 +971,9 @@ def test_detect_events_explicit_eye(detect_event_kwargs, gaze_dataset_configurat
 
         expected_schema = {
             'subject_id': pl.Int64,
-            **events.Events._minimal_schema,
+            'name': pl.Utf8,
+            'onset': pl.Int64,
+            'offset': pl.Int64,
             'duration': pl.Int64,
         }
 
@@ -973,7 +1001,9 @@ def test_detect_events_explicit_eye(detect_event_kwargs, gaze_dataset_configurat
             },
             {
                 'subject_id': pl.Int64,
-                **events.Events._minimal_schema,
+                'name': pl.Utf8,
+                'onset': pl.Int64,
+                'offset': pl.Int64,
                 'duration': pl.Int64,
             },
             id='two-saccade-runs',
@@ -991,7 +1021,9 @@ def test_detect_events_explicit_eye(detect_event_kwargs, gaze_dataset_configurat
             },
             {
                 'subject_id': pl.Int64,
-                **events.Events._minimal_schema,
+                'name': pl.Utf8,
+                'onset': pl.Int64,
+                'offset': pl.Int64,
                 'duration': pl.Int64,
             },
             id='one-saccade-one-fixation-run',
@@ -1697,7 +1729,9 @@ def test_event_dataframe_add_property_has_expected_height(
             {'event_properties': 'peak_velocity'},
             {
                 'subject_id': pl.Int64,
-                **events.Events._minimal_schema,
+                'name': pl.Utf8,
+                'onset': pl.Int64,
+                'offset': pl.Int64,
                 'duration': pl.Int64,
                 'peak_velocity': pl.Float64,
             },
@@ -1707,7 +1741,9 @@ def test_event_dataframe_add_property_has_expected_height(
             {'event_properties': 'location'},
             {
                 'subject_id': pl.Int64,
-                **events.Events._minimal_schema,
+                'name': pl.Utf8,
+                'onset': pl.Int64,
+                'offset': pl.Int64,
                 'duration': pl.Int64,
                 'location': pl.List(pl.Float64),
             },
@@ -1893,7 +1929,6 @@ def precomputed_fixture_dataset(request, tmp_path):
                 'precomputed_events': True,
                 'precomputed_reading_measures': False,
             },
-            extract={'precomputed_events': False},
             filename_format_schema_overrides={'precomputed_events': {}},
         )
     else:
@@ -1918,7 +1953,7 @@ def test_load_no_files_precomputed_raises_exception(precomputed_dataset_configur
     dataset.paths.precomputed_events.mkdir()
 
     with pytest.raises(RuntimeError):
-        dataset.load()
+        dataset.scan()
 
 
 @pytest.fixture(
@@ -1965,7 +2000,6 @@ def precomputed_rm_fixture_dataset(request, tmp_path):
                 'precomputed_events': False,
                 'precomputed_reading_measures': True,
             },
-            extract={'precomputed_reading_measures': False},
             filename_format_schema_overrides={
                 'precomputed_events': {},
                 'precomputed_reading_measures': {},
@@ -1994,7 +2028,7 @@ def test_load_no_files_precomputed_rm_raises_exception(precomputed_rm_dataset_co
     dataset.paths.precomputed_reading_measures.mkdir()
 
     with pytest.raises(RuntimeError):
-        dataset.load()
+        dataset.scan()
 
 
 @pytest.mark.parametrize(
@@ -2059,3 +2093,40 @@ def test_load_split_gaze(gaze_dataset_configuration, by, expected_len):
     dataset.load()
     dataset.split_gaze_data(by)
     assert len(dataset.gaze) == expected_len
+
+
+def test_two_resources_same_content_different_filename_pattern(tmp_path):
+    dirpath = tmp_path / 'precomputed_events'
+    dirpath.mkdir()
+
+    # create empty files
+    with open(dirpath / 'foo.csv', 'a', encoding='ascii') as f:
+        f.close()
+    with open(dirpath / 'bar.csv', 'a', encoding='ascii') as f:
+        f.close()
+
+    definition = DatasetDefinition(
+        name='example',
+        resources=[
+            {'content': 'precomputed_events', 'filename_pattern': 'foo.csv'},
+            {'content': 'precomputed_events', 'filename_pattern': 'bar.csv'},
+        ],
+    )
+
+    dataset = Dataset(definition=definition, path=tmp_path)
+
+    dataset.scan()
+
+    assert dataset.fileinfo['precomputed_events']['filepath'].to_list() == ['foo.csv', 'bar.csv']
+
+
+def test_unsupported_content_type(tmp_path):
+    definition = DatasetDefinition(
+        name='example',
+        resources=[{'content': 'foobar'}],
+    )
+    dataset = Dataset(definition=definition, path=tmp_path)
+
+    expected_msg = 'content type foobar is not supported'
+    with pytest.warns(UserWarning, match=expected_msg):
+        dataset.scan()

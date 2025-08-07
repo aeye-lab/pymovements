@@ -27,6 +27,7 @@ from typing import Any
 import polars as pl
 
 import pymovements as pm  # pylint: disable=cyclic-import
+from pymovements.events.frame import Events
 from pymovements.gaze._utils.parsing import parse_eyelink
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze import Gaze
@@ -300,6 +301,7 @@ def from_asc(
         column_schema_overrides: dict[str, Any] | None = None,
         encoding: str | None = None,
         definition: pm.DatasetDefinition | None = None,
+        events: bool = False,
 ) -> Gaze:
     """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
 
@@ -334,6 +336,8 @@ def from_asc(
     definition: pm.DatasetDefinition | None
         A dataset definition. Explicitly passed arguments take precedence over definition.
         (default: None)
+    events: bool
+        Flag indicating if events should be parsed from the asc file. (default: False)
 
     Returns
     -------
@@ -405,7 +409,7 @@ def from_asc(
                 encoding = custom_read_kwargs['encoding']
 
     # Read data.
-    gaze_data, metadata = parse_eyelink(
+    gaze_data, event_data, metadata = parse_eyelink(
         file,
         patterns=_patterns,
         schema=schema,
@@ -429,10 +433,15 @@ def from_asc(
     # Fill experiment with parsed metadata.
     experiment = _fill_experiment_from_parsing_metadata(experiment, metadata)
 
-    # Create gaze data frame.
+    # Create gaze and event data frames.
+    if events:
+        event_df = Events(event_data)
+    else:
+        event_df = None
     gaze = Gaze(
         gaze_data,
         experiment=experiment,
+        events=event_df,
         trial_columns=trial_columns,
         time_column='time',
         time_unit='ms',

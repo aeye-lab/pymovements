@@ -12,16 +12,9 @@ resources:
     - resource: "https://zenodo.org/records/11123101/files/Predicting%20Code%20Comprehension%20Package.zip?download=1"
       filename: "data.zip"
       md5: "3a3c6fb96550bc2c2ddcf5d458fb12a2"
-
-extract:
-  precomputed_events: true
-
-filename_format:
-  precomputed_events: 'fix_report_P{subject_id:s}.txt'
-
-filename_format_schema_overrides:
-  precomputed_events:
-    subject_id: !polars.Utf8
+      filename_pattern: 'fix_report_P{subject_id:s}.txt'
+      filename_pattern_schema_overrides:
+        subject_id: !polars.Utf8
 
 custom_read_kwargs:
   precomputed_events:

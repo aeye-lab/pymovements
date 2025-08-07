@@ -12,22 +12,12 @@ resources:
     - resource: "https://static-content.springer.com/esm/art%3A10.3758%2Fs13428-012-0313-y/MediaObjects/13428_2012_313_MOESM1_ESM.zip"
       filename: "UCL_events.zip"
       md5: "77e3c0cacccb0a074a55d23aa8531ca5"
+      filename_pattern: "eyetracking.fix"
   precomputed_reading_measures:
     - resource: "https://static-content.springer.com/esm/art%3A10.3758%2Fs13428-012-0313-y/MediaObjects/13428_2012_313_MOESM1_ESM.zip"
       filename: "UCL_measures.zip"
       md5: "77e3c0cacccb0a074a55d23aa8531ca5"
-
-extract:
-  precomputed_events: true
-  precomputed_reading_measures: true
-
-filename_format:
-  precomputed_events: "eyetracking.fix"
-  precomputed_reading_measures: "eyetracking.RT"
-
-filename_format_schema_overrides:
-  precomputed_events: {}
-  precomputed_reading_measures: {}
+      filename_pattern: "eyetracking.RT"
 
 custom_read_kwargs:
   precomputed_events:

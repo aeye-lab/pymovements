@@ -27,6 +27,7 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
@@ -54,24 +55,21 @@ class SBSAT(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: dict[str, list[dict[str, str]]]
+    resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    extract: dict[str, bool]
-        Decide whether to extract the data.
-
     experiment: Experiment
         The experiment definition.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -121,7 +119,7 @@ class SBSAT(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'SBSAT'
 
@@ -135,30 +133,28 @@ class SBSAT(DatasetDefinition):
         },
     )
 
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda:
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict(
             {
-                'gaze': [
-                    {
-                        'resource': 'https://osf.io/download/jgae7/',
-                        'filename': 'sbsat_csvs.zip',
-                        'md5': 'a6ef1fb0ecced683cdb489c3bd3e1a5c',
-                    },
-                ],
-                'precomputed_events': [
-                    {
-                        'resource': 'https://raw.githubusercontent.com/ahnchive/SB-SAT/master/fixation/18sat_fixfinal.csv',  # noqa: E501 # pylint: disable=line-too-long
-                        'filename': '18sat_fixfinal.csv',
-                        'md5': '4cf3212a71e6fc2fbe7041ce7c691927',
-                    },
-                ],
+                    'gaze': [
+                        {
+                            'resource': 'https://osf.io/download/jgae7/',
+                            'filename': 'sbsat_csvs.zip',
+                            'md5': 'a6ef1fb0ecced683cdb489c3bd3e1a5c',
+                            'filename_pattern': r'msd{subject_id:d}.csv',
+                            'filename_pattern_schema_overrides': {'subject_id': int},
+                        },
+                    ],
+                    'precomputed_events': [
+                        {
+                            'resource': 'https://raw.githubusercontent.com/ahnchive/SB-SAT/master/fixation/18sat_fixfinal.csv',  # noqa: E501 # pylint: disable=line-too-long
+                            'filename': '18sat_fixfinal.csv',
+                            'md5': '4cf3212a71e6fc2fbe7041ce7c691927',
+                            'filename_pattern': '18sat_fixfinal.csv',
+                        },
+                    ],
             },
-    )
-
-    extract: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True, 'precomputed_events': False,
-        },
+        ),
     )
 
     experiment: Experiment = field(
@@ -173,21 +169,9 @@ class SBSAT(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda:
-            {
-                'gaze': r'msd{subject_id:d}.csv',
-                'precomputed_events': '18sat_fixfinal.csv',
-            },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda:
-            {
-                'gaze': {'subject_id': int},
-                'precomputed_events': {},
-            },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     trial_columns: list[str] = field(
         default_factory=lambda: [

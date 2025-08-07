@@ -27,8 +27,10 @@ from typing import Any
 import polars as pl
 
 from pymovements._utils import _checks
+from pymovements._utils._html import repr_html
 
 
+@repr_html(['aois'])
 class TextStimulus:
     """A DataFrame for the text stimulus that the gaze data was recorded on.
 

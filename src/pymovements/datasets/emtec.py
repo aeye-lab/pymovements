@@ -27,6 +27,7 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
@@ -52,24 +53,21 @@ class EMTeC(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: dict[str, list[dict[str, str]]]
+    resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    extract: dict[str, bool]
-        Decide whether to extract the data.
-
     experiment: Experiment
         The experiment definition.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -116,7 +114,7 @@ class EMTeC(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'EMTeC'
 
@@ -126,33 +124,40 @@ class EMTeC(DatasetDefinition):
         default_factory=lambda: {
             'gaze': True,
             'precomputed_events': True,
-            'precomputed_reading_measures': False,
+            'precomputed_reading_measures': True,
         },
     )
 
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda: {
-            'gaze': [
-                {
-                    'resource': 'https://osf.io/download/374sk/',
-                    'filename': 'subject_level_data.zip',
-                    'md5': 'dca99e47ef43f3696acec4fd70967750',
-                },
-            ],
-            'precomputed_events': [
-                {
-                    'resource': 'https://osf.io/download/2hs8p/',
-                    'filename': 'fixations.csv',
-                    'md5': '5e05a364a1d8a044d8b36506aa91437e',
-                },
-            ],
-        },
-    )
-    extract: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': False,
-        },
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict(
+            {
+                'gaze': [
+                    {
+                        'resource': 'https://osf.io/download/374sk/',
+                        'filename': 'subject_level_data.zip',
+                        'md5': 'dca99e47ef43f3696acec4fd70967750',
+                        'filename_pattern': r'ET_{subject_id:d}.csv',
+                        'filename_pattern_schema_overrides': {'subject_id': int},
+                    },
+                ],
+                'precomputed_events': [
+                    {
+                        'resource': 'https://osf.io/download/2hs8p/',
+                        'filename': 'fixations.csv',
+                        'md5': '5e05a364a1d8a044d8b36506aa91437e',
+                        'filename_pattern': r'fixations.csv',
+                    },
+                ],
+                'precomputed_reading_measures': [
+                    {
+                        'resource': 'https://osf.io/download/s4ny8/',
+                        'filename': 'reading_measures.csv',
+                        'md5': '56880f50af20682558065ac2d26be827',
+                        'filename_pattern': r'reading_measures.csv',
+                    },
+                ],
+            },
+        ),
     )
 
     experiment: Experiment = field(
@@ -167,21 +172,9 @@ class EMTeC(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda:
-            {
-                'gaze': r'ET_{subject_id:d}.csv',
-                'precomputed_events': r'fixations.csv',
-            },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda:
-            {
-                'gaze': {'subject_id': int},
-                'precomputed_events': {},
-            },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     trial_columns: list[str] = field(default_factory=lambda: ['item_id'])
 
@@ -219,5 +212,6 @@ class EMTeC(DatasetDefinition):
                 },
             },
             'precomputed_events': {'separator': '\t'},
+            'precomputed_reading_measures': {'separator': '\t'},
         },
     )

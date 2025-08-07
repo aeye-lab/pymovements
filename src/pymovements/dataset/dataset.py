@@ -30,6 +30,7 @@ from typing import Any
 import polars as pl
 from tqdm.auto import tqdm
 
+from pymovements._utils._html import repr_html
 from pymovements.dataset import dataset_download
 from pymovements.dataset import dataset_files
 from pymovements.dataset.dataset_definition import DatasetDefinition
@@ -45,6 +46,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+@repr_html()
 class Dataset:
     """Dataset base class.
 
@@ -157,7 +159,7 @@ class Dataset:
         if self.definition.has_files['precomputed_reading_measures']:
             self.load_precomputed_reading_measures()
 
-        # Events extracted previously by pymovements
+        # Events detected previously by pymovements
         if events:
             self.load_event_files(
                 events_dirname=events_dirname,
@@ -234,7 +236,23 @@ class Dataset:
         return self
 
     def load_precomputed_events(self) -> None:
-        """Load precomputed events."""
+        """Load precomputed events.
+
+        This method checks that the file information for precomputed events is available,
+        then loads each event file listed in `self.fileinfo['precomputed_events']` using
+        the dataset definition and path settings. The resulting list of
+        `PrecomputedEventDataFrame` objects is assigned to `self.precomputed_events`.
+
+        Supported file extensions:
+        - CSV-like: .csv, .tsv, .txt
+        - JSON like: .jsonl, .ndjson
+        - RDA like: .rda
+
+        Raises
+        ------
+        ValueError
+            If the file info is missing or improperly formatted.
+        """
         self._check_fileinfo()
         self.precomputed_events = dataset_files.load_precomputed_event_files(
             self.definition,
@@ -243,7 +261,24 @@ class Dataset:
         )
 
     def load_precomputed_reading_measures(self) -> None:
-        """Load precomputed events."""
+        """Load precomputed reading reading measures.
+
+        This method checks that the file information for precomputed reading measures are
+        available, then loads each event file listed in
+        `self.fileinfo['precomputed_reading_measures']` using the dataset definition and
+        path settings. The resulting list of `ReadingMeasures` objects is assigned to
+        `self.reading_measures`.
+
+        Supported file extensions:
+        - CSV-like: .csv, .tsv, .txt
+        - Excel-like: .xlsx
+        - RDA like: .rda
+
+        Raises
+        ------
+        ValueError
+            If the file info is missing or improperly formatted.
+        """
         self._check_fileinfo()
         self.precomputed_reading_measures = dataset_files.load_precomputed_reading_measures(
             self.definition,
@@ -255,7 +290,7 @@ class Dataset:
             self,
             by: Sequence[str],
     ) -> None:
-        """Split gaze data into separated Gaze's.
+        """Split gaze data into separated Gaze objects.
 
         Parameters
         ----------

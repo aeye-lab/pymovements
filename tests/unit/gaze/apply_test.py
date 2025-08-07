@@ -97,12 +97,14 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
+                position=np.zeros((2, 100)),
                 events=pm.Events(
                     name=['fixation', 'saccade'], onsets=[0, 50], offsets=[40, 100],
                 ),
             ),
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
+                position=np.zeros((2, 100)),
                 events=pm.Events(
                     name=['fixation', 'saccade', 'unclassified'],
                     onsets=[0, 50, 40],

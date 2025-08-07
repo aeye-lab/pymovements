@@ -25,6 +25,7 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import ResourceDefinitions
 
 
 @dataclass
@@ -56,21 +57,18 @@ class DAEMONS(DatasetDefinition):
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    resources: dict[str, list[dict[str, str]]]
+    resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    extract: dict[str, bool]
-        Decide whether to extract the data.
-
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -99,7 +97,7 @@ class DAEMONS(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'DAEMONS'
 
@@ -113,38 +111,25 @@ class DAEMONS(DatasetDefinition):
         },
     )
 
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda:
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict(
             {
                 'precomputed_events': [
                     {
                         'resource': 'https://osf.io/download/ztgna/',
                         'filename': 'eye_movement.zip',
                         'md5': '2779b4c140a0b1e3c9976488994f08f3',
+                        'filename_pattern': r'SAC_{data_split:s}.csv',
+                        'filename_pattern_schema_overrides': {'data_split': str},
                     },
                 ],
             },
+        ),
     )
 
-    extract: dict[str, bool] = field(
-        default_factory=lambda: {
-            'precomputed_events': True,
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': r'SAC_{data_split:s}.csv',
-            },
-    )
-
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda:
-            {
-                'precomputed_events': {'data_split': str},
-            },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 

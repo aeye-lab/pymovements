@@ -18,119 +18,141 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test pymovements plotting utils."""
-from pathlib import Path
-from unittest.mock import Mock
+import re
 
+import matplotlib.pyplot
+import numpy as np
 import pytest
-from matplotlib import pyplot
 
-import pymovements as pm
+from pymovements import __version__
+from pymovements.utils.plotting import draw_image_stimulus
+from pymovements.utils.plotting import draw_line_data
+from pymovements.utils.plotting import setup_matplotlib
+
+
+@pytest.fixture(
+    name='axes',
+    params=[
+        (10, 15),
+        (15, 15),
+    ],
+)
+def axes_fixture(request):
+    fig = matplotlib.pyplot.figure(figsize=request.param)
+    yield fig.gca()
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+@pytest.mark.parametrize(
+    'kwargs',
+    [
+        pytest.param(
+            {
+                'x_signal': np.array([0.0, 1.0]),
+                'y_signal': np.array([0.0, 2.0]),
+                'figsize': (10, 15),
+            },
+            id='both_signals_figsize',
+        ),
+    ],
+)
+def test_setup_matplotlib(kwargs):
+    setup_matplotlib(**kwargs)
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+@pytest.mark.parametrize(
+    ('plotting_function', 'kwargs'),
+    [
+        pytest.param(
+            draw_image_stimulus,
+            {
+                'image_stimulus': 'tests/files/pexels-zoorg-1000498.jpg',
+            },
+            id='draw_image_stimulus',
+        ),
+
+        pytest.param(
+            draw_line_data,
+            {
+                'x_signal': np.array([0.0, 0.0]),
+                'y_signal': np.array([0.0, 0.0]),
+            },
+            id='_draw_line_data',
+        ),
+    ],
+)
+def test_plotting_function(plotting_function, kwargs, axes):
+    plotting_function(ax=axes, **kwargs)
 
 
 @pytest.mark.parametrize(
-    ('image_stimulus'),
-    (
+    ('plotting_function', 'kwargs'),
+    [
         pytest.param(
-            './tests/files/pexels-zoorg-1000498.jpg',
-            id='image_stimulus_str',
+            setup_matplotlib,
+            {
+                'x_signal': np.array([0.0, 0.0]),
+                'y_signal': np.array([0.0, 0.0]),
+                'figsize': (10, 15),
+            },
+            id='_setup_matplotlib',
         ),
+
         pytest.param(
-            Path('./tests/files/pexels-zoorg-1000498.jpg'),
-            id='image_stimulus_Path',
+            draw_image_stimulus,
+            {},
+            id='draw_image_stimulus',
         ),
-    ),
+
+        pytest.param(
+            draw_line_data,
+            {},
+            id='_draw_line_data',
+        ),
+    ],
 )
-@pytest.mark.parametrize(
-    ('origin'),
-    (
-        pytest.param(
-            'upper',
-            id='origin_upper',
-        ),
-        pytest.param(
-            'lower',
-            id='origin_lower',
-        ),
-    ),
-)
-def test_show_image_stimulus(image_stimulus, origin, monkeypatch):
-    mock = Mock()
-    monkeypatch.setattr(pyplot, 'show', mock)
-    pm.utils.plotting.draw_image_stimulus(image_stimulus, origin=origin, show=True)
-    pyplot.close()
-    mock.assert_called_once()
+def test_plotting_function_deprecated(plotting_function, kwargs):
+    with pytest.raises(DeprecationWarning):
+        plotting_function(**kwargs)
 
 
 @pytest.mark.parametrize(
-    ('image_stimulus'),
-    (
+    ('plotting_function', 'kwargs'),
+    [
         pytest.param(
-            './tests/files/pexels-zoorg-1000498.jpg',
-            id='image_stimulus_str',
+            setup_matplotlib,
+            {
+                'x_signal': np.array([0.0, 0.0]),
+                'y_signal': np.array([0.0, 0.0]),
+                'figsize': (10, 15),
+            },
+            id='_setup_matplotlib',
         ),
-        pytest.param(
-            Path('./tests/files/pexels-zoorg-1000498.jpg'),
-            id='image_stimulus_Path',
-        ),
-    ),
-)
-@pytest.mark.parametrize(
-    ('origin'),
-    (
-        pytest.param(
-            'upper',
-            id='origin_upper',
-        ),
-        pytest.param(
-            'lower',
-            id='origin_lower',
-        ),
-    ),
-)
-def test_no_show_image_stimulus(image_stimulus, origin, monkeypatch):
-    mock = Mock()
-    monkeypatch.setattr(pyplot, 'show', mock)
-    pm.utils.plotting.draw_image_stimulus(image_stimulus, origin=origin, show=False)
-    pyplot.close()
-    mock.assert_not_called()
 
+        pytest.param(
+            draw_image_stimulus,
+            {},
+            id='draw_image_stimulus',
+        ),
 
-@pytest.mark.parametrize(
-    ('image_stimulus'),
-    (
         pytest.param(
-            './tests/files/pexels-zoorg-1000498.jpg',
-            id='image_stimulus_str',
+            draw_line_data,
+            {},
+            id='_draw_line_data',
         ),
-        pytest.param(
-            Path('./tests/files/pexels-zoorg-1000498.jpg'),
-            id='image_stimulus_Path',
-        ),
-    ),
+    ],
 )
-@pytest.mark.parametrize(
-    ('origin'),
-    (
-        pytest.param(
-            'upper',
-            id='origin_upper',
-        ),
-        pytest.param(
-            'lower',
-            id='origin_lower',
-        ),
-    ),
-)
-def test_image_stimulus_fig_not_None(image_stimulus, origin, monkeypatch):
-    mock = Mock()
-    monkeypatch.setattr(pyplot, 'show', mock)
-    fig, ax = pyplot.subplots(figsize=(15, 10))
-    pm.utils.plotting.draw_image_stimulus(
-        image_stimulus,
-        origin=origin,
-        fig=fig,
-        ax=ax,
-        show=True,
+def test_plotting_function_removed(plotting_function, kwargs):
+    with pytest.raises(DeprecationWarning) as info:
+        plotting_function(**kwargs)
+
+    regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
+
+    msg = info.value.args[0]
+    remove_version = regex.match(msg).groupdict()['version']
+    current_version = __version__.split('+')[0]
+    assert current_version < remove_version, (
+        f'utils/filters.py was planned to be removed in v{remove_version}. '
+        f'Current version is v{current_version}.'
     )
-    pyplot.close()
-    mock.assert_called_once()
