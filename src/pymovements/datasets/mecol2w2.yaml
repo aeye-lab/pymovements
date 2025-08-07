@@ -2,28 +2,17 @@ name: "MECOL2W2"
 
 long_name: 'Multilingual Eye-tracking Corpus second language reader second wave'
 
-has_files:
-  gaze: false
-  precomputed_events: true
-  precomputed_reading_measures: true
-
 resources:
   precomputed_events:
     - resource: "https://osf.io/download/677e22d30788b62a2dd10a52/"
       filename: "joint_fix_trimmed_L2_wave2.rda"
       md5: "f7eaf80ac5916d79351419fd4f1da2f6"
+      filename_pattern: "joint_fix_trimmed_L2_wave2.rda"
   precomputed_reading_measures:
     - resource: "https://osf.io/download/tma46/"
       filename: "joint_data_trimmed_L2_wave2_2025_01_03.rda"
       md5: "87077697db7f09172a3431615397a5e9"
-
-filename_format:
-  precomputed_events: "joint_fix_trimmed_L2_wave2.rda"
-  precomputed_reading_measures: "joint_data_trimmed_L2_wave2_2025_01_03.rda"
-
-filename_format_schema_overrides:
-  precomputed_events: {}
-  precomputed_reading_measures: {}
+      filename_pattern: "joint_data_trimmed_L2_wave2_2025_01_03.rda"
 
 trial_columns:
   - "uniform_id"

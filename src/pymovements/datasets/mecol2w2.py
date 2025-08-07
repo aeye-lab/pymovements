@@ -47,7 +47,7 @@ class MECOL2W2(DatasetDefinition):
     long_name: str
         The entire name of the dataset.
 
-    has_files: dict[str, bool]
+    has_files: dict[str, bool] | None
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
@@ -58,11 +58,11 @@ class MECOL2W2(DatasetDefinition):
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -102,13 +102,7 @@ class MECOL2W2(DatasetDefinition):
 
     long_name: str = 'Multilingual Eye-tracking Corpus second language reader second wave'
 
-    has_files: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': False,
-            'precomputed_events': True,
-            'precomputed_reading_measures': True,
-        },
-    )
+    has_files: dict[str, bool] | None = None
 
     resources: ResourceDefinitions = field(
         default_factory=lambda: ResourceDefinitions.from_dict(
@@ -118,6 +112,7 @@ class MECOL2W2(DatasetDefinition):
                         'resource': 'https://osf.io/download/677e22d30788b62a2dd10a52/',
                         'filename': 'joint_fix_trimmed_L2_wave2.rda',
                         'md5': 'f7eaf80ac5916d79351419fd4f1da2f6',
+                        'filename_pattern': 'joint_fix_trimmed_L2_wave2.rda',
                     },
                 ],
                 'precomputed_reading_measures': [
@@ -125,25 +120,16 @@ class MECOL2W2(DatasetDefinition):
                         'resource': 'https://osf.io/download/tma46/',
                         'filename': 'joint_data_trimmed_L2_wave2_2025_01_03.rda',
                         'md5': '87077697db7f09172a3431615397a5e9',
+                        'filename_pattern': 'joint_data_trimmed_L2_wave2_2025_01_03.rda',
                     },
                 ],
             },
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'precomputed_events': 'joint_fix_trimmed_L2_wave2.rda',
-            'precomputed_reading_measures': 'joint_data_trimmed_L2_wave2_2025_01_03.rda',
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'precomputed_events': {},
-            'precomputed_reading_measures': {},
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     trial_columns: list[str] = field(
         default_factory=lambda: [
