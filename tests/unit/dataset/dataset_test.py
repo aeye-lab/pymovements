@@ -761,7 +761,7 @@ def test_load_no_files_raises_exception(gaze_dataset_configuration):
     dataset.paths.raw.mkdir()
 
     with pytest.raises(RuntimeError):
-        dataset.load()
+        dataset.scan()
 
 
 @pytest.mark.parametrize(
@@ -1953,7 +1953,7 @@ def test_load_no_files_precomputed_raises_exception(precomputed_dataset_configur
     dataset.paths.precomputed_events.mkdir()
 
     with pytest.raises(RuntimeError):
-        dataset.load()
+        dataset.scan()
 
 
 @pytest.fixture(
@@ -2028,7 +2028,7 @@ def test_load_no_files_precomputed_rm_raises_exception(precomputed_rm_dataset_co
     dataset.paths.precomputed_reading_measures.mkdir()
 
     with pytest.raises(RuntimeError):
-        dataset.load()
+        dataset.scan()
 
 
 @pytest.mark.parametrize(
@@ -2093,3 +2093,40 @@ def test_load_split_gaze(gaze_dataset_configuration, by, expected_len):
     dataset.load()
     dataset.split_gaze_data(by)
     assert len(dataset.gaze) == expected_len
+
+
+def test_two_resources_same_content_different_filename_pattern(tmp_path):
+    dirpath = tmp_path / 'precomputed_events'
+    dirpath.mkdir()
+
+    # create empty files
+    with open(dirpath / 'foo.csv', 'a', encoding='ascii') as f:
+        f.close()
+    with open(dirpath / 'bar.csv', 'a', encoding='ascii') as f:
+        f.close()
+
+    definition = DatasetDefinition(
+        name='example',
+        resources=[
+            {'content': 'precomputed_events', 'filename_pattern': 'foo.csv'},
+            {'content': 'precomputed_events', 'filename_pattern': 'bar.csv'},
+        ],
+    )
+
+    dataset = Dataset(definition=definition, path=tmp_path)
+
+    dataset.scan()
+
+    assert dataset.fileinfo['precomputed_events']['filepath'].to_list() == ['foo.csv', 'bar.csv']
+
+
+def test_unsupported_content_type(tmp_path):
+    definition = DatasetDefinition(
+        name='example',
+        resources=[{'content': 'foobar'}],
+    )
+    dataset = Dataset(definition=definition, path=tmp_path)
+
+    expected_msg = 'content type foobar is not supported'
+    with pytest.warns(UserWarning, match=expected_msg):
+        dataset.scan()

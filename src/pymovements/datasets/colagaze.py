@@ -61,11 +61,11 @@ class CoLAGaze(DatasetDefinition):
     experiment: Experiment
         The experiment definition.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -91,7 +91,7 @@ class CoLAGaze(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'CoLAGaze'
 
@@ -115,6 +115,8 @@ class CoLAGaze(DatasetDefinition):
                         '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
                         'filename': 'raw_data.zip',
                         'md5': None,  # type: ignore
+                        'filename_pattern': '{subject_id:d}.asc',
+                        'filename_pattern_schema_overrides': {'subject_id': int},
                     },
                 ],
                 'precomputed_events': [
@@ -124,6 +126,8 @@ class CoLAGaze(DatasetDefinition):
                         '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
                         'filename': 'fixations.zip',
                         'md5': None,  # type: ignore
+                        'filename_pattern': 'fixations_report_{subject_id:d}.csv',
+                        'filename_pattern_schema_overrides': {'subject_id': int},
                     },
                 ],
                 'precomputed_reading_measures': [
@@ -133,6 +137,8 @@ class CoLAGaze(DatasetDefinition):
                         '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
                         'filename': 'measures.zip',
                         'md5': None,  # type: ignore
+                        'filename_pattern': 'raw_measures_for_features{subject_id:d}.csv',
+                        'filename_pattern_schema_overrides': {'subject_id': int},
                     },
                 ],
             },
@@ -151,21 +157,9 @@ class CoLAGaze(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze': '{subject_id:d}.asc',
-            'precomputed_events': 'fixations_report_{subject_id:d}.csv',
-            'precomputed_reading_measures': 'raw_measures_for_features{subject_id:d}.csv',
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {'subject_id': int},
-            'precomputed_events': {'subject_id': int},
-            'precomputed_reading_measures': {'subject_id': int},
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {

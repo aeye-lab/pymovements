@@ -66,11 +66,11 @@ class CopCo(DatasetDefinition):
     experiment: Experiment
         The experiment definition.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -120,7 +120,7 @@ class CopCo(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'CopCo'
 
@@ -142,6 +142,8 @@ class CopCo(DatasetDefinition):
                         'resource': 'https://osf.io/download/bg9r4/',
                         'filename': 'csvs.zip',
                         'md5': '9dc3276714397b7fccac1e179a14c52b',  # type:ignore
+                        'filename_pattern': r'P{subject_id:d}.csv',
+                        'filename_pattern_schema_overrides': {'subject_id': int},
                     },
                 ],
                 'precomputed_events': [
@@ -150,6 +152,8 @@ class CopCo(DatasetDefinition):
                         'https://files.de-1.osf.io/v1/resources/ud8s5/providers/osfstorage/61e13174c99ebd02df017c14/?zip=',  # noqa: E501 # pylint: disable=line-too-long
                         'filename': 'FixationReports.zip',
                         'md5': None,  # type:ignore
+                        'filename_pattern': r'FIX_report_P{subject_id:d}.txt',
+                        'filename_pattern_schema_overrides': {'subject_id': int},
                     },
                 ],
                 'precomputed_reading_measures': [
@@ -158,6 +162,8 @@ class CopCo(DatasetDefinition):
                         'https://files.de-1.osf.io/v1/resources/ud8s5/providers/osfstorage/61e1317cc99ebd02df017c4f/?zip=',  # noqa: E501 # pylint: disable=line-too-long
                         'filename': 'ReadingMeasures.zip',
                         'md5': None,  # type:ignore
+                        'filename_pattern': r'P{subject_id:d}.csv',
+                        'filename_pattern_schema_overrides': {'subject_id': int},
                     },
                 ],
             },
@@ -176,21 +182,9 @@ class CopCo(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze': r'P{subject_id:d}.csv',
-            'precomputed_events': r'FIX_report_P{subject_id:d}.txt',
-            'precomputed_reading_measures': r'P{subject_id:d}.csv',
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {'subject_id': int},
-            'precomputed_events': {'subject_id': int},
-            'precomputed_reading_measures': {'subject_id': int},
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     trial_columns: list[str] = field(default_factory=lambda: ['paragraph_id', 'speech_id'])
 
