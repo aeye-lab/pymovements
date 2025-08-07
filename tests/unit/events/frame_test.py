@@ -18,11 +18,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Tests pymovements.events.events.EventDataFrame."""
+import re
+
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
 import pymovements as pm
+from pymovements import __version__
 
 
 @pytest.fixture(name='expected_schema_after_init')
@@ -409,7 +412,33 @@ def test_event_dataframe_clone():
     assert_frame_equal(events.frame, events_copy.frame)
 
 
-def test_event_dataframe_copies_trial_columns():
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+def test_event_dataframe_copy():
+    events = pm.EventDataFrame(name='saccade', onsets=[0], offsets=[123])
+    events_copy = events.clone()
+
+    # We want to have separate dataframes but with the exact same data.
+    assert events is not events_copy
+    assert events.frame is not events_copy.frame
+    assert_frame_equal(events.frame, events_copy.frame)
+
+
+def test_event_dataframe_copy_removed():
+    with pytest.raises(DeprecationWarning) as info:
+        pm.EventDataFrame().copy()
+
+    regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
+
+    msg = info.value.args[0]
+    remove_version = regex.match(msg).groupdict()['version']
+    current_version = __version__.split('+')[0]
+    assert current_version < remove_version, (
+        f'EventDataFrame.copy() was planned to be removed in v{remove_version}. '
+        f'Current version is v{current_version}.'
+    )
+
+
+def test_event_dataframe_clones_trial_columns():
     events = pm.EventDataFrame(data=pl.DataFrame({'trial': 'trial'}), trial_columns='trial')
     events_copy = events.clone()
 
