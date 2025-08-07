@@ -290,15 +290,15 @@ class EventDataFrame:
 
     @deprecated(
         reason='Please use EventDataFrame.clone() instead. '
-               'This function will be removed in v0.27.0.',
-        version='v0.22.2',
+               'This function will be removed in v0.28.0.',
+        version='v0.23.0',
     )
     def copy(self) -> EventDataFrame:
         """Return a copy of the EventDataFrame.
 
-        .. deprecated:: v0.22.2
+        .. deprecated:: v0.23.0
            Please use :py:meth:`~pymovements.events.EventDataFrame.clone()` instead.
-           This function will be removed in v0.27.0.
+           This function will be removed in v0.28.0.
 
         Returns
         -------
