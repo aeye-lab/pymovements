@@ -116,6 +116,7 @@ def mock_toy(
         rootpath,
         raw_fileformat,
         eyes,
+        samples=True,
         remote=False,
         extract=_UNSET,
         filename_format_schema_overrides=_UNSET,
@@ -1900,6 +1901,7 @@ def precomputed_fixture_dataset(request, tmp_path):
             raw_fileformat='csv',
             eyes='right',
         )
+        del dataset_dict['init_kwargs']['definition'].resources[0]  # remove gaze resources
     elif dataset_type == 'ToyPrecomputedEventNoExtract':
         dataset_dict = mock_toy(
             rootpath,
