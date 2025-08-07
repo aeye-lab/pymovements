@@ -415,7 +415,7 @@ def test_event_dataframe_clone():
 @pytest.mark.filterwarnings('ignore::DeprecationWarning')
 def test_event_dataframe_copy():
     events = pm.EventDataFrame(name='saccade', onsets=[0], offsets=[123])
-    events_copy = events.clone()
+    events_copy = events.copy()
 
     # We want to have separate dataframes but with the exact same data.
     assert events is not events_copy
