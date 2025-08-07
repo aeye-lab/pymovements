@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test GazeDataFrame detect method."""
+"""Test Gaze detect method."""
 import numpy as np
 import polars as pl
 import pytest
@@ -954,7 +954,7 @@ def test_gaze_detect_custom_method_no_arguments():
                 'minimum_duration': 2,
                 'eye': 'auto',
             },
-            pm.gaze.GazeDataFrame(None, pm.Experiment(1024, 768, 38, 30, 60, 'center', 10)),
+            pm.gaze.Gaze(None, pm.Experiment(1024, 768, 38, 30, 60, 'center', 10)),
             pl.exceptions.ColumnNotFoundError,
             "Column 'velocity' not found. Available columns are: ['time']",
             id='ivt_no_velocity_raises_column_not_found_error',

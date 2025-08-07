@@ -48,7 +48,7 @@ class Screen:
         Screen height in centimeters. (default: None)
     distance_cm: float | None
         Eye-to-screen distance in centimeters. If None, a `distance_column` must be provided
-        in the `DatasetDefinition` or `GazeDataFrame`, which contains the eye-to-screen
+        in the `DatasetDefinition` or `Gaze`, which contains the eye-to-screen
         distance for each sample in millimeters. (default: None)
     origin: str | None
         Specifies the screen location of the origin of the pixel
