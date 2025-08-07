@@ -1010,11 +1010,3 @@ def test_dataset_definition_get_attribute_is_removed(attribute):
         f'DatasetDefinition.{attribute} was planned to be removed in v{remove_version}. '
         f'Current version is v{current_version}.'
     )
-
-
-def test_add_single_definition():
-    class CustomDatasetDefinition(DatasetDefinition):
-        name: str = 'CustomDatasetDefinition'
-
-    if CustomDatasetDefinition():
-        print('a')

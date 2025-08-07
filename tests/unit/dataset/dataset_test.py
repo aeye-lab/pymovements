@@ -2057,14 +2057,6 @@ def test_load_split_gaze(gaze_dataset_configuration, by, expected_len):
 
 
 def test_two_resources_same_content_different_filename_pattern(tmp_path):
-    definition = DatasetDefinition(
-        name='example',
-        resources=[
-            {'content': 'precomputed_events', 'filename_pattern': 'foo.csv'},
-            {'content': 'precomputed_events', 'filename_pattern': 'bar.csv'},
-        ],
-    )
-
     dirpath = tmp_path / 'precomputed_events'
     dirpath.mkdir()
 
@@ -2073,6 +2065,14 @@ def test_two_resources_same_content_different_filename_pattern(tmp_path):
         f.close()
     with open(dirpath / 'bar.csv', 'a', encoding='ascii') as f:
         f.close()
+
+    definition = DatasetDefinition(
+        name='example',
+        resources=[
+            {'content': 'precomputed_events', 'filename_pattern': 'foo.csv'},
+            {'content': 'precomputed_events', 'filename_pattern': 'bar.csv'},
+        ],
+    )
 
     dataset = Dataset(definition=definition, path=tmp_path)
 
