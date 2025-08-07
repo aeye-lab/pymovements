@@ -17,20 +17,20 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test GazeDataFrame measure_samples method."""
+"""Test Gaze measure_samples method."""
 import numpy as np
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
-from pymovements import GazeDataFrame
+from pymovements import Gaze
 
 
 def my_test_measure(column: str) -> pl.Expr:
     return pl.col(column).len().cast(pl.Int64).alias('my_measure')
 
 
-@pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
+@pytest.mark.filterwarnings('ignore:Gaze contains data but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('gaze_init_kwargs', 'method', 'kwargs', 'expected'),
     [
@@ -313,6 +313,6 @@ def my_test_measure(column: str) -> pl.Expr:
     ],
 )
 def test_measure_samples(gaze_init_kwargs, method, kwargs, expected):
-    gaze = GazeDataFrame(**gaze_init_kwargs)
+    gaze = Gaze(**gaze_init_kwargs)
     df = gaze.measure_samples(method, **kwargs)
     assert_frame_equal(df, expected)

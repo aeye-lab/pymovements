@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Functionality to load GazeDataFrame from a csv file."""
+"""Functionality to load Gaze from a csv file."""
 from __future__ import annotations
 
 import math
@@ -30,7 +30,7 @@ import pymovements as pm  # pylint: disable=cyclic-import
 from pymovements.events.frame import EventDataFrame
 from pymovements.gaze._utils.parsing import parse_eyelink
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
+from pymovements.gaze.gaze import Gaze
 
 
 def from_csv(
@@ -51,8 +51,8 @@ def from_csv(
         column_schema_overrides: dict[str, type] | None = None,
         definition: pm.DatasetDefinition | None = None,
         **read_csv_kwargs: Any,
-) -> GazeDataFrame:
-    """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
+) -> Gaze:
+    """Initialize a :py:class:`pymovements.gaze.Gaze`.
 
     Parameters
     ----------
@@ -114,7 +114,7 @@ def from_csv(
 
     Returns
     -------
-    GazeDataFrame
+    Gaze
         The gaze data frame read from the csv file.
 
     Notes
@@ -159,7 +159,7 @@ def from_csv(
     │ 9    ┆ 0          ┆ 0          │
     └──────┴────────────┴────────────┘
 
-    We can now load the data into a ``GazeDataFrame`` by specyfing the experimental setting
+    We can now load the data into a ``Gaze`` by specyfing the experimental setting
     and the names of the pixel position columns. We can specify a custom separator for the csv
     file by passing it as a keyword argument to :py:func:`polars.read_csv`:
 
@@ -272,7 +272,7 @@ def from_csv(
         ])
 
     # Create gaze data frame.
-    gaze_df = GazeDataFrame(
+    gaze = Gaze(
         gaze_data,
         experiment=experiment,
         definition=definition,
@@ -286,7 +286,7 @@ def from_csv(
         distance_column=distance_column,
         auto_column_detect=auto_column_detect,
     )
-    return gaze_df
+    return gaze
 
 
 def from_asc(
@@ -302,7 +302,7 @@ def from_asc(
         encoding: str | None = None,
         definition: pm.DatasetDefinition | None = None,
         events: bool = False,
-) -> GazeDataFrame:
+) -> Gaze:
     """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
 
     Parameters
@@ -341,13 +341,13 @@ def from_asc(
 
     Returns
     -------
-    GazeDataFrame
+    Gaze
         The gaze data frame read from the asc file.
 
     Examples
     --------
     Let's assume we have an EyeLink asc file stored at `tests/files/eyelink_monocular_example.asc`.
-    We can then load the data into a ``GazeDataFrame``:
+    We can then load the data into a ``Gaze``:
 
     >>> from pymovements.gaze.io import from_asc
     >>> gaze = from_asc(file='tests/files/eyelink_monocular_example.asc')
@@ -438,7 +438,7 @@ def from_asc(
         event_df = EventDataFrame(event_data)
     else:
         event_df = None
-    gaze_df = GazeDataFrame(
+    gaze = Gaze(
         gaze_data,
         experiment=experiment,
         events=event_df,
@@ -447,8 +447,8 @@ def from_asc(
         time_unit='ms',
         pixel_columns=['x_pix', 'y_pix'],
     )
-    gaze_df._metadata = metadata  # pylint: disable=protected-access
-    return gaze_df
+    gaze._metadata = metadata  # pylint: disable=protected-access
+    return gaze
 
 
 def from_ipc(
@@ -460,8 +460,8 @@ def from_ipc(
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, type] | None = None,
         **read_ipc_kwargs: Any,
-) -> GazeDataFrame:
-    """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
+) -> Gaze:
+    """Initialize a :py:class:`pymovements.gaze.Gaze`.
 
     Parameters
     ----------
@@ -489,13 +489,13 @@ def from_ipc(
 
     Returns
     -------
-    GazeDataFrame
+    Gaze
         The gaze data frame read from the ipc file.
 
     Examples
     --------
     Let's assume we have an IPC file stored at `tests/files/monocular_example.feather`.
-    We can then load the data into a ``GazeDataFrame``:
+    We can then load the data into a ``Gaze``:
 
     >>> from pymovements.gaze.io import from_ipc
     >>> gaze = from_ipc(file='tests/files/monocular_example.feather')
@@ -545,12 +545,12 @@ def from_ipc(
         ])
 
     # Create gaze data frame.
-    gaze_df = GazeDataFrame(
+    gaze = Gaze(
         gaze_data,
         experiment=experiment,
         trial_columns=trial_columns,
     )
-    return gaze_df
+    return gaze
 
 
 def _fill_experiment_from_parsing_metadata(
