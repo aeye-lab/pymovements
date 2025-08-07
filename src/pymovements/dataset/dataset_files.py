@@ -35,7 +35,7 @@ from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
 from pymovements.events import EventDataFrame
 from pymovements.events.precomputed import PrecomputedEventDataFrame
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
+from pymovements.gaze.gaze import Gaze
 from pymovements.gaze.io import from_asc
 from pymovements.gaze.io import from_csv
 from pymovements.gaze.io import from_ipc
@@ -207,7 +207,7 @@ def load_gaze_files(
         preprocessed: bool = False,
         preprocessed_dirname: str | None = None,
         extension: str = 'feather',
-) -> list[GazeDataFrame]:
+) -> list[Gaze]:
     """Load all available gaze data files.
 
     Parameters
@@ -233,7 +233,7 @@ def load_gaze_files(
 
     Returns
     -------
-    list[GazeDataFrame]
+    list[Gaze]
         Returns self, useful for method cascading.
 
     Raises
@@ -243,7 +243,7 @@ def load_gaze_files(
     RuntimeError
         If file type of gaze file is not supported.
     """
-    gaze_dfs: list[GazeDataFrame] = []
+    gazes: list[Gaze] = []
 
     # Read gaze files from fileinfo attribute.
     for fileinfo_row in tqdm(fileinfo.to_dicts()):
@@ -256,15 +256,15 @@ def load_gaze_files(
                 extension=extension,
             )
 
-        gaze_df = load_gaze_file(
+        gaze = load_gaze_file(
             filepath=filepath,
             fileinfo_row=fileinfo_row,
             definition=deepcopy(definition),
             preprocessed=preprocessed,
         )
-        gaze_dfs.append(gaze_df)
+        gazes.append(gaze)
 
-    return gaze_dfs
+    return gazes
 
 
 def load_gaze_file(
@@ -272,8 +272,8 @@ def load_gaze_file(
         fileinfo_row: dict[str, Any],
         definition: DatasetDefinition,
         preprocessed: bool = False,
-) -> GazeDataFrame:
-    """Load a gaze data file as GazeDataFrame.
+) -> Gaze:
+    """Load a gaze data file as Gaze.
 
     Parameters
     ----------
@@ -289,8 +289,8 @@ def load_gaze_file(
 
     Returns
     -------
-    GazeDataFrame
-        The resulting GazeDataFrame
+    Gaze
+        The resulting Gaze
 
     Raises
     ------
@@ -326,7 +326,7 @@ def load_gaze_file(
             # Time unit is always milliseconds for preprocessed data if a time column is present.
             time_unit = 'ms'
 
-            gaze_df = from_csv(
+            gaze = from_csv(
                 filepath,
                 time_unit=time_unit,
                 auto_column_detect=True,
@@ -336,7 +336,7 @@ def load_gaze_file(
                 column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
             )
         else:
-            gaze_df = from_csv(
+            gaze = from_csv(
                 filepath,
                 definition=definition,
                 trial_columns=trial_columns,  # this includes all fileinfo_columns.
@@ -345,7 +345,7 @@ def load_gaze_file(
                 column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
             )
     elif filepath.suffix == '.feather':
-        gaze_df = from_ipc(
+        gaze = from_ipc(
             filepath,
             experiment=definition.experiment,
             trial_columns=trial_columns,  # this includes all fileinfo_columns.
@@ -354,7 +354,7 @@ def load_gaze_file(
             column_schema_overrides=definition.filename_format_schema_overrides['gaze'],
         )
     elif filepath.suffix == '.asc':
-        gaze_df = from_asc(
+        gaze = from_asc(
             filepath,
             definition=definition,
             trial_columns=trial_columns,  # this includes all fileinfo_columns.
@@ -369,7 +369,7 @@ def load_gaze_file(
             f'Supported formats are: {valid_extensions}',
         )
 
-    return gaze_df
+    return gaze
 
 
 def load_precomputed_reading_measures(
@@ -672,7 +672,7 @@ def save_events(
 
 
 def save_preprocessed(
-        gaze: list[GazeDataFrame],
+        gazes: list[Gaze],
         fileinfo: pl.DataFrame,
         paths: DatasetPaths,
         preprocessed_dirname: str | None = None,
@@ -686,7 +686,7 @@ def save_preprocessed(
 
     Parameters
     ----------
-    gaze: list[GazeDataFrame]
+    gazes: list[Gaze]
         The gaze dataframes to save.
     fileinfo: pl.DataFrame
         A dataframe holding file information.
@@ -710,8 +710,8 @@ def save_preprocessed(
     """
     disable_progressbar = not verbose
 
-    for file_id, gaze_df in enumerate(tqdm(gaze, disable=disable_progressbar)):
-        gaze_df = gaze_df.clone()
+    for file_id, gaze in enumerate(tqdm(gazes, disable=disable_progressbar)):
+        gaze = gaze.clone()
 
         raw_filepath = paths.raw / Path(fileinfo[file_id, 'filepath'])
         preprocessed_filepath = paths.get_preprocessed_filepath(
@@ -720,20 +720,20 @@ def save_preprocessed(
         )
 
         if extension == 'csv':
-            gaze_df.unnest()
+            gaze.unnest()
 
-        for column in gaze_df.columns:
+        for column in gaze.columns:
             if column in fileinfo.columns:
-                gaze_df.frame = gaze_df.frame.drop(column)
+                gaze.frame = gaze.frame.drop(column)
 
         if verbose >= 2:
             print('Save file to', preprocessed_filepath)
 
         preprocessed_filepath.parent.mkdir(parents=True, exist_ok=True)
         if extension == 'feather':
-            gaze_df.frame.write_ipc(preprocessed_filepath)
+            gaze.frame.write_ipc(preprocessed_filepath)
         elif extension == 'csv':
-            gaze_df.frame.write_csv(preprocessed_filepath)
+            gaze.frame.write_csv(preprocessed_filepath)
         else:
             valid_extensions = ['csv', 'feather']
             raise ValueError(
