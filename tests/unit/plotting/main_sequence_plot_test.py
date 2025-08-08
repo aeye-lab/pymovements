@@ -228,13 +228,13 @@ def test_main_sequence_plot_events(events):
 
 def test_main_sequence_plot_events_deprecated(events):
     with pytest.raises(DeprecationWarning):
-        main_sequence_plot(events=events, show=False)
+        main_sequence_plot(event_df=events, show=False)
     plt.close()
 
 
-def test_curly_to_regex_removed(events):
+def test_main_sequence_plot_events_removed(events):
     with pytest.raises(DeprecationWarning) as info:
-        main_sequence_plot(events=events, show=False)
+        main_sequence_plot(event_df=events, show=False)
     plt.close()
 
     regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
