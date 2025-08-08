@@ -88,7 +88,7 @@ def test_event_processor_init_exceptions(args, kwargs, exception, msg_substrings
 def test_event_processor_process_correct_result(
         events_kwargs, event_properties, expected_dataframe,
 ):
-    events = pm.EventDataFrame(**events_kwargs)
+    events = pm.Events(**events_kwargs)
     processor = pm.EventProcessor(event_properties)
 
     property_result = processor.process(events)
@@ -172,7 +172,7 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
 
 
 @pytest.mark.parametrize(
-    ('event_df', 'gaze', 'init_kwargs', 'process_kwargs', 'expected_dataframe'),
+    ('events', 'gaze', 'init_kwargs', 'process_kwargs', 'expected_dataframe'),
     [
         pytest.param(
             pl.from_dict(
@@ -663,16 +663,16 @@ def test_event_gaze_processor_init_exceptions(args, kwargs, exception, msg_subst
     ],
 )
 def test_event_gaze_processor_process_correct_result(
-        event_df, gaze, init_kwargs, process_kwargs, expected_dataframe,
+        events, gaze, init_kwargs, process_kwargs, expected_dataframe,
 ):
-    events = pm.EventDataFrame(event_df)
+    events = pm.Events(events)
     processor = pm.EventGazeProcessor(**init_kwargs)
     property_result = processor.process(events, gaze, **process_kwargs)
     assert_frame_equal(property_result, expected_dataframe)
 
 
 @pytest.mark.parametrize(
-    ('event_df', 'gaze', 'init_kwargs', 'process_kwargs', 'exception', 'msg_substrings'),
+    ('events', 'gaze', 'init_kwargs', 'process_kwargs', 'exception', 'msg_substrings'),
     [
         pytest.param(
             pl.from_dict(
@@ -736,10 +736,10 @@ def test_event_gaze_processor_process_correct_result(
     ],
 )
 def test_event_processor_process_exceptions(
-        event_df, gaze, init_kwargs, process_kwargs, exception, msg_substrings,
+        events, gaze, init_kwargs, process_kwargs, exception, msg_substrings,
 ):
     processor = pm.EventGazeProcessor(**init_kwargs)
-    events = pm.EventDataFrame(event_df)
+    events = pm.Events(events)
 
     with pytest.raises(exception) as excinfo:
         processor.process(events, gaze, **process_kwargs)

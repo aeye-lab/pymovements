@@ -33,7 +33,7 @@ from pymovements._utils._paths import match_filepaths
 from pymovements._utils._strings import curly_to_regex
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_paths import DatasetPaths
-from pymovements.events import EventDataFrame
+from pymovements.events import Events
 from pymovements.events.precomputed import PrecomputedEventDataFrame
 from pymovements.gaze.gaze import Gaze
 from pymovements.gaze.io import from_asc
@@ -117,7 +117,7 @@ def load_event_files(
         paths: DatasetPaths,
         events_dirname: str | None = None,
         extension: str = 'feather',
-) -> list[EventDataFrame]:
+) -> list[Events]:
     """Load all event files according to fileinfo dataframe.
 
     Parameters
@@ -139,7 +139,7 @@ def load_event_files(
 
     Returns
     -------
-    list[EventDataFrame]
+    list[Events]
         List of event dataframes.
 
     Raises
@@ -149,7 +149,7 @@ def load_event_files(
     ValueError
         If extension is not in list of valid extensions.
     """
-    event_dfs: list[EventDataFrame] = []
+    list_of_events: list[Events] = []
 
     # read and preprocess input files
     for fileinfo_row in tqdm(fileinfo.to_dicts()):
@@ -163,9 +163,9 @@ def load_event_files(
         )
 
         if extension == 'feather':
-            event_df = pl.read_ipc(filepath)
+            events = pl.read_ipc(filepath)
         elif extension in {'csv', 'tsv', 'txt'}:
-            event_df = pl.read_csv(filepath)
+            events = pl.read_csv(filepath)
         else:
             valid_extensions = ['csv', 'txt', 'tsv', 'feather']
             raise ValueError(
@@ -174,15 +174,15 @@ def load_event_files(
             )
 
         # Add fileinfo columns to dataframe.
-        event_df = add_fileinfo(
+        events = add_fileinfo(
             definition=definition,
-            df=event_df,
+            df=events,
             fileinfo=fileinfo_row,
         )
 
-        event_dfs.append(EventDataFrame(event_df))
+        list_of_events.append(Events(events))
 
-    return event_dfs
+    return list_of_events
 
 
 def load_gaze_files(
@@ -598,7 +598,7 @@ def add_fileinfo(
 
 
 def save_events(
-        events: list[EventDataFrame],
+        events: list[Events],
         fileinfo: pl.DataFrame,
         paths: DatasetPaths,
         events_dirname: str | None = None,
@@ -612,7 +612,7 @@ def save_events(
 
     Parameters
     ----------
-    events: list[EventDataFrame]
+    events: list[Events]
         The event dataframes to save.
     fileinfo: pl.DataFrame
         A dataframe holding file information.
@@ -636,26 +636,26 @@ def save_events(
     """
     disable_progressbar = not verbose
 
-    for file_id, event_df in enumerate(tqdm(events, disable=disable_progressbar)):
+    for file_id, events_in in enumerate(tqdm(events, disable=disable_progressbar)):
         raw_filepath = paths.raw / Path(fileinfo[file_id, 'filepath'])
         events_filepath = paths.raw_to_event_filepath(
             raw_filepath, events_dirname=events_dirname,
             extension=extension,
         )
 
-        event_df_out = event_df.frame.clone()
-        for column in event_df_out.columns:
+        events_out = events_in.frame.clone()
+        for column in events_out.columns:
             if column in fileinfo.columns:
-                event_df_out = event_df_out.drop(column)
+                events_out = events_out.drop(column)
 
         if verbose >= 2:
             print('Save file to', events_filepath)
 
         events_filepath.parent.mkdir(parents=True, exist_ok=True)
         if extension == 'feather':
-            event_df_out.write_ipc(events_filepath)
+            events_out.write_ipc(events_filepath)
         elif extension == 'csv':
-            event_df_out.write_csv(events_filepath)
+            events_out.write_csv(events_filepath)
         else:
             valid_extensions = ['csv', 'feather']
             raise ValueError(

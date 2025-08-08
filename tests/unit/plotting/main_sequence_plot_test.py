@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test main_sequence_plot."""
+import re
 from unittest.mock import Mock
 
 import numpy as np
@@ -25,24 +26,28 @@ import polars as pl
 import pytest
 from matplotlib import pyplot as plt
 
-from pymovements.events import EventDataFrame
+from pymovements import __version__
+from pymovements import Events
 from pymovements.plotting.main_sequence_plot import main_sequence_plot
 
 
+@pytest.fixture(name='events')
+def events_fixture():
+    yield Events(
+        pl.DataFrame(
+            {
+                'amplitude': [1.0, 1.0, 2.0, 2.0, 3.0, 4.0],
+                'peak_velocity': [10.0, 11.0, 12.0, 11.0, 13.0, 13.0],
+                'name': ['saccade' for _ in range(6)],
+            },
+        ),
+    )
+
+
 @pytest.mark.parametrize(
-    ('input_df', 'show', 'color', 'marker', 'alpha', 'size'),
+    ('show', 'color', 'marker', 'alpha', 'size'),
     [
         pytest.param(
-            EventDataFrame(
-                pl.DataFrame(
-                    {
-                        'amplitude': [1.0, 1.0, 2.0, 2.0, 3.0, 4.0],
-                        'peak_velocity': [10.0, 11.0, 12.0, 11.0, 13.0, 13.0],
-                        'name': ['saccade' for _ in range(6)],
-
-                    },
-                ),
-            ),
             True,
             'blue',
             'x',
@@ -52,7 +57,7 @@ from pymovements.plotting.main_sequence_plot import main_sequence_plot
         ),
     ],
 )
-def test_main_sequence_plot_show_plot(input_df, show, monkeypatch, color, marker, alpha, size):
+def test_main_sequence_plot_show_plot(events, show, monkeypatch, color, marker, alpha, size):
     mock_show = Mock()
     mock_scatter = Mock()
 
@@ -60,7 +65,7 @@ def test_main_sequence_plot_show_plot(input_df, show, monkeypatch, color, marker
     monkeypatch.setattr(plt, 'scatter', mock_scatter)
 
     main_sequence_plot(
-        input_df,
+        events,
         show=show,
         color=color,
         marker=marker,
@@ -82,10 +87,10 @@ def test_main_sequence_plot_show_plot(input_df, show, monkeypatch, color, marker
 
 
 @pytest.mark.parametrize(
-    'input_df',
+    'events',
     [
         pytest.param(
-            EventDataFrame(
+            Events(
                 pl.DataFrame(
                     {
                         'amplitude': [1.0, 1.0, 2.0, 2.0, 3.0, 4.0],
@@ -99,12 +104,12 @@ def test_main_sequence_plot_show_plot(input_df, show, monkeypatch, color, marker
         ),
     ],
 )
-def test_main_sequence_plot_filter_out_fixations(input_df, monkeypatch):
+def test_main_sequence_plot_filter_out_fixations(events, monkeypatch):
     mock_scatter = Mock()
 
     monkeypatch.setattr(plt, 'scatter', mock_scatter)
 
-    main_sequence_plot(input_df, show=False)
+    main_sequence_plot(events, show=False)
     plt.close()
 
     mock_scatter.assert_called_with(
@@ -117,88 +122,40 @@ def test_main_sequence_plot_filter_out_fixations(input_df, monkeypatch):
     )
 
 
-@pytest.mark.parametrize(
-    'input_df',
-    [
-        pytest.param(
-            EventDataFrame(
-                pl.DataFrame(
-                    {
-                        'amplitude': np.arange(100),
-                        'peak_velocity': np.linspace(10, 50, num=100),
-                        'name': ['saccade' for _ in range(100)],
-
-                    },
-                ),
-            ),
-            id='save_path',
-        ),
-    ],
-)
-def test_main_sequence_plot_save_path(input_df, monkeypatch):
+def test_main_sequence_plot_save_path(events, monkeypatch):
     mock_function = Mock()
     monkeypatch.setattr(plt.Figure, 'savefig', mock_function)
-    main_sequence_plot(input_df, show=False, savepath='mock')
+    main_sequence_plot(events, show=False, savepath='mock')
     plt.close()
     mock_function.assert_called_once()
 
 
-@pytest.mark.parametrize(
-    ('input_df', 'show'),
-    [
-        pytest.param(
-            EventDataFrame(
-                pl.DataFrame(
-                    {
-                        'amplitude': np.arange(100),
-                        'peak_velocity': np.linspace(10, 50, num=100),
-                        'name': ['saccade' for _ in range(100)],
-                    },
-                ),
-            ),
-            False,
-            id='do_not_show_plot',
-        ),
-    ],
-)
-def test_main_sequence_plot_not_show(input_df, show, monkeypatch):
+def test_main_sequence_plot_not_show(events, monkeypatch):
     mock_function = Mock()
     monkeypatch.setattr(plt, 'show', mock_function)
-    main_sequence_plot(input_df, show=show)
+    main_sequence_plot(events, show=False)
     plt.close()
     mock_function.assert_not_called()
 
 
 @pytest.mark.parametrize(
-    ('input_df', 'title'),
+    'title',
     [
-        pytest.param(
-            EventDataFrame(
-                pl.DataFrame(
-                    {
-                        'amplitude': np.arange(100),
-                        'peak_velocity': np.linspace(10, 50, num=100),
-                        'name': ['saccade' for _ in range(100)],
-                    },
-                ),
-            ),
-            'foo',
-            id='do_not_show_plot',
-        ),
+        'foo',
     ],
 )
-def test_main_sequence_plot_set_title(input_df, title, monkeypatch):
+def test_main_sequence_plot_set_title(events, title, monkeypatch):
     mock_function = Mock()
     monkeypatch.setattr(plt, 'title', mock_function)
-    main_sequence_plot(input_df, title=title)
+    main_sequence_plot(events, title=title)
     plt.close()
 
 
 @pytest.mark.parametrize(
-    ('input_df', 'expected_error', 'error_msg'),
+    ('events', 'expected_error', 'error_msg'),
     [
         pytest.param(
-            EventDataFrame(
+            Events(
                 pl.DataFrame(
                     {
                         'peak_velocity': np.linspace(10, 50, num=100),
@@ -214,7 +171,7 @@ def test_main_sequence_plot_set_title(input_df, title, monkeypatch):
             id='amplitude_missing',
         ),
         pytest.param(
-            EventDataFrame(
+            Events(
                 pl.DataFrame(
                     {
                         'amplitude': np.arange(100),
@@ -229,7 +186,7 @@ def test_main_sequence_plot_set_title(input_df, title, monkeypatch):
             id='peak_velocity_missing',
         ),
         pytest.param(
-            EventDataFrame(
+            Events(
                 pl.DataFrame(
                     {
                         'amplitude': [1.0, 1.0],
@@ -242,14 +199,50 @@ def test_main_sequence_plot_set_title(input_df, title, monkeypatch):
             'There are no saccades in the event dataframe. '
             'Please make sure you ran a saccade detection algorithm. '
             'The event name should be stored in a colum called "name".',
-            id='no_saccades_in_event_df',
+            id='no_saccades_in_events',
+        ),
+        pytest.param(
+            Events(),
+            ValueError,
+            'Events object is empty. '
+            'Please make sure you ran a saccade detection algorithm. '
+            'The event name should be stored in a colum called "name".',
+            id='empty_events',
         ),
     ],
 )
-def test_main_sequence_plot_error(input_df, expected_error, error_msg):
+def test_main_sequence_plot_error(events, expected_error, error_msg):
     with pytest.raises(expected_error) as actual_error:
-        main_sequence_plot(input_df)
+        main_sequence_plot(events)
 
     msg, = actual_error.value.args
 
     assert msg == error_msg
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+def test_main_sequence_plot_events(events):
+    main_sequence_plot(event_df=events, show=False)
+    plt.close()
+
+
+def test_main_sequence_plot_events_deprecated(events):
+    with pytest.raises(DeprecationWarning):
+        main_sequence_plot(event_df=events, show=False)
+    plt.close()
+
+
+def test_main_sequence_plot_events_removed(events):
+    with pytest.raises(DeprecationWarning) as info:
+        main_sequence_plot(event_df=events, show=False)
+    plt.close()
+
+    regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
+
+    msg = info.value.args[0]
+    remove_version = regex.match(msg).groupdict()['version']
+    current_version = __version__.split('+')[0]
+    assert current_version < remove_version, (
+        f'keyward argument events was planned to be removed in v{remove_version}. '
+        f'Current version is v{current_version}.'
+    )

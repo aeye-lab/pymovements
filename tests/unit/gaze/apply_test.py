@@ -50,7 +50,7 @@ from pymovements.synthetic import step_function
                 ),
                 orient='row',
                 experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
-                events=pm.events.EventDataFrame(
+                events=pm.events.Events(
                     name='fixation',
                     onsets=[0],
                     offsets=[99],
@@ -83,7 +83,7 @@ from pymovements.synthetic import step_function
                 ),
                 orient='row',
                 experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
-                events=pm.EventDataFrame(
+                events=pm.Events(
                     name='saccade',
                     onsets=[20, 70],
                     offsets=[29, 79],
@@ -98,14 +98,14 @@ from pymovements.synthetic import step_function
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
                 position=np.zeros((2, 100)),
-                events=pm.EventDataFrame(
+                events=pm.Events(
                     name=['fixation', 'saccade'], onsets=[0, 50], offsets=[40, 100],
                 ),
             ),
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
                 position=np.zeros((2, 100)),
-                events=pm.EventDataFrame(
+                events=pm.Events(
                     name=['fixation', 'saccade', 'unclassified'],
                     onsets=[0, 50, 40],
                     offsets=[40, 100, 49],
