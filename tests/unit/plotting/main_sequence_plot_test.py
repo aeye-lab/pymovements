@@ -222,7 +222,7 @@ def test_main_sequence_plot_error(events, expected_error, error_msg):
 
 @pytest.mark.filterwarnings('ignore::DeprecationWarning')
 def test_main_sequence_plot_events(events):
-    main_sequence_plot(events=events, show=False)
+    main_sequence_plot(event_df=events, show=False)
     plt.close()
 
 
