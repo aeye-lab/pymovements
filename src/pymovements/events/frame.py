@@ -1,4 +1,4 @@
-# Copyright (c) 2025 The pymovements Project Authors
+# Copyright (c) 2023-2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,7 +17,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides the EventDataFrame class."""
+"""Provides EventDataFrame class.
+
+.. deprecated:: v0.23.0
+   Please use :py:class:`~pymovements.Events` instead.
+   This module will be removed in v0.28.0.
+"""
 from __future__ import annotations
 
 import polars as pl
@@ -28,6 +33,10 @@ from pymovements.events.events import Events
 
 class EventDataFrame(metaclass=DeprecatedMetaClass):
     """A data structure for event data.
+
+    .. deprecated:: v0.23.0
+       Please use :py:class:`~pymovements.Events` instead.
+       This module will be removed in v0.28.0.
 
     Each row has at least an event name with its onset and offset specified.
 

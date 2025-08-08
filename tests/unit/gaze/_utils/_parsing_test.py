@@ -218,14 +218,14 @@ def test_parse_eyelink(tmp_path):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(ASC_TEXT)
 
-    gaze_df, event_df, metadata = pm.gaze._utils.parsing.parse_eyelink(
+    gaze_df, events, metadata = pm.gaze._utils.parsing.parse_eyelink(
         filepath,
         patterns=PATTERNS,
         metadata_patterns=METADATA_PATTERNS,
     )
 
     assert_frame_equal(gaze_df, EXPECTED_GAZE_DF, check_column_order=False, rtol=0)
-    assert_frame_equal(event_df, EXPECTED_EVENT_DF, check_column_order=False, rtol=0)
+    assert_frame_equal(events, EXPECTED_EVENT_DF, check_column_order=False, rtol=0)
     assert metadata == EXPECTED_METADATA
 
 

@@ -32,7 +32,7 @@ from pymovements.events.frame import EventDataFrame
 
 
 def main_sequence_plot(
-        events: Events | EventDataFrame,
+        events: Events | EventDataFrame | None = None,
         marker_size: float = 25,
         color: str = 'purple',
         alpha: float = 0.5,
@@ -49,7 +49,7 @@ def main_sequence_plot(
 
     Parameters
     ----------
-    events: Events | EventDataFrame
+    events: Events | EventDataFrame | None
         It must contain columns "peak_velocity" and "amplitude".
     marker_size: float
         Size of the marker symbol. (default: 25)
@@ -90,6 +90,14 @@ def main_sequence_plot(
         events = event_df
 
     event_col_name = 'name'
+
+    if not events:
+        raise ValueError(
+            'Events object is empty. '
+            'Please make sure you ran a saccade detection algorithm. '
+            f'The event name should be stored in a colum called "{event_col_name}".',
+        )
+
     saccades = events.frame.filter(pl.col(event_col_name) == 'saccade')
 
     if saccades.is_empty():

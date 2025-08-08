@@ -33,9 +33,13 @@ from pymovements import Dataset
 from pymovements import DatasetDefinition
 from pymovements import DatasetLibrary
 from pymovements import DatasetPaths
-from pymovements import events
+from pymovements import Events
 from pymovements import Experiment
 from pymovements import Gaze
+from pymovements.events import fill
+from pymovements.events import idt
+from pymovements.events import ivt
+from pymovements.events import microsaccades
 from pymovements.exceptions import InvalidProperty
 
 
@@ -335,9 +339,9 @@ def mock_toy(
         preprocessed_gazes, fileinfo, rootpath / 'preprocessed',
     )
 
-    event_dfs = []
+    events_list = []
     for fileinfo_row in fileinfo.to_dicts():
-        event_df = pl.from_dict(
+        events = pl.from_dict(
             {
                 'subject_id': fileinfo_row['subject_id'],
                 'name': ['saccade', 'fixation'] * 5,
@@ -353,9 +357,9 @@ def mock_toy(
                 'duration': pl.Int64,
             },
         )
-        event_dfs.append(event_df)
+        events_list.append(events)
 
-    create_event_files_from_fileinfo(event_dfs, fileinfo, rootpath / 'events')
+    create_event_files_from_fileinfo(events_list, fileinfo, rootpath / 'events')
 
     dataset_definition = DatasetDefinition(
         experiment=Experiment(
@@ -388,7 +392,7 @@ def mock_toy(
 
     precomputed_dfs = []
     for fileinfo_row in fileinfo.to_dicts():
-        precomputed_event_df = pl.from_dict(
+        precomputed_events = pl.from_dict(
             {
                 'subject_id': fileinfo_row['subject_id'],
                 'CURRENT_FIXATION_DURATION': np.arange(1000),
@@ -406,7 +410,7 @@ def mock_toy(
                 'trial_id_2': pl.Utf8,
             },
         )
-        precomputed_dfs.append(precomputed_event_df)
+        precomputed_dfs.append(precomputed_events)
 
     create_precomputed_files_from_fileinfo(
         precomputed_dfs,
@@ -448,7 +452,7 @@ def mock_toy(
         },
         'raw_gazes': gazes,
         'preprocessed_gazes': preprocessed_gazes,
-        'event_dfs': event_dfs,
+        'events_list': events_list,
         'precomputed_rm_dfs': precomputed_rm_dfs,
         'eyes': eyes,
         'trial_columns': ['subject_id'],
@@ -591,13 +595,13 @@ def test_load_fileinfo_column_in_trial_columns_warns(gaze_dataset_configuration)
     assert record[0].message.args[0] == expected_msg
 
 
-def test_load_correct_event_dfs(gaze_dataset_configuration):
+def test_load_correct_events_list(gaze_dataset_configuration):
     dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(events=True)
 
-    expected_event_dfs = gaze_dataset_configuration['event_dfs']
-    for result_event_df, expected_event_df in zip(dataset.events, expected_event_dfs):
-        assert_frame_equal(result_event_df.frame, expected_event_df)
+    expected_events_list = gaze_dataset_configuration['events_list']
+    for result_events, expected_events in zip(dataset.events, expected_events_list):
+        assert_frame_equal(result_events.frame, expected_events)
 
 
 @pytest.mark.parametrize(
@@ -713,7 +717,7 @@ def test_load_events_exceptions(
         dataset.pix2deg()
         dataset.pos2vel()
         dataset.detect_events(
-            method=events.ivt,
+            method=ivt,
             velocity_threshold=45,
             minimum_duration=55,
         )
@@ -746,7 +750,7 @@ def test_save_events_exceptions(init_kwargs, save_kwargs, exception, gaze_datase
         dataset.pix2deg()
         dataset.pos2vel()
         dataset.detect_events(
-            method=events.ivt,
+            method=ivt,
             velocity_threshold=45,
             minimum_duration=55,
         )
@@ -853,7 +857,7 @@ def test_clip(gaze_dataset_configuration):
     [
         pytest.param(
             {
-                'method': events.microsaccades,
+                'method': microsaccades,
                 'threshold': 1,
                 'eye': 'auto',
             },
@@ -869,7 +873,7 @@ def test_clip(gaze_dataset_configuration):
         ),
         pytest.param(
             {
-                'method': events.fill,
+                'method': fill,
                 'eye': 'auto',
             },
             id='fill_class',
@@ -892,7 +896,7 @@ def test_clip(gaze_dataset_configuration):
         ),
         pytest.param(
             {
-                'method': events.ivt,
+                'method': ivt,
                 'velocity_threshold': 1,
                 'minimum_duration': 1,
                 'eye': 'auto',
@@ -908,7 +912,7 @@ def test_clip(gaze_dataset_configuration):
         ),
         pytest.param(
             {
-                'method': events.idt,
+                'method': idt,
                 'eye': 'auto',
             },
             id='idt_class',
@@ -929,8 +933,8 @@ def test_detect_events_auto_eye(detect_event_kwargs, gaze_dataset_configuration)
         'offset': pl.Int64,
         'duration': pl.Int64,
     }
-    for result_event_df in dataset.events:
-        assert result_event_df.schema == expected_schema
+    for result_events in dataset.events:
+        assert result_events.schema == expected_schema
 
 
 @pytest.mark.parametrize(
@@ -938,7 +942,7 @@ def test_detect_events_auto_eye(detect_event_kwargs, gaze_dataset_configuration)
     [
         pytest.param(
             {
-                'method': events.microsaccades,
+                'method': microsaccades,
                 'threshold': 1,
                 'eye': 'left',
             },
@@ -946,7 +950,7 @@ def test_detect_events_auto_eye(detect_event_kwargs, gaze_dataset_configuration)
         ),
         pytest.param(
             {
-                'method': events.microsaccades,
+                'method': microsaccades,
                 'threshold': 1,
                 'eye': 'right',
             },
@@ -977,8 +981,8 @@ def test_detect_events_explicit_eye(detect_event_kwargs, gaze_dataset_configurat
             'duration': pl.Int64,
         }
 
-        for result_event_df in dataset.events:
-            assert result_event_df.schema == expected_schema
+        for result_events in dataset.events:
+            assert result_events.schema == expected_schema
 
     else:
         with pytest.raises(exception):
@@ -990,12 +994,12 @@ def test_detect_events_explicit_eye(detect_event_kwargs, gaze_dataset_configurat
     [
         pytest.param(
             {
-                'method': events.microsaccades,
+                'method': microsaccades,
                 'threshold': 1,
                 'eye': 'auto',
             },
             {
-                'method': events.microsaccades,
+                'method': microsaccades,
                 'threshold': 1,
                 'eye': 'auto',
             },
@@ -1010,12 +1014,12 @@ def test_detect_events_explicit_eye(detect_event_kwargs, gaze_dataset_configurat
         ),
         pytest.param(
             {
-                'method': events.microsaccades,
+                'method': microsaccades,
                 'threshold': 1,
                 'eye': 'auto',
             },
             {
-                'method': events.ivt,
+                'method': ivt,
                 'velocity_threshold': 1,
                 'minimum_duration': 1,
             },
@@ -1043,8 +1047,8 @@ def test_detect_events_multiple_calls(
     dataset.detect_events(**detect_event_kwargs_1)
     dataset.detect_events(**detect_event_kwargs_2)
 
-    for result_event_df in dataset.events:
-        assert result_event_df.schema == expected_schema
+    for result_events in dataset.events:
+        assert result_events.schema == expected_schema
 
 
 @pytest.mark.parametrize(
@@ -1087,7 +1091,7 @@ def test_detect_events_attribute_error(gaze_dataset_configuration):
     dataset.pos2vel()
 
     detect_event_kwargs = {
-        'method': events.microsaccades,
+        'method': microsaccades,
         'threshold': 1,
         'eye': 'right',
     }
@@ -1107,7 +1111,7 @@ def test_detect_events_attribute_error(gaze_dataset_configuration):
         pytest.param(
             {'position': 'custom_position'},
             {
-                'method': events.idt,
+                'method': idt,
                 'threshold': 1,
             },
             (
@@ -1120,7 +1124,7 @@ def test_detect_events_attribute_error(gaze_dataset_configuration):
         pytest.param(
             {'velocity': 'custom_velocity'},
             {
-                'method': events.microsaccades,
+                'method': microsaccades,
                 'threshold': 1,
             },
             (
@@ -1162,21 +1166,21 @@ def test_detect_events_raises_column_not_found_error(
             id='empty_list_stays_empty_list',
         ),
         pytest.param(
-            [events.Events()],
-            [events.Events()],
+            [Events()],
+            [Events()],
             id='empty_df_stays_empty_df',
         ),
         pytest.param(
-            [events.Events(name='event', onsets=[0], offsets=[99])],
-            [events.Events()],
+            [Events(name='event', onsets=[0], offsets=[99])],
+            [Events()],
             id='single_instance_filled_df_gets_cleared_to_empty_df',
         ),
         pytest.param(
             [
-                events.Events(name='event', onsets=[0], offsets=[99]),
-                events.Events(name='event', onsets=[0], offsets=[99]),
+                Events(name='event', onsets=[0], offsets=[99]),
+                Events(name='event', onsets=[0], offsets=[99]),
             ],
-            [events.Events(), events.Events()],
+            [Events(), Events()],
             id='two_instance_filled_df_gets_cleared_to_two_empty_dfs',
         ),
     ],
@@ -1198,21 +1202,21 @@ def test_clear_events(events_init, events_expected, tmp_path):
     ('detect_event_kwargs', 'events_dirname', 'expected_save_dirpath', 'save_kwargs'),
     [
         pytest.param(
-            {'method': events.microsaccades, 'threshold': 1, 'eye': 'auto'},
+            {'method': microsaccades, 'threshold': 1, 'eye': 'auto'},
             None,
             'events',
             {},
             id='none_dirname',
         ),
         pytest.param(
-            {'method': events.microsaccades, 'threshold': 1, 'eye': 'auto'},
+            {'method': microsaccades, 'threshold': 1, 'eye': 'auto'},
             'events_test',
             'events_test',
             {},
             id='explicit_dirname',
         ),
         pytest.param(
-            {'method': events.microsaccades, 'threshold': 1, 'eye': 'auto'},
+            {'method': microsaccades, 'threshold': 1, 'eye': 'auto'},
             None,
             'events',
             {'extension': 'csv'},
@@ -1248,21 +1252,21 @@ def test_save_events(
     ('detect_event_kwargs', 'events_dirname', 'expected_save_dirpath', 'load_save_kwargs'),
     [
         pytest.param(
-            {'method': events.microsaccades, 'threshold': 1, 'eye': 'auto'},
+            {'method': microsaccades, 'threshold': 1, 'eye': 'auto'},
             None,
             'events',
             {},
             id='none_dirname',
         ),
         pytest.param(
-            {'method': events.microsaccades, 'threshold': 1, 'eye': 'auto'},
+            {'method': microsaccades, 'threshold': 1, 'eye': 'auto'},
             'events_test',
             'events_test',
             {},
             id='explicit_dirname',
         ),
         pytest.param(
-            {'method': events.microsaccades, 'threshold': 1, 'eye': 'auto'},
+            {'method': microsaccades, 'threshold': 1, 'eye': 'auto'},
             None,
             'events',
             {'extension': 'csv'},
@@ -1445,7 +1449,7 @@ def test_save_creates_correct_directory(
     dataset.pix2deg()
     dataset.pos2vel()
 
-    detect_events_kwargs = {'method': events.microsaccades, 'threshold': 1, 'eye': 'auto'}
+    detect_events_kwargs = {'method': microsaccades, 'threshold': 1, 'eye': 'auto'}
     dataset.detect_events(**detect_events_kwargs)
 
     preprocessed_dirname = save_kwargs.get('preprocessed_dirname', 'preprocessed')
@@ -1494,7 +1498,7 @@ def test_save_files_have_correct_extension(
     dataset.pos2vel()
     dataset.pos2acc()
 
-    detect_events_kwargs = {'method': events.microsaccades, 'threshold': 1, 'eye': 'auto'}
+    detect_events_kwargs = {'method': microsaccades, 'threshold': 1, 'eye': 'auto'}
     dataset.detect_events(**detect_events_kwargs)
 
     preprocessed_dirname = save_kwargs.get('preprocessed_dirname', 'preprocessed')
@@ -1714,7 +1718,7 @@ def test_event_dataframe_add_property_has_expected_height(
     dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load(preprocessed=True, events=True)
 
-    expected_heights = [len(event_df) for event_df in dataset.events]
+    expected_heights = [len(events) for events in dataset.events]
 
     dataset.compute_event_properties(**property_kwargs)
 
