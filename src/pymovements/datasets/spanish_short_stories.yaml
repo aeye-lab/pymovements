@@ -3,22 +3,14 @@ name: "SpanishShortStories"
 long_name: 'TODO'
 
 has_files:
-  gaze: true
-  precomputed_events: false
+  gaze: false # TODO
+  precomputed_events: true
   precomputed_reading_measures: false
 
 resources:
-  gaze:
-    - resource: "https://figshare.com/ndownloader/articles/28311908/versions/2?folder_path=data"
-      filename: "csvs.zip"
-      md5: "9dc3276714397b7fccac1e179a14c52b"
   precomputed_events:
-    - resource: "https://files.de-1.osf.io/v1/resources/ud8s5/providers/osfstorage/61e13174c99ebd02df017c14/?zip="
+    - resource: "https://figshare.com/ndownloader/files/55961984"
       filename: "FixationReports.zip"
-      md5: null
-  precomputed_reading_measures:
-    - resource: "https://files.de-1.osf.io/v1/resources/ud8s5/providers/osfstorage/61e1317cc99ebd02df017c4f/?zip="
-      filename: "ReadingMeasures.zip"
       md5: null
 
 experiment:
@@ -32,7 +24,7 @@ experiment:
 
 filename_format:
   gaze: 'P{subject_id:d}.csv'
-  precomputed_events: 'FIX_report_P{subject_id:d}.txt'
+  precomputed_events: "{subject_id:s}/{text_id:s}/{screen_id:s}/fixations.pkl"
   precomputed_reading_measures: 'P{subject_id:d}.csv'
 
 filename_format_schema_overrides:
