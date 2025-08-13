@@ -12,6 +12,7 @@ Events page
    :recursive:
    :template: class.rst
 
+    Events
     EventDataFrame
 
 .. rubric:: Processing

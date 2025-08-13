@@ -24,7 +24,7 @@ import pytest
 from polars.testing import assert_frame_equal
 
 from pymovements import DatasetDefinition
-from pymovements import EventDataFrame
+from pymovements import Events
 from pymovements import Experiment
 from pymovements import Gaze
 
@@ -1929,7 +1929,7 @@ def test_gaze_copy_init_has_same_n_components():
         ),
 
         pytest.param(
-            EventDataFrame(),
+            Events(),
             {
                 'data': pl.from_dict(
                     {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
@@ -1940,19 +1940,19 @@ def test_gaze_copy_init_has_same_n_components():
         ),
 
         pytest.param(
-            EventDataFrame(),
+            Events(),
             {},
             id='no_data_empty_events',
         ),
 
         pytest.param(
-            EventDataFrame(name='saccade', onsets=[0], offsets=[10]),
+            Events(name='saccade', onsets=[0], offsets=[10]),
             {},
             id='no_data_with_saccades',
         ),
 
         pytest.param(
-            EventDataFrame(name='fixation', onsets=[100], offsets=[910]),
+            Events(name='fixation', onsets=[100], offsets=[910]),
             {
                 'data': pl.from_dict(
                     {'x': [1.23], 'y': [4.56]}, schema={'x': pl.Float64, 'y': pl.Float64},
@@ -1965,7 +1965,7 @@ def test_gaze_copy_init_has_same_n_components():
 )
 def test_gaze_init_events(events, init_kwargs):
     if events is None:
-        expected_events = EventDataFrame().frame
+        expected_events = Events().frame
     else:
         expected_events = events.frame
 

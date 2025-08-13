@@ -122,19 +122,19 @@ def test_from_pandas_with_trial_columnms():
 
         pytest.param(
             pd.DataFrame(),
-            pm.EventDataFrame(),
+            pm.Events(),
             id='events_empty',
         ),
 
         pytest.param(
             pd.DataFrame(),
-            pm.EventDataFrame(name='fixation', onsets=[123], offsets=[345]),
+            pm.Events(name='fixation', onsets=[123], offsets=[345]),
             id='fixation',
         ),
 
         pytest.param(
             pd.DataFrame(),
-            pm.EventDataFrame(name='saccade', onsets=[34123], offsets=[67345]),
+            pm.Events(name='saccade', onsets=[34123], offsets=[67345]),
             id='saccade',
         ),
 
@@ -142,7 +142,7 @@ def test_from_pandas_with_trial_columnms():
 )
 def test_from_pandas_events(df, events):
     if events is None:
-        expected_events = pm.EventDataFrame().frame
+        expected_events = pm.Events().frame
     else:
         expected_events = events.frame
 
