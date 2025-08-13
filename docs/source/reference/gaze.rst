@@ -8,7 +8,7 @@ Gaze page
 .. rubric:: Classes
 
 .. autosummary::
-   :toctree:
+   :toctree: api
    :template: class.rst
 
     Gaze

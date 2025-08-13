@@ -8,7 +8,7 @@ Events page
 .. rubric:: Classes
 
 .. autosummary::
-   :toctree:
+   :toctree: api
    :recursive:
    :template: class.rst
 
@@ -18,7 +18,7 @@ Events page
 .. rubric:: Processing
 
 .. autosummary::
-   :toctree:
+   :toctree: api
    :recursive:
 
     EventProcessor
@@ -29,7 +29,7 @@ Events page
 .. rubric:: Detection Methods
 
 .. autosummary::
-   :toctree:
+   :toctree: api
    :recursive:
 
     idt

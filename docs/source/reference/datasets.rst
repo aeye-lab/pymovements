@@ -6,7 +6,7 @@ Datasets
 .. rubric:: Dataset Definitions
 
 .. autosummary::
-   :toctree:
+   :toctree: api
    :template: class.rst
 
     BSC
@@ -44,7 +44,7 @@ Datasets
 .. rubric:: Example Datasets
 
 .. autosummary::
-   :toctree:
+   :toctree: api
    :template: class.rst
 
     ToyDataset
