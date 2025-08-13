@@ -29,6 +29,7 @@ from typing import Any
 
 import numpy as np
 import polars as pl
+from deprecated.sphinx import deprecated
 from tqdm import tqdm
 
 import pymovements as pm  # pylint: disable=cyclic-import
@@ -39,7 +40,7 @@ from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
 
 
-@repr_html(['frame', 'events', 'trial_columns', 'experiment'])
+@repr_html(['samples', 'events', 'trial_columns', 'experiment'])
 class Gaze:
     """Self-contained data structure containing gaze represented as samples or events.
 
@@ -50,8 +51,8 @@ class Gaze:
 
     Parameters
     ----------
-    data: pl.DataFrame | None
-        A dataframe to be transformed to a polars dataframe. (default: None)
+    samples: pl.DataFrame | None
+        A dataframe that contains gaze samples. (default: None)
     experiment : Experiment | None
         The experiment definition. (default: None)
     events: pm.EventDataFrame | None
@@ -95,18 +96,22 @@ class Gaze:
     definition: pm.DatasetDefinition | None
         A dataset definition. Explicitly passed arguments take precedence over definition.
         (default: None)
+    data: pl.DataFrame | None
+        A dataframe that contains gaze samples. (default: None)
+        .. deprecated:: v0.23.0
+        Please use ``samples`` instead. This field will be removed in v0.28.0.
 
     Attributes
     ----------
-    frame: pl.DataFrame
-        A dataframe to be transformed to a polars dataframe.
+    samples: pl.DataFrame
+        A dataframe of recorded gaze samples.
     events: pm.EventDataFrame
         A dataframe of events in the gaze signal.
     experiment : Experiment | None
         The experiment definition.
     trial_columns: list[str] | None
-        The name of the trial columns in the data frame. If not None, the transformation methods
-        will be applied to each trial separately.
+        The name of the trial columns in the samples data frame. If not None, the transformation
+        methods will be applied to each trial separately.
     n_components: int | None
         The number of components in the pixel, position, velocity and acceleration columns.
 
@@ -201,7 +206,7 @@ class Gaze:
     └──────┴────────────┘
     """
 
-    frame: pl.DataFrame
+    samples: pl.DataFrame
 
     events: pm.EventDataFrame
 
@@ -213,7 +218,7 @@ class Gaze:
 
     def __init__(
             self,
-            data: pl.DataFrame | None = None,
+            samples: pl.DataFrame | None = None,
             experiment: Experiment | None = None,
             events: pm.EventDataFrame | None = None,
             *,
@@ -227,15 +232,27 @@ class Gaze:
             distance_column: str | None = None,
             auto_column_detect: bool = False,
             definition: pm.DatasetDefinition | None = None,
+            data: pl.DataFrame | None = None,
     ):
-        if data is None:
-            data = pl.DataFrame()
+        if data is not None:
+            warnings.warn(
+                DeprecationWarning(
+                    "Gaze.__init__() argument 'data' is deprecated since version v0.23.0. "
+                    "Please use argument 'samples' instead. "
+                    'This argument will be removed in v0.28.0.',
+                ),
+            )
+            check_is_mutual_exclusive(samples=samples, data=data)
+            samples = data
+
+        if samples is None:
+            samples = pl.DataFrame()
         else:
-            data = data.clone()
-        self.frame = data
+            samples = samples.clone()
+        self.samples = samples
 
         # Set nan values to null.
-        self.frame = self.frame.fill_nan(None)
+        self.samples = self.samples.fill_nan(None)
 
         self._init_experiment(experiment, definition)
 
@@ -258,7 +275,9 @@ class Gaze:
             else:  # Ensure that trial columns with correct dtype are present in event dataframe.
                 self.events = pm.EventDataFrame(
                     data=pl.DataFrame(
-                        schema={column: self.frame.schema[column] for column in self.trial_columns},
+                        schema={
+                            column: self.samples.schema[column] for column in self.trial_columns
+                        },
                     ),
                     trial_columns=self.trial_columns,
                 )
@@ -290,7 +309,7 @@ class Gaze:
             raise ValueError(f"unsupported method '{function}'")
 
     def split(self, by: Sequence[str] | None = None) -> list[Gaze]:
-        """Split the Gaze into multiple frames based on specified column(s).
+        """Split a single Gaze object into multiple Gaze objects based on specified column(s).
 
         Parameters
         ----------
@@ -314,25 +333,25 @@ class Gaze:
 
         # Convert single string to list for consistent handling
         by = [by] if isinstance(by, str) else by
-        frames = self.frame.partition_by(by=by)
+        samples_list = self.samples.partition_by(by=by)
 
         # Check if all columns in 'by' are in events columns
         events_list = (
             self.events.split(by)
             if all(col in self.events.columns for col in by)
-            else [pm.EventDataFrame()] * len(frames)
+            else [pm.EventDataFrame()] * len(samples_list)
         )
 
         return [
             Gaze(
-                data=frame,
+                samples=samples,
                 experiment=self.experiment,
                 trial_columns=self.trial_columns,
                 time_column='time',
                 distance_column='distance',
                 events=events,
             )
-            for frame, events in zip(frames, events_list)
+            for samples, events in zip(samples_list, events_list)
         ]
 
     def transform(
@@ -354,7 +373,7 @@ class Gaze:
 
         if transform_method.__name__ == 'downsample':
             downsample_factor = kwargs.pop('factor')
-            self.frame = self.frame.select(
+            self.samples = self.samples.select(
                 transforms.downsample(
                     factor=downsample_factor, **kwargs,
                 ),
@@ -365,8 +384,8 @@ class Gaze:
             resample_rate = kwargs.pop('resampling_rate')
 
             if self.trial_columns is None:
-                self.frame = transforms.resample(
-                    frame=self.frame,
+                self.samples = transforms.resample(
+                    samples=self.samples,
                     resampling_rate=resample_rate,
                     n_components=self.n_components,
                     **kwargs,
@@ -376,7 +395,7 @@ class Gaze:
                 resample_columns = kwargs.pop('columns', 'all')
 
                 if resample_columns == 'all':
-                    resample_columns = self.frame.columns
+                    resample_columns = self.samples.columns
                 elif isinstance(resample_columns, str):
                     resample_columns = [resample_columns]
 
@@ -385,22 +404,22 @@ class Gaze:
                         col for col in resample_columns if col not in self.trial_columns
                     ]
 
-                self.frame = pl.concat(
+                self.samples = pl.concat(
                     [
                         transforms.resample(
-                            frame=df,
+                            samples=df,
                             resampling_rate=resample_rate,
                             n_components=self.n_components,
                             columns=resample_columns,
                             **kwargs,
                         )
                         for group, df in
-                        self.frame.group_by(self.trial_columns, maintain_order=True)
+                        self.samples.group_by(self.trial_columns, maintain_order=True)
                     ],
                 )
 
                 # forward fill trial columns
-                self.frame = self.frame.with_columns(
+                self.samples = self.samples.with_columns(
                     pl.col(self.trial_columns).fill_null(strategy='forward'),
                 )
 
@@ -434,7 +453,7 @@ class Gaze:
                 self._check_experiment()
                 assert self.experiment is not None
 
-                if 'distance' in self.frame.columns:
+                if 'distance' in self.samples.columns:
                     kwargs['distance'] = 'distance'
 
                     if self.experiment.screen.distance_cm:
@@ -442,13 +461,13 @@ class Gaze:
                             "Both a distance column and experiment's "
                             'eye-to-screen distance are specified. '
                             'Using eye-to-screen distances from column '
-                            "'distance' in the dataframe.",
+                            "'distance' in the samples dataframe.",
                         )
                 elif self.experiment.screen.distance_cm:
                     kwargs['distance'] = self.experiment.screen.distance_cm
                 else:
                     raise AttributeError(
-                        'Neither eye-to-screen distance is in the columns of the dataframe '
+                        'Neither eye-to-screen distance is in the columns of the samples dataframe '
                         'nor experiment eye-to-screen distance is specified.',
                     )
 
@@ -462,57 +481,57 @@ class Gaze:
                 kwargs['n_components'] = self.n_components
 
             if transform_method.__name__ in {'pos2vel', 'pos2acc'}:
-                if 'position' not in self.frame.columns and 'position_column' not in kwargs:
-                    if 'pixel' in self.frame.columns:
+                if 'position' not in self.samples.columns and 'position_column' not in kwargs:
+                    if 'pixel' in self.samples.columns:
                         raise pl.exceptions.ColumnNotFoundError(
-                            "Neither is 'position' in the dataframe columns, "
+                            "Neither is 'position' in the samples dataframe columns, "
                             'nor is a position column explicitly specified. '
-                            "Since the dataframe has a 'pixel' column, consider running "
+                            "Since the samples dataframe has a 'pixel' column, consider running "
                             f'pix2deg() before {transform_method.__name__}(). If you want '
                             'to run transformations in pixel units, you can do so by using '
                             f"{transform_method.__name__}(position_column='pixel'). "
-                            f'Available dataframe columns are: {self.frame.columns}',
+                            f'Available columns in samples dataframe are: {self.samples.columns}',
                         )
                     raise pl.exceptions.ColumnNotFoundError(
-                        "Neither is 'position' in the dataframe columns, "
+                        "Neither is 'position' in the samples dataframe columns, "
                         'nor is a position column explicitly specified. '
                         'You can specify the position column via: '
                         f'{transform_method.__name__}(position_column="your_position_column"). '
-                        f'Available dataframe columns are: {self.frame.columns}',
+                        f'Available columns in samples dataframe are: {self.samples.columns}',
                     )
 
             if transform_method.__name__ in {'pix2deg'}:
-                if 'pixel' not in self.frame.columns and 'pixel_column' not in kwargs:
+                if 'pixel' not in self.samples.columns and 'pixel_column' not in kwargs:
                     raise pl.exceptions.ColumnNotFoundError(
-                        "Neither is 'pixel' in the dataframe columns, "
+                        "Neither is 'pixel' in the samples dataframe columns, "
                         'nor is a pixel column explicitly specified. '
                         'You can specify the pixel column via: '
                         f'{transform_method.__name__}(pixel_column="name_of_your_pixel_column"). '
-                        f'Available dataframe columns are: {self.frame.columns}',
+                        f'Available columns in samples dataframe are: {self.samples.columns}',
                     )
 
             if transform_method.__name__ in {'deg2pix'}:
                 if (
                     'position_column' in kwargs and
-                    kwargs.get('position_column') not in self.frame.columns
+                    kwargs.get('position_column') not in self.samples.columns
                 ):
                     raise pl.exceptions.ColumnNotFoundError(
                         f"The specified 'position_column' ({kwargs.get('position_column')}) "
-                        'is not found in the dataframe columns. '
+                        'is not found in the samples dataframe columns. '
                         'You can specify the position column via: '
                         f'{transform_method.__name__}'
                         f'(position_column="name_of_your_position_column"). '
-                        f'Available dataframe columns are: {self.frame.columns}',
+                        f'Available columns in samples dataframe are: {self.samples.columns}',
                     )
 
             if self.trial_columns is None:
-                self.frame = self.frame.with_columns(transform_method(**kwargs))
+                self.samples = self.samples.with_columns(transform_method(**kwargs))
             else:
-                self.frame = pl.concat(
+                self.samples = pl.concat(
                     [
                         df.with_columns(transform_method(**kwargs))
                         for group, df in
-                        self.frame.group_by(self.trial_columns, maintain_order=True)
+                        self.samples.group_by(self.trial_columns, maintain_order=True)
                     ],
                 )
 
@@ -529,7 +548,7 @@ class Gaze:
 
         This method requires a properly initialized :py:attr:`~.Gaze.experiment` attribute.
 
-        After success, the gaze dataframe is clipped.
+        After success, the values in :py:attr:`~.Gaze.samples` are clipped.
 
         Parameters
         ----------
@@ -547,8 +566,7 @@ class Gaze:
         Raises
         ------
         AttributeError
-            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
-            if experiment is None.
+            If :py:attr:`~.Gaze.samples` is None, or if :py:attr:`~.Gaze.experiment` is None.
         """
         self.transform(
             'clip',
@@ -564,13 +582,12 @@ class Gaze:
 
         This method requires a properly initialized :py:attr:`~.Gaze.experiment` attribute.
 
-        After success, the gaze dataframe is extended by the resulting dva position columns.
+        After success, :py:attr:`~.Gaze.samples` is extended by the resulting dva position columns.
 
         Raises
         ------
         AttributeError
-            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
-            if experiment is None.
+            If :py:attr:`~.Gaze.samples` is None, or if :py:attr:`~.Gaze.experiment` is None.
         """
         self.transform('pix2deg')
 
@@ -584,7 +601,7 @@ class Gaze:
 
         This method requires a properly initialized :py:attr:`~.Gaze.experiment` attribute.
 
-        After success, the gaze dataframe is extended by the resulting dva position columns.
+        After success, :py:attr:`~.Gaze.samples` is extended by the resulting dva position columns.
 
         Parameters
         ----------
@@ -599,8 +616,7 @@ class Gaze:
         Raises
         ------
         AttributeError
-            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
-            if experiment is None.
+            If :py:attr:`~.Gaze.samples` is None, or if :py:attr:`~.Gaze.experiment` is None.
         """
         self.transform(
             'deg2pix',
@@ -620,7 +636,7 @@ class Gaze:
 
         This method requires a properly initialized :py:attr:`~.Gaze.experiment` attribute.
 
-        After success, the gaze dataframe is extended by the resulting velocity columns.
+        After success, :py:attr:`~.Gaze.samples` is extended by the resulting velocity columns.
 
         Parameters
         ----------
@@ -634,8 +650,7 @@ class Gaze:
         Raises
         ------
         AttributeError
-            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
-            if experiment is None.
+            If :py:attr:`~.Gaze.samples` is None, or if :py:attr:`~.Gaze.experiment` is None.
         """
         self.transform('pos2acc', window_length=window_length, degree=degree, padding=padding)
 
@@ -648,7 +663,7 @@ class Gaze:
 
         This method requires a properly initialized :py:attr:`~.Gaze.experiment` attribute.
 
-        After success, the gaze dataframe is extended by the resulting velocity columns.
+        After success, :py:attr:`~.Gaze.samples` is extended by the resulting velocity columns.
 
         Parameters
         ----------
@@ -661,8 +676,7 @@ class Gaze:
         Raises
         ------
         AttributeError
-            If `gaze` is None or there are no gaze dataframes present in the `gaze` attribute, or
-            if experiment is None.
+            If :py:attr:`~.Gaze.samples` is None, or if :py:attr:`~.Gaze.experiment` is None.
         """
         self.transform('pos2vel', method=method, **kwargs)
 
@@ -672,10 +686,10 @@ class Gaze:
             columns: str | list[str] = 'all',
             fill_null_strategy: str = 'interpolate_linear',
     ) -> None:
-        """Resample a DataFrame to a new sampling rate by timestamps in time column.
+        """Resample :py:attr:`~.Gaze.samples` to a new sampling rate by timestamps in time column.
 
-        The DataFrame is resampled by upsampling or downsampling the data to the new sampling rate.
-        Can also be used to achieve a constant sampling rate for inconsistent data.
+        :py:attr:`~.Gaze.samples` is resampled by upsampling or downsampling the data to the new
+        sampling rate. Can also be used to achieve a constant sampling rate for inconsistent data.
 
         Parameters
         ----------
@@ -699,8 +713,8 @@ class Gaze:
         ...     'x': [1, 2, 3, 4, 5],
         ...     'y': [1, 2, 3, 4, 5],
         ... })
-        >>> gaze = Gaze(data=df, time_column='time', pixel_columns=['x', 'y'])
-        >>> gaze.frame
+        >>> gaze = Gaze(samples=df, time_column='time', pixel_columns=['x', 'y'])
+        >>> gaze.samples
         shape: (5, 2)
         ┌──────┬───────────┐
         │ time ┆ pixel     │
@@ -721,7 +735,7 @@ class Gaze:
         ...     fill_null_strategy='interpolate_linear',
         ...     columns=['pixel'],
         ... )
-        >>> gaze.frame
+        >>> gaze.samples
         shape: (9, 2)
         ┌──────┬────────────┐
         │ time ┆ pixel      │
@@ -741,7 +755,7 @@ class Gaze:
 
         Downsample the Gaze to 500Hz results in the following DataFrame.
         >>> gaze.resample(resampling_rate=500)
-        >>> gaze.frame
+        >>> gaze.samples
         shape: (3, 2)
         ┌──────┬────────────┐
         │ time ┆ pixel      │
@@ -769,7 +783,7 @@ class Gaze:
             padding: str | float | int | None = 'nearest',
             **kwargs: int | float | str,
     ) -> None:
-        """Smooth data in a column.
+        """Smooth column values in :py:attr:`~.Gaze.samples`.
 
         Parameters
         ----------
@@ -793,7 +807,7 @@ class Gaze:
             This determines the type of extension to use for the padded signal to
             which the filter is applied.
             When passing ``None``, no extension padding is used.
-            When passing a scalar value, data will be padded using the passed value.
+            When passing a scalar value, sample series will be padded using the passed value.
             See :func:`~transforms.smooth()` for details on the padding methods.
             (default: 'nearest')
         **kwargs: int | float | str
@@ -826,7 +840,7 @@ class Gaze:
         eye: str
             Select which eye to choose. Valid options are ``auto``, ``left``, ``right`` or ``None``.
             If ``auto`` is passed, eye is inferred in the order ``['right', 'left', 'eye']`` from
-            the available :py:attr:`~.Dataset.gaze` dataframe columns. (default: 'auto')
+            the available columns in :py:attr:`~.Gaze.samples`. (default: 'auto')
         clear: bool
             If ``True``, event DataFrame will be overwritten with new DataFrame instead of being
             merged into the existing one. (default: False)
@@ -839,7 +853,9 @@ class Gaze:
             else:  # Ensure that trial columns with correct dtype are present in event dataframe.
                 self.events = pm.EventDataFrame(
                     data=pl.DataFrame(
-                        schema={column: self.frame.schema[column] for column in self.trial_columns},
+                        schema={
+                            column: self.samples.schema[column] for column in self.trial_columns
+                        },
                     ),
                     trial_columns=self.trial_columns,
                 )
@@ -855,7 +871,7 @@ class Gaze:
         if self.trial_columns is None:
             method_kwargs = self._fill_event_detection_kwargs(
                 method,
-                gaze=self.frame,
+                samples=self.samples,
                 events=self.events,
                 eye_components=eye_components,
                 **kwargs,
@@ -868,7 +884,7 @@ class Gaze:
                 how='diagonal_relaxed',
             )
         else:
-            grouped_frames = self.frame.partition_by(
+            grouped_samples = self.samples.partition_by(
                 self.trial_columns, maintain_order=True, include_key=True, as_dict=True,
             )
 
@@ -884,7 +900,7 @@ class Gaze:
 
             new_events_grouped: list[pl.DataFrame] = []
 
-            for group_identifier, group_gaze in grouped_frames.items():
+            for group_identifier, group_gaze in grouped_samples.items():
                 # Create filter expression for selecting respective group rows.
                 if len(self.trial_columns) == 1:
                     group_filter_expression = pl.col(self.trial_columns[0]) == group_identifier[0]
@@ -898,7 +914,7 @@ class Gaze:
 
                 method_kwargs = self._fill_event_detection_kwargs(
                     method,
-                    gaze=group_gaze,
+                    samples=group_gaze,
                     events=group_events,
                     eye_components=eye_components,
                     **kwargs,
@@ -971,7 +987,7 @@ class Gaze:
             method: str | Callable[..., pl.Expr],
             **kwargs: Any,
     ) -> pl.DataFrame:
-        """Calculate eye movement measure for gaze data samples.
+        """Calculate eye movement measure on :py:attr:`~.Gaze.samples`.
 
         If :py:class:``Gaze`` has :py:attr:``trial_columns``, measures will be grouped by
         trials.
@@ -1013,34 +1029,64 @@ class Gaze:
             method = pm.measure.SampleMeasureLibrary.get(method)
 
         if 'column_dtype' in inspect.getfullargspec(method).args:
-            kwargs['column_dtype'] = self.frame[kwargs['column']].dtype
+            kwargs['column_dtype'] = self.samples[kwargs['column']].dtype
 
         if self.trial_columns is None:
-            return self.frame.select(method(**kwargs))
+            return self.samples.select(method(**kwargs))
 
         # Group measure values by trial columns.
         return pl.concat(
             [
                 df.select(
                     [  # add trial columns first, then add column for measure.
-                        pl.lit(value).cast(self.frame.schema[name]).alias(name)
+                        pl.lit(value).cast(self.samples.schema[name]).alias(name)
                         for name, value in zip(self.trial_columns, trial_values)
                     ] + [method(**kwargs)],
                 )
                 for trial_values, df in
-                self.frame.group_by(self.trial_columns, maintain_order=True)
+                self.samples.group_by(self.trial_columns, maintain_order=True)
             ],
         )
 
     @property
     def schema(self) -> pl.type_aliases.SchemaDict:
-        """Schema of event dataframe."""
-        return self.frame.schema
+        """Schema of samples dataframe."""
+        return self.samples.schema
 
     @property
     def columns(self) -> list[str]:
-        """List of column names."""
-        return self.frame.columns
+        """List of column names in samples dataframe."""
+        return self.samples.columns
+
+    @property
+    @deprecated(
+        reason='Please use Gaze.samples instead. '
+               'This property will be removed in v0.28.0.',
+        version='v0.23.0',
+    )
+    def frame(self) -> pl.DataFrame:
+        """Gaze samples dataframe.
+
+        .. deprecated:: v0.23.0
+        Please use Gaze.samples instead.
+        This property will be removed in v0.28.0.
+
+        Returns
+        -------
+        pl.DataFrame
+            Gaze samples dataframe.
+
+        """
+        return self.samples
+
+    @frame.setter
+    @deprecated(
+        reason='Please use Gaze.samples instead. '
+               'This property will be removed in v0.28.0.',
+        version='v0.23.0',
+    )
+    def frame(self, data: pl.DataFrame) -> None:
+        self.samples = data
 
     def map_to_aois(
             self,
@@ -1069,12 +1115,12 @@ class Gaze:
         self.unnest()
 
         pix_column_canditates = ['pixel_' + suffix for suffix in component_suffixes]
-        pixel_columns = [c for c in pix_column_canditates if c in self.frame.columns]
+        pixel_columns = [c for c in pix_column_canditates if c in self.samples.columns]
         pos_column_canditates = ['position_' + suffix for suffix in component_suffixes]
         position_columns = [
             c
             for c in pos_column_canditates
-            if c in self.frame.columns
+            if c in self.samples.columns
         ]
 
         if gaze_type == 'pixel':
@@ -1104,14 +1150,17 @@ class Gaze:
                 x_eye = [col for col in position_columns if col.endswith('xr')][0]
                 y_eye = [col for col in position_columns if col.endswith('yr')][0]
         else:
-            raise ValueError('neither position nor pixel in gaze dataframe, one needed for mapping')
+            raise ValueError(
+                'neither position nor pixel column in samples dataframe, '
+                'at least one needed for mapping',
+            )
 
         aois = [
             aoi_dataframe.get_aoi(row=row, x_eye=x_eye, y_eye=y_eye)
-            for row in tqdm(self.frame.iter_rows(named=True))
+            for row in tqdm(self.samples.iter_rows(named=True))
         ]
         aoi_df = pl.concat(aois)
-        self.frame = pl.concat([self.frame, aoi_df], how='horizontal')
+        self.samples = pl.concat([self.samples, aoi_df], how='horizontal')
 
     def nest(
             self,
@@ -1131,7 +1180,7 @@ class Gaze:
         """
         self._check_component_columns(**{output_column: input_columns})
 
-        self.frame = self.frame.with_columns(
+        self.samples = self.samples.with_columns(
             pl.concat_list([pl.col(component) for component in input_columns])
             .alias(output_column),
         ).drop(input_columns)
@@ -1173,7 +1222,7 @@ class Gaze:
         """
         if input_columns is None:
             cols = ['pixel', 'position', 'velocity', 'acceleration']
-            input_columns = [col for col in cols if col in self.frame.columns]
+            input_columns = [col for col in cols if col in self.samples.columns]
 
             if len(input_columns) == 0:
                 raise Warning(
@@ -1230,7 +1279,7 @@ class Gaze:
             raise ValueError('Output columns / suffixes must be unique')
 
         for input_col, column_names in zip(input_columns, col_names):
-            self.frame = self.frame.with_columns(
+            self.samples = self.samples.with_columns(
                 [
                     pl.col(input_col).list.get(component_id).alias(names)
                     for component_id, names in enumerate(column_names)
@@ -1246,7 +1295,7 @@ class Gaze:
             A copy of the Gaze.
         """
         gaze = Gaze(
-            data=self.frame.clone(),
+            samples=self.samples.clone(),
             experiment=deepcopy(self.experiment),
             events=self.events.clone(),
         )
@@ -1320,13 +1369,14 @@ class Gaze:
                 )
 
             for column in columns:
-                if column not in self.frame.columns:
+                if column not in self.samples.columns:
                     raise pl.exceptions.ColumnNotFoundError(
-                        f'column {column} from {component_type} is not available in dataframe',
+                        f'column {column} from {component_type}'
+                        ' is not available in samples dataframe',
                     )
 
-            if len(set(self.frame[columns].dtypes)) != 1:
-                types_list = sorted([str(t) for t in set(self.frame[columns].dtypes)])
+            if len(set(self.samples[columns].dtypes)) != 1:
+                types_list = sorted([str(t) for t in set(self.samples[columns].dtypes)])
                 raise ValueError(
                     f'all columns in {component_type} must be of same type, '
                     f'but types are {types_list}',
@@ -1356,13 +1406,13 @@ class Gaze:
         """
         all_considered_columns = ['pixel', 'position', 'velocity', 'acceleration']
         considered_columns = [
-            column for column in all_considered_columns if column in self.frame.columns
+            column for column in all_considered_columns if column in self.samples.columns
         ]
 
         list_lengths = {
             list_length
             for column in considered_columns
-            for list_length in self.frame.get_column(column).list.len().unique().to_list()
+            for list_length in self.samples.get_column(column).list.len().unique().to_list()
         }
 
         for column_specifier_list in column_specifiers:
@@ -1430,7 +1480,7 @@ class Gaze:
     def _fill_event_detection_kwargs(
             self,
             method: Callable[..., pm.EventDataFrame],
-            gaze: pl.DataFrame,
+            samples: pl.DataFrame,
             events: pm.EventDataFrame,
             eye_components: tuple[int, int] | None,
             **kwargs: Any,
@@ -1441,10 +1491,10 @@ class Gaze:
         ----------
         method: Callable[..., pm.EventDataFrame]
             The method for which the keyword argument dictionary will be filled.
-        gaze: pl.DataFrame
-            The gaze dataframe to be used for filling event detection keyword arguments.
+        samples: pl.DataFrame
+            The samples to be used for filling event detection keyword arguments.
         events: pm.EventDataFrame
-            The event dataframe to be used for filling event detection keyword arguments.
+            The events to be used for filling event detection keyword arguments.
         eye_components: tuple[int, int] | None
             The eye components to be used for filling event detection keyword arguments.
         **kwargs: Any
@@ -1459,10 +1509,10 @@ class Gaze:
         method_args = inspect.getfullargspec(method).args
 
         if 'positions' in method_args:
-            if 'position' not in gaze.columns:
+            if 'position' not in samples.columns:
                 raise pl.exceptions.ColumnNotFoundError(
                     f'Column \'position\' not found.'
-                    f' Available columns are: {gaze.columns}',
+                    f' Available columns are: {samples.columns}',
                 )
 
             if eye_components is None:
@@ -1472,16 +1522,16 @@ class Gaze:
 
             kwargs['positions'] = np.vstack(
                 [
-                    gaze.get_column('position').list.get(eye_component)
+                    samples.get_column('position').list.get(eye_component)
                     for eye_component in eye_components
                 ],
             ).transpose()
 
         if 'velocities' in method_args:
-            if 'velocity' not in gaze.columns:
+            if 'velocity' not in samples.columns:
                 raise pl.exceptions.ColumnNotFoundError(
                     f'Column \'velocity\' not found.'
-                    f' Available columns are: {gaze.columns}',
+                    f' Available columns are: {samples.columns}',
                 )
 
             if eye_components is None:
@@ -1491,7 +1541,7 @@ class Gaze:
 
             kwargs['velocities'] = np.vstack(
                 [
-                    gaze.get_column('velocity').list.get(eye_component)
+                    samples.get_column('velocity').list.get(eye_component)
                     for eye_component in eye_components
                 ],
             ).transpose()
@@ -1499,8 +1549,8 @@ class Gaze:
         if 'events' in method_args:
             kwargs['events'] = events
 
-        if 'timesteps' in method_args and 'time' in gaze.columns:
-            kwargs['timesteps'] = gaze.get_column('time').to_numpy()
+        if 'timesteps' in method_args and 'time' in samples.columns:
+            kwargs['timesteps'] = samples.get_column('time').to_numpy()
 
         return kwargs
 
@@ -1517,7 +1567,7 @@ class Gaze:
             auto_column_detect: bool = False,
             definition: pm.DatasetDefinition | None = None,
     ) -> None:
-        """Initialize dataframe columns."""
+        """Initialize columns of :py:attr:`~.Gaze.samples`."""
         # Explicit arguments take precedence over definition.
         if definition:
             if trial_columns is None:
@@ -1548,7 +1598,7 @@ class Gaze:
         trial_columns = [trial_columns] if isinstance(trial_columns, str) else trial_columns
         if trial_columns is not None and len(trial_columns) == 0:
             trial_columns = None
-        _check_trial_columns(trial_columns, self.frame)
+        _check_trial_columns(trial_columns, self.samples)
         self.trial_columns = trial_columns
 
         # Initialize time column.
@@ -1556,26 +1606,26 @@ class Gaze:
 
         # Rename distance column if necessary.
         if distance_column is not None and distance_column != 'distance':
-            self.frame = self.frame.rename({distance_column: 'distance'})
+            self.samples = self.samples.rename({distance_column: 'distance'})
 
         # Autodetect column names.
         component_suffixes = ['x', 'y', 'xl', 'yl', 'xr', 'yr', 'xa', 'ya']
 
         if auto_column_detect and pixel_columns is None:
             column_canditates = ['pixel_' + suffix for suffix in component_suffixes]
-            pixel_columns = [c for c in column_canditates if c in self.frame.columns]
+            pixel_columns = [c for c in column_canditates if c in self.samples.columns]
 
         if auto_column_detect and position_columns is None:
             column_canditates = ['position_' + suffix for suffix in component_suffixes]
-            position_columns = [c for c in column_canditates if c in self.frame.columns]
+            position_columns = [c for c in column_canditates if c in self.samples.columns]
 
         if auto_column_detect and velocity_columns is None:
             column_canditates = ['velocity_' + suffix for suffix in component_suffixes]
-            velocity_columns = [c for c in column_canditates if c in self.frame.columns]
+            velocity_columns = [c for c in column_canditates if c in self.samples.columns]
 
         if auto_column_detect and acceleration_columns is None:
             column_canditates = ['acceleration_' + suffix for suffix in component_suffixes]
-            acceleration_columns = [c for c in column_canditates if c in self.frame.columns]
+            acceleration_columns = [c for c in column_canditates if c in self.samples.columns]
 
         # List of passed not-None column specifier lists.
         # The list will be used for inferring n_components.
@@ -1603,12 +1653,12 @@ class Gaze:
             column_specifiers.append(acceleration_columns)
 
         self.n_components = self._infer_n_components(column_specifiers)
-        # Warning if contains data but no gaze-related columns were provided.
+        # Warning if contains samples but no gaze-related columns were provided.
         # This can lead to failure in downstream methods that rely on those columns
         # (e.g., transformations).
-        if len(self.frame) > 1 and not self.n_components:
+        if len(self.samples) > 1 and not self.n_components:
             warnings.warn(
-                'Gaze contains data but no components could be inferred. \n'
+                'Gaze contains samples but no components could be inferred. \n'
                 'This usually happens if you did not specify any column content'
                 ' and the content could not be autodetected from the column names. \n'
                 "Please specify 'pixel_columns', 'position_columns', 'velocity_columns'"
@@ -1623,11 +1673,11 @@ class Gaze:
     ) -> None:
         """Initialize time column."""
         # If no time column exists, create a new one starting with zero and set time unit to steps.
-        if time_column is None and 'time' not in self.frame.columns:
+        if time_column is None and 'time' not in self.samples.columns:
             # In case we have an experiment with sampling rate given, we create a time
             if self.experiment is not None and self.experiment.sampling_rate is not None:
-                self.frame = self.frame.with_columns(
-                    time=pl.arange(0, len(self.frame)),
+                self.samples = self.samples.with_columns(
+                    time=pl.arange(0, len(self.samples)),
                 )
 
                 time_column = 'time'
@@ -1639,20 +1689,20 @@ class Gaze:
 
         # Rename time_column to 'time'.
         if time_column is not None and time_column != 'time':
-            self.frame = self.frame.rename({time_column: 'time'})
+            self.samples = self.samples.rename({time_column: 'time'})
 
         # Convert time column to milliseconds.
-        if 'time' in self.frame.columns:
+        if 'time' in self.samples.columns:
             self._convert_time_units(time_unit)
 
     def _convert_time_units(self, time_unit: str | None) -> None:
         """Convert the time column to milliseconds based on the specified time unit."""
         if time_unit == 's':
-            self.frame = self.frame.with_columns(pl.col('time').mul(1000))
+            self.samples = self.samples.with_columns(pl.col('time').mul(1000))
 
         elif time_unit == 'step':
             if self.experiment is not None:
-                self.frame = self.frame.with_columns(
+                self.samples = self.samples.with_columns(
                     pl.col('time').mul(1000).truediv(self.experiment.sampling_rate),
                 )
             else:
@@ -1668,13 +1718,13 @@ class Gaze:
             )
 
         # Convert to int if possible.
-        if self.frame.schema['time'] == pl.Float64:
-            all_decimals = self.frame.select(
+        if self.samples.schema['time'] == pl.Float64:
+            all_decimals = self.samples.select(
                 pl.col('time').round().eq(pl.col('time')).all(),
             ).item()
 
             if all_decimals:
-                self.frame = self.frame.with_columns(
+                self.samples = self.samples.with_columns(
                     pl.col('time').cast(pl.Int64),
                 )
 
@@ -1690,24 +1740,24 @@ class Gaze:
     def __str__(self) -> str:
         """Return string representation of Gaze."""
         if self.experiment is None:
-            return self.frame.__str__()
+            return self.samples.__str__()
 
-        return self.experiment.__str__() + '\n' + self.frame.__str__()
+        return self.experiment.__str__() + '\n' + self.samples.__str__()
 
     def __repr__(self) -> str:
         """Return string representation of Gaze."""
         return self.__str__()
 
 
-def _check_trial_columns(trial_columns: list[str] | None, data: pl.DataFrame) -> None:
+def _check_trial_columns(trial_columns: list[str] | None, samples: pl.DataFrame) -> None:
     """Check trial_columns for integrity.
 
     Parameters
     ----------
     trial_columns: list[str] | None
-        The name of the trial columns in the input data frame.
-    data: pl.DataFrame
-        The dataframe which holds the columns.
+        The name of the trial columns in the samples data frame.
+    samples: pl.DataFrame
+        The samples dataframe that is checked for columns.
     """
     if trial_columns:
         # Make sure there are no duplicates in trial_columns, else polars raises DuplicateError.
@@ -1722,7 +1772,7 @@ def _check_trial_columns(trial_columns: list[str] | None, data: pl.DataFrame) ->
 
             raise ValueError(f'duplicates in trial_columns: {", ".join(dupes)}')
 
-        # Make sure all trial_columns exist in data.
-        if len(set(trial_columns).intersection(data.columns)) != len(trial_columns):
-            missing = set(trial_columns) - set(data.columns)
-            raise KeyError(f'trial_columns missing in data: {", ".join(missing)}')
+        # Make sure all trial_columns exist in samples.
+        if len(set(trial_columns).intersection(samples.columns)) != len(trial_columns):
+            missing = set(trial_columns) - set(samples.columns)
+            raise KeyError(f'trial_columns missing in samples: {", ".join(missing)}')

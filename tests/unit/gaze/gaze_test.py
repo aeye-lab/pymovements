@@ -18,10 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test all Gaze functionality."""
+import re
+
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
+from pymovements import __version__
 from pymovements import EventDataFrame
 from pymovements import Experiment
 from pymovements import Gaze
@@ -42,7 +45,7 @@ from pymovements import Gaze
 )
 def test_gaze_init(init_arg):
     gaze = Gaze(init_arg)
-    assert isinstance(gaze.frame, pl.DataFrame)
+    assert isinstance(gaze.samples, pl.DataFrame)
 
 
 @pytest.mark.parametrize(
@@ -178,8 +181,8 @@ def test_gaze_copy_with_experiment():
     gaze_copy = gaze.clone()
 
     # We want to have separate dataframes but with the exact same data.
-    assert gaze.frame is not gaze_copy.frame
-    assert_frame_equal(gaze.frame, gaze_copy.frame)
+    assert gaze.samples is not gaze_copy.samples
+    assert_frame_equal(gaze.samples, gaze_copy.samples)
 
     # We want to have separate experiment instances but the same values.
     assert gaze.experiment is not gaze_copy.experiment
@@ -196,8 +199,8 @@ def test_gaze_copy_no_experiment():
     gaze_copy = gaze.clone()
 
     # We want to have separate dataframes but with the exact same data.
-    assert gaze.frame is not gaze_copy.frame
-    assert_frame_equal(gaze.frame, gaze_copy.frame)
+    assert gaze.samples is not gaze_copy.samples
+    assert_frame_equal(gaze.samples, gaze_copy.samples)
 
     # We want to have separate experiment instances but the same values.
     assert gaze.experiment is gaze_copy.experiment
@@ -213,7 +216,7 @@ def test_gaze_is_copy():
     gaze_copy = gaze.clone()
 
     assert gaze_copy is not gaze
-    assert_frame_equal(gaze.frame, gaze_copy.frame)
+    assert_frame_equal(gaze.samples, gaze_copy.samples)
 
 
 def test_gaze_copy_events():
@@ -249,11 +252,11 @@ def test_gaze_split():
     )
 
     split_gaze = gaze.split('trial_id')
-    assert all(gaze.frame.n_unique('trial_id') == 1 for gaze in split_gaze)
+    assert all(gaze.samples.n_unique('trial_id') == 1 for gaze in split_gaze)
     assert len(split_gaze) == 3
-    assert_frame_equal(gaze.frame.filter(pl.col('trial_id') == 0), split_gaze[0].frame)
-    assert_frame_equal(gaze.frame.filter(pl.col('trial_id') == 1), split_gaze[1].frame)
-    assert_frame_equal(gaze.frame.filter(pl.col('trial_id') == 2), split_gaze[2].frame)
+    assert_frame_equal(gaze.samples.filter(pl.col('trial_id') == 0), split_gaze[0].samples)
+    assert_frame_equal(gaze.samples.filter(pl.col('trial_id') == 1), split_gaze[1].samples)
+    assert_frame_equal(gaze.samples.filter(pl.col('trial_id') == 2), split_gaze[2].samples)
 
 
 def test_gaze_split_list():
@@ -277,7 +280,7 @@ def test_gaze_split_list():
     )
 
     split_gaze = gaze.split(['trial_ida', 'trial_idb'])
-    assert all(gaze_df.frame.n_unique(['trial_ida', 'trial_idb']) == 1 for gaze_df in split_gaze)
+    assert all(gaze.samples.n_unique(['trial_ida', 'trial_idb']) == 1 for gaze in split_gaze)
     assert len(split_gaze) == 4
 
 
@@ -321,7 +324,7 @@ def test_gaze_dataframe_split_events():
 
     by = 'trial_id'
     split_gaze = gaze.split(by)
-    assert all(gaze_df.events.frame.n_unique(by) == 1 for gaze_df in split_gaze)
+    assert all(gaze.events.frame.n_unique(by) == 1 for gaze in split_gaze)
     assert_frame_equal(gaze.events.frame.filter(pl.col(by) == 0), split_gaze[0].events.frame)
     assert_frame_equal(gaze.events.frame.filter(pl.col(by) == 1), split_gaze[1].events.frame)
     assert_frame_equal(gaze.events.frame.filter(pl.col(by) == 2), split_gaze[2].events.frame)
@@ -355,7 +358,7 @@ def test_gaze_dataframe_split_events_list():
     by = ['trial_ida', 'trial_idb']
     split_gaze = gaze.split(by)
     assert len(split_gaze) == 4
-    assert all(gaze_df.events.frame.n_unique(by) == 1 for gaze_df in split_gaze)
+    assert all(gaze.events.frame.n_unique(by) == 1 for gaze in split_gaze)
 
 
 def test_gaze_dataframe_split_default():
@@ -385,7 +388,7 @@ def test_gaze_dataframe_split_default():
 
     by = 'trial_id'
     split_gaze = gaze.split()
-    assert all(gaze_df.events.frame.n_unique(by) == 1 for gaze_df in split_gaze)
+    assert all(gaze.events.frame.n_unique(by) == 1 for gaze in split_gaze)
     assert_frame_equal(gaze.events.frame.filter(pl.col(by) == 0), split_gaze[0].events.frame)
     assert_frame_equal(gaze.events.frame.filter(pl.col(by) == 1), split_gaze[1].events.frame)
     assert_frame_equal(gaze.events.frame.filter(pl.col(by) == 2), split_gaze[2].events.frame)
@@ -417,3 +420,56 @@ def test_gaze_dataframe_split_default_no_trial_columns():
 
     with pytest.raises(TypeError):
         gaze.split()
+
+
+@pytest.mark.parametrize(
+    ('gaze', 'attribute'),
+    [
+        pytest.param(
+            Gaze(),
+            'frame',
+            id='frame',
+        ),
+    ],
+)
+def test_dataset_definition_get_attribute_is_deprecated(gaze, attribute):
+    with pytest.warns(DeprecationWarning):
+        getattr(gaze, attribute)
+
+
+@pytest.mark.parametrize(
+    ('gaze', 'attribute', 'value'),
+    [
+        pytest.param(
+            Gaze(),
+            'frame',
+            pl.DataFrame(),
+            id='frame',
+        ),
+    ],
+)
+def test_gaze_set_attribute_is_deprecated(gaze, attribute, value):
+    with pytest.warns(DeprecationWarning):
+        setattr(gaze, attribute, value)
+
+
+@pytest.mark.parametrize(
+    'attribute',
+    [
+        'frame',
+    ],
+)
+def test_gaze_get_attribute_is_removed(attribute):
+    definition = Gaze()
+    with pytest.raises(DeprecationWarning) as info:
+        getattr(definition, attribute)
+
+    regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
+
+    msg = info.value.args[0]
+    remove_version = regex.match(msg).groupdict()['version']
+    current_version = __version__.split('+')[0]
+    assert current_version < remove_version, (
+        f'Gaze.{attribute} was planned to be removed in v{remove_version}. '
+        f'Current version is v{current_version}.'
+    )

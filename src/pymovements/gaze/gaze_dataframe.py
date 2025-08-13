@@ -34,7 +34,7 @@ from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze import Gaze
 
 
-@repr_html(['frame', 'events', 'trial_columns', 'experiment'])
+@repr_html(['samples', 'events', 'trial_columns', 'experiment'])
 class GazeDataFrame(metaclass=DeprecatedMetaClass):
     """Self-contained data structure containing gaze represented as samples or events.
 

@@ -232,7 +232,7 @@ import pymovements as pm
 def test_gaze_unnest_has_expected_frame(init_data, unnest_kwargs, expected):
     gaze = pm.Gaze(init_data)
     gaze.unnest(**unnest_kwargs)
-    assert_frame_equal(gaze.frame, expected)
+    assert_frame_equal(gaze.samples, expected)
 
 
 @pytest.mark.parametrize(
@@ -356,7 +356,7 @@ def test_gaze_unnest_has_expected_frame_multiple_unnest(
 ):
     gaze = pm.Gaze(init_data)
     gaze.unnest(**unnest_kwargs)
-    assert_frame_equal(gaze.frame, expected)
+    assert_frame_equal(gaze.samples, expected)
 
 
 @pytest.mark.parametrize(

@@ -47,7 +47,7 @@ def gaze_fixture():
     )
 
     gaze = pm.gaze.from_numpy(
-        data=arr,
+        samples=arr,
         schema=['x_pix', 'y_pix'],
         experiment=experiment,
         pixel_columns=['x_pix', 'y_pix'],

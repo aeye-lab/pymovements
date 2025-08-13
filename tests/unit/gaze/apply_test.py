@@ -118,7 +118,7 @@ from pymovements.synthetic import step_function
             'downsample',
             {'factor': 2},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': np.arange(1000, 1010, 1),
                         'x_pix': np.arange(0, 1, 0.1),
@@ -128,7 +128,7 @@ from pymovements.synthetic import step_function
                 pixel_columns=['x_pix', 'y_pix'],
             ),
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': np.arange(1000, 1010, 2),
                         'x_pix': np.arange(0, 1, 0.2),
@@ -144,7 +144,7 @@ from pymovements.synthetic import step_function
             'pix2deg',
             {},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_pix': [(100 - 1) / 2, (100 - 1) / 2],
@@ -155,7 +155,7 @@ from pymovements.synthetic import step_function
                 pixel_columns=['x_pix', 'y_pix'],
             ),
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_pix': [49.5, 49.5],
@@ -174,7 +174,7 @@ from pymovements.synthetic import step_function
             'deg2pix',
             {'pixel_origin': 'center'},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_dva': [26.335410003881346, 26.335410003881346],
@@ -185,7 +185,7 @@ from pymovements.synthetic import step_function
                 position_columns=['x_dva', 'y_dva'],
             ),
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_pix': [49.5, 49.5],
@@ -204,7 +204,7 @@ from pymovements.synthetic import step_function
             'pos2vel',
             {'method': 'preceding'},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'trial_id': [1, 1, 1, 2, 2, 2],
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
@@ -217,7 +217,7 @@ from pymovements.synthetic import step_function
                 position_columns=['x', 'y'],
             ),
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'trial_id': [1, 1, 1, 2, 2, 2],
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
@@ -241,7 +241,7 @@ def test_gaze_apply(method, kwargs, gaze, expected):
     # the deg2pix test case results in a column order different to the default
     check_column_order = not method == 'deg2pix'
 
-    assert_frame_equal(gaze.frame, expected.frame, check_column_order=check_column_order)
+    assert_frame_equal(gaze.samples, expected.samples, check_column_order=check_column_order)
     assert_frame_equal(gaze.events.frame, expected.events.frame)
 
 
