@@ -147,7 +147,6 @@ repos:
             '--disable=missing-class-docstring',
             '--disable=missing-function-docstring',
             '--disable=protected-access',
-            '--disable=too-many-lines',
             '--rcfile=pylintrc',
           ]
 -   repo: local
