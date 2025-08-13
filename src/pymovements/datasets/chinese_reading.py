@@ -46,7 +46,7 @@ class ChineseReading(DatasetDefinition):
 
     has_files: dict[str, bool] | None
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
-        'precomputed_reading_measures'.
+        'precomputed_reading_measures'. (default: None)
 
     resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following

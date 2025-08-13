@@ -132,6 +132,8 @@ class DatasetDefinition:
     has_files: dict[str, bool] | None
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'. (default: None)
+        .. deprecated:: v0.23.0
+        This field will be removed in v0.28.0.
     mirrors: dict[str, Sequence[str]] | None
         A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
         (default: None)
@@ -145,6 +147,8 @@ class DatasetDefinition:
         The experiment definition. (default: None)
     extract: dict[str, bool] | None
         Decide whether to extract the data. (default: None)
+        .. deprecated:: v0.22.1
+        This field will be removed in v0.27.0.
     filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe. (default: None)

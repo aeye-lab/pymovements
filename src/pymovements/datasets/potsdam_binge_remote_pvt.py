@@ -55,7 +55,7 @@ class PotsdamBingeRemotePVT(DatasetDefinition):
 
     has_files: dict[str, bool] | None
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
-        'precomputed_reading_measures'.
+        'precomputed_reading_measures'. (default: None)
 
     mirrors: dict[str, Sequence[str]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
