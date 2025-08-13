@@ -439,7 +439,7 @@ def test_gaze_unnest_has_expected_frame_multiple_unnest(
             'No columns to unnest. '
             'Please specify columns to unnest via the "input_columns" argument.',
             marks=pytest.mark.filterwarnings(
-                'ignore:GazeDataFrame contains data but no.*:UserWarning',
+                'ignore:Gaze contains samples but no.*:UserWarning',
             ),
             id='df_single_row_two_components_unnest_all_default_values_no_cols_to_unnest',
         ),
