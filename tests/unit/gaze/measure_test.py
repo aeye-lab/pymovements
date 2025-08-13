@@ -30,13 +30,13 @@ def my_test_measure(column: str) -> pl.Expr:
     return pl.col(column).len().cast(pl.Int64).alias('my_measure')
 
 
-@pytest.mark.filterwarnings('ignore:Gaze contains data but no.*:UserWarning')
+@pytest.mark.filterwarnings('ignore:Gaze contains samples but no.*:UserWarning')
 @pytest.mark.parametrize(
     ('gaze_init_kwargs', 'method', 'kwargs', 'expected'),
     [
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     data={
                         'A': [1000, 1001, 1002, 1003],
                     },
@@ -51,7 +51,7 @@ def my_test_measure(column: str) -> pl.Expr:
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     data={
                         'A': [1000, None, None, 1003],
                     }, schema={'A': pl.Int64},
@@ -65,7 +65,7 @@ def my_test_measure(column: str) -> pl.Expr:
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     data={
                         'A': [1.0, np.nan, np.nan, 1.3],
                     }, schema={'A': pl.Float64},
@@ -79,7 +79,7 @@ def my_test_measure(column: str) -> pl.Expr:
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     data={
                         'A': [None, None, None, None],
                     }, schema={'A': pl.Int64},
@@ -93,7 +93,7 @@ def my_test_measure(column: str) -> pl.Expr:
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     data={
                         'A': [0.0, 0.1, 0.2, 0.3],
                     }, schema={'A': pl.Float64},
@@ -107,7 +107,7 @@ def my_test_measure(column: str) -> pl.Expr:
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     data={
                         'A': [0.0, None, None, 0.3],
                     }, schema={'A': pl.Float64},
@@ -121,7 +121,7 @@ def my_test_measure(column: str) -> pl.Expr:
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     data={
                         'A': [None, None, None, None],
                     }, schema={'A': pl.Float64},
@@ -135,7 +135,7 @@ def my_test_measure(column: str) -> pl.Expr:
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     data={
                         'A': ['a', 'b', 'c', 'd'],
                     }, schema={'A': pl.Utf8},
@@ -149,7 +149,7 @@ def my_test_measure(column: str) -> pl.Expr:
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     data={
                         'A': ['a', None, None, 'd'],
                     }, schema={'A': pl.Utf8},
@@ -163,7 +163,7 @@ def my_test_measure(column: str) -> pl.Expr:
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     data={
                         'A': [None, None, None, None],
                     }, schema={'A': pl.Utf8},
@@ -177,7 +177,7 @@ def my_test_measure(column: str) -> pl.Expr:
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     data={'t': [1000, 1001, 1002], 'x': [0.1, 0.2, 0.3], 'y': [0.1, 0.2, 0.3]},
                 ),
                 'time_column': 't',
@@ -191,7 +191,7 @@ def my_test_measure(column: str) -> pl.Expr:
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     data={
                         't': [1000, 1001, 1002], 'x': [None, None, None], 'y': [None, None, None],
                     },
@@ -207,7 +207,7 @@ def my_test_measure(column: str) -> pl.Expr:
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     data={
                         't': [1000, 1001], 'x': [0.1, None], 'y': [0.2, None],
                     },
@@ -223,7 +223,7 @@ def my_test_measure(column: str) -> pl.Expr:
 
         pytest.param(
             {
-                'data': pl.DataFrame(
+                'samples': pl.DataFrame(
                     data={
                         't': [1000, 1001], 'x': [0.1, np.nan], 'y': [0.2, np.nan],
                     },
@@ -239,7 +239,7 @@ def my_test_measure(column: str) -> pl.Expr:
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     data={
                         't': [1000, 1001], 'x': [0.1, None], 'y': [0.2, None],
                     },
@@ -255,7 +255,7 @@ def my_test_measure(column: str) -> pl.Expr:
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     data={
                         't': [1000, 1001], 'x': [0.1, None], 'y': [0.2, None],
                     },
@@ -271,7 +271,7 @@ def my_test_measure(column: str) -> pl.Expr:
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     data={'A': [1000, 1001, 1002, 1003], 'trial': [1, 1, 1, 1]},
                     schema={'A': pl.Int64, 'trial': pl.Int64},
                 ),
@@ -285,7 +285,7 @@ def my_test_measure(column: str) -> pl.Expr:
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     data={'A': [1000, 1001, None, None], 'trial': [1, 1, 2, 2]},
                     schema={'A': pl.Int64, 'trial': pl.Int64},
                 ),
@@ -299,7 +299,7 @@ def my_test_measure(column: str) -> pl.Expr:
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     data={
                         'A': [1000, 1001, 1002, 1003],
                     }, schema={'A': pl.Int64},

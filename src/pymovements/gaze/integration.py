@@ -326,7 +326,7 @@ def from_numpy(
 
 
 def from_pandas(
-        data: pd.DataFrame,
+        samples: pd.DataFrame,
         experiment: Experiment | None = None,
         events: EventDataFrame | None = None,
         *,
@@ -343,8 +343,8 @@ def from_pandas(
 
     Parameters
     ----------
-    data: pd.DataFrame
-        Data represented as a pandas DataFrame.
+    samples: pd.DataFrame
+        Gaze samples represented as a pandas DataFrame.
     experiment : Experiment | None
         The experiment definition. (default: None)
     events: EventDataFrame | None
@@ -378,11 +378,10 @@ def from_pandas(
     Returns
     -------
     Gaze
-        Returns gaze data frame read from pandas data frame.
+        Returns initialized gaze object with data read from pandas data frame.
     """
-    samples = pl.from_pandas(data=data)
     return Gaze(
-        samples=samples,
+        samples=pl.from_pandas(data=samples),
         experiment=experiment,
         events=events,
         trial_columns=trial_columns,

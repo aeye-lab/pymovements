@@ -158,7 +158,7 @@ class Gaze:
     We can now initialize our ``Gaze`` by specyfing the names of the pixel position
     columns, the timestamp column and the unit of the timestamps.
 
-    >>> gaze = Gaze(data=df, pixel_columns=['x', 'y'], time_column='t', time_unit='ms')
+    >>> gaze = Gaze(samples=df, pixel_columns=['x', 'y'], time_column='t', time_unit='ms')
     >>> gaze
     shape: (3, 2)
     ┌──────┬────────────┐
@@ -189,7 +189,7 @@ class Gaze:
     └─────┴─────┘
 
     >>> experiment = Experiment(1024, 768, 38, 30, 60, 'center', sampling_rate=100)
-    >>> gaze = Gaze(data=df_no_time, experiment=experiment, pixel_columns=['x', 'y'])
+    >>> gaze = Gaze(samples=df_no_time, experiment=experiment, pixel_columns=['x', 'y'])
     >>> gaze
     Experiment(screen=Screen(width_px=1024, height_px=768, width_cm=38, height_cm=30,
      distance_cm=60, origin='center'), eyetracker=EyeTracker(sampling_rate=100, left=None,
@@ -1656,7 +1656,7 @@ class Gaze:
         # Warning if contains samples but no gaze-related columns were provided.
         # This can lead to failure in downstream methods that rely on those columns
         # (e.g., transformations).
-        if len(self.samples) > 1 and not self.n_components:
+        if len(self.samples) > 0 and not self.n_components:
             warnings.warn(
                 'Gaze contains samples but no components could be inferred. \n'
                 'This usually happens if you did not specify any column content'

@@ -312,5 +312,5 @@ from pymovements.gaze import from_csv
 def test_from_csv_gaze_has_expected_shape_and_columns(kwargs, expected_shape, expected_schema):
     gaze = from_csv(**kwargs)
 
-    assert gaze.frame.shape == expected_shape
-    assert gaze.frame.schema == expected_schema
+    assert gaze.samples.shape == expected_shape
+    assert gaze.samples.schema == expected_schema

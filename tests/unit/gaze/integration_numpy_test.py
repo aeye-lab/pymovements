@@ -26,7 +26,7 @@ from polars.testing import assert_frame_equal
 import pymovements as pm
 
 
-@pytest.mark.filterwarnings('ignore:Gaze contains data but no.*:UserWarning')
+@pytest.mark.filterwarnings('ignore:Gaze contains samples but no.*:UserWarning')
 def test_from_numpy():
     array = np.array(
         [
@@ -50,12 +50,12 @@ def test_from_numpy():
     )
 
     gaze = pm.gaze.from_numpy(
-        data=array,
+        samples=array,
         schema=schema,
         experiment=experiment,
     )
 
-    assert gaze.frame.shape == (4, 5)
+    assert gaze.samples.shape == (4, 5)
     assert gaze.columns == schema + ['time']  # expected schema includes additional time column
 
 
@@ -89,7 +89,7 @@ def test_from_numpy_with_schema():
     )
 
     gaze = pm.gaze.from_numpy(
-        data=array,
+        samples=array,
         schema=schema,
         experiment=experiment,
         time_column='t',
@@ -120,7 +120,7 @@ def test_from_numpy_with_schema():
         },
     )
 
-    assert_frame_equal(gaze.frame, expected)
+    assert_frame_equal(gaze.samples, expected)
     assert gaze.n_components == 2
 
 
@@ -148,7 +148,7 @@ def test_from_numpy_with_trial_id():
     )
 
     gaze = pm.gaze.from_numpy(
-        data=array,
+        samples=array,
         schema=schema,
         experiment=experiment,
         trial_columns='trial_id',
@@ -169,7 +169,7 @@ def test_from_numpy_with_trial_id():
         },
     )
 
-    assert_frame_equal(gaze.frame, expected)
+    assert_frame_equal(gaze.samples, expected)
     assert gaze.n_components == 2
     assert gaze.trial_columns == ['trial_id']
 
@@ -222,7 +222,7 @@ def test_from_numpy_explicit_columns():
         },
     )
 
-    assert_frame_equal(gaze.frame, expected)
+    assert_frame_equal(gaze.samples, expected)
     assert gaze.n_components == 2
 
 
@@ -250,14 +250,14 @@ def test_from_numpy_explicit_columns_with_trial():
         },
     )
 
-    assert_frame_equal(gaze.frame, expected)
+    assert_frame_equal(gaze.samples, expected)
     assert gaze.n_components == 2
     assert gaze.trial_columns == ['trial']
 
 
 def test_from_numpy_all_none():
     gaze = pm.gaze.from_numpy(
-        data=None,
+        samples=None,
         schema=None,
         experiment=None,
         time=None,
@@ -274,7 +274,7 @@ def test_from_numpy_all_none():
 
     expected = pl.DataFrame()
 
-    assert_frame_equal(gaze.frame, expected)
+    assert_frame_equal(gaze.samples, expected)
     assert gaze.n_components is None
 
 
