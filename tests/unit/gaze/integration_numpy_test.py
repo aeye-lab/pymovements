@@ -18,12 +18,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test from gaze.from_numpy."""
+import re
+
 import numpy as np
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
-import pymovements as pm
+from pymovements import __version__
+from pymovements import EventDataFrame
+from pymovements import Experiment
+from pymovements.gaze import from_numpy
 
 
 @pytest.mark.filterwarnings('ignore:Gaze contains samples but no.*:UserWarning')
@@ -39,7 +44,7 @@ def test_from_numpy():
 
     schema = ['x_pix', 'y_pix', 'x_pos', 'y_pos']
 
-    experiment = pm.Experiment(
+    experiment = Experiment(
         screen_width_px=1280,
         screen_height_px=1024,
         screen_width_cm=38,
@@ -49,7 +54,7 @@ def test_from_numpy():
         sampling_rate=1000.0,
     )
 
-    gaze = pm.gaze.from_numpy(
+    gaze = from_numpy(
         samples=array,
         schema=schema,
         experiment=experiment,
@@ -78,7 +83,7 @@ def test_from_numpy_with_schema():
 
     schema = ['t', 'd', 'x_pix', 'y_pix', 'x_pos', 'y_pos', 'x_vel', 'y_vel', 'x_acc', 'y_acc']
 
-    experiment = pm.Experiment(
+    experiment = Experiment(
         screen_width_px=1280,
         screen_height_px=1024,
         screen_width_cm=38,
@@ -88,7 +93,7 @@ def test_from_numpy_with_schema():
         sampling_rate=1000.0,
     )
 
-    gaze = pm.gaze.from_numpy(
+    gaze = from_numpy(
         samples=array,
         schema=schema,
         experiment=experiment,
@@ -137,7 +142,7 @@ def test_from_numpy_with_trial_id():
 
     schema = ['trial_id', 't', 'x_pix', 'y_pix']
 
-    experiment = pm.Experiment(
+    experiment = Experiment(
         screen_width_px=1280,
         screen_height_px=1024,
         screen_width_cm=38,
@@ -147,7 +152,7 @@ def test_from_numpy_with_trial_id():
         sampling_rate=1000.0,
     )
 
-    gaze = pm.gaze.from_numpy(
+    gaze = from_numpy(
         samples=array,
         schema=schema,
         experiment=experiment,
@@ -182,7 +187,7 @@ def test_from_numpy_explicit_columns():
     velocity = np.array([[1, 2, 3, 4], [5, 6, 7, 8]], dtype=np.float64)
     acceleration = np.array([[2, 3, 4, 5], [6, 7, 8, 9]], dtype=np.float64)
 
-    experiment = pm.Experiment(
+    experiment = Experiment(
         screen_width_px=1280,
         screen_height_px=1024,
         screen_width_cm=38,
@@ -192,7 +197,7 @@ def test_from_numpy_explicit_columns():
         sampling_rate=1000.0,
     )
 
-    gaze = pm.gaze.from_numpy(
+    gaze = from_numpy(
         time=time,
         time_unit='ms',
         distance=distance,
@@ -231,7 +236,7 @@ def test_from_numpy_explicit_columns_with_trial():
     time = np.array([101, 102, 103, 104], dtype=np.int64)
     pixel = np.array([[0, 1, 2, 3], [4, 5, 6, 7]], dtype=np.int64)
 
-    gaze = pm.gaze.from_numpy(
+    gaze = from_numpy(
         trial=trial,
         time=time,
         pixel=pixel,
@@ -256,7 +261,7 @@ def test_from_numpy_explicit_columns_with_trial():
 
 
 def test_from_numpy_all_none():
-    gaze = pm.gaze.from_numpy(
+    gaze = from_numpy(
         samples=None,
         schema=None,
         experiment=None,
@@ -287,17 +292,17 @@ def test_from_numpy_all_none():
         ),
 
         pytest.param(
-            pm.EventDataFrame(),
+            EventDataFrame(),
             id='events_empty',
         ),
 
         pytest.param(
-            pm.EventDataFrame(name='fixation', onsets=[123], offsets=[345]),
+            EventDataFrame(name='fixation', onsets=[123], offsets=[345]),
             id='fixation',
         ),
 
         pytest.param(
-            pm.EventDataFrame(name='saccade', onsets=[34123], offsets=[67345]),
+            EventDataFrame(name='saccade', onsets=[34123], offsets=[67345]),
             id='saccade',
         ),
 
@@ -305,12 +310,56 @@ def test_from_numpy_all_none():
 )
 def test_from_numpy_events(events):
     if events is None:
-        expected_events = pm.EventDataFrame().frame
+        expected_events = EventDataFrame().frame
     else:
         expected_events = events.frame
 
-    gaze = pm.gaze.from_numpy(events=events)
+    gaze = from_numpy(events=events)
 
     assert_frame_equal(gaze.events.frame, expected_events)
     # We don't want the events point to the same reference.
     assert gaze.events.frame is not expected_events
+
+
+@pytest.mark.filterwarnings('ignore:Gaze contains samples but no.*:UserWarning')
+def test_from_numpy_data_argument_is_deprecated():
+    array = np.array(
+        [
+            [0, 1, 2, 3],
+            [0, 1, 2, 3],
+            [0, 1, 2, 3],
+            [0, 1, 2, 3],
+        ],
+    )
+    schema = ['x_pix', 'y_pix', 'x_pos', 'y_pos']
+
+    with pytest.warns(DeprecationWarning):
+        gaze = from_numpy(data=array, schema=schema)
+
+    assert gaze.samples.shape == (4, 4)
+
+
+def test_from_numpy_data_argument_is_removed():
+    array = np.array(
+        [
+            [0, 1, 2, 3],
+            [0, 1, 2, 3],
+            [0, 1, 2, 3],
+            [0, 1, 2, 3],
+        ],
+    )
+    schema = ['x_pix', 'y_pix', 'x_pos', 'y_pos']
+
+    with pytest.raises(DeprecationWarning) as info:
+        from_numpy(data=array, schema=schema)
+
+    regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
+
+    msg = info.value.args[0]
+    argument_name = 'data'
+    remove_version = regex.match(msg).groupdict()['version']
+    current_version = __version__.split('+')[0]
+    assert current_version < remove_version, (
+        f'keyword argument {argument_name} was planned to be removed in v{remove_version}. '
+        f'Current version is v{current_version}.'
+    )

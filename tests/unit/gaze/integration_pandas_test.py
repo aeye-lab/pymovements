@@ -18,12 +18,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test from gaze.from_pandas."""
+import re
+
 import pandas as pd
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
-import pymovements as pm
+from pymovements import __version__
+from pymovements import EventDataFrame
+from pymovements import Experiment
+from pymovements.gaze import from_pandas
 
 
 @pytest.mark.filterwarnings('ignore:Gaze contains samples but no.*:UserWarning')
@@ -37,9 +42,9 @@ def test_from_pandas_additional_time_column():
         },
     )
 
-    experiment = pm.Experiment(1280, 1024, 38, 30, 68, 'upper left', 1000.0)
+    experiment = Experiment(1280, 1024, 38, 30, 68, 'upper left', 1000.0)
 
-    gaze = pm.gaze.from_pandas(
+    gaze = from_pandas(
         samples=pandas_df,
         experiment=experiment,
     )
@@ -60,9 +65,9 @@ def test_from_pandas_explicit_columns():
         },
     )
 
-    experiment = pm.Experiment(1280, 1024, 38, 30, 68, 'upper left', 1000.0)
+    experiment = Experiment(1280, 1024, 38, 30, 68, 'upper left', 1000.0)
 
-    gaze = pm.gaze.from_pandas(
+    gaze = from_pandas(
         samples=pandas_df,
         experiment=experiment,
         time_column='t',
@@ -91,9 +96,9 @@ def test_from_pandas_with_trial_columnms():
         },
     )
 
-    experiment = pm.Experiment(1280, 1024, 38, 30, 68, 'upper left', 1000.0)
+    experiment = Experiment(1280, 1024, 38, 30, 68, 'upper left', 1000.0)
 
-    gaze = pm.gaze.from_pandas(
+    gaze = from_pandas(
         samples=pandas_df,
         experiment=experiment,
         trial_columns='trial_id',
@@ -122,19 +127,19 @@ def test_from_pandas_with_trial_columnms():
 
         pytest.param(
             pd.DataFrame(),
-            pm.EventDataFrame(),
+            EventDataFrame(),
             id='events_empty',
         ),
 
         pytest.param(
             pd.DataFrame(),
-            pm.EventDataFrame(name='fixation', onsets=[123], offsets=[345]),
+            EventDataFrame(name='fixation', onsets=[123], offsets=[345]),
             id='fixation',
         ),
 
         pytest.param(
             pd.DataFrame(),
-            pm.EventDataFrame(name='saccade', onsets=[34123], offsets=[67345]),
+            EventDataFrame(name='saccade', onsets=[34123], offsets=[67345]),
             id='saccade',
         ),
 
@@ -142,12 +147,45 @@ def test_from_pandas_with_trial_columnms():
 )
 def test_from_pandas_events(samples, events):
     if events is None:
-        expected_events = pm.EventDataFrame().frame
+        expected_events = EventDataFrame().frame
     else:
         expected_events = events.frame
 
-    gaze = pm.gaze.from_pandas(samples=samples, events=events)
+    gaze = from_pandas(samples=samples, events=events)
 
     assert_frame_equal(gaze.events.frame, expected_events)
     # We don't want the events point to the same reference.
     assert gaze.events.frame is not expected_events
+
+
+@pytest.mark.filterwarnings('ignore:Gaze contains samples but no.*:UserWarning')
+def test_from_pandas_data_argument_is_deprecated():
+    pandas_df = pd.DataFrame(
+        {
+            'x_pix': [0, 1, 2, 3],
+            'y_pix': [0, 1, 2, 3],
+            'x_pos': [0, 1, 2, 3],
+            'y_pos': [0, 1, 2, 3],
+        },
+    )
+
+    with pytest.warns(DeprecationWarning):
+        gaze = from_pandas(samples=None, data=pandas_df)
+
+    assert gaze.samples.shape == (4, 4)
+
+
+def test_from_pandas_data_argument_is_removed():
+    with pytest.raises(DeprecationWarning) as info:
+        from_pandas(samples=None, data=pd.DataFrame())
+
+    regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
+
+    msg = info.value.args[0]
+    argument_name = 'data'
+    remove_version = regex.match(msg).groupdict()['version']
+    current_version = __version__.split('+')[0]
+    assert current_version < remove_version, (
+        f'keyword argument {argument_name} was planned to be removed in v{remove_version}. '
+        f'Current version is v{current_version}.'
+    )
