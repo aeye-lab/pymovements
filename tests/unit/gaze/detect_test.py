@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test GazeDataFrame detect method."""
+"""Test Gaze detect method."""
 import numpy as np
 import polars as pl
 import pytest
@@ -359,18 +359,17 @@ from pymovements.synthetic import step_function
                 'minimum_duration': 2,
             },
             pm.gaze.from_numpy(
-                time=np.arange(1000, 1010, 0.1, dtype=float),
-                velocity=step_function(length=100, steps=[0], values=[(0, 0)]),
+                time=np.arange(1000, 1100, 0.1, dtype=float),
+                velocity=step_function(length=1000, steps=[0], values=[(0, 0)]),
                 orient='row',
                 experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             ),
             pm.events.EventDataFrame(
                 name='fixation',
                 onsets=[1000],
-                offsets=[1099],
+                offsets=[1099.9],
             ),
             id='ivt_constant_position_single_fixation_with_timesteps_float',
-            marks=pytest.mark.xfail(reason='#532'),
         ),
 
         pytest.param(
@@ -722,6 +721,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
+                position=np.zeros((2, 100)),
                 events=pm.EventDataFrame(name='fixation', onsets=[0], offsets=[100]),
             ),
             pm.EventDataFrame(name='fixation', onsets=[0], offsets=[100]),
@@ -733,6 +733,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
+                position=np.zeros((2, 100)),
                 events=pm.EventDataFrame(name='fixation', onsets=[10], offsets=[100]),
             ),
             pm.EventDataFrame(
@@ -748,6 +749,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
+                position=np.zeros((2, 100)),
                 events=pm.EventDataFrame(name='fixation', onsets=[0], offsets=[90]),
             ),
             pm.EventDataFrame(
@@ -763,6 +765,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
+                position=np.zeros((2, 100)),
                 events=pm.EventDataFrame(name='fixation', onsets=[0, 50], offsets=[40, 100]),
             ),
             pm.EventDataFrame(
@@ -778,6 +781,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(0, 100),
+                position=np.zeros((2, 100)),
                 events=pm.EventDataFrame(
                     name=['fixation', 'saccade'], onsets=[0, 50], offsets=[40, 100],
                 ),
@@ -796,6 +800,7 @@ from pymovements.synthetic import step_function
             pm.gaze.from_numpy(
                 trial=np.array([1] * 50 + [2] * 50),
                 time=np.arange(0, 100),
+                position=np.zeros((2, 100)),
                 events=pm.EventDataFrame(
                     name='fixation', onsets=[0, 90], offsets=[10, 100], trials=[1, 2],
                 ),
@@ -815,6 +820,7 @@ from pymovements.synthetic import step_function
             pm.gaze.from_numpy(
                 trial=np.array([1] * 50 + [2] * 50),
                 time=np.concatenate((np.arange(0, 50), np.arange(0, 50))),
+                position=np.zeros((2, 100)),
                 events=pm.EventDataFrame(
                     name='fixation', onsets=[0, 40], offsets=[10, 50], trials=[1, 2],
                 ),
@@ -838,6 +844,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(100, 200),
+                position=np.zeros((2, 100)),
                 events=pm.EventDataFrame(
                     name=['fixation', 'saccade'], onsets=[0, 50], offsets=[40, 100],
                 ),
@@ -855,6 +862,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(0, 200),
+                position=np.zeros((2, 100)),
                 events=pm.EventDataFrame(
                     name=['fixation', 'saccade'], onsets=[210, 250], offsets=[240, 300],
                 ),
@@ -872,6 +880,7 @@ from pymovements.synthetic import step_function
             {},
             pm.gaze.from_numpy(
                 time=np.arange(100, 200),
+                position=np.zeros((2, 100)),
                 events=pm.EventDataFrame(
                     name=['fixation', 'fixation'], onsets=[0, 120], offsets=[110, 220],
                 ),
@@ -945,7 +954,7 @@ def test_gaze_detect_custom_method_no_arguments():
                 'minimum_duration': 2,
                 'eye': 'auto',
             },
-            pm.gaze.GazeDataFrame(None, pm.Experiment(1024, 768, 38, 30, 60, 'center', 10)),
+            pm.gaze.Gaze(None, pm.Experiment(1024, 768, 38, 30, 60, 'center', 10)),
             pl.exceptions.ColumnNotFoundError,
             "Column 'velocity' not found. Available columns are: ['time']",
             id='ivt_no_velocity_raises_column_not_found_error',

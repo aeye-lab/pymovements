@@ -18,11 +18,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Tests pymovements.events.events.EventDataFrame."""
+import re
+
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
 import pymovements as pm
+from pymovements import __version__
 
 
 @pytest.fixture(name='expected_schema_after_init')
@@ -399,6 +402,17 @@ def test_event_dataframe_columns_same_as_frame():
     assert event_df.columns == event_df.frame.columns
 
 
+def test_event_dataframe_clone():
+    events = pm.EventDataFrame(name='saccade', onsets=[0], offsets=[123])
+    events_copy = events.clone()
+
+    # We want to have separate dataframes but with the exact same data.
+    assert events is not events_copy
+    assert events.frame is not events_copy.frame
+    assert_frame_equal(events.frame, events_copy.frame)
+
+
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
 def test_event_dataframe_copy():
     events = pm.EventDataFrame(name='saccade', onsets=[0], offsets=[123])
     events_copy = events.copy()
@@ -407,6 +421,28 @@ def test_event_dataframe_copy():
     assert events is not events_copy
     assert events.frame is not events_copy.frame
     assert_frame_equal(events.frame, events_copy.frame)
+
+
+def test_event_dataframe_copy_removed():
+    with pytest.raises(DeprecationWarning) as info:
+        pm.EventDataFrame().copy()
+
+    regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
+
+    msg = info.value.args[0]
+    remove_version = regex.match(msg).groupdict()['version']
+    current_version = __version__.split('+')[0]
+    assert current_version < remove_version, (
+        f'EventDataFrame.copy() was planned to be removed in v{remove_version}. '
+        f'Current version is v{current_version}.'
+    )
+
+
+def test_event_dataframe_clones_trial_columns():
+    events = pm.EventDataFrame(data=pl.DataFrame({'trial': 'trial'}), trial_columns='trial')
+    events_copy = events.clone()
+
+    assert events.trial_columns == events_copy.trial_columns
 
 
 @pytest.mark.parametrize(
@@ -486,3 +522,104 @@ def test_event_dataframe_add_trial_column_raises_exception(events, kwargs, excep
         events.add_trial_column(**kwargs)
 
     assert message == excinfo.value.args[0]
+
+
+def test_eventdataframe_split():
+    event_df = pm.EventDataFrame(
+        pl.DataFrame(
+            {
+                'trial_id': [0, 1, 1, 2],
+                'name': ['fixation', 'fixation', 'fixation', 'fixation'],
+                'onset': [0, 1, 2, 3],
+                'offset': [1, 2, 44, 1340],
+                'duration': [1, 1, 42, 1337],
+            },
+        ),
+    )
+
+    split_event = event_df.split('trial_id')
+    assert all(event_df.frame.n_unique('trial_id') == 1 for event_df in split_event)
+    assert len(split_event) == 3
+    assert_frame_equal(event_df.frame.filter(pl.col('trial_id') == 0), split_event[0].frame)
+    assert_frame_equal(event_df.frame.filter(pl.col('trial_id') == 1), split_event[1].frame)
+    assert_frame_equal(event_df.frame.filter(pl.col('trial_id') == 2), split_event[2].frame)
+
+
+def test_eventdataframe_split_by_str():
+    event_df = pm.EventDataFrame(
+        pl.DataFrame(
+            {
+                'trial_id': [0, 1, 1, 2],
+                'name': ['fixation', 'fixation', 'fixation', 'fixation'],
+                'onset': [0, 1, 2, 3],
+                'offset': [1, 2, 44, 1340],
+                'duration': [1, 1, 42, 1337],
+            },
+        ),
+        trial_columns='trial_id',
+    )
+
+    split_event = event_df.split('trial_id')
+    assert all(event_df.frame.n_unique('trial_id') == 1 for event_df in split_event)
+    assert len(split_event) == 3
+    assert_frame_equal(event_df.frame.filter(pl.col('trial_id') == 0), split_event[0].frame)
+    assert_frame_equal(event_df.frame.filter(pl.col('trial_id') == 1), split_event[1].frame)
+    assert_frame_equal(event_df.frame.filter(pl.col('trial_id') == 2), split_event[2].frame)
+
+
+def test_eventdataframe_split_by_list():
+    event_df = pm.EventDataFrame(
+        pl.DataFrame(
+            {
+                'trial_ida': [0, 1, 1, 2],
+                'trial_idb': [0, 1, 2, 3],
+                'name': ['fixation', 'fixation', 'fixation', 'fixation'],
+                'onset': [0, 1, 2, 3],
+                'offset': [1, 2, 44, 1340],
+                'duration': [1, 1, 42, 1337],
+            },
+        ),
+        trial_columns=['trial_ida', 'trial_idb'],
+    )
+
+    split_event = event_df.split(['trial_ida', 'trial_idb'])
+    assert all(event_df.frame.n_unique(['trial_ida', 'trial_idb']) == 1 for event_df in split_event)
+    assert len(split_event) == 4
+
+
+def test_event_dataframe_split_default():
+    event_df = pm.EventDataFrame(
+        pl.DataFrame(
+            {
+                'trial_id': [0, 1, 1, 2],
+                'name': ['fixation', 'fixation', 'fixation', 'fixation'],
+                'onset': [0, 1, 2, 3],
+                'offset': [1, 2, 44, 1340],
+                'duration': [1, 1, 42, 1337],
+            },
+        ),
+        trial_columns='trial_id',
+    )
+
+    split_event = event_df.split()
+    assert all(event_df.frame.n_unique('trial_id') == 1 for event_df in split_event)
+    assert len(split_event) == 3
+    assert_frame_equal(event_df.frame.filter(pl.col('trial_id') == 0), split_event[0].frame)
+    assert_frame_equal(event_df.frame.filter(pl.col('trial_id') == 1), split_event[1].frame)
+    assert_frame_equal(event_df.frame.filter(pl.col('trial_id') == 2), split_event[2].frame)
+
+
+def test_event_dataframe_split_default_no_trial_columns():
+    event_df = pm.EventDataFrame(
+        pl.DataFrame(
+            {
+                'trial_id': [0, 1, 1, 2],
+                'name': ['fixation', 'fixation', 'fixation', 'fixation'],
+                'onset': [0, 1, 2, 3],
+                'offset': [1, 2, 44, 1340],
+                'duration': [1, 1, 42, 1337],
+            },
+        ),
+    )
+    with pytest.raises(TypeError):
+        event_df.split()

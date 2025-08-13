@@ -11,6 +11,7 @@ Gaze page
    :toctree:
    :template: class.rst
 
+    Gaze
     GazeDataFrame
 
 .. currentmodule:: pymovements.gaze.transforms

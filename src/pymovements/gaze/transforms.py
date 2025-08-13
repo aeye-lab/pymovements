@@ -29,7 +29,7 @@ import numpy as np
 import polars as pl
 import scipy
 
-from pymovements.utils import checks
+from pymovements._utils import _checks
 
 TransformMethod = TypeVar('TransformMethod', bound=Callable[..., pl.Expr])
 
@@ -110,8 +110,8 @@ def register_transform(method: TransformMethod) -> TransformMethod:
 def center_origin(
         *,
         screen_resolution: tuple[int, int],
-        origin: str,
         n_components: int,
+        origin: str = 'upper left',
         pixel_column: str = 'pixel',
         output_column: str | None = None,
 ) -> pl.Expr:
@@ -123,10 +123,11 @@ def center_origin(
     ----------
     screen_resolution: tuple[int, int]
         Pixel screen resolution as tuple (width, height).
-    origin: str
-        The location of the pixel origin. Supported values: ``center``, ``upper left``
     n_components: int
         Number of components in input column.
+    origin: str
+        The location of the pixel origin. Supported values: ``center``, ``upper left``.
+        (default: ``upper left``)
     pixel_column: str
         Name of the input column with pixel data. (default: 'pixel')
     output_column: str | None
@@ -183,8 +184,8 @@ def downsample(
     pl.Expr
         The respective polars expression.
     """
-    checks.check_is_int(factor=factor)
-    checks.check_is_positive_value(factor=factor)
+    _checks.check_is_int(factor=factor)
+    _checks.check_is_positive_value(factor=factor)
 
     return pl.all().gather_every(n=factor)
 
@@ -220,8 +221,8 @@ def pix2deg(
         screen_resolution: tuple[int, int],
         screen_size: tuple[float, float],
         distance: float | str,
-        origin: str,
         n_components: int,
+        origin: str = 'upper left',
         pixel_column: str = 'pixel',
         position_column: str = 'position',
 ) -> pl.Expr:
@@ -237,11 +238,12 @@ def pix2deg(
         Must be either a scalar or a string. If a scalar is passed, it is interpreted as the
         Eye-to-screen distance in centimeters. If a string is passed, it is interpreted as the name
         of a column containing the Eye-to-screen distance in millimiters for each sample.
+    n_components: int
+        Number of components in input column.
     origin: str
         The location of the pixel origin. Supported values: ``center``, ``upper left``. See also
         py:func:`~pymovements.gaze.transform.center_origin` for more information.
-    n_components: int
-        Number of components in input column.
+        (default: ``upper left``)
     pixel_column: str
         The input pixel column name. (default: 'pixel')
     position_column: str
@@ -295,8 +297,8 @@ def deg2pix(
         screen_resolution: tuple[int, int],
         screen_size: tuple[float, float],
         distance: float | str,
-        pixel_origin: str = 'upper left',
         n_components: int,
+        pixel_origin: str = 'upper left',
         position_column: str = 'position',
         pixel_column: str = 'pixel',
 ) -> pl.Expr:
@@ -312,11 +314,11 @@ def deg2pix(
         Must be either a scalar or a string. If a scalar is passed, it is interpreted as the
         Eye-to-screen distance in centimeters. If a string is passed, it is interpreted as the name
         of a column containing the Eye-to-screen distance in millimiters for each sample.
-    pixel_origin: str
-        The desired location of the pixel origin. (default: 'upper left')
-        Supported values: ``center``, ``upper left``.
     n_components: int
         Number of components in input column.
+    pixel_origin: str
+        The desired location of the pixel origin. Supported values: ``center``, ``upper left``.
+        (default: 'upper left')
     position_column: str
         The input position column name. (default: 'position')
     pixel_column: str
@@ -381,8 +383,8 @@ def _check_distance(distance: float) -> None:
     distance: float
         The distance to check.
     """
-    checks.check_is_scalar(distance=distance)
-    checks.check_is_greater_than_zero(distance=distance)
+    _checks.check_is_scalar(distance=distance)
+    _checks.check_is_greater_than_zero(distance=distance)
 
 
 def _check_screen_resolution(screen_resolution: tuple[int, int]) -> None:
@@ -408,8 +410,8 @@ def _check_screen_resolution(screen_resolution: tuple[int, int]) -> None:
         )
 
     for element in screen_resolution:
-        checks.check_is_scalar(screen_resolution=element)
-        checks.check_is_greater_than_zero(screen_resolution=element)
+        _checks.check_is_scalar(screen_resolution=element)
+        _checks.check_is_greater_than_zero(screen_resolution=element)
 
 
 def _check_screen_size(screen_size: tuple[float, float]) -> None:
@@ -433,8 +435,8 @@ def _check_screen_size(screen_size: tuple[float, float]) -> None:
         raise ValueError(f'screen_size must have length of 2, but is of length {len(screen_size)}')
 
     for element in screen_size:
-        checks.check_is_scalar(screen_size=element)
-        checks.check_is_greater_than_zero(screen_size=element)
+        _checks.check_is_scalar(screen_size=element)
+        _checks.check_is_greater_than_zero(screen_size=element)
 
 
 @register_transform
@@ -531,7 +533,7 @@ def pos2vel(
 
     * ``savitzky_golay``: velocity is calculated by a polynomial of fixed degree and window length.
       See :py:func:`~pymovements.gaze.transforms.savitzky_golay` for further details.
-    * ``five_point``: velocity is calculated from the difference of the mean values
+    * ``fivepoint``: velocity is calculated from the difference of the mean values
       of the subsequent two samples and the preceding two samples
     * ``neighbors``: velocity is calculated from difference of the subsequent
       sample and the preceding sample
@@ -773,7 +775,7 @@ def resample(
     elif isinstance(columns, str):
         columns = [columns]
 
-    checks.check_is_greater_than_zero(resampling_rate=resampling_rate)
+    _checks.check_is_greater_than_zero(resampling_rate=resampling_rate)
 
     # Return frame if empty
     if frame.is_empty():
@@ -1134,9 +1136,9 @@ def _check_window_length(window_length: Any) -> None:
     window_length: Any
         The window length to check.
     """
-    checks.check_is_not_none(window_length=window_length)
-    checks.check_is_int(window_length=window_length)
-    checks.check_is_greater_than_zero(degree=window_length)
+    _checks.check_is_not_none(window_length=window_length)
+    _checks.check_is_int(window_length=window_length)
+    _checks.check_is_greater_than_zero(degree=window_length)
 
 
 def _check_degree(degree: Any, window_length: int) -> None:
@@ -1150,9 +1152,9 @@ def _check_degree(degree: Any, window_length: int) -> None:
     window_length: int
         The window length to check against.
     """
-    checks.check_is_not_none(degree=degree)
-    checks.check_is_int(degree=degree)
-    checks.check_is_greater_than_zero(degree=degree)
+    _checks.check_is_not_none(degree=degree)
+    _checks.check_is_int(degree=degree)
+    _checks.check_is_greater_than_zero(degree=degree)
 
     if degree >= window_length:
         raise ValueError("'degree' must be less than 'window_length'")
@@ -1191,5 +1193,5 @@ def _check_derivative(derivative: Any) -> None:
     derivative: Any
         The derivative to check.
     """
-    checks.check_is_int(derivative=derivative)
-    checks.check_is_positive_value(derivative=derivative)
+    _checks.check_is_int(derivative=derivative)
+    _checks.check_is_positive_value(derivative=derivative)

@@ -25,14 +25,16 @@ from typing import Any
 
 import numpy as np
 import polars as pl
+from deprecated.sphinx import deprecated
 from tqdm import tqdm
 
+from pymovements._utils import _checks
+from pymovements._utils._html import repr_html
 from pymovements.events.properties import duration
 from pymovements.stimulus.text import TextStimulus
-from pymovements.utils import checks
-from pymovements.utils.aois import get_aoi
 
 
+@repr_html(['frame', 'trial_columns'])
 class EventDataFrame:
     """A DataFrame for event data.
 
@@ -45,9 +47,9 @@ class EventDataFrame:
         exclusive with all the other arguments. (default: None)
     name: str | list[str] | None
         Name of events. (default: None)
-    onsets: list[int] | np.ndarray | None
+    onsets: list[int | float] | np.ndarray | None
         List of onsets. (default: None)
-    offsets: list[int] | np.ndarray | None
+    offsets: list[int | float] | np.ndarray | None
         List of offsets. (default: None)
     trials: list[int | float | str] | np.ndarray | None
         List of trial identifiers. (default: None)
@@ -84,24 +86,24 @@ class EventDataFrame:
     └──────────┴─────────┴─────────┴──────────┘
     """
 
-    _minimal_schema = {'name': pl.Utf8, 'onset': pl.Int64, 'offset': pl.Int64}
+    _minimal_schema = {'name': pl.Utf8, 'onset': pl.Float64, 'offset': pl.Float64}
 
     def __init__(
             self,
             data: pl.DataFrame | None = None,
             name: str | list[str] | None = None,
-            onsets: list[int] | np.ndarray | None = None,
-            offsets: list[int] | np.ndarray | None = None,
+            onsets: list[int | float] | np.ndarray | None = None,
+            offsets: list[int | float] | np.ndarray | None = None,
             trials: list[int | float | str] | np.ndarray | None = None,
             trial_columns: list[str] | str | None = None,
     ):
         self.trial_columns: list[str] | None  # otherwise mypy gets confused.
 
         if data is not None:
-            checks.check_is_mutual_exclusive(data=data, onsets=onsets)
-            checks.check_is_mutual_exclusive(data=data, offsets=offsets)
-            checks.check_is_mutual_exclusive(data=data, name=name)
-            checks.check_is_mutual_exclusive(data=data, name=trials)
+            _checks.check_is_mutual_exclusive(data=data, onsets=onsets)
+            _checks.check_is_mutual_exclusive(data=data, offsets=offsets)
+            _checks.check_is_mutual_exclusive(data=data, name=name)
+            _checks.check_is_mutual_exclusive(data=data, name=trials)
 
             data = data.clone()
             data = self._add_minimal_schema_columns(data)
@@ -119,7 +121,7 @@ class EventDataFrame:
 
         else:
             # Make sure that if either onsets or offsets is None, the other one is None too.
-            checks.check_is_none_is_mutual(onsets=onsets, offsets=offsets)
+            _checks.check_is_none_is_mutual(onsets=onsets, offsets=offsets)
 
             # Make sure lengths of onsets and offsets are equal.
             if onsets is not None:
@@ -127,10 +129,10 @@ class EventDataFrame:
                 # mypy does not get that offsets cannot be None (l. 87)
                 assert offsets is not None
 
-                checks.check_is_length_matching(onsets=onsets, offsets=offsets)
+                _checks.check_is_length_matching(onsets=onsets, offsets=offsets)
                 # In case name is given as a list, check that too.
                 if isinstance(name, Sequence) and not isinstance(name, str):
-                    checks.check_is_length_matching(onsets=onsets, name=name)
+                    _checks.check_is_length_matching(onsets=onsets, name=name)
 
                 # These reassignments are necessary for a correct conversion into a dataframe.
                 if len(onsets) == 0:
@@ -142,8 +144,8 @@ class EventDataFrame:
 
                 data_dict = {
                     'name': pl.Series(name, dtype=pl.Utf8),
-                    'onset': pl.Series(onsets, dtype=pl.Int64),
-                    'offset': pl.Series(offsets, dtype=pl.Int64),
+                    'onset': pl.Series(onsets, dtype=pl.Float64),
+                    'offset': pl.Series(offsets, dtype=pl.Float64),
                 }
 
                 if trials is not None:
@@ -155,8 +157,8 @@ class EventDataFrame:
             else:
                 data_dict = {
                     'name': pl.Series([], dtype=pl.Utf8),
-                    'onset': pl.Series([], dtype=pl.Int64),
-                    'offset': pl.Series([], dtype=pl.Int64),
+                    'onset': pl.Series([], dtype=pl.Float64),
+                    'offset': pl.Series([], dtype=pl.Float64),
                 }
                 self.trial_columns = None
 
@@ -165,6 +167,19 @@ class EventDataFrame:
         # Ensure column order: trial columns, name, onset, offset.
         if self.trial_columns is not None:
             self.frame = self.frame.select([*self.trial_columns, *self._minimal_schema.keys()])
+
+        # Convert to int if possible.
+        all_decimals = self.frame.select(
+            pl.all_horizontal(
+                pl.col('onset', 'offset').round()
+                .eq(pl.col('onset', 'offset'))
+                .all(),
+            ),
+        ).item()
+        if all_decimals:
+            self.frame = self.frame.with_columns(
+                pl.col('onset', 'offset').cast(pl.Int64),
+            )
 
         if 'duration' not in self.frame.columns:
             self._add_duration_property()
@@ -233,7 +248,7 @@ class EventDataFrame:
                 raise TypeError(
                     'data must be passed as a list of values in case of providing multiple columns',
                 )
-            checks.check_is_length_matching(column=column, data=data)
+            _checks.check_is_length_matching(column=column, data=data)
 
             trial_columns = dict(zip(column, data))
 
@@ -260,7 +275,7 @@ class EventDataFrame:
         event_property_columns -= set(self._additional_columns)
         return list(event_property_columns)
 
-    def copy(self) -> EventDataFrame:
+    def clone(self) -> EventDataFrame:
         """Return a copy of the EventDataFrame.
 
         Returns
@@ -268,7 +283,67 @@ class EventDataFrame:
         EventDataFrame
             A copy of the EventDataFrame.
         """
-        return EventDataFrame(data=self.frame.clone())
+        return EventDataFrame(
+            data=self.frame.clone(),
+            trial_columns=self.trial_columns,
+        )
+
+    @deprecated(
+        reason='Please use EventDataFrame.clone() instead. '
+               'This function will be removed in v0.28.0.',
+        version='v0.23.0',
+    )
+    def copy(self) -> EventDataFrame:
+        """Return a copy of the EventDataFrame.
+
+        .. deprecated:: v0.23.0
+           Please use :py:meth:`~pymovements.events.EventDataFrame.clone()` instead.
+           This function will be removed in v0.28.0.
+
+        Returns
+        -------
+        EventDataFrame
+            A copy of the EventDataFrame.
+        """
+        return self.clone()
+
+    def split(self, by: Sequence[str] | None = None) -> list[EventDataFrame]:
+        """Split the EventDataFrame into multiple frames based on specified column(s).
+
+        Parameters
+        ----------
+        by: Sequence[str] | None
+            Column name(s) to split the DataFrame by. If a single string is provided,
+            it will be used as a single column name. If a list is provided, the DataFrame
+            will be split by unique combinations of values in all specified columns.
+            If None, uses trial_columns. (default: None)
+
+        Returns
+        -------
+        list[EventDataFrame]
+            A list of new EventDataFrame instances, each containing a partition of the
+            original data with all metadata and configurations preserved.
+        """
+        # Use trial_columns if by is None
+        if by is None:
+            by = self.trial_columns
+            if by is None:
+                raise TypeError("Either 'by' or 'self.trial_columns' must be specified")
+
+        event_pl_df_list = list(self.frame.partition_by(by=by))
+
+        # Ensure column order: trial columns, name, onset, offset.
+        if self.trial_columns is not None:
+            event_pl_df_list = [
+                frame.select([*self.trial_columns, *self._minimal_schema.keys()])
+                for frame in event_pl_df_list
+            ]
+        return [
+            EventDataFrame(
+                frame,
+                trial_columns=self.trial_columns,
+            ) for frame in event_pl_df_list
+        ]
 
     def _add_minimal_schema_columns(self, df: pl.DataFrame) -> pl.DataFrame:
         """Add minimal schema columns to :py:class:`polars.DataFrame` if they are missing.
@@ -325,7 +400,7 @@ class EventDataFrame:
         """
         self.unnest()
         aois = [
-            get_aoi(aoi_dataframe, row, 'location_x', 'location_y')
+            aoi_dataframe.get_aoi(row=row, x_eye='location_x', y_eye='location_y')
             for row in tqdm(self.frame.iter_rows(named=True))
         ]
         aoi_df = pl.concat(aois)

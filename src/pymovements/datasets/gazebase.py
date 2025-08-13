@@ -27,6 +27,7 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
@@ -53,31 +54,28 @@ class GazeBase(DatasetDefinition):
     name: str
         The name of the dataset.
 
+    long_name: str
+        The entire name of the dataset.
+
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
 
-    mirrors: dict[str, list[str]]
-        A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
-
-    resources: dict[str, list[dict[str, str]]]
+    resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    extract: dict[str, bool]
-        Decide whether to extract the data.
-
     experiment: Experiment
         The experiment definition.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -122,9 +120,11 @@ class GazeBase(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'GazeBase'
+
+    long_name: str = 'GazeBase dataset'
 
     has_files: dict[str, bool] = field(
         default_factory=lambda: {
@@ -134,25 +134,28 @@ class GazeBase(DatasetDefinition):
         },
     )
 
-    mirrors: dict[str, list[str]] = field(
-        default_factory=lambda: {
-            'gaze': ['https://figshare.com/ndownloader/files/'],
-        },
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dict(
+            {
+                'gaze': [
+                    {
+                        'resource': 'https://figshare.com/ndownloader/files/27039812',
+                        'filename': 'GazeBase_v2_0.zip',
+                        'md5': 'cb7eb895fb48f8661decf038ab998c9a',
+                        'filename_pattern': (
+                            r'S_{round_id:1d}{subject_id:d}'
+                            r'_S{session_id:d}'
+                            r'_{task_name}.csv'
+                        ),
+                        'filename_pattern_schema_overrides': {
+                            'round_id': int, 'subject_id': int,
+                            'session_id': int,
+                        },
+                    },
+                ],
+            },
+        ),
     )
-
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda: {
-            'gaze': [
-                {
-                    'resource': '27039812',
-                    'filename': 'GazeBase_v2_0.zip',
-                    'md5': 'cb7eb895fb48f8661decf038ab998c9a',
-                },
-            ],
-        },
-    )
-
-    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
 
     experiment: Experiment = field(
         default_factory=lambda: Experiment(
@@ -166,22 +169,9 @@ class GazeBase(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze':
-                (
-                    r'S_{round_id:1d}{subject_id:d}'
-                    r'_S{session_id:d}'
-                    r'_{task_name}.csv'
-                ),
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {'round_id': int, 'subject_id': int, 'session_id': int},
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     time_column: str = 'n'
 

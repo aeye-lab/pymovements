@@ -24,11 +24,11 @@ from collections.abc import Sized
 
 import numpy as np
 
+from pymovements._utils import _checks
 from pymovements.events._utils._filters import filter_candidates_remove_nans
 from pymovements.events.detection._library import register_event_detection
 from pymovements.events.frame import EventDataFrame
 from pymovements.gaze.transforms_numpy import consecutive
-from pymovements.utils import checks
 
 
 @register_event_detection
@@ -95,7 +95,7 @@ def microsaccades(
     if timesteps is None:
         timesteps = np.arange(len(velocities), dtype=np.int64)
     timesteps = np.array(timesteps)
-    checks.check_is_length_matching(velocities=velocities, timesteps=timesteps)
+    _checks.check_is_length_matching(velocities=velocities, timesteps=timesteps)
 
     if isinstance(threshold, str):
         threshold = compute_threshold(velocities, method=threshold)

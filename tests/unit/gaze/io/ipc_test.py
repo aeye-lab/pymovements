@@ -46,11 +46,14 @@ import pymovements as pm
                 'column_map': {'pixel': 'pixel_coordinates'},
             },
             (10, 2),
-            id='feather_bino_shape',
+            marks=pytest.mark.filterwarnings(
+                'ignore:Gaze contains data but no.*:UserWarning',
+            ),
+            id='feather_mono_shape_column_map',
         ),
     ],
 )
 def test_shapes(kwargs, shape):
-    gaze_dataframe = pm.gaze.from_ipc(**kwargs)
+    gaze = pm.gaze.from_ipc(**kwargs)
 
-    assert gaze_dataframe.frame.shape == shape
+    assert gaze.frame.shape == shape

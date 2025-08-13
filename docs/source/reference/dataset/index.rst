@@ -14,5 +14,7 @@ This page gives an overview of all dataset classes.
 
     Dataset
     DatasetDefinition
-    DatasetPaths
     DatasetLibrary
+    DatasetPaths
+    ResourceDefinition
+    ResourceDefinitions

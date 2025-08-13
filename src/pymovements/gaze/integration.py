@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Module to create a GazeDataFrame from a numpy array."""
+"""Module to create a Gaze from a numpy array."""
 from __future__ import annotations
 
 from typing import Literal
@@ -26,10 +26,10 @@ import numpy as np
 import pandas as pd
 import polars as pl
 
+from pymovements._utils import _checks
 from pymovements.events.frame import EventDataFrame
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
-from pymovements.utils import checks
+from pymovements.gaze.gaze import Gaze
 
 
 def from_numpy(
@@ -54,8 +54,8 @@ def from_numpy(
         velocity_columns: list[str] | None = None,
         acceleration_columns: list[str] | None = None,
         distance_column: str | None = None,
-) -> GazeDataFrame:
-    """Get a :py:class:`~pymovements.gaze.GazeDataFrame` from a numpy array.
+) -> Gaze:
+    """Get a :py:class:`~pymovements.gaze.Gaze` from a numpy array.
 
     There are two mutually exclusive ways of conversion.
 
@@ -121,7 +121,7 @@ def from_numpy(
 
     Returns
     -------
-    GazeDataFrame
+    Gaze
         Returns gaze data frame read from numpy array.
 
     Examples
@@ -227,16 +227,16 @@ def from_numpy(
     └──────┴────────────┘
     """
     # Either data or {time, pixel, position, velocity, acceleration} must be None.
-    checks.check_is_mutual_exclusive(data=data, time=time)
-    checks.check_is_mutual_exclusive(data=data, pixel=pixel)
-    checks.check_is_mutual_exclusive(data=data, position=position)
-    checks.check_is_mutual_exclusive(data=data, velocity=velocity)
-    checks.check_is_mutual_exclusive(data=data, acceleration=acceleration)
-    checks.check_is_mutual_exclusive(data=data, distance=distance)
+    _checks.check_is_mutual_exclusive(data=data, time=time)
+    _checks.check_is_mutual_exclusive(data=data, pixel=pixel)
+    _checks.check_is_mutual_exclusive(data=data, position=position)
+    _checks.check_is_mutual_exclusive(data=data, velocity=velocity)
+    _checks.check_is_mutual_exclusive(data=data, acceleration=acceleration)
+    _checks.check_is_mutual_exclusive(data=data, distance=distance)
 
     if data is not None:
         df = pl.from_numpy(data=data, schema=schema, orient=orient)
-        return GazeDataFrame(
+        return Gaze(
             data=df,
             experiment=experiment,
             events=events,
@@ -297,7 +297,7 @@ def from_numpy(
         distance_column = 'distance'
 
     df = pl.concat(dfs, how='horizontal')
-    return GazeDataFrame(
+    return Gaze(
         data=df,
         experiment=experiment,
         events=events,
@@ -325,8 +325,8 @@ def from_pandas(
         velocity_columns: list[str] | None = None,
         acceleration_columns: list[str] | None = None,
         distance_column: str | None = None,
-) -> GazeDataFrame:
-    """Get a :py:class:`~pymovements.gaze.GazeDataFrame` from a pandas DataFrame.
+) -> Gaze:
+    """Get a :py:class:`~pymovements.gaze.Gaze` from a pandas DataFrame.
 
     Parameters
     ----------
@@ -364,11 +364,11 @@ def from_pandas(
 
     Returns
     -------
-    GazeDataFrame
+    Gaze
         Returns gaze data frame read from pandas data frame.
     """
     df = pl.from_pandas(data=data)
-    return GazeDataFrame(
+    return Gaze(
         data=df,
         experiment=experiment,
         events=events,

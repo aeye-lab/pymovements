@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test GazeDataFrame.unnest()."""
+"""Test Gaze.unnest."""
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
@@ -229,8 +229,8 @@ import pymovements as pm
 
     ],
 )
-def test_gaze_dataframe_unnest_has_expected_frame(init_data, unnest_kwargs, expected):
-    gaze = pm.GazeDataFrame(init_data)
+def test_gaze_unnest_has_expected_frame(init_data, unnest_kwargs, expected):
+    gaze = pm.Gaze(init_data)
     gaze.unnest(**unnest_kwargs)
     assert_frame_equal(gaze.frame, expected)
 
@@ -351,10 +351,10 @@ def test_gaze_dataframe_unnest_has_expected_frame(init_data, unnest_kwargs, expe
         ),
     ],
 )
-def test_gaze_dataframe_unnest_has_expected_frame_multiple_unnest(
+def test_gaze_unnest_has_expected_frame_multiple_unnest(
         init_data, unnest_kwargs, expected,
 ):
-    gaze = pm.GazeDataFrame(init_data)
+    gaze = pm.Gaze(init_data)
     gaze.unnest(**unnest_kwargs)
     assert_frame_equal(gaze.frame, expected)
 
@@ -438,14 +438,17 @@ def test_gaze_dataframe_unnest_has_expected_frame_multiple_unnest(
             Warning,
             'No columns to unnest. '
             'Please specify columns to unnest via the "input_columns" argument.',
+            marks=pytest.mark.filterwarnings(
+                'ignore:GazeDataFrame contains data but no.*:UserWarning',
+            ),
             id='df_single_row_two_components_unnest_all_default_values_no_cols_to_unnest',
         ),
     ],
 
 )
-def test_gaze_dataframe_unnest_errors(init_data, unnest_kwargs, exception, exception_msg):
+def test_gaze_unnest_errors(init_data, unnest_kwargs, exception, exception_msg):
     with pytest.raises(exception) as exc_info:
-        gaze = pm.GazeDataFrame(init_data)
+        gaze = pm.Gaze(init_data)
         gaze.unnest(**unnest_kwargs)
 
     msg, = exc_info.value.args
@@ -460,19 +463,19 @@ def test_gaze_dataframe_unnest_errors(init_data, unnest_kwargs, exception, excep
             {'input_columns': 'pixel', 'output_suffixes': ['_x', '_y']},
             1,
             AttributeError,
-            'n_components must be either 2, 4 or 6 but is 1',
+            'Number of components required but no gaze components could be inferred.',
             id='df_single_row_two_pixel_component_invalid_number_of_components',
         ),
     ],
 
 )
-def test_gaze_dataframe_unnest_invalid_number_of_components(
+def test_gaze_unnest_invalid_number_of_components(
         init_data, unnest_kwargs, n_components, exception, exception_msg,
 ):
     with pytest.raises(exception) as exc_info:
-        gaze = pm.GazeDataFrame(init_data)
+        gaze = pm.Gaze(init_data)
         gaze.n_components = n_components
         gaze.unnest(**unnest_kwargs)
 
     msg, = exc_info.value.args
-    assert msg == exception_msg
+    assert msg.startswith(exception_msg)
