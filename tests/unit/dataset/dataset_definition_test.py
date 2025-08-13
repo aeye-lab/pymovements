@@ -525,7 +525,7 @@ def test_dataset_definition_has_resources_boolean(resources, expected_has_resour
 
     # there are multiple contexts of using booleans.
     assert bool(definition.has_resources) == expected_has_resources
-    assert definition.has_resources.__repr__() == str(expected_has_resources)
+    assert str(definition.has_resources) == str(expected_has_resources)
     assert definition.has_resources == expected_has_resources
     assert not (definition.has_resources and not expected_has_resources)
     assert not (not definition.has_resources and expected_has_resources)
