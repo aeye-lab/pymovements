@@ -28,7 +28,7 @@ import pandas as pd
 import polars as pl
 
 from pymovements._utils import _checks
-from pymovements.events.frame import EventDataFrame
+from pymovements.events.events import Events
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze import Gaze
 
@@ -36,7 +36,7 @@ from pymovements.gaze.gaze import Gaze
 def from_numpy(
         samples: np.ndarray | None = None,
         experiment: Experiment | None = None,
-        events: EventDataFrame | None = None,
+        events: Events | None = None,
         *,
         trial: np.ndarray | None = None,
         time: np.ndarray | None = None,
@@ -75,7 +75,7 @@ def from_numpy(
         Two-dimensional samples data represented as a numpy ndarray. (default: None)
     experiment: Experiment | None
         The experiment definition. (default: None)
-    events: EventDataFrame | None
+    events: Events | None
         A dataframe of events in the gaze signal. (default: None)
     trial: np.ndarray | None
         Array of trial identifiers for each timestep. (default: None)
@@ -345,7 +345,7 @@ def from_numpy(
 def from_pandas(
         samples: pd.DataFrame,
         experiment: Experiment | None = None,
-        events: EventDataFrame | None = None,
+        events: Events | None = None,
         *,
         trial_columns: str | list[str] | None = None,
         time_column: str | None = None,
@@ -365,7 +365,7 @@ def from_pandas(
         Gaze samples represented as a pandas DataFrame.
     experiment : Experiment | None
         The experiment definition. (default: None)
-    events: EventDataFrame | None
+    events: Events | None
         A dataframe of events in the gaze signal. (default: None)
     trial_columns: str | list[str] | None
         The name of the trial columns in the input data frame. If the list is empty or None,

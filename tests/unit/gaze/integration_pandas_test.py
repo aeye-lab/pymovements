@@ -26,7 +26,7 @@ import pytest
 from polars.testing import assert_frame_equal
 
 from pymovements import __version__
-from pymovements import EventDataFrame
+from pymovements import Events
 from pymovements import Experiment
 from pymovements.gaze import from_pandas
 
@@ -127,19 +127,19 @@ def test_from_pandas_with_trial_columnms():
 
         pytest.param(
             pd.DataFrame(),
-            EventDataFrame(),
+            Events(),
             id='events_empty',
         ),
 
         pytest.param(
             pd.DataFrame(),
-            EventDataFrame(name='fixation', onsets=[123], offsets=[345]),
+            Events(name='fixation', onsets=[123], offsets=[345]),
             id='fixation',
         ),
 
         pytest.param(
             pd.DataFrame(),
-            EventDataFrame(name='saccade', onsets=[34123], offsets=[67345]),
+            Events(name='saccade', onsets=[34123], offsets=[67345]),
             id='saccade',
         ),
 
@@ -147,7 +147,7 @@ def test_from_pandas_with_trial_columnms():
 )
 def test_from_pandas_events(samples, events):
     if events is None:
-        expected_events = EventDataFrame().frame
+        expected_events = Events().frame
     else:
         expected_events = events.frame
 

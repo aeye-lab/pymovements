@@ -25,7 +25,7 @@ import pytest
 from polars.testing import assert_frame_equal
 
 from pymovements import __version__
-from pymovements import EventDataFrame
+from pymovements import Events
 from pymovements import Experiment
 from pymovements import Gaze
 
@@ -224,7 +224,7 @@ def test_gaze_copy_events():
         pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
         experiment=None,
         position_columns=['x', 'y'],
-        events=EventDataFrame(
+        events=Events(
             name='saccade',
             onsets=[0],
             offsets=[123],
@@ -310,7 +310,7 @@ def test_gaze_dataframe_split_events():
         ),
         experiment=None,
         position_columns=['x', 'y'],
-        events=EventDataFrame(
+        events=Events(
             pl.DataFrame(
                 {
                     'name': ['fixation', 'fixation', 'saccade', 'fixation'],
@@ -342,7 +342,7 @@ def test_gaze_dataframe_split_events_list():
         ),
         experiment=None,
         position_columns=['x', 'y'],
-        events=EventDataFrame(
+        events=Events(
             pl.DataFrame(
                 {
                     'name': ['fixation', 'fixation', 'saccade', 'fixation'],
@@ -373,7 +373,7 @@ def test_gaze_dataframe_split_default():
         ),
         experiment=None,
         position_columns=['x', 'y'],
-        events=EventDataFrame(
+        events=Events(
             pl.DataFrame(
                 {
                     'name': ['fixation', 'fixation', 'saccade', 'fixation'],
@@ -406,7 +406,7 @@ def test_gaze_dataframe_split_default_no_trial_columns():
         ),
         experiment=None,
         position_columns=['x', 'y'],
-        events=EventDataFrame(
+        events=Events(
             pl.DataFrame(
                 {
                     'name': ['fixation', 'fixation', 'saccade', 'fixation'],

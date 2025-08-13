@@ -32,7 +32,7 @@ import pymovements as pm
 
 @pytest.fixture(name='events', scope='session')
 def event_fixture():
-    return pm.EventDataFrame(
+    return pm.Events(
         pl.DataFrame(
             data={
                 'trial': [1, 1],

@@ -27,7 +27,7 @@ from typing import Any
 import polars as pl
 
 import pymovements as pm  # pylint: disable=cyclic-import
-from pymovements.events.frame import EventDataFrame
+from pymovements.events.events import Events
 from pymovements.events.properties import EVENT_PROPERTIES
 from pymovements.exceptions import InvalidProperty
 
@@ -56,12 +56,12 @@ class EventProcessor:
 
         self.event_properties = event_properties
 
-    def process(self, events: EventDataFrame) -> pl.DataFrame:
+    def process(self, events: Events) -> pl.DataFrame:
         """Process event dataframe.
 
         Parameters
         ----------
-        events: EventDataFrame
+        events: Events
             Event data to process event properties from.
 
         Returns
@@ -127,7 +127,7 @@ class EventGazeProcessor:
 
     def process(
             self,
-            events: EventDataFrame,
+            events: Events,
             gaze: pm.Gaze,
             identifiers: str | list[str],
             name: str | None = None,
@@ -136,7 +136,7 @@ class EventGazeProcessor:
 
         Parameters
         ----------
-        events: EventDataFrame
+        events: Events
             Event data to process event properties from.
         gaze: pm.Gaze
             Gaze data to process event properties from.

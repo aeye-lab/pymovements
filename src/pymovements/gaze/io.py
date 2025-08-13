@@ -27,7 +27,7 @@ from typing import Any
 import polars as pl
 
 import pymovements as pm  # pylint: disable=cyclic-import
-from pymovements.events.frame import EventDataFrame
+from pymovements.events.frame import Events
 from pymovements.gaze._utils.parsing import parse_eyelink
 from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze import Gaze
@@ -433,15 +433,11 @@ def from_asc(
     # Fill experiment with parsed metadata.
     experiment = _fill_experiment_from_parsing_metadata(experiment, metadata)
 
-    # Create gaze and event data frames.
-    if events:
-        event_df = EventDataFrame(event_data)
-    else:
-        event_df = None
+    # Instantiate Gaze with parsed data.
     gaze = Gaze(
         samples=samples,
         experiment=experiment,
-        events=event_df,
+        events=Events(event_data) if events else None,
         trial_columns=trial_columns,
         time_column='time',
         time_unit='ms',
