@@ -4,7 +4,7 @@ Integration
 .. currentmodule:: pymovements.gaze
 
 .. autosummary::
-    :toctree:
+    :toctree: api
     :template: function.rst
 
     from_numpy

@@ -7,7 +7,7 @@ Plotting
 .. rubric:: Functions
 
 .. autosummary::
-    :toctree:
+    :toctree: api
     :template: function.rst
 
     heatmap

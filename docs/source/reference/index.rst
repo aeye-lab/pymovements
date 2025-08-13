@@ -6,83 +6,83 @@
 
     .. grid-item-card::
 
-        .. toctree::
+        .. toctree:: api
            :maxdepth: 2
 
-           experiment/index
+           experiment
 
     .. grid-item-card::
 
-        .. toctree::
+        .. toctree:: api
            :maxdepth: 2
 
-           dataset/index
+           dataset
 
     .. grid-item-card::
 
-        .. toctree::
+        .. toctree:: api
            :maxdepth: 1
 
-           datasets/index
+           datasets
 
 .. grid::
 
     .. grid-item-card::
 
-        .. toctree::
+        .. toctree:: api
            :maxdepth: 2
 
-           gaze/index
+           gaze
 
     .. grid-item-card::
 
-        .. toctree::
+        .. toctree:: api
            :maxdepth: 2
 
-           events/index
+           events
 
     .. grid-item-card::
 
-        .. toctree::
+        .. toctree:: api
            :maxdepth: 2
 
-           measures/index
+           measures
 
 .. grid::
 
     .. grid-item-card::
 
-        .. toctree::
+        .. toctree:: api
            :maxdepth: 2
 
-           stimulus/index
+           stimulus
 
     .. grid-item-card::
 
-        .. toctree::
+        .. toctree:: api
            :maxdepth: 2
 
-           synthetic/index
+           synthetic
 
     .. grid-item-card::
 
-        .. toctree::
+        .. toctree:: api
            :maxdepth: 2
 
-           plotting/index
+           plotting
 
 .. grid::
 
     .. grid-item-card::
 
-        .. toctree::
+        .. toctree:: api
            :maxdepth: 2
 
-           utils/index
+           utils
 
     .. grid-item-card::
 
-        .. toctree::
+        .. toctree:: api
            :maxdepth: 2
 
-           extending/index
+           extending

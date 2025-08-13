@@ -8,7 +8,7 @@ This page gives an overview of all dataset classes.
 .. rubric:: Classes
 
 .. autosummary::
-    :toctree:
+    :toctree: api
     :nosignatures:
     :template: class.rst
 

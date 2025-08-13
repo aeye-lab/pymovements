@@ -1,12 +1,12 @@
-Experiment
-==========
+Metadata
+========
 
-This page gives an overview of all classes provided to describe your data.
+This page gives an overview of all classes provided to describe your metadata.
 
 .. currentmodule:: pymovements
 
 .. autosummary::
-    :toctree:
+    :toctree: api
     :nosignatures:
     :template: class.rst
 

@@ -8,7 +8,7 @@ Measures page
 .. rubric:: Measures
 
 .. autosummary::
-    :toctree:
+    :toctree: api
     :recursive:
 
     null_ratio
@@ -16,7 +16,7 @@ Measures page
 .. rubric:: Classes
 
 .. autosummary::
-    :toctree:
+    :toctree: api
     :template: class.rst
 
     SampleMeasureLibrary
@@ -26,7 +26,7 @@ Measures page
 .. rubric:: Classes
 
 .. autosummary::
-    :toctree:
+    :toctree: api
     :template: class.rst
 
     ReadingMeasures

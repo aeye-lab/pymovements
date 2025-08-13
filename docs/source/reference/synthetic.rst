@@ -6,7 +6,7 @@ Synthetic
 .. rubric:: Functions
 
 .. autosummary::
-    :toctree:
+    :toctree: api
     :template: function.rst
 
     step_function

@@ -6,7 +6,7 @@ Extending the API
 .. rubric:: Decorators
 
 .. autosummary::
-    :toctree:
+    :toctree: api
     :template: function.rst
 
     register_dataset

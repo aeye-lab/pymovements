@@ -4,7 +4,7 @@ Transforms
 .. currentmodule:: pymovements.gaze.transforms
 
 .. autosummary::
-    :toctree:
+    :toctree: api
     :template: function.rst
 
     center_origin

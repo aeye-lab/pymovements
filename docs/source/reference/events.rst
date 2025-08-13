@@ -42,7 +42,7 @@ Events page
 .. rubric:: Event Properties
 
 .. autosummary::
-    :toctree:
+    :toctree: api
     :recursive:
 
     amplitude

@@ -4,7 +4,7 @@ Numpy Transforms
 .. currentmodule:: pymovements.gaze.transforms_numpy
 
 .. autosummary::
-    :toctree:
+    :toctree: api
     :template: function.rst
 
     pix2deg
