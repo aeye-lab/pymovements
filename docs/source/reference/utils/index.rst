@@ -10,7 +10,6 @@ Utils
    :template: module.rst
 
     archives
-    checks
     downloads
     parsing
     paths
