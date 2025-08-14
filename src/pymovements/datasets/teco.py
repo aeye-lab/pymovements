@@ -114,17 +114,16 @@ class TECO(DatasetDefinition):
     )
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'precomputed_reading_measures': [
-                    {
-                        'resource': 'https://osf.io/download/xmt3k/',
-                        'filename': 'wordmeasure_v1.csv',
-                        'md5': '61502321a757c0ffee01c0047b29a22b',
-                        'filename_pattern': 'wordmeasure_v1.csv',
-                    },
-                ],
-            },
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
+                {
+                    'content': 'precomputed_reading_measures',
+                    'url': 'https://osf.io/download/xmt3k/',
+                    'filename': 'wordmeasure_v1.csv',
+                    'md5': '61502321a757c0ffee01c0047b29a22b',
+                    'filename_pattern': 'wordmeasure_v1.csv',
+                },
+            ],
         ),
     )
 

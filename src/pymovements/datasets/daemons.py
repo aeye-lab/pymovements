@@ -112,18 +112,17 @@ class DAEMONS(DatasetDefinition):
     )
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'precomputed_events': [
-                    {
-                        'resource': 'https://osf.io/download/ztgna/',
-                        'filename': 'eye_movement.zip',
-                        'md5': '2779b4c140a0b1e3c9976488994f08f3',
-                        'filename_pattern': r'SAC_{data_split:s}.csv',
-                        'filename_pattern_schema_overrides': {'data_split': str},
-                    },
-                ],
-            },
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
+                {
+                    'content': 'precomputed_events',
+                    'url': 'https://osf.io/download/ztgna/',
+                    'filename': 'eye_movement.zip',
+                    'md5': '2779b4c140a0b1e3c9976488994f08f3',
+                    'filename_pattern': r'SAC_{data_split:s}.csv',
+                    'filename_pattern_schema_overrides': {'data_split': str},
+                },
+            ],
         ),
     )
 

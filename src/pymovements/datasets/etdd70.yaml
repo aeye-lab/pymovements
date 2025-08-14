@@ -8,16 +8,16 @@ has_files:
   precomputed_reading_measures: false
 
 resources:
-  gaze:
-    - resource: https://zenodo.org/api/records/13332134/files-archive
-      filename: edd_raw.zip
-      md5: null
-      filename_pattern: 'Subject_{subject_id:d}_{task:s}_raw.csv'
-  precomputed_events:
-    - resource: https://zenodo.org/api/records/13332134/files-archive
-      filename: edd_fix.zip
-      md5: null
-      filename_pattern: 'Subject_{subject_id:d}_{task:s}_fixations.csv'
+  - content: gaze
+    url: https://zenodo.org/api/records/13332134/files-archive
+    filename: edd_raw.zip
+    md5: null
+    filename_pattern: 'Subject_{subject_id:d}_{task:s}_raw.csv'
+  - content: precomputed_events
+    url: https://zenodo.org/api/records/13332134/files-archive
+    filename: edd_fix.zip
+    md5: null
+    filename_pattern: 'Subject_{subject_id:d}_{task:s}_fixations.csv'
 
 experiment:
   screen_width_px: 1680

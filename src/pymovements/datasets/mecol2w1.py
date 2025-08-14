@@ -111,25 +111,23 @@ class MECOL2W1(DatasetDefinition):
     )
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'precomputed_events': [
-                    {
-                        'resource': 'https://osf.io/download/8rygu/',
-                        'filename': 'joint_l2_fixation_trimmed_report_2.0.rda',
-                        'md5': '1ff32c5823eb70c22bab725499fbbf87',
-                        'filename_pattern': 'joint_l2_fixation_trimmed_report_2.0.rda',
-                    },
-                ],
-                'precomputed_reading_measures': [
-                    {
-                        'resource': 'https://osf.io/download/re7uy/',
-                        'filename': 'joint_data_l2_trimmed_version2.0.rda',
-                        'md5': '3d10225781faf413467104dcc4e071e0',
-                        'filename_pattern': 'joint_data_l2_trimmed_version2.0.rda',
-                    },
-                ],
-            },
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
+                {
+                    'content': 'precomputed_events',
+                    'url': 'https://osf.io/download/8rygu/',
+                    'filename': 'joint_l2_fixation_trimmed_report_2.0.rda',
+                    'md5': '1ff32c5823eb70c22bab725499fbbf87',
+                    'filename_pattern': 'joint_l2_fixation_trimmed_report_2.0.rda',
+                },
+                {
+                    'content': 'precomputed_reading_measures',
+                    'url': 'https://osf.io/download/re7uy/',
+                    'filename': 'joint_data_l2_trimmed_version2.0.rda',
+                    'md5': '3d10225781faf413467104dcc4e071e0',
+                    'filename_pattern': 'joint_data_l2_trimmed_version2.0.rda',
+                },
+            ],
         ),
     )
 

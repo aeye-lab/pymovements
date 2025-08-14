@@ -106,42 +106,33 @@ class CoLAGaze(DatasetDefinition):
     )
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'gaze': [
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
                     {
-                        'resource':
-                        'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
-                        '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
+                        'content': 'gaze',
+                        'url': 'https://files.osf.io/v1/resources/gj2uk/providers/osfstorage/67e14ce0f392601163f33215',  # noqa: E501 # pylint: disable=line-too-long
                         'filename': 'raw_data.zip',
                         'md5': None,  # type: ignore
                         'filename_pattern': '{subject_id:d}.asc',
                         'filename_pattern_schema_overrides': {'subject_id': int},
                     },
-                ],
-                'precomputed_events': [
                     {
-                        'resource':
-                        'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
-                        '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
+                        'content': 'precomputed_events',
+                        'url': 'https://files.osf.io/v1/resources/gj2uk/providers/osfstorage/67e14ce0f392601163f33215',  # noqa: E501 # pylint: disable=line-too-long
                         'filename': 'fixations.zip',
                         'md5': None,  # type: ignore
                         'filename_pattern': 'fixations_report_{subject_id:d}.csv',
                         'filename_pattern_schema_overrides': {'subject_id': int},
                     },
-                ],
-                'precomputed_reading_measures': [
                     {
-                        'resource':
-                        'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
-                        '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
+                        'content': 'precomputed_reading_measures',
+                        'url': 'https://files.osf.io/v1/resources/gj2uk/providers/osfstorage/67e14ce0f392601163f33215',  # noqa: E501 # pylint: disable=line-too-long
                         'filename': 'measures.zip',
                         'md5': None,  # type: ignore
                         'filename_pattern': 'raw_measures_for_features{subject_id:d}.csv',
                         'filename_pattern_schema_overrides': {'subject_id': int},
                     },
-                ],
-            },
+            ],
         ),
     )
 

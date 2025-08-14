@@ -112,25 +112,23 @@ class Gaze4Hate(DatasetDefinition):
     )
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'precomputed_events': [
-                    {
-                        'resource': 'https://osf.io/download/dbshf/',
-                        'filename': 'gaze4hate_sentence_reading_fix_report.csv',
-                        'md5': 'c8cc645d1fad659f9442d61795da5481',
-                        'filename_pattern': 'gaze4hate_sentence_reading_fix_report.csv',
-                    },
-                ],
-                'precomputed_reading_measures': [
-                    {
-                        'resource': 'https://osf.io/download/fgdjw/',
-                        'filename': 'gaze4hate_sentence_reading_IA_report.csv',
-                        'md5': 'e09e791e7d31d6ac3c69cd862d139c57',
-                        'filename_pattern': 'gaze4hate_sentence_reading_IA_report.csv',
-                    },
-                ],
-            },
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
+                {
+                    'content': 'precomputed_events',
+                    'url': 'https://osf.io/download/dbshf/',
+                    'filename': 'gaze4hate_sentence_reading_fix_report.csv',
+                    'md5': 'c8cc645d1fad659f9442d61795da5481',
+                    'filename_pattern': 'gaze4hate_sentence_reading_fix_report.csv',
+                },
+                {
+                    'content': 'precomputed_reading_measures',
+                    'url': 'https://osf.io/download/fgdjw/',
+                    'filename': 'gaze4hate_sentence_reading_IA_report.csv',
+                    'md5': 'e09e791e7d31d6ac3c69cd862d139c57',
+                    'filename_pattern': 'gaze4hate_sentence_reading_IA_report.csv',
+                },
+            ],
         ),
     )
 

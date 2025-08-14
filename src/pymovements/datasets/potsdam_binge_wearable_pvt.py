@@ -20,7 +20,6 @@
 """Provides a definition for the PotsdamBingeWearablePVT dataset."""
 from __future__ import annotations
 
-from collections.abc import Sequence
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
@@ -57,9 +56,6 @@ class PotsdamBingeWearablePVT(DatasetDefinition):
     has_files: dict[str, bool]
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'.
-
-    mirrors: dict[str, Sequence[str]]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
     resources: ResourceDefinitions
         A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
@@ -144,18 +140,12 @@ class PotsdamBingeWearablePVT(DatasetDefinition):
         },
     )
 
-    mirrors: dict[str, Sequence[str]] = field(
-        default_factory=lambda: {
-            'gaze': ['https://osf.io/download/'],
-        },
-    )
-
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'gaze': [
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
                     {
-                        'resource': '9vbs8/',
+                        'content': 'gaze',
+                        'url': 'https://osf.io/download/9vbs8/',
                         'filename': 'a.zip',
                         'md5': '87c6c74a9a17cbd093b91f9415e8dd9d',
                         'filename_pattern': r'{subject_id:d}_{session_id:d}_{condition:s}_{trial_id:d}_{block_id:d}.csv',  # noqa: E501 # pylint: disable=line-too-long
@@ -166,7 +156,8 @@ class PotsdamBingeWearablePVT(DatasetDefinition):
                         },
                     },
                     {
-                        'resource': 'yqukn/',
+                        'content': 'gaze',
+                        'url': 'https://osf.io/download/yqukn/',
                         'filename': 'b.zip',
                         'md5': '54038547b1a373253b38999a227dde63',
                         'filename_pattern': r'{subject_id:d}_{session_id:d}_{condition:s}_{trial_id:d}_{block_id:d}.csv',  # noqa: E501 # pylint: disable=line-too-long
@@ -177,7 +168,8 @@ class PotsdamBingeWearablePVT(DatasetDefinition):
                         },
                     },
                     {
-                        'resource': 'yf2xa/',
+                        'content': 'gaze',
+                        'url': 'https://osf.io/download/yf2xa/',
                         'filename': 'e.zip',
                         'md5': 'a0d0203cbb273f6908c1b52a42750551',
                         'filename_pattern': r'{subject_id:d}_{session_id:d}_{condition:s}_{trial_id:d}_{block_id:d}.csv',  # noqa: E501 # pylint: disable=line-too-long
@@ -187,8 +179,7 @@ class PotsdamBingeWearablePVT(DatasetDefinition):
                             'block_id': int,
                         },
                     },
-                ],
-            },
+            ],
         ),
     )
 

@@ -130,11 +130,11 @@ class GazeOnFaces(DatasetDefinition):
     )
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'gaze': [
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
                     {
-                        'resource': 'https://uncloud.univ-nantes.fr/index.php/s/8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip',  # noqa: E501 # pylint: disable=line-too-long
+                        'content': 'gaze',
+                        'url': 'https://uncloud.univ-nantes.fr/index.php/s/8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip',  # noqa: E501 # pylint: disable=line-too-long
                         'filename': 'gaze_csv.zip',
                         'md5': 'fe219f07c9253cd9aaee6bd50233c034',
                         'filename_pattern': r'gaze_sub{sub_id:d}_trial{trial_id:d}.csv',
@@ -143,8 +143,7 @@ class GazeOnFaces(DatasetDefinition):
                             'trial_id': int,
                         },
                     },
-                ],
-            },
+            ],
         ),
     )
 
