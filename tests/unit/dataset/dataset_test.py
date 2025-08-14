@@ -371,17 +371,29 @@ def mock_toy(
             origin='upper left',
             sampling_rate=1000,
         ),
-        filename_format={
-            'gaze': r'{subject_id:d}.' + raw_fileformat,
-            'precomputed_events': r'{subject_id:d}.' + raw_fileformat,
-            'precomputed_reading_measures': r'{subject_id:d}.' + raw_fileformat,
-        },
-        filename_format_schema_overrides=filename_format_schema_overrides,
-        custom_read_kwargs={
-            'gaze': {},
-            'precomputed_events': {},
-            'precomputed_reading_measures': {},
-        },
+        resources=[
+            {
+                'content': 'gaze',
+                'filename_pattern': r'{subject_id:d}.' + raw_fileformat,
+                'filename_pattern_schema_overrides': filename_format_schema_overrides.get(
+                    'gaze', None,
+                )
+            },
+            {
+                'content': 'precomputed_events',
+                'filename_pattern': r'{subject_id:d}.' + raw_fileformat,
+                'filename_pattern_schema_overrides': filename_format_schema_overrides.get(
+                    'precomputed_events', None,
+                )
+            },
+            {
+                'content': 'precomputed_reading_measures',
+                'filename_pattern': r'{subject_id:d}.' + raw_fileformat,
+                'filename_pattern_schema_overrides': filename_format_schema_overrides.get(
+                    'precomputed_reading_measures', None,
+                )
+            },
+        ],
         time_column='time',
         time_unit='ms',
         distance_column=distance_column,
