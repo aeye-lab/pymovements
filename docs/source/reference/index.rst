@@ -14,8 +14,6 @@
      - Overview of the :py:class:`~pymovements.Events` class
    * - measures
      - Overview of eye movement measures
-   * - reading measures
-     - Overview of reading measures
    * - stimulus
      - Overview of stimulus classes
    * - synthetic
@@ -24,3 +22,16 @@
      - Overview of plotting functionality
    * - utilities
      - Overview of helper utilities
+
+
+.. toctree::
+   :hidden:
+   :maxdepth: 2
+   dataset
+   gaze
+   events
+   measures
+   stimulus
+   synthetic
+   plotting
+   utilities
