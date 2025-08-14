@@ -2,11 +2,6 @@ name: "PotsdamBingeRemotePVT"
 
 long_name: 'Potsdam Binge Remote PVT dataset'
 
-has_files:
-  gaze: true
-  precomputed_events: false
-  precomputed_reading_measures: false
-
 resources:
   - content: gaze
     url: "https://osf.io/download/9vbs8/"

@@ -2,11 +2,6 @@ name: "Provo"
 
 long_name: 'Provo Corpus'
 
-has_files:
-  gaze: false
-  precomputed_events: true
-  precomputed_reading_measures: false
-
 resources:
   - content: precomputed_events
     url: "https://osf.io/download/z3eh6/"

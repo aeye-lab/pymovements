@@ -2,11 +2,6 @@ name: "EMTeC"
 
 long_name: 'Eye movements on Machine-generated Texts Corpus'
 
-has_files:
-  gaze: true
-  precomputed_events: true
-  precomputed_reading_measures: true
-
 resources:
   - content: gaze
     url: "https://osf.io/download/374sk/"

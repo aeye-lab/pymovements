@@ -60,9 +60,6 @@ class DatasetDefinition:
         The name of the dataset. (default: '.')
     long_name: str | None
         The entire name of the dataset. (default: None)
-    has_files: dict[str, bool]
-        Indicate whether the dataset contains 'gaze', 'precomputed_events', and
-        'precomputed_reading_measures'.
     mirrors: dict[str, Sequence[str]]
         A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
         (default: {})
@@ -135,6 +132,8 @@ class DatasetDefinition:
     has_files: dict[str, bool] | None
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
         'precomputed_reading_measures'. (default: None)
+        .. deprecated:: v0.23.0
+        This field will be removed in v0.28.0.
     mirrors: dict[str, Sequence[str]] | None
         A list of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
         (default: None)
@@ -148,6 +147,8 @@ class DatasetDefinition:
         The experiment definition. (default: None)
     extract: dict[str, bool] | None
         Decide whether to extract the data. (default: None)
+        .. deprecated:: v0.22.1
+        This field will be removed in v0.27.0.
     filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe. (default: None)
@@ -231,8 +232,6 @@ class DatasetDefinition:
 
     long_name: str | None = None
 
-    has_files: dict[str, bool] = field(default_factory=dict)
-
     mirrors: dict[str, Sequence[str]] = field(default_factory=dict)
 
     resources: ResourceDefinitions = field(default_factory=ResourceDefinitions)
@@ -292,11 +291,6 @@ class DatasetDefinition:
         self.acceleration_columns = acceleration_columns
         self.distance_column = distance_column
 
-        if has_files is None:
-            self.has_files = {}
-        else:
-            self.has_files = has_files
-
         if mirrors is None:
             self.mirrors = {}
         else:
@@ -318,6 +312,15 @@ class DatasetDefinition:
             filename_format_schema_overrides=filename_format_schema_overrides,
         )
         self._has_resources = _HasResourcesIndexer(resources=self.resources)
+
+        if has_files is not None:
+            warn(
+                DeprecationWarning(
+                    'DatasetDefinition.has_files is deprecated since version v0.23.0. '
+                    'Please specify Resource.filename_pattern instead. '
+                    'This field will be removed in v0.28.0.',
+                ),
+            )
 
         if self.extract is not None:
             warn(
@@ -506,6 +509,11 @@ class DatasetDefinition:
             yaml.dump(data, f, sort_keys=False)
 
     @property
+    @deprecated(
+        reason='Please use DatasetDefinition.resources.has_content() instead. '
+               'This field will be removed in v0.28.0.',
+        version='v0.23.0',
+    )
     def has_resources(self) -> _HasResourcesIndexer:
         """Checks for resources in :py:attr:`~pymovements.dataset.DatasetDefinition.resources`.
 
@@ -515,27 +523,32 @@ class DatasetDefinition:
         :py:cls:`~pymovements.dataset.DatasetDefinition`. Furthermore, you can index the property
         to check if there are any resources set for a given content type.
 
+        Returns
+        -------
+        _HasResourcesIndexer
+            indexable helper class to check for resources of each content type.
+
         Examples
         --------
         This custom :py:cls:`~pymovements.dataset.DatasetDefinition` has no resources defined:
         >>> import pymovements as pm
         >>> my_definition = pm.DatasetDefinition('MyDatasetWithoutOnlineResources', resources=None)
-        >>> my_definition.has_resources
+        >>> my_definition.has_resources# doctest: +SKIP
         False
 
         A :py:cls:`~pymovements.dataset.DatasetDefinition` from our
         :py:cls:`~pymovements.dataset.DatasetLibrary` will usually have some online resources
         defined:
         >>> definition = pm.DatasetLibrary.get('ToyDataset')
-        >>> definition.has_resources
+        >>> definition.has_resources# doctest: +SKIP
         True
 
         You can also check if a specific content type is contained in the resources:
-        >>> definition.has_resources['gaze']
+        >>> definition.has_resources['gaze']# doctest: +SKIP
         True
 
         In this definition there are gaze resources defined, but no precomputed events.
-        >>> definition.has_resources['precomputed_events']
+        >>> definition.has_resources['precomputed_events']# doctest: +SKIP
         False
         """
         # ResourceDefinitions may have changed, so update indexer before returning.

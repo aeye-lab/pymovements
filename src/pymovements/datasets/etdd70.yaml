@@ -2,11 +2,6 @@ name: ETDD70
 
 long_name: 'Eye-Tracking Dyslexia Dataset'
 
-has_files:
-  gaze: true
-  precomputed_events: true
-  precomputed_reading_measures: false
-
 resources:
   - content: gaze
     url: https://zenodo.org/api/records/13332134/files-archive

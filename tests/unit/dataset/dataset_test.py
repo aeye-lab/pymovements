@@ -121,17 +121,9 @@ def mock_toy(
         raw_fileformat,
         eyes,
         remote=False,
-        has_files=_UNSET,
         extract=_UNSET,
         filename_format_schema_overrides=_UNSET,
 ):
-    if has_files is _UNSET:
-        has_files = {
-            'gaze': True,
-            'precomputed_events': False,
-            'precomputed_reading_measures': False,
-        }
-
     if extract is _UNSET:
         extract = None
 
@@ -398,7 +390,6 @@ def mock_toy(
         time_unit='ms',
         distance_column=distance_column,
         pixel_columns=pixel_columns,
-        has_files=has_files,
         extract=extract,
     )
 
@@ -1918,33 +1909,19 @@ def precomputed_fixture_dataset(request, tmp_path):
             rootpath,
             raw_fileformat='csv',
             eyes='right',
-            has_files={
-                'gaze': True,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
         )
     elif dataset_type == 'ToyPrecomputedEvent':
         dataset_dict = mock_toy(
             rootpath,
             raw_fileformat='csv',
             eyes='right',
-            has_files={
-                'gaze': False,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
         )
+        del dataset_dict['init_kwargs']['definition'].resources[0]  # remove gaze resources
     elif dataset_type == 'ToyPrecomputedEventNoExtract':
         dataset_dict = mock_toy(
             rootpath,
             raw_fileformat='csv',
             eyes='right',
-            has_files={
-                'gaze': False,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
             filename_format_schema_overrides={'precomputed_events': {}},
         )
     else:
@@ -1989,33 +1966,18 @@ def precomputed_rm_fixture_dataset(request, tmp_path):
             rootpath,
             raw_fileformat='csv',
             eyes='right',
-            has_files={
-                'gaze': True,
-                'precomputed_events': True,
-                'precomputed_reading_measures': True,
-            },
         )
     elif dataset_type == 'ToyPrecomputedRM':
         dataset_dict = mock_toy(
             rootpath,
             raw_fileformat='csv',
             eyes='right',
-            has_files={
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': True,
-            },
         )
     elif dataset_type == 'ToyPrecomputedRMNoExtract':
         dataset_dict = mock_toy(
             rootpath,
             raw_fileformat='csv',
             eyes='right',
-            has_files={
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': True,
-            },
             filename_format_schema_overrides={
                 'precomputed_events': {},
                 'precomputed_reading_measures': {},

@@ -50,11 +50,6 @@ def dataset_definition_fixture(request):
     if request.param == 'CustomGazeAndPrecomputed':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            has_files={
-                'gaze': True,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
             mirrors={
                 'gaze': (
                     'https://example.com/',
@@ -84,11 +79,6 @@ def dataset_definition_fixture(request):
     if request.param == 'CustomGazeAndPrecomputedNoMirror':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            has_files={
-                'gaze': True,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
             resources=[
                 {
                     'content': 'gaze',
@@ -108,11 +98,6 @@ def dataset_definition_fixture(request):
     if request.param == 'CustomGazeOnly':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            has_files={
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
             mirrors={
                 'gaze': (
                     'https://example.com/',
@@ -132,11 +117,6 @@ def dataset_definition_fixture(request):
     if request.param == 'CustomGazeOnlyNoMirror':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            has_files={
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
             resources=[
                 {
                     'content': 'gaze',
@@ -150,11 +130,6 @@ def dataset_definition_fixture(request):
     if request.param == 'CustomPrecomputedOnly':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            has_files={
-                'gaze': False,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
             mirrors={
                 'precomputed_events': (
                     'https://example.com/',
@@ -174,11 +149,6 @@ def dataset_definition_fixture(request):
     if request.param == 'CustomPrecomputedOnlyNoMirror':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            has_files={
-                'gaze': False,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
             resources=[
                 {
                     'content': 'precomputed_events',
@@ -192,11 +162,6 @@ def dataset_definition_fixture(request):
     if request.param == 'CustomPrecomputedOnlyNoExtract':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            has_files={
-                'gaze': False,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
             mirrors={
                 'precomputed_events': (
                     'https://example.com/',
@@ -216,11 +181,6 @@ def dataset_definition_fixture(request):
     if request.param == 'CustomPrecomputedOnlyNoExtractNoMirror':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            has_files={
-                'gaze': False,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
             resources=[
                 {
                     'content': 'precomputed_events',
@@ -234,11 +194,6 @@ def dataset_definition_fixture(request):
     if request.param == 'CustomPrecomputedRMOnly':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            has_files={
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': True,
-            },
             mirrors={
                 'precomputed_reading_measures': (
                     'https://example.com/',
@@ -258,11 +213,6 @@ def dataset_definition_fixture(request):
     if request.param == 'CustomPrecomputedRMOnlyNoMirror':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            has_files={
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': True,
-            },
             resources=[
                 {
                     'content': 'precomputed_reading_measures',
@@ -1169,11 +1119,6 @@ def test_dataset_download_default_extract_precomputed(
         pytest.param(
             DatasetDefinition(
                 name='CustomPublicDataset',
-                has_files={
-                    'gaze': True,
-                    'precomputed_events': False,
-                    'precomputed_reading_measures': False,
-                },
                 mirrors={'gaze': ['https://example.com/']},
                 resources=[
                     {
@@ -1191,11 +1136,6 @@ def test_dataset_download_default_extract_precomputed(
         pytest.param(
             DatasetDefinition(
                 name='CustomPublicDataset',
-                has_files={
-                    'gaze': True,
-                    'precomputed_events': False,
-                    'precomputed_reading_measures': False,
-                },
                 mirrors={'gaze': ['https://example.com/']},
                 resources=[
                     {
@@ -1213,11 +1153,6 @@ def test_dataset_download_default_extract_precomputed(
         pytest.param(
             DatasetDefinition(
                 name='CustomPublicDataset',
-                has_files={
-                    'gaze': True,
-                    'precomputed_events': False,
-                    'precomputed_reading_measures': False,
-                },
                 resources=[{
                     'content': 'gaze',
                     'url': None,
@@ -1232,11 +1167,6 @@ def test_dataset_download_default_extract_precomputed(
         pytest.param(
             DatasetDefinition(
                 name='CustomPublicDataset',
-                has_files={
-                    'gaze': True,
-                    'precomputed_events': False,
-                    'precomputed_reading_measures': False,
-                },
                 resources=[{
                     'content': 'gaze',
                     'url': 'https://example.com/test.gz.tar',
@@ -1251,11 +1181,6 @@ def test_dataset_download_default_extract_precomputed(
         pytest.param(
             DatasetDefinition(
                 name='CustomPublicDataset',
-                has_files={
-                    'gaze': True,
-                    'precomputed_events': False,
-                    'precomputed_reading_measures': False,
-                },
                 resources=[{
                     'content': 'gaze',
                     'url': 'test.gz.tar',
@@ -1270,11 +1195,6 @@ def test_dataset_download_default_extract_precomputed(
         pytest.param(
             DatasetDefinition(
                 name='CustomPublicDataset',
-                has_files={
-                    'gaze': False,
-                    'precomputed_events': True,
-                    'precomputed_reading_measures': False,
-                },
                 resources=[{
                     'content': 'gaze',
                     'url': 'test.gz.tar',
@@ -1289,11 +1209,6 @@ def test_dataset_download_default_extract_precomputed(
         pytest.param(
             DatasetDefinition(
                 name='CustomPublicDataset',
-                has_files={
-                    'gaze': False,
-                    'precomputed_events': False,
-                    'precomputed_reading_measures': True,
-                },
                 resources=[{
                     'content': 'gaze',
                     'url': 'test.gz.tar',
@@ -1316,59 +1231,60 @@ def test_dataset_download_raises_exception(
     assert msg.startswith(expected_msg_prefix)
 
 
-def test_dataset_download_no_resources_raises_exception(tmp_path):
-    definition = DatasetDefinition(
-        name='CustomPublicDataset',
-        has_files={
-            'gaze': True,
-            'precomputed_events': False,
-            'precomputed_reading_measures': False,
-        },
-        mirrors={
-            'gaze': (
-                'https://example.com/',
-                'https://another_example.com/',
+@pytest.mark.parametrize(
+    'definition',
+    [
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                mirrors={
+                    'gaze': (
+                        'https://example.com/',
+                        'https://another_example.com/',
+                    ),
+                },
+                resources={
+                    'gaze': (),
+                },
             ),
-        },
-        resources={
-            'gaze': (),
-        },
-    )
-
+            id='gaze',
+        ),
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                mirrors={
+                    'precomputed_events': (
+                        'https://example.com/',
+                        'https://another_example.com/',
+                    ),
+                },
+                resources={
+                    'precomputed_events': (),
+                },
+            ),
+            id='precomputed_events',
+        ),
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                mirrors={
+                    'precomputed_reading_measures': (
+                        'https://example.com/',
+                        'https://another_example.com/',
+                    ),
+                },
+            ),
+            id='precomputed_reading_measures',
+        ),
+    ],
+)
+def test_dataset_download_no_resources_raises_exception(definition, tmp_path):
     with pytest.raises(AttributeError) as excinfo:
         Dataset(definition, path=tmp_path).download()
 
     msg, = excinfo.value.args
 
-    expected_msg = "'gaze' resources must be specified to download dataset."
-    assert msg == expected_msg
-
-
-def test_dataset_download_no_precomputed_event_resources_raises_exception(tmp_path):
-    definition = DatasetDefinition(
-        name='CustomPublicDataset',
-        has_files={
-            'gaze': False,
-            'precomputed_events': True,
-            'precomputed_reading_measures': False,
-        },
-        mirrors={
-            'precomputed_events': (
-                'https://example.com/',
-                'https://another_example.com/',
-            ),
-        },
-        resources={
-            'precomputed_events': (),
-        },
-    )
-
-    with pytest.raises(AttributeError) as excinfo:
-        Dataset(definition, path=tmp_path).download()
-
-    msg, = excinfo.value.args
-
-    expected_msg = "'precomputed_events' resources must be specified to download dataset."
+    expected_msg = 'resources must be specified to download a dataset.'
     assert msg == expected_msg
 
 
@@ -1378,17 +1294,11 @@ def test_public_dataset_registered_correct_attributes(tmp_path, dataset_definiti
     assert dataset.definition.mirrors == dataset_definition.mirrors
     assert dataset.definition.resources == dataset_definition.resources
     assert dataset.definition.experiment == dataset_definition.experiment
-    assert dataset.definition.has_files == dataset_definition.has_files
 
 
 def test_extract_dataset_precomputed_move_single_file(tmp_path):
     definition = DatasetDefinition(
         name='CustomPublicDataset',
-        has_files={
-            'gaze': False,
-            'precomputed_events': True,
-            'precomputed_reading_measures': False,
-        },
         mirrors={
             'precompued_events': (
                 'https://example.com/',
@@ -1418,11 +1328,6 @@ def test_extract_dataset_precomputed_move_single_file(tmp_path):
 def test_extract_dataset_precomputed_rm_move_single_file(tmp_path):
     definition = DatasetDefinition(
         name='CustomPublicDataset',
-        has_files={
-            'gaze': False,
-            'precomputed_events': False,
-            'precomputed_reading_measures': True,
-        },
         mirrors={
             'precomputed_reading_measures': (
                 'https://example.com/',
@@ -1448,28 +1353,3 @@ def test_extract_dataset_precomputed_rm_move_single_file(tmp_path):
     )
 
     Dataset(definition, path=tmp_path).extract()
-
-
-def test_dataset_download_no_precomputed_rm_resources_raises_exception(tmp_path):
-    definition = DatasetDefinition(
-        name='CustomPublicDataset',
-        has_files={
-            'gaze': False,
-            'precomputed_events': False,
-            'precomputed_reading_measures': True,
-        },
-        mirrors={
-            'precomputed_reading_measures': (
-                'https://example.com/',
-                'https://another_example.com/',
-            ),
-        },
-    )
-
-    with pytest.raises(AttributeError) as excinfo:
-        Dataset(definition, path=tmp_path).download()
-
-    msg, = excinfo.value.args
-
-    expected_msg = "'precomputed_reading_measures' resources must be specified to download dataset."
-    assert msg == expected_msg

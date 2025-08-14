@@ -50,9 +50,9 @@ class TECO(DatasetDefinition):
     long_name: str
         The entire name of the dataset.
 
-    has_files: dict[str, bool]
+    has_files: dict[str, bool] | None
         Indicate whether the dataset contains 'gaze', 'precomputed_events', and
-        'precomputed_reading_measures'.
+        'precomputed_reading_measures'. (default: None)
 
     resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
@@ -105,13 +105,7 @@ class TECO(DatasetDefinition):
 
     long_name: str = 'Tsukuba Eye-tracking Corpus'
 
-    has_files: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': False,
-            'precomputed_events': False,
-            'precomputed_reading_measures': True,
-        },
-    )
+    has_files: dict[str, bool] | None = None
 
     resources: ResourceDefinitions = field(
         default_factory=lambda: ResourceDefinitions.from_dicts(

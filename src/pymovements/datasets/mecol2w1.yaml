@@ -2,11 +2,6 @@ name: "MECOL2W1"
 
 long_name: 'Multilingual Eye-tracking Corpus second language reader first wave'
 
-has_files:
-  gaze: false
-  precomputed_events: true
-  precomputed_reading_measures: true
-
 resources:
   - content: precomputed_events
     url: "https://osf.io/download/8rygu/"
