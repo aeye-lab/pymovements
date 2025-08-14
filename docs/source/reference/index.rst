@@ -3,6 +3,7 @@
 ================
 
 .. toctree::
+   :maxdepth: 1
    dataset
    gaze
    events
@@ -32,3 +33,16 @@
      - Overview of plotting functionality
    * - utilities
      - Overview of helper utilities
+
+
+.. toctree::
+   :hidden:
+   :maxdepth: 2
+   dataset
+   gaze
+   events
+   measures
+   stimulus
+   synthetic
+   plotting
+   utilities
