@@ -66,22 +66,22 @@ def dataset_definition_fixture(request):
                     'https://another_example.com/',
                 ),
             },
-            resources={
-                'gaze': (
+            resources=ResourceDefinitions.from_dicts(
+                [
                     {
+                        'content': 'gaze',
                         'resource': 'test.gz.tar',
                         'filename': 'test.gz.tar',
                         'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                     },
-                ),
-                'precomputed_events': (
                     {
+                        'content': 'precomputed_events',
                         'resource': 'test_pc.gz.tar',
                         'filename': 'test_pc.gz.tar',
                         'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                     },
-                ),
-            },
+                ],
+            ),
         )
 
     if request.param == 'CustomGazeAndPrecomputedNoMirror':
@@ -92,22 +92,22 @@ def dataset_definition_fixture(request):
                 'precomputed_events': True,
                 'precomputed_reading_measures': False,
             },
-            resources={
-                'gaze': (
+            resources=ResourceDefinitions.from_dicts(
+                [
                     {
+                        'content': 'gaze',
                         'resource': 'https://example.com/test.gz.tar',
                         'filename': 'test.gz.tar',
                         'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                     },
-                ),
-                'precomputed_events': (
                     {
+                        'content': 'precomputed_events',
                         'resource': 'https://example.com/test_pc.gz.tar',
                         'filename': 'test_pc.gz.tar',
                         'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                     },
-                ),
-            },
+                ],
+            ),
         )
 
     if request.param == 'CustomGazeOnly':
@@ -124,15 +124,16 @@ def dataset_definition_fixture(request):
                     'https://another_example.com/',
                 ),
             },
-            resources={
-                'gaze': (
+            resources=ResourceDefinitions.from_dicts(
+                [
                     {
+                        'content': 'gaze',
                         'resource': 'test.gz.tar',
                         'filename': 'test.gz.tar',
                         'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                     },
-                ),
-            },
+                ],
+            ),
         )
 
     if request.param == 'CustomGazeOnlyNoMirror':
@@ -143,15 +144,16 @@ def dataset_definition_fixture(request):
                 'precomputed_events': False,
                 'precomputed_reading_measures': False,
             },
-            resources={
-                'gaze': (
+            resources=ResourceDefinitions.from_dicts(
+                [
                     {
+                        'content': 'gaze',
                         'resource': 'https://example.com/test.gz.tar',
                         'filename': 'test.gz.tar',
                         'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                     },
-                ),
-            },
+                ],
+            ),
         )
 
     if request.param == 'CustomPrecomputedOnly':
@@ -168,15 +170,16 @@ def dataset_definition_fixture(request):
                     'https://another_example.com/',
                 ),
             },
-            resources={
-                'precomputed_events': (
+            resources=ResourceDefinitions.from_dicts(
+                [
                     {
+                        'content': 'precomputed_events',
                         'resource': 'test_pc.gz.tar',
                         'filename': 'test_pc.gz.tar',
                         'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                     },
-                ),
-            },
+                ],
+            ),
         )
 
     if request.param == 'CustomPrecomputedOnlyNoMirror':
@@ -187,15 +190,16 @@ def dataset_definition_fixture(request):
                 'precomputed_events': True,
                 'precomputed_reading_measures': False,
             },
-            resources={
-                'precomputed_events': (
+            resources=ResourceDefinitions.from_dicts(
+                [
                     {
+                        'content': 'precomputed_events',
                         'resource': 'https://example.com/test_pc.gz.tar',
                         'filename': 'test_pc.gz.tar',
                         'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                     },
-                ),
-            },
+                ],
+            ),
         )
 
     if request.param == 'CustomPrecomputedOnlyNoExtract':
@@ -212,15 +216,16 @@ def dataset_definition_fixture(request):
                     'https://another_example.com/',
                 ),
             },
-            resources={
-                'precomputed_events': (
+            resources=ResourceDefinitions.from_dicts(
+                [
                     {
+                        'content': 'precomputed_events',
                         'resource': 'test_pc.gz.tar',
                         'filename': 'test_pc.gz.tar',
                         'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                     },
-                ),
-            },
+                ],
+            ),
         )
 
     if request.param == 'CustomPrecomputedOnlyNoExtractNoMirror':
@@ -231,15 +236,16 @@ def dataset_definition_fixture(request):
                 'precomputed_events': True,
                 'precomputed_reading_measures': False,
             },
-            resources={
-                'precomputed_events': (
+            resources=ResourceDefinitions.from_dicts(
+                [
                     {
+                        'content': 'precomputed_events',
                         'resource': 'https://example.com/test_pc.gz.tar',
                         'filename': 'test_pc.gz.tar',
                         'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                     },
-                ),
-            },
+                ],
+            ),
         )
 
     if request.param == 'CustomPrecomputedRMOnly':
@@ -256,15 +262,16 @@ def dataset_definition_fixture(request):
                     'https://another_example.com/',
                 ),
             },
-            resources={
-                'precomputed_reading_measures': (
+            resources=ResourceDefinitions.from_dicts(
+                [
                     {
+                        'content': 'precomputed_reading_measures',
                         'resource': 'test_rm.gz.tar',
                         'filename': 'test_rm.gz.tar',
                         'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                     },
-                ),
-            },
+                ],
+            ),
         )
 
     if request.param == 'CustomPrecomputedRMOnlyNoMirror':
@@ -275,15 +282,16 @@ def dataset_definition_fixture(request):
                 'precomputed_events': False,
                 'precomputed_reading_measures': True,
             },
-            resources={
-                'precomputed_reading_measures': (
+            resources=ResourceDefinitions.from_dicts(
+                [
                     {
+                        'content': 'precomputed_reading_measures',
                         'resource': 'https://example.com/test_rm.gz.tar',
                         'filename': 'test_rm.gz.tar',
                         'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                     },
-                ),
-            },
+                ],
+            ),
         )
 
     assert False, f'unknown dataset_definition fixture {request.param}'
