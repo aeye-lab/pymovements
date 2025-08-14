@@ -29,7 +29,6 @@ import pytest
 from pymovements import Dataset
 from pymovements import DatasetDefinition
 from pymovements import DatasetPaths
-from pymovements import ResourceDefinitions
 
 
 @pytest.fixture(
@@ -1182,8 +1181,8 @@ def test_dataset_download_default_extract_precomputed(
                         'url': None,
                         'filename': 'test.gz.tar',
                         'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    }
-                ]
+                    },
+                ],
             ),
             AttributeError,
             'Resource.url must not be None',
@@ -1204,7 +1203,8 @@ def test_dataset_download_default_extract_precomputed(
                         'url': 'https://example.com/test.gz.tar',
                         'filename': None,
                         'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    }],
+                    },
+                ],
             ),
             AttributeError,
             'Resource.filename must not be None',
@@ -1396,13 +1396,13 @@ def test_extract_dataset_precomputed_move_single_file(tmp_path):
             ),
         },
         resources=[
-                {
-                    'content': 'precomputed_events',
-                    'url': 'tests/files/',
-                    'filename': '18sat_fixfinal.csv',
-                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                },
-            ],
+            {
+                'content': 'precomputed_events',
+                'url': 'tests/files/',
+                'filename': '18sat_fixfinal.csv',
+                'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+            },
+        ],
     )
 
     # Create directory and copy test file.
@@ -1436,7 +1436,7 @@ def test_extract_dataset_precomputed_rm_move_single_file(tmp_path):
                 'filename': 'copco_rm_dummy.csv',
                 'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
             },
-        ]
+        ],
     )
 
     # Create directory and copy test file.
