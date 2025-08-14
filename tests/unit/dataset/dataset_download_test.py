@@ -1396,13 +1396,13 @@ def test_extract_dataset_precomputed_move_single_file(tmp_path):
             ),
         },
         resources=[
-            {
-                'content': 'precomputed_events'
-                'url': 'tests/files/',
-                'filename': '18sat_fixfinal.csv',
-                'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-            },
-        ],
+                {
+                    'content': 'precomputed_events',
+                    'url': 'tests/files/',
+                    'filename': '18sat_fixfinal.csv',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
     )
 
     # Create directory and copy test file.
