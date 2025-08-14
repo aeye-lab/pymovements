@@ -2,6 +2,16 @@
  API Reference
 ================
 
+.. toctree::
+   dataset
+   gaze
+   events
+   measures
+   stimulus
+   synthetic
+   plotting
+   utilities
+
 .. list-table::
    :widths: 40 60
    :header-rows: 0
@@ -22,16 +32,3 @@
      - Overview of plotting functionality
    * - utilities
      - Overview of helper utilities
-
-
-.. toctree::
-   :hidden:
-   :maxdepth: 2
-   dataset
-   gaze
-   events
-   measures
-   stimulus
-   synthetic
-   plotting
-   utilities
