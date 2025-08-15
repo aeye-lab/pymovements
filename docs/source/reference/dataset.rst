@@ -26,9 +26,9 @@ in different formats.
 .. rubric:: Dataset Definitions
 
 .. autosummary::
-   :toctree: api
+    :toctree: api
     :nosignatures:
-   :template: class.rst
+    :template: class.rst
 
     BSC
     BSCII
@@ -67,8 +67,8 @@ in different formats.
 .. rubric:: Example Datasets
 
 .. autosummary::
-   :toctree: api
-   :template: class.rst
+    :toctree: api
+    :template: class.rst
     :nosignatures:
 
     ToyDataset

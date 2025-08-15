@@ -1,7 +1,7 @@
 Events
 ======
 
-All events have a starting time (onset) and an ending time (offset).
+All events have a starting time (onset) and an ending time (offset, inclusive).
 
 
 .. currentmodule:: pymovements

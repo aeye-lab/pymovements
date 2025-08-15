@@ -1,8 +1,6 @@
 Measures
 ========
 
-Measures page
-
 .. currentmodule:: pymovements.measure
 
 .. rubric:: Measures
