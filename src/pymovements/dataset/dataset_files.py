@@ -680,7 +680,7 @@ def save_preprocessed(
     Parameters
     ----------
     gazes: list[Gaze]
-        The gaze dataframes to save.
+        The gaze objects to save.
     fileinfo: pl.DataFrame
         A dataframe holding file information.
     paths: DatasetPaths
@@ -717,16 +717,16 @@ def save_preprocessed(
 
         for column in gaze.columns:
             if column in fileinfo.columns:
-                gaze.frame = gaze.frame.drop(column)
+                gaze.samples = gaze.samples.drop(column)
 
         if verbose >= 2:
             print('Save file to', preprocessed_filepath)
 
         preprocessed_filepath.parent.mkdir(parents=True, exist_ok=True)
         if extension == 'feather':
-            gaze.frame.write_ipc(preprocessed_filepath)
+            gaze.samples.write_ipc(preprocessed_filepath)
         elif extension == 'csv':
-            gaze.frame.write_csv(preprocessed_filepath)
+            gaze.samples.write_csv(preprocessed_filepath)
         else:
             valid_extensions = ['csv', 'feather']
             raise ValueError(

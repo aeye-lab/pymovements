@@ -176,7 +176,7 @@ def fixture_dataset_init_kwargs(request):
 def test_dataset_save_load_preprocessed(dataset):
     dataset.load()
 
-    if 'pixel' in dataset.gaze[0].frame.columns:
+    if 'pixel' in dataset.gaze[0].samples.columns:
         dataset.pix2deg()
 
     dataset.pos2vel()

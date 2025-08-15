@@ -34,7 +34,7 @@ from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze import Gaze
 
 
-@repr_html(['frame', 'events', 'trial_columns', 'experiment'])
+@repr_html(['samples', 'events', 'trial_columns', 'experiment'])
 class GazeDataFrame(metaclass=DeprecatedMetaClass):
     """Self-contained data structure containing gaze represented as samples or events.
 
@@ -49,8 +49,8 @@ class GazeDataFrame(metaclass=DeprecatedMetaClass):
 
     Parameters
     ----------
-    data: pl.DataFrame | None
-        A dataframe to be transformed to a polars dataframe. (default: None)
+    samples: pl.DataFrame | None
+        A dataframe that contains gaze samples. (default: None)
     experiment : Experiment | None
         The experiment definition. (default: None)
     events: pm.Events | None
@@ -94,10 +94,12 @@ class GazeDataFrame(metaclass=DeprecatedMetaClass):
     definition: pm.DatasetDefinition | None
         A dataset definition. Explicitly passed arguments take precedence over definition.
         (default: None)
+    data: pl.DataFrame | None
+        A dataframe that contains gaze samples. (default: None)
 
     Attributes
     ----------
-    frame: pl.DataFrame
+    samples: pl.DataFrame
         A dataframe to be transformed to a polars dataframe.
     events: pm.Events
         A dataframe of events in the gaze signal.
@@ -152,7 +154,7 @@ class GazeDataFrame(metaclass=DeprecatedMetaClass):
     We can now initialize our ``Gaze`` by specyfing the names of the pixel position
     columns, the timestamp column and the unit of the timestamps.
 
-    >>> gaze = Gaze(data=df, pixel_columns=['x', 'y'], time_column='t', time_unit='ms')
+    >>> gaze = Gaze(samples=df, pixel_columns=['x', 'y'], time_column='t', time_unit='ms')
     >>> gaze
     shape: (3, 2)
     ┌──────┬────────────┐
@@ -183,7 +185,7 @@ class GazeDataFrame(metaclass=DeprecatedMetaClass):
     └─────┴─────┘
 
     >>> experiment = Experiment(1024, 768, 38, 30, 60, 'center', sampling_rate=100)
-    >>> gaze = Gaze(data=df_no_time, experiment=experiment, pixel_columns=['x', 'y'])
+    >>> gaze = Gaze(samples=df_no_time, experiment=experiment, pixel_columns=['x', 'y'])
     >>> gaze
     Experiment(screen=Screen(width_px=1024, height_px=768, width_cm=38, height_cm=30,
      distance_cm=60, origin='center'), eyetracker=EyeTracker(sampling_rate=100, left=None,
@@ -204,7 +206,7 @@ class GazeDataFrame(metaclass=DeprecatedMetaClass):
     _DeprecatedMetaClass__version_deprecated = 'v0.23.0'
     _DeprecatedMetaClass__version_removed = 'v0.28.0'
 
-    frame: pl.DataFrame
+    samples: pl.DataFrame
 
     events: pm.Events
 

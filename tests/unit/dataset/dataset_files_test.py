@@ -217,7 +217,7 @@ def test_load_eyelink_file(tmp_path, read_kwargs):
     else:
         expected_df = EXPECTED_DF_NO_PATTERNS
 
-    assert_frame_equal(gaze.frame, expected_df, check_column_order=False)
+    assert_frame_equal(gaze.samples, expected_df, check_column_order=False)
     assert gaze.experiment is not None
 
 

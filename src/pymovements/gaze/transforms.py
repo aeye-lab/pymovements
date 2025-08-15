@@ -721,7 +721,7 @@ def savitzky_golay(
 
 @register_transform
 def resample(
-        frame: pl.DataFrame,
+        samples: pl.DataFrame,
         resampling_rate: float,
         columns: str | list[str] = 'all',
         fill_null_strategy: str = 'interpolate_linear',
@@ -734,8 +734,8 @@ def resample(
 
     Parameters
     ----------
-    frame: pl.DataFrame
-        The DataFrame to resample.
+    samples: pl.DataFrame
+        The samples DataFrame to resample.
     resampling_rate: float
         The new sampling rate.
     columns: str | list[str]
@@ -771,15 +771,15 @@ def resample(
 
     """
     if columns == 'all':
-        columns = [column for column in frame.columns if column != 'time']
+        columns = [column for column in samples.columns if column != 'time']
     elif isinstance(columns, str):
         columns = [columns]
 
     _checks.check_is_greater_than_zero(resampling_rate=resampling_rate)
 
-    # Return frame if empty
-    if frame.is_empty():
-        return frame
+    # Return samples if empty
+    if samples.is_empty():
+        return samples
 
     # Calculate resampling time steps in microseconds
     resample_step_us = 1000000 / resampling_rate
@@ -796,24 +796,24 @@ def resample(
     resample_step_us = int(resample_step_us)
 
     # Create microsecond precision datetime column from millisecond time column
-    frame = frame.with_columns(
+    samples = samples.with_columns(
         pl.col('time').cast(pl.Float64).mul(1000).cast(pl.Datetime('us')).alias('datetime'),
     )
 
     # Sort columns by datetime
-    frame = frame.sort('datetime')
+    samples = samples.sort('datetime')
 
     # Replace pre-existing null values with NaN as they should not be interpolated
     if columns is not None:
-        frame = _apply_on_columns(
-            frame,
+        samples = _apply_on_columns(
+            samples,
             columns=columns,
             transformation=lambda series: series.fill_null(np.nan),
             n_components=n_components,
         )
 
     # Resample data by datetime column, create milliseconds time column and drop datetime column
-    frame = frame.upsample(
+    samples = samples.upsample(
         time_column='datetime',
         every=f'{resample_step_us}us',
     ).with_columns(
@@ -821,26 +821,26 @@ def resample(
     ).drop('datetime')
 
     # Convert time column to integer if all values are integers
-    all_decimals = frame.select(
+    all_decimals = samples.select(
         pl.col('time').round().eq(pl.col('time')).all(),
     ).item()
 
     if all_decimals:
-        frame = frame.with_columns(
+        samples = samples.with_columns(
             pl.col('time').cast(pl.Int64),
         )
 
     # Fill null values with specified strategy
     if columns is not None and fill_null_strategy is not None:
         if fill_null_strategy in {'forward', 'backward'}:
-            frame = frame.with_columns(
+            samples = samples.with_columns(
                 pl.col(columns).fill_null(strategy=fill_null_strategy),
             )
         elif fill_null_strategy in {'interpolate_linear', 'interpolate_nearest'}:
             _, interpolate_method = fill_null_strategy.split('_')
 
-            frame = _apply_on_columns(
-                frame=frame,
+            samples = _apply_on_columns(
+                frame=samples,
                 columns=columns,
                 transformation=lambda series: series.interpolate(
                     method=interpolate_method,
@@ -855,14 +855,14 @@ def resample(
             )
 
         # Replace the pre-existing NaN values with Null
-        frame = _apply_on_columns(
-            frame,
-            columns=[column for column in columns if frame[column].dtype != pl.String],
+        samples = _apply_on_columns(
+            samples,
+            columns=[column for column in columns if samples[column].dtype != pl.String],
             transformation=lambda series: series.fill_nan(None),
             n_components=n_components,
         )
 
-    return frame
+    return samples
 
 
 @register_transform

@@ -36,7 +36,7 @@ def fixture_experiment():
     [
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': np.arange(1000, 1100, 1),
                         'x_pix': np.arange(0, 10, 0.1),
@@ -47,7 +47,7 @@ def fixture_experiment():
             },
             pm.gaze.transforms.downsample, {'factor': 1},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': np.arange(1000, 1100, 1),
                         'x_pix': np.arange(0, 10, 0.1),
@@ -61,7 +61,7 @@ def fixture_experiment():
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': np.arange(1000, 1100, 1),
                         'x_pix': np.arange(0, 10, 0.1),
@@ -72,7 +72,7 @@ def fixture_experiment():
             },
             'downsample', {'factor': 1},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': np.arange(1000, 1100, 1),
                         'x_pix': np.arange(0, 10, 0.1),
@@ -86,7 +86,7 @@ def fixture_experiment():
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': np.arange(1000, 1010, 1),
                         'x_pix': np.arange(0, 1, 0.1),
@@ -97,7 +97,7 @@ def fixture_experiment():
             },
             'downsample', {'factor': 2},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': np.arange(1000, 1010, 2),
                         'x_pix': np.arange(0, 1, 0.2),
@@ -110,7 +110,7 @@ def fixture_experiment():
         ),
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000],
                         'x_pix': [(100 - 1) / 2],
@@ -130,7 +130,7 @@ def fixture_experiment():
             },
             'center_origin', {},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000],
                         'x_pix': [(100 - 1) / 2],
@@ -144,7 +144,7 @@ def fixture_experiment():
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_pix': [(100 - 1) / 2, (100 - 1) / 2],
@@ -164,7 +164,7 @@ def fixture_experiment():
             },
             'center_origin', {},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_pix': [0.0, 0.0],
@@ -178,7 +178,7 @@ def fixture_experiment():
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_pix': [(100 - 1) / 2, (100 - 1) / 2],
@@ -198,7 +198,7 @@ def fixture_experiment():
             },
             'pix2deg', {},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_pix': [49.5, 49.5],
@@ -215,7 +215,7 @@ def fixture_experiment():
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_pix': [(100 - 1) / 2, (100 - 1) / 2],
@@ -235,7 +235,7 @@ def fixture_experiment():
             },
             'pix2deg', {'n_components': 2},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_pix': [49.5, 49.5],
@@ -252,7 +252,7 @@ def fixture_experiment():
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000],
                         'x_pix': [(100 - 1) / 2],
@@ -272,7 +272,7 @@ def fixture_experiment():
             },
             'pix2deg', {},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000],
                         'x_pix': [49.5],
@@ -289,7 +289,7 @@ def fixture_experiment():
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_pix': [(100 - 1) / 2, (100 - 1) / 2],
@@ -311,7 +311,7 @@ def fixture_experiment():
             },
             'pix2deg', {},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_pix': [49.5, 49.5],
@@ -329,7 +329,7 @@ def fixture_experiment():
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_pix': [(100 - 1) / 2, (100 - 1) / 2],
@@ -351,7 +351,7 @@ def fixture_experiment():
             },
             'pix2deg', {'n_components': 2},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_pix': [49.5, 49.5],
@@ -370,7 +370,7 @@ def fixture_experiment():
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_pix': [(100 - 1) / 2, (100 - 1) / 2],
@@ -391,7 +391,7 @@ def fixture_experiment():
             },
             'pix2deg', {'distance': 'distance'},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_pix': [49.5, 49.5],
@@ -409,7 +409,7 @@ def fixture_experiment():
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000],
                         'x_pix': [(100 - 1) / 2],
@@ -430,7 +430,7 @@ def fixture_experiment():
             },
             'pix2deg', {},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000],
                         'x_pix': [49.5],
@@ -449,7 +449,7 @@ def fixture_experiment():
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000],
                         'x_pix': [(100 - 1) / 2],
@@ -471,7 +471,7 @@ def fixture_experiment():
             },
             'pix2deg', {},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000],
                         'x_pix': [49.5],
@@ -490,7 +490,7 @@ def fixture_experiment():
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_dva': [26.335410003881346, 26.335410003881346],
@@ -510,7 +510,7 @@ def fixture_experiment():
             },
             'deg2pix', {'pixel_origin': 'center'},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_pix': [49.5, 49.5],
@@ -527,7 +527,7 @@ def fixture_experiment():
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000],
                         'x_dva': [0.0],
@@ -546,7 +546,7 @@ def fixture_experiment():
             },
             'deg2pix', {},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000],
                         'x_pix': [49.5],
@@ -563,7 +563,7 @@ def fixture_experiment():
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000],
                         'x_dva': [0.0],
@@ -583,7 +583,7 @@ def fixture_experiment():
             },
             'deg2pix', {},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000],
                         'x_pix': [49.5],
@@ -600,7 +600,7 @@ def fixture_experiment():
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_dva': [26.3354, 26.3354],
@@ -622,7 +622,7 @@ def fixture_experiment():
             },
             'deg2pix', {'pixel_origin': 'center'},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000, 1000],
                         'x_pix': [49.5, 49.5],
@@ -640,7 +640,7 @@ def fixture_experiment():
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'trial_id': [1, 1, 1, 2, 2, 2],
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
@@ -661,7 +661,7 @@ def fixture_experiment():
             },
             'pos2vel', {'method': 'preceding'},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'trial_id': [1, 1, 1, 2, 2, 2],
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
@@ -679,7 +679,7 @@ def fixture_experiment():
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000, 1001, 1002],
                         'x_dva': [1.0, 1.0, 1.0],
@@ -699,7 +699,7 @@ def fixture_experiment():
             },
             'pos2vel', {'method': 'neighbors'},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000, 1001, 1002],
                         'x_dva': [1.0, 1.0, 1.0],
@@ -716,7 +716,7 @@ def fixture_experiment():
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000, 1001, 1002, 1003, 1004],
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0],
@@ -736,7 +736,7 @@ def fixture_experiment():
             },
             'pos2vel', {'method': 'fivepoint'},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000, 1001, 1002, 1003, 1004],
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0],
@@ -753,7 +753,7 @@ def fixture_experiment():
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'trial_id': [1, 1, 1, 2, 2, 2],
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
@@ -775,7 +775,7 @@ def fixture_experiment():
             },
             'pos2vel', {'method': 'preceding'},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'trial_id': [1, 1, 1, 2, 2, 2],
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
@@ -792,7 +792,7 @@ def fixture_experiment():
         ),
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
@@ -803,7 +803,7 @@ def fixture_experiment():
             },
             'smooth', {'method': 'moving_average', 'window_length': 3},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
@@ -816,7 +816,7 @@ def fixture_experiment():
         ),
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
@@ -827,7 +827,7 @@ def fixture_experiment():
             },
             pm.gaze.transforms.smooth, {'method': 'moving_average', 'window_length': 3},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_dva': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
@@ -841,7 +841,7 @@ def fixture_experiment():
 
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000, 1001, 1002, 1003],
                         'x_pix': [-50, 5, 50, None],
@@ -855,7 +855,7 @@ def fixture_experiment():
                 'lower_bound': 1, 'upper_bound': 10,
             },
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000, 1001, 1002, 1003],
                         'x_pix': [1, 5, 10, None],
@@ -878,7 +878,7 @@ def test_gaze_transform_expected_frame(
     # the deg2pix test cases result in a column order different to the default ordering
     check_column_order = not transform_method == 'deg2pix'
 
-    assert_frame_equal(gaze.frame, expected.frame, check_column_order=check_column_order)
+    assert_frame_equal(gaze.samples, expected.samples, check_column_order=check_column_order)
 
 
 @pytest.mark.parametrize(
@@ -892,7 +892,7 @@ def test_gaze_transform_expected_frame(
     [
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000],
                         'x_pix': [(100 - 1) / 2],
@@ -914,7 +914,7 @@ def test_gaze_transform_expected_frame(
             },
             'pix2deg', {},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000],
                         'x_pix': [49.5],
@@ -933,14 +933,14 @@ def test_gaze_transform_expected_frame(
         ),
     ],
 )
-def test_gaze_transfrom_expected_frame_warning(
+def test_gaze_transform_expected_samples_warning(
         gaze_init_kwargs, transform_method, transform_kwargs, expected_result, expected_warning,
 ):
     with pytest.warns(expected_warning):
         gaze = pm.Gaze(**gaze_init_kwargs)
         gaze.transform(transform_method, **transform_kwargs)
 
-        assert_frame_equal(gaze.frame, expected_result.frame)
+        assert_frame_equal(gaze.samples, expected_result.samples)
 
 
 @pytest.mark.parametrize(
@@ -948,7 +948,7 @@ def test_gaze_transfrom_expected_frame_warning(
     [
         pytest.param(
             {
-                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'samples': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
                 'pixel_columns': 1,
             },
             TypeError,
@@ -966,7 +966,7 @@ def test_gaze_transform_raises_exception(init_kwargs, exception, exception_msg):
 
 
 @pytest.mark.parametrize(
-    ('data', 'pixel_columns'),
+    ('samples', 'pixel_columns'),
     [
         pytest.param(
             {'x': [0.0], 'y': [0.0]},
@@ -990,9 +990,9 @@ def test_gaze_transform_raises_exception(init_kwargs, exception, exception_msg):
         ),
     ],
 )
-def test_gaze_pix2deg_creates_position_column(data, experiment, pixel_columns):
+def test_gaze_pix2deg_creates_position_column(samples, experiment, pixel_columns):
     gaze = pm.Gaze(
-        data=pl.from_dict(data),
+        samples=pl.from_dict(samples),
         experiment=experiment,
         pixel_columns=pixel_columns,
     )
@@ -1005,7 +1005,7 @@ def test_gaze_pix2deg_creates_position_column(data, experiment, pixel_columns):
     [
         pytest.param(
             {
-                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'samples': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             },
             AttributeError,
@@ -1014,23 +1014,23 @@ def test_gaze_pix2deg_creates_position_column(data, experiment, pixel_columns):
         ),
         pytest.param(
             {
-                'data': pl.from_dict({'x': [0.1], 'y': [0.2]}),
+                'samples': pl.from_dict({'x': [0.1], 'y': [0.2]}),
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
                 'acceleration_columns': ['x', 'y'],
             },
             pl.exceptions.ColumnNotFoundError,
             (
-                "Neither is 'pixel' in the dataframe columns, "
+                "Neither is 'pixel' in the samples dataframe columns, "
                 'nor is a pixel column explicitly specified. '
                 'You can specify the pixel column via: '
                 'pix2deg(pixel_column="name_of_your_pixel_column"). '
-                "Available dataframe columns are: ['time', 'acceleration']"
+                "Available columns in samples dataframe are: ['time', 'acceleration']"
             ),
             id='no_pixel_column',
         ),
         pytest.param(
             {
-                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'samples': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
                 'pixel_columns': ['x', 'y'],
             },
             AttributeError,
@@ -1039,24 +1039,24 @@ def test_gaze_pix2deg_creates_position_column(data, experiment, pixel_columns):
         ),
         pytest.param(
             {
-                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'samples': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
                 'experiment': pm.Experiment(1024, 768, 38, 30, None, 'center', 1000),
                 'pixel_columns': ['x', 'y'],
             },
             AttributeError,
-            'Neither eye-to-screen distance is in the columns of the dataframe '
+            'Neither eye-to-screen distance is in the columns of the samples dataframe '
             'nor experiment eye-to-screen distance is specified.',
             id='no_distance_column_no_experiment_distance',
         ),
         pytest.param(
             {
-                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'samples': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
                 'experiment': pm.Experiment(1024, 768, 38, 30, None, 'center', 1000),
                 'pixel_columns': ['x', 'y'],
                 'distance_column': 'distance',
             },
             AttributeError,
-            'Neither eye-to-screen distance is in the columns of the dataframe '
+            'Neither eye-to-screen distance is in the columns of the samples dataframe '
             'nor experiment eye-to-screen distance is specified.',
             id='distance_column_not_in_dataframe',
         ),
@@ -1077,7 +1077,7 @@ def test_gaze_pix2deg_exceptions(init_kwargs, exception, expected_msg):
     [
         pytest.param(
             {
-                'data': pl.DataFrame(schema={'d': pl.Float64, 'x': pl.Float64, 'y': pl.Float64}),
+                'samples': pl.DataFrame(schema={'d': pl.Float64, 'x': pl.Float64, 'y': pl.Float64}),
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
                 'pixel_columns': ['x', 'y'],
                 'distance_column': 'd',
@@ -1086,7 +1086,7 @@ def test_gaze_pix2deg_exceptions(init_kwargs, exception, expected_msg):
             "Both a distance column and experiment's "
             'eye-to-screen distance are specified. '
             'Using eye-to-screen distances from column '
-            "'distance' in the dataframe.",
+            "'distance' in the samples dataframe.",
             id='both_distance_column_and_experiment_distance',
         ),
     ],
@@ -1106,7 +1106,7 @@ def test_gaze_pix2deg_warnings(init_kwargs, warning, expected_msg):
     [
         pytest.param(
             {
-                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'samples': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             },
             AttributeError,
@@ -1115,22 +1115,22 @@ def test_gaze_pix2deg_warnings(init_kwargs, warning, expected_msg):
         ),
         pytest.param(
             {
-                'data': pl.from_dict({'x': [0.1], 'y': [0.2]}),
+                'samples': pl.from_dict({'x': [0.1], 'y': [0.2]}),
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
                 'acceleration_columns': ['x', 'y'],
             },
             pl.exceptions.ColumnNotFoundError,
             "The specified 'position_column' (position) "
-            'is not found in the dataframe columns. '
+            'is not found in the samples dataframe columns. '
             'You can specify the position column via: '
             'deg2pix'
             '(position_column="name_of_your_position_column"). '
-            "Available dataframe columns are: ['time', 'acceleration']",
+            "Available columns in samples dataframe are: ['time', 'acceleration']",
             id='no_position_column',
         ),
         pytest.param(
             {
-                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'samples': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
                 'pixel_columns': ['x', 'y'],
             },
             AttributeError,
@@ -1139,24 +1139,24 @@ def test_gaze_pix2deg_warnings(init_kwargs, warning, expected_msg):
         ),
         pytest.param(
             {
-                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'samples': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
                 'experiment': pm.Experiment(1024, 768, 38, 30, None, 'center', 1000),
                 'position_columns': ['x', 'y'],
             },
             AttributeError,
-            'Neither eye-to-screen distance is in the columns of the dataframe '
+            'Neither eye-to-screen distance is in the columns of the samples dataframe '
             'nor experiment eye-to-screen distance is specified.',
             id='no_distance_column_no_experiment_distance',
         ),
         pytest.param(
             {
-                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'samples': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
                 'experiment': pm.Experiment(1024, 768, 38, 30, None, 'center', 1000),
                 'position_columns': ['x', 'y'],
                 'distance_column': 'distance',
             },
             AttributeError,
-            'Neither eye-to-screen distance is in the columns of the dataframe '
+            'Neither eye-to-screen distance is in the columns of the samples dataframe '
             'nor experiment eye-to-screen distance is specified.',
             id='distance_column_not_in_dataframe',
         ),
@@ -1173,7 +1173,7 @@ def test_gaze_deg2pix_exceptions(init_kwargs, exception, expected_msg):
 
 
 @pytest.mark.parametrize(
-    ('data', 'position_columns'),
+    ('samples', 'position_columns'),
     [
         pytest.param(
             {'x': [0.0], 'y': [0.0]},
@@ -1197,9 +1197,9 @@ def test_gaze_deg2pix_exceptions(init_kwargs, exception, expected_msg):
         ),
     ],
 )
-def test_gaze_pos2acc_creates_acceleration_column(data, experiment, position_columns):
+def test_gaze_pos2acc_creates_acceleration_column(samples, experiment, position_columns):
     gaze = pm.Gaze(
-        data=pl.from_dict(data),
+        samples=pl.from_dict(samples),
         experiment=experiment,
         position_columns=position_columns,
     )
@@ -1212,7 +1212,7 @@ def test_gaze_pos2acc_creates_acceleration_column(data, experiment, position_col
     [
         pytest.param(
             {
-                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'samples': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             },
             AttributeError,
@@ -1221,40 +1221,40 @@ def test_gaze_pos2acc_creates_acceleration_column(data, experiment, position_col
         ),
         pytest.param(
             {
-                'data': pl.from_dict({'x': [0.1], 'y': [0.2]}),
+                'samples': pl.from_dict({'x': [0.1], 'y': [0.2]}),
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
                 'pixel_columns': ['x', 'y'],
             },
             pl.exceptions.ColumnNotFoundError,
             (
-                "Neither is 'position' in the dataframe columns, "
+                "Neither is 'position' in the samples dataframe columns, "
                 'nor is a position column explicitly specified. '
-                "Since the dataframe has a 'pixel' column, "
+                "Since the samples dataframe has a 'pixel' column, "
                 'consider running pix2deg() before pos2acc(). If you want to run transformations '
                 "in pixel units, you can do so by using pos2acc(position_column='pixel'). "
-                "Available dataframe columns are: ['time', 'pixel']"
+                "Available columns in samples dataframe are: ['time', 'pixel']"
             ),
             id='no_position_column_but_has_pixel_column',
         ),
         pytest.param(
             {
-                'data': pl.from_dict({'x': [0.1], 'y': [0.2]}),
+                'samples': pl.from_dict({'x': [0.1], 'y': [0.2]}),
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
                 'acceleration_columns': ['x', 'y'],
             },
             pl.exceptions.ColumnNotFoundError,
             (
-                "Neither is 'position' in the dataframe columns, "
+                "Neither is 'position' in the samples dataframe columns, "
                 'nor is a position column explicitly specified. '
                 'You can specify the position column via: '
                 'pos2acc(position_column="your_position_column"). '
-                "Available dataframe columns are: ['time', 'acceleration']"
+                "Available columns in samples dataframe are: ['time', 'acceleration']"
             ),
             id='no_position_column',
         ),
         pytest.param(
             {
-                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'samples': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
                 'position_columns': ['x', 'y'],
             },
             AttributeError,
@@ -1274,7 +1274,7 @@ def test_gaze_pos2acc_exceptions(init_kwargs, exception, expected_msg):
 
 
 @pytest.mark.parametrize(
-    ('data', 'position_columns'),
+    ('samples', 'position_columns'),
     [
         pytest.param(
             {'x': [0.0], 'y': [0.0]},
@@ -1298,9 +1298,9 @@ def test_gaze_pos2acc_exceptions(init_kwargs, exception, expected_msg):
         ),
     ],
 )
-def test_gaze_pos2vel_creates_velocity_column(data, experiment, position_columns):
+def test_gaze_pos2vel_creates_velocity_column(samples, experiment, position_columns):
     gaze = pm.Gaze(
-        data=pl.from_dict(data),
+        samples=pl.from_dict(samples),
         experiment=experiment,
         position_columns=position_columns,
     )
@@ -1310,7 +1310,7 @@ def test_gaze_pos2vel_creates_velocity_column(data, experiment, position_columns
 
 def test_gaze_clip_creates_new_column(experiment):
     gaze = pm.Gaze(
-        data=pl.from_dict(
+        samples=pl.from_dict(
             {
                 'time': [1000, 1001, 1002, 1003],
                 'x_pix': [1, 5, 10, None],
@@ -1335,7 +1335,7 @@ def test_gaze_clip_creates_new_column(experiment):
     [
         pytest.param(
             {
-                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'samples': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             },
             AttributeError,
@@ -1344,40 +1344,40 @@ def test_gaze_clip_creates_new_column(experiment):
         ),
         pytest.param(
             {
-                'data': pl.from_dict({'x': [0.1], 'y': [0.2]}),
+                'samples': pl.from_dict({'x': [0.1], 'y': [0.2]}),
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
                 'pixel_columns': ['x', 'y'],
             },
             pl.exceptions.ColumnNotFoundError,
             (
-                "Neither is 'position' in the dataframe columns, "
+                "Neither is 'position' in the samples dataframe columns, "
                 'nor is a position column explicitly specified. '
-                "Since the dataframe has a 'pixel' column, "
+                "Since the samples dataframe has a 'pixel' column, "
                 'consider running pix2deg() before pos2vel(). If you want to run transformations '
                 "in pixel units, you can do so by using pos2vel(position_column='pixel'). "
-                "Available dataframe columns are: ['time', 'pixel']"
+                "Available columns in samples dataframe are: ['time', 'pixel']"
             ),
             id='no_position_column_but_has_pixel_column',
         ),
         pytest.param(
             {
-                'data': pl.from_dict({'x': [0.1], 'y': [0.2]}),
+                'samples': pl.from_dict({'x': [0.1], 'y': [0.2]}),
                 'experiment': pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
                 'acceleration_columns': ['x', 'y'],
             },
             pl.exceptions.ColumnNotFoundError,
             (
-                "Neither is 'position' in the dataframe columns, "
+                "Neither is 'position' in the samples dataframe columns, "
                 'nor is a position column explicitly specified. '
                 'You can specify the position column via: '
                 'pos2vel(position_column="your_position_column"). '
-                "Available dataframe columns are: ['time', 'acceleration']"
+                "Available columns in samples dataframe are: ['time', 'acceleration']"
             ),
             id='no_position_column',
         ),
         pytest.param(
             {
-                'data': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
+                'samples': pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
                 'position_columns': ['x', 'y'],
             },
             AttributeError,
@@ -1401,7 +1401,7 @@ def test_gaze_pos2vel_exceptions(init_kwargs, exception, expected_msg):
     [
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
@@ -1415,7 +1415,7 @@ def test_gaze_pos2vel_exceptions(init_kwargs, exception, expected_msg):
             },
             {'method': 'moving_average', 'column': 'pixel', 'window_length': 3},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_pix': [1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3],
@@ -1431,7 +1431,7 @@ def test_gaze_pos2vel_exceptions(init_kwargs, exception, expected_msg):
         ),
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
@@ -1445,7 +1445,7 @@ def test_gaze_pos2vel_exceptions(init_kwargs, exception, expected_msg):
             },
             {'method': 'moving_average', 'column': 'position', 'window_length': 3},
             pm.Gaze(
-                data=pl.from_dict(
+                samples=pl.from_dict(
                     {
                         'time': [1000, 1001, 1002, 1003, 1004, 1005],
                         'x_pix': [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
@@ -1467,15 +1467,15 @@ def test_gaze_smooth_expected_column(
     gaze = pm.Gaze(**gaze_init_kwargs)
     gaze.smooth(**kwargs)
 
-    assert_frame_equal(gaze.frame, expected.frame)
+    assert_frame_equal(gaze.samples, expected.samples)
 
 
 @pytest.mark.parametrize(
-    ('gaze_init_kwargs', 'kwargs', 'expected_frame'),
+    ('gaze_init_kwargs', 'kwargs', 'expected_samples'),
     [
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000, 1001],
                         'x_pix': [0.0, 1.0],
@@ -1505,7 +1505,7 @@ def test_gaze_smooth_expected_column(
         ),
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000, 1001, 2000, 2001, 3000, 3001],
                         'x_pix': [0.0, 1.0, 0.0, 1.0, 0.0, 1.0],
@@ -1547,7 +1547,7 @@ def test_gaze_smooth_expected_column(
         ),
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000, 1001, 2000, 2001, 3000, 3001],
                         'x_pix': [0.0, 1.0, 0.0, 1.0, 0.0, 1.0],
@@ -1585,7 +1585,7 @@ def test_gaze_smooth_expected_column(
         ),
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000, 1001, 2000, 2001, 3000, 3001],
                         'x_pix': [0.0, 1.0, 0.0, 1.0, 0.0, 1.0],
@@ -1622,7 +1622,7 @@ def test_gaze_smooth_expected_column(
         ),
         pytest.param(
             {
-                'data': pl.from_dict(
+                'samples': pl.from_dict(
                     {
                         'time': [1000, 1001, 2000, 2001, 3000, 3001],
                         'x_pix': [0.0, 1.0, 0.0, 1.0, 0.0, 1.0],
@@ -1660,17 +1660,17 @@ def test_gaze_smooth_expected_column(
     ],
 )
 def test_gaze_resample_expected(
-        gaze_init_kwargs, kwargs, expected_frame,
+        gaze_init_kwargs, kwargs, expected_samples,
 ):
     gaze = pm.Gaze(**gaze_init_kwargs)
     gaze.resample(**kwargs)
 
-    assert_frame_equal(gaze.frame, expected_frame)
+    assert_frame_equal(gaze.samples, expected_samples)
 
 
 def test_gaze_resample_changes_experiemnt_sampling_rate(experiment):
     gaze = pm.Gaze(
-        data=pl.from_dict(
+        samples=pl.from_dict(
             {
                 'time': [1000, 1001, 1002, 1003],
                 'x_pix': [1, 5, 10, None],
