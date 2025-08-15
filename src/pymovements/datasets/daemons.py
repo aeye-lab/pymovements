@@ -53,10 +53,6 @@ class DAEMONS(DatasetDefinition):
     long_name: str
         The entire name of the dataset.
 
-    has_files: dict[str, bool] | None
-        Indicate whether the dataset contains 'gaze', 'precomputed_events', and
-        'precomputed_reading_measures'. (default: None)
-
     resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
@@ -102,8 +98,6 @@ class DAEMONS(DatasetDefinition):
     name: str = 'DAEMONS'
 
     long_name: str = 'Potsdam data set of eye movement on natural scenes'
-
-    has_files: dict[str, bool] | None = None
 
     resources: ResourceDefinitions = field(
         default_factory=lambda: ResourceDefinitions.from_dict(
