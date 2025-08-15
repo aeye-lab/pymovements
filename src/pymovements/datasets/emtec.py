@@ -117,34 +117,31 @@ class EMTeC(DatasetDefinition):
     long_name: str = 'Eye movements on Machine-generated Texts Corpus'
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'gaze': [
-                    {
-                        'resource': 'https://osf.io/download/374sk/',
-                        'filename': 'subject_level_data.zip',
-                        'md5': 'dca99e47ef43f3696acec4fd70967750',
-                        'filename_pattern': r'ET_{subject_id:d}.csv',
-                        'filename_pattern_schema_overrides': {'subject_id': int},
-                    },
-                ],
-                'precomputed_events': [
-                    {
-                        'resource': 'https://osf.io/download/2hs8p/',
-                        'filename': 'fixations.csv',
-                        'md5': '5e05a364a1d8a044d8b36506aa91437e',
-                        'filename_pattern': r'fixations.csv',
-                    },
-                ],
-                'precomputed_reading_measures': [
-                    {
-                        'resource': 'https://osf.io/download/s4ny8/',
-                        'filename': 'reading_measures.csv',
-                        'md5': '56880f50af20682558065ac2d26be827',
-                        'filename_pattern': r'reading_measures.csv',
-                    },
-                ],
-            },
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
+                {
+                    'content': 'samples',
+                    'url': 'https://osf.io/download/374sk/',
+                    'filename': 'subject_level_data.zip',
+                    'md5': 'dca99e47ef43f3696acec4fd70967750',
+                    'filename_pattern': r'ET_{subject_id:d}.csv',
+                    'filename_pattern_schema_overrides': {'subject_id': int},
+                },
+                {
+                    'content': 'precomputed_events',
+                    'url': 'https://osf.io/download/2hs8p/',
+                    'filename': 'fixations.csv',
+                    'md5': '5e05a364a1d8a044d8b36506aa91437e',
+                    'filename_pattern': r'fixations.csv',
+                },
+                {
+                    'content': 'precomputed_reading_measures',
+                    'url': 'https://osf.io/download/s4ny8/',
+                    'filename': 'reading_measures.csv',
+                    'md5': '56880f50af20682558065ac2d26be827',
+                    'filename_pattern': r'reading_measures.csv',
+                },
+            ],
         ),
     )
 
@@ -174,7 +171,7 @@ class EMTeC(DatasetDefinition):
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
-            'gaze': {
+            'samples': {
                 'separator': '\t',
                 'columns': [
                     'item_id',

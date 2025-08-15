@@ -102,17 +102,16 @@ class BSCII(DatasetDefinition):
     long_name: str = 'Beijing Sentence Corpus II'
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'precomputed_events': [
-                    {
-                        'resource': 'https://osf.io/download/2cuys/',
-                        'filename': 'BSCII.EMD.rev.zip',
-                        'md5': '4daad0fa922785d8c681a883b1197e1e',
-                        'filename_pattern': 'BSCII.EMD.rev.txt',
-                    },
-                ],
-            },
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
+                {
+                    'content': 'precomputed_events',
+                    'url': 'https://osf.io/download/2cuys/',
+                    'filename': 'BSCII.EMD.rev.zip',
+                    'md5': '4daad0fa922785d8c681a883b1197e1e',
+                    'filename_pattern': 'BSCII.EMD.rev.txt',
+                },
+            ],
         ),
     )
 

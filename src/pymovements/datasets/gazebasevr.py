@@ -124,26 +124,25 @@ class GazeBaseVR(DatasetDefinition):
     long_name: str = 'GazeBaseVR dataset'
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'gaze': [
-                    {
-                        'resource': 'https://figshare.com/ndownloader/files/38844024',
-                        'filename': 'gazebasevr.zip',
-                        'md5': '048c04b00fd64347375cc8d37b451a22',
-                        'filename_pattern': (
-                            r'S_{round_id:1d}{subject_id:d}'
-                            r'_S{session_id:d}'
-                            r'_{task_name}.csv'
-                        ),
-                        'filename_pattern_schema_overrides': {
-                            'round_id': int,
-                            'subject_id': int,
-                            'session_id': int,
-                        },
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
+                {
+                    'content': 'samples',
+                    'url': 'https://figshare.com/ndownloader/files/38844024',
+                    'filename': 'gazebasevr.zip',
+                    'md5': '048c04b00fd64347375cc8d37b451a22',
+                    'filename_pattern': (
+                        r'S_{round_id:1d}{subject_id:d}'
+                        r'_S{session_id:d}'
+                        r'_{task_name}.csv'
+                    ),
+                    'filename_pattern_schema_overrides': {
+                        'round_id': int,
+                        'subject_id': int,
+                        'session_id': int,
                     },
-                ],
-            },
+                },
+            ],
         ),
     )
 
@@ -179,7 +178,7 @@ class GazeBaseVR(DatasetDefinition):
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
-            'gaze': {
+            'samples': {
                 'schema_overrides': {
                     'n': pl.Float32,
                     'x': pl.Float32,

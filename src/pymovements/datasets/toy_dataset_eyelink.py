@@ -121,12 +121,11 @@ class ToyDatasetEyeLink(DatasetDefinition):
     long_name: str = 'pymovements Toy Dataset EyeLink'
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'gaze':
-                    [
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
                         {
-                            'resource': 'http://github.com/aeye-lab/pymovements-toy-dataset-eyelink/zipball/a970d090588542dad745297866e794ab9dad8795/',  # noqa: E501 # pylint: disable=line-too-long
+                            'content': 'samples',
+                            'url': 'http://github.com/aeye-lab/pymovements-toy-dataset-eyelink/zipball/a970d090588542dad745297866e794ab9dad8795/',  # noqa: E501 # pylint: disable=line-too-long
                             'filename': 'pymovements-toy-dataset-eyelink.zip',
                             'md5': 'b1d426751403752c8a154fc48d1670ce',
                             'filename_pattern': r'subject_{subject_id:d}_session_{session_id:d}.asc',  # noqa: E501 # pylint: disable=line-too-long
@@ -135,8 +134,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
                                 'session_id': int,
                             },
                         },
-                    ],
-            },
+            ],
         ),
     )
 
@@ -176,7 +174,7 @@ class ToyDatasetEyeLink(DatasetDefinition):
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
-            'gaze': {
+            'samples': {
                 'patterns': [
                     {
                         'pattern': 'SYNCTIME_READING_SCREEN',

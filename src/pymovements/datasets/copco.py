@@ -123,38 +123,33 @@ class CopCo(DatasetDefinition):
     long_name: str = 'Copenhagen Corpus of Eye-Tracking Recordings from Natural Reading'
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'gaze': [
-                    {
-                        'resource': 'https://osf.io/download/bg9r4/',
-                        'filename': 'csvs.zip',
-                        'md5': '9dc3276714397b7fccac1e179a14c52b',  # type:ignore
-                        'filename_pattern': r'P{subject_id:d}.csv',
-                        'filename_pattern_schema_overrides': {'subject_id': int},
-                    },
-                ],
-                'precomputed_events': [
-                    {
-                        'resource':
-                        'https://files.de-1.osf.io/v1/resources/ud8s5/providers/osfstorage/61e13174c99ebd02df017c14/?zip=',  # noqa: E501 # pylint: disable=line-too-long
-                        'filename': 'FixationReports.zip',
-                        'md5': None,  # type:ignore
-                        'filename_pattern': r'FIX_report_P{subject_id:d}.txt',
-                        'filename_pattern_schema_overrides': {'subject_id': int},
-                    },
-                ],
-                'precomputed_reading_measures': [
-                    {
-                        'resource':
-                        'https://files.de-1.osf.io/v1/resources/ud8s5/providers/osfstorage/61e1317cc99ebd02df017c4f/?zip=',  # noqa: E501 # pylint: disable=line-too-long
-                        'filename': 'ReadingMeasures.zip',
-                        'md5': None,  # type:ignore
-                        'filename_pattern': r'P{subject_id:d}.csv',
-                        'filename_pattern_schema_overrides': {'subject_id': int},
-                    },
-                ],
-            },
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
+                {
+                    'content': 'samples',
+                    'url': 'https://osf.io/download/bg9r4/',
+                    'filename': 'csvs.zip',
+                    'md5': '9dc3276714397b7fccac1e179a14c52b',  # type:ignore
+                    'filename_pattern': r'P{subject_id:d}.csv',
+                    'filename_pattern_schema_overrides': {'subject_id': int},
+                },
+                {
+                    'content': 'precomputed_events',
+                    'url': 'https://files.de-1.osf.io/v1/resources/ud8s5/providers/osfstorage/61e13174c99ebd02df017c14/?zip=',  # noqa: E501 # pylint: disable=line-too-long
+                    'filename': 'FixationReports.zip',
+                    'md5': None,  # type:ignore
+                    'filename_pattern': r'FIX_report_P{subject_id:d}.txt',
+                    'filename_pattern_schema_overrides': {'subject_id': int},
+                },
+                {
+                    'content': 'precomputed_reading_measures',
+                    'url': 'https://files.de-1.osf.io/v1/resources/ud8s5/providers/osfstorage/61e1317cc99ebd02df017c4f/?zip=',  # noqa: E501 # pylint: disable=line-too-long
+                    'filename': 'ReadingMeasures.zip',
+                    'md5': None,  # type:ignore
+                    'filename_pattern': r'P{subject_id:d}.csv',
+                    'filename_pattern_schema_overrides': {'subject_id': int},
+                },
+            ],
         ),
     )
 
@@ -186,7 +181,7 @@ class CopCo(DatasetDefinition):
 
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
-            'gaze': {},
+            'samples': {},
             'precomputed_events': {
                 'separator': '\t',
                 'null_values': ['.', 'UNDEFINEDnull'],

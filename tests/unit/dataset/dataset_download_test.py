@@ -29,7 +29,6 @@ import pytest
 from pymovements import Dataset
 from pymovements import DatasetDefinition
 from pymovements import DatasetPaths
-from pymovements import ResourceDefinitions
 
 
 @pytest.fixture(
@@ -61,43 +60,39 @@ def dataset_definition_fixture(request):
                     'https://another_example.com/',
                 ),
             },
-            resources={
-                'gaze': (
-                    {
-                        'resource': 'test.gz.tar',
-                        'filename': 'test.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-                'precomputed_events': (
-                    {
-                        'resource': 'test_pc.gz.tar',
-                        'filename': 'test_pc.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
+            resources=[
+                {
+                    'content': 'gaze',
+                    'url': 'test.gz.tar',
+                    'filename': 'test.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+                {
+                    'content': 'precomputed_events',
+                    'url': 'test_pc.gz.tar',
+                    'filename': 'test_pc.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
         )
 
     if request.param == 'CustomGazeAndPrecomputedNoMirror':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            resources={
-                'gaze': (
-                    {
-                        'resource': 'https://example.com/test.gz.tar',
-                        'filename': 'test.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-                'precomputed_events': (
-                    {
-                        'resource': 'https://example.com/test_pc.gz.tar',
-                        'filename': 'test_pc.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
+            resources=[
+                {
+                    'content': 'gaze',
+                    'url': 'https://example.com/test.gz.tar',
+                    'filename': 'test.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+                {
+                    'content': 'precomputed_events',
+                    'url': 'https://example.com/test_pc.gz.tar',
+                    'filename': 'test_pc.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
         )
 
     if request.param == 'CustomGazeOnly':
@@ -109,29 +104,27 @@ def dataset_definition_fixture(request):
                     'https://another_example.com/',
                 ),
             },
-            resources={
-                'gaze': (
-                    {
-                        'resource': 'test.gz.tar',
-                        'filename': 'test.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
+            resources=[
+                {
+                    'content': 'gaze',
+                    'url': 'test.gz.tar',
+                    'filename': 'test.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
         )
 
     if request.param == 'CustomGazeOnlyNoMirror':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            resources={
-                'gaze': (
-                    {
-                        'resource': 'https://example.com/test.gz.tar',
-                        'filename': 'test.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
+            resources=[
+                {
+                    'content': 'gaze',
+                    'url': 'https://example.com/test.gz.tar',
+                    'filename': 'test.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
         )
 
     if request.param == 'CustomPrecomputedOnly':
@@ -143,29 +136,27 @@ def dataset_definition_fixture(request):
                     'https://another_example.com/',
                 ),
             },
-            resources={
-                'precomputed_events': (
-                    {
-                        'resource': 'test_pc.gz.tar',
-                        'filename': 'test_pc.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
+            resources=[
+                {
+                    'content': 'precomputed_events',
+                    'url': 'test_pc.gz.tar',
+                    'filename': 'test_pc.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
         )
 
     if request.param == 'CustomPrecomputedOnlyNoMirror':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            resources={
-                'precomputed_events': (
-                    {
-                        'resource': 'https://example.com/test_pc.gz.tar',
-                        'filename': 'test_pc.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
+            resources=[
+                {
+                    'content': 'precomputed_events',
+                    'url': 'https://example.com/test_pc.gz.tar',
+                    'filename': 'test_pc.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
         )
 
     if request.param == 'CustomPrecomputedOnlyNoExtract':
@@ -177,29 +168,27 @@ def dataset_definition_fixture(request):
                     'https://another_example.com/',
                 ),
             },
-            resources={
-                'precomputed_events': (
-                    {
-                        'resource': 'test_pc.gz.tar',
-                        'filename': 'test_pc.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
+            resources=[
+                {
+                    'content': 'precomputed_events',
+                    'url': 'test_pc.gz.tar',
+                    'filename': 'test_pc.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
         )
 
     if request.param == 'CustomPrecomputedOnlyNoExtractNoMirror':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            resources={
-                'precomputed_events': (
-                    {
-                        'resource': 'https://example.com/test_pc.gz.tar',
-                        'filename': 'test_pc.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
+            resources=[
+                {
+                    'content': 'precomputed_events',
+                    'url': 'https://example.com/test_pc.gz.tar',
+                    'filename': 'test_pc.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
         )
 
     if request.param == 'CustomPrecomputedRMOnly':
@@ -211,29 +200,27 @@ def dataset_definition_fixture(request):
                     'https://another_example.com/',
                 ),
             },
-            resources={
-                'precomputed_reading_measures': (
-                    {
-                        'resource': 'test_rm.gz.tar',
-                        'filename': 'test_rm.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
+            resources=[
+                {
+                    'content': 'precomputed_reading_measures',
+                    'url': 'test_rm.gz.tar',
+                    'filename': 'test_rm.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
         )
 
     if request.param == 'CustomPrecomputedRMOnlyNoMirror':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            resources={
-                'precomputed_reading_measures': (
-                    {
-                        'resource': 'https://example.com/test_rm.gz.tar',
-                        'filename': 'test_rm.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
+            resources=[
+                {
+                    'content': 'precomputed_reading_measures',
+                    'url': 'https://example.com/test_rm.gz.tar',
+                    'filename': 'test_rm.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
         )
 
     assert False, f'unknown dataset_definition fixture {request.param}'
@@ -1133,13 +1120,14 @@ def test_dataset_download_default_extract_precomputed(
             DatasetDefinition(
                 name='CustomPublicDataset',
                 mirrors={'gaze': ['https://example.com/']},
-                resources=ResourceDefinitions.from_dict({
-                    'gaze': [{
-                        'resource': None,
+                resources=[
+                    {
+                        'content': 'gaze',
+                        'url': None,
                         'filename': 'test.gz.tar',
                         'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    }],
-                }),
+                    },
+                ],
             ),
             AttributeError,
             'Resource.url must not be None',
@@ -1149,13 +1137,14 @@ def test_dataset_download_default_extract_precomputed(
             DatasetDefinition(
                 name='CustomPublicDataset',
                 mirrors={'gaze': ['https://example.com/']},
-                resources=ResourceDefinitions.from_dict({
-                    'gaze': [{
-                        'resource': 'https://example.com/test.gz.tar',
+                resources=[
+                    {
+                        'content': 'gaze',
+                        'url': 'https://example.com/test.gz.tar',
                         'filename': None,
                         'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    }],
-                }),
+                    },
+                ],
             ),
             AttributeError,
             'Resource.filename must not be None',
@@ -1164,13 +1153,12 @@ def test_dataset_download_default_extract_precomputed(
         pytest.param(
             DatasetDefinition(
                 name='CustomPublicDataset',
-                resources=ResourceDefinitions.from_dict({
-                    'gaze': [{
-                        'resource': None,
-                        'filename': 'test.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    }],
-                }),
+                resources=[{
+                    'content': 'gaze',
+                    'url': None,
+                    'filename': 'test.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                }],
             ),
             AttributeError,
             'Resource.url must not be None',
@@ -1179,13 +1167,12 @@ def test_dataset_download_default_extract_precomputed(
         pytest.param(
             DatasetDefinition(
                 name='CustomPublicDataset',
-                resources=ResourceDefinitions.from_dict({
-                    'gaze': [{
-                        'resource': 'https://example.com/test.gz.tar',
-                        'filename': None,
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    }],
-                }),
+                resources=[{
+                    'content': 'gaze',
+                    'url': 'https://example.com/test.gz.tar',
+                    'filename': None,
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                }],
             ),
             AttributeError,
             'Resource.filename must not be None',
@@ -1194,13 +1181,12 @@ def test_dataset_download_default_extract_precomputed(
         pytest.param(
             DatasetDefinition(
                 name='CustomPublicDataset',
-                resources=ResourceDefinitions.from_dict({
-                    'gaze': [{
-                        'resource': 'test.gz.tar',
-                        'filename': 'test.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    }],
-                }),
+                resources=[{
+                    'content': 'gaze',
+                    'url': 'test.gz.tar',
+                    'filename': 'test.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                }],
             ),
             ValueError,
             'unknown url type: ',
@@ -1209,13 +1195,12 @@ def test_dataset_download_default_extract_precomputed(
         pytest.param(
             DatasetDefinition(
                 name='CustomPublicDataset',
-                resources=ResourceDefinitions.from_dict({
-                    'precomputed_events': [{
-                        'resource': 'test.gz.tar',
-                        'filename': 'test.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    }],
-                }),
+                resources=[{
+                    'content': 'gaze',
+                    'url': 'test.gz.tar',
+                    'filename': 'test.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                }],
             ),
             ValueError,
             'unknown url type: ',
@@ -1224,13 +1209,12 @@ def test_dataset_download_default_extract_precomputed(
         pytest.param(
             DatasetDefinition(
                 name='CustomPublicDataset',
-                resources=ResourceDefinitions.from_dict({
-                    'precomputed_reading_measures': [{
-                        'resource': 'test.gz.tar',
-                        'filename': 'test.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    }],
-                }),
+                resources=[{
+                    'content': 'gaze',
+                    'url': 'test.gz.tar',
+                    'filename': 'test.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                }],
             ),
             ValueError,
             'unknown url type: ',
@@ -1259,9 +1243,6 @@ def test_dataset_download_raises_exception(
                         'https://another_example.com/',
                     ),
                 },
-                resources={
-                    'gaze': (),
-                },
             ),
             id='gaze',
         ),
@@ -1273,9 +1254,6 @@ def test_dataset_download_raises_exception(
                         'https://example.com/',
                         'https://another_example.com/',
                     ),
-                },
-                resources={
-                    'precomputed_events': (),
                 },
             ),
             id='precomputed_events',
@@ -1321,15 +1299,14 @@ def test_extract_dataset_precomputed_move_single_file(tmp_path):
                 'https://another_example.com/',
             ),
         },
-        resources={
-            'precomputed_events': (
-                {
-                    'resource': 'tests/files/',
-                    'filename': '18sat_fixfinal.csv',
-                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                },
-            ),
-        },
+        resources=[
+            {
+                'content': 'precomputed_events',
+                'url': 'tests/files/',
+                'filename': '18sat_fixfinal.csv',
+                'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+            },
+        ],
     )
 
     # Create directory and copy test file.
@@ -1351,15 +1328,14 @@ def test_extract_dataset_precomputed_rm_move_single_file(tmp_path):
                 'https://another_example.com/',
             ),
         },
-        resources={
-            'precomputed_reading_measures': (
-                {
-                    'resource': 'tests/files/',
-                    'filename': 'copco_rm_dummy.csv',
-                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                },
-            ),
-        },
+        resources=[
+            {
+                'content': 'precomputed_reading_measures',
+                'url': 'tests/files/',
+                'filename': 'copco_rm_dummy.csv',
+                'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+            },
+        ],
     )
 
     # Create directory and copy test file.

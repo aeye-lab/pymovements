@@ -121,25 +121,23 @@ class InteRead(DatasetDefinition):
     long_name: str = 'Interrupted Reading dataset'
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'gaze': [
-                    {
-                        'resource': 'https://osf.io/download/6ju3x/',
-                        'filename': 'resampled_gaze.csv.zip',
-                        'md5': '06b2cdff1827086fa125a703ee9d4324',
-                        'filename_pattern': r'resampled_gaze.csv',
-                    },
-                ],
-                'precomputed_events': [
-                    {
-                        'resource': 'https://osf.io/download/85ckh/',
-                        'filename': 'resumption_fixation.csv',
-                        'md5': '44edb7c58318ad76af1fa6f1bc1f1ceb',
-                        'filename_pattern': r'resumption_fixation.csv',
-                    },
-                ],
-            },
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
+                {
+                    'content': 'samples',
+                    'url': 'https://osf.io/download/6ju3x/',
+                    'filename': 'resampled_gaze.csv.zip',
+                    'md5': '06b2cdff1827086fa125a703ee9d4324',
+                    'filename_pattern': r'resampled_gaze.csv',
+                },
+                {
+                    'content': 'precomputed_events',
+                    'url': 'https://osf.io/download/85ckh/',
+                    'filename': 'resumption_fixation.csv',
+                    'md5': '44edb7c58318ad76af1fa6f1bc1f1ceb',
+                    'filename_pattern': r'resumption_fixation.csv',
+                },
+            ],
         ),
     )
 
@@ -182,7 +180,7 @@ class InteRead(DatasetDefinition):
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
-            'gaze': {},
+            'samples': {},
             'precomputed_events': {},
         },
     )
