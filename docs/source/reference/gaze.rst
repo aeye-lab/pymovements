@@ -1,7 +1,9 @@
 Gaze
 ====
 
-Gaze page
+:py:class:`~pymovements.Gaze` class is a self-contained data structure that contains eye tracking
+data represented as samples or events. It also includes metadata on the experiment and recording
+setup.
 
 .. currentmodule:: pymovements
 
@@ -19,6 +21,8 @@ Gaze page
 .. rubric:: Transformations
 
 .. autosummary::
+    :toctree: api
+    :template: function.rst
 
    center_origin
    downsample
@@ -34,6 +38,8 @@ Gaze page
 .. rubric:: Input / Output
 
 .. autosummary::
+    :toctree: api
+    :template: function.rst
 
     from_asc
     from_csv
@@ -42,6 +48,8 @@ Gaze page
 .. rubric:: Integration
 
 .. autosummary::
+    :toctree: api
+    :template: function.rst
 
     from_numpy
     from_pandas
@@ -51,6 +59,8 @@ Gaze page
 .. rubric:: Numpy Transformations
 
 .. autosummary::
+    :toctree: api
+    :template: function.rst
 
     pix2deg
     pos2acc
@@ -59,14 +69,3 @@ Gaze page
     split
     downsample
     consecutive
-
-.. currentmodule:: pymovements
-
-.. toctree::
-    :hidden:
-    :maxdepth: 2
-
-    transforms/index
-    io/index
-    integration/index
-    transforms_numpy/index
