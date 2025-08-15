@@ -91,9 +91,9 @@ def tsplot(
         If array has more than two dimensions.
     """
     if channels is None:
-        channels = [c for c in gaze.frame.columns if gaze.frame[c].dtype != pl.List]
+        channels = [c for c in gaze.samples.columns if gaze.samples[c].dtype != pl.List]
 
-    arr = gaze.frame[channels].to_numpy().transpose()
+    arr = gaze.samples[channels].to_numpy().transpose()
 
     if arr.ndim == 1:
         arr = np.expand_dims(arr, axis=0)

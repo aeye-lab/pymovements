@@ -58,7 +58,7 @@ def args_fixture(experiment_fixture, request):
 
     # Init a Gaze
     gaze = Gaze(
-        data=df,
+        samples=df,
         experiment=experiment_fixture,
         pixel_columns=pixel_columns,
         position_columns=position_columns,
@@ -167,7 +167,7 @@ def test_heatmap_noshow_no_pixel_or_position_column(args, monkeypatch):
         position_column = 'position'
 
     gaze = args[0]
-    gaze.frame = gaze.frame.rename({position_column: 'custom_column'})
+    gaze.samples = gaze.samples.rename({position_column: 'custom_column'})
 
     heatmap(gaze, position_column='custom_column', show=False)
     plt.close()
@@ -208,7 +208,7 @@ def test_heatmap_no_experiment_property():
         },
     )
 
-    gaze = Gaze(data=df, pixel_columns=['x_pix', 'y_pix'], experiment=None)
+    gaze = Gaze(samples=df, pixel_columns=['x_pix', 'y_pix'], experiment=None)
 
     with pytest.raises(ValueError):
         heatmap(gaze, show=False)

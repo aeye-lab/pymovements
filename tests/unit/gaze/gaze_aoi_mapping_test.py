@@ -1122,7 +1122,7 @@ def test_gaze_to_aoi_mapping_char_width_height(eye, aoi_column, gaze_type):
         assert False, 'unknown gaze_type'
 
     gaze.map_to_aois(aoi_df, eye=eye, gaze_type=gaze_type)
-    assert_frame_equal(gaze.frame, EXPECTED_DF[f'{aoi_column}_{eye}_{gaze_type}'])
+    assert_frame_equal(gaze.samples, EXPECTED_DF[f'{aoi_column}_{eye}_{gaze_type}'])
 
 
 @pytest.mark.filterwarnings('ignore:GazeDataFrame contains data but no.*:UserWarning')
@@ -1177,7 +1177,7 @@ def test_gaze_to_aoi_mapping_char_end(eye, aoi_column, gaze_type):
         assert False, 'unknown gaze_type'
 
     gaze.map_to_aois(aoi_df, eye=eye, gaze_type=gaze_type)
-    assert_frame_equal(gaze.frame, EXPECTED_DF[f'{aoi_column}_{eye}_{gaze_type}'])
+    assert_frame_equal(gaze.samples, EXPECTED_DF[f'{aoi_column}_{eye}_{gaze_type}'])
 
 
 def test_map_to_aois_raises_value_error():
@@ -1199,4 +1199,4 @@ def test_map_to_aois_raises_value_error():
     with pytest.raises(ValueError) as excinfo:
         gaze.map_to_aois(aoi_df, eye='right', gaze_type='')
     msg, = excinfo.value.args
-    assert msg == 'neither position nor pixel in gaze dataframe, one needed for mapping'
+    assert msg.startswith('neither position nor pixel column in samples dataframe')

@@ -109,8 +109,8 @@ def heatmap(
         The heatmap figure.
     """
     # Extract x and y positions from the gaze dataframe
-    x = gaze.frame[position_column].list.get(0).to_numpy()
-    y = gaze.frame[position_column].list.get(1).to_numpy()
+    x = gaze.samples[position_column].list.get(0).to_numpy()
+    y = gaze.samples[position_column].list.get(1).to_numpy()
 
     # Check if experiment properties are available
     if not gaze.experiment:

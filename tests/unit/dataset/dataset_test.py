@@ -71,7 +71,7 @@ def create_preprocessed_gaze_files_from_fileinfo(gazes, fileinfo, rootpath):
 
         for key in fileinfo_row.keys():
             if key in gaze.columns:
-                gaze = gaze.frame.drop(key)
+                gaze = gaze.samples.drop(key)
 
         gaze.write_ipc(rootpath / filepath)
 
@@ -510,8 +510,8 @@ def test_load_correct_raw_gazes(gaze_dataset_configuration):
     expected_gazes = gaze_dataset_configuration['raw_gazes']
     for result_gaze, expected_gaze in zip(dataset.gaze, expected_gazes):
         assert_frame_equal(
-            result_gaze.frame,
-            expected_gaze.frame,
+            result_gaze.samples,
+            expected_gaze.samples,
             check_column_order=False,
         )
 
@@ -553,8 +553,8 @@ def test_load_correct_preprocessed_gazes(gaze_dataset_configuration):
     expected_gazes = gaze_dataset_configuration['preprocessed_gazes']
     for result_gaze, expected_gaze in zip(dataset.gaze, expected_gazes):
         assert_frame_equal(
-            result_gaze.frame,
-            expected_gaze.frame,
+            result_gaze.samples,
+            expected_gaze.samples,
             check_column_order=False,
         )
 
@@ -1139,7 +1139,7 @@ def test_detect_events_raises_column_not_found_error(
     dataset.pos2vel()
 
     for file_id, _ in enumerate(dataset.gaze):
-        dataset.gaze[file_id].frame = dataset.gaze[file_id].frame.rename(rename_arg)
+        dataset.gaze[file_id].samples = dataset.gaze[file_id].samples.rename(rename_arg)
 
     with pytest.raises(pl.exceptions.ColumnNotFoundError) as excinfo:
         dataset.detect_events(**detect_event_kwargs)
@@ -1350,7 +1350,7 @@ def test_save_preprocessed(gaze_dataset_configuration, drop_column):
     dataset.pos2vel()
     dataset.pos2acc()
 
-    dataset.gaze[0].frame = dataset.gaze[0].frame.drop(drop_column)
+    dataset.gaze[0].samples = dataset.gaze[0].samples.drop(drop_column)
 
     preprocessed_dirname = 'preprocessed-test'
     shutil.rmtree(dataset.path / Path(preprocessed_dirname), ignore_errors=True)
@@ -1380,16 +1380,16 @@ def test_save_preprocessed_has_no_side_effect(gaze_dataset_configuration, drop_c
     dataset.pos2vel()
     dataset.pos2acc()
 
-    dataset.gaze[0].frame = dataset.gaze[0].frame.drop(drop_column)
+    dataset.gaze[0].samples = dataset.gaze[0].samples.drop(drop_column)
 
-    old_frame = dataset.gaze[0].frame.clone()
+    old_frame = dataset.gaze[0].samples.clone()
 
     preprocessed_dirname = 'preprocessed-test'
     shutil.rmtree(dataset.path / Path(preprocessed_dirname), ignore_errors=True)
     shutil.rmtree(dataset.path / Path(preprocessed_dirname), ignore_errors=True)
     dataset.save_preprocessed(preprocessed_dirname, extension='csv')
 
-    new_frame = dataset.gaze[0].frame.clone()
+    new_frame = dataset.gaze[0].samples.clone()
 
     assert_frame_equal(old_frame, new_frame)
 
