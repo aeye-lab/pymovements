@@ -19,7 +19,6 @@
 # SOFTWARE.
 """ResourceDefinitions and ResourceDefinition module."""
 from __future__ import annotations
-from warnings import warn
 
 from collections.abc import Iterable
 from collections.abc import Sequence
