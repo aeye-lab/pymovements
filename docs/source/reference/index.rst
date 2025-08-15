@@ -20,12 +20,11 @@
      - Overview of data generation functionality
    * - :doc:`plotting`
      - Overview of plotting functionality
-   * - :doc:`utilities`
+   * - :doc:`utils`
      - Overview of helper utilities
 
 
 .. toctree::
-   :hidden:
    :maxdepth: 2
    dataset
    gaze
@@ -34,4 +33,4 @@
    stimulus
    synthetic
    plotting
-   utilities
+   utils
