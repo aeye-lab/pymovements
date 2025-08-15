@@ -3,7 +3,7 @@
 ================
 
 .. list-table::
-   :widths: 40 60
+   :widths: 30 70
    :header-rows: 0
 
    * - :doc:`dataset`
