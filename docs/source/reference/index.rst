@@ -26,6 +26,7 @@
 
 .. toctree::
    :maxdepth: 2
+
    dataset
    gaze
    events
