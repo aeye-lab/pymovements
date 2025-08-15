@@ -49,10 +49,6 @@ class DIDEC(DatasetDefinition):
     long_name: str
         The entire name of the dataset.
 
-    has_files: dict[str, bool]
-        Indicate whether the dataset contains 'gaze', 'precomputed_events', and
-        'precomputed_reading_measures'.
-
     resources: ResourceDefinitions
         A list of dataset resources. Each list entry must be a dictionary with the following keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -121,14 +117,6 @@ class DIDEC(DatasetDefinition):
     name: str = 'DIDEC'
 
     long_name: str = 'Dutch Image Description and Eye-tracking Corpus'
-
-    has_files: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': False,
-            'precomputed_reading_measures': False,
-        },
-    )
 
     resources: ResourceDefinitions = field(
         default_factory=lambda: ResourceDefinitions.from_dicts(

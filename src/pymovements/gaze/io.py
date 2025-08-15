@@ -115,7 +115,7 @@ def from_csv(
     Returns
     -------
     Gaze
-        The gaze data frame read from the csv file.
+        The initialized gaze object read from the csv file.
 
     Notes
     -----
@@ -171,7 +171,7 @@ def from_csv(
     ...     pixel_columns = ['x_left_pix','y_left_pix'],
     ...     separator = ',',
     ... )
-    >>> gaze.frame
+    >>> gaze.samples
     shape: (10, 2)
     ┌──────┬───────────┐
     │ time ┆ pixel     │
@@ -203,7 +203,7 @@ def from_csv(
     ...     pixel_columns = ['x_left_pix','y_left_pix'],
     ...     schema_overrides = {'time': pl.Int64, 'x_left_pix': pl.Int64, 'y_left_pix': pl.Int64},
     ... )
-    >>> gaze.frame
+    >>> gaze.samples
     shape: (10, 2)
     ┌──────┬───────────┐
     │ time ┆ pixel     │
@@ -233,21 +233,21 @@ def from_csv(
                 read_csv_kwargs = definition.custom_read_kwargs['gaze']
 
     # Read data.
-    gaze_data = pl.read_csv(file, **read_csv_kwargs)
+    samples = pl.read_csv(file, **read_csv_kwargs)
     if column_map is not None:
-        gaze_data = gaze_data.rename({
+        samples = samples.rename({
             key: column_map[key] for key in
             [
                 key for key in column_map.keys()
-                if key in gaze_data.columns
+                if key in samples.columns
             ]
         })
 
     if add_columns is not None:
-        gaze_data = gaze_data.with_columns([
+        samples = samples.with_columns([
             pl.lit(value).alias(column)
             for column, value in add_columns.items()
-            if column not in gaze_data.columns
+            if column not in samples.columns
         ])
 
     # Cast numerical columns to Float64 if they were incorrectly inferred to be Utf8.
@@ -260,20 +260,20 @@ def from_csv(
         + ([distance_column] if distance_column else [])
     )
     for column in numerical_columns:
-        if gaze_data[column].dtype == pl.Utf8:
-            gaze_data = gaze_data.with_columns([
+        if samples[column].dtype == pl.Utf8:
+            samples = samples.with_columns([
                 pl.col(column).cast(pl.Float64),
             ])
 
     if column_schema_overrides is not None:
-        gaze_data = gaze_data.with_columns([
+        samples = samples.with_columns([
             pl.col(fileinfo_key).cast(fileinfo_dtype)
             for fileinfo_key, fileinfo_dtype in column_schema_overrides.items()
         ])
 
-    # Create gaze data frame.
+    # Create gaze object.
     gaze = Gaze(
-        gaze_data,
+        samples=samples,
         experiment=experiment,
         definition=definition,
         trial_columns=trial_columns,
@@ -342,7 +342,7 @@ def from_asc(
     Returns
     -------
     Gaze
-        The gaze data frame read from the asc file.
+        The initialized gaze object read from the asc file.
 
     Examples
     --------
@@ -351,7 +351,7 @@ def from_asc(
 
     >>> from pymovements.gaze.io import from_asc
     >>> gaze = from_asc(file='tests/files/eyelink_monocular_example.asc')
-    >>> gaze.frame
+    >>> gaze.samples
     shape: (16, 3)
     ┌─────────┬───────┬────────────────┐
     │ time    ┆ pupil ┆ pixel          │
@@ -409,7 +409,7 @@ def from_asc(
                 encoding = custom_read_kwargs['encoding']
 
     # Read data.
-    gaze_data, event_data, metadata = parse_eyelink(
+    samples, event_data, metadata = parse_eyelink(
         file,
         patterns=_patterns,
         schema=schema,
@@ -418,14 +418,14 @@ def from_asc(
     )
 
     if add_columns is not None:
-        gaze_data = gaze_data.with_columns([
+        samples = samples.with_columns([
             pl.lit(value).alias(column)
             for column, value in add_columns.items()
-            if column not in gaze_data.columns
+            if column not in samples.columns
         ])
 
     if column_schema_overrides is not None:
-        gaze_data = gaze_data.with_columns([
+        samples = samples.with_columns([
             pl.col(fileinfo_key).cast(fileinfo_dtype)
             for fileinfo_key, fileinfo_dtype in column_schema_overrides.items()
         ])
@@ -435,7 +435,7 @@ def from_asc(
 
     # Instantiate Gaze with parsed data.
     gaze = Gaze(
-        gaze_data,
+        samples=samples,
         experiment=experiment,
         events=Events(event_data) if events else None,
         trial_columns=trial_columns,
@@ -486,7 +486,7 @@ def from_ipc(
     Returns
     -------
     Gaze
-        The gaze data frame read from the ipc file.
+        The initialized gaze object read from the ipc file.
 
     Examples
     --------
@@ -495,7 +495,7 @@ def from_ipc(
 
     >>> from pymovements.gaze.io import from_ipc
     >>> gaze = from_ipc(file='tests/files/monocular_example.feather')
-    >>> gaze.frame
+    >>> gaze.samples
     shape: (10, 2)
     ┌──────┬───────────┐
     │ time ┆ pixel     │
@@ -516,33 +516,33 @@ def from_ipc(
 
     """
     # Read data.
-    gaze_data = pl.read_ipc(file, **read_ipc_kwargs)
+    samples = pl.read_ipc(file, **read_ipc_kwargs)
 
     if column_map is not None:
-        gaze_data = gaze_data.rename({
+        samples = samples.rename({
             key: column_map[key] for key in
             [
                 key for key in column_map.keys()
-                if key in gaze_data.columns
+                if key in samples.columns
             ]
         })
 
     if add_columns is not None:
-        gaze_data = gaze_data.with_columns([
+        samples = samples.with_columns([
             pl.lit(value).alias(column)
             for column, value in add_columns.items()
-            if column not in gaze_data.columns
+            if column not in samples.columns
         ])
 
     if column_schema_overrides is not None:
-        gaze_data = gaze_data.with_columns([
+        samples = samples.with_columns([
             pl.col(fileinfo_key).cast(fileinfo_dtype)
             for fileinfo_key, fileinfo_dtype in column_schema_overrides.items()
         ])
 
-    # Create gaze data frame.
+    # Create gaze object.
     gaze = Gaze(
-        gaze_data,
+        samples=samples,
         experiment=experiment,
         trial_columns=trial_columns,
     )

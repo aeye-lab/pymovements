@@ -2,11 +2,6 @@ name: "CoLAGaze"
 
 long_name: 'Corpus of Eye Movements for Linguistic Acceptability'
 
-has_files:
-  gaze: true
-  precomputed_events: true
-  precomputed_reading_measures: true
-
 resources:
   gaze:
     - resource: https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=

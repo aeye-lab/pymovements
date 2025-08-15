@@ -211,20 +211,10 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
             DatasetDefinition(
                 name='Example',
                 long_name='Example',
-                has_files={
-                    'gaze': False,
-                    'precomputed_events': False,
-                    'precomputed_reading_measures': False,
-                },
             ),
             {
                 'name': 'Example',
                 'long_name': 'Example',
-                'has_files': {
-                    'gaze': False,
-                    'precomputed_events': False,
-                    'precomputed_reading_measures': False,
-                },
                 'acceleration_columns': None,
                 'column_map': {},
                 'custom_read_kwargs': {},
@@ -246,11 +236,6 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
             DatasetDefinition(
                 name='Example',
                 long_name='Example',
-                has_files={
-                    'gaze': False,
-                    'precomputed_events': False,
-                    'precomputed_reading_measures': False,
-                },
                 experiment=Experiment(
                     screen_width_px=1280,
                     screen_height_px=1024,
@@ -264,11 +249,6 @@ def test_dataset_definition_resources_init_expected(init_kwargs, expected_resour
             {
                 'name': 'Example',
                 'long_name': 'Example',
-                'has_files': {
-                    'gaze': False,
-                    'precomputed_events': False,
-                    'precomputed_reading_measures': False,
-                },
                 'acceleration_columns': None,
                 'column_map': {},
                 'custom_read_kwargs': {},
@@ -318,7 +298,6 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
             {
                 'name': 'MyDatasetDefinition',
                 'long_name': None,
-                'has_files': {},
                 'acceleration_columns': None,
                 'column_map': {},
                 'custom_read_kwargs': {},
@@ -361,7 +340,6 @@ def test_dataset_definition_to_dict_expected(definition, expected_dict):
                 'name': 'MyDatasetDefinition',
                 'long_name': None,
                 '_foobar': 'test',
-                'has_files': {},
                 'acceleration_columns': None,
                 'column_map': {},
                 'custom_read_kwargs': {},
@@ -416,11 +394,6 @@ def test_dataset_definition_to_dict_exclude_private_expected(exclude_private, ex
         pytest.param(
             DatasetDefinition(
                 name='Example',
-                has_files={
-                    'gaze': False,
-                    'precomputed_events': False,
-                    'precomputed_reading_measures': False,
-                },
             ),
             id='no_exp',
         ),
@@ -428,11 +401,6 @@ def test_dataset_definition_to_dict_exclude_private_expected(exclude_private, ex
         pytest.param(
             DatasetDefinition(
                 name='Example',
-                has_files={
-                    'gaze': False,
-                    'precomputed_events': False,
-                    'precomputed_reading_measures': False,
-                },
                 experiment=Experiment(
                     screen_width_px=1280,
                     screen_height_px=1024,
@@ -473,11 +441,6 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
     dictionary_tmp_file = tmp_path / 'dictionary.yaml'
     yaml_encoding = {
         'name': 'Example',
-        'has_files': {
-            'gaze': False,
-            'precomputed_events': False,
-            'precomputed_reading_measures': False,
-        },
     }
 
     with open(dictionary_tmp_file, 'w', encoding='utf-8') as f:
@@ -487,16 +450,12 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
 
     expected_definition = DatasetDefinition(
         name='Example',
-        has_files={
-            'gaze': False,
-            'precomputed_events': False,
-            'precomputed_reading_measures': False,
-        },
     )
 
     assert yaml_definition == expected_definition
 
 
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
 @pytest.mark.parametrize(
     ('resources', 'expected_has_resources'),
     [
@@ -566,11 +525,13 @@ def test_dataset_definition_has_resources_boolean(resources, expected_has_resour
 
     # there are multiple contexts of using booleans.
     assert bool(definition.has_resources) == expected_has_resources
+    assert str(definition.has_resources) == str(expected_has_resources)
     assert definition.has_resources == expected_has_resources
     assert not (definition.has_resources and not expected_has_resources)
     assert not (not definition.has_resources and expected_has_resources)
 
 
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
 @pytest.mark.parametrize(
     ('resources', 'expected_resources'),
     [
@@ -665,7 +626,8 @@ def test_dataset_definition_has_resources_indexable(resources, expected_resource
         assert definition.has_resources[key] == value
 
 
-def test_dataset_definition_not_equal():
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+def test_dataset_definition_has_resources_not_equal():
     definition1 = DatasetDefinition(resources={'gaze': [{'resource': 'foo'}]})
     definition2 = DatasetDefinition(resources={})
 
@@ -728,7 +690,6 @@ def test_dataset_definition_not_equal():
             {
                 'name': '.',
                 'long_name': None,
-                'has_files': {},
                 'mirrors': {},
                 'resources': [],
                 'experiment': None,
@@ -753,7 +714,6 @@ def test_dataset_definition_not_equal():
             {
                 'name': '.',
                 'long_name': None,
-                'has_files': {},
                 'mirrors': {},
                 'resources': [],
                 'experiment': None,
@@ -778,7 +738,6 @@ def test_dataset_definition_not_equal():
             {
                 'name': '.',
                 'long_name': None,
-                'has_files': {},
                 'mirrors': {},
                 'resources': [],
                 'experiment': {
@@ -831,6 +790,10 @@ def test_dataset_to_dict_exclude_none(dataset_definition, exclude_none, expected
             {'extract': False},
             id='extract_false',
         ),
+        pytest.param(
+            {'has_files': {'gaze': True}},
+            id='has_files',
+        ),
     ],
 )
 def test_dataset_definition_attribute_is_deprecated(attribute_kwarg):
@@ -849,6 +812,10 @@ def test_dataset_definition_attribute_is_deprecated(attribute_kwarg):
             {'extract': False},
             id='extract_false',
         ),
+        pytest.param(
+            {'has_files': {'gaze': True}},
+            id='has_files',
+        ),
     ],
 )
 def test_dataset_definition_attribute_is_removed(attribute_kwarg):
@@ -860,8 +827,9 @@ def test_dataset_definition_attribute_is_removed(attribute_kwarg):
     msg = info.value.args[0]
     remove_version = regex.match(msg).groupdict()['version']
     current_version = __version__.split('+')[0]
+    attribute_name = list(attribute_kwarg.keys())[0]
     assert current_version < remove_version, (
-        f'utils/parsing.py was planned to be removed in v{remove_version}. '
+        f'{attribute_name} is scheduled to be removed in v{remove_version}. '
         f'Current version is v{current_version}.'
     )
 

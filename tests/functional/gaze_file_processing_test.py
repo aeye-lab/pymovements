@@ -151,7 +151,7 @@ def test_gaze_file_processing(gaze_from_kwargs):
         gaze = gaze_module.from_asc(**gaze_from_kwargs)
 
     assert gaze is not None
-    assert gaze.frame.height > 0
+    assert gaze.samples.height > 0
 
     # Do some basic transformations.
     if 'pixel' in gaze.columns:

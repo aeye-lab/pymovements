@@ -214,7 +214,7 @@ from pymovements.synthetic import step_function
                 'minimum_duration': 2,
             },
             pm.gaze.from_pandas(
-                data=pl.DataFrame({
+                samples=pl.DataFrame({
                     'trial': ['A'] * 50 + ['B'] * 50,
                     'screen': ['1'] * 25 + ['2'] * 25 + ['1'] * 25 + ['2'] * 25,
                     'position': [(0, 0)] * 100,

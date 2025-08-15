@@ -749,7 +749,7 @@ def test_map_to_aois_raises_value_error():
     with pytest.raises(ValueError) as excinfo:
         gaze.map_to_aois(aoi_df, eye='right', gaze_type='')
     msg, = excinfo.value.args
-    assert msg == 'neither position nor pixel in gaze dataframe, one needed for mapping'
+    assert msg.startswith('neither position nor pixel column in samples dataframe')
 
 
 def test_map_to_aois_raises_value_error_missing_width_height(dataset):

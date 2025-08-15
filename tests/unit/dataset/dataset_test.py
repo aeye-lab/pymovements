@@ -71,7 +71,7 @@ def create_preprocessed_gaze_files_from_fileinfo(gazes, fileinfo, rootpath):
 
         for key in fileinfo_row.keys():
             if key in gaze.columns:
-                gaze = gaze.frame.drop(key)
+                gaze = gaze.samples.drop(key)
 
         gaze.write_ipc(rootpath / filepath)
 
@@ -121,17 +121,9 @@ def mock_toy(
         raw_fileformat,
         eyes,
         remote=False,
-        has_files=_UNSET,
         extract=_UNSET,
         filename_format_schema_overrides=_UNSET,
 ):
-    if has_files is _UNSET:
-        has_files = {
-            'gaze': True,
-            'precomputed_events': False,
-            'precomputed_reading_measures': False,
-        }
-
     if extract is _UNSET:
         extract = None
 
@@ -386,7 +378,6 @@ def mock_toy(
         time_unit='ms',
         distance_column=distance_column,
         pixel_columns=pixel_columns,
-        has_files=has_files,
         extract=extract,
     )
 
@@ -519,8 +510,8 @@ def test_load_correct_raw_gazes(gaze_dataset_configuration):
     expected_gazes = gaze_dataset_configuration['raw_gazes']
     for result_gaze, expected_gaze in zip(dataset.gaze, expected_gazes):
         assert_frame_equal(
-            result_gaze.frame,
-            expected_gaze.frame,
+            result_gaze.samples,
+            expected_gaze.samples,
             check_column_order=False,
         )
 
@@ -562,8 +553,8 @@ def test_load_correct_preprocessed_gazes(gaze_dataset_configuration):
     expected_gazes = gaze_dataset_configuration['preprocessed_gazes']
     for result_gaze, expected_gaze in zip(dataset.gaze, expected_gazes):
         assert_frame_equal(
-            result_gaze.frame,
-            expected_gaze.frame,
+            result_gaze.samples,
+            expected_gaze.samples,
             check_column_order=False,
         )
 
@@ -1148,7 +1139,7 @@ def test_detect_events_raises_column_not_found_error(
     dataset.pos2vel()
 
     for file_id, _ in enumerate(dataset.gaze):
-        dataset.gaze[file_id].frame = dataset.gaze[file_id].frame.rename(rename_arg)
+        dataset.gaze[file_id].samples = dataset.gaze[file_id].samples.rename(rename_arg)
 
     with pytest.raises(pl.exceptions.ColumnNotFoundError) as excinfo:
         dataset.detect_events(**detect_event_kwargs)
@@ -1359,7 +1350,7 @@ def test_save_preprocessed(gaze_dataset_configuration, drop_column):
     dataset.pos2vel()
     dataset.pos2acc()
 
-    dataset.gaze[0].frame = dataset.gaze[0].frame.drop(drop_column)
+    dataset.gaze[0].samples = dataset.gaze[0].samples.drop(drop_column)
 
     preprocessed_dirname = 'preprocessed-test'
     shutil.rmtree(dataset.path / Path(preprocessed_dirname), ignore_errors=True)
@@ -1389,16 +1380,16 @@ def test_save_preprocessed_has_no_side_effect(gaze_dataset_configuration, drop_c
     dataset.pos2vel()
     dataset.pos2acc()
 
-    dataset.gaze[0].frame = dataset.gaze[0].frame.drop(drop_column)
+    dataset.gaze[0].samples = dataset.gaze[0].samples.drop(drop_column)
 
-    old_frame = dataset.gaze[0].frame.clone()
+    old_frame = dataset.gaze[0].samples.clone()
 
     preprocessed_dirname = 'preprocessed-test'
     shutil.rmtree(dataset.path / Path(preprocessed_dirname), ignore_errors=True)
     shutil.rmtree(dataset.path / Path(preprocessed_dirname), ignore_errors=True)
     dataset.save_preprocessed(preprocessed_dirname, extension='csv')
 
-    new_frame = dataset.gaze[0].frame.clone()
+    new_frame = dataset.gaze[0].samples.clone()
 
     assert_frame_equal(old_frame, new_frame)
 
@@ -1906,33 +1897,19 @@ def precomputed_fixture_dataset(request, tmp_path):
             rootpath,
             raw_fileformat='csv',
             eyes='right',
-            has_files={
-                'gaze': True,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
         )
     elif dataset_type == 'ToyPrecomputedEvent':
         dataset_dict = mock_toy(
             rootpath,
             raw_fileformat='csv',
             eyes='right',
-            has_files={
-                'gaze': False,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
         )
+        del dataset_dict['init_kwargs']['definition'].resources[0]  # remove gaze resources
     elif dataset_type == 'ToyPrecomputedEventNoExtract':
         dataset_dict = mock_toy(
             rootpath,
             raw_fileformat='csv',
             eyes='right',
-            has_files={
-                'gaze': False,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
             filename_format_schema_overrides={'precomputed_events': {}},
         )
     else:
@@ -1977,33 +1954,18 @@ def precomputed_rm_fixture_dataset(request, tmp_path):
             rootpath,
             raw_fileformat='csv',
             eyes='right',
-            has_files={
-                'gaze': True,
-                'precomputed_events': True,
-                'precomputed_reading_measures': True,
-            },
         )
     elif dataset_type == 'ToyPrecomputedRM':
         dataset_dict = mock_toy(
             rootpath,
             raw_fileformat='csv',
             eyes='right',
-            has_files={
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': True,
-            },
         )
     elif dataset_type == 'ToyPrecomputedRMNoExtract':
         dataset_dict = mock_toy(
             rootpath,
             raw_fileformat='csv',
             eyes='right',
-            has_files={
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': True,
-            },
             filename_format_schema_overrides={
                 'precomputed_events': {},
                 'precomputed_reading_measures': {},

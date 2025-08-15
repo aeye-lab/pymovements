@@ -47,7 +47,7 @@ import pymovements as pm
             },
             (10, 2),
             marks=pytest.mark.filterwarnings(
-                'ignore:Gaze contains data but no.*:UserWarning',
+                'ignore:Gaze contains samples but no.*:UserWarning',
             ),
             id='feather_mono_shape_column_map',
         ),
@@ -56,4 +56,4 @@ import pymovements as pm
 def test_shapes(kwargs, shape):
     gaze = pm.gaze.from_ipc(**kwargs)
 
-    assert gaze.frame.shape == shape
+    assert gaze.samples.shape == shape
