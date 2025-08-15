@@ -9,7 +9,7 @@ Measures page
 
 .. autosummary::
     :toctree: api
-    :recursive:
+    :template: function.rst
 
     null_ratio
 

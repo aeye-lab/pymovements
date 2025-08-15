@@ -6,8 +6,9 @@ Utils
 .. rubric:: Modules
 
 .. autosummary::
-   :toctree: api
-   :template: module.rst
+    :toctree: api
+    :nosignatures:
+    :template: module.rst
 
     archives
     downloads

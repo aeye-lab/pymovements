@@ -6,8 +6,9 @@ Stimulus
 .. rubric:: Classes
 
 .. autosummary::
-   :toctree: api
-   :template: class.rst
+    :toctree: api
+    :nosignatures:
+    :template: class.rst
 
     ImageStimulus
     TextStimulus

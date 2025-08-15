@@ -7,6 +7,7 @@ Synthetic
 
 .. autosummary::
     :toctree: api
+    :nosignatures:
     :template: function.rst
 
     step_function

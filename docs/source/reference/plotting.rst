@@ -8,6 +8,7 @@ Plotting
 
 .. autosummary::
     :toctree: api
+    :nosignatures:
     :template: function.rst
 
     heatmap

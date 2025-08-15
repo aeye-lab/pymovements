@@ -10,8 +10,9 @@ setup.
 .. rubric:: Classes
 
 .. autosummary::
-   :toctree: api
-   :template: class.rst
+    :toctree: api
+    :nosignatures:
+    :template: class.rst
 
     Gaze
     GazeDataFrame
@@ -22,16 +23,17 @@ setup.
 
 .. autosummary::
     :toctree: api
+    :nosignatures:
     :template: function.rst
 
-   center_origin
-   downsample
-   norm
-   pix2deg
-   deg2pix
-   pos2acc
-   pos2vel
-   savitzky_golay
+    center_origin
+    downsample
+    norm
+    pix2deg
+    deg2pix
+    pos2acc
+    pos2vel
+    savitzky_golay
 
 .. currentmodule:: pymovements.gaze
 
@@ -39,6 +41,7 @@ setup.
 
 .. autosummary::
     :toctree: api
+    :nosignatures:
     :template: function.rst
 
     from_asc
@@ -49,6 +52,7 @@ setup.
 
 .. autosummary::
     :toctree: api
+    :nosignatures:
     :template: function.rst
 
     from_numpy
@@ -60,6 +64,7 @@ setup.
 
 .. autosummary::
     :toctree: api
+    :nosignatures:
     :template: function.rst
 
     pix2deg

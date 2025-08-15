@@ -7,6 +7,7 @@ Extending the API
 
 .. autosummary::
     :toctree: api
+    :nosignatures:
     :template: function.rst
 
     register_dataset

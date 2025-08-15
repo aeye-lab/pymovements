@@ -1,9 +1,8 @@
 Dataset
 =======
 
-This page gives an overview of all dataset classes.
-
-The overview of the included
+A Dataset is a collection of files which can contain experiment metadata and gaze data represented
+in different formats.
 
 .. currentmodule:: pymovements
 
@@ -28,6 +27,7 @@ The overview of the included
 
 .. autosummary::
    :toctree: api
+    :nosignatures:
    :template: class.rst
 
     BSC
@@ -69,6 +69,7 @@ The overview of the included
 .. autosummary::
    :toctree: api
    :template: class.rst
+    :nosignatures:
 
     ToyDataset
     ToyDatasetEyeLink

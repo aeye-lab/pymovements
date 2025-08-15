@@ -1,16 +1,17 @@
 Events
 ======
 
-Events page
+All events have a starting time (onset) and an ending time (offset).
+
 
 .. currentmodule:: pymovements
 
 .. rubric:: Classes
 
 .. autosummary::
-   :toctree: api
-   :recursive:
-   :template: class.rst
+    :toctree: api
+    :nosignatures:
+    :template: class.rst
 
     Events
     EventDataFrame
@@ -18,8 +19,9 @@ Events page
 .. rubric:: Processing
 
 .. autosummary::
-   :toctree: api
-   :recursive:
+    :toctree: api
+    :nosignatures:
+    :template: class.rst
 
     EventProcessor
     EventGazeProcessor
@@ -29,8 +31,9 @@ Events page
 .. rubric:: Detection Methods
 
 .. autosummary::
-   :toctree: api
-   :recursive:
+    :toctree: api
+    :nosignatures:
+    :template: function.rst
 
     idt
     ivt
@@ -43,7 +46,8 @@ Events page
 
 .. autosummary::
     :toctree: api
-    :recursive:
+    :nosignatures:
+    :template: function.rst
 
     amplitude
     duration
