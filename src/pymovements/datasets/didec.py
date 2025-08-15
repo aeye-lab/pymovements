@@ -122,8 +122,8 @@ class DIDEC(DatasetDefinition):
         default_factory=lambda: ResourceDefinitions.from_dicts(
             [
                 {
-                    'content': 'gaze',
-                    'resource': 'https://didec.uvt.nl/corpus/DIDEC_only_the_eyetracking_data.zip',
+                    'content': 'samples',
+                    'url': 'https://didec.uvt.nl/corpus/DIDEC_only_the_eyetracking_data.zip',
                     'filename': 'DIDEC_only_the_eyetracking_data.zip',
                     'md5': 'd572b0b41828986ca48a2fcf6966728a',
                     'filename_pattern': (
@@ -182,7 +182,7 @@ class DIDEC(DatasetDefinition):
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
-            'gaze': {
+            'samples': {
                 'separator': '\t',
                 # skip begaze tracker data
                 'skip_rows': 43,

@@ -122,26 +122,24 @@ class SBSAT(DatasetDefinition):
     long_name: str = 'Stony Brook SAT reading fixation dataset'
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                    'gaze': [
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
                         {
-                            'resource': 'https://osf.io/download/jgae7/',
+                            'content': 'samples',
+                            'url': 'https://osf.io/download/jgae7/',
                             'filename': 'sbsat_csvs.zip',
                             'md5': 'a6ef1fb0ecced683cdb489c3bd3e1a5c',
                             'filename_pattern': r'msd{subject_id:d}.csv',
                             'filename_pattern_schema_overrides': {'subject_id': int},
                         },
-                    ],
-                    'precomputed_events': [
                         {
-                            'resource': 'https://raw.githubusercontent.com/ahnchive/SB-SAT/master/fixation/18sat_fixfinal.csv',  # noqa: E501 # pylint: disable=line-too-long
+                            'content': 'precomputed_events',
+                            'url': 'https://raw.githubusercontent.com/ahnchive/SB-SAT/master/fixation/18sat_fixfinal.csv',  # noqa: E501 # pylint: disable=line-too-long
                             'filename': '18sat_fixfinal.csv',
                             'md5': '4cf3212a71e6fc2fbe7041ce7c691927',
                             'filename_pattern': '18sat_fixfinal.csv',
                         },
-                    ],
-            },
+            ],
         ),
     )
 
@@ -179,7 +177,7 @@ class SBSAT(DatasetDefinition):
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda:
             {
-                'gaze': {
+                'samples': {
                     'separator': '\t',
                     'columns': ['time', 'book_name', 'screen_id', 'x_left', 'y_left', 'pupil_left'],
                     'schema_overrides': {

@@ -123,21 +123,20 @@ class JuDo1000(DatasetDefinition):
     long_name: str = 'Jumping Dots 1000 Hz dataset'
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'gaze': [
-                    {
-                        'resource': 'https://osf.io/download/4wy7s/',
-                        'filename': 'JuDo1000.zip',
-                        'md5': 'b8b9e5bb65b78d6f2bd260451cdd89f8',
-                        'filename_pattern': r'{subject_id:d}_{session_id:d}.csv',
-                        'filename_pattern_schema_overrides': {
-                            'subject_id': int,
-                            'session_id': int,
-                        },
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
+                {
+                    'content': 'samples',
+                    'url': 'https://osf.io/download/4wy7s/',
+                    'filename': 'JuDo1000.zip',
+                    'md5': 'b8b9e5bb65b78d6f2bd260451cdd89f8',
+                    'filename_pattern': r'{subject_id:d}_{session_id:d}.csv',
+                    'filename_pattern_schema_overrides': {
+                        'subject_id': int,
+                        'session_id': int,
                     },
-                ],
-            },
+                },
+            ],
         ),
     )
 
@@ -178,7 +177,7 @@ class JuDo1000(DatasetDefinition):
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
-            'gaze': {
+            'samples': {
                 'schema_overrides': {
                     'trialId': pl.Int64,
                     'pointId': pl.Int64,

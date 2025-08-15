@@ -70,7 +70,7 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> dict[str
     for resource_definition in definition.resources:
         content_type = resource_definition.content
 
-        if content_type == 'gaze':
+        if content_type == 'samples':
             resource_dirpath = paths.raw
         elif content_type == 'precomputed_events':
             resource_dirpath = paths.precomputed_events
@@ -289,7 +289,7 @@ def load_gaze_file(
         [column for column in fileinfo_row.keys() if column != 'filepath']
     }
     # overrides types in fileinfo_columns that are later passed via add_columns.
-    gaze_resource_definitions = definition.resources.filter('gaze')
+    gaze_resource_definitions = definition.resources.filter('samples')
     if gaze_resource_definitions:
         column_schema_overrides = gaze_resource_definitions[0].filename_pattern_schema_overrides
     else:
@@ -389,7 +389,7 @@ def load_precomputed_reading_measures(
         precomputed_reading_measures.append(
             load_precomputed_reading_measure_file(
                 data_path,
-                definition.custom_read_kwargs['precomputed_reading_measures'],
+                definition.custom_read_kwargs.get('precomputed_reading_measures', None),
             ),
         )
     return precomputed_reading_measures
@@ -490,7 +490,7 @@ def load_precomputed_event_files(
         precomputed_events.append(
             load_precomputed_event_file(
                 data_path,
-                definition.custom_read_kwargs['precomputed_events'],
+                definition.custom_read_kwargs.get('precomputed_events', None),
             ),
         )
     return precomputed_events
@@ -586,7 +586,7 @@ def add_fileinfo(
     )
 
     # Cast columns from fileinfo according to specification.
-    resource_definitions = definition.resources.filter('gaze')
+    resource_definitions = definition.resources.filter('samples')
     # overrides types in fileinfo_columns.
     _schema_overrides = resource_definitions[0].filename_pattern_schema_overrides
     df = df.with_columns([
@@ -777,10 +777,10 @@ def take_subset(
                 f' {type(subset_key)}',
             )
 
-        if subset_key not in fileinfo['gaze'].columns:
+        if subset_key not in fileinfo['samples'].columns:
             raise ValueError(
                 f'subset key {subset_key} must be a column in the fileinfo attribute.'
-                f" Available columns are: {fileinfo['gaze'].columns}",
+                f" Available columns are: {fileinfo['samples'].columns}",
             )
 
         if isinstance(subset_value, (bool, float, int, str)):
@@ -793,5 +793,5 @@ def take_subset(
                 f'but value of pair {subset_key}: {subset_value} is of type {type(subset_value)}',
             )
 
-        fileinfo['gaze'] = fileinfo['gaze'].filter(pl.col(subset_key).is_in(column_values))
+        fileinfo['samples'] = fileinfo['samples'].filter(pl.col(subset_key).is_in(column_values))
     return fileinfo

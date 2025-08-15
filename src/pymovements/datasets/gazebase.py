@@ -123,25 +123,24 @@ class GazeBase(DatasetDefinition):
     long_name: str = 'GazeBase dataset'
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'gaze': [
-                    {
-                        'resource': 'https://figshare.com/ndownloader/files/27039812',
-                        'filename': 'GazeBase_v2_0.zip',
-                        'md5': 'cb7eb895fb48f8661decf038ab998c9a',
-                        'filename_pattern': (
-                            r'S_{round_id:1d}{subject_id:d}'
-                            r'_S{session_id:d}'
-                            r'_{task_name}.csv'
-                        ),
-                        'filename_pattern_schema_overrides': {
-                            'round_id': int, 'subject_id': int,
-                            'session_id': int,
-                        },
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
+                {
+                    'content': 'samples',
+                    'url': 'https://figshare.com/ndownloader/files/27039812',
+                    'filename': 'GazeBase_v2_0.zip',
+                    'md5': 'cb7eb895fb48f8661decf038ab998c9a',
+                    'filename_pattern': (
+                        r'S_{round_id:1d}{subject_id:d}'
+                        r'_S{session_id:d}'
+                        r'_{task_name}.csv'
+                    ),
+                    'filename_pattern_schema_overrides': {
+                        'round_id': int, 'subject_id': int,
+                        'session_id': int,
                     },
-                ],
-            },
+                },
+            ],
         ),
     )
 
@@ -177,7 +176,7 @@ class GazeBase(DatasetDefinition):
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {
-            'gaze': {
+            'samples': {
                 'null_values': 'NaN',
                 'schema_overrides': {
                     'n': pl.Int64,

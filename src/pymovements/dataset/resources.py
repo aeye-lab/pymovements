@@ -19,6 +19,7 @@
 # SOFTWARE.
 """ResourceDefinitions and ResourceDefinition module."""
 from __future__ import annotations
+from warnings import warn
 
 from collections.abc import Iterable
 from collections.abc import Sequence
@@ -26,6 +27,9 @@ from copy import deepcopy
 from dataclasses import asdict
 from dataclasses import dataclass
 from typing import Any
+from warnings import warn
+
+from deprecated.sphinx import deprecated
 
 
 @dataclass
@@ -74,6 +78,14 @@ class ResourceDefinition:
             An initialized ``Resource`` instance.
         """
         if 'resource' in dictionary:
+            warn(
+                DeprecationWarning(
+                    'from_dict() key "resource" is deprecated since version v0.23.0. '
+                    'Please use key "url" instead. '
+                    'This field will be removed in v0.28.0.',
+                ),
+            )
+
             url = dictionary['resource']
             dictionary = {key: value for key, value in dictionary.items() if key != 'resource'}
             dictionary['url'] = url
@@ -104,6 +116,16 @@ class ResourceDefinition:
                     del data[key]
 
         return data
+
+    def __post_init__(self) -> None:
+        if self.content == 'gaze':
+            warn(
+                DeprecationWarning(
+                    'content type "gaze" is deprecated since version v0.23.0. '
+                    'Please use "samples" instead. This field will be removed in v0.28.0.',
+                ),
+            )
+            self.content = 'samples'
 
 
 class ResourceDefinitions(list):
@@ -136,6 +158,11 @@ class ResourceDefinitions(list):
         return ResourceDefinitions(resources)
 
     @staticmethod
+    @deprecated(
+        reason='Please use ResourceDefinitions.from_dicts() instead. '
+               'This property will be removed in v0.28.0.',
+        version='v0.23.0',
+    )
     def from_dict(
         dictionary: dict[str, Sequence[dict[str, Any]]] | None,
     ) -> ResourceDefinitions:
