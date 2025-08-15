@@ -2,36 +2,25 @@
  API Reference
 ================
 
-.. toctree::
-   :maxdepth: 1
-   dataset
-   gaze
-   events
-   measures
-   stimulus
-   synthetic
-   plotting
-   utilities
-
 .. list-table::
    :widths: 40 60
    :header-rows: 0
 
-   * - dataset
+   * - :doc:`dataset`
      - Overview of the :py:class:`~pymovements.Dataset` class
-   * - gaze
+   * - :doc:`gaze`
      - Overview of the :py:class:`~pymovements.Gaze` class
-   * - events
+   * - :doc:`events`
      - Overview of the :py:class:`~pymovements.Events` class
-   * - measures
+   * - :doc:`measures`
      - Overview of eye movement measures
-   * - stimulus
+   * - :doc:`stimulus`
      - Overview of stimulus classes
-   * - synthetic
+   * - :doc:`synthetic`
      - Overview of data generation functionality
-   * - plotting
+   * - :doc:`plotting`
      - Overview of plotting functionality
-   * - utilities
+   * - :doc:`utilities`
      - Overview of helper utilities
 
 
