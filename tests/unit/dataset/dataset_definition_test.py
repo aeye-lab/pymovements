@@ -81,6 +81,12 @@ def test_dataset_definition_is_equal(init_kwargs):
         ),
 
         pytest.param(
+            {'resources': ResourceDefinitions([ResourceDefinition(content='gaze')])},
+            ResourceDefinitions([ResourceDefinition(content='gaze')]),
+            id='single_gaze_resource',
+        ),
+
+        pytest.param(
             {'resources': [{'content': 'gaze'}]},
             ResourceDefinitions([ResourceDefinition(content='gaze')]),
             id='single_gaze_resource',
