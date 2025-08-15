@@ -54,10 +54,6 @@ class PotsdamBingeWearablePVT(DatasetDefinition):
     long_name: str
         The entire name of the dataset.
 
-    has_files: dict[str, bool]
-        Indicate whether the dataset contains 'gaze', 'precomputed_events', and
-        'precomputed_reading_measures'.
-
     mirrors: dict[str, Sequence[str]]
         A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
 
@@ -135,14 +131,6 @@ class PotsdamBingeWearablePVT(DatasetDefinition):
     name: str = 'PotsdamBingeWearablePVT'
 
     long_name: str = 'Potsdam Binge Wearable PVT dataset'
-
-    has_files: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': False,
-            'precomputed_reading_measures': False,
-        },
-    )
 
     mirrors: dict[str, Sequence[str]] = field(
         default_factory=lambda: {
