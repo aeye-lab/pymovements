@@ -51,8 +51,8 @@ The overview of the included
     InteRead
     JuDo1000
     MECOL1W1
-    MECOL1W2
-    MECOL1W3
+    MECOL2W1
+    MECOL2W2
     MouseCursor
     OneStop
     PoTeC
