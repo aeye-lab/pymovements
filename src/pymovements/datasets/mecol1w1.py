@@ -99,25 +99,23 @@ class MECOL1W1(DatasetDefinition):
     long_name: str = 'Multilingual Eye-tracking Corpus native reader first wave'
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'precomputed_events': [
-                    {
-                        'resource': 'https://osf.io/download/67dc6027920cab9abae48b83/',
-                        'filename': 'joint_l1_fixation_version1.3.rda',
-                        'md5': '3c969a930a71cd62c67b936426dd079b',
-                        'filename_pattern': 'joint_l1_fixation_version1.3.rda',
-                    },
-                ],
-                'precomputed_reading_measures': [
-                    {
-                        'resource': 'https://osf.io/download/n5pvh/',
-                        'filename': 'sentence_data_version1.3.csv',
-                        'md5': '609f82b6f45b7c98a0769c6ce14ee6e9',
-                        'filename_pattern': 'sentence_data_version1.3.csv',
-                    },
-                ],
-            },
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
+                {
+                    'content': 'precomputed_events',
+                    'url': 'https://osf.io/download/67dc6027920cab9abae48b83/',
+                    'filename': 'joint_l1_fixation_version1.3.rda',
+                    'md5': '3c969a930a71cd62c67b936426dd079b',
+                    'filename_pattern': 'joint_l1_fixation_version1.3.rda',
+                },
+                {
+                    'content': 'precomputed_reading_measures',
+                    'url': 'https://osf.io/download/n5pvh/',
+                    'filename': 'sentence_data_version1.3.csv',
+                    'md5': '609f82b6f45b7c98a0769c6ce14ee6e9',
+                    'filename_pattern': 'sentence_data_version1.3.csv',
+                },
+            ],
         ),
     )
 

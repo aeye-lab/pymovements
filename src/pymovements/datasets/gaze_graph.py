@@ -126,11 +126,11 @@ class GazeGraph(DatasetDefinition):
     long_name: str = 'GazeGraph dataset'
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'gaze': [
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
                     {
-                        'resource': 'https://codeload.github.com/GazeGraphResource/GazeGraph/zip/refs/heads/master',  # noqa: E501 # pylint: disable=line-too-long
+                        'content': 'gaze',
+                        'url': 'https://codeload.github.com/GazeGraphResource/GazeGraph/zip/refs/heads/master',  # noqa: E501 # pylint: disable=line-too-long
                         'filename': 'gaze_graph_data.zip',
                         'md5': '181f4b79477cee6e0267482d989610b0',
                         'filename_pattern': r'P{subject_id}_{task}.csv',
@@ -139,8 +139,7 @@ class GazeGraph(DatasetDefinition):
                             'task': str,
                         },
                     },
-                ],
-            },
+            ],
         ),
     )
 

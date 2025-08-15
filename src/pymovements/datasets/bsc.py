@@ -101,17 +101,16 @@ class BSC(DatasetDefinition):
     long_name: str = 'Beijing Sentence Corpus'
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'precomputed_events': [
-                    {
-                        'resource': 'https://osf.io/download/xfe4s/',
-                        'filename': 'BSC.EMD.zip',
-                        'md5': 'c7118bfe48c91264d69c45d347f11416',
-                        'filename_pattern': 'BSC.EMD.txt',
-                    },
-                ],
-            },
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
+                {
+                    'content': 'precomputed_events',
+                    'url': 'https://osf.io/download/xfe4s/',
+                    'filename': 'BSC.EMD.zip',
+                    'md5': 'c7118bfe48c91264d69c45d347f11416',
+                    'filename_pattern': 'BSC.EMD.txt',
+                },
+            ],
         ),
     )
 

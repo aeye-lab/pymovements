@@ -70,6 +70,7 @@ def test_dataset_definition_is_equal(init_kwargs):
         pytest.param(
             {'resources': {}},
             ResourceDefinitions(),
+            marks=pytest.mark.filterwarnings('ignore:.*from_dict.*:DeprecationWarning'),
             id='empty_dict',
         ),
 
@@ -77,6 +78,12 @@ def test_dataset_definition_is_equal(init_kwargs):
             {'resources': []},
             ResourceDefinitions(),
             id='empty_list',
+        ),
+
+        pytest.param(
+            {'resources': ResourceDefinitions([ResourceDefinition(content='gaze')])},
+            ResourceDefinitions([ResourceDefinition(content='gaze')]),
+            id='resource_definitions',
         ),
 
         pytest.param(
@@ -88,6 +95,7 @@ def test_dataset_definition_is_equal(init_kwargs):
         pytest.param(
             {'resources': {'gaze': [{'resource': 'www.example.com'}]}},
             ResourceDefinitions([ResourceDefinition(content='gaze', url='www.example.com')]),
+            marks=pytest.mark.filterwarnings('ignore:.*from_dict.*:DeprecationWarning'),
             id='single_gaze_resource_legacy',
         ),
 
@@ -107,6 +115,7 @@ def test_dataset_definition_is_equal(init_kwargs):
                 'filename_format': {'gaze': 'test.csv'},
             },
             ResourceDefinitions([ResourceDefinition(content='gaze', filename_pattern='test.csv')]),
+            marks=pytest.mark.filterwarnings('ignore:.*from_dict.*:DeprecationWarning'),
             id='single_gaze_resource_filename_format_legacy',
         ),
 
@@ -115,6 +124,7 @@ def test_dataset_definition_is_equal(init_kwargs):
                 'filename_format': {'gaze': 'test.csv'},
             },
             ResourceDefinitions([ResourceDefinition(content='gaze', filename_pattern='test.csv')]),
+            marks=pytest.mark.filterwarnings('ignore:.*from_dict.*:DeprecationWarning'),
             id='filename_format_without_resources_legacy',
         ),
 
@@ -135,6 +145,7 @@ def test_dataset_definition_is_equal(init_kwargs):
                     filename_pattern_schema_overrides={'subject_id': int},
                 ),
             ]),
+            marks=pytest.mark.filterwarnings('ignore:.*from_dict.*:DeprecationWarning'),
             id='single_gaze_resource_filename_format_schema_overrides_legacy',
         ),
 
@@ -169,6 +180,7 @@ def test_dataset_definition_is_equal(init_kwargs):
                 ResourceDefinition(content='gaze', url='www.example1.com'),
                 ResourceDefinition(content='precomputed_events', url='www.example2.com'),
             ]),
+            marks=pytest.mark.filterwarnings('ignore:.*from_dict.*:DeprecationWarning'),
             id='two_resources_legacy',
         ),
 
@@ -195,6 +207,7 @@ def test_dataset_definition_is_equal(init_kwargs):
                     filename_pattern='test2.csv',
                 ),
             ]),
+            marks=pytest.mark.filterwarnings('ignore:.*from_dict.*:DeprecationWarning'),
             id='two_resources_filename_format_legacy',
         ),
     ],
@@ -455,7 +468,8 @@ def test_check_equality_of_load_from_yaml_and_load_from_dictionary_dump(tmp_path
     assert yaml_definition == expected_definition
 
 
-@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+@pytest.mark.filterwarnings('ignore:.*from_dict.*:DeprecationWarning')
+@pytest.mark.filterwarnings('ignore:.*has_resources.*:DeprecationWarning')
 @pytest.mark.parametrize(
     ('resources', 'expected_has_resources'),
     [
@@ -531,7 +545,8 @@ def test_dataset_definition_has_resources_boolean(resources, expected_has_resour
     assert not (not definition.has_resources and expected_has_resources)
 
 
-@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+@pytest.mark.filterwarnings('ignore:.*from_dict.*:DeprecationWarning')
+@pytest.mark.filterwarnings('ignore:.*has_resources.*:DeprecationWarning')
 @pytest.mark.parametrize(
     ('resources', 'expected_resources'),
     [
@@ -628,8 +643,8 @@ def test_dataset_definition_has_resources_indexable(resources, expected_resource
 
 @pytest.mark.filterwarnings('ignore::DeprecationWarning')
 def test_dataset_definition_has_resources_not_equal():
-    definition1 = DatasetDefinition(resources={'gaze': [{'resource': 'foo'}]})
-    definition2 = DatasetDefinition(resources={})
+    definition1 = DatasetDefinition(resources=[{'content': 'gaze', 'url': 'http://www.xample.com'}])
+    definition2 = DatasetDefinition(resources=[])
 
     assert definition1.has_resources != definition2.has_resources
 

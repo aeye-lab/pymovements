@@ -3,14 +3,14 @@ name: "GazeOnFaces"
 long_name: 'GazeOnFaces dataset'
 
 resources:
-  gaze:
-    - resource: "https://uncloud.univ-nantes.fr/index.php/s/8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip"
-      filename: "gaze_csv.zip"
-      md5: "fe219f07c9253cd9aaee6bd50233c034"
-      filename_pattern: 'gaze_sub{sub_id:d}_trial{trial_id:d}.csv'
-      filename_pattern_schema_overrides:
-        sub_id: !int
-        trial_id: !int
+  - content: gaze
+    url: "https://uncloud.univ-nantes.fr/index.php/s/8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip"
+    filename: "gaze_csv.zip"
+    md5: "fe219f07c9253cd9aaee6bd50233c034"
+    filename_pattern: 'gaze_sub{sub_id:d}_trial{trial_id:d}.csv'
+    filename_pattern_schema_overrides:
+      sub_id: !int
+      trial_id: !int
 
 experiment:
   screen_width_px: 1280

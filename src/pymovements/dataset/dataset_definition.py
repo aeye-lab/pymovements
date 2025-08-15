@@ -332,7 +332,7 @@ class DatasetDefinition:
 
     @property
     @deprecated(
-        reason='Please use Resource.filename_pattern instead. '
+        reason='Please use ResourceDefinition.filename_pattern instead. '
                'This property will be removed in v0.28.0.',
         version='v0.23.0',
     )
@@ -361,7 +361,7 @@ class DatasetDefinition:
 
     @filename_format.setter
     @deprecated(
-        reason='Please use Resource.filename_pattern instead. '
+        reason='Please use ResourceDefinition.filename_pattern instead. '
                'This property will be removed in v0.28.0.',
         version='v0.23.0',
     )
@@ -372,7 +372,7 @@ class DatasetDefinition:
 
     @property
     @deprecated(
-        reason='Please use Resource.filename_pattern_schema_overrides instead. '
+        reason='Please use ResourceDefinition.filename_pattern_schema_overrides instead. '
                'This property will be removed in v0.28.0.',
         version='v0.23.0',
     )
@@ -401,7 +401,7 @@ class DatasetDefinition:
 
     @filename_format_schema_overrides.setter
     @deprecated(
-        reason='Please use Resource.filename_pattern instead. '
+        reason='Please use ResourceDefinition.filename_pattern instead. '
                'This property will be removed in v0.28.0.',
         version='v0.23.0',
     )

@@ -123,11 +123,11 @@ class PoTeC(DatasetDefinition):
     long_name: str = 'Potsdam Textbook Corpus'
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'gaze': [
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
                     {
-                        'resource': 'https://osf.io/download/tgd9q/',
+                        'content': 'gaze',
+                        'url': 'https://osf.io/download/tgd9q/',
                         'filename': 'PoTeC.zip',
                         'md5': 'cffd45039757c3777e2fd130e5d8a2ad',
                         'filename_pattern': r'reader{subject_id:d}_{text_id}_raw_data.tsv',
@@ -136,10 +136,9 @@ class PoTeC(DatasetDefinition):
                             'text_id': str,
                         },
                     },
-                ],
-                'precomputed_events': [
                     {
-                        'resource': 'https://osf.io/download/d8pyg/',
+                        'content': 'precomputed_events',
+                        'url': 'https://osf.io/download/d8pyg/',
                         'filename': 'fixation.zip',
                         'md5': 'ecd9a998d07158922bb9b8cdd52f5688',
                         'filename_pattern': r'reader{subject_id:d}_{text_id}_uncorrected_fixations.tsv',  # noqa: E501 # pylint: disable=line-too-long
@@ -148,10 +147,9 @@ class PoTeC(DatasetDefinition):
                             'text_id': str,
                         },
                     },
-                ],
-                'precomputed_reading_measures': [
                     {
-                        'resource': 'https://osf.io/download/3ywhz/',
+                        'content': 'precomputed_reading_measures',
+                        'url': 'https://osf.io/download/3ywhz/',
                         'filename': 'reading_measures.zip',
                         'md5': 'efafec5ce074d8f492cc2409b6c4d9eb',
                         'filename_pattern': r'reader{subject_id:d}_{text_id}_merged.tsv',
@@ -160,8 +158,7 @@ class PoTeC(DatasetDefinition):
                             'text_id': str,
                         },
                     },
-                ],
-            },
+            ],
         ),
     )
 

@@ -389,7 +389,7 @@ def load_precomputed_reading_measures(
         precomputed_reading_measures.append(
             load_precomputed_reading_measure_file(
                 data_path,
-                definition.custom_read_kwargs['precomputed_reading_measures'],
+                definition.custom_read_kwargs.get('precomputed_reading_measures', None),
             ),
         )
     return precomputed_reading_measures
@@ -490,7 +490,7 @@ def load_precomputed_event_files(
         precomputed_events.append(
             load_precomputed_event_file(
                 data_path,
-                definition.custom_read_kwargs['precomputed_events'],
+                definition.custom_read_kwargs.get('precomputed_events', None),
             ),
         )
     return precomputed_events

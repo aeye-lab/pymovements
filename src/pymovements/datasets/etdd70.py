@@ -115,25 +115,23 @@ class ETDD70(DatasetDefinition):
     long_name: str = 'Eye-Tracking Dyslexia Dataset'
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'gaze': [
-                    {
-                        'resource': 'https://zenodo.org/api/records/13332134/files-archive',
-                        'filename': 'edd_raw.zip',
-                        'md5': None,  # type: ignore
-                        'filename_pattern': r'Subject_{subject_id:d}_{task:s}_raw.csv',
-                    },
-                ],
-                'precomputed_events': [
-                    {
-                        'resource': 'https://zenodo.org/api/records/13332134/files-archive',
-                        'filename': 'edd_fix.zip',
-                        'md5': None,  # type: ignore
-                        'filename_pattern': r'Subject_{subject_id:d}_{task:s}_fixations.csv',
-                    },
-                ],
-            },
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
+                {
+                    'content': 'gaze',
+                    'url': 'https://zenodo.org/api/records/13332134/files-archive',
+                    'filename': 'edd_raw.zip',
+                    'md5': None,  # type: ignore
+                    'filename_pattern': r'Subject_{subject_id:d}_{task:s}_raw.csv',
+                },
+                {
+                    'content': 'precomputed_events',
+                    'url': 'https://zenodo.org/api/records/13332134/files-archive',
+                    'filename': 'edd_fix.zip',
+                    'md5': None,  # type: ignore
+                    'filename_pattern': r'Subject_{subject_id:d}_{task:s}_fixations.csv',
+                },
+            ],
         ),
     )
 
