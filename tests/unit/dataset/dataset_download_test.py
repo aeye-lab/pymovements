@@ -1243,9 +1243,6 @@ def test_dataset_download_raises_exception(
                         'https://another_example.com/',
                     ),
                 },
-                resources={
-                    'gaze': (),
-                },
             ),
             id='gaze',
         ),
@@ -1257,9 +1254,6 @@ def test_dataset_download_raises_exception(
                         'https://example.com/',
                         'https://another_example.com/',
                     ),
-                },
-                resources={
-                    'precomputed_events': (),
                 },
             ),
             id='precomputed_events',
