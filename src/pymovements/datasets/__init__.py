@@ -17,55 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides dataset definitions.
-
-.. rubric:: Dataset Definitions
-
-.. autosummary::
-   :toctree:
-   :template: class.rst
-
-    BSC
-    BSCII
-    ChineseReading
-    CodeComprehension
-    CoLAGaze
-    CopCo
-    DAEMONS
-    DIDEC
-    EMTeC
-    ETDD70
-    FakeNewsPerception
-    Gaze4Hate
-    GazeBase
-    GazeBaseVR
-    GazeGraph
-    GazeOnFaces
-    HBN
-    IITB_HGC
-    InteRead
-    JuDo1000
-    MECOL1W1
-    MouseCursor
-    OneStop
-    PoTeC
-    PotsdamBingeRemotePVT
-    PotsdamBingeWearablePVT
-    Provo
-    SBSAT
-    TECO
-    UCL
-
-
-.. rubric:: Example Datasets
-
-.. autosummary::
-   :toctree:
-   :template: class.rst
-
-    ToyDataset
-    ToyDatasetEyeLink
-"""
+"""Provides dataset definitions."""
 from pymovements.datasets.bsc import BSC
 from pymovements.datasets.bsc2 import BSCII
 from pymovements.datasets.chinese_reading import ChineseReading

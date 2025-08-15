@@ -22,17 +22,6 @@
 
 .. deprecated:: v0.22.0
    This module will be removed in v0.27.0.
-
-.. rubric:: Modules
-
-.. autosummary::
-   :toctree:
-   :template: module.rst
-
-    archives
-    downloads
-    parsing
-    paths
 """
 from pymovements.utils import aois
 from pymovements.utils import archives

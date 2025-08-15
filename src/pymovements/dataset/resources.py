@@ -107,7 +107,7 @@ class ResourceDefinition:
 
 
 class ResourceDefinitions(list):
-    """List of ``ResourceDefinition`` instances."""
+    """List of :py:class:`~pymovements.ResourceDefinition` instances."""
 
     def __init__(self, resources: Iterable[ResourceDefinition] | None = None) -> None:
         if resources is None:

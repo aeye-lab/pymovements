@@ -52,7 +52,7 @@ def from_csv(
         definition: pm.DatasetDefinition | None = None,
         **read_csv_kwargs: Any,
 ) -> Gaze:
-    """Initialize a :py:class:`pymovements.gaze.Gaze`.
+    """Initialize a :py:class:`~pymovements.Gaze`.
 
     Parameters
     ----------
@@ -303,7 +303,7 @@ def from_asc(
         definition: pm.DatasetDefinition | None = None,
         events: bool = False,
 ) -> Gaze:
-    """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
+    """Initialize a :py:class:`~pymovements.Gaze`.
 
     Parameters
     ----------
@@ -457,7 +457,7 @@ def from_ipc(
         column_schema_overrides: dict[str, type] | None = None,
         **read_ipc_kwargs: Any,
 ) -> Gaze:
-    """Initialize a :py:class:`pymovements.gaze.Gaze`.
+    """Initialize a :py:class:`~pymovements.Gaze`.
 
     Parameters
     ----------

@@ -57,7 +57,7 @@ def from_numpy(
         distance_column: str | None = None,
         data: np.ndarray | None = None,
 ) -> Gaze:
-    """Get a :py:class:`~pymovements.gaze.Gaze` from a numpy array.
+    """Get a :py:class:`~pymovements.Gaze` from a numpy array.
 
     There are two mutually exclusive ways of conversion.
 
@@ -357,7 +357,7 @@ def from_pandas(
         distance_column: str | None = None,
         data: pd.DataFrame | None = None,
 ) -> Gaze:
-    """Get a :py:class:`~pymovements.gaze.Gaze` from a pandas DataFrame.
+    """Get a :py:class:`~pymovements.Gaze` from a pandas DataFrame.
 
     Parameters
     ----------
