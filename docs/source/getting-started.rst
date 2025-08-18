@@ -2,49 +2,43 @@
  Getting started
 ================
 
-
 .. grid::
     :gutter: 5
 
     .. grid-item-card::
 
-        **Working with pip?**
-        ^^^^^^^^^^^^^^^^^^^^^
+        **Install pymovements**
+        ^^^^^^^^^^^^^^^^^^^^^^^
 
-        *pymovements* can be installed via pip from `PyPI <https://pypi.org/project/pymovements>`__:
-
-        ++++++
-
-        .. code-block:: bash
-
-            pip install pymovements
-
-    .. grid-item-card::
-
-        **Working with uv?**
-        ^^^^^^^^^^^^^^^^^^^^
-
-        *pymovements* can be installed via `uv <https://github.com/astral-sh/uv>`__ from PyPI:
+        Choose your preferred package manager:
 
         ++++++
 
-        .. code-block:: bash
+        .. tab-set::
 
-            uv pip install pymovements
+            .. tab-item:: pip
 
-    .. grid-item-card::
+                *pymovements* can be installed via pip from `PyPI <https://pypi.org/project/pymovements>`__:
 
-        **Prefer conda?**
-        ^^^^^^^^^^^^^^^^^
+                .. code-block:: bash
 
-        *pymovements* is part of the `conda-forge <https://anaconda.org/conda-forge/pymovements>`__
-        repository and can be installed with Anaconda or Miniconda:
+                    pip install pymovements
 
-        ++++++
+            .. tab-item:: uv
 
-        .. code-block:: bash
+                *pymovements* can also be installed via `uv <https://github.com/astral-sh/uv>`__ from PyPI:
 
-            conda install -c conda-forge pymovements
+                .. code-block:: bash
+
+                    uv pip install pymovements
+
+            .. tab-item:: conda
+
+                *pymovements* is part of the `conda-forge <https://anaconda.org/conda-forge/pymovements>`__ repository and can be installed with Anaconda or Miniconda:
+
+                .. code-block:: bash
+
+                    conda install -c conda-forge pymovements
 
 |
 
