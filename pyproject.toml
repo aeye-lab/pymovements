@@ -66,6 +66,9 @@ docs = [
   "sphinxcontrib.datatemplates>=0.9.0",
   "sphinxcontrib.bibtex>=2.4.1"
 ]
+dev = [
+  "tox>=4.28.4"
+]
 test = [
   "pybtex<0.25.2",
   "pytest>=6.0.0",
@@ -73,6 +76,11 @@ test = [
   "pytest-cov>=4.0.0",
   "setuptools>=61.0.0,<81",
   "types-tqdm>=4.64.0,<5"
+]
+lint = [
+  "pre-commit",
+  "flake8",
+  "pylint"
 ]
 
 [project.urls]
