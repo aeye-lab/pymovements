@@ -12,8 +12,6 @@
 
         Choose your preferred package manager:
 
-        ++++++
-
         .. tab-set::
 
             .. tab-item:: pip
@@ -40,11 +38,6 @@
 
                     conda install -c conda-forge pymovements
 
-|
-
-.. grid::
-    :gutter: 5
-
     .. grid-item-card::
 
         **Advanced installation?**
@@ -53,12 +46,18 @@
         Installing a specific version? Installing from source?
         Check the advanced installation page.
 
+        ++++++
+
         .. button-link:: advanced-installation.rst
             :color: primary
             :shadow:
 
             Installation Guide
 
+|
+
+.. grid::
+    :gutter: 5
     .. grid-item-card::
 
         **Already installed?**
@@ -71,8 +70,6 @@
             :shadow:
 
             pymovements-in-10-minutes
-
-
 
 .. toctree::
    :hidden:
