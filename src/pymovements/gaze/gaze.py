@@ -321,7 +321,7 @@ class Gaze:
 
             Examples:
             - `by=["trial"]` → split by trial; each trial becomes a separate Gaze object.
-            - `by=["subject_id", "trial"]` → split by subject and trial; one Gaze object per 
+            - `by=["subject_id", "trial"]` → split by subject and trial; one Gaze object per
             subject-trial pair.
 
         Returns
@@ -334,7 +334,7 @@ class Gaze:
         ------
             - This method is particularly useful for large datasets or experiments where
             analyses are performed at the trial or block level.
-            - The original gaze data and metadata are not modified; the method returns new 
+            - The original gaze data and metadata are not modified; the method returns new
             Gaze objects.
         """
         # Use trial_columns if by is None
