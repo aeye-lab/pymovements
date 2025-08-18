@@ -46,18 +46,15 @@
         Installing a specific version? Installing from source?
         Check the advanced installation page.
 
-        ++++++
-
         .. button-link:: advanced-installation.rst
             :color: primary
             :shadow:
 
             Installation Guide
 
-|
-
 .. grid::
     :gutter: 5
+
     .. grid-item-card::
 
         **Already installed?**
@@ -70,6 +67,7 @@
             :shadow:
 
             pymovements-in-10-minutes
+
 
 .. toctree::
    :hidden:
