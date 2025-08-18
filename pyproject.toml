@@ -82,6 +82,7 @@ lint = [
   "flake8",
   "pylint"
 ]
+all = ["pymovements[docs,dev,test,lint]"]
 
 [project.urls]
 Homepage = "https://github.com/aeye-lab/pymovements"

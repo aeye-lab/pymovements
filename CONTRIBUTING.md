@@ -24,7 +24,7 @@ https://github.com/aeye-lab/pymovements/issues/new/choose) or write us at
   - [Pull Requests](#pull-requests)
   - [Continuous Integration](#continuous-integration)
 - [Core Developer Guidelines](#core-developer-guidelines)
-- [Publishing Releases](#Publishing Releases)
+- [Publishing Releases](#publishing-releases)
 - [License](#license)
 - [Questions](#questions)
 
@@ -141,14 +141,15 @@ We use [`flake8`](https://pypi.org/project/flake8/) for quick style checks and
 https://pypi.org/project/mypy/) for checking type annotations.
 
 You can check your code style by using [pre-commit](https://www.pre-commit.com).
-You can install `pre-commit` via pip:
+You can install `pre-commit`, `flake8` and `pylist` via pip:
 
 ```bash
-pip install pre-commit
-pip install pylint
+pip install -e .[lint]
 ```
 
-To always run style checks when pushing commits upstream you can register a pre-push hook by
+To always run style checks when pushing commits upstream,
+you can register a pre-push hook by
+
 ```bash
 pre-commit install --hook-type pre-push
 ```
@@ -186,9 +187,10 @@ pre-commit run mypy -a
 Tests are written using [Pytest](https://docs.pytest.org) and executed
 in a separate environment using [Tox](https://tox.readthedocs.io/en/latest/).
 
-If you have not yet installed `tox` you can do so via
+If you have not yet installed `tox` and the testing dependencies you can do so via
+
 ```bash
-pip install tox
+pip install -e .[dev,test]
 ```
 
 You can run all tests on all supported python versions run by simply calling `tox` in the repository root.
@@ -214,9 +216,14 @@ tox -e py39 -- tests/unit/events
 Make sure to add docstrings to every class, method and function that you add to the codebase.
 Docstrings should include a description of all parameters, returns and exceptions. Use the existing
 documentation as an example.
+To generate documentation pages, you can install the needed dependencies using:
 
-The API-documentation is generated from the numpydoc-style docstring of the respective
-modules/classes/functions by [Sphinx](https://www.sphinx-doc.org).
+```bash
+pip install -e .[docs]
+```
+
+[Sphinx](https://www.sphinx-doc.org) generates the API-documentation from the
+numpydoc-style docstring of the respective modules/classes/functions.
 You can build the documentation locally using the respective tox environment:
 ```bash
 tox -e docs
