@@ -346,11 +346,16 @@ def from_asc(
 
     Notes
     -----
-    ASC files are created from EyeLink EDF files using the edf2asc tool (available from the SR Research Support website).
-    ASC files contain gaze samples, events, and metadata about the experiment in a text (ASCII) format.
-    This function assumes that the ASC file is in the default format created by edf2asc, although you can add custom patterns for parsing if needed.
-    For example, if you have an Eyelink EDF file stored at `tests/files/eyelink_monocular_example.edf`,
-    you can convert it to an ASC file using the following command (requires the edf2asc tool which can be downloaded from the SR Research Support website):
+    ASC files are created from EyeLink EDF files using the edf2asc tool 
+    (available from the SR Research Support website).
+    ASC files contain gaze samples, events, and metadata about 
+    the experiment in a text (ASCII) format.
+    This function assumes that the ASC file is in the default format 
+    created by edf2asc, although you can add custom patterns for parsing if needed.
+    For example, if you have an Eyelink EDF file stored at 
+    `tests/files/eyelink_monocular_example.edf`,
+    you can convert it to an ASC file using the following command 
+    (requires the edf2asc tool which can be downloaded from the SR Research Support website):
     ```
     edf2asc tests/files/eyelink_monocular_example.edf
     ```
