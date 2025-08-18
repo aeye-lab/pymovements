@@ -137,7 +137,7 @@ You can check your code style by using [pre-commit](https://www.pre-commit.com).
 You can install `pre-commit`, `flake8` and `pylist` via pip:
 
 ```bash
-pip install -e .[lint]
+pip install -e .[dev]
 ```
 
 To always run style checks when pushing commits upstream,
@@ -188,7 +188,7 @@ in a separate environment using [Tox](https://tox.readthedocs.io/en/latest/).
 If you have not yet installed `tox` and the testing dependencies you can do so via
 
 ```bash
-pip install -e .[dev,test]
+pip install -e .[dev]
 ```
 
 You can run all tests on all supported python versions run by simply calling `tox` in the repository root.
@@ -216,7 +216,7 @@ tox -e py39 -- tests/unit/events
 Make sure to add docstrings to every class, method, and function that you add to the codebase.
 Docstrings should include a description of all parameters, returns, and exceptions. Use the existing
 documentation as an example.
-To generate documentation pages, you can install the needed dependencies using:
+To generate documentation pages, you can install the necessary dependencies using:
 
 ```bash
 pip install -e .[docs]
