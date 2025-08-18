@@ -1,15 +1,16 @@
 name: MouseCursor
 long_name: Mouse Cursor dataset
-has_files:
-  gaze: true
-  precomputed_events: false
-  precomputed_reading_measures: false
 resources:
-  gaze:
-  - resource: https://ars.els-cdn.com/content/image/1-s2.0-S2352340921000160-mmc1.zip
-    filename: mousecursor.zip
-    md5: 7885e8fd44f14f02f60e9f62431aea63
+- content: gaze
+  filename: mousecursor.zip
+  url: https://ars.els-cdn.com/content/image/1-s2.0-S2352340921000160-mmc1.zip
+  md5: 7885e8fd44f14f02f60e9f62431aea63
+  filename_pattern: Experiment {experiment_id:d}.csv
+  filename_pattern_schema_overrides:
+    experiment_id: '!int'
 experiment:
+  eyetracker:
+    sampling_rate: 3
   screen:
     width_px: 1920
     height_px: 1080
@@ -17,13 +18,6 @@ experiment:
     height_cm: 29.81
     distance_cm: 50
     origin: upper left
-  eyetracker:
-    sampling_rate: 3
-filename_format:
-  gaze: Experiment {experiment_id:d}.csv
-filename_format_schema_overrides:
-  gaze:
-    experiment_id: '!int'
 custom_read_kwargs:
   gaze:
     schema_overrides:

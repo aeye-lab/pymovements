@@ -1,18 +1,11 @@
 name: BSC
 long_name: Beijing Sentence Corpus
-has_files:
-  gaze: false
-  precomputed_events: true
-  precomputed_reading_measures: false
 resources:
-  precomputed_events:
-  - resource: https://osf.io/download/xfe4s/
-    filename: BSC.EMD.zip
-    md5: c7118bfe48c91264d69c45d347f11416
-filename_format:
-  precomputed_events: BSC.EMD.txt
-filename_format_schema_overrides:
-  precomputed_events: {}
+- content: precomputed_events
+  filename: BSC.EMD.zip
+  url: https://osf.io/download/xfe4s/
+  md5: c7118bfe48c91264d69c45d347f11416
+  filename_pattern: BSC.EMD.txt
 custom_read_kwargs:
   precomputed_events:
     separator: "\t"

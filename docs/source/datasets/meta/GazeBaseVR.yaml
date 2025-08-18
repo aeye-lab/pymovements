@@ -1,15 +1,18 @@
 name: GazeBaseVR
 long_name: GazeBaseVR dataset
-has_files:
-  gaze: true
-  precomputed_events: false
-  precomputed_reading_measures: false
 resources:
-  gaze:
-  - resource: https://figshare.com/ndownloader/files/38844024
-    filename: gazebasevr.zip
-    md5: 048c04b00fd64347375cc8d37b451a22
+- content: gaze
+  filename: gazebasevr.zip
+  url: https://figshare.com/ndownloader/files/38844024
+  md5: 048c04b00fd64347375cc8d37b451a22
+  filename_pattern: S_{round_id:1d}{subject_id:d}_S{session_id:d}_{task_name}.csv
+  filename_pattern_schema_overrides:
+    round_id: '!int'
+    subject_id: '!int'
+    session_id: '!int'
 experiment:
+  eyetracker:
+    sampling_rate: 250
   screen:
     width_px: 1680
     height_px: 1050
@@ -17,15 +20,6 @@ experiment:
     height_cm: 29.7
     distance_cm: 55
     origin: center
-  eyetracker:
-    sampling_rate: 250
-filename_format:
-  gaze: S_{round_id:1d}{subject_id:d}_S{session_id:d}_{task_name}.csv
-filename_format_schema_overrides:
-  gaze:
-    round_id: '!int'
-    subject_id: '!int'
-    session_id: '!int'
 custom_read_kwargs:
   gaze:
     schema_overrides:

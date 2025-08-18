@@ -1,15 +1,17 @@
 name: ToyDataset
 long_name: pymovements Toy Dataset
-has_files:
-  gaze: true
-  precomputed_events: false
-  precomputed_reading_measures: false
 resources:
-  gaze:
-  - resource: http://github.com/aeye-lab/pymovements-toy-dataset/zipball/6cb5d663317bf418cec0c9abe1dde5085a8a8ebd/
-    filename: pymovements-toy-dataset.zip
-    md5: 4da622457637a8181d86601fe17f3aa8
+- content: gaze
+  filename: pymovements-toy-dataset.zip
+  url: http://github.com/aeye-lab/pymovements-toy-dataset/zipball/6cb5d663317bf418cec0c9abe1dde5085a8a8ebd/
+  md5: 4da622457637a8181d86601fe17f3aa8
+  filename_pattern: trial_{text_id:d}_{page_id:d}.csv
+  filename_pattern_schema_overrides:
+    text_id: '!int'
+    page_id: '!int'
 experiment:
+  eyetracker:
+    sampling_rate: 1000
   screen:
     width_px: 1280
     height_px: 1024
@@ -17,14 +19,6 @@ experiment:
     height_cm: 30.2
     distance_cm: 68
     origin: upper left
-  eyetracker:
-    sampling_rate: 1000
-filename_format:
-  gaze: trial_{text_id:d}_{page_id:d}.csv
-filename_format_schema_overrides:
-  gaze:
-    text_id: '!int'
-    page_id: '!int'
 custom_read_kwargs:
   gaze:
     columns:

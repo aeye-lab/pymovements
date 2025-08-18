@@ -1,23 +1,26 @@
 name: EMTeC
 long_name: Eye movements on Machine-generated Texts Corpus
-has_files:
-  gaze: true
-  precomputed_events: true
-  precomputed_reading_measures: true
 resources:
-  gaze:
-  - resource: https://osf.io/download/374sk/
-    filename: subject_level_data.zip
-    md5: dca99e47ef43f3696acec4fd70967750
-  precomputed_events:
-  - resource: https://osf.io/download/2hs8p/
-    filename: fixations.csv
-    md5: 5e05a364a1d8a044d8b36506aa91437e
-  precomputed_reading_measures:
-  - resource: https://osf.io/download/s4ny8/
-    filename: reading_measures.csv
-    md5: 56880f50af20682558065ac2d26be827
+- content: gaze
+  filename: subject_level_data.zip
+  url: https://osf.io/download/374sk/
+  md5: dca99e47ef43f3696acec4fd70967750
+  filename_pattern: ET_{subject_id:d}.csv
+  filename_pattern_schema_overrides:
+    subject_id: '!int'
+- content: precomputed_events
+  filename: fixations.csv
+  url: https://osf.io/download/2hs8p/
+  md5: 5e05a364a1d8a044d8b36506aa91437e
+  filename_pattern: fixations.csv
+- content: precomputed_reading_measures
+  filename: reading_measures.csv
+  url: https://osf.io/download/s4ny8/
+  md5: 56880f50af20682558065ac2d26be827
+  filename_pattern: reading_measures.csv
 experiment:
+  eyetracker:
+    sampling_rate: 2000
   screen:
     width_px: 1280
     height_px: 1024
@@ -25,17 +28,6 @@ experiment:
     height_cm: 30.2
     distance_cm: 60
     origin: center
-  eyetracker:
-    sampling_rate: 2000
-filename_format:
-  gaze: ET_{subject_id:d}.csv
-  precomputed_events: fixations.csv
-  precomputed_reading_measures: reading_measures.csv
-filename_format_schema_overrides:
-  gaze:
-    subject_id: '!int'
-  precomputed_events: {}
-  precomputed_reading_measures: {}
 custom_read_kwargs:
   gaze:
     separator: "\t"

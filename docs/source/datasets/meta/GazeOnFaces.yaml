@@ -1,15 +1,17 @@
 name: GazeOnFaces
 long_name: GazeOnFaces dataset
-has_files:
-  gaze: true
-  precomputed_events: false
-  precomputed_reading_measures: false
 resources:
-  gaze:
-  - resource: https://uncloud.univ-nantes.fr/index.php/s/8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip
-    filename: gaze_csv.zip
-    md5: fe219f07c9253cd9aaee6bd50233c034
+- content: gaze
+  filename: gaze_csv.zip
+  url: https://uncloud.univ-nantes.fr/index.php/s/8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip
+  md5: fe219f07c9253cd9aaee6bd50233c034
+  filename_pattern: gaze_sub{sub_id:d}_trial{trial_id:d}.csv
+  filename_pattern_schema_overrides:
+    sub_id: '!int'
+    trial_id: '!int'
 experiment:
+  eyetracker:
+    sampling_rate: 60
   screen:
     width_px: 1280
     height_px: 1024
@@ -17,14 +19,6 @@ experiment:
     height_cm: 30
     distance_cm: 57
     origin: center
-  eyetracker:
-    sampling_rate: 60
-filename_format:
-  gaze: gaze_sub{sub_id:d}_trial{trial_id:d}.csv
-filename_format_schema_overrides:
-  gaze:
-    sub_id: '!int'
-    trial_id: '!int'
 custom_read_kwargs:
   gaze:
     separator: ','
