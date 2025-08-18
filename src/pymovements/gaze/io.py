@@ -363,7 +363,7 @@ def from_asc(
 
     - `-vel` and `-fvel` for outputting velocity values (although these values will not be read)
 
-    - `-l` or `-or `-nl`` and `-r` for outputting left and right eye data only in case of a
+    - `-l` or `-or `-nr` and `-r` or `-nl`  for outputting left and right eye data only in case of a
       binocular file (this is currently the only way to access right eye data).
 
     - `-avg` for outputting average values of the left and right eye data
