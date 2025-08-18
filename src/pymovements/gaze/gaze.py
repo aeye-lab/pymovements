@@ -319,11 +319,21 @@ class Gaze:
             will be split by unique combinations of values in all specified columns.
             If None, uses trial_columns. (default=None)
 
+            Examples:
+            - `by=["trial"]` → split by trial; each trial becomes a separate Gaze object.
+            - `by=["subject_id", "trial"]` → split by subject and trial; one Gaze object per subject-trial pair.
+
         Returns
         -------
         list[Gaze]
             A list of new Gaze instances, each containing a partition of the
             original data with all metadata and configurations preserved.
+
+        Notes
+        ------
+            - This method is particularly useful for large datasets or experiments where analyses are performed at
+            the trial or block level.
+            - The original gaze data and metadata are not modified; the method returns new Gaze objects.
         """
         # Use trial_columns if by is None
         if by is None:
