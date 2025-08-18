@@ -30,7 +30,10 @@ from warnings import warn
 
 from deprecated.sphinx import deprecated
 
+from pymovements._utils._html import repr_html
 
+
+@repr_html()
 @dataclass
 class ResourceDefinition:
     """ResourceDefinition definition.
