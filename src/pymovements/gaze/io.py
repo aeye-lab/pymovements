@@ -348,7 +348,7 @@ def from_asc(
     -----
     Currently, only monocular recordings are supported. If a binocular recording is
     provided, only the left eye data will be read.
-    The following edf2asc parameters/flags will produce an ASC file 
+    The following edf2asc parameters/flags will produce an ASC file
     that can be read by this function:
     - `-input` for writing the status of the Host PC parallel port to the ASC file
     - `-ftime` for outputting time as a floating point value
