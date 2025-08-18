@@ -17,51 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides event related functionality.
-
-.. rubric:: Classes
-
-.. autosummary::
-   :toctree:
-   :recursive:
-   :template: class.rst
-
-    Events
-    EventDataFrame
-
-.. rubric:: Processing
-
-.. autosummary::
-   :toctree:
-   :recursive:
-
-    EventProcessor
-    EventGazeProcessor
-
-.. rubric:: Detection Methods
-
-.. autosummary::
-   :toctree:
-   :recursive:
-
-    idt
-    ivt
-    microsaccades
-    fill
-
-.. rubric:: Event Properties
-
-.. autosummary::
-    :toctree:
-    :recursive:
-
-    amplitude
-    duration
-    dispersion
-    disposition
-    peak_velocity
-    location
-"""
+"""Provides event related functionality."""
 from pymovements.events.detection import fill
 from pymovements.events.detection import idt
 from pymovements.events.detection import ivt
