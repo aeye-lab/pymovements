@@ -344,15 +344,21 @@ def from_asc(
     Gaze
         The initialized gaze object read from the asc file.
 
+    Notes
+    -----
+    ASC files are created from EyeLink EDF files using the edf2asc tool (available from the SR Research Support website).
+    ASC files contain gaze samples, events, and metadata about the experiment in a text (ASCII) format.
+    This function assumes that the ASC file is in the default format created by edf2asc, although you can add custom patterns for parsing if needed.
+    For example, if you have an Eyelink EDF file stored at `tests/files/eyelink_monocular_example.edf`,
+    you can convert it to an ASC file using the following command (requires the edf2asc tool which can be downloaded from the SR Research Support website):
+    ```
+    edf2asc tests/files/eyelink_monocular_example.edf
+    ```
+    This will create an ASC file named `tests/files/eyelink_monocular_example.asc`.
+
     Examples
     --------
-    ASC files are created from EyeLink EDF files using the edf2asc tool. The ASC file contains gaze samples, events, and metadata about the experiment.
-    This function assumes that the ASC file is in the default format created by edf2asc.
-    For example, if you have an Eyelink EDF file stored at `tests/files/eyelink_monocular_example.edf`, you can convert it to an ASC file using the following command (requires the edf2asc tool which can be downloaded from the SR Research Support website):
-    ```
-    edf2asc tests/files/eyelink_monocular_example.edf tests/files/eyelink_monocular_example.asc
-    ```
-    We can then load the asc file stored at `tests/files/eyelink_monocular_example.asc` into a ``Gaze``:
+    We can load an asc file stored at `tests/files/eyelink_monocular_example.asc` into a ``Gaze``:
 
     >>> from pymovements.gaze.io import from_asc
     >>> gaze = from_asc(file='tests/files/eyelink_monocular_example.asc')
