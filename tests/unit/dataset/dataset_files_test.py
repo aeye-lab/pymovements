@@ -21,6 +21,7 @@
 # flake8: noqa: E101, W191, E501
 # pylint: disable=duplicate-code
 import polars as pl
+import pyreadr
 import pytest
 from polars.testing import assert_frame_equal
 
@@ -206,10 +207,9 @@ def test_load_eyelink_file(tmp_path, read_kwargs):
         filepath,
         fileinfo_row={},
         definition=DatasetDefinition(
-            experiment=pm.Experiment(1280, 1024, 38, 30, None, 'center', 100),
-            filename_format_schema_overrides={'gaze': {}, 'precomputed_events': {}},
+            experiment=pm.Experiment(1280, 1024, 38, 30, None, 'center', 1000),
+            custom_read_kwargs={'gaze': read_kwargs},
         ),
-        custom_read_kwargs=read_kwargs,
     )
 
     if read_kwargs is not None:
@@ -217,7 +217,7 @@ def test_load_eyelink_file(tmp_path, read_kwargs):
     else:
         expected_df = EXPECTED_DF_NO_PATTERNS
 
-    assert_frame_equal(gaze.frame, expected_df, check_column_order=False)
+    assert_frame_equal(gaze.samples, expected_df, check_column_order=False)
     assert gaze.experiment is not None
 
 
@@ -244,6 +244,19 @@ def test_load_precomputed_rm_file_no_kwargs():
     assert_frame_equal(reading_measure.frame, expected_df, check_column_order=False)
 
 
+def test_load_precomputed_rm_file_xlsx():
+    filepath = 'tests/files/Sentences.xlsx'
+
+    reading_measure = pm.dataset.dataset_files.load_precomputed_reading_measure_file(
+        filepath,
+        custom_read_kwargs={'sheet_name': 'Sheet 1'},
+    )
+
+    expected_df = pl.from_dict({'test': ['foo', 'bar'], 'id': [0, 1]})
+
+    assert_frame_equal(reading_measure.frame, expected_df, check_column_order=True)
+
+
 def test_load_precomputed_rm_file_unsupported_file_format():
     filepath = 'tests/files/copco_rm_dummy.feather'
 
@@ -251,10 +264,11 @@ def test_load_precomputed_rm_file_unsupported_file_format():
         pm.dataset.dataset_files.load_precomputed_reading_measure_file(filepath)
 
     msg, = exc.value.args
-    assert msg == 'unsupported file format ".feather". Supported formats are: .csv, .tsv, .txt'
+    assert msg == 'unsupported file format ".feather". Supported formats are: '\
+        '.csv, .rda, .tsv, .txt, .xlsx'
 
 
-def test_load_precomputed_file():
+def test_load_precomputed_file_csv():
     filepath = 'tests/files/18sat_fixfinal.csv'
 
     gaze = pm.dataset.dataset_files.load_precomputed_event_file(
@@ -266,6 +280,15 @@ def test_load_precomputed_file():
     assert_frame_equal(gaze.frame, expected_df, check_column_order=False)
 
 
+def test_load_precomputed_file_json():
+    filepath = 'tests/files/test.jsonl'
+
+    gaze = pm.dataset.dataset_files.load_precomputed_event_file(filepath)
+    expected_df = pl.read_ndjson(filepath)
+
+    assert_frame_equal(gaze.frame, expected_df, check_column_order=False)
+
+
 def test_load_precomputed_file_unsupported_file_format():
     filepath = 'tests/files/18sat_fixfinal.feather'
 
@@ -273,4 +296,59 @@ def test_load_precomputed_file_unsupported_file_format():
         pm.dataset.dataset_files.load_precomputed_event_file(filepath)
 
     msg, = exc.value.args
-    assert msg == 'unsupported file format ".feather". Supported formats are: .csv, .tsv, .txt'
+    assert msg == 'unsupported file format ".feather". '\
+        'Supported formats are: .csv, .jsonl, .ndjson, .rda, .tsv, .txt'
+
+
+def test_load_precomputed_file_rda():
+    filepath = 'tests/files/rda_test_file.rda'
+
+    gaze = pm.dataset.dataset_files.load_precomputed_event_file(
+        filepath,
+        custom_read_kwargs={'r_dataframe_key': 'joint.fix'},
+    )
+
+    expected_df = pyreadr.read_r('tests/files/rda_test_file.rda')
+
+    assert_frame_equal(
+        gaze.frame,
+        pl.DataFrame(expected_df['joint.fix']),
+        check_column_order=False,
+    )
+
+
+def test_load_precomputed_file_rda_raise_value_error():
+    filepath = 'tests/files/rda_test_file.rda'
+
+    with pytest.raises(ValueError) as exc:
+        pm.dataset.dataset_files.load_precomputed_event_file(filepath)
+
+    msg, = exc.value.args
+    assert msg == 'please specify r_dataframe_key in custom_read_kwargs'
+
+
+def test_load_precomputed_rm_file_rda():
+    filepath = 'tests/files/rda_test_file.rda'
+
+    gaze = pm.dataset.dataset_files.load_precomputed_reading_measure_file(
+        filepath,
+        custom_read_kwargs={'r_dataframe_key': 'joint.fix'},
+    )
+
+    expected_df = pyreadr.read_r('tests/files/rda_test_file.rda')
+
+    assert_frame_equal(
+        gaze.frame,
+        pl.DataFrame(expected_df['joint.fix']),
+        check_column_order=False,
+    )
+
+
+def test_load_precomputed_rm_file_rda_raise_value_error():
+    filepath = 'tests/files/rda_test_file.rda'
+
+    with pytest.raises(ValueError) as exc:
+        pm.dataset.dataset_files.load_precomputed_reading_measure_file(filepath)
+
+    msg, = exc.value.args
+    assert msg == 'please specify r_dataframe_key in custom_read_kwargs'

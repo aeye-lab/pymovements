@@ -26,11 +26,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import polars as pl
 
-from pymovements.gaze import GazeDataFrame
+from pymovements.gaze import Gaze
 
 
 def tsplot(
-        gaze: GazeDataFrame,
+        gaze: Gaze,
         channels: list[str] | None = None,
         xlabel: str | None = None,
         n_cols: int | None = None,
@@ -51,8 +51,8 @@ def tsplot(
 
     Parameters
     ----------
-    gaze: GazeDataFrame
-        The GazeDataFrame to plot.
+    gaze: Gaze
+        The Gaze to plot.
     channels: list[str] | None
         List of channel names to plot. If None, all channels will be plotted. (default: None)
     xlabel: str | None
@@ -91,9 +91,9 @@ def tsplot(
         If array has more than two dimensions.
     """
     if channels is None:
-        channels = [c for c in gaze.frame.columns if gaze.frame[c].dtype != pl.List]
+        channels = [c for c in gaze.samples.columns if gaze.samples[c].dtype != pl.List]
 
-    arr = gaze.frame[channels].to_numpy().transpose()
+    arr = gaze.samples[channels].to_numpy().transpose()
 
     if arr.ndim == 1:
         arr = np.expand_dims(arr, axis=0)

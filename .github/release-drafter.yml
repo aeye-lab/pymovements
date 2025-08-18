@@ -13,6 +13,8 @@ categories:
     labels: breaking
   - title: ⚠️ Deprecations
     labels: deprecation
+  - title: 🚀 Performance improvements
+    labels: performance
   - title: ✨ Enhancements
     labels: enhancement
   - title: 📀 Datasets
@@ -23,7 +25,7 @@ categories:
     labels:
       - build
       - internal
-  - title: 🔖 Documentation
+  - title: 📖 Documentation
     labels: documentation
 
 exclude-labels:
@@ -50,7 +52,7 @@ autolabeler:
       - '/^build/'
   - label: internal
     title:
-      - '/^(chore|ci|perf|refactor|test)/'
+      - '/^(chore|ci|refactor|test)/'
   - label: dataset
     title:
       - '/^dataset/'
@@ -66,6 +68,9 @@ autolabeler:
   - label: fix
     title:
       - '/^fix/'
+  - label: performance
+    title:
+      - '/^perf/'
   - label: release
     title:
       - '/^release/'

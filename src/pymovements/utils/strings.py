@@ -17,16 +17,24 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides string specific funtions."""
+"""Provides string specific funtions.
+
+.. deprecated:: v0.21.1
+   This module will be removed in v0.26.0.
+"""
 from __future__ import annotations
 
 import re
 
-CURLY_TO_REGEX = re.compile(
-    r'(?:^|(?<=[^{])|(?<={{)){(?P<name>[^{][0-9a-zA-z_]*?)(?:\:(?P<quantity>\d*)(?P<type>[sd])?)?}',
+from deprecated.sphinx import deprecated
+
+from pymovements._utils._strings import curly_to_regex as _curly_to_regex
+
+
+@deprecated(
+    reason='This module will be removed in v0.26.0.',
+    version='v0.21.1',
 )
-
-
 def curly_to_regex(s: str) -> re.Pattern:
     """Return regex pattern converted from provided python formatting style pattern.
 
@@ -36,6 +44,9 @@ def curly_to_regex(s: str) -> re.Pattern:
     For example:
                 r'{subject_id:d}_{session_name}.csv'
     converts to r'(?P<subject_id>[0-9]+)_(?P<session_name>.+).csv'
+
+    .. deprecated:: v0.21.1
+       This module will be removed in v0.26.0.
 
     Parameters
     ----------
@@ -47,18 +58,4 @@ def curly_to_regex(s: str) -> re.Pattern:
     re.Pattern
         Converted regex patterns.
     """
-
-    def replace_aux(match: re.Match) -> str:     # Auxiliary replacement function
-        pattern = r'.'
-        if match.group('type') == 'd':
-            pattern = r'[0-9]'
-        elif match.group('type') == 's':
-            pattern = r'.'
-        quantity = r'+'
-        if match.group('quantity'):
-            quantity = f'{{{match.group("quantity")}}}'
-        return fr'(?P<{match.group("name")}>{pattern}{quantity})'
-
-    result = CURLY_TO_REGEX.sub(replace_aux, s)
-    result = result.replace('{{', '{').replace('}}', '}')
-    return re.compile(result)
+    return _curly_to_regex(s=s)

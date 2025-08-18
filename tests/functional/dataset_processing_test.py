@@ -20,11 +20,16 @@
 """Test basic preprocessing on various datasets."""
 import pytest
 
-import pymovements as pm
+from pymovements import Dataset
+from pymovements import DatasetDefinition
+from pymovements import DatasetPaths
+from pymovements import datasets
+from pymovements import Experiment
+from pymovements import ResourceDefinitions
 
 
 @pytest.fixture(
-    name='datasets',
+    name='dataset',
     params=[
         'csv_monocular',
         'csv_binocular',
@@ -40,185 +45,126 @@ import pymovements as pm
         'gazegraph',
         'judo1000',
         'potec',
+        'potsdam_binge_remote_pvt',
+        'potsdam_binge_wearable_pvt',
     ],
 )
 def fixture_dataset_init_kwargs(request):
     init_param_dict = {
-        'csv_monocular': pm.dataset.DatasetDefinition(
-            has_files={
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
+        'csv_monocular': DatasetDefinition(
+            resources=[{'content': 'gaze', 'filename_pattern': 'monocular_example.csv'}],
             time_column='time',
             time_unit='ms',
             pixel_columns=['x_left_pix', 'y_left_pix'],
-            experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
-            filename_format={'gaze': 'monocular_example.csv'},
-            filename_format_schema_overrides={'gaze': {}},
+            experiment=Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             custom_read_kwargs={'gaze': {}},
         ),
-        'csv_binocular': pm.dataset.DatasetDefinition(
-            has_files={
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            filename_format={'gaze': 'binocular_example.csv'},
+        'csv_binocular': DatasetDefinition(
+            resources=[{'content': 'gaze', 'filename_pattern': 'binocular_example.csv'}],
             time_column='time',
             time_unit='ms',
             pixel_columns=['x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix'],
             position_columns=['x_left_pos', 'y_left_pos', 'x_right_pos', 'y_right_pos'],
-            experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
-            filename_format_schema_overrides={'gaze': {}},
+            experiment=Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             custom_read_kwargs={'gaze': {}},
         ),
-        'ipc_monocular': pm.dataset.DatasetDefinition(
-            has_files={
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            filename_format={'gaze': 'monocular_example.feather'},
-            experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
-            filename_format_schema_overrides={'gaze': {}},
+        'ipc_monocular': DatasetDefinition(
+            resources=[{'content': 'gaze', 'filename_pattern': 'monocular_example.feather'}],
+            experiment=Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             custom_read_kwargs={'gaze': {}},
         ),
-        'ipc_binocular': pm.dataset.DatasetDefinition(
-            has_files={
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            filename_format={'gaze': 'binocular_example.feather'},
-            experiment=pm.Experiment(1024, 768, 38, 30, 60, 'center', 1000),
-            filename_format_schema_overrides={'gaze': {}},
+        'ipc_binocular': DatasetDefinition(
+            resources=[{'content': 'gaze', 'filename_pattern': 'binocular_example.feather'}],
+            experiment=Experiment(1024, 768, 38, 30, 60, 'center', 1000),
             custom_read_kwargs={'gaze': {}},
         ),
-        'emtec': pm.datasets.EMTeC(
-            has_files={
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            filename_format={'gaze': 'emtec_example.csv'},
-            time_column=pm.datasets.EMTeC().time_column,
-            time_unit=pm.datasets.EMTeC().time_unit,
-            filename_format_schema_overrides={'gaze': {}},
+        'didec': datasets.DIDEC(
+            resources=ResourceDefinitions.from_dicts([{
+                'content': 'gaze',
+                'filename_pattern': 'didec_example.txt',
+            }]),
             trial_columns=None,
         ),
-        'didec': pm.datasets.DIDEC(
-            has_files={
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            filename_format={'gaze': 'didec_example.txt'},
-            time_column=pm.datasets.DIDEC().time_column,
-            time_unit=pm.datasets.DIDEC().time_unit,
-            filename_format_schema_overrides={'gaze': {}},
+        'emtec': datasets.EMTeC(
+            resources=ResourceDefinitions.from_dicts([{
+                'content': 'gaze',
+                'filename_pattern': 'emtec_example.csv',
+            }]),
             trial_columns=None,
         ),
-        'hbn': pm.datasets.HBN(
-            has_files={
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            filename_format={'gaze': 'hbn_example.csv'},
-            time_column=pm.datasets.HBN().time_column,
-            time_unit=pm.datasets.HBN().time_unit,
-            filename_format_schema_overrides={'gaze': {}},
+        'hbn': datasets.HBN(
+            resources=ResourceDefinitions.from_dicts([{
+                'content': 'gaze',
+                'filename_pattern': 'hbn_example.csv',
+            }]),
             trial_columns=None,
         ),
-        'sbsat': pm.datasets.SBSAT(
-            has_files={
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            filename_format={'gaze': 'sbsat_example.csv'},
-            time_column=pm.datasets.SBSAT().time_column,
-            time_unit=pm.datasets.SBSAT().time_unit,
-            filename_format_schema_overrides={'gaze': {}},
+        'sbsat': datasets.SBSAT(
+            resources=ResourceDefinitions.from_dicts([{
+                'content': 'gaze',
+                'filename_pattern': 'sbsat_example.csv',
+            }]),
             trial_columns=None,
         ),
-        'gaze_on_faces': pm.datasets.GazeOnFaces(
-            has_files={
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            filename_format={'gaze': 'gaze_on_faces_example.csv'},
-            time_column=pm.datasets.GazeOnFaces().time_column,
-            time_unit=pm.datasets.GazeOnFaces().time_unit,
-            filename_format_schema_overrides={'gaze': {}},
+        'gaze_on_faces': datasets.GazeOnFaces(
+            resources=ResourceDefinitions.from_dicts([{
+                'content': 'gaze',
+                'filename_pattern': 'gaze_on_faces_example.csv',
+            }]),
             trial_columns=None,
         ),
-        'gazebase': pm.datasets.GazeBase(
-            has_files={
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            filename_format={'gaze': 'gazebase_example.csv'},
-            time_column=pm.datasets.GazeBase().time_column,
-            time_unit=pm.datasets.GazeBase().time_unit,
-            filename_format_schema_overrides={'gaze': {}},
+        'gazebase': datasets.GazeBase(
+            resources=ResourceDefinitions.from_dicts([{
+                'content': 'gaze',
+                'filename_pattern': 'gazebase_example.csv',
+            }]),
             trial_columns=None,
         ),
-        'gazebase_vr': pm.datasets.GazeBaseVR(
-            has_files={
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            filename_format={'gaze': 'gazebase_vr_example.csv'},
-            time_column=pm.datasets.GazeBaseVR().time_column,
-            time_unit=pm.datasets.GazeBaseVR().time_unit,
-            filename_format_schema_overrides={'gaze': {}},
+        'gazebase_vr': datasets.GazeBaseVR(
+            resources=ResourceDefinitions.from_dicts([{
+                'content': 'gaze',
+                'filename_pattern': 'gazebase_vr_example.csv',
+            }]),
             trial_columns=None,
         ),
-        'gazegraph': pm.datasets.GazeGraph(
-            has_files={
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            filename_format={'gaze': 'gazegraph_example.csv'},
-            time_column=pm.datasets.GazeGraph().time_column,
-            time_unit=pm.datasets.GazeGraph().time_unit,
-            filename_format_schema_overrides={'gaze': {}},
+        'gazegraph': datasets.GazeGraph(
+            resources=ResourceDefinitions.from_dicts([{
+                'content': 'gaze',
+                'filename_pattern': 'gazegraph_example.csv',
+            }]),
             trial_columns=None,
         ),
-        'judo1000': pm.datasets.JuDo1000(
-            has_files={
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            filename_format={'gaze': 'judo1000_example.csv'},
-            time_column=pm.datasets.JuDo1000().time_column,
-            time_unit=pm.datasets.JuDo1000().time_unit,
-            filename_format_schema_overrides={'gaze': {}},
+        'judo1000': datasets.JuDo1000(
+            resources=ResourceDefinitions.from_dicts([{
+                'content': 'gaze',
+                'filename_pattern': 'judo1000_example.csv',
+            }]),
             trial_columns=['trial_id'],
         ),
-        'potec': pm.datasets.PoTeC(
-            has_files={
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            filename_format={'gaze': 'potec_example.tsv'},
-            time_column=pm.datasets.PoTeC().time_column,
-            time_unit=pm.datasets.PoTeC().time_unit,
-            filename_format_schema_overrides={'gaze': {}},
+        'potec': datasets.PoTeC(
+            resources=ResourceDefinitions.from_dicts([{
+                'content': 'gaze',
+                'filename_pattern': 'potec_example.tsv',
+            }]),
             trial_columns=None,
         ),
+        'potsdam_binge_remote_pvt': datasets.PotsdamBingeRemotePVT(
+            resources=ResourceDefinitions.from_dicts([{
+                'content': 'gaze',
+                'filename_pattern': 'potsdam_binge_pvt_example.csv',
+            }]),
+            trial_columns=None,
+        ),
+        'potsdam_binge_wearable_pvt': datasets.PotsdamBingeWearablePVT(
+            resources=ResourceDefinitions.from_dicts([{
+                'content': 'gaze',
+                'filename_pattern': 'potsdam_binge_pvt_example.csv',
+            }]),
+        ),
     }
-    yield pm.dataset.Dataset(
+    yield Dataset(
         definition=init_param_dict[request.param],
-        path=pm.dataset.DatasetPaths(
+        path=DatasetPaths(
             root='tests',
             dataset='.',
             raw='files',
@@ -227,11 +173,10 @@ def fixture_dataset_init_kwargs(request):
     )
 
 
-def test_dataset_save_load_preprocessed(datasets):
-    dataset = datasets
+def test_dataset_save_load_preprocessed(dataset):
     dataset.load()
 
-    if 'pixel' in dataset.gaze[0].frame.columns:
+    if 'pixel' in dataset.gaze[0].samples.columns:
         dataset.pix2deg()
 
     dataset.pos2vel()

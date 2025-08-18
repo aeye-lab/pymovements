@@ -27,12 +27,11 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
-from pymovements.dataset.dataset_library import register_dataset
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
 @dataclass
-@register_dataset
 class GazeOnFaces(DatasetDefinition):
     """GazeOnFaces dataset :cite:p:`GazeOnFaces`.
 
@@ -51,39 +50,26 @@ class GazeOnFaces(DatasetDefinition):
     name: str
         The name of the dataset.
 
-    has_files: dict[str, bool]
-        Indicate whether the dataset contains 'gaze', 'precomputed_events', and
-        'precomputed_reading_measures'.
+    long_name: str
+        The entire name of the dataset.
 
-    mirrors: dict[str, tuple[str, ...]]
-        A tuple of mirrors of the dataset. Each entry must be of type `str` and end with a '/'.
-
-    resources: dict[str, tuple[dict[str, str], ...]]
-        A tuple of dataset gaze_resources. Each list entry must be a dictionary with the following
+    resources: ResourceDefinitions
+        A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    extract: dict[str, bool]
-        Decide whether to extract the data.
-
     experiment: Experiment
         The experiment definition.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides : dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
-
-    trial_columns: list[str]
-            The name of the trial columns in the input data frame. If the list is empty or None,
-            the input data frame is assumed to contain only one trial. If the list is not empty,
-            the input data frame is assumed to contain multiple trials and the transformation
-            methods will be applied to each trial separately.
 
     time_column: Any
         The name of the timestamp column in the input data frame. This column will be renamed to
@@ -125,66 +111,45 @@ class GazeOnFaces(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'GazeOnFaces'
 
-    has_files: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': False,
-            'precomputed_reading_measures': False,
-        },
+    long_name: str = 'GazeOnFaces dataset'
+
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
+                    {
+                        'content': 'gaze',
+                        'url': 'https://uncloud.univ-nantes.fr/index.php/s/8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip',  # noqa: E501 # pylint: disable=line-too-long
+                        'filename': 'gaze_csv.zip',
+                        'md5': 'fe219f07c9253cd9aaee6bd50233c034',
+                        'filename_pattern': r'gaze_sub{sub_id:d}_trial{trial_id:d}.csv',
+                        'filename_pattern_schema_overrides': {
+                            'sub_id': int,
+                            'trial_id': int,
+                        },
+                    },
+            ],
+        ),
     )
 
-    mirrors: dict[str, tuple[str, ...]] = field(
-        default_factory=lambda: {
-            'gaze': (
-                'https://uncloud.univ-nantes.fr/index.php/s/',
-            ),
-        },
+    experiment: Experiment = field(
+        default_factory=lambda: Experiment(
+            screen_width_px=1280,
+            screen_height_px=1024,
+            screen_width_cm=38,
+            screen_height_cm=30,
+            distance_cm=57,
+            origin='center',
+            sampling_rate=60,
+        ),
     )
 
-    resources: dict[str, tuple[dict[str, str], ...]] = field(
-        default_factory=lambda: {
-            'gaze': (
-                {
-                    'resource': '8KW6dEdyBJqxpmo/download?path=%2F&files=gaze_csv.zip',
-                    'filename': 'gaze_csv.zip',
-                    'md5': 'fe219f07c9253cd9aaee6bd50233c034',
-                },
-            ),
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    extract: dict[str, bool] = field(default_factory=lambda: {'gaze': True})
-
-    experiment: Experiment = Experiment(
-        screen_width_px=1280,
-        screen_height_px=1024,
-        screen_width_cm=38,
-        screen_height_cm=30,
-        distance_cm=57,
-        origin='center',
-        sampling_rate=60,
-    )
-
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze': r'gaze_sub{sub_id:d}_trial{trial_id:d}.csv',
-        },
-    )
-
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'sub_id': int,
-                'trial_id': int,
-            },
-        },
-    )
-
-    trial_columns: list[str] = field(default_factory=lambda: [])
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     time_column: Any = None
 

@@ -143,9 +143,9 @@ def test_savitzky_golay_init_raises_error(kwargs, exception, msg_substrings):
                 'sampling_rate': 1, 'n_components': 2, 'input_column': 'A',
             },
             pl.Series('A', [[1, 1]], pl.List(pl.Float64)),
-            pl.exceptions.ComputeError,
-            ('',),
-            id='no_padding_input_shorter_than_window_length_raises_panicexception',
+            ValueError,
+            ('If mode is \'interp\', window_length must be less than or equal to the size of x',),
+            id='no_padding_input_shorter_than_window_length_raises_valueerror',
         ),
     ],
 )
@@ -172,7 +172,6 @@ def test_savitzky_golay_raises_error(kwargs, series, exception, msg_substrings):
             pl.Series('A', [], pl.List(pl.Float64)),
             pl.Series('A', [], pl.List(pl.Float64)),
             id='empty_series_returns_empty_series',
-            marks=pytest.mark.xfail(reason='#475'),
         ),
         pytest.param(
             {

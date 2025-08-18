@@ -20,7 +20,7 @@
 """Module for parsing input data.
 
 .. deprecated:: v0.21.0
-   Please use gaze.from_asc() instead of utils.parsing.
+   Please use :py:func:`~pymovements.gaze.from_asc()` instead.
    This module will be removed in v0.26.0.
 """
 from __future__ import annotations
@@ -35,7 +35,7 @@ from pymovements.gaze._utils.parsing import parse_eyelink as _parse_eyelink
 
 
 @deprecated(
-    reason='Please use gaze.from_asc() instead of utils.parsing. '
+    reason='Please use gaze.from_asc() instead. '
            'This module will be removed in v0.26.0.',
     version='v0.21.0',
 )
@@ -47,6 +47,10 @@ def parse_eyelink(
         encoding: str = 'ascii',
 ) -> tuple[pl.DataFrame, dict[str, Any]]:
     """Parse EyeLink asc file.
+
+    .. deprecated:: v0.21.0
+       Please use :py:func:`~pymovements.gaze.from_asc()` instead.
+       This module will be removed in v0.26.0.
 
     Parameters
     ----------
@@ -71,7 +75,7 @@ def parse_eyelink(
     Warning
         If no metadata is found in the file.
     """
-    gaze, metadata = _parse_eyelink(
+    gaze, _, metadata = _parse_eyelink(
         filepath=filepath,
         patterns=patterns,
         schema=schema,

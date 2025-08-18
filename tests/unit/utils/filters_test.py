@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2025 The pymovements Project Authors
+# Copyright (c) 2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,75 +17,49 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test pymovements filters."""
-from __future__ import annotations
+"""Tests deprecated utils.filters."""
+import re
 
 import numpy as np
 import pytest
 
+from pymovements import __version__
 from pymovements.utils.filters import events_split_nans
 from pymovements.utils.filters import filter_candidates_remove_nans
 
 
-@pytest.mark.parametrize(
-    ('params', 'expected'),
-    [
-        pytest.param(
-            {
-                'candidates': [
-                    [0, 1, 2, 3, 4],
-                    [5, 6, 7, 8],
-                ],
-                'values': np.array([
-                    (np.nan, np.nan), (0, 0),
-                    (0, 0), (0, 0),
-                    (np.nan, np.nan),
-                    (np.nan, np.nan),
-                    (0, 0), (0, 0),
-                    (0, 0),
-                ]),
-            },
-            {'values_filter': [np.array([1, 2, 3]), np.array([6, 7, 8])]},
-            id='test_filters',
-        ),
-        pytest.param(
-            {
-                'candidates': [[0, 1, 2, 3, 4, 5, 6, 7]],
-                'values': np.array([
-                    (0, 0),
-                    (0, 0), (0, 0),
-                    (np.nan, np.nan),
-                    (np.nan, np.nan),
-                    (0, 0), (0, 0),
-                    (0, 0),
-                ]),
-            },
-            {'values_split': [np.array([0, 1, 2]), np.array([5, 6, 7])]},
-            id='test_events_split',
-        ),
-        pytest.param(
-            {'candidates': [[]], 'values': np.array([(0, 0)])},
-            {'values_filter': []},
-            id='test_no_candidates_in_array',
-        ),
-        pytest.param(
-            {'candidates': [[]], 'values': np.array([(np.nan, np.nan)])},
-            {'values_split': []},
-            id='test_no_candidates_in_array_nan',
-        ),
-    ],
-)
-def test_filters(params, expected):
-    if 'values_filter' in expected:
-        results = filter_candidates_remove_nans(
-            params['candidates'],
-            params['values'],
-        )
-        assert np.all(np.array(expected['values_filter']) == np.array(results))
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+@pytest.mark.parametrize('filter_function', [events_split_nans, filter_candidates_remove_nans])
+def test_filter_function(filter_function):
+    candidates = [[0, 1], [2, 3]]
+    values = np.array([(np.nan, np.nan), (0, 0), (0, 0), (0, 0)])
 
-    if 'values_split' in expected:
-        results = events_split_nans(
-            params['candidates'],
-            params['values'],
-        )
-        assert np.all(np.array(expected['values_split']) == np.array(results))
+    filter_function(candidates=candidates, values=values)
+
+
+@pytest.mark.parametrize('filter_function', [events_split_nans, filter_candidates_remove_nans])
+def test_filter_function_deprecated(filter_function):
+    candidates = [[0, 1], [2, 3]]
+    values = np.array([(np.nan, np.nan), (0, 0), (0, 0), (0, 0)])
+
+    with pytest.raises(DeprecationWarning):
+        filter_function(candidates=candidates, values=values)
+
+
+@pytest.mark.parametrize('filter_function', [events_split_nans, filter_candidates_remove_nans])
+def test_filter_function_removed(filter_function):
+    candidates = [[0, 1], [2, 3]]
+    values = np.array([(np.nan, np.nan), (0, 0), (0, 0), (0, 0)])
+
+    with pytest.raises(DeprecationWarning) as info:
+        filter_function(candidates=candidates, values=values)
+
+    regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
+
+    msg = info.value.args[0]
+    remove_version = regex.match(msg).groupdict()['version']
+    current_version = __version__.split('+')[0]
+    assert current_version < remove_version, (
+        f'utils/filters.py was planned to be removed in v{remove_version}. '
+        f'Current version is v{current_version}.'
+    )

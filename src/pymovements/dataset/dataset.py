@@ -20,6 +20,7 @@
 """Provides the Dataset class."""
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from collections.abc import Sequence
 from copy import deepcopy
@@ -29,18 +30,23 @@ from typing import Any
 import polars as pl
 from tqdm.auto import tqdm
 
+from pymovements._utils._html import repr_html
 from pymovements.dataset import dataset_download
 from pymovements.dataset import dataset_files
 from pymovements.dataset.dataset_definition import DatasetDefinition
 from pymovements.dataset.dataset_library import DatasetLibrary
 from pymovements.dataset.dataset_paths import DatasetPaths
-from pymovements.events import EventDataFrame
+from pymovements.events import Events
 from pymovements.events.precomputed import PrecomputedEventDataFrame
-from pymovements.events.processing import EventGazeProcessor
-from pymovements.gaze import GazeDataFrame
+from pymovements.gaze import Gaze
 from pymovements.reading_measures import ReadingMeasures
 
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+@repr_html()
 class Dataset:
     """Dataset base class.
 
@@ -48,7 +54,7 @@ class Dataset:
 
     Parameters
     ----------
-    definition: str | DatasetDefinition | type[DatasetDefinition]
+    definition: str | Path | DatasetDefinition | type[DatasetDefinition]
         Dataset definition to initialize dataset with.
     path : str | Path | DatasetPaths
         Path to the dataset directory. You can set up a custom directory structure by passing a
@@ -57,26 +63,36 @@ class Dataset:
 
     def __init__(
             self,
-            definition: str | DatasetDefinition | type[DatasetDefinition],
+            definition: str | Path | DatasetDefinition | type[DatasetDefinition],
             path: str | Path | DatasetPaths,
     ):
         self.fileinfo: pl.DataFrame = pl.DataFrame()
-        self.gaze: list[GazeDataFrame] = []
-        self.events: list[EventDataFrame] = []
+        self.gaze: list[Gaze] = []
+        self.events: list[Events] = []
         self.precomputed_events: list[PrecomputedEventDataFrame] = []
         self.precomputed_reading_measures: list[ReadingMeasures] = []
 
-        if isinstance(definition, str):
-            definition = DatasetLibrary.get(definition)()
-        if isinstance(definition, type):
-            definition = definition()
-        self.definition = deepcopy(definition)
+        # Handle different definition input types
+        if isinstance(definition, (str, Path)):
+            # Check if it's a path to a YAML file
+            if isinstance(definition, Path) or str(definition).endswith('.yaml'):
+                self.definition = DatasetDefinition.from_yaml(definition)
+            else:
+                # Try to load from registered datasets
+                self.definition = DatasetLibrary.get(definition)
 
+        elif isinstance(definition, type):
+            self.definition = definition()
+        else:
+            self.definition = deepcopy(definition)
+
+        # Handle path setup
         if isinstance(path, (str, Path)):
             self.paths = DatasetPaths(root=path, dataset='.')
         else:
             self.paths = deepcopy(path)
-        # Fill dataset directory name with dataset definition name if specified.
+
+        # Fill dataset directory name with dataset definition name if specified
         self.paths.fill_name(self.definition.name)
 
     def load(
@@ -116,7 +132,8 @@ class Dataset:
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`. (default: None)
         extension: str
-            Specifies the file format for loading data. Valid options are: `csv`, `feather`.
+            Specifies the file format for loading data. Valid options are: `csv`, `feather`,
+            `tsv`, `txt`, `asc`.
             (default: 'feather')
 
         Returns
@@ -127,7 +144,7 @@ class Dataset:
         self.scan()
         self.fileinfo = dataset_files.take_subset(fileinfo=self.fileinfo, subset=subset)
 
-        if self.definition.has_files['gaze']:
+        if self.definition.resources.has_content('gaze'):
             self.load_gaze_files(
                 preprocessed=preprocessed,
                 preprocessed_dirname=preprocessed_dirname,
@@ -135,19 +152,21 @@ class Dataset:
             )
 
         # Event files precomuted by authors of the dataset
-        if self.definition.has_files['precomputed_events']:
+        if self.definition.resources.has_content('precomputed_events'):
             self.load_precomputed_events()
 
         # Reading measures files precomuted by authors of the dataset
-        if self.definition.has_files['precomputed_reading_measures']:
+        if self.definition.resources.has_content('precomputed_reading_measures'):
             self.load_precomputed_reading_measures()
 
-        # Events extracted previously by pymovements
+        # Events detected previously by pymovements
         if events:
             self.load_event_files(
                 events_dirname=events_dirname,
                 extension=extension,
             )
+            for loaded_gaze, loaded_events in zip(self.gaze, self.events):
+                loaded_gaze.events = loaded_events
 
         return self
 
@@ -188,7 +207,8 @@ class Dataset:
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`. (default: None)
         extension: str
-            Specifies the file format for loading data. Valid options are: `csv`, `feather`.
+            Specifies the file format for loading data. Valid options are: `csv`, `feather`,
+            `tsv`, `txt`, `asc`.
             (default: 'feather')
 
         Returns
@@ -212,10 +232,27 @@ class Dataset:
             preprocessed_dirname=preprocessed_dirname,
             extension=extension,
         )
+
         return self
 
     def load_precomputed_events(self) -> None:
-        """Load precomputed events."""
+        """Load precomputed events.
+
+        This method checks that the file information for precomputed events is available,
+        then loads each event file listed in `self.fileinfo['precomputed_events']` using
+        the dataset definition and path settings. The resulting list of
+        `PrecomputedEventDataFrame` objects is assigned to `self.precomputed_events`.
+
+        Supported file extensions:
+        - CSV-like: .csv, .tsv, .txt
+        - JSON like: .jsonl, .ndjson
+        - RDA like: .rda
+
+        Raises
+        ------
+        ValueError
+            If the file info is missing or improperly formatted.
+        """
         self._check_fileinfo()
         self.precomputed_events = dataset_files.load_precomputed_event_files(
             self.definition,
@@ -224,7 +261,24 @@ class Dataset:
         )
 
     def load_precomputed_reading_measures(self) -> None:
-        """Load precomputed events."""
+        """Load precomputed reading reading measures.
+
+        This method checks that the file information for precomputed reading measures are
+        available, then loads each event file listed in
+        `self.fileinfo['precomputed_reading_measures']` using the dataset definition and
+        path settings. The resulting list of `ReadingMeasures` objects is assigned to
+        `self.reading_measures`.
+
+        Supported file extensions:
+        - CSV-like: .csv, .tsv, .txt
+        - Excel-like: .xlsx
+        - RDA like: .rda
+
+        Raises
+        ------
+        ValueError
+            If the file info is missing or improperly formatted.
+        """
         self._check_fileinfo()
         self.precomputed_reading_measures = dataset_files.load_precomputed_reading_measures(
             self.definition,
@@ -236,7 +290,7 @@ class Dataset:
             self,
             by: Sequence[str],
     ) -> None:
-        """Split gaze data into separated GazeDataFrame's.
+        """Split gaze data into separated Gaze objects.
 
         Parameters
         ----------
@@ -321,7 +375,7 @@ class Dataset:
             verbose: bool = True,
             **kwargs: Any,
     ) -> Dataset:
-        """Apply preprocessing method to all GazeDataFrames in Dataset.
+        """Apply preprocessing method to all Gazes in Dataset.
 
         Parameters
         ----------
@@ -370,7 +424,7 @@ class Dataset:
         >>> dataset.apply('resample', resampling_rate=2000)# doctest:+ELLIPSIS
         <pymovements.dataset.dataset.Dataset object at ...>
         """
-        self._check_gaze_dataframe()
+        self._check_gaze()
 
         disable_progressbar = not verbose
         for gaze in tqdm(self.gaze, disable=disable_progressbar):
@@ -620,7 +674,7 @@ class Dataset:
 
     def detect_events(
             self,
-            method: Callable[..., EventDataFrame] | str,
+            method: Callable[..., Events] | str,
             *,
             eye: str = 'auto',
             clear: bool = False,
@@ -631,7 +685,7 @@ class Dataset:
 
         Parameters
         ----------
-        method : Callable[..., EventDataFrame] | str
+        method : Callable[..., Events] | str
             The event detection method to be applied.
         eye: str
             Select which eye to choose. Valid options are ``auto``, ``left``, ``right`` or ``None``.
@@ -665,7 +719,7 @@ class Dataset:
 
     def detect(
             self,
-            method: Callable[..., EventDataFrame] | str,
+            method: Callable[..., Events] | str,
             *,
             eye: str = 'auto',
             clear: bool = False,
@@ -678,7 +732,7 @@ class Dataset:
 
         Parameters
         ----------
-        method: Callable[..., EventDataFrame] | str
+        method: Callable[..., Events] | str
             The event detection method to be applied.
         eye: str
             Select which eye to choose. Valid options are ``auto``, ``left``, ``right`` or ``None``.
@@ -702,7 +756,7 @@ class Dataset:
         AttributeError
             If gaze files have not been loaded yet or gaze files do not contain the right columns.
         """
-        self._check_gaze_dataframe()
+        self._check_gaze()
 
         if not self.events:
             self.events = [gaze.events for gaze in self.gaze]
@@ -713,7 +767,7 @@ class Dataset:
                 disable=disable_progressbar,
         ):
             gaze.detect(method, eye=eye, clear=clear, **kwargs)
-            # workaround until events are fully part of the GazeDataFrame
+            # workaround until events are fully part of the Gaze
             gaze.events.frame = dataset_files.add_fileinfo(
                 definition=self.definition,
                 df=gaze.events.frame,
@@ -729,7 +783,7 @@ class Dataset:
             name: str | None = None,
             verbose: bool = True,
     ) -> Dataset:
-        """Calculate an event property for and add it as a column to the event dataframe.
+        """Calculate an event property and add it as a column to the event dataframe.
 
         Parameters
         ----------
@@ -747,28 +801,16 @@ class Dataset:
             :py:mod:`pymovements.events` for an overview of supported properties.
         RuntimeError
             If specified event name ``name`` is missing from ``events``.
+        ValueError
+            If the computed property already exists in the event dataframe.
 
         Returns
         -------
         Dataset
             Returns self, useful for method cascading.
         """
-        processor = EventGazeProcessor(event_properties)
-
-        identifier_columns = [
-            column
-            for column in self.fileinfo['gaze'].columns
-            if column != 'filepath'
-        ]
-
-        disable_progressbar = not verbose
-        for events, gaze in tqdm(zip(self.events, self.gaze), disable=disable_progressbar):
-            new_properties = processor.process(
-                events, gaze, identifiers=identifier_columns, name=name,
-            )
-            join_on = identifier_columns + ['name', 'onset', 'offset']
-            events.add_event_properties(new_properties, join_on=join_on)
-
+        for gaze in tqdm(self.gaze, disable=not verbose):
+            gaze.compute_event_properties(event_properties, name=name)
         return self
 
     def compute_properties(
@@ -820,7 +862,7 @@ class Dataset:
             return self
 
         for file_id, _ in enumerate(self.events):
-            self.events[file_id] = EventDataFrame()
+            self.events[file_id] = Events()
 
         return self
 
@@ -940,7 +982,7 @@ class Dataset:
             If extension is not in list of valid extensions.
         """
         dataset_files.save_preprocessed(
-            gaze=self.gaze,
+            gazes=self.gaze,
             fileinfo=self.fileinfo['gaze'],
             paths=self.paths,
             preprocessed_dirname=preprocessed_dirname,
@@ -954,7 +996,7 @@ class Dataset:
             *,
             extract: bool = True,
             remove_finished: bool = False,
-            resume: bool = False,
+            resume: bool = True,
             verbose: int = 1,
     ) -> Dataset:
         """Download dataset resources.
@@ -978,7 +1020,7 @@ class Dataset:
             Remove archive files after extraction. (default: False)
         resume: bool
             Resume previous extraction by skipping existing files.
-            Checks for correct size of existing files but not integrity. (default: False)
+            Checks for correct size of existing files but not integrity. (default: True)
         verbose: int
             Verbosity levels: (1) Show download progress bar and print info messages on downloading
             and extracting archive files without printing messages for recursive archive extraction.
@@ -996,6 +1038,8 @@ class Dataset:
         RuntimeError
             If downloading a resource failed for all given mirrors.
         """
+        logger.info(self._disclaimer())
+
         dataset_download.download_dataset(
             definition=self.definition,
             paths=self.paths,
@@ -1011,7 +1055,7 @@ class Dataset:
             *,
             remove_finished: bool = False,
             remove_top_level: bool = True,
-            resume: bool = False,
+            resume: bool = True,
             verbose: int = 1,
     ) -> Dataset:
         """Extract downloaded dataset archive files.
@@ -1024,7 +1068,7 @@ class Dataset:
             If ``True``, remove the top-level directory if it has only one child. (default: True)
         resume: bool
             Resume previous extraction by skipping existing files.
-            Checks for correct size of existing files but not integrity. (default: False)
+            Checks for correct size of existing files but not integrity. (default: True)
         verbose: int
             Verbosity levels: (1) Print messages for extracting each dataset resource without
             printing messages for recursive archives. (2) Print additional messages for each
@@ -1092,9 +1136,24 @@ class Dataset:
         if len(self.fileinfo) == 0:
             raise AttributeError('no files present in fileinfo attribute')
 
-    def _check_gaze_dataframe(self) -> None:
+    def _check_gaze(self) -> None:
         """Check if gaze attribute is set and there is at least one gaze dataframe available."""
         if self.gaze is None:
             raise AttributeError('gaze files were not loaded yet. please run load() beforehand')
         if len(self.gaze) == 0:
             raise AttributeError('no files present in gaze attribute')
+
+    def _disclaimer(self) -> str:
+        """Return string for dataset download disclaimer."""
+        if self.definition.long_name is not None:
+            dataset_name = self.definition.long_name
+        else:
+            dataset_name = self.definition.name + ' dataset'
+
+        return f"""\
+        You are downloading the {dataset_name}. Please be aware that pymovements does not
+        host or distribute any dataset resources and only provides a convenient interface to
+        download the public dataset resources that were published by their respective authors.
+
+        Please cite the referenced publication if you intend to use the dataset in your research.
+        """

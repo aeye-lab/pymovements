@@ -31,6 +31,7 @@ import pymovements as pm
 
 @pytest.fixture(name='gaze', scope='session')
 def gaze_fixture():
+    # pylint: disable=duplicate-code
     x = np.arange(-100, 100)
     y = np.arange(-100, 100)
     arr = np.column_stack((x, y)).transpose()
@@ -46,7 +47,7 @@ def gaze_fixture():
     )
 
     gaze = pm.gaze.from_numpy(
-        data=arr,
+        samples=arr,
         schema=['x_pix', 'y_pix'],
         experiment=experiment,
         pixel_columns=['x_pix', 'y_pix'],

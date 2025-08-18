@@ -24,7 +24,7 @@ import polars
 import pytest
 from polars.testing import assert_frame_equal
 
-import pymovements as pm
+from pymovements.stimulus import text
 
 
 EXPECTED_DF = polars.DataFrame(
@@ -192,7 +192,7 @@ EXPECTED_DF = polars.DataFrame(
     ],
 )
 def test_text_stimulus(aoi_file, custom_read_kwargs, expected):
-    aois = pm.stimulus.text.from_file(
+    aois = text.from_file(
         aoi_file,
         aoi_column='char',
         start_x_column='top_left_x',
@@ -213,7 +213,7 @@ def test_text_stimulus(aoi_file, custom_read_kwargs, expected):
 
 def test_text_stimulus_unsupported_format():
     with pytest.raises(ValueError) as excinfo:
-        pm.stimulus.text.from_file(
+        text.from_file(
             'tests/files/toy_text_1_1_aoi.pickle',
             aoi_column='char',
             start_x_column='top_left_x',
@@ -244,7 +244,7 @@ def test_text_stimulus_unsupported_format():
     ],
 )
 def test_text_stimulus_splitting(aoi_file, custom_read_kwargs):
-    aois_df = pm.stimulus.text.from_file(
+    aois_df = text.from_file(
         aoi_file,
         aoi_column='char',
         start_x_column='top_left_x',
@@ -275,7 +275,7 @@ def test_text_stimulus_splitting(aoi_file, custom_read_kwargs):
     ],
 )
 def test_text_stimulus_splitting_unique_within(aoi_file, custom_read_kwargs):
-    aois_df = pm.stimulus.text.from_file(
+    aois_df = text.from_file(
         aoi_file,
         aoi_column='char',
         start_x_column='top_left_x',
@@ -306,7 +306,7 @@ def test_text_stimulus_splitting_unique_within(aoi_file, custom_read_kwargs):
     ],
 )
 def test_text_stimulus_splitting_different_between(aoi_file, custom_read_kwargs):
-    aois_df = pm.stimulus.text.from_file(
+    aois_df = text.from_file(
         aoi_file,
         aoi_column='char',
         start_x_column='top_left_x',
@@ -324,3 +324,37 @@ def test_text_stimulus_splitting_different_between(aoi_file, custom_read_kwargs)
         unique_values.extend(unique_value)
 
     assert len(unique_values) == len(set(unique_values))
+
+
+@pytest.fixture(name='text_stimulus')
+def fixture_text_stimulus():
+    yield text.from_file(
+        'tests/files/toy_text_1_1_aoi.csv',
+        aoi_column='word',
+        start_x_column='top_left_x',
+        start_y_column='top_left_y',
+        end_x_column='bottom_left_x',
+        end_y_column='bottom_left_y',
+        page_column='page',
+    )
+
+
+@pytest.mark.parametrize(
+    ('row', 'expected_aoi'),
+    [
+        pytest.param(
+            {'x': 400, 'y': 125},
+            'A',
+            id='400,125',
+        ),
+        pytest.param(
+            {'x': 500, 'y': 300},
+            None,
+            id='500,300',
+        ),
+    ],
+)
+def test_text_stimulus_get_aoi(text_stimulus, row, expected_aoi):
+    aoi = text_stimulus.get_aoi(row=row, x_eye='x', y_eye='y')
+
+    assert aoi['char'].first() == expected_aoi

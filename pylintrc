@@ -104,6 +104,7 @@ disable=
     too-many-instance-attributes,
     too-many-locals,
     too-many-positional-arguments,
+    too-many-arguments,
     too-many-public-methods,
 
 [REPORTS]
@@ -154,7 +155,7 @@ notes=FIXME,XXX,TODO
 [SIMILARITIES]
 
 # Minimum lines number of a similarity.
-min-similarity-lines=8
+min-similarity-lines=16
 
 # Ignore comments when computing similarities.
 ignore-comments=yes

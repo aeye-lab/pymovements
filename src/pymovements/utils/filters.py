@@ -17,14 +17,25 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides filter specific funtions."""
+"""Provides filter specific funtions.
+
+.. deprecated:: v0.21.1
+   This module will be removed in v0.26.0.
+"""
 from __future__ import annotations
 
 import numpy as np
+from deprecated.sphinx import deprecated
 
-from pymovements.gaze.transforms_numpy import consecutive
+from pymovements.events._utils._filters import events_split_nans as _events_split_nans
+from pymovements.events._utils._filters import filter_candidates_remove_nans \
+    as _filter_candidates_remove_nans
 
 
+@deprecated(
+    reason='This function will be removed in v0.26.0.',
+    version='v0.21.1',
+)
 def filter_candidates_remove_nans(
         candidates: list[np.ndarray],
         values: np.ndarray,
@@ -33,6 +44,9 @@ def filter_candidates_remove_nans(
 
     Removes leading and ending np.nans for all candidates in candidates
 
+    .. deprecated:: v0.21.1
+       This module will be removed in v0.26.0.
+
     Parameters
     ----------
     candidates: list[np.ndarray]
@@ -46,23 +60,16 @@ def filter_candidates_remove_nans(
     list[np.ndarray]
         Returns a filtered list of candidates.
     """
-    values = np.array(values)
-    return_candidates = []
-    for candidate in candidates:
-        if len(candidate) == 0:
-            continue
-        cand_values = values[np.array(candidate)]
-        start_id = 0
-        while np.sum(np.isnan(cand_values[start_id, :])) > 0:
-            start_id += 1
-        end_id = len(cand_values) - 1
-        while np.sum(np.isnan(cand_values[end_id, :])) > 0:
-            end_id -= 1
-        cur_candidate = list(candidate[start_id:end_id + 1])
-        return_candidates.append(np.array(cur_candidate))
-    return return_candidates
+    return _filter_candidates_remove_nans(
+        candidates=candidates,
+        values=values,
+    )
 
 
+@deprecated(
+    reason='This function will be removed in v0.26.0.',
+    version='v0.21.1',
+)
 def events_split_nans(
         candidates: list[np.ndarray],
         values: np.ndarray,
@@ -71,6 +78,9 @@ def events_split_nans(
 
     Splits events if np.nans are within an event
 
+    .. deprecated:: v0.21.1
+       This module will be removed in v0.26.0.
+
     Parameters
     ----------
     candidates: list[np.ndarray]
@@ -84,16 +94,7 @@ def events_split_nans(
     list[np.ndarray]
         Returns a filtered list of candidates.
     """
-    values = np.array(values)
-    return_candidates = []
-    for candidate in candidates:
-        if len(candidate) == 0:
-            continue
-        cur_values = values[np.array(candidate)]
-        nan_candidates = consecutive(arr=np.where(~np.isnan(np.sum(cur_values, axis=1)))[0])
-        cand_list = [
-            np.array(candidate[candidate_indices[0]:candidate_indices[-1] + 1])
-            for candidate_indices in nan_candidates
-        ]
-        return_candidates += cand_list
-    return return_candidates
+    return _events_split_nans(
+        candidates=candidates,
+        values=values,
+    )
