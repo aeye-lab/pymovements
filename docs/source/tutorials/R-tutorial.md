@@ -5,6 +5,15 @@ Install the R-package **reticulate** for interoperability between Python and R.
  install.packages("reticulate")
 ```
 
+Specify the Python environment where pymovements is installed
+```r
+use_condaenv("my_env", required=TRUE)
+```
+
+or, if you used a virtualenv
+```r
+use_virtualenv("my_env", required=TRUE)
+```
 Load the package.
 ```r
 library(reticulate)
