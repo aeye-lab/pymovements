@@ -8,7 +8,7 @@ to pymovements.
 
 **Questions:** If you have any developer-related questions, please [open an issue](
 https://github.com/aeye-lab/pymovements/issues/new/choose) or write us at
-[pymovements-list@uni-potsdam.de](mailto:pymovements-list@uni-potsdam.de)
+[pymovements@python.org](mailto:pymovements@python.org)
 
 
 ## Table of Contents

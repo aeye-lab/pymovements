@@ -27,7 +27,7 @@ from typing import Any
 import polars as pl
 
 import pymovements as pm  # pylint: disable=cyclic-import
-from pymovements.events.frame import EventDataFrame
+from pymovements.events.events import Events
 from pymovements.events.properties import EVENT_PROPERTIES
 from pymovements.exceptions import InvalidProperty
 
@@ -56,12 +56,12 @@ class EventProcessor:
 
         self.event_properties = event_properties
 
-    def process(self, events: EventDataFrame) -> pl.DataFrame:
+    def process(self, events: Events) -> pl.DataFrame:
         """Process event dataframe.
 
         Parameters
         ----------
-        events: EventDataFrame
+        events: Events
             Event data to process event properties from.
 
         Returns
@@ -127,8 +127,8 @@ class EventGazeProcessor:
 
     def process(
             self,
-            events: EventDataFrame,
-            gaze: pm.GazeDataFrame,
+            events: Events,
+            gaze: pm.Gaze,
             identifiers: str | list[str],
             name: str | None = None,
     ) -> pl.DataFrame:
@@ -136,9 +136,9 @@ class EventGazeProcessor:
 
         Parameters
         ----------
-        events: EventDataFrame
+        events: Events
             Event data to process event properties from.
-        gaze: pm.GazeDataFrame
+        gaze: pm.Gaze
             Gaze data to process event properties from.
         identifiers: str | list[str]
             Column names to join on events and gaze dataframes.
@@ -192,7 +192,7 @@ class EventGazeProcessor:
         property_values = defaultdict(list)
         for event in events_frame.iter_rows(named=True):
             # Find gaze samples that belong to the current event.
-            filtered_gaze = gaze.frame.filter(
+            filtered_gaze = gaze.samples.filter(
                 pl.col('time').is_between(event['onset'], event['offset']),
                 *[pl.col(identifier) == event[identifier] for identifier in trial_identifiers],
             )

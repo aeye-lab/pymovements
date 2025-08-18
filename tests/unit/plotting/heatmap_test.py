@@ -27,8 +27,8 @@ import polars as pl
 import pytest
 from matplotlib import figure
 
-from pymovements.gaze import Experiment
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
+from pymovements import Experiment
+from pymovements import Gaze
 from pymovements.plotting import heatmap
 
 
@@ -56,15 +56,15 @@ def args_fixture(experiment_fixture, request):
         },
     )
 
-    # Init a GazeDataFrame
-    gdf = GazeDataFrame(
-        data=df,
+    # Init a Gaze
+    gaze = Gaze(
+        samples=df,
         experiment=experiment_fixture,
         pixel_columns=pixel_columns,
         position_columns=position_columns,
     )
 
-    return gdf, request.param
+    return gaze, request.param
 
 
 @pytest.mark.parametrize(
@@ -167,7 +167,7 @@ def test_heatmap_noshow_no_pixel_or_position_column(args, monkeypatch):
         position_column = 'position'
 
     gaze = args[0]
-    gaze.frame = gaze.frame.rename({position_column: 'custom_column'})
+    gaze.samples = gaze.samples.rename({position_column: 'custom_column'})
 
     heatmap(gaze, position_column='custom_column', show=False)
     plt.close()
@@ -208,7 +208,7 @@ def test_heatmap_no_experiment_property():
         },
     )
 
-    gdf = GazeDataFrame(data=df, pixel_columns=['x_pix', 'y_pix'], experiment=None)
+    gaze = Gaze(samples=df, pixel_columns=['x_pix', 'y_pix'], experiment=None)
 
     with pytest.raises(ValueError):
-        heatmap(gdf, show=False)
+        heatmap(gaze, show=False)

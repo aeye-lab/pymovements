@@ -2,16 +2,16 @@ name: "FakeNewsPerception"
 
 long_name:  'Fake News Perception Eye Tracking Corpus'
 
-has_files:
-  gaze: false
-  precomputed_events: true
-  precomputed_reading_measures: false
-
 resources:
-  precomputed_events:
-    - resource: "https://dataverse.harvard.edu/api/access/datafile/4200164"
-      filename: "D3-Eye-movements-data.zip"
-      md5: "ab009f28cd703f433e9b6c02b0bb38d2"
+  - content: precomputed_events
+    url: "https://dataverse.harvard.edu/api/access/datafile/4200164"
+    filename: "D3-Eye-movements-data.zip"
+    md5: "ab009f28cd703f433e9b6c02b0bb38d2"
+    filename_pattern: 'P{subject_id:d}_S{session_id:d}_{truth_value:s}.csv'
+    filename_pattern_schema_overrides:
+      subject_id: !int
+      session_id: !int
+      truth_value: !str
 
 experiment:
   screen_width_px: 1920
@@ -21,15 +21,6 @@ experiment:
   distance_cm: null
   origin: null
   sampling_rate: 600
-
-filename_format:
-  precomputed_events: 'P{subject_id:d}_S{session_id:d}_{truth_value:s}.csv'
-
-filename_format_schema_overrides:
-  precomputed_events:
-    subject_id: !int
-    session_id: !int
-    truth_value: !str
 
 custom_read_kwargs:
   precomputed_events:

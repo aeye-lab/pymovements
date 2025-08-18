@@ -27,6 +27,7 @@ from typing import Any
 import polars as pl
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
@@ -57,11 +58,7 @@ class GazeBaseVR(DatasetDefinition):
     long_name: str
         The entire name of the dataset.
 
-    has_files: dict[str, bool]
-        Indicate whether the dataset contains 'gaze', 'precomputed_events', and
-        'precomputed_reading_measures'.
-
-    resources: dict[str, list[dict[str, str]]]
+    resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -71,11 +68,11 @@ class GazeBaseVR(DatasetDefinition):
     experiment: Experiment
         The experiment definition.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -120,30 +117,33 @@ class GazeBaseVR(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'GazeBaseVR'
 
     long_name: str = 'GazeBaseVR dataset'
 
-    has_files: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': False,
-            'precomputed_reading_measures': False,
-        },
-    )
-
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda: {
-            'gaze': [
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
                 {
-                    'resource': 'https://figshare.com/ndownloader/files/38844024',
+                    'content': 'gaze',
+                    'url': 'https://figshare.com/ndownloader/files/38844024',
                     'filename': 'gazebasevr.zip',
                     'md5': '048c04b00fd64347375cc8d37b451a22',
+                    'filename_pattern': (
+                        r'S_{round_id:1d}{subject_id:d}'
+                        r'_S{session_id:d}'
+                        r'_{task_name}.csv'
+                    ),
+                    'filename_pattern_schema_overrides': {
+                        'round_id': int,
+                        'subject_id': int,
+                        'session_id': int,
+                    },
                 },
             ],
-        },
+        ),
     )
 
     experiment: Experiment = field(
@@ -158,25 +158,9 @@ class GazeBaseVR(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze': (
-                r'S_{round_id:1d}{subject_id:d}'
-                r'_S{session_id:d}'
-                r'_{task_name}.csv'
-            ),
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {
-                'round_id': int,
-                'subject_id': int,
-                'session_id': int,
-            },
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     time_column: str = 'n'
 

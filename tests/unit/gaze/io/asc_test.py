@@ -208,7 +208,7 @@ from pymovements.gaze import from_asc
 def test_from_asc_has_frame_equal(kwargs, expected_frame):
     gaze = from_asc(**kwargs)
 
-    assert_frame_equal(gaze.frame, expected_frame, check_column_order=False)
+    assert_frame_equal(gaze.samples, expected_frame, check_column_order=False)
 
 
 @pytest.mark.parametrize(
@@ -340,8 +340,8 @@ def test_from_asc_has_frame_equal(kwargs, expected_frame):
 def test_from_asc_has_shape_and_schema(kwargs, shape, schema):
     gaze = from_asc(**kwargs)
 
-    assert gaze.frame.shape == shape
-    assert dict(gaze.frame.schema) == schema
+    assert gaze.samples.shape == shape
+    assert dict(gaze.samples.schema) == schema
 
 
 @pytest.mark.parametrize(

@@ -26,6 +26,7 @@
    :recursive:
    :template: class.rst
 
+    Events
     EventDataFrame
 
 .. rubric:: Processing
@@ -67,6 +68,7 @@ from pymovements.events.detection import ivt
 from pymovements.events.detection import microsaccades
 from pymovements.events.detection._library import EventDetectionLibrary
 from pymovements.events.detection._library import register_event_detection
+from pymovements.events.events import Events
 from pymovements.events.frame import EventDataFrame
 from pymovements.events.precomputed import PrecomputedEventDataFrame
 from pymovements.events.processing import EventGazeProcessor
@@ -90,6 +92,7 @@ __all__ = [
     'microsaccades',
 
     'PrecomputedEventDataFrame',
+    'Events',
     'EventDataFrame',
 
     'EventGazeProcessor',

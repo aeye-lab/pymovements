@@ -17,7 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Functionality to load GazeDataFrame from a csv file."""
+"""Functionality to load Gaze from a csv file."""
 from __future__ import annotations
 
 import math
@@ -27,10 +27,10 @@ from typing import Any
 import polars as pl
 
 import pymovements as pm  # pylint: disable=cyclic-import
-from pymovements.events.frame import EventDataFrame
+from pymovements.events.frame import Events
 from pymovements.gaze._utils.parsing import parse_eyelink
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
+from pymovements.gaze.gaze import Gaze
 
 
 def from_csv(
@@ -51,8 +51,8 @@ def from_csv(
         column_schema_overrides: dict[str, type] | None = None,
         definition: pm.DatasetDefinition | None = None,
         **read_csv_kwargs: Any,
-) -> GazeDataFrame:
-    """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
+) -> Gaze:
+    """Initialize a :py:class:`pymovements.gaze.Gaze`.
 
     Parameters
     ----------
@@ -114,8 +114,8 @@ def from_csv(
 
     Returns
     -------
-    GazeDataFrame
-        The gaze data frame read from the csv file.
+    Gaze
+        The initialized gaze object read from the csv file.
 
     Notes
     -----
@@ -159,7 +159,7 @@ def from_csv(
     │ 9    ┆ 0          ┆ 0          │
     └──────┴────────────┴────────────┘
 
-    We can now load the data into a ``GazeDataFrame`` by specyfing the experimental setting
+    We can now load the data into a ``Gaze`` by specyfing the experimental setting
     and the names of the pixel position columns. We can specify a custom separator for the csv
     file by passing it as a keyword argument to :py:func:`polars.read_csv`:
 
@@ -171,7 +171,7 @@ def from_csv(
     ...     pixel_columns = ['x_left_pix','y_left_pix'],
     ...     separator = ',',
     ... )
-    >>> gaze.frame
+    >>> gaze.samples
     shape: (10, 2)
     ┌──────┬───────────┐
     │ time ┆ pixel     │
@@ -203,7 +203,7 @@ def from_csv(
     ...     pixel_columns = ['x_left_pix','y_left_pix'],
     ...     schema_overrides = {'time': pl.Int64, 'x_left_pix': pl.Int64, 'y_left_pix': pl.Int64},
     ... )
-    >>> gaze.frame
+    >>> gaze.samples
     shape: (10, 2)
     ┌──────┬───────────┐
     │ time ┆ pixel     │
@@ -233,21 +233,21 @@ def from_csv(
                 read_csv_kwargs = definition.custom_read_kwargs['gaze']
 
     # Read data.
-    gaze_data = pl.read_csv(file, **read_csv_kwargs)
+    samples = pl.read_csv(file, **read_csv_kwargs)
     if column_map is not None:
-        gaze_data = gaze_data.rename({
+        samples = samples.rename({
             key: column_map[key] for key in
             [
                 key for key in column_map.keys()
-                if key in gaze_data.columns
+                if key in samples.columns
             ]
         })
 
     if add_columns is not None:
-        gaze_data = gaze_data.with_columns([
+        samples = samples.with_columns([
             pl.lit(value).alias(column)
             for column, value in add_columns.items()
-            if column not in gaze_data.columns
+            if column not in samples.columns
         ])
 
     # Cast numerical columns to Float64 if they were incorrectly inferred to be Utf8.
@@ -260,20 +260,20 @@ def from_csv(
         + ([distance_column] if distance_column else [])
     )
     for column in numerical_columns:
-        if gaze_data[column].dtype == pl.Utf8:
-            gaze_data = gaze_data.with_columns([
+        if samples[column].dtype == pl.Utf8:
+            samples = samples.with_columns([
                 pl.col(column).cast(pl.Float64),
             ])
 
     if column_schema_overrides is not None:
-        gaze_data = gaze_data.with_columns([
+        samples = samples.with_columns([
             pl.col(fileinfo_key).cast(fileinfo_dtype)
             for fileinfo_key, fileinfo_dtype in column_schema_overrides.items()
         ])
 
-    # Create gaze data frame.
-    gaze_df = GazeDataFrame(
-        gaze_data,
+    # Create gaze object.
+    gaze = Gaze(
+        samples=samples,
         experiment=experiment,
         definition=definition,
         trial_columns=trial_columns,
@@ -286,7 +286,7 @@ def from_csv(
         distance_column=distance_column,
         auto_column_detect=auto_column_detect,
     )
-    return gaze_df
+    return gaze
 
 
 def from_asc(
@@ -302,7 +302,7 @@ def from_asc(
         encoding: str | None = None,
         definition: pm.DatasetDefinition | None = None,
         events: bool = False,
-) -> GazeDataFrame:
+) -> Gaze:
     """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
 
     Parameters
@@ -341,17 +341,17 @@ def from_asc(
 
     Returns
     -------
-    GazeDataFrame
-        The gaze data frame read from the asc file.
+    Gaze
+        The initialized gaze object read from the asc file.
 
     Examples
     --------
     Let's assume we have an EyeLink asc file stored at `tests/files/eyelink_monocular_example.asc`.
-    We can then load the data into a ``GazeDataFrame``:
+    We can then load the data into a ``Gaze``:
 
     >>> from pymovements.gaze.io import from_asc
     >>> gaze = from_asc(file='tests/files/eyelink_monocular_example.asc')
-    >>> gaze.frame
+    >>> gaze.samples
     shape: (16, 3)
     ┌─────────┬───────┬────────────────┐
     │ time    ┆ pupil ┆ pixel          │
@@ -409,7 +409,7 @@ def from_asc(
                 encoding = custom_read_kwargs['encoding']
 
     # Read data.
-    gaze_data, event_data, metadata = parse_eyelink(
+    samples, event_data, metadata = parse_eyelink(
         file,
         patterns=_patterns,
         schema=schema,
@@ -418,14 +418,14 @@ def from_asc(
     )
 
     if add_columns is not None:
-        gaze_data = gaze_data.with_columns([
+        samples = samples.with_columns([
             pl.lit(value).alias(column)
             for column, value in add_columns.items()
-            if column not in gaze_data.columns
+            if column not in samples.columns
         ])
 
     if column_schema_overrides is not None:
-        gaze_data = gaze_data.with_columns([
+        samples = samples.with_columns([
             pl.col(fileinfo_key).cast(fileinfo_dtype)
             for fileinfo_key, fileinfo_dtype in column_schema_overrides.items()
         ])
@@ -433,22 +433,18 @@ def from_asc(
     # Fill experiment with parsed metadata.
     experiment = _fill_experiment_from_parsing_metadata(experiment, metadata)
 
-    # Create gaze and event data frames.
-    if events:
-        event_df = EventDataFrame(event_data)
-    else:
-        event_df = None
-    gaze_df = GazeDataFrame(
-        gaze_data,
+    # Instantiate Gaze with parsed data.
+    gaze = Gaze(
+        samples=samples,
         experiment=experiment,
-        events=event_df,
+        events=Events(event_data) if events else None,
         trial_columns=trial_columns,
         time_column='time',
         time_unit='ms',
         pixel_columns=['x_pix', 'y_pix'],
     )
-    gaze_df._metadata = metadata  # pylint: disable=protected-access
-    return gaze_df
+    gaze._metadata = metadata  # pylint: disable=protected-access
+    return gaze
 
 
 def from_ipc(
@@ -460,8 +456,8 @@ def from_ipc(
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, type] | None = None,
         **read_ipc_kwargs: Any,
-) -> GazeDataFrame:
-    """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
+) -> Gaze:
+    """Initialize a :py:class:`pymovements.gaze.Gaze`.
 
     Parameters
     ----------
@@ -489,17 +485,17 @@ def from_ipc(
 
     Returns
     -------
-    GazeDataFrame
-        The gaze data frame read from the ipc file.
+    Gaze
+        The initialized gaze object read from the ipc file.
 
     Examples
     --------
     Let's assume we have an IPC file stored at `tests/files/monocular_example.feather`.
-    We can then load the data into a ``GazeDataFrame``:
+    We can then load the data into a ``Gaze``:
 
     >>> from pymovements.gaze.io import from_ipc
     >>> gaze = from_ipc(file='tests/files/monocular_example.feather')
-    >>> gaze.frame
+    >>> gaze.samples
     shape: (10, 2)
     ┌──────┬───────────┐
     │ time ┆ pixel     │
@@ -520,37 +516,37 @@ def from_ipc(
 
     """
     # Read data.
-    gaze_data = pl.read_ipc(file, **read_ipc_kwargs)
+    samples = pl.read_ipc(file, **read_ipc_kwargs)
 
     if column_map is not None:
-        gaze_data = gaze_data.rename({
+        samples = samples.rename({
             key: column_map[key] for key in
             [
                 key for key in column_map.keys()
-                if key in gaze_data.columns
+                if key in samples.columns
             ]
         })
 
     if add_columns is not None:
-        gaze_data = gaze_data.with_columns([
+        samples = samples.with_columns([
             pl.lit(value).alias(column)
             for column, value in add_columns.items()
-            if column not in gaze_data.columns
+            if column not in samples.columns
         ])
 
     if column_schema_overrides is not None:
-        gaze_data = gaze_data.with_columns([
+        samples = samples.with_columns([
             pl.col(fileinfo_key).cast(fileinfo_dtype)
             for fileinfo_key, fileinfo_dtype in column_schema_overrides.items()
         ])
 
-    # Create gaze data frame.
-    gaze_df = GazeDataFrame(
-        gaze_data,
+    # Create gaze object.
+    gaze = Gaze(
+        samples=samples,
         experiment=experiment,
         trial_columns=trial_columns,
     )
-    return gaze_df
+    return gaze
 
 
 def _fill_experiment_from_parsing_metadata(

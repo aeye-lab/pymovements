@@ -25,6 +25,7 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
@@ -46,11 +47,7 @@ class CoLAGaze(DatasetDefinition):
     long_name: str
         The entire name of the dataset.
 
-    has_files: dict[str, bool]
-        Indicate whether the dataset contains 'gaze', 'precomputed_events', and
-        'precomputed_reading_measures'.
-
-    resources: dict[str, list[dict[str, str]]]
+    resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -60,11 +57,11 @@ class CoLAGaze(DatasetDefinition):
     experiment: Experiment
         The experiment definition.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -90,50 +87,41 @@ class CoLAGaze(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'CoLAGaze'
 
     long_name: str = 'Corpus of Eye Movements for Linguistic Acceptability'
 
-    has_files: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': True,
-            'precomputed_events': True,
-            'precomputed_reading_measures': True,
-        },
-    )
-
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda: {
-            'gaze': [
-                {
-                    'resource':
-                    'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
-                    '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
-                    'filename': 'raw_data.zip',
-                    'md5': None,  # type: ignore
-                },
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
+                    {
+                        'content': 'gaze',
+                        'url': 'https://files.osf.io/v1/resources/gj2uk/providers/osfstorage/67e14ce0f392601163f33215',  # noqa: E501 # pylint: disable=line-too-long
+                        'filename': 'raw_data.zip',
+                        'md5': None,  # type: ignore
+                        'filename_pattern': '{subject_id:d}.asc',
+                        'filename_pattern_schema_overrides': {'subject_id': int},
+                    },
+                    {
+                        'content': 'precomputed_events',
+                        'url': 'https://files.osf.io/v1/resources/gj2uk/providers/osfstorage/67e14ce0f392601163f33215',  # noqa: E501 # pylint: disable=line-too-long
+                        'filename': 'fixations.zip',
+                        'md5': None,  # type: ignore
+                        'filename_pattern': 'fixations_report_{subject_id:d}.csv',
+                        'filename_pattern_schema_overrides': {'subject_id': int},
+                    },
+                    {
+                        'content': 'precomputed_reading_measures',
+                        'url': 'https://files.osf.io/v1/resources/gj2uk/providers/osfstorage/67e14ce0f392601163f33215',  # noqa: E501 # pylint: disable=line-too-long
+                        'filename': 'measures.zip',
+                        'md5': None,  # type: ignore
+                        'filename_pattern': 'raw_measures_for_features{subject_id:d}.csv',
+                        'filename_pattern_schema_overrides': {'subject_id': int},
+                    },
             ],
-            'precomputed_events': [
-                {
-                    'resource':
-                    'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
-                    '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
-                    'filename': 'fixations.zip',
-                    'md5': None,  # type: ignore
-                },
-            ],
-            'precomputed_reading_measures': [
-                {
-                    'resource':
-                    'https://files.au-1.osf.io/v1/resources/gj2uk/providers/osfstorage/'
-                    '67e14ce0f392601163f33215/?view_only=a8ac6e0091e64d0a81d5b1fdec9bab6e&zip=',
-                    'filename': 'measures.zip',
-                    'md5': None,  # type: ignore
-                },
-            ],
-        },
+        ),
     )
 
     experiment: Experiment = field(
@@ -148,21 +136,9 @@ class CoLAGaze(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'gaze': '{subject_id:d}.asc',
-            'precomputed_events': 'fixations_report_{subject_id:d}.csv',
-            'precomputed_reading_measures': 'raw_measures_for_features{subject_id:d}.csv',
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'gaze': {'subject_id': int},
-            'precomputed_events': {'subject_id': int},
-            'precomputed_reading_measures': {'subject_id': int},
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     custom_read_kwargs: dict[str, dict[str, Any]] = field(
         default_factory=lambda: {

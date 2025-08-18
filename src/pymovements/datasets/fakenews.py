@@ -25,6 +25,7 @@ from dataclasses import field
 from typing import Any
 
 from pymovements.dataset.dataset_definition import DatasetDefinition
+from pymovements.dataset.resources import ResourceDefinitions
 from pymovements.gaze.experiment import Experiment
 
 
@@ -48,11 +49,7 @@ class FakeNewsPerception(DatasetDefinition):
     long_name: str
         The entire name of the dataset.
 
-    has_files: dict[str, bool]
-        Indicate whether the dataset contains 'gaze', 'precomputed_events', and
-        'precomputed_reading_measures'.
-
-    resources: dict[str, list[dict[str, str]]]
+    resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
         - `resource`: The url suffix of the resource. This will be concatenated with the mirror.
@@ -62,11 +59,11 @@ class FakeNewsPerception(DatasetDefinition):
     experiment: Experiment
         The experiment definition.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -81,24 +78,22 @@ class FakeNewsPerception(DatasetDefinition):
 
     long_name: str = 'Fake News Perception Eye Tracking Corpus'
 
-    has_files: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': False,
-            'precomputed_events': True,
-            'precomputed_reading_measures': False,
-        },
-    )
-
-    resources: dict[str, list[dict[str, str]]] = field(
-        default_factory=lambda: {
-            'precomputed_events': [
+    resources: ResourceDefinitions = field(
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
                 {
-                    'resource': 'https://dataverse.harvard.edu/api/access/datafile/4200164',
+                    'content': 'precomputed_events',
+                    'url': 'https://dataverse.harvard.edu/api/access/datafile/4200164',
                     'filename': 'D3-Eye-movements-data.zip',
                     'md5': 'ab009f28cd703f433e9b6c02b0bb38d2',
+                    'filename_pattern': r'P{subject_id:d}_S{session_id:d}_{truth_value:s}.csv',
+                    'filename_pattern_schema_overrides': {
+                        'subject_id': int, 'session_id': int,
+                        'truth_value': str,
+                    },
                 },
             ],
-        },
+        ),
     )
 
     experiment: Experiment = field(
@@ -113,17 +108,9 @@ class FakeNewsPerception(DatasetDefinition):
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'precomputed_events': r'P{subject_id:d}_S{session_id:d}_{truth_value:s}.csv',
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'precomputed_events': {'subject_id': int, 'session_id': int, 'truth_value': str},
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 
