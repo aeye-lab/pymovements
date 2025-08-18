@@ -21,6 +21,19 @@
 
     .. grid-item-card::
 
+        **Working with uv?**
+        ^^^^^^^^^^^^^^^^^^^^
+
+        *pymovements* can be installed via `uv <https://github.com/astral-sh/uv>`__ from PyPI:
+
+        ++++++
+
+        .. code-block:: bash
+
+            uv pip install pymovements
+
+    .. grid-item-card::
+
         **Prefer conda?**
         ^^^^^^^^^^^^^^^^^
 
