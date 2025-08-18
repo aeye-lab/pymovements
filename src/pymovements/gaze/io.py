@@ -346,6 +346,22 @@ def from_asc(
 
     Notes
     -----
+    Currently, only monocular recordings are supported. If a binocular recording is
+    provided, only the left eye data will be read.
+    The following edf2asc parameters/flags will produce an ASC file that can be read by this function:
+    - `-input` for writing the status of the Host PC parallel port to the ASC file
+    - `-ftime` for outputting time as a floating point value
+    - `-t` for using only tabs as delimiters
+    - `-utf8` for forcing UTF-8 encoding of the ASC file
+    - `-buttons` for outputting button values in samples (although these values will not be read)
+    - `-vel` and `-fvel` for outputting velocity values (although these values will not be read)
+    - `-l` or `-or `-nl`` and `-r` for outputting left and right eye data only in case of a 
+    binocular file (this is currently the only way to access right eye data).
+    - `-avg` for outputting average values of the left and right eye data in case of a binocular file 
+    (although these will not be read).
+    
+    Using other parameters may lead to errors or unexpected behavior.
+
     ASC files are created from EyeLink EDF files using the edf2asc tool
     (available from the SR Research Support website).
     ASC files contain gaze samples, events, and metadata about
@@ -361,6 +377,7 @@ def from_asc(
     ```
     This will create an ASC file named `tests/files/eyelink_monocular_example.asc`.
 
+    
     Examples
     --------
     We can load an asc file stored at `tests/files/eyelink_monocular_example.asc` into a ``Gaze``:
