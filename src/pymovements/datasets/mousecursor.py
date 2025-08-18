@@ -124,11 +124,11 @@ class MouseCursor(DatasetDefinition):
     long_name: str = 'Mouse Cursor dataset'
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'gaze': [
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
                     {
-                        'resource': 'https://ars.els-cdn.com/content/image/1-s2.0-S2352340921000160-mmc1.zip',  # noqa: E501 # pylint: disable=line-too-long
+                        'content': 'gaze',
+                        'url': 'https://ars.els-cdn.com/content/image/1-s2.0-S2352340921000160-mmc1.zip',  # noqa: E501 # pylint: disable=line-too-long
                         'filename': 'mousecursor.zip',
                         'md5': '7885e8fd44f14f02f60e9f62431aea63',
                         'filename_pattern': r'Experiment {experiment_id:d}.csv',
@@ -136,8 +136,7 @@ class MouseCursor(DatasetDefinition):
                             'experiment_id': int,
                         },
                     },
-                ],
-            },
+            ],
         ),
     )
 

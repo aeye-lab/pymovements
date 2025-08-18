@@ -123,7 +123,7 @@ class DIDEC(DatasetDefinition):
             [
                 {
                     'content': 'gaze',
-                    'resource': 'https://didec.uvt.nl/corpus/DIDEC_only_the_eyetracking_data.zip',
+                    'url': 'https://didec.uvt.nl/corpus/DIDEC_only_the_eyetracking_data.zip',
                     'filename': 'DIDEC_only_the_eyetracking_data.zip',
                     'md5': 'd572b0b41828986ca48a2fcf6966728a',
                     'filename_pattern': (

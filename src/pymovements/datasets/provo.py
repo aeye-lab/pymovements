@@ -98,18 +98,17 @@ class Provo(DatasetDefinition):
     long_name: str = 'Provo Corpus'
 
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'precomputed_events': [
-                    {
-                        'resource': 'https://osf.io/download/z3eh6/',
-                        'filename': 'Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv',
-                        'md5': '7aa239e51e5d78528e2430f84a23da3f',
-                        'filename_pattern':
-                            'Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv',
-                    },
-                ],
-            },
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
+                {
+                    'content': 'precomputed_events',
+                    'url': 'https://osf.io/download/z3eh6/',
+                    'filename': 'Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv',
+                    'md5': '7aa239e51e5d78528e2430f84a23da3f',
+                    'filename_pattern':
+                    'Provo_Corpus-Additional_Eyetracking_Data-Fixation_Report.csv',
+                },
+            ],
         ),
     )
 
