@@ -363,7 +363,7 @@ def from_asc(
 
     - `-vel` and `-fvel` for outputting velocity values (although these values will not be read)
 
-    - `-l` or `-or `-nr` and `-r` or `-nl`  for outputting left and right eye data only in case of a
+    - `-l` or `-nr` and `-r` or `-nl`  for outputting left and right eye data only in case of a
       binocular file (this is currently the only way to access right eye data).
 
     - `-avg` for outputting average values of the left and right eye data
@@ -381,9 +381,7 @@ def from_asc(
     `tests/files/eyelink_monocular_example.edf`,
     you can convert it to an ASC file using the following command
     (requires the edf2asc tool which can be downloaded from the SR Research Support website):
-    ```
-    edf2asc tests/files/eyelink_monocular_example.edf
-    ```
+    `edf2asc tests/files/eyelink_monocular_example.edf`
     This will create an ASC file named `tests/files/eyelink_monocular_example.asc`.
 
 
