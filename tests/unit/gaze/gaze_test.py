@@ -474,6 +474,7 @@ def test_gaze_get_attribute_is_removed(attribute):
         f'Current version is v{current_version}.'
     )
 
+
 def test_gaze_save(tmp_path):
     gaze = Gaze(
         pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
@@ -482,4 +483,3 @@ def test_gaze_save(tmp_path):
     )
     print(tmp_path)
     gaze.save(tmp_path)
-    
