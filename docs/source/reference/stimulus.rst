@@ -15,6 +15,8 @@ Stimulus
 
 .. rubric:: Input / Output
 
+.. currentmodule:: pymovements.stimulus.text
+
 .. autosummary::
     :toctree: api
     :nosignatures:
