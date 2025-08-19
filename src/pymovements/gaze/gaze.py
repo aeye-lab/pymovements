@@ -39,6 +39,8 @@ from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
 
+from pathlib import Path
+
 
 @repr_html(['samples', 'events', 'trial_columns', 'experiment'])
 class Gaze:
@@ -1748,6 +1750,150 @@ class Gaze:
         """Return string representation of Gaze."""
         return self.__str__()
 
+    def save(
+            self,
+            dirname: str | None = None, #TODO what if None?
+            save_events: bool = True,
+            save_samples: bool = True,
+            save_experiment: bool = True,
+            verbose: int = 1,
+            extension: str = 'feather',
+    ) -> Gaze:
+        """Save preprocessed gaze  in samples, events and experiment files in the provides directory.
+
+        Data will be saved as feather/csv files to the provided directory.
+
+        Returns
+        -------
+        Gaze
+            Returns self, useful for method cascading.
+
+        Parameters
+        ----------
+        dirname: str | None
+            Absloute directory name to save data.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.events_rootpath`.
+        save_events: bool
+            Save events in events.{extension} file
+        save_samples: bool
+            Save samples in sample.{extension} file
+        save_experiment: bool
+            Save experiment metadata in experiment.yaml file
+        verbose: int
+            Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
+            (default: 1)
+        extension: str
+            Extension specifies the fileformat to store the data. (default: 'feather')
+        """
+        #TODO create dir if does not exist?
+        Path(dirname).mkdir(parents=True, exist_ok=True)
+
+        if save_events:
+            self.save_events(dirname, verbose=verbose, extension=extension)
+        if save_samples:
+            self.save_preprocessed(dirname, verbose=verbose, extension=extension)
+        if save_experiment:
+            if verbose>=2:
+                print(f'Saving experiment.yaml file to', dirname)
+            self.experiment.to_yaml(dirname/'experiment.yaml')
+        return self
+    
+    def save_events(
+            self,
+            dirname: str,
+            verbose: int = 1,
+            extension: str = 'feather',
+    ) -> None:
+        """Save gaze events to file.
+
+        Data will be saved as the events.{extension} file to `dirname`.
+
+        Parameters
+        ----------
+        dirname: str | None
+            Directory name to save data.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.events_rootpath`.
+        verbose: int
+            Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
+            (default: 1)
+        extension: str
+            Specifies the file format for loading data. Valid options are: `csv`, `feather`.
+            (default: 'feather')
+
+        Raises
+        ------
+        ValueError
+            If extension is not in list of valid extensions.
+        """
+        events_out = self.events.frame.clone()
+
+        if verbose >= 2:
+            print(f'Saving events.{extension} file to', dirname)
+
+        if extension == 'feather':
+            events_out.write_ipc(dirname/'events.feather')
+        elif extension == 'csv':
+            events_out.write_csv(dirname/'events.csv')
+        else:
+            valid_extensions = ['csv', 'feather']
+            raise ValueError(
+                f'unsupported file format "{extension}".'
+                f'Supported formats are: {valid_extensions}',
+            )
+
+
+    def save_preprocessed(
+            self,
+            dirname: str,
+            verbose: int = 1,
+            extension: str = 'feather',
+    ) -> None:
+        """Save preprocessed gaze files.
+
+        Data will be saved to the samples.{extension} file in `dirname`.
+
+        Parameters
+        ----------
+        dirname: str | None
+            Directory name to save data.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
+        verbose: int
+            Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
+            (default: 1)
+        extension: str
+            Specifies the file format for loading data. Valid options are: `csv`, `feather`.
+            (default: 'feather')
+
+        Raises
+        ------
+        ValueError
+            If extension is not in list of valid extensions.
+        """
+        gaze = self.clone()
+
+        if extension == 'csv':
+            gaze.unnest()
+
+        if verbose >= 2:
+            print(f'Saving samples.{extension} file to', dirname)
+
+        if extension == 'feather':
+            gaze.samples.write_ipc(dirname/'samples.feather')
+        elif extension == 'csv':
+            gaze.samples.write_csv(dirname/'samples.csv')
+        else:
+            valid_extensions = ['csv', 'feather']
+            raise ValueError(
+                f'unsupported file format "{extension}".'
+                f'Supported formats are: {valid_extensions}',
+            )
+
+
+
+
 
 def _check_trial_columns(trial_columns: list[str] | None, samples: pl.DataFrame) -> None:
     """Check trial_columns for integrity.
@@ -1776,3 +1922,4 @@ def _check_trial_columns(trial_columns: list[str] | None, samples: pl.DataFrame)
         if len(set(trial_columns).intersection(samples.columns)) != len(trial_columns):
             missing = set(trial_columns) - set(samples.columns)
             raise KeyError(f'trial_columns missing in samples: {", ".join(missing)}')
+
