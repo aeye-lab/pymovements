@@ -10,7 +10,7 @@
         **Install pymovements**
         ^^^^^^^^^^^^^^^^^^^^^^^
 
-        Choose your preferred package manager:
+        Choose your preferred way:
 
         .. tab-set::
 
@@ -51,7 +51,7 @@
 
                     conda install -c conda-forge pymovements
 
-            .. tab-item:: From source (dev)
+            .. tab-item:: source (dev)
 
                 To use the latest development version or try out tutorials, clone the repository and install in editable mode:
 
