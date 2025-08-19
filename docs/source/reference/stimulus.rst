@@ -20,4 +20,4 @@ Stimulus
     :nosignatures:
     :template: function.rst
 
-    from_file
+    text.from_file
