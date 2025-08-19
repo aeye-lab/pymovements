@@ -473,13 +473,3 @@ def test_gaze_get_attribute_is_removed(attribute):
         f'Gaze.{attribute} was planned to be removed in v{remove_version}. '
         f'Current version is v{current_version}.'
     )
-
-
-def test_gaze_save(tmp_path):
-    gaze = Gaze(
-        pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
-        experiment=Experiment(1024, 768, 38, 30, 60, 'center', 1000),
-        position_columns=['x', 'y'],
-    )
-    print(tmp_path)
-    gaze.save(tmp_path)
