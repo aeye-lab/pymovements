@@ -12,3 +12,12 @@ Stimulus
 
     ImageStimulus
     TextStimulus
+
+.. rubric:: Input / Output
+
+.. autosummary::
+    :toctree: api
+    :nosignatures:
+    :template: function.rst
+
+    from_file
