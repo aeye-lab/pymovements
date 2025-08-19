@@ -347,7 +347,7 @@ class Events:
         -------
         pl.DataFrame
             DataFrame containing all microsaccade events, i.e., rows where
-            ``name`` starts with ``"microsaccade"`` (e.g., ``"microsaccade"``, ``"microsaccade_x"``).
+            ``name`` starts with ``"microsaccade"`` (e.g., ``"microsaccade"``).
         """
         return self._filter_by_prefix('microsaccade')
 
