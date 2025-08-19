@@ -27,5 +27,3 @@
       ~GazeDataFrame.experiment
       ~GazeDataFrame.trial_columns
       ~GazeDataFrame.n_components
-
-

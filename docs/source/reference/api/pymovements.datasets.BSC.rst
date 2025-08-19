@@ -44,5 +44,3 @@
       ~BSC.custom_read_kwargs
       ~BSC.mirrors
       ~BSC.experiment
-
-

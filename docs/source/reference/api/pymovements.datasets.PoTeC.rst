@@ -44,5 +44,3 @@
       ~PoTeC.custom_read_kwargs
       ~PoTeC.mirrors
       ~PoTeC.column_map
-
-

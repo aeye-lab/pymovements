@@ -44,5 +44,3 @@
       ~InteRead.column_map
       ~InteRead.custom_read_kwargs
       ~InteRead.mirrors
-
-

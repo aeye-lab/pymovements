@@ -44,5 +44,3 @@
       ~GazeOnFaces.column_map
       ~GazeOnFaces.custom_read_kwargs
       ~GazeOnFaces.mirrors
-
-

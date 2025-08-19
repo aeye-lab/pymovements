@@ -13,9 +13,3 @@
       :toctree:
 
       ~ReadingMeasures.__init__
-
-
-
-
-
-

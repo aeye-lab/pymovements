@@ -44,5 +44,3 @@
       ~PotsdamBingeRemotePVT.column_map
       ~PotsdamBingeRemotePVT.custom_read_kwargs
       ~PotsdamBingeRemotePVT.mirrors
-
-

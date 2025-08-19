@@ -44,5 +44,3 @@
       ~PotsdamBingeWearablePVT.column_map
       ~PotsdamBingeWearablePVT.custom_read_kwargs
       ~PotsdamBingeWearablePVT.mirrors
-
-

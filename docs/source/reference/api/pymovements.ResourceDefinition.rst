@@ -30,5 +30,3 @@
       ~ResourceDefinition.md5
       ~ResourceDefinition.url
       ~ResourceDefinition.content
-
-

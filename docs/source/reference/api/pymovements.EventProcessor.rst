@@ -14,9 +14,3 @@
 
       ~EventProcessor.__init__
       ~EventProcessor.process
-
-
-
-
-
-

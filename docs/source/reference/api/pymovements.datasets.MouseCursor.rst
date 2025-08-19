@@ -44,5 +44,3 @@
       ~MouseCursor.column_map
       ~MouseCursor.custom_read_kwargs
       ~MouseCursor.mirrors
-
-

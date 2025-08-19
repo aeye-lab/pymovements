@@ -44,5 +44,3 @@
       ~Gaze4Hate.custom_read_kwargs
       ~Gaze4Hate.mirrors
       ~Gaze4Hate.column_map
-
-

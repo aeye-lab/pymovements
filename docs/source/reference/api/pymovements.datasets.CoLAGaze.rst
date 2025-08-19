@@ -44,5 +44,3 @@
       ~CoLAGaze.custom_read_kwargs
       ~CoLAGaze.mirrors
       ~CoLAGaze.column_map
-
-

@@ -44,5 +44,3 @@
       ~DatasetDefinition.experiment
       ~DatasetDefinition.custom_read_kwargs
       ~DatasetDefinition.column_map
-
-

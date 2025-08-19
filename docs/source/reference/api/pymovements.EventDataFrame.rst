@@ -24,5 +24,3 @@
 
       ~EventDataFrame.frame
       ~EventDataFrame.trial_columns
-
-

@@ -48,5 +48,3 @@
    .. autosummary::
 
       ~Dataset.path
-
-

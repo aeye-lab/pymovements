@@ -30,5 +30,3 @@
       ~EyeTracker.sampling_rate
       ~EyeTracker.vendor
       ~EyeTracker.version
-
-

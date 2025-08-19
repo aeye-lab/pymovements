@@ -44,5 +44,3 @@
       ~MECOL1W1.custom_read_kwargs
       ~MECOL1W1.mirrors
       ~MECOL1W1.experiment
-
-

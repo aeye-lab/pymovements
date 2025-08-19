@@ -14,9 +14,3 @@
 
       ~EventGazeProcessor.__init__
       ~EventGazeProcessor.process
-
-
-
-
-
-

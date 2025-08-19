@@ -34,5 +34,3 @@
       ~Events.schema
       ~Events.frame
       ~Events.trial_columns
-
-

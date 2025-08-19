@@ -44,5 +44,3 @@
       ~FakeNewsPerception.column_map
       ~FakeNewsPerception.custom_read_kwargs
       ~FakeNewsPerception.mirrors
-
-

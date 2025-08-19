@@ -44,5 +44,3 @@
       ~GazeGraph.column_map
       ~GazeGraph.custom_read_kwargs
       ~GazeGraph.mirrors
-
-

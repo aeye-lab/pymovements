@@ -22,13 +22,3 @@
 
 
       parse_eyelink
-
-
-
-
-
-
-
-
-
-

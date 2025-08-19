@@ -1794,7 +1794,7 @@ class Gaze:
             self.save_preprocessed(dirname, verbose=verbose, extension=extension)
         if save_experiment:
             if verbose >= 2:
-                print(f'Saving experiment.yaml file to', dirname)
+                print('Saving experiment.yaml file to', dirname)
             self.experiment.to_yaml(dirname / 'experiment.yaml')
         return self
 

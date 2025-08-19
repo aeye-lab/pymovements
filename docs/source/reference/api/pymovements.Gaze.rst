@@ -47,5 +47,3 @@
       ~Gaze.experiment
       ~Gaze.trial_columns
       ~Gaze.n_components
-
-

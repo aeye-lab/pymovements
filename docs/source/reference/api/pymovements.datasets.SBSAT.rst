@@ -44,5 +44,3 @@
       ~SBSAT.column_map
       ~SBSAT.custom_read_kwargs
       ~SBSAT.mirrors
-
-

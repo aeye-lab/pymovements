@@ -26,5 +26,3 @@
    .. autosummary::
 
       ~DatasetLibrary.definitions
-
-

@@ -44,5 +44,3 @@
       ~ETDD70.custom_read_kwargs
       ~ETDD70.mirrors
       ~ETDD70.column_map
-
-

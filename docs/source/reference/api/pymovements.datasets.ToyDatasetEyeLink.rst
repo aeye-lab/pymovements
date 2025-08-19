@@ -44,5 +44,3 @@
       ~ToyDatasetEyeLink.column_map
       ~ToyDatasetEyeLink.custom_read_kwargs
       ~ToyDatasetEyeLink.mirrors
-
-

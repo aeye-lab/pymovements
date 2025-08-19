@@ -44,5 +44,3 @@
       ~ToyDataset.column_map
       ~ToyDataset.custom_read_kwargs
       ~ToyDataset.mirrors
-
-

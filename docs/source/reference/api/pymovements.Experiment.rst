@@ -26,5 +26,3 @@
    .. autosummary::
 
       ~Experiment.sampling_rate
-
-

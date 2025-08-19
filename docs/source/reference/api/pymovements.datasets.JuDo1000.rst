@@ -44,5 +44,3 @@
       ~JuDo1000.column_map
       ~JuDo1000.custom_read_kwargs
       ~JuDo1000.mirrors
-
-

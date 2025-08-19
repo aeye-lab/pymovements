@@ -44,5 +44,3 @@
       ~GazeBaseVR.column_map
       ~GazeBaseVR.custom_read_kwargs
       ~GazeBaseVR.mirrors
-
-

@@ -34,5 +34,3 @@
       ~Screen.x_min_dva
       ~Screen.y_max_dva
       ~Screen.y_min_dva
-
-

@@ -44,5 +44,3 @@
       ~EMTeC.custom_read_kwargs
       ~EMTeC.mirrors
       ~EMTeC.column_map
-
-

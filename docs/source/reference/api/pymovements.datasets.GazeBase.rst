@@ -44,5 +44,3 @@
       ~GazeBase.column_map
       ~GazeBase.custom_read_kwargs
       ~GazeBase.mirrors
-
-

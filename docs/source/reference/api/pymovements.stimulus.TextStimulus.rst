@@ -15,9 +15,3 @@
       ~TextStimulus.__init__
       ~TextStimulus.get_aoi
       ~TextStimulus.split
-
-
-
-
-
-

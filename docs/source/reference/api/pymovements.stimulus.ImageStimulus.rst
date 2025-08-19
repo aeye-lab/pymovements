@@ -14,9 +14,3 @@
 
       ~ImageStimulus.__init__
       ~ImageStimulus.show
-
-
-
-
-
-

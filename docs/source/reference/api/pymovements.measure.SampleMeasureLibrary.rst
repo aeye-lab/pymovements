@@ -25,5 +25,3 @@
    .. autosummary::
 
       ~SampleMeasureLibrary.methods
-
-

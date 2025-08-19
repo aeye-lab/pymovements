@@ -44,5 +44,3 @@
       ~CopCo.column_map
       ~CopCo.custom_read_kwargs
       ~CopCo.mirrors
-
-
