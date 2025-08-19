@@ -48,7 +48,7 @@ pip-delete-this-directory.txt
 # Docs
 docs/build
 docs/doctree*
-docs/source/reference/pymovements.*.rst
+docs/source/reference/api
 docs/source/tutorials/data
 .ipynb_checkpoints
 
