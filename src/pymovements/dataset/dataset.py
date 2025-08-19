@@ -1150,7 +1150,7 @@ class Dataset:
         else:
             dataset_name = self.definition.name + ' dataset'
 
-        return f"""\
+        return f"""
         You are downloading the {dataset_name}. Please be aware that pymovements does not
         host or distribute any dataset resources and only provides a convenient interface to
         download the public dataset resources that were published by their respective authors.
