@@ -303,6 +303,33 @@ class Experiment:
 
         return data
 
+    def to_yaml(
+            self,
+            path: str | Path,
+            *,
+            exclude_private: bool = True,
+            exclude_none: bool = True,
+        ) -> None:
+            """Save a dataset definition to a YAML file.
+    
+            Parameters
+            ----------
+            path: str | Path
+                Path where to save the YAML file to.
+            exclude_private: bool
+                Exclude attributes that start with ``_``.
+            exclude_none: bool
+                Exclude attributes that are either ``None`` or that are objects that evaluate to
+                ``False`` (e.g., ``[]``, ``{}``, ``EyeTracker()``). Attributes of type ``bool``,
+                ``int``, and ``float`` are not excluded.
+            """
+            data = self.to_dict(exclude_private=exclude_private, exclude_none=exclude_none)
+    
+            data = substitute_types(data)
+    
+            with open(path, 'w', encoding='utf-8') as f:
+                yaml.dump(data, f, sort_keys=False)
+
     def __str__(self: Experiment) -> str:
         """Return Experiment string."""
         return f'{type(self).__name__}(screen={self.screen}, eyetracker={self.eyetracker})'
