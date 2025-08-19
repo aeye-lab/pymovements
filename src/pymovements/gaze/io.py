@@ -363,7 +363,7 @@ def from_asc(
     If a binocular ASC file is provided, only the left eye data will be read.
     If you want to use right eye data, you can use the
     `-r` or `-nl` edf2asc flags to get an ASC file with only right eye data.
-    Additionally, following optional edf2asc parameters/flags are safe to use
+    Additionally, the following optional edf2asc parameters/flags are safe to use
     and will also result in an ASC file that can be read by this function:
 
     - `-input` for writing the status of the Host PC parallel port to the ASC file.
