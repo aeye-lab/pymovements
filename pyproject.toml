@@ -68,6 +68,7 @@ docs = [
 ]
 dev = [
   "tox>=4.28.4",
+  "packaging>=25.0,<26",
   "pybtex<0.25.2",
   "pytest>=6.0.0",
   "pytest-benchmark>=5.1.0",
