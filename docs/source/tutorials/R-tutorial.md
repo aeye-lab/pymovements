@@ -17,7 +17,7 @@ library(reticulate)
 ```r
 py_install("pymovements")
 ```
-If this fails, create a dedicated python environment and make sure to point R to it. 
+If this fails, create a dedicated python environment and make sure to point R to it.
 
 #### Set up a dedicated environment
 Skip this step if you already have an environment containing `pymovements`.
@@ -32,7 +32,7 @@ pymovements_packages <- c(
 reticulate::conda_create("pymovements_env", packages = pymovements_packages, pip = TRUE)
 ```
 
-##### 2. using terminal 
+##### 2. using terminal
 
 If you work with Conda:
 
