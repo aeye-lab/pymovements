@@ -1302,12 +1302,6 @@ class Gaze:
         gaze.n_components = self.n_components
         return gaze
 
-    def save(self, path: str) -> None:
-        """Save a copy of the Gaze in file path.
-
-        """
-        Experiment.to_yaml(self.experiment, path)
-
     def _check_experiment(self) -> None:
         """Check if experiment attribute has been set.
 
