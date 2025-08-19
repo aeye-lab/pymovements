@@ -50,7 +50,7 @@ def traceplot(
         show_cbar: bool = False,
         padding: float | None = None,
         pad_factor: float | None = 0.05,
-        figsize: tuple[int, int] = (15, 5),
+        figsize: tuple[int, int] = (20, 1),
         title: str | None = None,
         savepath: str | None = None,
         show: bool = True,
@@ -107,6 +107,14 @@ def traceplot(
     # pylint: disable=duplicate-code
     x_signal = gaze.samples[position_column].list.get(0)
     y_signal = gaze.samples[position_column].list.get(1)
+    if all(v is not None for v in (
+        gaze.experiment.screen.width_cm,
+        gaze.experiment.screen.height_cm,
+    )):
+        figsize = (
+            int(gaze.experiment.screen.width_cm),
+            int(gaze.experiment.screen.height_cm),
+        )
 
     fig, ax, cmap, cmap_norm, cval, show_cbar = _setup_matplotlib(
         x_signal,
