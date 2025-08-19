@@ -626,7 +626,7 @@ def test_event_dataframe_split_default_no_trial_columns():
 
 
 def _edf(names):
-    """Helper to build an Events object with deterministic onsets/offsets."""
+    """Create an EventDataFrame for tests."""
     df = pl.DataFrame({
         'name': names,
         'onset': [0] * len(names),
