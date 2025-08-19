@@ -51,7 +51,7 @@
 
                     conda install -c conda-forge pymovements
 
-           .. tab-item:: From source (dev)
+            .. tab-item:: From source (dev)
 
                 To use the latest development version or try out tutorials, clone the repository and install in editable mode:
 
@@ -60,6 +60,7 @@
                     git clone https://github.com/aeye-lab/pymovements.git
                     pip install --upgrade pip
                     pip install -e ./pymovements
+
 
 .. grid::
     :gutter: 5
@@ -80,5 +81,3 @@
 
 .. toctree::
    :hidden:
-
-   advanced-installation
