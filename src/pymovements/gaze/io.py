@@ -351,17 +351,17 @@ def from_asc(
     The following edf2asc parameters/flags will produce an ASC file
     that can be read by this function:
 
-    - `-input` for writing the status of the Host PC parallel port to the ASC file
+    - `-input` for writing the status of the Host PC parallel port to the ASC file.
 
-    - `-ftime` for outputting time as a floating point value
+    - `-ftime` for outputting time as a floating point value.
 
-    - `-t` for using only tabs as delimiters
+    - `-t` for using only tabs as delimiters.
 
-    - `-utf8` for forcing UTF-8 encoding of the ASC file
+    - `-utf8` for forcing UTF-8 encoding of the ASC file.
 
-    - `-buttons` for outputting button values in samples (although these values will not be read)
+    - `-buttons` for outputting button values in samples (although these values will not be read).
 
-    - `-vel` and `-fvel` for outputting velocity values (although these values will not be read)
+    - `-vel` and `-fvel` for outputting velocity values (although these values will not be read).
 
     - `-l` or `-nr` and `-r` or `-nl`  for outputting left and right eye data only in case of a
       binocular file (this is currently the only way to access right eye data).
@@ -381,7 +381,7 @@ def from_asc(
     `tests/files/eyelink_monocular_example.edf`,
     you can convert it to an ASC file using the following command
     (requires the edf2asc tool which can be downloaded from the SR Research Support website):
-    `edf2asc tests/files/eyelink_monocular_example.edf`
+    `edf2asc tests/files/eyelink_monocular_example.edf`.
     This will create an ASC file named `tests/files/eyelink_monocular_example.asc`.
 
 
