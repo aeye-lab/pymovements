@@ -26,6 +26,7 @@ from unittest.mock import Mock
 
 import numpy as np
 import polars as pl
+from pymovements.stimulus.text import TextStimulus
 import pytest
 from polars.testing import assert_frame_equal
 
@@ -123,6 +124,7 @@ def mock_toy(
         remote=False,
         extract=_UNSET,
         filename_format_schema_overrides=_UNSET,
+        stimuli_dirname=_UNSET,
 ):
     if extract is _UNSET:
         extract = None
@@ -471,6 +473,7 @@ def mock_toy(
         'ToyRight',
         'ToyBino+Avg',
         'ToyRemote',
+        'ToyAOI'
     ],
 )
 def gaze_fixture_dataset(request, tmp_path):
@@ -491,6 +494,8 @@ def gaze_fixture_dataset(request, tmp_path):
         dataset_dict = mock_toy(rootpath, raw_fileformat='mat', eyes='both')
     elif dataset_type == 'ToyRemote':
         dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='both', remote=True)
+    elif dataset_type == 'ToyAOI':
+        dataset_dict = mock_toy(rootpath, raw_fileformat='csv', eyes='both', stimuli_dirname='tests/files/aoi_multipleye_stimuli_toy_x_1')
     else:
         raise ValueError(f'{request.param} not supported as dataset mock')
 
@@ -526,6 +531,24 @@ def test_load_correct_raw_gazes(gaze_dataset_configuration):
             expected_gaze.samples,
             check_column_order=False,
         )
+
+def test_stimuli_list_exists(gaze_dataset_configuration):
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
+
+    assert(isinstance(dataset.stimuli, list))
+
+@pytest.mark.parametrize(
+    'gaze_dataset_configuration',
+    ['ToyAOI'],
+    indirect=['gaze_dataset_configuration'],
+)
+def test_stimuli_list_not_empty(gaze_dataset_configuration):
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
+    dataset.load()
+    assert dataset.stimuli and all(isinstance(stim, TextStimulus) for stim in dataset.stimuli)
+    
+
+    
 
 
 def test_loaded_gazes_do_not_share_experiment_with_definition(gaze_dataset_configuration):

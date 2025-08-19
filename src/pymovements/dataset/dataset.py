@@ -41,6 +41,7 @@ from pymovements.events.precomputed import PrecomputedEventDataFrame
 from pymovements.gaze import Gaze
 from pymovements.reading_measures import ReadingMeasures
 
+from pymovements.stimulus.text import TextStimulus
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -64,13 +65,14 @@ class Dataset:
     def __init__(
             self,
             definition: str | Path | DatasetDefinition | type[DatasetDefinition],
-            path: str | Path | DatasetPaths,
+            path: str | Path | DatasetPaths
     ):
         self.fileinfo: pl.DataFrame = pl.DataFrame()
         self.gaze: list[Gaze] = []
         self.events: list[Events] = []
         self.precomputed_events: list[PrecomputedEventDataFrame] = []
         self.precomputed_reading_measures: list[ReadingMeasures] = []
+        self.stimuli: list[TextStimulus] = []
 
         # Handle different definition input types
         if isinstance(definition, (str, Path)):
@@ -103,6 +105,7 @@ class Dataset:
             subset: dict[str, float | int | str | list[float | int | str]] | None = None,
             events_dirname: str | None = None,
             preprocessed_dirname: str | None = None,
+            stimuli_dirname: str | None = None,
             extension: str = 'feather',
     ) -> Dataset:
         """Parse file information and load all gaze files.
