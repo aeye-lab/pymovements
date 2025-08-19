@@ -624,31 +624,36 @@ def test_event_dataframe_split_default_no_trial_columns():
     with pytest.raises(TypeError):
         events.split()
 
+
 def _edf(names):
     """Helper to build an Events object with deterministic onsets/offsets."""
     df = pl.DataFrame({
-        "name": names,
-        "onset": [0] * len(names),
-        "offset": [1] * len(names),
+        'name': names,
+        'onset': [0] * len(names),
+        'offset': [1] * len(names),
     })
     return Events(data=df)
 
+
 def test_fixations_filter():
-    edf = _edf(["fixation", "fixation_ivt", "saccade", "blink"])
+    edf = _edf(['fixation', 'fixation_ivt', 'saccade', 'blink'])
     out = edf.fixations
-    assert set(out["name"].to_list()) == {"fixation", "fixation_ivt"}
+    assert set(out['name'].to_list()) == {'fixation', 'fixation_ivt'}
+
 
 def test_saccades_filter():
-    edf = _edf(["saccade", "saccade_algo", "fixation"])
+    edf = _edf(['saccade', 'saccade_algo', 'fixation'])
     out = edf.saccades
-    assert set(out["name"].to_list()) == {"saccade", "saccade_algo"}
+    assert set(out['name'].to_list()) == {'saccade', 'saccade_algo'}
+
 
 def test_blinks_filter():
-    edf = _edf(["blink", "blink_fast", "fixation"])
+    edf = _edf(['blink', 'blink_fast', 'fixation'])
     out = edf.blinks
-    assert set(out["name"].to_list()) == {"blink", "blink_fast"}
+    assert set(out['name'].to_list()) == {'blink', 'blink_fast'}
+
 
 def test_microsaccades_filter():
-    edf = _edf(["microsaccade", "microsaccade_x", "saccade"])
+    edf = _edf(['microsaccade', 'microsaccade_x', 'saccade'])
     out = edf.microsaccades
-    assert set(out["name"].to_list()) == {"microsaccade", "microsaccade_x"}
+    assert set(out['name'].to_list()) == {'microsaccade', 'microsaccade_x'}
