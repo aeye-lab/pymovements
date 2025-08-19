@@ -27,11 +27,10 @@ from polars.testing import assert_frame_equal
 from pymovements import __version__
 from pymovements import Events
 from pymovements import Experiment
-from pymovements import Gaze
-##PK
-from pymovements import Dataset
-from pymovements import Screen
 from pymovements import EyeTracker
+from pymovements import Gaze
+from pymovements import Screen
+# PK
 
 
 @pytest.mark.parametrize(
@@ -478,6 +477,7 @@ def test_gaze_get_attribute_is_removed(attribute):
         f'Current version is v{current_version}.'
     )
 
+
 def test_gaze_save(tmp_path):
 
     # Creating a Gaze object
@@ -490,9 +490,15 @@ def test_gaze_save(tmp_path):
             },
             schema={'x': pl.Float64, 'y': pl.Float64, 'trial_id': pl.Int8},
         ),
-        experiment=Experiment(screen=Screen(width_px=1280, height_px=1024, width_cm=38.0, height_cm=30.0,
-     distance_cm=68.0, origin='upper left'), eyetracker=EyeTracker(sampling_rate=1000.0, left=None,
-      right=None, model='MyModel', version=None, vendor=None, mount=None)),
+        experiment=Experiment(
+            screen=Screen(
+                width_px=1280, height_px=1024, width_cm=38.0, height_cm=30.0,
+                distance_cm=68.0, origin='upper left',
+            ), eyetracker=EyeTracker(
+                sampling_rate=1000.0, left=None,
+                right=None, model='MyModel', version=None, vendor=None, mount=None,
+            ),
+        ),
         position_columns=['x', 'y'],
         events=Events(
             pl.DataFrame(
@@ -508,7 +514,7 @@ def test_gaze_save(tmp_path):
 
     # Saving Gaze to tmp_path
     gaze.save(
-        dirname = tmp_path,
-        verbose = 2,
-        extension = 'csv'
+        dirname=tmp_path,
+        verbose=2,
+        extension='csv',
     )

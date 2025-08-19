@@ -21,9 +21,11 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from pathlib import Path
 from typing import Any
 
 import numpy as np
+import yaml
 
 from pymovements._utils import _checks
 from pymovements._utils._html import repr_html
@@ -31,8 +33,6 @@ from pymovements.gaze import transforms_numpy
 from pymovements.gaze.eyetracker import EyeTracker
 from pymovements.gaze.screen import Screen
 
-from pathlib import Path
-import yaml
 
 @repr_html()
 class Experiment:
