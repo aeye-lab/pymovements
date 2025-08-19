@@ -38,19 +38,28 @@
 
                     conda install -c conda-forge pymovements
 
-    .. grid-item-card::
+                If you haven't configured *conda-forge* yet, add it to your channels and enable strict priority:
 
-        **Advanced installation?**
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+                .. code-block:: bash
 
-        Installing a specific version? Installing from source?
-        Check the advanced installation page.
+                    conda config --add channels conda-forge
+                    conda config --set channel_priority strict
 
-        .. button-link:: advanced-installation.rst
-            :color: primary
-            :shadow:
+                Then install *pymovements* into your conda environment:
 
-            Installation Guide
+                .. code-block:: bash
+
+                    conda install -c conda-forge pymovements
+
+           .. tab-item:: From source (dev)
+
+                To use the latest development version or try out tutorials, clone the repository and install in editable mode:
+
+                .. code-block:: bash
+
+                    git clone https://github.com/aeye-lab/pymovements.git
+                    pip install --upgrade pip
+                    pip install -e ./pymovements
 
 .. grid::
     :gutter: 5
