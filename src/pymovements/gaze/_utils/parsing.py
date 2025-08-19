@@ -731,13 +731,28 @@ def _parse_eyelink_mount_config(mount_config: str) -> dict[str, str]:
     }
 
 
+BEGAZE_SAMPLE = re.compile(
+    r'(?P<time>\d+)\t'
+    r'SMP\t'
+    r'(?P<trial>\d+)\t'
+    r'(?P<x_pix>[-]?\d*[.]\d*)\t'
+    r'(?P<y_pix>[-]?\d*[.]\d*)\t'
+    r'(?P<pupil>\d*[.]\d*)\t'
+    r'(?P<timing>\d+)\t'
+    r'(?P<pupil_confidence>\d+)\t'
+    r'(?P<plane>[-]?\d+)\t'
+    r'(?P<event>\w+|-)\t'
+    r'(?P<stimulus>.+)',
+)
+
+
 def parse_begaze(
         filepath: Path | str,
         patterns: list[dict[str, Any] | str] | None = None,
         schema: dict[str, Any] | None = None,
         metadata_patterns: list[dict[str, Any] | str] | None = None,
         encoding: str = 'ascii',
-) -> tuple[pl.DataFrame, dict[str, Any]]:
+) -> tuple[pl.DataFrame, pl.DataFrame, dict[str, Any]]:
     """Parse BeGaze raw data export file.
 
     Parameters
@@ -755,17 +770,123 @@ def parse_begaze(
 
     Returns
     -------
-    tuple[pl.DataFrame, dict[str, Any]]
-        A tuple containing the parsed sample data and the metadata in a dictionary.
+    tuple[pl.DataFrame, pl.DataFrame, dict[str, Any]]
+        A tuple containing the parsed gaze sample data, the parsed event data, and the metadata.
     """
     msg_prefix = r'\d+\tMSG\t\d+\t# Message:\s+'
 
     if patterns is None:
         patterns = []
-    compile_patterns(patterns, msg_prefix)
+    compiled_patterns = compile_patterns(patterns, msg_prefix)
 
     if metadata_patterns is None:
         metadata_patterns = []
-    compile_patterns(metadata_patterns, msg_prefix)
+    compiled_metadata_patterns = compile_patterns(metadata_patterns, msg_prefix)
 
-    # TODO
+    additional_columns = get_pattern_keys(compiled_patterns, 'column')
+    current_additional = {
+        additional_column: None for additional_column in additional_columns
+    }
+    current_event = '-'
+    current_event_onset = None
+    previous_timestamp = None
+    current_event_additional: dict[str, dict[str, Any]] = {
+        'fixation': {}, 'saccade': {}, 'blink': {},
+    }
+
+    samples: dict[str, list[Any]] = {
+        'time': [],
+        'x_pix': [],
+        'y_pix': [],
+        'pupil': [],
+        **{additional_column: [] for additional_column in additional_columns},
+    }
+    events: dict[str, list[Any]] = {
+        'name': [],
+        'onset': [],
+        'offset': [],
+        **{additional_column: [] for additional_column in additional_columns},
+    }
+
+    with open(filepath, encoding=encoding) as begaze_file:
+        lines = begaze_file.readlines()
+
+    # will return an empty string if the key does not exist
+    metadata: defaultdict = defaultdict(str)
+
+    # metadata keys specified by the user should have a default value of None
+    metadata_keys = get_pattern_keys(compiled_metadata_patterns, 'key')
+    for key in metadata_keys:
+        metadata[key] = None
+
+    compiled_metadata_patterns.extend(EYELINK_META_REGEXES)
+
+    # TODO: calibrations, validations
+
+    for line in lines:
+        print(current_event)
+        for pattern_dict in compiled_patterns:
+
+            if match := pattern_dict['pattern'].match(line):
+                if 'value' in pattern_dict:
+                    current_column = pattern_dict['column']
+                    current_additional[current_column] = pattern_dict['value']
+
+                else:
+                    current_additional.update(match.groupdict())
+
+        if match := BEGAZE_SAMPLE.match(line):
+            timestamp_s = match.group('time')
+            x_pix_s = match.group('x_pix')
+            y_pix_s = match.group('y_pix')
+            pupil_s = match.group('pupil')
+
+            timestamp = float(timestamp_s) / 1000  # convert to milliseconds
+            x_pix = check_nan(x_pix_s)
+            y_pix = check_nan(y_pix_s)
+            pupil = check_nan(pupil_s)
+
+            samples['time'].append(timestamp)
+            samples['x_pix'].append(x_pix)
+            samples['y_pix'].append(y_pix)
+            samples['pupil'].append(pupil)
+
+            for additional_column in additional_columns:
+                samples[additional_column].append(current_additional[additional_column])
+
+            event = match.group('event')
+            if event != current_event:
+                if current_event != '-':
+                    # end previous event
+                    events['name'].append(current_event.lower() + '_begaze')
+                    events['onset'].append(current_event_onset)
+                    events['offset'].append(previous_timestamp)
+                    for additional_column in additional_columns:
+                        events[additional_column].append(
+                            current_event_additional[current_event][additional_column],
+                        )
+                current_event = event
+                current_event_onset = timestamp
+                current_event_additional[current_event] = {**current_additional}
+            previous_timestamp = timestamp
+
+    # TODO: refactor
+    # add last event
+    if current_event != '-':
+        events['name'].append(current_event.lower() + '_begaze')
+        events['onset'].append(current_event_onset)
+        events['offset'].append(previous_timestamp)
+        for additional_column in additional_columns:
+            events[additional_column].append(
+                current_event_additional[current_event][additional_column],
+            )
+        current_event = '-'
+        current_event_onset = None
+        current_event_additional = {key: {} for key in current_event_additional.keys()}
+
+    # TODO: metadata
+
+    gaze_df = pl.from_dict(data=samples)  # .cast(gaze_schema_overrides)
+    event_df = pl.from_dict(data=events)  # .cast(event_schema_overrides)
+
+    return gaze_df, event_df, metadata

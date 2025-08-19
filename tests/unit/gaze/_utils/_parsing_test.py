@@ -152,31 +152,31 @@ BEGAZE_TEXT = r"""
 ## Format:	LEFT, POR, QUALITY, PLANE, MSG
 ##
 Time	Type	Trial	L POR X [px]	L POR Y [px]	L Pupil Diameter [mm]	Timing	Pupil Confidence	R Plane	Info	R Event Info	Stimulus
-10000000123	SMP	1	850.71	717.53	714.00	0	1	1	1	-	test.bmp
-10000000234	MSG	1	# Message: START_A
-10000002123	SMP	1	850.71	717.53	714.00	0	1	1	1	-	test.bmp
+10000000123	SMP	1	850.71	717.53	714.00	0	1	1	Fixation	test.bmp
+10000001123	MSG	1	# Message: START_A
+10000002123	SMP	1	850.71	717.53	714.00	0	1	1	Fixation	test.bmp
 10000003234	MSG	1	# Message: STOP_A
-10000004123	SMP	1	850.71	717.53	714.00	0	1	1	1	-	test.bmp
+10000004123	SMP	1	850.71	717.53	714.00	0	1	1	Fixation	test.bmp
 10000004234	MSG	1	# Message: METADATA_1 123
 10000005234	MSG	1	# Message: START_B
-10000006123	SMP	1	850.71	717.53	714.00	0	1	1	1	-	test.bmp
+10000006123	SMP	1	850.71	717.53	714.00	0	1	1	Fixation	test.bmp
 10000007234	MSG	1	# Message: START_TRIAL_1
-10000008123	SMP	1	850.71	717.53	714.00	0	1	1	1	-	test.bmp
+10000008123	SMP	1	850.71	717.53	714.00	0	1	1	Fixation	test.bmp
 10000009234	MSG	1	# Message: STOP_TRIAL_1
 10000010234	MSG	1	# Message: START_TRIAL_2
-10000011123	SMP	1	850.71	717.53	714.00	0	1	1	1	-	test.bmp
+10000011123	SMP	1	850.71	717.53	714.00	0	1	1	Saccade	test.bmp
 10000012234	MSG	1	# Message: STOP_TRIAL_2
 10000013234	MSG	1	# Message: START_TRIAL_3
 10000014234	MSG	1	# Message: METADATA_2 abc
 10000014235	MSG	1	# Message: METADATA_1 456
-10000014345	SMP	1	850.71	717.53	714.00	0	1	1	1	-	test.bmp
+10000014345	SMP	1	850.71	717.53	714.00	0	1	1	Saccade	test.bmp
 10000015234	MSG	1	# Message: STOP_TRIAL_3
 10000016234	MSG	1	# Message: STOP_B
 10000017234	MSG	1	# Message: METADATA_3
-10000017345	SMP	1	850.71	717.53	714.00	0	0	-1	-1	-	test.bmp
-10000019123	SMP	1	850.71	717.53	714.00	0	0	-1	-1	Blink	test.bmp
-10000020123	SMP	1	850.71	717.53	714.00	0	0	-1	-1	Blink	test.bmp
-10000021123	SMP	1	850.71	717.53	714.00	0	0	1	-1	-	test.bmp
+10000017345	SMP	1	850.71	717.53	714.00	0	1	1	Saccade	test.bmp
+10000019123	SMP	1	850.71	717.53	714.00	0	0	-1	Saccade	test.bmp
+10000020123	SMP	1	850.71	717.53	714.00	0	0	-1	Blink	test.bmp
+10000021123	SMP	1	850.71	717.53	714.00	0	0	-1	Blink	test.bmp
 """  # noqa: E501
 
 
@@ -230,6 +230,24 @@ EXPECTED_GAZE_DF = pl.from_dict(
     },
 )
 
+BEGAZE_EXPECTED_GAZE_DF = pl.from_dict(
+    {
+        'time': [
+            10000000.123, 10000002.123, 10000004.123, 10000006.123, 10000008.123, 10000011.123, 10000014.345,
+            10000017.345, 10000019.123, 10000020.123, 10000021.123,
+        ],
+        'x_pix': [
+            850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, 850.7, np.nan, np.nan,
+        ],
+        'y_pix': [
+            717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, 717.5, np.nan, np.nan,
+        ],
+        'pupil': [714.0, 714.0, 714.0, 714.0, 714.0, 714.0, 714.0, 714.0, np.nan, 0.0, 0.0],
+        'task': [None, 'A', None, 'B', 'B', 'B', 'B', None, None, None, None],
+        'trial_id': [None, None, None, None, '1', '2', '3', None, None, None, None],
+    },
+)
+
 EXPECTED_EVENT_DF = pl.from_dict(
     {
         'name': ['fixation_eyelink', 'blink_eyelink', 'saccade_eyelink'],
@@ -237,6 +255,16 @@ EXPECTED_EVENT_DF = pl.from_dict(
         'offset': [10000008.0, 10000022.0, 10000022.0],
         'task': [None, None, 'B'],
         'trial_id': [None, None, '2'],
+    },
+)
+
+BEGAZE_EXPECTED_EVENT_DF = pl.from_dict(
+    {
+        'name': ['fixation_begaze', 'saccade_begaze', 'blink_begaze'],
+        'onset': [10000000.123, 10000011.123, 10000020.123],
+        'offset': [10000008.123, 10000019.123, 10000021.123],
+        'task': [None, 'B', None],
+        'trial_id': [None, '2', None],
     },
 )
 
@@ -949,11 +977,16 @@ def test_parse_begaze(tmp_path):
     filepath = tmp_path / 'sub.txt'
     filepath.write_text(BEGAZE_TEXT)
 
-    gaze_df, metadata = pm.gaze._utils.parsing.parse_begaze(
+    gaze_df, event_df, metadata = pm.gaze._utils.parsing.parse_begaze(
         filepath,
         patterns=PATTERNS,
         metadata_patterns=METADATA_PATTERNS,
     )
 
-    assert_frame_equal(gaze_df, EXPECTED_GAZE_DF, check_column_order=False, rtol=0)
+    print(gaze_df.with_columns(pl.all().cast(pl.String)))
+    print(BEGAZE_EXPECTED_GAZE_DF.with_columns(pl.all().cast(pl.String)))
+    assert_frame_equal(gaze_df, BEGAZE_EXPECTED_GAZE_DF, check_column_order=False, rtol=0)
+    print(event_df.with_columns(pl.all().cast(pl.String)))
+    print(BEGAZE_EXPECTED_EVENT_DF.with_columns(pl.all().cast(pl.String)))
+    assert_frame_equal(event_df, BEGAZE_EXPECTED_EVENT_DF, check_column_order=False, rtol=0)
     assert metadata == EXPECTED_METADATA_BEGAZE
