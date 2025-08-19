@@ -347,18 +347,17 @@ def from_asc(
     Notes
     -----
     ASC files are created from EyeLink EDF files using the edf2asc tool
-    (available from the SR Research Support website).
+    (can be downloaded from the SR Research Support website).
     ASC files contain gaze samples, events, and metadata about
     the experiment in a text (ASCII) format.
     For example, if you have an Eyelink EDF file stored at
     `tests/files/eyelink_monocular_example.edf`,
-    you can convert it to an ASC file using the following command
-    (requires the edf2asc tool which can be downloaded from the SR Research Support website):
+    you can convert it to an ASC file using the following command:
     `edf2asc tests/files/eyelink_monocular_example.edf`.
     This will create an ASC file named `tests/files/eyelink_monocular_example.asc`.
 
     Running edf2asc with the default settings (no flags/parameters) will always produce
-    an ASC file  that can be read by this function, although currently only monocular
+    an ASC file that can be read by this function, although currently only monocular
     recordings are supported.
     If a binocular ASC file is provided, only the left eye data will be read.
     If you want to use right eye data, you can use the
@@ -366,7 +365,8 @@ def from_asc(
     Additionally, the following optional edf2asc parameters/flags are safe to use
     and will also result in an ASC file that can be read by this function:
 
-    - `-input` for writing the status of the Host PC parallel port to the ASC file.
+    - `-input` for writing the status of the Host PC parallel port to the ASC
+      file (although these values will not be read).
 
     - `-ftime` for outputting time as a floating point value.
 
