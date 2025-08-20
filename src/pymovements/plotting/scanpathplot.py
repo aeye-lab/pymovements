@@ -31,7 +31,9 @@ import numpy as np
 from matplotlib.patches import Circle
 
 from pymovements._utils._checks import check_is_mutual_exclusive
+from pymovements._utils._checks import check_is_not_none
 from pymovements.events import EventDataFrame
+from pymovements.events import Events
 from pymovements.gaze import Gaze
 from pymovements.plotting._matplotlib import _draw_line_data
 from pymovements.plotting._matplotlib import _setup_matplotlib
@@ -72,8 +74,6 @@ def scanpathplot(
 
     Parameters
     ----------
-    events: EventDataFrame
-        The EventDataFrame to plot.
     gaze: Gaze | None
         Optional Gaze Dataframe. (default: None)
     position_column: str
@@ -117,6 +117,8 @@ def scanpathplot(
         Path of the stimulus to be shown. (default: None)
     stimulus_origin: str
         Origin of stimuls to plot on the stimulus. (default: 'upper')
+    events: EventDataFrame | None
+        The EventDataFrame to plot. (default: None)
 
     Raises
     ------
@@ -134,6 +136,10 @@ def scanpathplot(
             ),
         )
     else:
+        check_is_not_none(gaze)
+        check_is_not_none(gaze.events)
+        assert gaze is not None
+        assert gaze.events is not None
         events = gaze.events
 
     # pylint: disable=duplicate-code
