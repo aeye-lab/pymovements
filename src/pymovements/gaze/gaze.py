@@ -25,6 +25,7 @@ import warnings
 from collections.abc import Callable
 from collections.abc import Sequence
 from copy import deepcopy
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -38,8 +39,6 @@ from pymovements._utils._html import repr_html
 from pymovements.events.processing import EventGazeProcessor
 from pymovements.gaze import transforms
 from pymovements.gaze.experiment import Experiment
-
-from pathlib import Path
 
 
 @repr_html(['samples', 'events', 'trial_columns', 'experiment'])
@@ -1752,7 +1751,7 @@ class Gaze:
 
     def save(
             self,
-            dirname: str | None = None, #TODO what if None?
+            dirname: str | None = None,  # TODO what if None?
             save_events: bool = True,
             save_samples: bool = True,
             save_experiment: bool = True,
@@ -1786,7 +1785,7 @@ class Gaze:
         extension: str
             Extension specifies the fileformat to store the data. (default: 'feather')
         """
-        #TODO create dir if does not exist?
+        # TODO create dir if does not exist?
         Path(dirname).mkdir(parents=True, exist_ok=True)
 
         if save_events:
@@ -1794,11 +1793,11 @@ class Gaze:
         if save_samples:
             self.save_preprocessed(dirname, verbose=verbose, extension=extension)
         if save_experiment:
-            if verbose>=2:
-                print(f'Saving experiment.yaml file to', dirname)
-            self.experiment.to_yaml(dirname/'experiment.yaml')
+            if verbose >= 2:
+                print('Saving experiment.yaml file to', dirname)
+            self.experiment.to_yaml(dirname / 'experiment.yaml')
         return self
-    
+
     def save_events(
             self,
             dirname: str,
@@ -1833,16 +1832,15 @@ class Gaze:
             print(f'Saving events.{extension} file to', dirname)
 
         if extension == 'feather':
-            events_out.write_ipc(dirname/'events.feather')
+            events_out.write_ipc(dirname / 'events.feather')
         elif extension == 'csv':
-            events_out.write_csv(dirname/'events.csv')
+            events_out.write_csv(dirname / 'events.csv')
         else:
             valid_extensions = ['csv', 'feather']
             raise ValueError(
                 f'unsupported file format "{extension}".'
                 f'Supported formats are: {valid_extensions}',
             )
-
 
     def save_preprocessed(
             self,
@@ -1881,18 +1879,15 @@ class Gaze:
             print(f'Saving samples.{extension} file to', dirname)
 
         if extension == 'feather':
-            gaze.samples.write_ipc(dirname/'samples.feather')
+            gaze.samples.write_ipc(dirname / 'samples.feather')
         elif extension == 'csv':
-            gaze.samples.write_csv(dirname/'samples.csv')
+            gaze.samples.write_csv(dirname / 'samples.csv')
         else:
             valid_extensions = ['csv', 'feather']
             raise ValueError(
                 f'unsupported file format "{extension}".'
                 f'Supported formats are: {valid_extensions}',
             )
-
-
-
 
 
 def _check_trial_columns(trial_columns: list[str] | None, samples: pl.DataFrame) -> None:
@@ -1922,4 +1917,3 @@ def _check_trial_columns(trial_columns: list[str] | None, samples: pl.DataFrame)
         if len(set(trial_columns).intersection(samples.columns)) != len(trial_columns):
             missing = set(trial_columns) - set(samples.columns)
             raise KeyError(f'trial_columns missing in samples: {", ".join(missing)}')
-
