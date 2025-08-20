@@ -107,11 +107,10 @@ def traceplot(
     # pylint: disable=duplicate-code
     x_signal = gaze.samples[position_column].list.get(0)
     y_signal = gaze.samples[position_column].list.get(1)
-    if all(
-        v is not None for v in (
-            gaze.experiment.screen.width_cm,
-            gaze.experiment.screen.height_cm,
-        )
+    if (
+        gaze.experiment is not None
+        and gaze.experiment.screen.width_cm is not None
+            and gaze.experiment.screen.height_cm is not None
     ):
         figsize = (
             int(gaze.experiment.screen.width_cm),
