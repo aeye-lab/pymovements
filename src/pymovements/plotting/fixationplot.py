@@ -167,5 +167,5 @@ def fixationplot(
     if show:
         plt.show()
     plt.close(fig)
-    print("Local version")
+
 

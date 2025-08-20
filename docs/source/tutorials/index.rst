@@ -16,5 +16,6 @@ These How-Tos provide detailed guides to implement the most important use cases 
     saving-loading-preprocessed
     event-handling
     plot-main-sequence
+    scatterplot
     heatmap
     R-tutorial
