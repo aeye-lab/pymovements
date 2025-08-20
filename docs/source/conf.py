@@ -158,7 +158,7 @@ bibtex_reference_style = 'author_year'
 class AuthorYearLabelStyle(BaseLabelStyle):
     def format_labels(self, sorted_entries):
         for entry in sorted_entries:
-            yield f'[{entry.persons["author"][0].last_names[0]} et al., {entry.fields["year"]}]'
+            yield f'{entry.persons["author"][0].rich_last_names[0]} et al., {entry.fields["year"]}'
 
 
 class AuthorYearStyle(PlainStyle):
