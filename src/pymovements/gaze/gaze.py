@@ -709,6 +709,7 @@ class Gaze:
         --------
         Lets create an example Gaze of 1000Hz with a time column and a position column.
         Please note that time is always stored in milliseconds in the Gaze.
+
         >>> df = pl.DataFrame({
         ...     'time': [0, 1, 2, 3, 4],
         ...     'x': [1, 2, 3, 4, 5],
@@ -731,6 +732,7 @@ class Gaze:
 
         We can now upsample the Gaze to 2000Hz with interpolating the values in
         the pixel column.
+
         >>> gaze.resample(
         ...     resampling_rate=2000,
         ...     fill_null_strategy='interpolate_linear',
@@ -755,6 +757,7 @@ class Gaze:
         └──────┴────────────┘
 
         Downsample the Gaze to 500Hz results in the following DataFrame.
+
         >>> gaze.resample(resampling_rate=500)
         >>> gaze.samples
         shape: (3, 2)
