@@ -23,7 +23,6 @@ from __future__ import annotations
 import math
 import sys
 
-import matplotlib.colors
 import matplotlib.pyplot as plt
 import matplotlib.scale
 import numpy as np
@@ -31,9 +30,10 @@ from matplotlib.patches import Circle
 
 from pymovements.events import EventDataFrame
 from pymovements.gaze import Gaze
-from pymovements.plotting._matplotlib import _draw_line_data
-from pymovements.plotting._matplotlib import _setup_matplotlib
-from pymovements.plotting._matplotlib import LinearSegmentedColormapType
+from pymovements.plotting._figure_utils import _draw_line_data
+from pymovements.plotting._figure_utils import _setup_axes_and_colormap
+from pymovements.plotting._figure_utils import finalize_figure
+from pymovements.plotting._figure_utils import LinearSegmentedColormapType
 
 # This is really a dirty workaround to use the Agg backend if runnning pytest.
 # This is needed as Windows workers on GitHub fail randomly with other backends.
@@ -65,7 +65,10 @@ def scanpathplot(
         add_stimulus: bool = False,
         path_to_image_stimulus: str | None = None,
         stimulus_origin: str = 'upper',
-) -> None:
+        *,
+        ax: plt.Axes | None = None,
+        closefig: bool | None = None,
+) -> tuple[plt.Figure, plt.Axes]:
     """Plot scanpath from positional data.
 
     Parameters
@@ -115,6 +118,15 @@ def scanpathplot(
         Path of the stimulus to be shown. (default: None)
     stimulus_origin: str
         Origin of stimuls to plot on the stimulus. (default: 'upper')
+    ax: plt.Axes | None
+        External axes to draw into. If provided, the function will not show or close the figure.
+    closefig: bool | None
+        Whether to close the figure. If None, close only when the function created the figure.
+
+    Returns
+    -------
+    tuple[plt.Figure, plt.Axes]
+        The created or provided figure and axes.
 
     Raises
     ------
@@ -126,7 +138,9 @@ def scanpathplot(
     x_signal = events.frame[position_column].list.get(0)
     y_signal = events.frame[position_column].list.get(1)
 
-    fig, ax, cmap, cmap_norm, cval, show_cbar = _setup_matplotlib(
+    own_figure = ax is None
+
+    fig, ax, cmap, cmap_norm, cval, show_cbar = _setup_axes_and_colormap(
         x_signal,
         y_signal,
         figsize,
@@ -140,6 +154,7 @@ def scanpathplot(
         stimulus_origin,
         padding,
         pad_factor,
+        ax=ax,
     )
 
     for row in events.frame.iter_rows(named=True):
@@ -174,9 +189,13 @@ def scanpathplot(
     if title:
         ax.set_title(title)
 
-    if savepath is not None:
-        fig.savefig(savepath)
+    finalize_figure(
+        fig,
+        show=show,
+        savepath=savepath,
+        closefig=closefig,
+        own_figure=own_figure,
+        func_name='scanpathplot',
+    )
 
-    if show:
-        plt.show()
-    plt.close(fig)
+    return fig, ax
