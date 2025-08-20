@@ -1764,11 +1764,11 @@ class Gaze:
         """Save data from the Gaze object in the provided directory.
 
         Depending on parameters it may save three files:
-        * preprocessed gaze in samples
-        * calculated gaze events
-        * metadatata experiment in YAML file.
+        * preprocessed gaze in samples (samples)
+        * calculated gaze events (events)
+        * metadatata experiment in YAML file (experiment).
 
-        Data will be saved as feather/csv files.
+        Data will be saved as feather or csv files.
 
         Returns
         -------
@@ -1797,6 +1797,8 @@ class Gaze:
         ------
         ValueError
             If save_events is True and self.events is None or empty
+        ValueError
+            If save_experiment is True and self.experiment is None
 
         """
         # Create dir if does not exist
@@ -1844,7 +1846,7 @@ class Gaze:
         Raises
         ------
         ValueError
-            If extension is not in list of valid extensions.
+            If file extension in path is not in list of valid extensions.
         """
         events_out = self.events.frame.clone()
         extension = path.suffix[1:]
@@ -1883,7 +1885,7 @@ class Gaze:
         Raises
         ------
         ValueError
-            If extension is not in list of valid extensions.
+            If file extension in path is not in list of valid extensions.
         """
         gaze = self.clone()
         extension = path.suffix[1:]
