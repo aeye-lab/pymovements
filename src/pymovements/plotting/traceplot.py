@@ -50,7 +50,7 @@ def traceplot(
         show_cbar: bool = False,
         padding: float | None = None,
         pad_factor: float | None = 0.05,
-        figsize: tuple[int, int] = (20, 1),
+        figsize: tuple[int, int] = (15, 5),
         title: str | None = None,
         savepath: str | None = None,
         show: bool = True,
