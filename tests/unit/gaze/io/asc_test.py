@@ -789,7 +789,9 @@ def test_from_asc_has_expected_metadata(kwargs, expected_metadata):
             },
             pl.from_dict(
                 data={
-                    'name': ['fixation_left_eyelink', 'saccade_left_eyelink', 'fixation_left_eyelink'],
+                    'name': ['fixation_left_eyelink', 
+                             'saccade_left_eyelink', 
+                             'fixation_left_eyelink'],
                     'onset': [2154563, 2339227, 2339246],
                     'offset': [2154695, 2339245, 2339290],
                     'duration': [132, 18, 44],
@@ -810,7 +812,9 @@ def test_from_asc_has_expected_metadata(kwargs, expected_metadata):
             },
             pl.from_dict(
                 data={
-                    'name': ['fixation_left_eyelink', 'saccade_left_eyelink', 'fixation_left_eyelink'],
+                    'name': ['fixation_left_eyelink',
+                             'saccade_left_eyelink', 
+                             'fixation_left_eyelink'],
                     'onset': [2154563, 2339227, 2339246],
                     'offset': [2154695, 2339245, 2339290],
                     'duration': [132, 18, 44],
