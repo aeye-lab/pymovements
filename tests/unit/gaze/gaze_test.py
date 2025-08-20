@@ -588,7 +588,7 @@ def test_gaze_save_no_experiment(tmp_path):
     assert not os.path.exists(tmp_path / 'experiment.yaml')
 
 
-def test_gaze_save_wrong_extension(tmp_path):
+def test_gaze_save_wrong_extension_events(tmp_path):
     gaze = _create_gaze()
 
     with pytest.raises(ValueError):
@@ -598,7 +598,7 @@ def test_gaze_save_wrong_extension(tmp_path):
             extension='blabla',
         )
 
-def test_gaze_save_wrong_extension(tmp_path):
+def test_gaze_save_wrong_extension_preprocessed(tmp_path):
     gaze = _create_gaze()
 
     with pytest.raises(ValueError):
@@ -609,7 +609,7 @@ def test_gaze_save_wrong_extension(tmp_path):
             extension='blabla',
         )
 
-def test_gaze_save_no_experiment(tmp_path):
+def test_gaze_save_empty_experiment(tmp_path):
     gaze = _create_gaze()
     gaze.experiment = None
 
