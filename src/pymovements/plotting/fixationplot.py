@@ -17,20 +17,18 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Provides the scanpath plotting function."""
+"""Provides the traceplot plotting function."""
 from __future__ import annotations
 
-import math
 import sys
 
 import matplotlib.colors
 import matplotlib.pyplot as plt
 import matplotlib.scale
 import numpy as np
-from matplotlib.patches import Circle
+import polars as pl
 
-from pymovements.events import EventDataFrame
-from pymovements.gaze import Gaze
+from pymovements.gaze.gaze import Gaze
 from pymovements.plotting._matplotlib import _draw_line_data
 from pymovements.plotting._matplotlib import _setup_matplotlib
 from pymovements.plotting._matplotlib import LinearSegmentedColormapType
@@ -42,11 +40,11 @@ if 'pytest' in sys.modules:  # pragma: no cover
     matplotlib.use('Agg')
 
 
-def scanpathplot(
-        events: EventDataFrame,
-        gaze: Gaze | None = None,
-        position_column: str = 'location',
-        cval: np.ndarray | None = None,  # pragma: no cover
+def fixationplot(
+        gaze: Gaze,
+        position_column: str = 'pixel',
+        fixations: pl.DataFrame | None = None,  # Add this parameter
+        cval: np.ndarray | None = None,
         cmap: matplotlib.colors.Colormap | None = None,
         cmap_norm: matplotlib.colors.Normalize | str | None = None,
         cmap_segmentdata: LinearSegmentedColormapType | None = None,
@@ -58,24 +56,21 @@ def scanpathplot(
         title: str | None = None,
         savepath: str | None = None,
         show: bool = True,
-        color: str = 'blue',
-        alpha: float = 0.5,
-        add_traceplot: bool = False,
-        gaze_position_column: str = 'pixel',
         add_stimulus: bool = False,
         path_to_image_stimulus: str | None = None,
         stimulus_origin: str = 'upper',
 ) -> None:
-    """Plot scanpath from positional data.
+    """Plot eye gaze trace from positional data.
 
     Parameters
     ----------
-    events: EventDataFrame
-        The EventDataFrame to plot.
-    gaze: Gaze | None
-        Optional Gaze Dataframe. (default: None)
+    gaze: Gaze
+        The Gaze to plot.
     position_column: str
-        The column name of the x and y position data (default: 'location')
+        The column name of the x and y position data (default: 'pixel')
+    fixations: pl.DataFrame | None
+        DataFrame containing fixation events with 'onset' and 'offset' columns.
+        If provided, fixation centroids will be plotted as circles. (default: None)
     cval: np.ndarray | None
         Line color values. (default: None)
     cmap: matplotlib.colors.Colormap | None
@@ -101,20 +96,12 @@ def scanpathplot(
         If given, figure will be saved to this path. (default: None)
     show: bool
         If True, figure will be shown. (default: True)
-    color: str
-        Color of fixations. (default: 'blue')
-    alpha: float
-        Alpha value of scanpath. (default: 0.5)
-    add_traceplot: bool
-        Boolean value indicating whether to add traceplot to the scanpath plot. (default: False)
-    gaze_position_column: str
-        Position column in the gaze dataframe. (default: 'pixel')
     add_stimulus: bool
-        Boolean value indicationg whether to plot the scanpath on the stimuls. (default: False)
+        Define whether stimulus should be included. (default: False)
     path_to_image_stimulus: str | None
-        Path of the stimulus to be shown. (default: None)
+        Path to image stimulus. (default: None)
     stimulus_origin: str
-        Origin of stimuls to plot on the stimulus. (default: 'upper')
+        Origin of stimulus. (default: 'upper')
 
     Raises
     ------
@@ -122,10 +109,25 @@ def scanpathplot(
         If length of x and y coordinates do not match or if ``cmap_norm`` is unknown.
 
     """
+    def calculate_fixation_centroid(onset, offset):
+        fixation_data = gaze.samples[onset-gaze.samples['time'][0]:offset-gaze.samples['time'][0]]
+        if len(fixation_data) > 0:
+            pixel_coords = fixation_data['pixel'].to_list()
+            return np.mean(pixel_coords, axis=0)
+        return None
+
+    # Get all onset and offset pairs
+    fixation_boundaries = fixations.select(['onset', 'offset','duration']).rows()
+
+    # Calculate centroids for all fixations
+    centroids = [[calculate_fixation_centroid(onset, offset), duration ]
+                for onset, offset, duration in fixation_boundaries]
+    print(centroids)
     # pylint: disable=duplicate-code
-    x_signal = events.frame[position_column].list.get(0)
-    y_signal = events.frame[position_column].list.get(1)
-    figsize = (gaze.experiment.screen.width_cm, gaze.experiment.screen.height_cm)
+    x_signal = gaze.samples[position_column].list.get(0)
+    y_signal = gaze.samples[position_column].list.get(1)
+    figsize = (10, 10)
+
     fig, ax, cmap, cmap_norm, cval, show_cbar = _setup_matplotlib(
         x_signal,
         y_signal,
@@ -142,34 +144,19 @@ def scanpathplot(
         pad_factor,
     )
 
-    for row in events.frame.iter_rows(named=True):
-        fixation = Circle(
-            row[position_column],
-            math.sqrt(row['duration']),
-            color=color,
-            fill=True,
-            alpha=alpha,
-            zorder=10,
-        )
-        ax.add_patch(fixation)
+    line = _draw_line_data(
+        x_signal,
+        y_signal,
+        ax,
+        cmap,
+        cmap_norm,
+        cval,
+    )
 
-    if add_traceplot:
-        assert gaze
-        gaze_x_signal = gaze.frame[gaze_position_column].list.get(0)
-        gaze_y_signal = gaze.frame[gaze_position_column].list.get(1)
-        line = _draw_line_data(
-            gaze_x_signal,
-            gaze_y_signal,
-            ax,
-            cmap,
-            cmap_norm,
-            cval,
-        )
-
-        if show_cbar:
-            # sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
-            # sm.set_array(cval)
-            fig.colorbar(line, label=cbar_label, ax=ax)
+    if show_cbar:
+        # sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
+        # sm.set_array(cval)
+        fig.colorbar(line, label=cbar_label, ax=ax)
 
     if title:
         ax.set_title(title)
@@ -180,3 +167,5 @@ def scanpathplot(
     if show:
         plt.show()
     plt.close(fig)
+    print("Local version")
+

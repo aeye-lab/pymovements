@@ -107,6 +107,7 @@ def traceplot(
     # pylint: disable=duplicate-code
     x_signal = gaze.samples[position_column].list.get(0)
     y_signal = gaze.samples[position_column].list.get(1)
+    figsize = (10, 10)
 
     fig, ax, cmap, cmap_norm, cval, show_cbar = _setup_matplotlib(
         x_signal,
@@ -147,3 +148,4 @@ def traceplot(
     if show:
         plt.show()
     plt.close(fig)
+    print("Local version")
