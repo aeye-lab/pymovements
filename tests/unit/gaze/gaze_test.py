@@ -610,6 +610,7 @@ def test_gaze_save_wrong_extension_preprocessed(tmp_path):
             extension='blabla',
         )
 
+
 def test_gaze_save_empty_experiment(tmp_path):
     gaze = _create_gaze()
     gaze.experiment = None
