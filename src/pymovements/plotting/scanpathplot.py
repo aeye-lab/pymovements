@@ -31,7 +31,6 @@ import numpy as np
 from matplotlib.patches import Circle
 
 from pymovements._utils._checks import check_is_mutual_exclusive
-from pymovements._utils._checks import check_is_not_none
 from pymovements.events import EventDataFrame
 from pymovements.events import Events
 from pymovements.gaze import Gaze
@@ -136,8 +135,10 @@ def scanpathplot(
             ),
         )
     else:
-        check_is_not_none(gaze=gaze)
-        check_is_not_none(gaze.events=gaze.events)
+        if gaze is None:
+            raise TypeError(f"scanpathplot argument 'gaze' or 'events' must not be None")
+        if gaze.events is None:
+            raise TypeError(f"scanpathplot 'gaze.events' must not be None")
         assert gaze is not None
         assert gaze.events is not None
         events = gaze.events
