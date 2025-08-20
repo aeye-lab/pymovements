@@ -1751,16 +1751,20 @@ class Gaze:
 
     def save(
             self,
-            dirname: str | None = None,  # TODO what if None?
+            dirname: str | None = None,
             save_events: bool = True,
             save_samples: bool = True,
             save_experiment: bool = True,
             verbose: int = 1,
             extension: str = 'feather',
     ) -> Gaze:
-        """Save preprocessed gaze  in samples, events and experiment files in the provides directory.
+        """Saves data from the Gaze object in the provided directory.
+        Depending on parameters it may save three files: 
+        * preprocessed gaze in samples
+        * calculated gaze events
+        * metadatata experiment in YAML file.
 
-        Data will be saved as feather/csv files to the provided directory.
+        Data will be saved as feather/csv files.
 
         Returns
         -------
@@ -1785,7 +1789,7 @@ class Gaze:
         extension: str
             Extension specifies the fileformat to store the data. (default: 'feather')
         """
-        # TODO create dir if does not exist?
+        # Create dir if does not exist
         Path(dirname).mkdir(parents=True, exist_ok=True)
 
         if save_events:
