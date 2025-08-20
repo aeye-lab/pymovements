@@ -1813,9 +1813,9 @@ class Gaze:
             self.save_samples(Path(f'{dirpath}/samples.{extension}'), verbose=verbose)
 
         if save_experiment is None or save_experiment:
+            if verbose >= 2:
+                print('Saving experiment.yaml file to', dirpath)
             if self.experiment is not None:
-                if verbose >= 2:
-                    print('Saving experiment.yaml file to', dirpath)
                 self.experiment.to_yaml(Path(f"{dirpath}/experiment.yaml"))
             elif save_experiment is not None:
                 raise ValueError(
@@ -1825,7 +1825,7 @@ class Gaze:
 
     def save_events(
             self,
-            path: str | Path,
+            path: Path,
             verbose: int = 1,
 
     ) -> None:
@@ -1835,7 +1835,7 @@ class Gaze:
 
         Parameters
         ----------
-        path: str | Path
+        path: Path
             File to save data.
         verbose: int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
@@ -1848,12 +1848,6 @@ class Gaze:
         """
         events_out = self.events.frame.clone()
         extension = path.suffix[1:]
-
-        # if events_out is None or len(events_out)==0:
-        #     raise ValueError(
-        #         f'there are no events in the Gaze object'
-        #     )
-
 
         if verbose >= 2:
             print(f'Saving events to ', path)
@@ -1871,7 +1865,7 @@ class Gaze:
 
     def save_samples(
             self,
-            path: str | Path,
+            path: Path,
             verbose: int = 1
     ) -> None:
         """Save preprocessed gaze files.
@@ -1880,7 +1874,7 @@ class Gaze:
 
         Parameters
         ----------
-        path: str | Path
+        path: Path
             File to save data.
         verbose: int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
