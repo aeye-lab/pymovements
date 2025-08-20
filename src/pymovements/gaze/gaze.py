@@ -1754,7 +1754,7 @@ class Gaze:
 
     def save(
             self,
-            dirname: str | None = None,
+            dirname: str,
             save_events: bool = True,
             save_samples: bool = True,
             save_experiment: bool = True,
