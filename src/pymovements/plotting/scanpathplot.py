@@ -136,8 +136,8 @@ def scanpathplot(
             ),
         )
     else:
-        check_is_not_none(gaze)
-        check_is_not_none(gaze.events)
+        check_is_not_none(gaze=gaze)
+        check_is_not_none(gaze.events=gaze.events)
         assert gaze is not None
         assert gaze.events is not None
         events = gaze.events
