@@ -1797,18 +1797,18 @@ class Gaze:
         ------
         ValueError
             If save_events is True and self.events is None or empty
-    
+
         """
         # Create dir if does not exist
         Path(dirpath).mkdir(parents=True, exist_ok=True)
 
         if save_events is None or save_events:
-            if save_events and (self.events is None or len(self.events)==0):
+            if save_events and (self.events is None or len(self.events) == 0):
                 raise ValueError(
-                    f'there are no events in the Gaze object'
+                    'there are no events in the Gaze object',
                 )
             self.save_events(Path(f'{dirpath}/events.{extension}'), verbose=verbose)
-        
+
         if save_samples is None or save_samples:
             self.save_samples(Path(f'{dirpath}/samples.{extension}'), verbose=verbose)
 
@@ -1819,8 +1819,8 @@ class Gaze:
                 self.experiment.to_yaml(Path(f"{dirpath}/experiment.yaml"))
             elif save_experiment is not None:
                 raise ValueError(
-                        f'no experiment data in the Gaze object'
-                    )
+                    'no experiment data in the Gaze object',
+                )
         return self
 
     def save_events(
@@ -1850,7 +1850,7 @@ class Gaze:
         extension = path.suffix[1:]
 
         if verbose >= 2:
-            print(f'Saving events to ', path)
+            print('Saving events to ', path)
 
         if extension == 'feather':
             events_out.write_ipc(path)
@@ -1892,7 +1892,7 @@ class Gaze:
             gaze.unnest()
 
         if verbose >= 2:
-            print(f'Saving samples to', path)
+            print('Saving samples to', path)
 
         if extension == 'feather':
             gaze.samples.write_ipc(path)

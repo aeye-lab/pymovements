@@ -638,6 +638,7 @@ def test_gaze_save_empty_experiment(tmp_path):
     assert os.path.exists(tmp_path / 'samples.csv')
     assert not os.path.exists(tmp_path / 'experiment.yaml')
 
+
 def test_gaze_save_empty_experiment_true_save(tmp_path):
     gaze = _create_gaze()
     gaze.experiment = None
