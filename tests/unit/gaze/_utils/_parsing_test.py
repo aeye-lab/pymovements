@@ -180,7 +180,8 @@ EXPECTED_METADATA = {
     'model': 'EyeLink Portable Duo',
     'version_number': '6.12',
     'sampling_rate': 1000.0,
-    'tracked_eye': 'L',
+    'tracked_eye': 'LEFT',
+    'recorded_eye': 'L',
     'pupil_data_type': 'AREA',
     'calibrations': [],
     'validations': [],
@@ -356,6 +357,7 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
 )
 @pytest.mark.filterwarnings('ignore:No metadata found.')
 @pytest.mark.filterwarnings('ignore:No recording configuration found.')
+@pytest.mark.filterwarnings('ignore:No samples configuration found.')
 def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_model):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
@@ -400,6 +402,7 @@ def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_mo
 )
 @pytest.mark.filterwarnings('ignore:No metadata found.')
 @pytest.mark.filterwarnings('ignore:No recording configuration found.')
+@pytest.mark.filterwarnings('ignore:No samples configuration found.')
 def test_metadata_warnings(tmp_path, metadata, expected_msg):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
@@ -458,6 +461,7 @@ def test_metadata_warnings(tmp_path, metadata, expected_msg):
 )
 @pytest.mark.filterwarnings('ignore:No metadata found.')
 @pytest.mark.filterwarnings('ignore:No recording configuration found.')
+@pytest.mark.filterwarnings('ignore:No samples configuration found.')
 def test_val_cal_eyelink(tmp_path, metadata, expected_validation, expected_calibration):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
@@ -614,6 +618,7 @@ def test_parse_val_cal_eyelink_monocular_file():
 )
 @pytest.mark.filterwarnings('ignore:No metadata found.')
 @pytest.mark.filterwarnings('ignore:No recording configuration found.')
+@pytest.mark.filterwarnings('ignore:No samples configuration found.')
 @pytest.mark.filterwarnings("ignore:Found inconsistent values for 'sampling_rate':")
 def test_parse_eyelink_data_loss_ratio(
         tmp_path, metadata, expected_blink_ratio, expected_overall_ratio,
@@ -629,6 +634,7 @@ def test_parse_eyelink_data_loss_ratio(
 
 @pytest.mark.filterwarnings('ignore:No metadata found.')
 @pytest.mark.filterwarnings('ignore:No recording configuration found.')
+@pytest.mark.filterwarnings('ignore:No samples configuration found.')
 def test_parse_eyelink_datetime(tmp_path):
     metadata = '** DATE: Wed Mar  8 09:25:20 2023\n'
     expected_datetime = datetime.datetime(2023, 3, 8, 9, 25, 20)
@@ -814,6 +820,7 @@ def test_parse_eyelink_datetime(tmp_path):
         ),
     ],
 )
+@pytest.mark.filterwarnings('ignore:No samples configuration found.')
 def test_parse_eyelink_mount_config(tmp_path, metadata, expected_mount_config):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
@@ -841,6 +848,8 @@ def test_parse_eyelink_mount_config(tmp_path, metadata, expected_mount_config):
     ],
 )
 @pytest.mark.filterwarnings('ignore:No recording configuration found.')
+@pytest.mark.filterwarnings('ignore:No samples configuration found.')
+
 def test_parse_eyelink_encoding(tmp_path, bytestring, encoding, expected_text):
     filepath = tmp_path / 'sub.asc'
     filepath.write_bytes(bytestring)
@@ -852,3 +861,57 @@ def test_parse_eyelink_encoding(tmp_path, bytestring, encoding, expected_text):
     )
 
     assert parsed_metadata['text'] == expected_text
+
+
+def test_parse_eyelink_binocular_simple(tmp_path):
+    """Basic test for parsing a binocular ASC snippet."""
+    asc_text = r"""
+** TYPE: EDF_FILE BINARY EVENT SAMPLE TAGGED
+MSG	1408659 RECCFG CR 1000 2 1 LR
+MSG	1408659 ELCLCFG BTABLER
+MSG	1408659 GAZE_COORDS 0.00 0.00 1919.00 1079.00
+PRESCALER	1
+VPRESCALER	1
+PUPIL	AREA
+EVENTS	GAZE	LEFT	RIGHT	RATE	1000.00	TRACKING	CR	FILTER	2
+SAMPLES	GAZE	LEFT	RIGHT	RATE	1000.00	TRACKING	CR	FILTER	2
+START	1408660 	LEFT	RIGHT	SAMPLES	EVENTS
+1408660	 964.3	 541.5	 288.0	 960.5	 538.8	 305.0	.....
+1408661	 964.5	 542.2	 288.0	 960.4	 539.5	 306.0	.....
+1408662	 964.9	 543.0	 288.0	 960.3	 540.4	 307.0	.....
+SFIX L   1408667
+SFIX R   1408667
+1408667	 963.7	 543.1	 288.0	 959.3	 538.6	 306.0	.....
+END	1408675 	SAMPLES	EVENTS	RES	 38.54	 31.12
+"""
+
+    filepath = tmp_path / 'sub_binoc.asc'
+    filepath.write_text(asc_text)
+
+    gaze_df, event_df, metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
+
+    assert isinstance(gaze_df, pl.DataFrame)
+
+    # Assert exact binocular sample values (times and left/right coords/pupils)
+    expected_gaze = pl.from_dict(
+        {
+            'time': [1408660.0, 1408661.0, 1408662.0, 1408667.0],
+            'x_left_pix': [964.3, 964.5, 964.9, 963.7],
+            'y_left_pix': [541.5, 542.2, 543.0, 543.1],
+            'pupil_left': [288.0, 288.0, 288.0, 288.0],
+            'x_right_pix': [960.5, 960.4, 960.3, 959.3],
+            'y_right_pix': [538.8, 539.5, 540.4, 538.6],
+            'pupil_right': [305.0, 306.0, 307.0, 306.0],
+        }
+    )
+
+    assert_frame_equal(gaze_df, expected_gaze, check_column_order=False, rtol=0)
+
+    assert isinstance(event_df, pl.DataFrame)
+    assert 'name' in event_df.columns
+
+    # basic metadata expectations
+    assert 'sampling_rate' in metadata
+    assert metadata['sampling_rate'] == 1000.0
+    # resolution should reflect the GAZE_COORDS line
+    assert metadata.get('resolution') == (1920, 1080) or metadata.get('resolution') == (1920.0, 1080.0)

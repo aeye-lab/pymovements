@@ -31,13 +31,26 @@ from typing import Any
 import numpy as np
 import polars as pl
 
-EYE_TRACKING_SAMPLE = re.compile(
+# Define separate regex patterns for monocular and binocular cases
+EYE_TRACKING_SAMPLE_MONOCULAR = re.compile(
     r'(?P<time>(\d+[.]?\d*))\s+'
-    r'(?P<x_pix>[-]?\d*[.]\d*)\s+'
-    r'(?P<y_pix>[-]?\d*[.]\d*)\s+'
-    r'(?P<pupil>\d*[.]\d*)\s+'
-    r'((?P<dummy>\d*[.]\d*)\s+)?'  # optional dummy column
-    r'(?P<dots>[A-Za-z.]{3,5})?\s*',
+    r'(?P<x_pix>[-]?\d*[.]\d*|\.)?\s*'
+    r'(?P<y_pix>[-]?\d*[.]\d*|\.)?\s*'
+    r'(?P<pupil>\d*[.]\d*|\.)?\s*'
+    r'(?P<dummy>\d*[.]\d*|\.)?\s*'
+    r'(?P<flags>[A-Za-z.]{3,5})?\s*'
+)
+
+EYE_TRACKING_SAMPLE_BINOCULAR = re.compile(
+    r'(?P<time>(\d+[.]?\d*))\s+'
+    r'(?P<x_pix_left>[-]?\d*[.]\d*|\.)?\s*'
+    r'(?P<y_pix_left>[-]?\d*[.]\d*|\.)?\s*'
+    r'(?P<pupil_left>\d*[.]\d*|\.)?\s*'
+    r'(?P<x_pix_right>[-]?\d*[.]\d*|\.)?\s*'
+    r'(?P<y_pix_right>[-]?\d*[.]\d*|\.)?\s*'
+    r'(?P<pupil_right>\d*[.]\d*|\.)?\s*'
+    r'(?P<dummy>\d*[.]\d*|\.)?\s*'
+    r'(?P<flags>[A-Za-z.]{3,5})?\s*'
 )
 
 EYELINK_META_REGEXES = [
@@ -99,8 +112,22 @@ RECORDING_CONFIG_REGEX = re.compile(
     r'(?P<link_sample_filter>0|1|2)\s+'
     r'(?P<tracked_eye>LR|[LR])\s*',
 )
+
+# Resolution (GAZE_COORDS) pattern used to extract screen coordinates
 RESOLUTION_REGEX = re.compile(
-    r'MSG\s+\d+[.]?\d*\s+GAZE_COORDS\s*=?\s*(?P<resolution>.*)',
+    r'MSG\s+\d+[.]?\d*\s+GAZE_COORDS\s*=?\s*(?P<resolution>.*)'
+)
+
+# Regex to match SAMPLES lines and capture which eyes are present (LEFT, RIGHT, LEFT RIGHT, LR)
+SAMPLES_CONFIG_REGEX = re.compile(
+    r'SAMPLES\s+GAZE\s+'
+    r'(?P<tracked_eye>(?:LEFT\s+RIGHT|LEFT|RIGHT|LR|[LR]))'
+    r'(?:\s+RATE\s+(?P<sampling_rate>\d+(?:\.\d+)?))?'
+    r'(?:\s+TRACKING\s+(?P<tracking_method>\S+))?'
+    r'(?:\s+FILTER\s+(?P<filter>\d+))?'
+    r'(?:\s+(?P<input_flag>INPUT))?'
+    ,
+    re.IGNORECASE,
 )
 START_RECORDING_REGEX = re.compile(
     r'START\s+(?P<timestamp>(\d+[.]?\d*))\s+(RIGHT|LEFT)\s+(?P<types>.*)',
@@ -303,12 +330,53 @@ def parse_eyelink(
     validations = []
     calibrations = []
     recording_config: list[dict[str, Any]] = []
+    samples_config: list[dict[str, Any]] = []
 
     total_recording_duration = 0.0
     num_expected_samples = 0
     num_valid_samples = 0  # excluding blinks
     num_blink_samples = 0
     blinking = False
+
+    # Detect if the file is binocular or monocular
+    is_binocular = False
+    for line in lines:
+        if match := SAMPLES_CONFIG_REGEX.search(line):
+            samples_config.append(match.groupdict())
+            tracked = match.group('tracked_eye').upper().strip()
+            # consider 'LEFT' in tracked and 'RIGHT' in tracked or tracked == 'LR' or tracked == 'L R':
+            if 'LEFT' in tracked and 'RIGHT' in tracked or tracked == 'LR' or tracked == 'L R':
+                is_binocular = True
+            else:
+                is_binocular = False
+            break
+
+    # Update the samples dictionary to include binocular data with correct column names if needed
+    if is_binocular:
+        samples.update({
+            'x_left_pix': [],
+            'y_left_pix': [],
+            'pupil_left': [],
+            'x_right_pix': [],
+            'y_right_pix': [],
+            'pupil_right': [],
+        })
+        # remove monocular-only keys to avoid mismatched column lengths
+        for _k in ('x_pix', 'y_pix', 'pupil'):
+            samples.pop(_k, None)
+    else:
+        # Ensure monocular fields are present in the samples dictionary
+        samples.update({
+            'x_pix': [],
+            'y_pix': [],
+            'pupil': [],
+        })
+        # remove binocular-only keys to avoid mismatched column lengths
+        for _k in (
+            'x_left_pix', 'y_left_pix', 'pupil_left',
+            'x_right_pix', 'y_right_pix', 'pupil_right',
+        ):
+            samples.pop(_k, None)
 
     for line in lines:
         for pattern_dict in compiled_patterns:
@@ -378,27 +446,60 @@ def parse_eyelink(
                 block_duration * float(recording_config[-1]['sampling_rate']) / 1000,
             )
 
-        elif eye_tracking_sample_match := EYE_TRACKING_SAMPLE.match(line):
+        # Use the appropriate regex based on the file type
+        eye_tracking_sample_match = (
+            EYE_TRACKING_SAMPLE_BINOCULAR.match(line)
+            if is_binocular else
+            EYE_TRACKING_SAMPLE_MONOCULAR.match(line)
+        )
 
+        if eye_tracking_sample_match:
             timestamp_s = eye_tracking_sample_match.group('time')
-            x_pix_s = eye_tracking_sample_match.group('x_pix')
-            y_pix_s = eye_tracking_sample_match.group('y_pix')
-            pupil_s = eye_tracking_sample_match.group('pupil')
+
+            if is_binocular:
+                x_left_pix_s = eye_tracking_sample_match.group('x_pix_left')
+                y_left_pix_s = eye_tracking_sample_match.group('y_pix_left')
+                pupil_left_s = eye_tracking_sample_match.group('pupil_left')
+                x_right_pix_s = eye_tracking_sample_match.group('x_pix_right')
+                y_right_pix_s = eye_tracking_sample_match.group('y_pix_right')
+                pupil_right_s = eye_tracking_sample_match.group('pupil_right')
+
+                samples['x_left_pix'].append(check_nan(x_left_pix_s))
+                samples['y_left_pix'].append(check_nan(y_left_pix_s))
+                samples['pupil_left'].append(check_nan(pupil_left_s))
+                samples['x_right_pix'].append(check_nan(x_right_pix_s))
+                samples['y_right_pix'].append(check_nan(y_right_pix_s))
+                samples['pupil_right'].append(check_nan(pupil_right_s))
+            else:
+                x_pix_s = eye_tracking_sample_match.group('x_pix')
+                y_pix_s = eye_tracking_sample_match.group('y_pix')
+                pupil_s = eye_tracking_sample_match.group('pupil')
+
+                samples['x_pix'].append(check_nan(x_pix_s))
+                samples['y_pix'].append(check_nan(y_pix_s))
+                samples['pupil'].append(check_nan(pupil_s))
 
             timestamp = float(timestamp_s)
-            x_pix = check_nan(x_pix_s)
-            y_pix = check_nan(y_pix_s)
-            pupil = check_nan(pupil_s)
-
             samples['time'].append(timestamp)
-            samples['x_pix'].append(x_pix)
-            samples['y_pix'].append(y_pix)
-            samples['pupil'].append(pupil)
 
             for additional_column in additional_columns:
                 samples[additional_column].append(current_additional[additional_column])
 
-            if not blinking and x_pix is not np.nan and y_pix is not np.nan and pupil is not np.nan:
+            # only check monocular validity when parsing monocular files
+            if not is_binocular:
+                if not blinking and all(
+                    val is not np.nan for val in (
+                        samples['x_pix'][-1], samples['y_pix'][-1], samples['pupil'][-1]
+                    )
+                ):
+                    num_valid_samples += 1
+
+            if is_binocular and not blinking and all(
+                val is not np.nan for val in (
+                    samples['x_left_pix'][-1], samples['y_left_pix'][-1], samples['pupil_left'][-1],
+                    samples['x_right_pix'][-1], samples['y_right_pix'][-1], samples['pupil_right'][-1]
+                )
+            ):
                 num_valid_samples += 1
 
         elif match := CALIBRATION_TIMESTAMP_REGEX.match(line):
@@ -422,8 +523,13 @@ def parse_eyelink(
     if not metadata:
         warnings.warn('No metadata found. Please check the file for errors.')
 
+# the actual tracked eye is in the samples config, not in the recording config
+# the recording config contains the eyes that were recorded
     metadata['sampling_rate'] = _check_reccfg_key(recording_config, 'sampling_rate', float)
-    metadata['tracked_eye'] = _check_reccfg_key(recording_config, 'tracked_eye')
+    metadata['recorded_eye'] = _check_reccfg_key(recording_config, 'tracked_eye')
+# the actual tracked eye is in the samples config, not in the recording config
+# the recording config contains the eyes that were recorded
+    metadata['tracked_eye'] = _check_samples_config_key(samples_config, 'tracked_eye')
     metadata['resolution'] = _check_reccfg_key(recording_config, 'resolution')
 
     pre_processed_metadata: dict[str, Any] = _pre_process_metadata(metadata)
@@ -439,10 +545,24 @@ def parse_eyelink(
 
     gaze_schema_overrides = {
         'time': pl.Float64,
-        'x_pix': pl.Float64,
-        'y_pix': pl.Float64,
-        'pupil': pl.Float64,
     }
+
+    if is_binocular:
+        gaze_schema_overrides.update({
+            'x_left_pix': pl.Float64,
+            'y_left_pix': pl.Float64,
+            'pupil_left': pl.Float64,
+            'x_right_pix': pl.Float64,
+            'y_right_pix': pl.Float64,
+            'pupil_right': pl.Float64,
+        })
+    else:
+        gaze_schema_overrides.update({
+            'x_pix': pl.Float64,
+            'y_pix': pl.Float64,
+            'pupil': pl.Float64,
+        })
+
     if schema is not None:
         gaze_schema_overrides.update(schema)
 
@@ -529,6 +649,44 @@ def _check_reccfg_key(
         return None
 
     values = {d.get(key) for d in recording_config}
+    if len(values) != 1:
+        sorted_values: list = sorted(values)
+        warnings.warn(f"Found inconsistent values for '{key}': {sorted_values}")
+        return None
+
+    value = values.pop()
+    if astype is not None:
+        value = astype(value)
+    return value
+
+def _check_samples_config_key(
+        samples_config: list[dict[str, Any]],
+        key: str,
+        astype: type | None = None,
+) -> Any:
+    """Check if the sample configs contain consistent values for the specified key and return it.
+
+    Prints a warning if no sample config is found or if the value is inconsistent across entries.
+
+    Parameters
+    ----------
+    samples_config: list[dict[str, Any]]
+        List of dictionaries containing sample config details.
+    key: str
+        The key in the recording configs to check for consistency.
+    astype: type | None
+        The type to cast the value to.
+
+    Returns
+    -------
+    Any
+        The value of the specified key if available, otherwise None.
+    """
+    if not samples_config:
+        warnings.warn('No samples configuration found.')
+        return None
+
+    values = {d.get(key) for d in samples_config}
     if len(values) != 1:
         sorted_values: list = sorted(values)
         warnings.warn(f"Found inconsistent values for '{key}': {sorted_values}")
