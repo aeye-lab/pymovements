@@ -598,7 +598,12 @@ def test_gaze_save_wrong_extension_events(tmp_path):
             extension='blabla',
         )
 
+<<<<<<< HEAD
 def test_gaze_save_wrong_extension_preprocessed(tmp_path):
+=======
+
+def test_gaze_save_wrong_extension(tmp_path):
+>>>>>>> 5c00b8a63af95c5be942ca4749e54a62ecf6cd98
     gaze = _create_gaze()
 
     with pytest.raises(ValueError):
@@ -609,7 +614,12 @@ def test_gaze_save_wrong_extension_preprocessed(tmp_path):
             extension='blabla',
         )
 
+<<<<<<< HEAD
 def test_gaze_save_empty_experiment(tmp_path):
+=======
+
+def test_gaze_save_no_experiment(tmp_path):
+>>>>>>> 5c00b8a63af95c5be942ca4749e54a62ecf6cd98
     gaze = _create_gaze()
     gaze.experiment = None
 
