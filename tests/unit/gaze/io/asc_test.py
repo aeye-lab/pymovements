@@ -335,6 +335,19 @@ def test_from_asc_has_frame_equal(kwargs, expected_frame):
             },
             id='eyelink_asc_mono_no_dummy_pattern_eyelink_encoding_overrides_definition',
         ),
+        pytest.param(
+            {
+                'file': 'tests/files/eyelink_binocular_example.asc',
+                'patterns': 'eyelink',
+            },
+            (368, 3),
+            {
+                'time': pl.Int64,
+                'pixel': pl.List(pl.Float64),
+                'pupil': pl.List(pl.Float64),
+            },
+            id='eyelink_asc_bino_pattern_eyelink',
+        ),
     ],
 )
 def test_from_asc_has_shape_and_schema(kwargs, shape, schema):
@@ -776,7 +789,7 @@ def test_from_asc_has_expected_metadata(kwargs, expected_metadata):
             },
             pl.from_dict(
                 data={
-                    'name': ['fixation_eyelink', 'saccade_eyelink', 'fixation_eyelink'],
+                    'name': ['fixation_left_eyelink', 'saccade_left_eyelink', 'fixation_left_eyelink'],
                     'onset': [2154563, 2339227, 2339246],
                     'offset': [2154695, 2339245, 2339290],
                     'duration': [132, 18, 44],
@@ -797,7 +810,7 @@ def test_from_asc_has_expected_metadata(kwargs, expected_metadata):
             },
             pl.from_dict(
                 data={
-                    'name': ['fixation_eyelink', 'saccade_eyelink', 'fixation_eyelink'],
+                    'name': ['fixation_left_eyelink', 'saccade_left_eyelink', 'fixation_left_eyelink'],
                     'onset': [2154563, 2339227, 2339246],
                     'offset': [2154695, 2339245, 2339290],
                     'duration': [132, 18, 44],

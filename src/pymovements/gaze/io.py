@@ -477,7 +477,34 @@ def from_asc(
     # Fill experiment with parsed metadata.
     experiment = _fill_experiment_from_parsing_metadata(experiment, metadata)
 
-    # Instantiate Gaze with parsed data.
+    # Detect pixel / position column names (monocular or binocular) and pass them to Gaze
+    cols = set(samples.columns)
+
+    pixel_columns_detect: list[str] | None = None
+    position_columns_detect: list[str] | None = None
+
+    # common binocular naming produced by parse_eyelink
+    if {'x_pix_left', 'y_pix_left', 'x_pix_right', 'y_pix_right'}.issubset(cols):
+        pixel_columns_detect = ['x_pix_left', 'y_pix_left', 'x_pix_right', 'y_pix_right']
+    elif {'x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix'}.issubset(cols):
+        pixel_columns_detect = ['x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix']
+    # fallback monocular
+    elif {'x_pix', 'y_pix'}.issubset(cols):
+        pixel_columns_detect = ['x_pix', 'y_pix']
+
+    # position columns (dva) often follow this naming
+    if {'x_left_pos', 'y_left_pos', 'x_right_pos', 'y_right_pos'}.issubset(cols):
+        position_columns_detect = ['x_left_pos', 'y_left_pos', 'x_right_pos', 'y_right_pos']
+    elif {'x_pos_left', 'y_pos_left', 'x_pos_right', 'y_pos_right'}.issubset(cols):
+        position_columns_detect = ['x_pos_left', 'y_pos_left', 'x_pos_right', 'y_pos_right']
+
+    # Instantiate Gaze with parsed data using detected column names
+    # If binocular pupils exist, create a nested 'pupil' column [left, right]
+    if 'pupil_left' in cols and 'pupil_right' in cols:
+        samples = samples.with_columns(
+            pl.concat_list([pl.col('pupil_left'), pl.col('pupil_right')]).alias('pupil'),
+        ).drop(['pupil_left', 'pupil_right'])
+
     gaze = Gaze(
         samples=samples,
         experiment=experiment,
@@ -485,7 +512,8 @@ def from_asc(
         trial_columns=trial_columns,
         time_column='time',
         time_unit='ms',
-        pixel_columns=['x_pix', 'y_pix'],
+        pixel_columns=pixel_columns_detect,
+        position_columns=position_columns_detect,
     )
     gaze._metadata = metadata  # pylint: disable=protected-access
     return gaze
