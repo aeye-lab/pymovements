@@ -598,6 +598,7 @@ def test_gaze_save_wrong_extension(tmp_path):
             extension='blabla',
         )
 
+
 def test_gaze_save_wrong_extension(tmp_path):
     gaze = _create_gaze()
 
@@ -608,6 +609,7 @@ def test_gaze_save_wrong_extension(tmp_path):
             verbose=1,
             extension='blabla',
         )
+
 
 def test_gaze_save_no_experiment(tmp_path):
     gaze = _create_gaze()

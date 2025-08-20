@@ -1800,9 +1800,9 @@ class Gaze:
         if save_samples:
             self.save_preprocessed(dirname, verbose=verbose, extension=extension)
         if save_experiment and self.experiment is not None:
-                if verbose >= 2:
-                    print('Saving experiment.yaml file to', dirname)
-                self.experiment.to_yaml(f"{dirname}/experiment.yaml")
+            if verbose >= 2:
+                print('Saving experiment.yaml file to', dirname)
+            self.experiment.to_yaml(f"{dirname}/experiment.yaml")
         return self
 
     def save_events(
