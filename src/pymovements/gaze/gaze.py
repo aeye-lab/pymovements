@@ -1776,7 +1776,7 @@ class Gaze:
 
         Parameters
         ----------
-        dirname: str | None
+        dirname: str
             Absloute directory name to save data.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.events_rootpath`.
@@ -1817,7 +1817,7 @@ class Gaze:
 
         Parameters
         ----------
-        dirname: str | None
+        dirname: str
             Directory name to save data.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.events_rootpath`.
@@ -1861,7 +1861,7 @@ class Gaze:
 
         Parameters
         ----------
-        dirname: str | None
+        dirname: str
             Directory name to save data.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`.

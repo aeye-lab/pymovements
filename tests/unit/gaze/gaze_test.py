@@ -599,46 +599,26 @@ def test_gaze_save_wrong_extension_events(tmp_path):
         )
 
 
-<< << << < HEAD
 def test_gaze_save_wrong_extension_preprocessed(tmp_path):
+    gaze = _create_gaze()
 
+    with pytest.raises(ValueError):
+        gaze.save(
+            dirname=tmp_path,
+            save_events=False,
+            verbose=1,
+            extension='blabla',
+        )
 
-== == == =
+def test_gaze_save_empty_experiment(tmp_path):
+    gaze = _create_gaze()
+    gaze.experiment = None
 
-
-def test_gaze_save_wrong_extension(tmp_path):
-
-
->>>>>> > 5c00b8a63af95c5be942ca4749e54a62ecf6cd98
-gaze = _create_gaze()
-
-with pytest.raises(ValueError):
     gaze.save(
         dirname=tmp_path,
-        save_events=False,
         verbose=1,
-        extension='blabla',
+        extension='csv',
     )
-
-<< << << < HEAD
-def test_gaze_save_empty_experiment(tmp_path):
-
-
-== == == =
-
-
-def test_gaze_save_no_experiment(tmp_path):
-
-
->>>>>> > 5c00b8a63af95c5be942ca4749e54a62ecf6cd98
-gaze = _create_gaze()
-gaze.experiment = None
-
-gaze.save(
-    dirname=tmp_path,
-    verbose=1,
-    extension='csv',
-)
-assert os.path.exists(tmp_path / 'events.csv')
-assert os.path.exists(tmp_path / 'samples.csv')
-assert not os.path.exists(tmp_path / 'experiment.yaml')
+    assert os.path.exists(tmp_path / 'events.csv')
+    assert os.path.exists(tmp_path / 'samples.csv')
+    assert not os.path.exists(tmp_path / 'experiment.yaml')
