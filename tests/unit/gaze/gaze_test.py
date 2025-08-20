@@ -513,7 +513,7 @@ def _create_gaze():
     )
 
 
-def test_gaze_save(tmp_path):
+def test_gaze_save_csv(tmp_path):
 
     gaze = _create_gaze()
     # Saving Gaze to tmp_path
@@ -524,6 +524,18 @@ def test_gaze_save(tmp_path):
     )
     assert os.path.exists(tmp_path / 'samples.csv')
     assert os.path.exists(tmp_path / 'events.csv')
+    assert os.path.exists(tmp_path / 'experiment.yaml')
+
+def test_gaze_save_feather(tmp_path):
+    gaze = _create_gaze()
+    # Saving Gaze to tmp_path
+    gaze.save(
+        dirname=tmp_path,
+        verbose=2,
+        extension='feather',
+    )
+    assert os.path.exists(tmp_path / 'samples.feather')
+    assert os.path.exists(tmp_path / 'events.feather')
     assert os.path.exists(tmp_path / 'experiment.yaml')
 
 
@@ -573,3 +585,14 @@ def test_gaze_save_no_experiment(tmp_path):
     assert os.path.exists(tmp_path / 'events.csv')
     assert os.path.exists(tmp_path / 'samples.csv')
     assert os.path.exists(tmp_path / 'experiment.yaml') == False
+
+def test_gaze_save_wrong_extension(tmp_path):
+    gaze = _create_gaze()
+
+    with pytest.raises(ValueError) as ve:
+        gaze.save(
+            dirname=tmp_path,
+            save_experiment=False,
+            verbose=1,
+            extension='blabla',
+        )
