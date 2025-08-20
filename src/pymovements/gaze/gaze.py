@@ -1754,15 +1754,15 @@ class Gaze:
 
     def save(
             self,
-            dirname: str | Path,
-            save_events: bool = True,
-            save_samples: bool = True,
-            save_experiment: bool = True,
+            dirpath: str | Path,
+            save_events: bool | None = None,
+            save_samples: bool | None = None,
+            save_experiment: bool | None = None,
             verbose: int = 1,
             extension: str = 'feather',
     ) -> Gaze:
         """Save data from the Gaze object in the provided directory.
-        
+
         Depending on parameters it may save three files:
         * preprocessed gaze in samples
         * calculated gaze events
@@ -1777,57 +1777,69 @@ class Gaze:
 
         Parameters
         ----------
-        dirname: str | Path
+        dirpath: str | Path
             Absloute directory name to save data.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.events_rootpath`.
-        save_events: bool
+        save_events: bool | None
             Save events in events.{extension} file
-        save_samples: bool
+        save_samples: bool | None
             Save samples in sample.{extension} file
-        save_experiment: bool
+        save_experiment: bool | None
             Save experiment metadata in experiment.yaml file
         verbose: int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
             (default: 1)
         extension: str
             Extension specifies the fileformat to store the data. (default: 'feather')
+
+        Raises
+        ------
+        ValueError
+            If save_events is True and self.events is None or empty
+    
         """
         # Create dir if does not exist
-        Path(dirname).mkdir(parents=True, exist_ok=True)
+        Path(dirpath).mkdir(parents=True, exist_ok=True)
 
-        if save_events:
-            self.save_events(dirname, verbose=verbose, extension=extension)
-        if save_samples:
-            self.save_preprocessed(dirname, verbose=verbose, extension=extension)
-        if save_experiment and self.experiment is not None:
-            if verbose >= 2:
-                print('Saving experiment.yaml file to', dirname)
-            self.experiment.to_yaml(f"{dirname}/experiment.yaml")
+        if save_events is None or save_events:
+            if save_events and (self.events is None or len(self.events)==0):
+                raise ValueError(
+                    f'there are no events in the Gaze object'
+                )
+            self.save_events(Path(f'{dirpath}/events.{extension}'), verbose=verbose)
+        
+        if save_samples is None or save_samples:
+            self.save_samples(Path(f'{dirpath}/samples.{extension}'), verbose=verbose)
+
+        if save_experiment is None or save_experiment:
+            if self.experiment is not None:
+                if verbose >= 2:
+                    print('Saving experiment.yaml file to', dirpath)
+                self.experiment.to_yaml(Path(f"{dirpath}/experiment.yaml"))
+            elif save_experiment is not None:
+                raise ValueError(
+                        f'no experiment data in the Gaze object'
+                    )
         return self
 
     def save_events(
             self,
-            dirname: str | Path,
+            path: str | Path,
             verbose: int = 1,
-            extension: str = 'feather',
+
     ) -> None:
         """Save gaze events to file.
 
-        Data will be saved as the events.{extension} file to `dirname`.
+        Data will be saved as the given file.
 
         Parameters
         ----------
-        dirname: str | Path
-            Directory name to save data.
-            This argument is used only for this single call and does not alter
-            :py:meth:`pymovements.Dataset.events_rootpath`.
+        path: str | Path
+            File to save data.
         verbose: int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
             (default: 1)
-        extension: str
-            Specifies the file format for loading data. Valid options are: `csv`, `feather`.
-            (default: 'feather')
 
         Raises
         ------
@@ -1835,14 +1847,21 @@ class Gaze:
             If extension is not in list of valid extensions.
         """
         events_out = self.events.frame.clone()
+        extension = path.suffix[1:]
+
+        # if events_out is None or len(events_out)==0:
+        #     raise ValueError(
+        #         f'there are no events in the Gaze object'
+        #     )
+
 
         if verbose >= 2:
-            print(f'Saving events.{extension} file to', dirname)
+            print(f'Saving events to ', path)
 
         if extension == 'feather':
-            events_out.write_ipc(f'{dirname}/events.feather')
+            events_out.write_ipc(path)
         elif extension == 'csv':
-            events_out.write_csv(f'{dirname}/events.csv')
+            events_out.write_csv(path)
         else:
             valid_extensions = ['csv', 'feather']
             raise ValueError(
@@ -1850,28 +1869,22 @@ class Gaze:
                 f'Supported formats are: {valid_extensions}',
             )
 
-    def save_preprocessed(
+    def save_samples(
             self,
-            dirname: str | Path,
-            verbose: int = 1,
-            extension: str = 'feather',
+            path: str | Path,
+            verbose: int = 1
     ) -> None:
         """Save preprocessed gaze files.
 
-        Data will be saved to the samples.{extension} file in `dirname`.
+        Samples will be saved to the file given by path.
 
         Parameters
         ----------
-        dirname: str | Path
-            Directory name to save data.
-            This argument is used only for this single call and does not alter
-            :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
+        path: str | Path
+            File to save data.
         verbose: int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
             (default: 1)
-        extension: str
-            Specifies the file format for loading data. Valid options are: `csv`, `feather`.
-            (default: 'feather')
 
         Raises
         ------
@@ -1879,17 +1892,18 @@ class Gaze:
             If extension is not in list of valid extensions.
         """
         gaze = self.clone()
+        extension = path.suffix[1:]
 
         if extension == 'csv':
             gaze.unnest()
 
         if verbose >= 2:
-            print(f'Saving samples.{extension} file to', dirname)
+            print(f'Saving samples to', path)
 
         if extension == 'feather':
-            gaze.samples.write_ipc(f'{dirname}/samples.feather')
+            gaze.samples.write_ipc(path)
         elif extension == 'csv':
-            gaze.samples.write_csv(f'{dirname}/samples.csv')
+            gaze.samples.write_csv(path)
         else:
             valid_extensions = ['csv', 'feather']
             raise ValueError(
