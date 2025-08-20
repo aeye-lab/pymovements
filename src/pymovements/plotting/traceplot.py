@@ -50,7 +50,7 @@ def traceplot(
         show_cbar: bool = False,
         padding: float | None = None,
         pad_factor: float | None = 0.05,
-        figsize: tuple[int, int] = (15, 5),
+        figsize: tuple[int, int] = (10, 10),
         title: str | None = None,
         savepath: str | None = None,
         show: bool = True,
@@ -107,15 +107,24 @@ def traceplot(
     # pylint: disable=duplicate-code
     x_signal = gaze.samples[position_column].list.get(0)
     y_signal = gaze.samples[position_column].list.get(1)
-    if (
-        gaze.experiment is not None
-        and gaze.experiment.screen.width_cm is not None
-            and gaze.experiment.screen.height_cm is not None
-    ):
-        figsize = (
-            int(gaze.experiment.screen.width_cm),
-            int(gaze.experiment.screen.height_cm),
-        )
+
+    screen_width_px = None
+    screen_height_px = None
+
+    if gaze.experiment is not None:
+        screen = gaze.experiment.screen
+        screen_width_px = screen.width_px
+        screen_height_px = screen.height_px
+
+        if screen_width_px is not None and screen_height_px is not None:
+            figsize = (int(screen_width_px / screen_height_px * 10), 10)
+            print(figsize)
+
+        if screen.origin != 'upper left':
+            raise ValueError(
+                f"Origin of the experiment screen is set to {screen.origin}, "
+                "but only 'upper left' is supported for traceplot.",
+            )
 
     fig, ax, cmap, cmap_norm, cval, show_cbar = _setup_matplotlib(
         x_signal,
@@ -141,6 +150,11 @@ def traceplot(
         cmap_norm,
         cval,
     )
+
+    # only set axes limits if we have experiment screen info
+    if screen_width_px is not None and screen_height_px is not None:
+        ax.set_xlim(0, screen_width_px)
+        ax.set_ylim(screen_height_px, 0)
 
     if show_cbar:
         # sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
