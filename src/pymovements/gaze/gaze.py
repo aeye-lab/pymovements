@@ -1762,7 +1762,7 @@ class Gaze:
             extension: str = 'feather',
     ) -> Gaze:
         """Save data from the Gaze object in the provided directory.
-        
+
         Depending on parameters it may save three files:
         * preprocessed gaze in samples
         * calculated gaze events
