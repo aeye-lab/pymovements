@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import math
 import sys
+from warnings import warn
 
 import matplotlib.colors
 import matplotlib.pyplot as plt
@@ -43,7 +44,6 @@ if 'pytest' in sys.modules:  # pragma: no cover
 
 
 def scanpathplot(
-        events: EventDataFrame,
         gaze: Gaze | None = None,
         position_column: str = 'location',
         cval: np.ndarray | None = None,  # pragma: no cover
@@ -65,6 +65,7 @@ def scanpathplot(
         add_stimulus: bool = False,
         path_to_image_stimulus: str | None = None,
         stimulus_origin: str = 'upper',
+        events: Events | EventDataFrame = None,
 ) -> None:
     """Plot scanpath from positional data.
 
@@ -122,6 +123,17 @@ def scanpathplot(
         If length of x and y coordinates do not match or if ``cmap_norm`` is unknown.
 
     """
+    if events is not None:
+        warn(
+            DeprecationWarning(
+                "scanpathplot argument 'events' is deprecated since version v0.23.1. "
+                "Please use argument 'gaze' instead. "
+                'This argument will be removed in v0.28.0.',
+            ),
+        )
+    else:
+        events = gaze.events
+
     # pylint: disable=duplicate-code
     x_signal = events.frame[position_column].list.get(0)
     y_signal = events.frame[position_column].list.get(1)
@@ -154,7 +166,6 @@ def scanpathplot(
         ax.add_patch(fixation)
 
     if add_traceplot:
-        assert gaze
         gaze_x_signal = gaze.frame[gaze_position_column].list.get(0)
         gaze_y_signal = gaze.frame[gaze_position_column].list.get(1)
         line = _draw_line_data(
