@@ -55,10 +55,6 @@ class OneStop(DatasetDefinition):
     long_name: str
         The entire name of the dataset.
 
-    has_files: dict[str, bool]
-        Indicate whether the dataset contains 'gaze', 'precomputed_events', and
-        'precomputed_reading_measures'.
-
     resources: ResourceDefinitions
         A list of dataset gaze_resources. Each list entry must be a dictionary with the following
         keys:
@@ -66,11 +62,11 @@ class OneStop(DatasetDefinition):
         - `filename`: The filename under which the file is saved as.
         - `md5`: The MD5 checksum of the respective file.
 
-    filename_format: dict[str, str]
+    filename_format: dict[str, str] | None
         Regular expression which will be matched before trying to load the file. Namedgroups will
         appear in the `fileinfo` dataframe.
 
-    filename_format_schema_overrides: dict[str, dict[str, type]]
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
         specific named groups to a particular datatype.
 
@@ -96,56 +92,37 @@ class OneStop(DatasetDefinition):
     """
 
     # pylint: disable=similarities
-    # The PublicDatasetDefinition child classes potentially share code chunks for definitions.
+    # The DatasetDefinition child classes potentially share code chunks for definitions.
 
     name: str = 'OneStop'
 
     long_name: str = 'OneStop: A 360-Participant English Eye Tracking Dataset with Different '\
         'Reading Regimes'
 
-    has_files: dict[str, bool] = field(
-        default_factory=lambda: {
-            'gaze': False,
-            'precomputed_events': True,
-            'precomputed_reading_measures': True,
-        },
-    )
-
     resources: ResourceDefinitions = field(
-        default_factory=lambda: ResourceDefinitions.from_dict(
-            {
-                'precomputed_events': [
-                    {
-                        'resource':
-                        'https://osf.io/download/z3xd8/',
-                        'filename': 'fixations_Paragraph.csv.zip',
-                        'md5': 'bb2cb3a43ae15c4da78eb3f0baf434a4',
-                    },
-                ],
-                'precomputed_reading_measures': [
-                    {
-                        'resource': 'https://osf.io/download/d2aew/',
-                        'filename': 'ia_Paragraph.csv.zip',
-                        'md5': 'cee97f13b113c5675757223238ef1bb4',
-                    },
-                ],
-            },
+        default_factory=lambda: ResourceDefinitions.from_dicts(
+            [
+                {
+                    'content': 'precomputed_events',
+                    'url': 'https://osf.io/download/dq935/',
+                    'filename': 'fixations_Paragraph.csv.zip',
+                    'md5': '3d3b6a3794a50e174e025f43735674bd',
+                    'filename_pattern': 'fixations_Paragraph.csv',
+                },
+                {
+                    'content': 'precomputed_reading_measures',
+                    'url': 'https://osf.io/download/4ajc8/',
+                    'filename': 'ia_Paragraph.csv.zip',
+                    'md5': '9b9548e49efdc7dbf63d4f3a5dc3af22',
+                    'filename_pattern': 'ia_Paragraph.csv',
+                },
+            ],
         ),
     )
 
-    filename_format: dict[str, str] = field(
-        default_factory=lambda: {
-            'precomputed_events': 'fixations_Paragraph.csv',
-            'precomputed_reading_measures': 'ia_Paragraph.csv',
-        },
-    )
+    filename_format: dict[str, str] | None = None
 
-    filename_format_schema_overrides: dict[str, dict[str, type]] = field(
-        default_factory=lambda: {
-            'precomputed_events': {},
-            'precomputed_reading_measures': {},
-        },
-    )
+    filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
     custom_read_kwargs: dict[str, Any] = field(
         default_factory=lambda: {

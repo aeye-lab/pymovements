@@ -2,23 +2,14 @@ name: CodeComprehension
 
 long_name: "Code Comprehension dataset"
 
-has_files:
-  gaze: false
-  precomputed_events: true
-  precomputed_reading_measures: false
-
 resources:
-  precomputed_events:
-    - resource: "https://zenodo.org/records/11123101/files/Predicting%20Code%20Comprehension%20Package.zip?download=1"
-      filename: "data.zip"
-      md5: "3a3c6fb96550bc2c2ddcf5d458fb12a2"
-
-filename_format:
-  precomputed_events: 'fix_report_P{subject_id:s}.txt'
-
-filename_format_schema_overrides:
-  precomputed_events:
-    subject_id: !polars.Utf8
+  - content: precomputed_events
+    url: "https://zenodo.org/records/11123101/files/Predicting%20Code%20Comprehension%20Package.zip?download=1"
+    filename: "data.zip"
+    md5: "3a3c6fb96550bc2c2ddcf5d458fb12a2"
+    filename_pattern: 'fix_report_P{subject_id:s}.txt'
+    filename_pattern_schema_overrides:
+      subject_id: !polars.Utf8
 
 custom_read_kwargs:
   precomputed_events:

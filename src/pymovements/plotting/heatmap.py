@@ -26,12 +26,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import colors
 
-from pymovements.gaze import GazeDataFrame
+from pymovements.gaze import Gaze
 from pymovements.stimulus.image import _draw_image_stimulus
 
 
 def heatmap(
-        gaze: GazeDataFrame,
+        gaze: Gaze,
         position_column: str = 'pixel',
         gridsize: tuple[int, int] = (10, 10),
         cmap: colors.Colormap | str = 'jet',
@@ -53,13 +53,13 @@ def heatmap(
     """Plot a heatmap of gaze data.
 
     The heatmap displays the distribution of gaze positions across the experiment screen,
-    for a given GazeDataFrame object.
+    for a given Gaze object.
     The color values indicate the time spent at each position in seconds.
 
     Parameters
     ----------
-    gaze: GazeDataFrame
-        A GazeDataFrame object.
+    gaze: Gaze
+        A Gaze object.
     position_column: str
         The column name of the x and y position data. (default: 'pixel')
     gridsize: tuple[int, int]
@@ -102,21 +102,21 @@ def heatmap(
     ValueError
         If the position columns are not in pixels or degrees
     ValueError
-        If the experiment property of the GazeDataFrame is None
+        If the experiment property of the Gaze is None
     Returns
     -------
     plt.Figure
         The heatmap figure.
     """
     # Extract x and y positions from the gaze dataframe
-    x = gaze.frame[position_column].list.get(0).to_numpy()
-    y = gaze.frame[position_column].list.get(1).to_numpy()
+    x = gaze.samples[position_column].list.get(0).to_numpy()
+    y = gaze.samples[position_column].list.get(1).to_numpy()
 
     # Check if experiment properties are available
     if not gaze.experiment:
         raise ValueError(
-            'Experiment property of GazeDataFrame is None. '
-            'GazeDataFrame must be associated with an experiment.',
+            'Experiment property of Gaze is None. '
+            'Gaze must be associated with an experiment.',
         )
 
     assert gaze.experiment.sampling_rate is not None
@@ -153,7 +153,10 @@ def heatmap(
     # Convert heatmap values from sample count to seconds
     heatmap_value /= gaze.experiment.sampling_rate
 
-    extent = [x_edges[0], x_edges[-1], y_edges[0], y_edges[-1]]
+    if origin == 'upper':
+        extent = [x_edges[0], x_edges[-1], y_edges[0], y_edges[-1]]
+    else:
+        extent = [x_edges[0], x_edges[-1], y_edges[-1], y_edges[0]]
 
     # Create the plot
     if add_stimulus:

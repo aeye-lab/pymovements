@@ -26,16 +26,44 @@ from copy import deepcopy
 from dataclasses import asdict
 from dataclasses import dataclass
 from typing import Any
+from warnings import warn
+
+from deprecated.sphinx import deprecated
+
+from pymovements._utils._html import repr_html
 
 
+@repr_html()
 @dataclass
 class ResourceDefinition:
-    """ResourceDefinition definition."""
+    """ResourceDefinition definition.
+
+    Attributes
+    ----------
+    content: str
+        The content type of the resource.
+    filename: str | None
+        The target filename of the downloadable resource. This may be an archive. (default: None)
+    url: str | None
+        The URL to the downloadable resource. (default: None)
+    md5: str | None
+        The MD5 checksum of the downloadable resource. (default: None)
+    filename_pattern: str | None
+        The filename pattern of the resource files. Named groups will
+        be parsed as metadata will appear in the `fileinfo` dataframe. (default: None)
+    filename_pattern_schema_overrides: dict[str, type] | None
+        If named groups are present in the `filename_pattern`, this specifies their particular
+        datatypes. (default: None)
+    """
 
     content: str
+
     filename: str | None = None
     url: str | None = None
     md5: str | None = None
+
+    filename_pattern: str | None = None
+    filename_pattern_schema_overrides: dict[str, type] | None = None
 
     @staticmethod
     def from_dict(dictionary: dict[str, Any]) -> ResourceDefinition:
@@ -52,6 +80,14 @@ class ResourceDefinition:
             An initialized ``Resource`` instance.
         """
         if 'resource' in dictionary:
+            warn(
+                DeprecationWarning(
+                    'from_dict() key "resource" is deprecated since version v0.23.0. '
+                    'Please use key "url" instead. '
+                    'This field will be removed in v0.28.0.',
+                ),
+            )
+
             url = dictionary['resource']
             dictionary = {key: value for key, value in dictionary.items() if key != 'resource'}
             dictionary['url'] = url
@@ -85,7 +121,7 @@ class ResourceDefinition:
 
 
 class ResourceDefinitions(list):
-    """List of ``ResourceDefinition`` instances."""
+    """List of :py:class:`~pymovements.ResourceDefinition` instances."""
 
     def __init__(self, resources: Iterable[ResourceDefinition] | None = None) -> None:
         if resources is None:
@@ -114,6 +150,11 @@ class ResourceDefinitions(list):
         return ResourceDefinitions(resources)
 
     @staticmethod
+    @deprecated(
+        reason='Please use ResourceDefinitions.from_dicts() instead. '
+               'This property will be removed in v0.28.0.',
+        version='v0.23.0',
+    )
     def from_dict(
         dictionary: dict[str, Sequence[dict[str, Any]]] | None,
     ) -> ResourceDefinitions:

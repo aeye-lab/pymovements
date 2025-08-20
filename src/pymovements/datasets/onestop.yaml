@@ -2,29 +2,18 @@ name: OneStop
 
 long_name: 'OneStop: A 360-Participant English Eye Tracking Dataset with Different Reading Regimes'
 
-has_files:
-    gaze: false
-    precomputed_events: true
-    precomputed_reading_measures: true
-
 resources:
-    precomputed_events:
-        - resource: https://osf.io/download/z3xd8/
-          filename: fixations_Paragraph.csv.zip
-          md5: bb2cb3a43ae15c4da78eb3f0baf434a4
-    precomputed_reading_measures:
-        - resource: https://osf.io/download/d2aew/
-          filename: ia_Paragraph.csv.zip
-          md5: cee97f13b113c5675757223238ef1bb4
-
-filename_format:
-    precomputed_events: fixations_Paragraph.csv
-    precomputed_reading_measures: ia_Paragraph.csv
-
-filename_format_schema_overrides:
-  precomputed_events: {}
-  precomputed_reading_measures: {}
+  - content: precomputed_events
+    url: https://osf.io/download/dq935/
+    filename: fixations_Paragraph.csv.zip
+    md5: 3d3b6a3794a50e174e025f43735674bd
+    filename_pattern: fixations_Paragraph.csv
+  - content: precomputed_reading_measures
+    url: https://osf.io/download/4ajc8/
+    filename: ia_Paragraph.csv.zip
+    md5: 9b9548e49efdc7dbf63d4f3a5dc3af22
+    filename_pattern: ia_Paragraph.csv
 
 custom_read_kwargs:
-    precomputed_events: {'null_values': '.'}
-    precomputed_reading_measures: {'null_values': '.'}
+  precomputed_events: {'null_values': '.'}
+  precomputed_reading_measures: {'null_values': '.'}

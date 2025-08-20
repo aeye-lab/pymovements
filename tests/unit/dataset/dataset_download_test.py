@@ -29,7 +29,6 @@ import pytest
 from pymovements import Dataset
 from pymovements import DatasetDefinition
 from pymovements import DatasetPaths
-from pymovements import ResourceDefinitions
 
 
 @pytest.fixture(
@@ -51,11 +50,6 @@ def dataset_definition_fixture(request):
     if request.param == 'CustomGazeAndPrecomputed':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            has_files={
-                'gaze': True,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
             mirrors={
                 'gaze': (
                     'https://example.com/',
@@ -66,224 +60,167 @@ def dataset_definition_fixture(request):
                     'https://another_example.com/',
                 ),
             },
-            resources={
-                'gaze': (
-                    {
-                        'resource': 'test.gz.tar',
-                        'filename': 'test.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-                'precomputed_events': (
-                    {
-                        'resource': 'test_pc.gz.tar',
-                        'filename': 'test_pc.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
+            resources=[
+                {
+                    'content': 'gaze',
+                    'url': 'test.gz.tar',
+                    'filename': 'test.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+                {
+                    'content': 'precomputed_events',
+                    'url': 'test_pc.gz.tar',
+                    'filename': 'test_pc.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
         )
 
     if request.param == 'CustomGazeAndPrecomputedNoMirror':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            has_files={
-                'gaze': True,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
-            resources={
-                'gaze': (
-                    {
-                        'resource': 'https://example.com/test.gz.tar',
-                        'filename': 'test.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-                'precomputed_events': (
-                    {
-                        'resource': 'https://example.com/test_pc.gz.tar',
-                        'filename': 'test_pc.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
+            resources=[
+                {
+                    'content': 'gaze',
+                    'url': 'https://example.com/test.gz.tar',
+                    'filename': 'test.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+                {
+                    'content': 'precomputed_events',
+                    'url': 'https://example.com/test_pc.gz.tar',
+                    'filename': 'test_pc.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
         )
 
     if request.param == 'CustomGazeOnly':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            has_files={
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
             mirrors={
                 'gaze': (
                     'https://example.com/',
                     'https://another_example.com/',
                 ),
             },
-            resources={
-                'gaze': (
-                    {
-                        'resource': 'test.gz.tar',
-                        'filename': 'test.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
+            resources=[
+                {
+                    'content': 'gaze',
+                    'url': 'test.gz.tar',
+                    'filename': 'test.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
         )
 
     if request.param == 'CustomGazeOnlyNoMirror':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            has_files={
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            resources={
-                'gaze': (
-                    {
-                        'resource': 'https://example.com/test.gz.tar',
-                        'filename': 'test.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
+            resources=[
+                {
+                    'content': 'gaze',
+                    'url': 'https://example.com/test.gz.tar',
+                    'filename': 'test.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
         )
 
     if request.param == 'CustomPrecomputedOnly':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            has_files={
-                'gaze': False,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
             mirrors={
                 'precomputed_events': (
                     'https://example.com/',
                     'https://another_example.com/',
                 ),
             },
-            resources={
-                'precomputed_events': (
-                    {
-                        'resource': 'test_pc.gz.tar',
-                        'filename': 'test_pc.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
+            resources=[
+                {
+                    'content': 'precomputed_events',
+                    'url': 'test_pc.gz.tar',
+                    'filename': 'test_pc.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
         )
 
     if request.param == 'CustomPrecomputedOnlyNoMirror':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            has_files={
-                'gaze': False,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
-            resources={
-                'precomputed_events': (
-                    {
-                        'resource': 'https://example.com/test_pc.gz.tar',
-                        'filename': 'test_pc.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
+            resources=[
+                {
+                    'content': 'precomputed_events',
+                    'url': 'https://example.com/test_pc.gz.tar',
+                    'filename': 'test_pc.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
         )
 
     if request.param == 'CustomPrecomputedOnlyNoExtract':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            has_files={
-                'gaze': False,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
             mirrors={
                 'precomputed_events': (
                     'https://example.com/',
                     'https://another_example.com/',
                 ),
             },
-            resources={
-                'precomputed_events': (
-                    {
-                        'resource': 'test_pc.gz.tar',
-                        'filename': 'test_pc.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
+            resources=[
+                {
+                    'content': 'precomputed_events',
+                    'url': 'test_pc.gz.tar',
+                    'filename': 'test_pc.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
         )
 
     if request.param == 'CustomPrecomputedOnlyNoExtractNoMirror':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            has_files={
-                'gaze': False,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
-            resources={
-                'precomputed_events': (
-                    {
-                        'resource': 'https://example.com/test_pc.gz.tar',
-                        'filename': 'test_pc.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
+            resources=[
+                {
+                    'content': 'precomputed_events',
+                    'url': 'https://example.com/test_pc.gz.tar',
+                    'filename': 'test_pc.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
         )
 
     if request.param == 'CustomPrecomputedRMOnly':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            has_files={
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': True,
-            },
             mirrors={
                 'precomputed_reading_measures': (
                     'https://example.com/',
                     'https://another_example.com/',
                 ),
             },
-            resources={
-                'precomputed_reading_measures': (
-                    {
-                        'resource': 'test_rm.gz.tar',
-                        'filename': 'test_rm.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
+            resources=[
+                {
+                    'content': 'precomputed_reading_measures',
+                    'url': 'test_rm.gz.tar',
+                    'filename': 'test_rm.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
         )
 
     if request.param == 'CustomPrecomputedRMOnlyNoMirror':
         return DatasetDefinition(
             name='CustomPublicDataset',
-            has_files={
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': True,
-            },
-            resources={
-                'precomputed_reading_measures': (
-                    {
-                        'resource': 'https://example.com/test_rm.gz.tar',
-                        'filename': 'test_rm.gz.tar',
-                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                    },
-                ),
-            },
+            resources=[
+                {
+                    'content': 'precomputed_reading_measures',
+                    'url': 'https://example.com/test_rm.gz.tar',
+                    'filename': 'test_rm.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
         )
 
     assert False, f'unknown dataset_definition fixture {request.param}'
@@ -1177,120 +1114,171 @@ def test_dataset_download_default_extract_precomputed(
 
 
 @pytest.mark.parametrize(
-    'dataset_definition',
+    ('dataset_definition', 'expected_exception', 'expected_msg_prefix'),
     [
-        DatasetDefinition(
-            name='CustomPublicDataset',
-            has_files={
-                'gaze': True,
-                'precomputed_events': False,
-                'precomputed_reading_measures': False,
-            },
-            resources=ResourceDefinitions.from_dict({
-                'gaze': [{
-                    'resource': 'test.gz.tar',
-                    'filename': 'test.gz.tar',
-                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                }],
-            }),
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                mirrors={'gaze': ['https://example.com/']},
+                resources=[
+                    {
+                        'content': 'gaze',
+                        'url': None,
+                        'filename': 'test.gz.tar',
+                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                    },
+                ],
+            ),
+            AttributeError,
+            'Resource.url must not be None',
+            id='mirrors_url_none',
         ),
-        DatasetDefinition(
-            name='CustomPublicDataset',
-            has_files={
-                'gaze': False,
-                'precomputed_events': True,
-                'precomputed_reading_measures': False,
-            },
-            resources=ResourceDefinitions.from_dict({
-                'precomputed_events': [{
-                    'resource': 'test.gz.tar',
-                    'filename': 'test.gz.tar',
-                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                }],
-            }),
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                mirrors={'gaze': ['https://example.com/']},
+                resources=[
+                    {
+                        'content': 'gaze',
+                        'url': 'https://example.com/test.gz.tar',
+                        'filename': None,
+                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                    },
+                ],
+            ),
+            AttributeError,
+            'Resource.filename must not be None',
+            id='mirrors_filename_none',
         ),
-        DatasetDefinition(
-            name='CustomPublicDataset',
-            has_files={
-                'gaze': False,
-                'precomputed_events': False,
-                'precomputed_reading_measures': True,
-            },
-            resources=ResourceDefinitions.from_dict({
-                'precomputed_reading_measures': [{
-                    'resource': 'test.gz.tar',
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                resources=[{
+                    'content': 'gaze',
+                    'url': None,
                     'filename': 'test.gz.tar',
                     'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                 }],
-            }),
+            ),
+            AttributeError,
+            'Resource.url must not be None',
+            id='no_mirrors_url_none',
+        ),
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                resources=[{
+                    'content': 'gaze',
+                    'url': 'https://example.com/test.gz.tar',
+                    'filename': None,
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                }],
+            ),
+            AttributeError,
+            'Resource.filename must not be None',
+            id='no_mirrors_filename_none',
+        ),
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                resources=[{
+                    'content': 'gaze',
+                    'url': 'test.gz.tar',
+                    'filename': 'test.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                }],
+            ),
+            ValueError,
+            'unknown url type: ',
+            id='no_mirrors_no_http_resource_gaze',
+        ),
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                resources=[{
+                    'content': 'gaze',
+                    'url': 'test.gz.tar',
+                    'filename': 'test.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                }],
+            ),
+            ValueError,
+            'unknown url type: ',
+            id='no_mirrors_no_http_resource_events',
+        ),
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                resources=[{
+                    'content': 'gaze',
+                    'url': 'test.gz.tar',
+                    'filename': 'test.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                }],
+            ),
+            ValueError,
+            'unknown url type: ',
+            id='no_mirrors_no_http_resource_measures',
         ),
     ],
 )
-def test_dataset_download_no_mirrors_no_http_resource_raises_exception(
-        dataset_definition, tmp_path,
+def test_dataset_download_raises_exception(
+        dataset_definition, expected_exception, expected_msg_prefix, tmp_path,
 ):
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(expected_exception) as excinfo:
         Dataset(dataset_definition, path=tmp_path).download()
-
     msg, = excinfo.value.args
-
-    expected_msg_prefix = 'unknown url type: '
     assert msg.startswith(expected_msg_prefix)
 
 
-def test_dataset_download_no_resources_raises_exception(tmp_path):
-    definition = DatasetDefinition(
-        name='CustomPublicDataset',
-        has_files={
-            'gaze': True,
-            'precomputed_events': False,
-            'precomputed_reading_measures': False,
-        },
-        mirrors={
-            'gaze': (
-                'https://example.com/',
-                'https://another_example.com/',
+@pytest.mark.parametrize(
+    'definition',
+    [
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                mirrors={
+                    'gaze': (
+                        'https://example.com/',
+                        'https://another_example.com/',
+                    ),
+                },
             ),
-        },
-        resources={
-            'gaze': (),
-        },
-    )
-
+            id='gaze',
+        ),
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                mirrors={
+                    'precomputed_events': (
+                        'https://example.com/',
+                        'https://another_example.com/',
+                    ),
+                },
+            ),
+            id='precomputed_events',
+        ),
+        pytest.param(
+            DatasetDefinition(
+                name='CustomPublicDataset',
+                mirrors={
+                    'precomputed_reading_measures': (
+                        'https://example.com/',
+                        'https://another_example.com/',
+                    ),
+                },
+            ),
+            id='precomputed_reading_measures',
+        ),
+    ],
+)
+def test_dataset_download_no_resources_raises_exception(definition, tmp_path):
     with pytest.raises(AttributeError) as excinfo:
         Dataset(definition, path=tmp_path).download()
 
     msg, = excinfo.value.args
 
-    expected_msg = "'gaze' resources must be specified to download dataset."
-    assert msg == expected_msg
-
-
-def test_dataset_download_no_precomputed_event_resources_raises_exception(tmp_path):
-    definition = DatasetDefinition(
-        name='CustomPublicDataset',
-        has_files={
-            'gaze': False,
-            'precomputed_events': True,
-            'precomputed_reading_measures': False,
-        },
-        mirrors={
-            'precomputed_events': (
-                'https://example.com/',
-                'https://another_example.com/',
-            ),
-        },
-        resources={
-            'precomputed_events': (),
-        },
-    )
-
-    with pytest.raises(AttributeError) as excinfo:
-        Dataset(definition, path=tmp_path).download()
-
-    msg, = excinfo.value.args
-
-    expected_msg = "'precomputed_events' resources must be specified to download dataset."
+    expected_msg = 'resources must be specified to download a dataset.'
     assert msg == expected_msg
 
 
@@ -1300,35 +1288,25 @@ def test_public_dataset_registered_correct_attributes(tmp_path, dataset_definiti
     assert dataset.definition.mirrors == dataset_definition.mirrors
     assert dataset.definition.resources == dataset_definition.resources
     assert dataset.definition.experiment == dataset_definition.experiment
-    assert dataset.definition.filename_format == dataset_definition.filename_format
-    assert dataset.definition.filename_format_schema_overrides \
-        == dataset_definition.filename_format_schema_overrides
-    assert dataset.definition.has_files == dataset_definition.has_files
 
 
 def test_extract_dataset_precomputed_move_single_file(tmp_path):
     definition = DatasetDefinition(
         name='CustomPublicDataset',
-        has_files={
-            'gaze': False,
-            'precomputed_events': True,
-            'precomputed_reading_measures': False,
-        },
         mirrors={
             'precompued_events': (
                 'https://example.com/',
                 'https://another_example.com/',
             ),
         },
-        resources={
-            'precomputed_events': (
-                {
-                    'resource': 'tests/files/',
-                    'filename': '18sat_fixfinal.csv',
-                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                },
-            ),
-        },
+        resources=[
+            {
+                'content': 'precomputed_events',
+                'url': 'tests/files/',
+                'filename': '18sat_fixfinal.csv',
+                'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+            },
+        ],
     )
 
     # Create directory and copy test file.
@@ -1344,26 +1322,20 @@ def test_extract_dataset_precomputed_move_single_file(tmp_path):
 def test_extract_dataset_precomputed_rm_move_single_file(tmp_path):
     definition = DatasetDefinition(
         name='CustomPublicDataset',
-        has_files={
-            'gaze': False,
-            'precomputed_events': False,
-            'precomputed_reading_measures': True,
-        },
         mirrors={
             'precomputed_reading_measures': (
                 'https://example.com/',
                 'https://another_example.com/',
             ),
         },
-        resources={
-            'precomputed_reading_measures': (
-                {
-                    'resource': 'tests/files/',
-                    'filename': 'copco_rm_dummy.csv',
-                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
-                },
-            ),
-        },
+        resources=[
+            {
+                'content': 'precomputed_reading_measures',
+                'url': 'tests/files/',
+                'filename': 'copco_rm_dummy.csv',
+                'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+            },
+        ],
     )
 
     # Create directory and copy test file.
@@ -1375,28 +1347,3 @@ def test_extract_dataset_precomputed_rm_move_single_file(tmp_path):
     )
 
     Dataset(definition, path=tmp_path).extract()
-
-
-def test_dataset_download_no_precomputed_rm_resources_raises_exception(tmp_path):
-    definition = DatasetDefinition(
-        name='CustomPublicDataset',
-        has_files={
-            'gaze': False,
-            'precomputed_events': False,
-            'precomputed_reading_measures': True,
-        },
-        mirrors={
-            'precomputed_reading_measures': (
-                'https://example.com/',
-                'https://another_example.com/',
-            ),
-        },
-    )
-
-    with pytest.raises(AttributeError) as excinfo:
-        Dataset(definition, path=tmp_path).download()
-
-    msg, = excinfo.value.args
-
-    expected_msg = "'precomputed_reading_measures' resources must be specified to download dataset."
-    assert msg == expected_msg

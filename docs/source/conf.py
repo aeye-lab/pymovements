@@ -59,10 +59,10 @@ author = 'The pymovements Project Authors'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
-    'sphinx.ext.napoleon',
+    'sphinx.ext.extlinks',
     'sphinx.ext.linkcode',
     'sphinx.ext.mathjax',
-    'sphinx.ext.extlinks',
+    'sphinx.ext.napoleon',
     'sphinx_copybutton',
     'sphinx_design',
     'sphinx_favicon',
@@ -118,6 +118,7 @@ html_css_files = [
 
 html_theme_options = {
     'navigation_with_keys': False,
+    'sidebar_includehidden': True,
     'external_links': [
         {
             'name': 'Contributing',

@@ -32,7 +32,7 @@ import pymovements as pm
 
 @pytest.fixture(name='events', scope='session')
 def event_fixture():
-    return pm.EventDataFrame(
+    return pm.Events(
         pl.DataFrame(
             data={
                 'trial': [1, 1],
@@ -61,7 +61,7 @@ def gaze_fixture():
     y = np.arange(-100, 100)
     arr = np.column_stack((x, y)).transpose()
     gaze = pm.gaze.from_numpy(
-        data=arr,
+        samples=arr,
         schema=['x_pix', 'y_pix'],
         experiment=experiment,
         pixel_columns=['x_pix', 'y_pix'],

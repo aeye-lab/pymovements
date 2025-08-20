@@ -39,8 +39,10 @@ from pymovements.dataset import ResourceDefinitions
 from pymovements.events import EventDataFrame
 from pymovements.events import EventGazeProcessor
 from pymovements.events import EventProcessor
+from pymovements.events import Events
 from pymovements.gaze import Experiment
 from pymovements.gaze import EyeTracker
+from pymovements.gaze import Gaze
 from pymovements.gaze import GazeDataFrame
 from pymovements.gaze import Screen
 from pymovements.measure import register_sample_measure
@@ -59,6 +61,7 @@ __all__ = [
     'ResourceDefinitions',
 
     'events',
+    'Events',
     'EventDataFrame',
     'EventGazeProcessor',
     'EventProcessor',
@@ -67,6 +70,7 @@ __all__ = [
     'Experiment',
     'EyeTracker',
     'Screen',
+    'Gaze',
     'GazeDataFrame',
 
     'exceptions',
