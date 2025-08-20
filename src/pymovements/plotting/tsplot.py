@@ -28,8 +28,8 @@ import numpy as np
 import polars as pl
 
 from pymovements.gaze import Gaze
-from pymovements.plotting._figure_utils import finalize_figure
-from pymovements.plotting._figure_utils import prepare_figure
+from pymovements.plotting._matplotlib import finalize_figure
+from pymovements.plotting._matplotlib import prepare_figure
 
 
 def tsplot(

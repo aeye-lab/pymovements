@@ -31,10 +31,10 @@ import matplotlib.pyplot
 import numpy as np
 from deprecated.sphinx import deprecated
 
-from pymovements.plotting._figure_utils import _draw_line_data
-from pymovements.plotting._figure_utils import _setup_axes_and_colormap
-from pymovements.plotting._figure_utils import LinearSegmentedColormapType
-from pymovements.plotting._figure_utils import MatplotlibSetupType
+from pymovements.plotting._matplotlib import _draw_line_data
+from pymovements.plotting._matplotlib import _setup_axes_and_colormap
+from pymovements.plotting._matplotlib import LinearSegmentedColormapType
+from pymovements.plotting._matplotlib import MatplotlibSetupType
 from pymovements.stimulus.image import _draw_image_stimulus
 
 

@@ -29,8 +29,8 @@ from matplotlib.collections import Collection
 from pymovements._utils._checks import check_is_mutual_exclusive
 from pymovements.events.events import Events
 from pymovements.events.frame import EventDataFrame
-from pymovements.plotting._figure_utils import finalize_figure
-from pymovements.plotting._figure_utils import prepare_figure
+from pymovements.plotting._matplotlib import finalize_figure
+from pymovements.plotting._matplotlib import prepare_figure
 
 
 def main_sequence_plot(

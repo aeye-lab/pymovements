@@ -32,9 +32,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from pymovements.plotting._figure_utils import _setup_axes_and_colormap
-from pymovements.plotting._figure_utils import finalize_figure
-from pymovements.plotting._figure_utils import prepare_figure
+from pymovements.plotting._matplotlib import _setup_axes_and_colormap
+from pymovements.plotting._matplotlib import finalize_figure
+from pymovements.plotting._matplotlib import prepare_figure
 
 
 def test_prepare_figure_figsize_none_creates_default():

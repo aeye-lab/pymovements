@@ -27,8 +27,8 @@ import numpy as np
 from matplotlib import colors
 
 from pymovements.gaze import Gaze
-from pymovements.plotting._figure_utils import finalize_figure
-from pymovements.plotting._figure_utils import prepare_figure
+from pymovements.plotting._matplotlib import finalize_figure
+from pymovements.plotting._matplotlib import prepare_figure
 from pymovements.stimulus.image import _draw_image_stimulus
 
 
