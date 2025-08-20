@@ -50,7 +50,7 @@ def test_prepare_figure_figsize_none_creates_default():
 def test_finalize_figure_closefig_true_ignored_with_external_ax_warns(monkeypatch):
     # When an external ax is used (own_figure=False) and closefig=True is requested,
     # finalize_figure should warn and not close the figure.
-    fig, ax = plt.subplots()
+    fig, _ = plt.subplots()
     close_mock = Mock()
     monkeypatch.setattr(plt, 'close', close_mock)
 
