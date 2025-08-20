@@ -1754,7 +1754,7 @@ class Gaze:
 
     def save(
             self,
-            dirname: str,
+            dirname: str | Path,
             save_events: bool = True,
             save_samples: bool = True,
             save_experiment: bool = True,
@@ -1776,7 +1776,7 @@ class Gaze:
 
         Parameters
         ----------
-        dirname: str
+        dirname: str | Path
             Absloute directory name to save data.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.events_rootpath`.
@@ -1807,7 +1807,7 @@ class Gaze:
 
     def save_events(
             self,
-            dirname: str,
+            dirname: str | Path,
             verbose: int = 1,
             extension: str = 'feather',
     ) -> None:
@@ -1817,7 +1817,7 @@ class Gaze:
 
         Parameters
         ----------
-        dirname: str
+        dirname: str | Path
             Directory name to save data.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.events_rootpath`.
@@ -1851,7 +1851,7 @@ class Gaze:
 
     def save_preprocessed(
             self,
-            dirname: str,
+            dirname: str | Path,
             verbose: int = 1,
             extension: str = 'feather',
     ) -> None:
@@ -1861,7 +1861,7 @@ class Gaze:
 
         Parameters
         ----------
-        dirname: str
+        dirname: str | Path
             Directory name to save data.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`.
