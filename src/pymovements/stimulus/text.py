@@ -230,57 +230,6 @@ def from_file(
         page_column=page_column,
     )
 
-def from_path(
-        aoi_path: str | Path,
-        *,
-        aoi_column: str,
-        start_x_column: str,
-        start_y_column: str,
-        width_column: str | None = None,
-        height_column: str | None = None,
-        end_x_column: str | None = None,
-        end_y_column: str | None = None,
-        page_column: str | None = None,
-        custom_read_kwargs: dict[str, Any] | None = None) -> list[TextStimulus]:
-    """Load text stimuli from a directory.
-
-    Parameters
-    ----------
-    aoi_dir_path: str | Path
-        Path to the directory containing the AOI files or a single AOI file.
-    aoi_column: str
-        Name of the column that contains the content of the aois.
-    start_x_column: str
-        Name of the column which contains the x coordinate's start position of the
-        areas of interest.
-    start_y_column: str
-        Name of the column which contains the y coordinate's start position of the
-        areas of interest.
-    width_column: str | None
-        Name of the column which contains the width of the area of interest. (default: None)
-    height_column: str | None
-        Name of the column which contains the height of the area of interest. (default: None)
-    end_x_column: str | None
-        Name of the column which contains the x coordinate's end position of the areas of interest.
-        (default: None)
-    end_y_column: str | None
-        Name of the column which contains the y coordinate's end position of the areas of interest.
-        (default: None)
-    page_column: str | None
-        Name of the column which contains the page information of the area of interest.
-        (default: None)
-    custom_read_kwargs: dict[str, Any] | None
-        Custom read keyword arguments for polars. (default: None)
-
-    Returns
-    -------
-    list[TextStimulus]
-        List of text stimuli.
-    """
-    # check if path is a directory path or a single file
-    
-    
-
 
 def _get_aoi(
         aoi_dataframe: TextStimulus,

@@ -150,7 +150,7 @@ class DatasetDefinition:
         .. deprecated:: v0.22.1
         This field will be removed in v0.27.0.
     filename_format: dict[str, str] | None
-        Regular expression which will be matched before trying to load the file. Namedgroups will
+        Regular expression which will be matched before trying to load the file. Named groups will
         appear in the `fileinfo` dataframe. (default: None)
     filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
@@ -202,6 +202,28 @@ class DatasetDefinition:
         in the input data frame. If specified, the column will be used for pixel to dva
         transformations. If not specified, the constant eye-to-screen distance will be taken from
         the experiment definition. This column will be renamed to ``distance``. (default: None)
+
+    aoi_content_column: str
+        Name of the column that contains the content of the AOIs.
+    aoi_start_x_column: str
+        Name of the column which contains the x coordinate's start position of the
+        areas of interest.
+    aoi_start_y_column: str
+        Name of the column which contains the y coordinate's start position of the
+        areas of interest.
+    aoi_width_column: str | None
+        Name of the column which contains the width of the area of interest. (default: None)
+    aoi_height_column: str | None
+        Name of the column which contains the height of the area of interest. (default: None)
+    aoi_end_x_column: str | None
+        Name of the column which contains the x coordinate's end position of the areas of interest.
+        (default: None)
+    aoi_end_y_column: str | None
+        Name of the column which contains the y coordinate's end position of the areas of interest.
+        (default: None)
+    aoi_page_column: str | None
+        Name of the column which contains the page information of the area of interest.
+        (default: None)
 
     Notes
     -----
@@ -274,6 +296,14 @@ class DatasetDefinition:
             velocity_columns: list[str] | None = None,
             acceleration_columns: list[str] | None = None,
             distance_column: str | None = None,
+            aoi_content_column: str | None = None,
+            aoi_start_x_column: str | None = None,
+            aoi_start_y_column: str | None = None,
+            aoi_width_column: str | None = None,
+            aoi_height_column: str | None = None,
+            aoi_end_x_column: str | None = None,
+            aoi_end_y_column: str | None = None,
+            aoi_page_column: str | None = None,
     ) -> None:
         self.name = name
         self.long_name = long_name
@@ -290,6 +320,15 @@ class DatasetDefinition:
         self.velocity_columns = velocity_columns
         self.acceleration_columns = acceleration_columns
         self.distance_column = distance_column
+
+        self.aoi_content_column = aoi_content_column
+        self.aoi_start_x_column = aoi_start_x_column
+        self.aoi_start_y_column = aoi_start_y_column
+        self.aoi_width_column = aoi_width_column
+        self.aoi_height_column = aoi_height_column
+        self.aoi_end_x_column = aoi_end_x_column
+        self.aoi_end_y_column = aoi_end_y_column
+        self.aoi_page_column = aoi_page_column
 
         if mirrors is None:
             self.mirrors = {}
@@ -351,7 +390,7 @@ class DatasetDefinition:
             filename format for each content type
         """
         data: dict[str, str] = {}
-        content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures')
+        content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures', 'stimuli')
         for content_type in content_types:
             if content_resources := self.resources.filter(content=content_type):
                 # take first resource with matching content type.
@@ -391,7 +430,7 @@ class DatasetDefinition:
             filename format schema overrides for each content type
         """
         data: dict[str, dict[str, type]] = {}
-        content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures')
+        content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures' ,'stimuli')
         for content_type in content_types:
             if content_resources := self.resources.filter(content=content_type):
                 # take first resource with matching content type.
