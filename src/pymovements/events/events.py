@@ -292,7 +292,7 @@ class Events:
 
         Parameters
         ----------
-        prefix : str
+        prefix: str
             Event name prefix used to select rows (e.g., ``"fixation"``, ``"saccade"``).
 
         Returns
