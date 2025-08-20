@@ -47,7 +47,7 @@ def event_fixture():
 
 
 @pytest.fixture(name='gaze', scope='session')
-def gaze_fixture():
+def gaze_fixture(events):
     experiment = pm.Experiment(
         screen_width_px=1280,
         screen_height_px=1024,
@@ -66,6 +66,8 @@ def gaze_fixture():
         experiment=experiment,
         pixel_columns=['x_pix', 'y_pix'],
     )
+
+    gaze.events = events
 
     gaze.pix2deg()
     gaze.pos2vel()
@@ -137,27 +139,26 @@ def gaze_fixture():
         ),
     ],
 )
-def test_scanpathplot_show(events, gaze, kwargs, monkeypatch):
+def test_scanpathplot_show(gaze, kwargs, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
-    pm.plotting.scanpathplot(events=events, gaze=gaze, **kwargs)
+    pm.plotting.scanpathplot(gaze=gaze, **kwargs)
     plt.close()
     mock.assert_called_once()
 
 
-def test_scanpathplot_noshow(events, gaze, monkeypatch):
+def test_scanpathplot_noshow(gaze, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
-    pm.plotting.scanpathplot(events=events, gaze=gaze, show=False)
+    pm.plotting.scanpathplot(gaze=gaze, show=False)
     plt.close()
     mock.assert_not_called()
 
 
-def test_scanpathplot_save(events, gaze, monkeypatch, tmp_path):
+def test_scanpathplot_save(gaze, monkeypatch, tmp_path):
     mock = Mock()
     monkeypatch.setattr(figure.Figure, 'savefig', mock)
     pm.plotting.scanpathplot(
-        events=events,
         gaze=gaze,
         show=False,
         savepath=str(
@@ -182,9 +183,9 @@ def test_scanpathplot_save(events, gaze, monkeypatch, tmp_path):
         ),
     ],
 )
-def test_scanpathplot_exceptions(events, gaze, kwargs, exception, monkeypatch):
+def test_scanpathplot_exceptions(gaze, kwargs, exception, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
 
     with pytest.raises(exception):
-        pm.plotting.scanpathplot(events=events, gaze=gaze, **kwargs)
+        pm.plotting.scanpathplot(gaze=gaze, **kwargs)

@@ -136,9 +136,9 @@ def scanpathplot(
         )
     else:
         if gaze is None:
-            raise TypeError(f"scanpathplot argument 'gaze' or 'events' must not be None")
+            raise TypeError("scanpathplot argument 'gaze' or 'events' must not be None")
         if gaze.events is None:
-            raise TypeError(f"scanpathplot 'gaze.events' must not be None")
+            raise TypeError("scanpathplot 'gaze.events' must not be None")
         assert gaze is not None
         assert gaze.events is not None
         events = gaze.events
