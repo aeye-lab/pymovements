@@ -48,7 +48,7 @@ if 'pytest' in sys.modules:  # pragma: no cover
 def scanpathplot(
         gaze: Gaze | None = None,
         position_column: str = 'location',
-        cval: np.ndarray | None = None,  # pragma: no cover
+        cval: np.ndarray | None = None,
         cmap: matplotlib.colors.Colormap | None = None,
         cmap_norm: matplotlib.colors.Normalize | str | None = None,
         cmap_segmentdata: LinearSegmentedColormapType | None = None,
