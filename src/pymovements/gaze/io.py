@@ -344,15 +344,54 @@ def from_asc(
     Gaze
         The initialized gaze object read from the asc file.
 
+    Notes
+    -----
+    ASC files are created from EyeLink EDF files using the edf2asc tool
+    (can be downloaded from the SR Research Support website).
+    ASC files contain gaze samples, events, and metadata about
+    the experiment in a text (ASCII) format.
+    For example, if you have an Eyelink EDF file stored at
+    `tests/files/eyelink_monocular_example.edf`,
+    you can convert it to an ASC file using the following command:
+    `edf2asc tests/files/eyelink_monocular_example.edf`.
+    This will create an ASC file named `tests/files/eyelink_monocular_example.asc`.
+
+    Running edf2asc with the default settings (no flags/parameters) will always produce
+    an ASC file that can be read by this function, although currently only monocular
+    recordings are supported.
+    If a binocular ASC file is provided, only the left eye data will be read.
+    If you want to use right eye data, you can use the
+    `-r` or `-nl` edf2asc flags to get an ASC file with only right eye data.
+    Additionally, the following optional edf2asc parameters/flags are safe to use
+    and will also result in an ASC file that can be read by this function:
+
+    - `-input` for writing the status of the Host PC parallel port to the ASC
+      file (although these values will not be read).
+
+    - `-ftime` for outputting time as a floating point value.
+
+    - `-t` for using only tabs as delimiters.
+
+    - `-utf8` for forcing UTF-8 encoding of the ASC file.
+
+    - `-buttons` for outputting button values in samples (although these values will not be read).
+
+    - `-vel` and `-fvel` for outputting velocity values (although these values will not be read).
+
+    - `-l` or `-nr` and `-r` or `-nl`  for outputting left and right eye data only in case of a
+      binocular file (this is currently the only way to access right eye data).
+
+    - `-avg` for outputting average values of the left and right eye data
+      in case of a binocular file (although these will not be read).
+
+    Using other edf2asc parameters may lead to errors or unexpected behavior. For example, using
+    `-e` or `-ns` to output only events or `-s` or `-ne` to only output samples will not work
+    with this function, as it expects both samples and events to be present in the ASC file.
+
+
     Examples
     --------
-    ASC files are created from EyeLink EDF files using the edf2asc tool. The ASC file contains gaze samples, events, and metadata about the experiment.
-    This function assumes that the ASC file is in the default format created by edf2asc.
-    For example, if you have an Eyelink EDF file stored at `tests/files/eyelink_monocular_example.edf`, you can convert it to an ASC file using the following command (requires the edf2asc tool which can be downloaded from the SR Research Support website):
-    ```
-    edf2asc tests/files/eyelink_monocular_example.edf tests/files/eyelink_monocular_example.asc
-    ```
-    We can then load the asc file stored at `tests/files/eyelink_monocular_example.asc` into a ``Gaze``:
+    We can load an asc file stored at `tests/files/eyelink_monocular_example.asc` into a ``Gaze``:
 
     >>> from pymovements.gaze.io import from_asc
     >>> gaze = from_asc(file='tests/files/eyelink_monocular_example.asc')
