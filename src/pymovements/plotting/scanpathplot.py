@@ -30,6 +30,7 @@ import matplotlib.scale
 import numpy as np
 from matplotlib.patches import Circle
 
+from pymovements._utils._checks import check_is_mutual_exclusive
 from pymovements.events import EventDataFrame
 from pymovements.gaze import Gaze
 from pymovements.plotting._matplotlib import _draw_line_data
@@ -124,6 +125,7 @@ def scanpathplot(
 
     """
     if events is not None:
+        check_is_mutual_exclusive(gaze=gaze, events=events)
         warn(
             DeprecationWarning(
                 "scanpathplot argument 'events' is deprecated since version v0.23.1. "
@@ -166,6 +168,7 @@ def scanpathplot(
         ax.add_patch(fixation)
 
     if add_traceplot:
+        assert gaze
         gaze_x_signal = gaze.frame[gaze_position_column].list.get(0)
         gaze_y_signal = gaze.frame[gaze_position_column].list.get(1)
         line = _draw_line_data(
