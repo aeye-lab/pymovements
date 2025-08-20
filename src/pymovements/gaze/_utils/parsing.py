@@ -38,7 +38,7 @@ EYE_TRACKING_SAMPLE_MONOCULAR = re.compile(
     r'(?P<y_pix>[-]?\d*[.]\d*|\.)?\s*'
     r'(?P<pupil>\d*[.]\d*|\.)?\s*'
     r'(?P<dummy>\d*[.]\d*|\.)?\s*'
-    r'(?P<flags>[A-Za-z.]{3,5})?\s*'
+    r'(?P<flags>[A-Za-z.]{3,5})?\s*',
 )
 
 EYE_TRACKING_SAMPLE_BINOCULAR = re.compile(
@@ -50,7 +50,7 @@ EYE_TRACKING_SAMPLE_BINOCULAR = re.compile(
     r'(?P<y_pix_right>[-]?\d*[.]\d*|\.)?\s*'
     r'(?P<pupil_right>\d*[.]\d*|\.)?\s*'
     r'(?P<dummy>\d*[.]\d*|\.)?\s*'
-    r'(?P<flags>[A-Za-z.]{3,5})?\s*'
+    r'(?P<flags>[A-Za-z.]{3,5})?\s*',
 )
 
 EYELINK_META_REGEXES = [
@@ -115,7 +115,7 @@ RECORDING_CONFIG_REGEX = re.compile(
 
 # Resolution (GAZE_COORDS) pattern used to extract screen coordinates
 RESOLUTION_REGEX = re.compile(
-    r'MSG\s+\d+[.]?\d*\s+GAZE_COORDS\s*=?\s*(?P<resolution>.*)'
+    r'MSG\s+\d+[.]?\d*\s+GAZE_COORDS\s*=?\s*(?P<resolution>.*)',
 )
 
 # Regex to match SAMPLES lines and capture which eyes are present (LEFT, RIGHT, LEFT RIGHT, LR)
@@ -125,8 +125,7 @@ SAMPLES_CONFIG_REGEX = re.compile(
     r'(?:\s+RATE\s+(?P<sampling_rate>\d+(?:\.\d+)?))?'
     r'(?:\s+TRACKING\s+(?P<tracking_method>\S+))?'
     r'(?:\s+FILTER\s+(?P<filter>\d+))?'
-    r'(?:\s+(?P<input_flag>INPUT))?'
-    ,
+    r'(?:\s+(?P<input_flag>INPUT))?',
     re.IGNORECASE,
 )
 START_RECORDING_REGEX = re.compile(
@@ -344,11 +343,12 @@ def parse_eyelink(
         if match := SAMPLES_CONFIG_REGEX.search(line):
             samples_config.append(match.groupdict())
             tracked = match.group('tracked_eye').upper().strip()
-            # consider 'LEFT' in tracked and 'RIGHT' in tracked or tracked == 'LR' or tracked == 'L R':
-            if 'LEFT' in tracked and 'RIGHT' in tracked or tracked == 'LR' or tracked == 'L R':
-                is_binocular = True
-            else:
-                is_binocular = False
+            # consider 'LEFT' in tracked and 'RIGHT' in tracked or tracked == 'LR' or
+            # tracked == 'L R':
+            is_binocular = (
+                'LEFT' in tracked and 'RIGHT' in tracked or
+                tracked == 'LR' or tracked == 'L R'
+            )
             break
 
     # Update the samples dictionary to include binocular data with correct column names if needed
@@ -489,15 +489,19 @@ def parse_eyelink(
             if not is_binocular:
                 if not blinking and all(
                     val is not np.nan for val in (
-                        samples['x_pix'][-1], samples['y_pix'][-1], samples['pupil'][-1]
+                        samples['x_pix'][-1], samples['y_pix'][-1], samples['pupil'][-1],
                     )
                 ):
                     num_valid_samples += 1
 
             if is_binocular and not blinking and all(
                 val is not np.nan for val in (
-                    samples['x_left_pix'][-1], samples['y_left_pix'][-1], samples['pupil_left'][-1],
-                    samples['x_right_pix'][-1], samples['y_right_pix'][-1], samples['pupil_right'][-1]
+                    samples['x_left_pix'][-1],
+                    samples['y_left_pix'][-1],
+                    samples['pupil_left'][-1],
+                    samples['x_right_pix'][-1],
+                    samples['y_right_pix'][-1],
+                    samples['pupil_right'][-1],
                 )
             ):
                 num_valid_samples += 1
@@ -658,6 +662,7 @@ def _check_reccfg_key(
     if astype is not None:
         value = astype(value)
     return value
+
 
 def _check_samples_config_key(
         samples_config: list[dict[str, Any]],
