@@ -116,11 +116,13 @@ def scanpathplot(
         Path of the stimulus to be shown. (default: None)
     stimulus_origin: str
         Origin of stimuls to plot on the stimulus. (default: 'upper')
-    events: EventDataFrame | None
-        The EventDataFrame to plot. (default: None)
+    events: Events | EventDataFrame | None
+        The events to plot. (default: None)
 
     Raises
     ------
+    TypeError
+        If both gaze and events are 'None'.
     ValueError
         If length of x and y coordinates do not match or if ``cmap_norm`` is unknown.
 
