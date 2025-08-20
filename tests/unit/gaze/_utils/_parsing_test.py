@@ -26,7 +26,7 @@ import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
-import pymovements as pm
+from pymovements.gaze._utils import parsing
 
 ASC_TEXT = r"""
 ** DATE: Wed Mar  8 09:25:20 2023
@@ -161,7 +161,7 @@ EXPECTED_GAZE_DF = pl.from_dict(
 
 EXPECTED_EVENT_DF = pl.from_dict(
     {
-        'name': ['fixation_eyelink', 'blink_eyelink', 'saccade_eyelink'],
+        'name': ['fixation_right_eyelink', 'blink_right_eyelink', 'saccade_right_eyelink'],
         'onset': [10000000.0, 10000020.0, 10000011.0],
         'offset': [10000008.0, 10000022.0, 10000022.0],
         'task': [None, None, 'B'],
@@ -219,7 +219,7 @@ def test_parse_eyelink(tmp_path):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(ASC_TEXT)
 
-    gaze_df, event_df, metadata = pm.gaze._utils.parsing.parse_eyelink(
+    gaze_df, event_df, metadata = parsing.parse_eyelink(
         filepath,
         patterns=PATTERNS,
         metadata_patterns=METADATA_PATTERNS,
@@ -260,7 +260,7 @@ def test_parse_eyelink(tmp_path):
     ],
 )
 def test_from_asc_metadata_patterns(kwargs, expected_metadata):
-    _, _, metadata = pm.gaze._utils.parsing.parse_eyelink(**kwargs)
+    _, _, metadata = parsing.parse_eyelink(**kwargs)
 
     for key, value in expected_metadata.items():
         assert metadata[key] == value
@@ -278,7 +278,7 @@ def test_parse_eyelink_raises_value_error(tmp_path, patterns):
     filepath.write_text(ASC_TEXT)
 
     with pytest.raises(ValueError) as excinfo:
-        pm.gaze._utils.parsing.parse_eyelink(
+        parsing.parse_eyelink(
             filepath,
             patterns=patterns,
         )
@@ -362,7 +362,7 @@ def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_mo
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, _, metadata = pm.gaze._utils.parsing.parse_eyelink(
+    _, _, metadata = parsing.parse_eyelink(
         filepath,
     )
 
@@ -408,7 +408,7 @@ def test_metadata_warnings(tmp_path, metadata, expected_msg):
     filepath.write_text(metadata)
 
     with pytest.warns(Warning, match=expected_msg):
-        _, _, metadata = pm.gaze._utils.parsing.parse_eyelink(
+        _, _, metadata = parsing.parse_eyelink(
             filepath,
         )
 
@@ -466,7 +466,7 @@ def test_val_cal_eyelink(tmp_path, metadata, expected_validation, expected_calib
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
+    _, _, parsed_metadata = parsing.parse_eyelink(filepath)
 
     assert parsed_metadata['calibrations'] == expected_calibration
     assert parsed_metadata['validations'] == expected_validation
@@ -475,7 +475,7 @@ def test_val_cal_eyelink(tmp_path, metadata, expected_validation, expected_calib
 def test_parse_val_cal_eyelink_monocular_file():
     example_asc_monocular_path = Path('tests/files/eyelink_monocular_example.asc')
 
-    _, _, metadata = pm.gaze._utils.parsing.parse_eyelink(example_asc_monocular_path)
+    _, _, metadata = parsing.parse_eyelink(example_asc_monocular_path)
 
     expected_validation = [{
         'error': 'GOOD ERROR',
@@ -626,7 +626,7 @@ def test_parse_eyelink_data_loss_ratio(
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
+    _, _, parsed_metadata = parsing.parse_eyelink(filepath)
 
     assert parsed_metadata['data_loss_ratio_blinks'] == expected_blink_ratio
     assert parsed_metadata['data_loss_ratio'] == expected_overall_ratio
@@ -642,7 +642,7 @@ def test_parse_eyelink_datetime(tmp_path):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
+    _, _, parsed_metadata = parsing.parse_eyelink(filepath)
 
     assert parsed_metadata['datetime'] == expected_datetime
 
@@ -825,7 +825,7 @@ def test_parse_eyelink_mount_config(tmp_path, metadata, expected_mount_config):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(metadata)
 
-    _, _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
+    _, _, parsed_metadata = parsing.parse_eyelink(filepath)
 
     assert parsed_metadata['mount_configuration'] == expected_mount_config
 
@@ -849,12 +849,11 @@ def test_parse_eyelink_mount_config(tmp_path, metadata, expected_mount_config):
 )
 @pytest.mark.filterwarnings('ignore:No recording configuration found.')
 @pytest.mark.filterwarnings('ignore:No samples configuration found.')
-
 def test_parse_eyelink_encoding(tmp_path, bytestring, encoding, expected_text):
     filepath = tmp_path / 'sub.asc'
     filepath.write_bytes(bytestring)
 
-    _, _, parsed_metadata = pm.gaze._utils.parsing.parse_eyelink(
+    _, _, parsed_metadata = parsing.parse_eyelink(
         filepath,
         metadata_patterns=[r'(?P<text>.+)'],
         encoding=encoding,
@@ -882,27 +881,78 @@ START	1408660 	LEFT	RIGHT	SAMPLES	EVENTS
 SFIX L   1408667
 SFIX R   1408667
 1408667	 963.7	 543.1	 288.0	 959.3	 538.6	 306.0	.....
-END	1408675 	SAMPLES	EVENTS	RES	 38.54	 31.12
+1408782	 966.9	 565.5	 276.0	 949.4	 545.5	 308.0	.....
+1408783	 970.7	 580.5	 271.0	 945.7	 540.8	 308.0	.....
+1408784	 974.4	 594.8	 266.0	 942.4	 538.1	 307.0	.....
+1408785	 976.7	 604.8	 262.0	 938.9	 540.1	 305.0	.....
+1408786	 976.7	 604.8	 262.0	 935.1	 549.1	 303.0	.....
+SBLINK L 1408787
+1408787	  .	  .	   0.0	 933.4	 568.2	 298.0	.C...
+1408788	  .	  .	   0.0	 934.1	 597.2	 289.0	.C...
+1408789	  .	  .	   0.0	 937.7	 634.5	 276.0	.C...
+1408790	  .	  .	   0.0	 941.1	 661.7	 266.0	.C...
+1408791	  .	  .	   0.0	 942.9	 675.4	 259.0	.C...
+1408792	  .	  .	   0.0	 942.9	 675.4	 259.0	.C...
+SBLINK R 1408793
+1408793	  .	  .	   0.0	  .	  .	   0.0	.C.C.
+1408794	  .	  .	   0.0	  .	  .	   0.0	.C.C.
+1408795	  .	  .	   0.0	  .	  .	   0.0	.C.C.
+END	1408795 	SAMPLES	EVENTS	RES	 38.54	 31.12
 """
 
     filepath = tmp_path / 'sub_binoc.asc'
     filepath.write_text(asc_text)
 
-    gaze_df, event_df, metadata = pm.gaze._utils.parsing.parse_eyelink(filepath)
+    gaze_df, event_df, metadata = parsing.parse_eyelink(filepath)
 
     assert isinstance(gaze_df, pl.DataFrame)
 
     # Assert exact binocular sample values (times and left/right coords/pupils)
     expected_gaze = pl.from_dict(
         {
-            'time': [1408660.0, 1408661.0, 1408662.0, 1408667.0],
-            'x_left_pix': [964.3, 964.5, 964.9, 963.7],
-            'y_left_pix': [541.5, 542.2, 543.0, 543.1],
-            'pupil_left': [288.0, 288.0, 288.0, 288.0],
-            'x_right_pix': [960.5, 960.4, 960.3, 959.3],
-            'y_right_pix': [538.8, 539.5, 540.4, 538.6],
-            'pupil_right': [305.0, 306.0, 307.0, 306.0],
-        }
+            'time': [
+                1408660.0, 1408661.0, 1408662.0, 1408667.0,
+                1408782.0, 1408783.0, 1408784.0, 1408785.0, 1408786.0,
+                1408787.0, 1408788.0, 1408789.0, 1408790.0, 1408791.0, 1408792.0,
+                1408793.0, 1408794.0, 1408795.0,
+            ],
+            'x_left_pix': [
+                964.3, 964.5, 964.9, 963.7,
+                966.9, 970.7, 974.4, 976.7, 976.7,
+                np.nan, np.nan, np.nan, np.nan, np.nan, np.nan,
+                np.nan, np.nan, np.nan,
+            ],
+            'y_left_pix': [
+                541.5, 542.2, 543.0, 543.1,
+                565.5, 580.5, 594.8, 604.8, 604.8,
+                np.nan, np.nan, np.nan, np.nan, np.nan, np.nan,
+                np.nan, np.nan, np.nan,
+            ],
+            'pupil_left': [
+                288.0, 288.0, 288.0, 288.0,
+                276.0, 271.0, 266.0, 262.0, 262.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0,
+            ],
+            'x_right_pix': [
+                960.5, 960.4, 960.3, 959.3,
+                949.4, 945.7, 942.4, 938.9, 935.1,
+                933.4, 934.1, 937.7, 941.1, 942.9, 942.9,
+                np.nan, np.nan, np.nan,
+            ],
+            'y_right_pix': [
+                538.8, 539.5, 540.4, 538.6,
+                545.5, 540.8, 538.1, 540.1, 549.1,
+                568.2, 597.2, 634.5, 661.7, 675.4, 675.4,
+                np.nan, np.nan, np.nan,
+            ],
+            'pupil_right': [
+                305.0, 306.0, 307.0, 306.0,
+                308.0, 308.0, 307.0, 305.0, 303.0,
+                298.0, 289.0, 276.0, 266.0, 259.0, 259.0,
+                0.0, 0.0, 0.0,
+            ],
+        },
     )
 
     assert_frame_equal(gaze_df, expected_gaze, check_column_order=False, rtol=0)
@@ -913,5 +963,92 @@ END	1408675 	SAMPLES	EVENTS	RES	 38.54	 31.12
     # basic metadata expectations
     assert 'sampling_rate' in metadata
     assert metadata['sampling_rate'] == 1000.0
-    # resolution should reflect the GAZE_COORDS line
-    assert metadata.get('resolution') == (1920, 1080) or metadata.get('resolution') == (1920.0, 1080.0)
+    # resolution should reflect the GAZE_COORDS line (+1 pixel for each
+    # dimension because of 0-based indexing, see
+    # https://www.sr-research.com/support/thread-9129.html)
+    assert metadata.get('resolution') == (
+        1920, 1080,
+    ) or metadata.get('resolution') == (
+        1920.0, 1080.0,
+    )
+
+
+@pytest.mark.filterwarnings('ignore:No metadata found.')
+@pytest.mark.filterwarnings('ignore:No recording configuration found.')
+@pytest.mark.filterwarnings('ignore:No samples configuration found.')
+def test_parse_eyelink_binocular_missing_samples_data_loss(tmp_path):
+    """Ensure data loss ratios are reported for binocular ASC with missing samples.
+
+    The snippet contains timestamps where the left eye becomes missing (dots) while the
+    right eye still has values, and later both eyes are missing. The test checks that
+    parse_eyelink returns numeric data loss ratios in the expected range.
+    """
+    # Build ASC text with continuous timestamps (1 ms steps) to cover blink intervals
+    start = 1408782
+    end = 1408887
+
+    asc_lines = [
+        '** TYPE: EDF_FILE BINARY EVENT SAMPLE TAGGED',
+        'MSG\t1408659 RECCFG CR 1000 2 1 LR',
+        'MSG\t1408659 ELCLCFG BTABLER',
+        'MSG\t1408659 GAZE_COORDS 0.00 0.00 1919.00 1079.00',
+        'PRESCALER\t1',
+        'VPRESCALER\t1',
+        'PUPIL\tAREA',
+        'EVENTS\tGAZE\tLEFT\tRIGHT\tRATE\t1000.00\tTRACKING\tCR\tFILTER\t2',
+        'SAMPLES\tGAZE\tLEFT\tRIGHT\tRATE\t1000.00\tTRACKING\tCR\tFILTER\t2',
+        f'START\t{start}\tLEFT\tRIGHT\tSAMPLES\tEVENTS',
+    ]
+
+    for t in range(start, end + 1):
+        # Insert SBLINK markers at their onsets
+        if t == 1408787:
+            asc_lines.append(f'SBLINK L {t}')
+        if t == 1408793:
+            asc_lines.append(f'SBLINK R {t}')
+        # Insert EBlink markers at their ends
+        if t == 1408873:
+            asc_lines.append('EBLINK R 1408793\t1408872\t80')
+        if t == 1408884:
+            asc_lines.append('EBLINK L 1408787\t1408883\t97')
+
+        # Construct sample lines depending on the timestamp range
+        if t <= 1408786:
+            # both eyes valid
+            asc_lines.append(f"{t}\t 966.9\t 565.5\t 276.0\t 949.4\t 545.5\t 308.0\t.....")
+        elif 1408787 <= t <= 1408792:
+            # left missing, right valid
+            asc_lines.append(f"{t}\t  .\t  .\t   0.0\t 933.4\t 568.2\t 298.0\t.C...")
+        elif 1408793 <= t <= 1408872:
+            # both eyes missing (overlap of left and right blink)
+            asc_lines.append(f"{t}\t  .\t  .\t   0.0\t  .\t  .\t   0.0\t.C.C.")
+        elif 1408873 <= t <= 1408883:
+            # left missing, right valid (after right blink ended)
+            asc_lines.append(f"{t}\t  .\t  .\t   0.0\t 939.7\t 590.6\t 288.0\t.C...")
+        else:
+            # both eyes valid again
+            asc_lines.append(f"{t}\t 1009.6\t 483.1\t 252.0\t 939.4\t 582.3\t 292.0\t..R..")
+
+    asc_lines.append(f'END\t{end}\tSAMPLES\tEVENTS\tRES\t 47.75\t 45.92')
+
+    asc_text = '\n'.join(asc_lines) + '\n'
+
+    filepath = tmp_path / 'sub_binoc_missing.asc'
+    filepath.write_text(asc_text)
+
+    _, _, parsed_metadata = parsing.parse_eyelink(filepath)
+
+    # The parser should return both ratios and they should be numeric and valid
+    assert 'data_loss_ratio_blinks' in parsed_metadata
+    assert 'data_loss_ratio' in parsed_metadata
+
+    blink_ratio = parsed_metadata['data_loss_ratio_blinks']
+    overall_ratio = parsed_metadata['data_loss_ratio']
+
+    print(f'Blink ratio: {blink_ratio}, Overall ratio: {overall_ratio}')
+
+    assert isinstance(blink_ratio, (int, float))
+    assert isinstance(overall_ratio, (int, float))
+
+    assert blink_ratio == pytest.approx(97 / 105)
+    assert overall_ratio == pytest.approx(96 / 105)

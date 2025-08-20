@@ -76,23 +76,23 @@ VALIDATION_REGEX = re.compile(
     r'(?P<validation_score_max>\d.\d\d)\s+max',
 )
 
-FIXATION_START_REGEX = re.compile(r'SFIX\s+(R|L)\s+(?P<timestamp>(\d+[.]?\d*))\s*')
+FIXATION_START_REGEX = re.compile(r'SFIX\s+(?P<eye>R|L)\s+(?P<timestamp>(\d+[.]?\d*))\s*')
 FIXATION_STOP_REGEX = re.compile(
-    r'EFIX\s+(R|L)\s+(?P<timestamp_start>(\d+[.]?\d*))\s+'
+    r'EFIX\s+(?P<eye>R|L)\s+(?P<timestamp_start>(\d+[.]?\d*))\s+'
     r'(?P<timestamp_end>(\d+[.]?\d*))\s+(?P<duration_ms>(\d+[.]?\d*))\s+'
     r'(?P<avg_x_pix>(\d+[.]?\d*))\s+(?P<avg_y_pix>(\d+[.]?\d*))\s+(?P<avg_pupil>(\d+[.]?\d*))\s*.*',
 )
-SACCADE_START_REGEX = re.compile(r'SSACC\s+(R|L)\s+(?P<timestamp>(\d+[.]?\d*))\s*')
+SACCADE_START_REGEX = re.compile(r'SSACC\s+(?P<eye>R|L)\s+(?P<timestamp>(\d+[.]?\d*))\s*')
 SACCADE_STOP_REGEX = re.compile(
-    r'ESACC\s+(R|L)\s+(?P<timestamp_start>(\d+[.]?\d*))\s+'
+    r'ESACC\s+(?P<eye>R|L)\s+(?P<timestamp_start>(\d+[.]?\d*))\s+'
     r'(?P<timestamp_end>(\d+[.]?\d*))\s+(?P<duration_ms>(\d+[.]?\d*))\s+'
     r'(?P<start_x_pix>(\d+[.]?\d*))\s+(?P<start_y_pix>(\d+[.]?\d*))\s+'
     r'(?P<end_x_pix>(\d+[.]?\d*))\s+(?P<end_y_pix>(\d+[.]?\d*))\s+'
     r'(?P<amplitude>(\d+[.]?\d*))\s+(?P<peak_velocity>(\d+[.]?\d*))\s*.*',
 )
-BLINK_START_REGEX = re.compile(r'SBLINK\s+(R|L)\s+(?P<timestamp>(\d+[.]?\d*))\s*')
+BLINK_START_REGEX = re.compile(r'SBLINK\s+(?P<eye>R|L)\s+(?P<timestamp>(\d+[.]?\d*))\s*')
 BLINK_STOP_REGEX = re.compile(
-    r'EBLINK\s+(R|L)\s+(?P<timestamp_start>(\d+[.]?\d*))\s+'
+    r'EBLINK\s+(?P<eye>R|L)\s+(?P<timestamp_start>(\d+[.]?\d*))\s+'
     r'(?P<timestamp_end>(\d+[.]?\d*))\s+(?P<duration_ms>(\d+[.]?\d*))\s*',
 )
 
@@ -132,7 +132,7 @@ START_RECORDING_REGEX = re.compile(
     r'START\s+(?P<timestamp>(\d+[.]?\d*))\s+(RIGHT|LEFT)\s+(?P<types>.*)',
 )
 STOP_RECORDING_REGEX = re.compile(
-    r'END\s+(?P<timestamp>(\d+[.]?\d*))\s+\s+(?P<types>.*)\s+RES\s+'
+    r'END\s+(?P<timestamp>(\d+[.]?\d*))\s+(?P<types>.*)\s+RES\s+'
     r'(?P<xres>[\d\.]*)\s+(?P<yres>[\d\.]*)\s*',
 )
 
@@ -218,26 +218,52 @@ def get_pattern_keys(compiled_patterns: list[dict[str, Any]], pattern_key: str) 
 
 
 def parse_eyelink_event_start(line: str) -> str | None:
-    """Check if the line contains the start of an event and return the event name."""
-    if FIXATION_START_REGEX.match(line):
-        return 'fixation'
-    if SACCADE_START_REGEX.match(line):
-        return 'saccade'
-    if BLINK_START_REGEX.match(line):
-        return 'blink'
+    """Check if the line contains the start of an event and return the event name.
+
+    Returns event names with eye suffixes: e.g. 'fixation_left' or 'saccade_right'.
+    """
+    if match := FIXATION_START_REGEX.match(line):
+        eye = match.group('eye').upper()
+        suffix = '_left' if eye == 'L' else '_right'
+        return f'fixation{suffix}'
+    if match := SACCADE_START_REGEX.match(line):
+        eye = match.group('eye').upper()
+        suffix = '_left' if eye == 'L' else '_right'
+        return f'saccade{suffix}'
+    if match := BLINK_START_REGEX.match(line):
+        eye = match.group('eye').upper()
+        suffix = '_left' if eye == 'L' else '_right'
+        return f'blink{suffix}'
     return None
 
 
 def parse_eyelink_event_end(line: str) -> tuple[str, float, float] | None:
-    """Check if the line contains the start of an event and return the event name and times."""
+    """Check if the line contains the start of an event and return the event name and times.
+
+    Returns event name with eye suffix, e.g. 'fixation_left', and the onset/offset times.
+    """
     if match := FIXATION_STOP_REGEX.match(line):
-        return 'fixation', float(
-            match.group('timestamp_start'),
+        eye = match.group('eye').upper()
+        suffix = '_left' if eye == 'L' else '_right'
+        return f'fixation{suffix}', float(
+            match.group(
+                'timestamp_start',
+            ),
         ), float(match.group('timestamp_end'))
     if match := SACCADE_STOP_REGEX.match(line):
-        return 'saccade', float(match.group('timestamp_start')), float(match.group('timestamp_end'))
+        eye = match.group('eye').upper()
+        suffix = '_left' if eye == 'L' else '_right'
+        return f'saccade{suffix}', float(
+            match.group(
+                'timestamp_start',
+            ),
+        ), float(match.group('timestamp_end'))
     if match := BLINK_STOP_REGEX.match(line):
-        return 'blink', float(match.group('timestamp_start')), float(match.group('timestamp_end'))
+        eye = match.group('eye').upper()
+        suffix = '_left' if eye == 'L' else '_right'
+        return f'blink{suffix}', float(
+            match.group('timestamp_start'),
+        ), float(match.group('timestamp_end'))
     return None
 
 
@@ -335,6 +361,7 @@ def parse_eyelink(
     num_expected_samples = 0
     num_valid_samples = 0  # excluding blinks
     num_blink_samples = 0
+    blink_intervals: list[tuple[float, float]] = []
     blinking = False
 
     # Detect if the file is binocular or monocular
@@ -407,7 +434,7 @@ def parse_eyelink(
         elif event_name := parse_eyelink_event_start(line):
             current_event_additional[event_name] = {**current_additional}
 
-            if event_name == 'blink':
+            if event_name.startswith('blink'):
                 blinking = True
 
         elif event := parse_eyelink_event_end(line):
@@ -422,9 +449,9 @@ def parse_eyelink(
                 )
             current_event_additional[event_name] = {}
 
-            if event_name == 'blink':
-                sample_length = 1 / float(recording_config[-1]['sampling_rate']) * 1000
-                num_blink_samples += round((event_offset - event_onset) / sample_length) + 1
+            if event_name.startswith('blink'):
+                # collect blink intervals and compute counts later once sampling rate is known
+                blink_intervals.append((event_onset, event_offset))
                 blinking = False
 
         elif match := RECORDING_CONFIG_REGEX.match(line):
@@ -488,14 +515,14 @@ def parse_eyelink(
             # only check monocular validity when parsing monocular files
             if not is_binocular:
                 if not blinking and all(
-                    val is not np.nan for val in (
+                    (not np.isnan(val)) for val in (
                         samples['x_pix'][-1], samples['y_pix'][-1], samples['pupil'][-1],
                     )
                 ):
                     num_valid_samples += 1
 
             if is_binocular and not blinking and all(
-                val is not np.nan for val in (
+                (not np.isnan(val)) for val in (
                     samples['x_left_pix'][-1],
                     samples['y_left_pix'][-1],
                     samples['pupil_left'][-1],
@@ -542,6 +569,32 @@ def parse_eyelink(
     pre_processed_metadata['validations'] = validations
     pre_processed_metadata['recording_config'] = recording_config
     pre_processed_metadata['total_recording_duration_ms'] = total_recording_duration
+
+    # compute num_blink_samples from collected blink intervals to avoid double-counting overlaps
+    num_blink_samples = 0
+    if blink_intervals and recording_config:
+        try:
+            sampling_rate = float(recording_config[-1]['sampling_rate'])
+        except KeyError:
+            sampling_rate = None
+
+        if sampling_rate:
+            # merge overlapping intervals
+            intervals = sorted(blink_intervals, key=lambda x: x[0])
+            merged: list[tuple[float, float]] = []
+            current_start, current_end = intervals[0]
+            for s, e in intervals[1:]:
+                if s <= current_end:
+                    current_end = max(current_end, e)
+                else:
+                    merged.append((current_start, current_end))
+                    current_start, current_end = s, e
+            merged.append((current_start, current_end))
+
+            sample_length = 1 / sampling_rate * 1000
+            for s, e in merged:
+                num_blink_samples += round((e - s) / sample_length) + 1
+
     (
         pre_processed_metadata['data_loss_ratio'],
         pre_processed_metadata['data_loss_ratio_blinks'],
