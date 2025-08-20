@@ -18,4 +18,5 @@ These How-Tos provide detailed guides to implement the most important use cases 
     plot-main-sequence
     scatterplot
     heatmap
+    creating-synthetic-data
     R-tutorial
