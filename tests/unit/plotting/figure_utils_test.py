@@ -26,6 +26,7 @@ These focus on covering specific branches that were previously missed:
 """
 from __future__ import annotations
 
+import warnings
 from unittest.mock import Mock
 
 import matplotlib.pyplot as plt
@@ -96,3 +97,62 @@ def test_setup_axes_and_colormap_warns_on_external_ax_with_figsize():
     assert ret_ax is ax
     assert ret_fig is fig
     plt.close(fig)
+
+
+def test_setup_axes_and_colormap_external_ax_figsize_none_no_warning():
+    # External ax with figsize=None should not warn.
+    fig, ax = plt.subplots()
+    x = np.arange(10)
+    y = np.arange(10)
+
+    with warnings.catch_warnings(record=True) as record:
+        warnings.simplefilter('always')
+        ret_fig, ret_ax, *_ = _setup_axes_and_colormap(
+            x_signal=x,
+            y_signal=y,
+            figsize=None,
+            cmap=None,
+            cmap_norm=None,
+            cmap_segmentdata=None,
+            cval=None,
+            show_cbar=False,
+            add_stimulus=False,
+            path_to_image_stimulus=None,
+            stimulus_origin='upper',
+            padding=None,
+            pad_factor=0.05,
+            ax=ax,
+        )
+    assert len(record) == 0
+    assert ret_ax is ax
+    assert ret_fig is fig
+    plt.close(fig)
+
+
+def test_prepare_figure_warns_on_external_ax_with_figsize():
+    # prepare_figure should warn when an external ax is provided and figsize is not None.
+    fig, ax = plt.subplots()
+    try:
+        with pytest.warns(UserWarning):
+            ret_fig, ret_ax, own = prepare_figure(ax=ax, figsize=(6, 4), func_name='dummy')
+        assert ret_ax is ax
+        assert ret_fig is fig
+        assert own is False
+    finally:
+        plt.close(fig)
+
+
+def test_prepare_figure_external_ax_figsize_none_no_warning():
+    # When external ax is supplied and figsize is None, no warning should be emitted.
+    fig, ax = plt.subplots()
+    try:
+        with warnings.catch_warnings(record=True) as record:
+            warnings.simplefilter('always')
+            ret_fig, ret_ax, own = prepare_figure(ax=ax, figsize=None, func_name='dummy')
+        # No warnings captured
+        assert len(record) == 0
+        assert ret_ax is ax
+        assert ret_fig is fig
+        assert own is False
+    finally:
+        plt.close(fig)
