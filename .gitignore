@@ -57,6 +57,7 @@ docs/source/tutorials/data
 .tox
 .coverage
 .coverage.*
+benchmark-data.json
 coverage.xml
 htmlcov/
 tests/preprocessed/
