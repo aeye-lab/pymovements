@@ -67,7 +67,7 @@ def scanpathplot(
         add_stimulus: bool = False,
         path_to_image_stimulus: str | None = None,
         stimulus_origin: str = 'upper',
-        events: Events | EventDataFrame = None,
+        events: Events | EventDataFrame | None = None,
 ) -> None:
     """Plot scanpath from positional data.
 
