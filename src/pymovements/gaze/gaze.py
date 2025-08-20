@@ -1866,7 +1866,7 @@ class Gaze:
     def save_samples(
             self,
             path: Path,
-            verbose: int = 1
+            verbose: int = 1,
     ) -> None:
         """Save preprocessed gaze files.
 
