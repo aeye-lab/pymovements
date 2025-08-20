@@ -1839,9 +1839,9 @@ class Gaze:
             print(f'Saving events.{extension} file to', dirname)
 
         if extension == 'feather':
-            events_out.write_ipc(dirname / 'events.feather')
+            events_out.write_ipc(f'{dirname}/events.feather')
         elif extension == 'csv':
-            events_out.write_csv(dirname / 'events.csv')
+            events_out.write_csv(f'{dirname}/events.csv')
         else:
             valid_extensions = ['csv', 'feather']
             raise ValueError(
@@ -1886,9 +1886,9 @@ class Gaze:
             print(f'Saving samples.{extension} file to', dirname)
 
         if extension == 'feather':
-            gaze.samples.write_ipc(dirname / 'samples.feather')
+            gaze.samples.write_ipc(f'{dirname}/samples.feather')
         elif extension == 'csv':
-            gaze.samples.write_csv(dirname / 'samples.csv')
+            gaze.samples.write_csv(f'{dirname}/samples.csv')
         else:
             valid_extensions = ['csv', 'feather']
             raise ValueError(
