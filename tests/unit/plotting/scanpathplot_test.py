@@ -200,16 +200,16 @@ def test_scanpathplot_exceptions(gaze, kwargs, exception, monkeypatch):
         scanpathplot(gaze=gaze, **kwargs)
 
 
-def test_scanpathplot_gaze_events_all_none_exception(gaze):
+def test_scanpathplot_gaze_events_all_none_exception():
+    with pytest.raises(TypeError, match='must not be both None'):
+        scanpathplot(gaze=None, events=None)
+
+
+def test_scanpathplot_traceplot_gaze_samples_none_exception(gaze):
     gaze = gaze.clone()
     gaze.samples = None
     with pytest.raises(TypeError, match='must not be None'):
-        scanpathplot(gaze=gaze)
-
-
-def test_scanpathplot_traceplot_gaze_samples_none_exception():
-    with pytest.raises(TypeError, match='must not be both None'):
-        scanpathplot(events=None, gaze=None)
+        scanpathplot(events=None, gaze=gaze, add_traceplot=True)
 
 
 def test_scanpathplot_gaze_events_none_exception(gaze):
