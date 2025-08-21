@@ -1288,6 +1288,42 @@ class Dataset:
         if hasattr(self, 'events') and self.events:
             print(f"  Event Recordings: {len(self.events)}")
 
+            # Aggregate metrics across all recordings
+        total_samples_all = 0
+        null_counts_all = {}
+        
+        # First pass to collect all column names
+        all_columns = set()
+        for gaze_recording in self.gaze:
+            all_columns.update(gaze_recording.samples.columns)
+            total_samples_all += len(gaze_recording.samples)
+        
+        # Initialize null counters for all columns
+        for col in all_columns:
+            null_counts_all[col] = 0
+        
+        # Count nulls in each recording
+        for gaze_recording in self.gaze:
+            samples = gaze_recording.samples
+            for col in samples.columns:
+                null_counts_all[col] += samples[col].is_null().sum()
+        
+        # Print overall statistics
+        print("\nDATA QUALITY:")
+        print(f"Total samples across all recordings: {total_samples_all}")
+        
+        # Missing data summary
+        print("\nMissing Data:")
+        has_missing = False
+        for col, null_count in sorted(null_counts_all.items(), key=lambda x: x[1], reverse=True):
+            if null_count > 0:
+                has_missing = True
+                percent = (null_count / total_samples_all) * 100
+                print(f"  '{col}': {null_count} missing values ({percent:.2f}%)")
+        
+        if not has_missing:
+            print("  No missing values found in any column")
+    
         # References (if present)
         if hasattr(definition, 'references') and definition.references:
             print("\nREFERENCES:")
