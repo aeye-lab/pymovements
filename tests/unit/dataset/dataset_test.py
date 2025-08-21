@@ -2133,7 +2133,7 @@ def test_remove_event_property(gaze_dataset_configuration):
     assert 'peak_velocity' not in dataset.gaze[0].events.columns
     assert isinstance(dd, Dataset)
 
-    # Now error should be raised bacause peak_velocity does not exist
+    # Now error should be raised because peak_velocity does not exist
     with pytest.raises(ValueError) as exinfo:
         dataset.remove_event_properties("peak_velocity")
     assert str(exinfo.value).startswith("The property peak_velocity does not exist")

@@ -961,17 +961,11 @@ class Gaze:
                     f"The property {prop} does not exist and cannot be removed. "
                     f"Available properties to remove: {self.events.event_property_columns}.",
                 )
-            if prop in self.events._minimal_schema:
+            if prop not in self.events.event_property_columns:
                 raise ValueError(
                     f"The property {prop} cannot be removed because"
-                    f" it belongs to minimal_schema. "
+                    f" it belongs to minimal_schema or additional_columns. "
                     f"Available properties to remove: {self.events.event_property_columns}.",
-                )
-            if prop in self.events._additional_columns:
-                raise ValueError(
-                    f"The property {prop} cannot be removed because it belongs to"
-                    f" additional_columns. Available properties to remove: "
-                    f"{self.events.event_property_columns}.",
                 )
         for prop in event_properties:
             self.events.drop_event_property(prop)
