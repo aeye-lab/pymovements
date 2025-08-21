@@ -365,18 +365,20 @@ def parse_eyelink(
     blinking = False
 
     # Detect if the file is binocular or monocular
+    # Collect ALL SAMPLES config lines (don't stop at the first match) so
+    # inconsistent values (e.g. different sampling rates across SAMPLES lines)
+    # can be detected later.
     is_binocular = False
     for line in lines:
         if match := SAMPLES_CONFIG_REGEX.search(line):
             samples_config.append(match.groupdict())
             tracked = match.group('tracked_eye').upper().strip()
             # consider 'LEFT' in tracked and 'RIGHT' in tracked or tracked == 'LR' or
-            # tracked == 'L R':
-            is_binocular = (
-                'LEFT' in tracked and 'RIGHT' in tracked or
+            # tracked == 'L R': set is_binocular to True if any config indicates binocular
+            is_binocular = is_binocular or (
+                ('LEFT' in tracked and 'RIGHT' in tracked) or
                 tracked == 'LR' or tracked == 'L R'
             )
-            break
 
     # Update the samples dictionary to include binocular data with correct column names if needed
     if is_binocular:
@@ -556,11 +558,40 @@ def parse_eyelink(
 
 # the actual tracked eye is in the samples config, not in the recording config
 # the recording config contains the eyes that were recorded
-    metadata['sampling_rate'] = _check_reccfg_key(recording_config, 'sampling_rate', float)
+    sampling_rate_samples_config = _check_samples_config_key(samples_config, 'sampling_rate', float)
+    sampling_rate_reccfg = _check_reccfg_key(recording_config, 'sampling_rate', float)
+    if sampling_rate_samples_config and sampling_rate_reccfg:
+        if sampling_rate_samples_config != sampling_rate_reccfg:
+            warnings.warn(
+                f'The recording configuration message and the samples message'
+                f" give inconsistent values for 'sampling_rate': "
+                f'[{sampling_rate_samples_config}, {sampling_rate_reccfg}]'
+                f' Using the value from the samples message.',
+            )
+    metadata['sampling_rate'] = sampling_rate_samples_config
     metadata['recorded_eye'] = _check_reccfg_key(recording_config, 'tracked_eye')
 # the actual tracked eye is in the samples config, not in the recording config
 # the recording config contains the eyes that were recorded
-    metadata['tracked_eye'] = _check_samples_config_key(samples_config, 'tracked_eye')
+# RECCFG uses L/R/LR, SAMPLES uses LEFT/RIGHT/LEFT RIGHT
+    tracked_eye_samples_config = _check_samples_config_key(samples_config, 'tracked_eye')
+    if tracked_eye_samples_config == 'LEFT':
+        metadata['tracked_eye'] = 'L'
+    elif tracked_eye_samples_config == 'RIGHT':
+        metadata['tracked_eye'] = 'R'
+    elif tracked_eye_samples_config == 'LEFT RIGHT':
+        metadata['tracked_eye'] = 'LR'
+
+    if metadata['tracked_eye'] and metadata['recorded_eye']:
+        if metadata['tracked_eye'] != metadata['recorded_eye']:
+            warnings.warn(
+                f'The recorded eye in the recording configuration message and'
+                f' the samples message are inconsistent: '
+                f"[{metadata['recorded_eye']}, {metadata['tracked_eye']}]"
+                f' This could be because the -r or -l flag in edf2asc was used'
+                f' to obtain monocular data from a binocular EDF file.'
+                f' Using the value from the samples message and storing the value from'
+                f" the recording configuration message in 'recorded_eye'.",
+            )
     metadata['resolution'] = _check_reccfg_key(recording_config, 'resolution')
 
     pre_processed_metadata: dict[str, Any] = _pre_process_metadata(metadata)

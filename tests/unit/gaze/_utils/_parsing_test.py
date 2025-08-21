@@ -180,7 +180,7 @@ EXPECTED_METADATA = {
     'model': 'EyeLink Portable Duo',
     'version_number': '6.12',
     'sampling_rate': 1000.0,
-    'tracked_eye': 'LEFT',
+    'tracked_eye': 'L',
     'recorded_eye': 'L',
     'pupil_data_type': 'AREA',
     'calibrations': [],
@@ -387,7 +387,13 @@ def test_parse_eyelink_version(tmp_path, metadata, expected_version, expected_mo
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
             'MSG	2154556 RECCFG CR 2000 2 1 L\n',
             r"Found inconsistent values for 'sampling_rate': \['1000', '2000'\]",
-            id='inconsistent_sampling_rate',
+            id='inconsistent_sampling_rate_reccfg',
+        ),
+        pytest.param(
+            'SAMPLES	GAZE	LEFT	RIGHT	RATE	1000.00	TRACKING	CR	FILTER	2\n'
+            'SAMPLES	GAZE	LEFT	RIGHT	RATE	2000.00	TRACKING	CR	FILTER	2\n',
+            r"Found inconsistent values for 'sampling_rate': \['1000.00', '2000.00'\]",
+            id='inconsistent_sampling_rate_samples_config',
         ),
         pytest.param(
             'MSG	2154555 RECCFG CR 1000 2 1 L\n'
@@ -1015,19 +1021,19 @@ def test_parse_eyelink_binocular_missing_samples_data_loss(tmp_path):
         # Construct sample lines depending on the timestamp range
         if t <= 1408786:
             # both eyes valid
-            asc_lines.append(f"{t}\t 966.9\t 565.5\t 276.0\t 949.4\t 545.5\t 308.0\t.....")
+            asc_lines.append(f'{t}\t 966.9\t 565.5\t 276.0\t 949.4\t 545.5\t 308.0\t.....')
         elif 1408787 <= t <= 1408792:
             # left missing, right valid
-            asc_lines.append(f"{t}\t  .\t  .\t   0.0\t 933.4\t 568.2\t 298.0\t.C...")
+            asc_lines.append(f'{t}\t  .\t  .\t   0.0\t 933.4\t 568.2\t 298.0\t.C...')
         elif 1408793 <= t <= 1408872:
             # both eyes missing (overlap of left and right blink)
-            asc_lines.append(f"{t}\t  .\t  .\t   0.0\t  .\t  .\t   0.0\t.C.C.")
+            asc_lines.append(f'{t}\t  .\t  .\t   0.0\t  .\t  .\t   0.0\t.C.C.')
         elif 1408873 <= t <= 1408883:
             # left missing, right valid (after right blink ended)
-            asc_lines.append(f"{t}\t  .\t  .\t   0.0\t 939.7\t 590.6\t 288.0\t.C...")
+            asc_lines.append(f'{t}\t  .\t  .\t   0.0\t 939.7\t 590.6\t 288.0\t.C...')
         else:
             # both eyes valid again
-            asc_lines.append(f"{t}\t 1009.6\t 483.1\t 252.0\t 939.4\t 582.3\t 292.0\t..R..")
+            asc_lines.append(f'{t}\t 1009.6\t 483.1\t 252.0\t 939.4\t 582.3\t 292.0\t..R..')
 
     asc_lines.append(f'END\t{end}\tSAMPLES\tEVENTS\tRES\t 47.75\t 45.92')
 
@@ -1052,3 +1058,21 @@ def test_parse_eyelink_binocular_missing_samples_data_loss(tmp_path):
 
     assert blink_ratio == pytest.approx(97 / 105)
     assert overall_ratio == pytest.approx(96 / 105)
+
+
+@pytest.mark.filterwarnings('ignore:No metadata found.')
+# @pytest.mark.filterwarnings('ignore:No recording configuration found.')
+# @pytest.mark.filterwarnings('ignore:No samples configuration found.')
+def test_tracked_vs_recorded_eye_warning(tmp_path):
+    """When RECCFG and SAMPLES report different eyes, a warning should be raised."""
+    asc_text = (
+        'MSG\t2154555 RECCFG CR 1000 2 1 LR\n'
+        'SAMPLES\tGAZE\tRIGHT\tRATE\t1000.00\tTRACKING\tCR\tFILTER\t2\n'
+    )
+
+    filepath = tmp_path / 'sub_mismatch.asc'
+    filepath.write_text(asc_text)
+
+    # The parser maps RECCFG 'LR' -> 'LR' and SAMPLES 'RIGHT' -> 'R', so expect [LR, R]
+    with pytest.warns(Warning, match=r'inconsistent: \[LR, R\]'):
+        parsing.parse_eyelink(filepath)

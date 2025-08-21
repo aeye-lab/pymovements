@@ -484,9 +484,7 @@ def from_asc(
     position_columns_detect: list[str] | None = None
 
     # common binocular naming produced by parse_eyelink
-    if {'x_pix_left', 'y_pix_left', 'x_pix_right', 'y_pix_right'}.issubset(cols):
-        pixel_columns_detect = ['x_pix_left', 'y_pix_left', 'x_pix_right', 'y_pix_right']
-    elif {'x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix'}.issubset(cols):
+    if {'x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix'}.issubset(cols):
         pixel_columns_detect = ['x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix']
     # fallback monocular
     elif {'x_pix', 'y_pix'}.issubset(cols):
@@ -495,8 +493,9 @@ def from_asc(
     # position columns (dva) often follow this naming
     if {'x_left_pos', 'y_left_pos', 'x_right_pos', 'y_right_pos'}.issubset(cols):
         position_columns_detect = ['x_left_pos', 'y_left_pos', 'x_right_pos', 'y_right_pos']
-    elif {'x_pos_left', 'y_pos_left', 'x_pos_right', 'y_pos_right'}.issubset(cols):
-        position_columns_detect = ['x_pos_left', 'y_pos_left', 'x_pos_right', 'y_pos_right']
+    # fallback monocular
+    elif {'x_pos', 'y_pos'}.issubset(cols):
+        position_columns_detect = ['x_pos', 'y_pos']
 
     # Instantiate Gaze with parsed data using detected column names
     # If binocular pupils exist, create a nested 'pupil' column [left, right]
@@ -654,25 +653,27 @@ def _fill_experiment_from_parsing_metadata(
     if experiment.eyetracker.left is None:
         experiment.eyetracker.left = asc_left_eye
     elif experiment.eyetracker.left != asc_left_eye:
-        issues.append(f"Left eye tracked: {experiment.eyetracker.left} != {asc_left_eye}")
+        issues.append(f'Left eye tracked: {experiment.eyetracker.left} != {asc_left_eye}')
     if experiment.eyetracker.right is None:
         experiment.eyetracker.right = asc_right_eye
     elif experiment.eyetracker.right != asc_right_eye:
-        issues.append(f"Right eye tracked: {experiment.eyetracker.right} != {asc_right_eye}")
+        issues.append(f'Right eye tracked: {experiment.eyetracker.right} != {asc_right_eye}')
 
     # Mount configuration
     if experiment.eyetracker.mount is None:
         experiment.eyetracker.mount = metadata['mount_configuration']['mount_type']
     elif experiment.eyetracker.mount != metadata['mount_configuration']['mount_type']:
-        issues.append(f"Mount configuration: {experiment.eyetracker.mount} != "
-                      f"{metadata['mount_configuration']['mount_type']}")
+        issues.append(
+            f'Mount configuration: {experiment.eyetracker.mount} != '
+            f"{metadata['mount_configuration']['mount_type']}",
+        )
 
     # Eye tracker vendor
     asc_vendor = 'EyeLink' if 'EyeLink' in metadata['model'] else None
     if experiment.eyetracker.vendor is None:
         experiment.eyetracker.vendor = asc_vendor
     elif experiment.eyetracker.vendor != asc_vendor:
-        issues.append(f"Eye tracker vendor: {experiment.eyetracker.vendor} != {asc_vendor}")
+        issues.append(f'Eye tracker vendor: {experiment.eyetracker.vendor} != {asc_vendor}')
 
     # Eye tracker model
     if experiment.eyetracker.model is None:
@@ -684,8 +685,10 @@ def _fill_experiment_from_parsing_metadata(
     if experiment.eyetracker.version is None:
         experiment.eyetracker.version = metadata['version_number']
     elif experiment.eyetracker.version != metadata['version_number']:
-        issues.append(f"Eye tracker software version: {experiment.eyetracker.version} != "
-                      f"{metadata['version_number']}")
+        issues.append(
+            f'Eye tracker software version: {experiment.eyetracker.version} != '
+            f"{metadata['version_number']}",
+        )
 
     if issues:
         raise ValueError(
