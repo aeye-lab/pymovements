@@ -17,4 +17,5 @@ These How-Tos provide detailed guides to implement the most important use cases 
     event-handling
     plot-main-sequence
     heatmap
+    creating-synthetic-data
     R-tutorial

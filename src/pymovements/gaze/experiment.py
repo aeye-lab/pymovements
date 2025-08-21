@@ -21,9 +21,11 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from pathlib import Path
 from typing import Any
 
 import numpy as np
+import yaml
 
 from pymovements._utils import _checks
 from pymovements._utils._html import repr_html
@@ -310,3 +312,24 @@ class Experiment:
     def __bool__(self) -> bool:
         """Return True if the experiment has data defined, else False."""
         return not all(not value for value in self.__dict__.values())
+
+    def to_yaml(
+        self,
+        path: str | Path,
+        *,
+        exclude_none: bool = True,
+    ) -> None:
+        """Save an experiment to a YAML file.
+
+        Parameters
+        ----------
+        path: str | Path
+            Path where to save the YAML file to.
+        exclude_none: bool
+            Exclude attributes that are either ``None`` or that are objects that evaluate to
+            ``False`` (e.g., ``[]``, ``{}``, ``EyeTracker()``). Attributes of type ``bool``,
+            ``int``, and ``float`` are not excluded.
+        """
+        data = self.to_dict(exclude_none=exclude_none)
+        with open(path, 'w', encoding='utf-8') as f:
+            yaml.dump(data, f, sort_keys=False)
