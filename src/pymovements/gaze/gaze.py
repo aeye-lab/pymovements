@@ -940,7 +940,7 @@ class Gaze:
             event_properties: str | list[str]
     ) -> None:
         """Remove event properties from the event dataframe.
-        
+
         Parameters
         ----------
         event_properties: str | list[str]
@@ -963,13 +963,15 @@ class Gaze:
                 )
             if prop in self.events._minimal_schema:
                 raise ValueError(
-                    f"The property '{prop}' cannot be removed beacuse it belongs to minimal_schema. "
+                    f"The property '{prop}' cannot be removed beacuse",
+                    f" it belongs to minimal_schema. "
                     f"Available properties to remove: {self.events.event_property_columns}.",
                 )
             if prop in self.events._additional_columns:
                 raise ValueError(
-                    f"The property '{prop}' cannot be removed beacuse it belongs to additional_columns. "
-                    f"Available properties to remove: {self.events.event_property_columns}.",
+                    f"The property '{prop}' cannot be removed beacuse it belongs to",
+                    f" additional_columns. Available properties to remove: ",
+                    f"{self.events.event_property_columns}.",
                 )
         for prop in event_properties:
             self.events.drop_event_property(prop)
