@@ -958,19 +958,19 @@ class Gaze:
         for prop in event_properties:
             if prop not in existing_columns:
                 raise ValueError(
-                    f"The property '{prop}' does not exist and cannot be removed. "
+                    f"The property {prop} does not exist and cannot be removed. "
                     f"Available properties to remove: {self.events.event_property_columns}.",
                 )
             if prop in self.events._minimal_schema:
                 raise ValueError(
-                    f"The property '{prop}' cannot be removed beacuse",
+                    f"The property {prop} cannot be removed because"
                     f" it belongs to minimal_schema. "
                     f"Available properties to remove: {self.events.event_property_columns}.",
                 )
             if prop in self.events._additional_columns:
                 raise ValueError(
-                    f"The property '{prop}' cannot be removed beacuse it belongs to",
-                    f" additional_columns. Available properties to remove: ",
+                    f"The property {prop} cannot be removed because it belongs to"
+                    f" additional_columns. Available properties to remove: "
                     f"{self.events.event_property_columns}.",
                 )
         for prop in event_properties:
@@ -1557,7 +1557,7 @@ class Gaze:
             if 'position' not in samples.columns:
                 raise pl.exceptions.ColumnNotFoundError(
                     f'Column \'position\' not found.'
-                    f' Available columns are: {samples.columns}',
+                    f' Available columns are: {samples.columns}'
                     ' TIP: Calculate positions using pix2deg() function',
                 )
 
