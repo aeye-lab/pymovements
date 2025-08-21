@@ -379,10 +379,10 @@ class Dataset:
         return self
 
     def load_text_stimuli(self) -> None:
-        """Load stimuli.
+        """Load text stimuli.
 
-        This method checks that the file information for stimuli is available,
-        then loads each stimulus file listed in `self.fileinfo['stimuli']` using
+        This method checks that the file information for text stimuli is available,
+        then loads each text stimulus file listed in `self.fileinfo['stimuli']` using
         the dataset definition and path settings. The resulting list of
         `TextStimulus` objects is assigned to `self.stimuli`.
 
@@ -919,14 +919,14 @@ class Dataset:
         Parameters
         ----------
         events_dirname: str | None
-            One-time usage of an alternative directory to save data relative to dataset path.
+            One-time usage of an alternative directory name to save data relative to dataset path.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.events_rootpath`. (default: None)
+        preprocessed_dirname: str | None
             One-time usage of an alternative directory name to save data relative to dataset path.
-            One-time usage of an alternative directory to save data relative to dataset path.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`. (default: None)
-            One-time usage of an alternative directory name to save data relative to dataset path.
+        verbose: int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
             (default: 1)
         extension: str
@@ -950,10 +950,10 @@ class Dataset:
         Parameters
         ----------
         events_dirname: str | None
-            One-time usage of an alternative directory to save data relative to dataset path.
+            One-time usage of an alternative directory name to save data relative to dataset path.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.events_rootpath`. (default: None)
-            One-time usage of an alternative directory name to save data relative to dataset path.
+        verbose: int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
             (default: 1)
         extension: str
@@ -994,10 +994,10 @@ class Dataset:
         Parameters
         ----------
         preprocessed_dirname: str | None
-            One-time usage of an alternative directory to save data relative to dataset path.
+            One-time usage of an alternative directory name to save data relative to dataset path.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`. (default: None)
-            One-time usage of an alternative directory name to save data relative to dataset path.
+        verbose: int
             Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
             (default: 1)
         extension: str

@@ -59,6 +59,9 @@ class DatasetPaths:
         (default: 'preprocessed')
     downloads: str
         Name of directory to store downloaded data. (default: 'downloads')
+    stimuli: str
+        Name of directory under dataset path that will be used to store stimuli data.
+        Can be `.` if stimuli data is located in dataset path.
     """
 
     def __init__(
@@ -501,7 +504,7 @@ class DatasetPaths:
     def stimuli(self) -> Path:
         """Return the path to the stimuli directory.
 
-        Example
+        Example:
         -------
         >>> import pymovements as pm
         >>>
@@ -524,4 +527,3 @@ class DatasetPaths:
         Path('/path/to/your/datasets/ToyDataset/my_stimuli')
         """
         return self.dataset / self._stimuli
-
