@@ -2117,13 +2117,13 @@ def test_remove_event_property(gaze_dataset_configuration):
     dataset.pix2deg()
     dataset.detect_events('idt', dispersion_threshold=2.7, name='fixation.idt')
     dataset.pos2vel()
-    dataset.compute_event_properties("peak_velocity")
+    dataset.compute_event_properties('peak_velocity')
 
     with pytest.raises(ValueError) as exinfo:
         dataset.remove_event_properties("alamakota")
     assert str(exinfo.value).startswith("The property alamakota does not exist and cannot be removed")
 
-    ## Nothing should be changed
+    # Nothing should be changed
     with pytest.raises(ValueError) as exinfo:
         dataset.remove_event_properties(["peak_velocity","alamakota"])
     assert "peak_velocity" in dataset.gaze[0].events.columns
@@ -2138,7 +2138,7 @@ def test_remove_event_property(gaze_dataset_configuration):
         dataset.remove_event_properties("peak_velocity")
     assert str(exinfo.value).startswith("The property peak_velocity does not exist and cannot be removed")
 
-    ## onset should not be removed
+    # onset should not be removed
     with pytest.raises(ValueError) as exinfo:
         dataset.remove_event_properties("onset")
     assert str(exinfo.value).startswith("The property onset cannot be removed beacuse it belongs to minimal_schema")

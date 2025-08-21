@@ -803,8 +803,6 @@ class Dataset:
             gaze.remove_event_properties(event_properties)
         return self
 
-        
-
     def compute_event_properties(
             self,
             event_properties: str | tuple[str, dict[str, Any]]
