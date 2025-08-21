@@ -564,7 +564,6 @@ def load_text_stimuli_files(
         definition: DatasetDefinition,
         fileinfo: pl.DataFrame,
         paths: DatasetPaths,
-        # stimuli_dirname: str | None = None, # TODO maybe add custom
 ) -> list[TextStimulus]:
     """Load all available text stimuli files.
 
@@ -576,11 +575,6 @@ def load_text_stimuli_files(
         A dataframe holding file information.
     paths: DatasetPaths
         Path of directory containing stimuli files.
-    stimuli_dirname: str | None
-        One-time usage of an alternative directory name to save data relative to
-        :py:meth:`pymovements.Dataset.path`.
-        This argument is used only for this single call and does not alter
-        :py:meth:`pymovements.Dataset.stimuli_rootpath`.
 
     Returns
     -------
@@ -610,9 +604,6 @@ def load_text_stimuli_file(
 
     File format is inferred from the extension:
         - CSV-like: .csv
-        # TODO not implemented yet, to be added in TextStimulus class:
-        - (.tsv, .txt, Excel)
-
     Raises a ValueError for unsupported formats.
 
     Parameters
