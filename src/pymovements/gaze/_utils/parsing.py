@@ -217,53 +217,59 @@ def get_pattern_keys(compiled_patterns: list[dict[str, Any]], pattern_key: str) 
     return keys
 
 
-def parse_eyelink_event_start(line: str) -> str | None:
-    """Check if the line contains the start of an event and return the event name.
+def parse_eyelink_event_start(line: str) -> tuple[str, str] | None:
+    """Check if the line contains the start of an event and return the event name and eye.
 
-    Returns event names with eye suffixes: e.g. 'fixation_left' or 'saccade_right'.
+    Returns a tuple (event_name, eye) where eye is 'left' or 'right'.
+    Example: ('fixation', 'left')
     """
     if match := FIXATION_START_REGEX.match(line):
         eye = match.group('eye').upper()
-        suffix = '_left' if eye == 'L' else '_right'
-        return f'fixation{suffix}'
+        eye_str = 'left' if eye == 'L' else 'right'
+        return 'fixation', eye_str
     if match := SACCADE_START_REGEX.match(line):
         eye = match.group('eye').upper()
-        suffix = '_left' if eye == 'L' else '_right'
-        return f'saccade{suffix}'
+        eye_str = 'left' if eye == 'L' else 'right'
+        return 'saccade', eye_str
     if match := BLINK_START_REGEX.match(line):
         eye = match.group('eye').upper()
-        suffix = '_left' if eye == 'L' else '_right'
-        return f'blink{suffix}'
+        eye_str = 'left' if eye == 'L' else 'right'
+        return 'blink', eye_str
     return None
 
 
-def parse_eyelink_event_end(line: str) -> tuple[str, float, float] | None:
-    """Check if the line contains the start of an event and return the event name and times.
+def parse_eyelink_event_end(line: str) -> tuple[str, str, float, float] | None:
+    """Check if the line contains the end of an event and return the event name, eye and times.
 
-    Returns event name with eye suffix, e.g. 'fixation_left', and the onset/offset times.
+    Returns a tuple (event_name, eye, onset, offset). Example: ('fixation', 'left', 123.0, 130.0)
     """
     if match := FIXATION_STOP_REGEX.match(line):
         eye = match.group('eye').upper()
-        suffix = '_left' if eye == 'L' else '_right'
-        return f'fixation{suffix}', float(
-            match.group(
-                'timestamp_start',
-            ),
-        ), float(match.group('timestamp_end'))
+        eye_str = 'left' if eye == 'L' else 'right'
+        return (
+            'fixation',
+            eye_str,
+            float(match.group('timestamp_start')),
+            float(match.group('timestamp_end')),
+        )
     if match := SACCADE_STOP_REGEX.match(line):
         eye = match.group('eye').upper()
-        suffix = '_left' if eye == 'L' else '_right'
-        return f'saccade{suffix}', float(
-            match.group(
-                'timestamp_start',
-            ),
-        ), float(match.group('timestamp_end'))
+        eye_str = 'left' if eye == 'L' else 'right'
+        return (
+            'saccade',
+            eye_str,
+            float(match.group('timestamp_start')),
+            float(match.group('timestamp_end')),
+        )
     if match := BLINK_STOP_REGEX.match(line):
         eye = match.group('eye').upper()
-        suffix = '_left' if eye == 'L' else '_right'
-        return f'blink{suffix}', float(
-            match.group('timestamp_start'),
-        ), float(match.group('timestamp_end'))
+        eye_str = 'left' if eye == 'L' else 'right'
+        return (
+            'blink',
+            eye_str,
+            float(match.group('timestamp_start')),
+            float(match.group('timestamp_end')),
+        )
     return None
 
 
@@ -332,6 +338,7 @@ def parse_eyelink(
     }
     events: dict[str, list[Any]] = {
         'name': [],
+        'eye': [],
         'onset': [],
         'offset': [],
         **{additional_column: [] for additional_column in additional_columns},
@@ -433,15 +440,19 @@ def parse_eyelink(
             )
             cal_timestamp = ''
 
-        elif event_name := parse_eyelink_event_start(line):
+        elif start_event := parse_eyelink_event_start(line):
+            event_name, eye = start_event
+            # store additional metadata for this event type + eye
+            # key by event name only (e.g., 'fixation')
             current_event_additional[event_name] = {**current_additional}
 
-            if event_name.startswith('blink'):
+            if event_name == 'blink':
                 blinking = True
 
-        elif event := parse_eyelink_event_end(line):
-            event_name, event_onset, event_offset = event
+        elif end_event := parse_eyelink_event_end(line):
+            event_name, eye, event_onset, event_offset = end_event
             events['name'].append(f'{event_name}_eyelink')
+            events['eye'].append(eye)
             events['onset'].append(event_onset)
             events['offset'].append(event_offset)
 
@@ -451,7 +462,7 @@ def parse_eyelink(
                 )
             current_event_additional[event_name] = {}
 
-            if event_name.startswith('blink'):
+            if event_name == 'blink':
                 # collect blink intervals and compute counts later once sampling rate is known
                 blink_intervals.append((event_onset, event_offset))
                 blinking = False
@@ -706,6 +717,7 @@ def parse_eyelink(
 
     event_schema_overrides = {
         'name': pl.String,
+        'eye': pl.String,
         'onset': pl.Float64,
         'offset': pl.Float64,
     }

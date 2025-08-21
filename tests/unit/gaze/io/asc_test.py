@@ -790,16 +790,18 @@ def test_from_asc_has_expected_metadata(kwargs, expected_metadata):
             pl.from_dict(
                 data={
                     'name': [
-                        'fixation_left_eyelink',
-                        'saccade_left_eyelink',
-                        'fixation_left_eyelink',
+                        'fixation_eyelink',
+                        'saccade_eyelink',
+                        'fixation_eyelink',
                     ],
+                    'eye': ['left', 'left', 'left'],
                     'onset': [2154563, 2339227, 2339246],
                     'offset': [2154695, 2339245, 2339290],
                     'duration': [132, 18, 44],
                 },
                 schema={
                     'name': pl.Utf8,
+                    'eye': pl.Utf8,
                     'onset': pl.Int64,
                     'offset': pl.Int64,
                     'duration': pl.Int64,
@@ -815,16 +817,18 @@ def test_from_asc_has_expected_metadata(kwargs, expected_metadata):
             pl.from_dict(
                 data={
                     'name': [
-                        'fixation_left_eyelink',
-                        'saccade_left_eyelink',
-                        'fixation_left_eyelink',
+                        'fixation_eyelink',
+                        'saccade_eyelink',
+                        'fixation_eyelink',
                     ],
+                    'eye': ['left', 'left', 'left'],
                     'onset': [2154563, 2339227, 2339246],
                     'offset': [2154695, 2339245, 2339290],
                     'duration': [132, 18, 44],
                 },
                 schema={
                     'name': pl.Utf8,
+                    'eye': pl.Utf8,
                     'onset': pl.Int64,
                     'offset': pl.Int64,
                     'duration': pl.Int64,

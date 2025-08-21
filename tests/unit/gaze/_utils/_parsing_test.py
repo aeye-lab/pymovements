@@ -21,6 +21,7 @@
 import datetime
 import warnings
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import polars as pl
@@ -162,7 +163,8 @@ EXPECTED_GAZE_DF = pl.from_dict(
 
 EXPECTED_EVENT_DF = pl.from_dict(
     {
-        'name': ['fixation_right_eyelink', 'blink_right_eyelink', 'saccade_right_eyelink'],
+        'name': ['fixation_eyelink', 'blink_eyelink', 'saccade_eyelink'],
+        'eye': ['right', 'right', 'right'],
         'onset': [10000000.0, 10000020.0, 10000011.0],
         'offset': [10000008.0, 10000022.0, 10000022.0],
         'task': [None, None, 'B'],
@@ -1243,7 +1245,7 @@ def test_check_reccfg_key_handles_unorderable_values_with_warning() -> None:
     We create a recording_config with mixed types (int and str) for the same key so
     that sorted(unique_values) raises TypeError and the code falls back to list(unique_values).
     """
-    recording_config = [
+    recording_config: list[dict[str, Any]] = [
         {'sampling_rate': 1000},
         {'sampling_rate': '1000'},
     ]
