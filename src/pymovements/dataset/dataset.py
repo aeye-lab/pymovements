@@ -782,6 +782,7 @@ class Dataset:
             verbose: bool = True,
     ) -> Dataset:
         """Remove event properties from the event dataframe.
+
         Parameters
         ----------
         event_properties: str | list[str]

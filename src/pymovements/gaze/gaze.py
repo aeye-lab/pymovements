@@ -1551,8 +1551,7 @@ class Gaze:
             if 'position' not in samples.columns:
                 raise pl.exceptions.ColumnNotFoundError(
                     f'Column \'position\' not found.'
-                    f' Available columns are: {samples.columns}'
-                    ' TIP: Calculate positions using pix2deg() function',
+                    f' Available columns are: {samples.columns}',
                 )
 
             if eye_components is None:
