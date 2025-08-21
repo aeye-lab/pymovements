@@ -253,11 +253,11 @@ def from_csv(
     # Cast numerical columns to Float64 if they were incorrectly inferred to be Utf8.
     # This can happen if the column only has missing values in the top 100 rows.
     numerical_columns = (
-            (pixel_columns or [])
-            + (position_columns or [])
-            + (velocity_columns or [])
-            + (acceleration_columns or [])
-            + ([distance_column] if distance_column else [])
+        (pixel_columns or [])
+        + (position_columns or [])
+        + (velocity_columns or [])
+        + (acceleration_columns or [])
+        + ([distance_column] if distance_column else [])
     )
     for column in numerical_columns:
         if samples[column].dtype == pl.Utf8:
@@ -772,9 +772,9 @@ def from_psychopy_csv(
     # Cast numerical columns to Float64 if they were incorrectly inferred to be Utf8.
     # This can happen if the column only has missing values in the top 100 rows.
     numerical_columns = (
-            (pixel_columns or [])
-            + (velocity_columns or [])
-            + ([distance_column] if distance_column else [])
+        (pixel_columns or [])
+        + (velocity_columns or [])
+        + ([distance_column] if distance_column else [])
     )
     for column in numerical_columns:
         if samples[column].dtype == pl.Utf8:

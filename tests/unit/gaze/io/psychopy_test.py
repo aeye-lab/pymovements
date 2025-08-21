@@ -22,7 +22,6 @@ import polars as pl
 import pytest
 
 from pymovements import DatasetDefinition
-from pymovements import datasets
 from pymovements.gaze import from_psychopy_csv
 
 
@@ -73,7 +72,8 @@ from pymovements.gaze import from_psychopy_csv
         ),
     ],
 )
-def test_from_psychopy_csv_gaze_has_expected_shape_and_columns(kwargs, expected_shape, expected_schema):
+def test_from_psychopy_csv_gaze_has_expected_shape_and_columns(
+        kwargs, expected_shape, expected_schema):
     gaze = from_psychopy_csv(**kwargs)
 
     assert gaze.samples.shape == expected_shape
