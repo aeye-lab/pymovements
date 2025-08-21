@@ -33,6 +33,11 @@ from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze import Gaze
 
 
+# Note: column detection for ASC files now uses simple substring matching
+# for 'pix' and 'pos' further down in `from_asc`. The older helper-based
+# detection was removed to avoid duplication and simplify the logic.
+
+
 def from_csv(
         file: str | Path,
         experiment: Experiment | None = None,
@@ -480,22 +485,17 @@ def from_asc(
     # Detect pixel / position column names (monocular or binocular) and pass them to Gaze
     cols = set(samples.columns)
 
-    pixel_columns_detect: list[str] | None = None
-    position_columns_detect: list[str] | None = None
+    # Simpler detection: pick any columns that contain the substrings 'pix' or 'pos'
+    # and pass them directly to Gaze. This covers monocular/binocular naming
+    # produced by parse_eyelink without complex subset checks.
+    # Annotate as optional so mypy knows these variables may be None.
+    pixel_columns_detect: list[str] | None = [c for c in samples.columns if 'pix' in c]
+    if not pixel_columns_detect:
+        pixel_columns_detect = None
 
-    # common binocular naming produced by parse_eyelink
-    if {'x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix'}.issubset(cols):
-        pixel_columns_detect = ['x_left_pix', 'y_left_pix', 'x_right_pix', 'y_right_pix']
-    # fallback monocular
-    elif {'x_pix', 'y_pix'}.issubset(cols):
-        pixel_columns_detect = ['x_pix', 'y_pix']
-
-    # position columns (dva) often follow this naming
-    if {'x_left_pos', 'y_left_pos', 'x_right_pos', 'y_right_pos'}.issubset(cols):
-        position_columns_detect = ['x_left_pos', 'y_left_pos', 'x_right_pos', 'y_right_pos']
-    # fallback monocular
-    elif {'x_pos', 'y_pos'}.issubset(cols):
-        position_columns_detect = ['x_pos', 'y_pos']
+    position_columns_detect: list[str] | None = [c for c in samples.columns if 'pos' in c]
+    if not position_columns_detect:
+        position_columns_detect = None
 
     # Instantiate Gaze with parsed data using detected column names
     # If binocular pupils exist, create a nested 'pupil' column [left, right]
