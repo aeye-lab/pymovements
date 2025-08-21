@@ -179,7 +179,7 @@ def finalize_figure(
             plt.show()
         else:
             warn(
-                f'{func_name}: "show=True" has no effect when plotting into an external Axes.',
+                f'{func_name}: "show=True" has no effect if plotting into an external Axes.',
                 UserWarning,
                 stacklevel=2,
             )
@@ -189,7 +189,7 @@ def finalize_figure(
     else:
         if not own_figure and closefig:
             warn(
-                f'{func_name}: "closefig=True" is ignored when an external Axes is provided.',
+                f'{func_name}: "closefig=True" is ignored if an external Axes is provided.',
                 UserWarning,
                 stacklevel=2,
             )
