@@ -19,6 +19,7 @@
 # SOFTWARE.
 """Tests pymovements asc to csv processing."""
 import datetime
+import warnings
 from pathlib import Path
 
 import numpy as np
@@ -478,9 +479,48 @@ def test_val_cal_eyelink(tmp_path, metadata, expected_validation, expected_calib
     assert parsed_metadata['validations'] == expected_validation
 
 
-def test_parse_val_cal_eyelink_monocular_file():
-    example_asc_monocular_path = Path('tests/files/eyelink_monocular_example.asc')
+def test_check_reccfg_key_warnings_and_behavior():
+    """Ensure _check_reccfg_key emits expected warnings and returns correct values."""
+    # No recording config -> should warn and return None
+    with pytest.warns(UserWarning, match='No recording configuration found.'):
+        assert parsing._check_reccfg_key([], 'sampling_rate') is None
 
+    # Recording config exists but key missing -> silently return None
+    rc = [{'timestamp': '1'}]
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter('always')
+        assert parsing._check_reccfg_key(rc, 'sampling_rate') is None
+        assert len(w) == 0
+
+    # Inconsistent values -> should warn and return None
+    rc = [{'sampling_rate': '1000'}, {'sampling_rate': '2000'}]
+    with pytest.warns(UserWarning, match="Found inconsistent values for 'sampling_rate'"):
+        assert parsing._check_reccfg_key(rc, 'sampling_rate') is None
+
+    # Casting failure should return None silently (no warning)
+    rc = [{'sampling_rate': 'not_a_number'}]
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter('always')
+        assert parsing._check_reccfg_key(rc, 'sampling_rate', float) is None
+        assert len(w) == 0
+
+
+def test_check_samples_config_key_warnings_and_casting():
+    """Ensure _check_samples_config_key emits expected warnings and casts values."""
+    # No samples config -> should warn and return None
+    with pytest.warns(UserWarning, match='No samples configuration found.'):
+        assert parsing._check_samples_config_key([], 'sampling_rate') is None
+
+    # Inconsistent values -> should warn and return None
+    sc = [{'sampling_rate': '1000.00'}, {'sampling_rate': '2000.00'}]
+    with pytest.warns(UserWarning, match="Found inconsistent values for 'sampling_rate'"):
+        assert parsing._check_samples_config_key(sc, 'sampling_rate') is None
+
+    # Consistent value should be returned and cast when astype provided
+    sc = [{'sampling_rate': '1000.00'}]
+    assert parsing._check_samples_config_key(sc, 'sampling_rate', float) == 1000.0
+
+    example_asc_monocular_path = Path('tests/files/eyelink_monocular_example.asc')
     _, _, metadata = parsing.parse_eyelink(example_asc_monocular_path)
 
     expected_validation = [{
