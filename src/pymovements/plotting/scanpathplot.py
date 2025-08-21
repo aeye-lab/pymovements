@@ -172,7 +172,7 @@ def scanpathplot(
             # sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
             # sm.set_array(cval)
             fig.colorbar(line, label=cbar_label, ax=ax)
-
+    
     if title:
         ax.set_title(title)
 
