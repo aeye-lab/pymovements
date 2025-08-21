@@ -247,8 +247,6 @@ class Events:
         """
         self.frame = self.frame.drop(event_property)
 
-    
-
     def add_trial_column(
             self,
             column: str | list[str],

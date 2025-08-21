@@ -485,7 +485,7 @@ def _create_gaze():
             {
                 'x': [0, 1, 2, 3],
                 'y': [1, 1, 0, 0],
-                'pixel': [[260,150],[270,120],[271,122],[240,22]],
+                'pixel': [[260, 150], [270, 120], [271, 122], [240, 22]],
                 'trial_id': [0, 1, 1, 2],
             },
             schema={'x': pl.Float64, 'y': pl.Float64, 'pixel': list, 'trial_id': pl.Int8},
@@ -650,4 +650,3 @@ def test_gaze_save_empty_experiment_true_save(tmp_path):
             verbose=1,
             extension='csv',
         )
-

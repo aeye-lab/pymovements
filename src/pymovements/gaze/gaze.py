@@ -937,10 +937,10 @@ class Gaze:
 
     def remove_event_properties(
             self,
-            event_properties: str | list[str]
+            event_properties: str | list[str],
     ) -> None:
         """Remove event properties from the event dataframe.
-        
+
         Parameters
         ----------
         event_properties: str | list[str]
@@ -952,7 +952,7 @@ class Gaze:
             If ``event_properties`` do not exist in the event dataframe
             or it is not allowed to remove them
         """
-        if isinstance(event_properties,str):
+        if isinstance(event_properties, str):
             event_properties = [event_properties]
         existing_columns = self.events.columns
         for prop in event_properties:
@@ -973,7 +973,6 @@ class Gaze:
                 )
         for prop in event_properties:
             self.events.drop_event_property(prop)
-
 
     def compute_event_properties(
             self,
@@ -1557,7 +1556,7 @@ class Gaze:
                 raise pl.exceptions.ColumnNotFoundError(
                     f'Column \'position\' not found.'
                     f' Available columns are: {samples.columns}',
-                    f' TIP: Calculate positions using pix2deg() function'
+                    ' TIP: Calculate positions using pix2deg() function',
                 )
 
             if eye_components is None:
