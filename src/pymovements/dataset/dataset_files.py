@@ -609,9 +609,9 @@ def load_text_stimuli_file(
     """Load stimuli from a single file.
 
     File format is inferred from the extension:
-        - CSV-like: .csv, .tsv, .txt
+        - CSV-like: .csv
         # TODO not implemented yet, to be added in TextStimulus class:
-        - (JSON-like: jsonl, .ndjson, Excel)
+        - (.tsv, .txt, Excel)
 
     Raises a ValueError for unsupported formats.
 
@@ -642,25 +642,25 @@ def load_text_stimuli_file(
     if custom_read_kwargs is None:
         custom_read_kwargs = {}
 
-    # check if we have aoi columns specified
-    if definition.aoi_content_column:
-        aoi_content_column = definition.aoi_content_column
-    else:
+    # check if we have all the required aoi columns specified
+    required = {
+        "aoi_content_column": definition.aoi_content_column,
+        "aoi_start_x_column": definition.aoi_start_x_column,
+        "aoi_start_y_column": definition.aoi_start_y_column,
+    }
+
+    missing = [name for name, value in required.items() if not value]
+
+    if missing:
         raise ValueError(
-            'Please specify aoi_content_column in definition for loading text stimuli.',
+            f"Please specify the following in DatasetDefinition for loading text stimuli: {', '.join(missing)}"
         )
-    if definition.aoi_start_x_column:
-        aoi_start_x_column = definition.aoi_start_x_column
-    else:
-        raise ValueError(
-            'Please specify aoi_start_x_column in definition for loading text stimuli.',
-        )
-    if definition.aoi_start_y_column:
-        aoi_start_y_column = definition.aoi_start_y_column
-    else:
-        raise ValueError(
-            'Please specify aoi_start_y_column in definition for loading text stimuli.',
-        )
+
+    # unpack them if all are present
+    aoi_content_column = required["aoi_content_column"]
+    aoi_start_x_column = required["aoi_start_x_column"]
+    aoi_start_y_column = required["aoi_start_y_column"]
+
 
     text_stimulus_object = TextStimulus.from_file(
         data_path,
