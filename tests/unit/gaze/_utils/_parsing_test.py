@@ -1202,3 +1202,25 @@ def test_recording_config_missing_sampling_rate_key(monkeypatch, tmp_path):
 
     assert metadata['data_loss_ratio'] is None
     assert metadata['data_loss_ratio_blinks'] is None
+
+
+def test_check_reccfg_key_handles_unorderable_values_with_warning():
+    """Ensure the TypeError in sorting unique values is handled and a warning is emitted.
+
+    We create a recording_config with mixed types (int and str) for the same key so
+    that sorted(unique_values) raises TypeError and the code falls back to list(unique_values).
+    """
+    recording_config = [
+        {'sampling_rate': 1000},
+        {'sampling_rate': '1000'},
+    ]
+
+    with pytest.warns(UserWarning) as w:
+        result = parsing._check_reccfg_key(recording_config, 'sampling_rate')
+
+    # Function should return None when inconsistent values are found
+    assert result is None
+
+    # A warning should have been emitted about inconsistent values
+    assert len(w) >= 1
+    assert any("Found inconsistent values for 'sampling_rate'" in str(rec.message) for rec in w)
