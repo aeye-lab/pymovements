@@ -28,6 +28,18 @@ from pymovements import EyeTracker
 from pymovements import Screen
 from pymovements.datasets import ToyDatasetEyeLink
 from pymovements.gaze import from_asc
+from pymovements.gaze import io as gaze_io
+
+
+def _make_metadata():
+    return {
+        'sampling_rate': 1000.0,
+        'resolution': (1024, 768),
+        'tracked_eye': 'L',
+        'mount_configuration': {'mount_type': 'head'},
+        'model': 'EyeLink 1000',
+        'version_number': '1.0',
+    }
 
 
 @pytest.mark.parametrize(
@@ -842,3 +854,35 @@ def test_from_asc_events(kwargs, expected_event_frame):
     gaze = from_asc(**kwargs)
 
     assert_frame_equal(gaze.events.frame, expected_event_frame, check_column_order=False)
+
+
+def test_from_asc_no_pix_columns(monkeypatch):
+    """If parse_eyelink returns no columns containing 'pix', no nested 'pixel' column is created."""
+    samples = pl.DataFrame({'time': [0, 1, 2], 'x': [0.0, 1.0, 2.0]})
+
+    def fake_parse_eyelink(*_args, **_kwargs):
+        return samples, [], _make_metadata()
+
+    monkeypatch.setattr(gaze_io, 'parse_eyelink', fake_parse_eyelink)
+
+    # Gaze initialization will warn because no component columns could be inferred.
+    with pytest.warns(UserWarning):
+        gaze = from_asc(file='dummy.asc')
+
+    assert 'pixel' not in gaze.samples.columns
+
+
+def test_from_asc_with_pix_columns(monkeypatch):
+    """If parse_eyelink returns columns containing 'pix', a nested 'pixel' column is created."""
+    samples = pl.DataFrame({'time': [0, 1, 2], 'x_pix': [0.0, 1.0, 2.0], 'y_pix': [5.0, 6.0, 7.0]})
+
+    def fake_parse_eyelink(*_args, **_kwargs):
+        return samples, [], _make_metadata()
+
+    monkeypatch.setattr(gaze_io, 'parse_eyelink', fake_parse_eyelink)
+
+    gaze = from_asc(file='dummy.asc')
+
+    assert 'pixel' in gaze.samples.columns
+    pixel_col = gaze.samples.select('pixel').to_series()
+    assert len(pixel_col[0]) == 2

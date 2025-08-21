@@ -910,6 +910,20 @@ def test_parse_eyelink_encoding(tmp_path, bytestring, encoding, expected_text):
     assert parsed_metadata['text'] == expected_text
 
 
+def test_data_loss_zero_expected_samples_via_parsing_module():
+    """When num_expected_samples == 0 the function must return (0.0, 0.0)."""
+    total, blink = parsing._calculate_data_loss_ratio(0, 10, 5)
+    assert total == 0.0
+    assert blink == 0.0
+
+
+def test_data_loss_zero_expected_all_zero_via_parsing_module():
+    """Sanity: zero inputs produce zero outputs."""
+    total, blink = parsing._calculate_data_loss_ratio(0, 0, 0)
+    assert total == 0.0
+    assert blink == 0.0
+
+
 def test_parse_eyelink_binocular_simple(tmp_path):
     """Basic test for parsing a binocular ASC snippet."""
     asc_text = r"""
