@@ -268,6 +268,27 @@ def test_load_eyelink_file(tmp_path, read_kwargs):
             {'separator': '\t'},
             id='load_tsv_rename_from_csv',
         ),
+        pytest.param(
+            'tests/files/monocular_example.feather',
+            'feather',
+            None,
+            None,
+            id='load_feather_default',
+        ),
+        pytest.param(
+            'tests/files/monocular_example.feather',
+            'feather',
+            'from_ipc',
+            None,
+            id='load_feather_from_ipc',
+        ),
+        pytest.param(
+            'tests/files/monocular_example.feather',
+            'csv',
+            'from_ipc',
+            None,
+            id='load_feather_rename_from_ipc',
+        ),
     ],
 )
 def test_load_gaze_file(tmp_path, filepath, rename_extension, load_function, read_kwargs):
