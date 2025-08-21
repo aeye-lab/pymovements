@@ -430,7 +430,7 @@ class DatasetDefinition:
             filename format schema overrides for each content type
         """
         data: dict[str, dict[str, type]] = {}
-        content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures' ,'stimuli')
+        content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures', 'stimuli')
         for content_type in content_types:
             if content_resources := self.resources.filter(content=content_type):
                 # take first resource with matching content type.

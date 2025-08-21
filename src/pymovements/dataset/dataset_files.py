@@ -82,7 +82,7 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> dict[str
         else:
             warnings.warn(
                 f'content type {content_type} is not supported. '
-                'supported contents are: gaze, precomputed_events, ' \
+                'supported contents are: gaze, precomputed_events, '
                 'precomputed_reading_measures, stimuli. '
                 'skipping this resource definition during scan.',
             )
@@ -611,7 +611,7 @@ def load_text_stimuli_file(
     File format is inferred from the extension:
         - CSV-like: .csv, .tsv, .txt
         # TODO not implemented yet, to be added in TextStimulus class:
-        - (JSON-like: jsonl, .ndjson, Excel) 
+        - (JSON-like: jsonl, .ndjson, Excel)
 
     Raises a ValueError for unsupported formats.
 
@@ -634,7 +634,7 @@ def load_text_stimuli_file(
     Raises
     ------
     ValueError
-        If one or more of the required AOI file columns are not specified 
+        If one or more of the required AOI file columns are not specified
         in the dataset definition: aoi_content_column, aoi_start_x_column, aoi_start_y_column.
 
     """
