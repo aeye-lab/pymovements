@@ -140,6 +140,10 @@ def gaze_fixture(events):
             id='set_traceplot',
         ),
         pytest.param(
+            {'add_traceplot': True, 'show_cbar': True},
+            id='set_traceplo_and_cbart',
+        ),
+        pytest.param(
             {
                 'add_stimulus': True,
                 'path_to_image_stimulus': './tests/files/pexels-zoorg-1000498.jpg',
