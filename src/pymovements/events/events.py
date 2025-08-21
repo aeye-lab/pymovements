@@ -234,6 +234,21 @@ class Events:
         """
         self.frame = self.frame.join(event_properties, on=join_on, how='left')
 
+    def drop_event_property(
+            self,
+            event_property: str,
+    ) -> None:
+        """Drop event property with the given name.
+
+        Parameters
+        ----------
+        event_property: str
+            name of the event property to drop.
+        """
+        self.frame = self.frame.drop(event_property)
+
+    
+
     def add_trial_column(
             self,
             column: str | list[str],

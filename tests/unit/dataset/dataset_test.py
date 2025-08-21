@@ -2108,3 +2108,34 @@ def test_unsupported_content_type(tmp_path):
     expected_msg = 'content type foobar is not supported'
     with pytest.warns(UserWarning, match=expected_msg):
         dataset.scan()
+
+
+def test_remove_event_property(precomputed_dataset_configuration):
+    dataset = Dataset('ToyDataset', path='data/ToyDataset')
+    dataset.download()
+    #dataset.load()
+    
+    #dataset = Dataset(**precomputed_dataset_configuration['init_kwargs'])
+    dataset.load()
+    dataset.pix2deg()
+    dataset.detect_events('idt', dispersion_threshold=2.7, name='fixation.idt')
+    dataset.pos2vel()
+    dataset.compute_event_properties("peak_velocity")
+
+    with pytest.raises(ValueError) as exinfo:
+        dataset.remove_event_properties("alamakota")
+    print(exinfo.value)
+    assert str(exinfo.value).startswith("The property alamakota does not exist and cannot be removed")
+
+    dataset.remove_event_properties("peak_velocity")
+
+    with pytest.raises(ValueError) as exinfo:
+        dataset.remove_event_properties("peak_velocity")
+    print(exinfo.value)
+    assert str(exinfo.value).startswith("The property peak_velocity does not exist and cannot be removed")
+
+    with pytest.raises(ValueError) as exinfo:
+        dataset.remove_event_properties("onset")
+    print(exinfo.value)
+    assert str(exinfo.value).startswith("The property onset cannot be removed beacuse it belongs to minimal_schema")
+

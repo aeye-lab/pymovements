@@ -934,6 +934,46 @@ class Gaze:
                 how='diagonal',
             )
 
+    def remove_event_properties(
+            self,
+            event_properties: str | list[str]
+    ) -> None:
+        """Remove event properties from the event dataframe.
+        
+        Parameters
+        ----------
+        event_properties: str | list[str]
+            The event properties to remove.
+
+        Raises
+        ------
+        ValueError
+            If ``event_properties`` do not exist in the event dataframe
+            or it is not allowed to remove them
+        """
+        if isinstance(event_properties,str):
+            event_properties = [event_properties]
+        existing_columns = self.events.columns
+        for prop in event_properties:
+            if prop not in existing_columns:
+                raise ValueError(
+                    f"The property {prop} does not exist and cannot be removed. "
+                    f"Available properties: {existing_columns}.",
+                )
+            if prop in self.events._minimal_schema:
+                raise ValueError(
+                    f"The property {prop} cannot be removed beacuse it belongs to minimal_schema. "
+                    f"Available properties to remove: {self.events.event_property_columns}.",
+                )
+            if prop in self.events._additional_columns:
+                raise ValueError(
+                    f"The property {prop} cannot be removed beacuse it belongs to additional_columns. "
+                    f"Available properties to remove: {self.events.event_property_columns}.",
+                )
+        for prop in event_properties:
+            self.events.drop_event_property(prop)
+
+
     def compute_event_properties(
             self,
             event_properties: str | tuple[str, dict[str, Any]]
@@ -1516,6 +1556,7 @@ class Gaze:
                 raise pl.exceptions.ColumnNotFoundError(
                     f'Column \'position\' not found.'
                     f' Available columns are: {samples.columns}',
+                    f' TIP: Calculate positions using pix2deg() function'
                 )
 
             if eye_components is None:
