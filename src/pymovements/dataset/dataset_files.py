@@ -376,7 +376,7 @@ def load_gaze_file(
     else:
         valid_load_functions = ['from_csv', 'from_ipc', 'from_asc']
         raise ValueError(
-            f'Unsupported load_function "{load_function_name}".'
+            f'Unsupported load_function "{load_function_name}". '
             f'Available options are: {valid_load_functions}',
         )
 

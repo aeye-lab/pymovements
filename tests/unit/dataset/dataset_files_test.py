@@ -201,13 +201,17 @@ PATTERNS = [
         ),
     ],
 )
-def test_load_eyelink_file(tmp_path, read_kwargs):
+@pytest.mark.parametrize(
+    'load_function',
+    [None, 'from_asc'],
+)
+def test_load_eyelink_file(tmp_path, read_kwargs, load_function):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(ASC_TEXT)
 
     gaze = pm.dataset.dataset_files.load_gaze_file(
         filepath,
-        fileinfo_row={},
+        fileinfo_row={'load_function': load_function},
         definition=DatasetDefinition(
             experiment=pm.Experiment(1280, 1024, 38, 30, None, 'center', 1000),
             custom_read_kwargs={'gaze': read_kwargs},
@@ -315,6 +319,26 @@ def test_load_gaze_file(tmp_path, filepath, rename_extension, load_function, rea
     )
 
     assert_frame_equal(gaze.samples, expected_df, check_column_order=False)
+
+
+def test_load_gaze_file_unsupported_load_function():
+    filepath = 'tests/files/monocular_example.csv'
+
+    with pytest.raises(ValueError) as exc:
+        pm.dataset.dataset_files.load_gaze_file(
+            filepath,
+            fileinfo_row={'load_function': 'from_a_land_down_under'},
+            definition=DatasetDefinition(
+                experiment=pm.Experiment(1280, 1024, 38, 30, None, 'center', 1000),
+                pixel_columns=['x_left_pix', 'y_left_pix'],
+            ),
+        )
+
+    msg, = exc.value.args
+    assert msg == (
+        'Unsupported load_function "from_a_land_down_under". '
+        'Available options are: [\'from_csv\', \'from_ipc\', \'from_asc\']'
+    )
 
 
 def test_load_precomputed_rm_file():
