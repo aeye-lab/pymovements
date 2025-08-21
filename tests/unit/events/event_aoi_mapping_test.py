@@ -694,7 +694,7 @@ def dataset_fixture():
     ],
 )
 def test_event_to_aoi_mapping_char_width_height(aoi_column, dataset):
-    aoi_df = pm.stimulus.text.from_file(
+    aoi_df = pm.stimulus.text.TextStimulus.from_file(
         'tests/files/toy_text_1_1_aoi.csv',
         aoi_column=aoi_column,
         start_x_column='top_left_x',
@@ -716,7 +716,7 @@ def test_event_to_aoi_mapping_char_width_height(aoi_column, dataset):
     ],
 )
 def test_event_to_aoi_mapping_char_end(aoi_column, dataset):
-    aoi_df = pm.stimulus.text.from_file(
+    aoi_df = pm.stimulus.text.TextStimulus.from_file(
         'tests/files/toy_text_1_1_aoi.csv',
         aoi_column=aoi_column,
         start_x_column='top_left_x',
@@ -731,7 +731,7 @@ def test_event_to_aoi_mapping_char_end(aoi_column, dataset):
 
 
 def test_map_to_aois_raises_value_error():
-    aoi_df = pm.stimulus.text.from_file(
+    aoi_df = pm.stimulus.text.TextStimulus.from_file(
         'tests/files/toy_text_1_1_aoi.csv',
         aoi_column='char',
         start_x_column='top_left_x',
@@ -753,7 +753,7 @@ def test_map_to_aois_raises_value_error():
 
 
 def test_map_to_aois_raises_value_error_missing_width_height(dataset):
-    aoi_df = pm.stimulus.text.from_file(
+    aoi_df = pm.stimulus.text.TextStimulus.from_file(
         'tests/files/toy_text_1_1_aoi.csv',
         aoi_column='char',
         start_x_column='top_left_x',

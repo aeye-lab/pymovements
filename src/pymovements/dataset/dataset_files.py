@@ -22,7 +22,6 @@ from __future__ import annotations
 
 import warnings
 from copy import deepcopy
-from csv import excel
 from pathlib import Path
 from typing import Any
 
@@ -41,8 +40,7 @@ from pymovements.gaze.io import from_asc
 from pymovements.gaze.io import from_csv
 from pymovements.gaze.io import from_ipc
 from pymovements.reading_measures import ReadingMeasures
-from pymovements.stimulus.text import TextStimulus, from_file
-
+from pymovements.stimulus.text import TextStimulus
 
 
 def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> dict[str, pl.DataFrame]:
@@ -84,7 +82,8 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> dict[str
         else:
             warnings.warn(
                 f'content type {content_type} is not supported. '
-                'supported contents are: gaze, precomputed_events, precomputed_reading_measures, stimuli. '
+                'supported contents are: gaze, precomputed_events, ' \
+                'precomputed_reading_measures, stimuli. '
                 'skipping this resource definition during scan.',
             )
             continue
@@ -561,6 +560,123 @@ def load_precomputed_event_file(
     return PrecomputedEventDataFrame(data=precomputed_event_df)
 
 
+def load_text_stimuli_files(
+        definition: DatasetDefinition,
+        fileinfo: pl.DataFrame,
+        paths: DatasetPaths,
+        # stimuli_dirname: str | None = None, # TODO maybe add custom
+) -> list[TextStimulus]:
+    """Load all available text stimuli files.
+
+    Parameters
+    ----------
+    definition: DatasetDefinition
+        The dataset definition.
+    fileinfo: pl.DataFrame
+        A dataframe holding file information.
+    paths: DatasetPaths
+        Path of directory containing stimuli files.
+    stimuli_dirname: str | None
+        One-time usage of an alternative directory name to save data relative to
+        :py:meth:`pymovements.Dataset.path`.
+        This argument is used only for this single call and does not alter
+        :py:meth:`pymovements.Dataset.stimuli_rootpath`.
+
+    Returns
+    -------
+    list[TextStimulus]
+        List of loaded text stimuli objects.
+
+    """
+    stimuli_list: list[TextStimulus] = []
+    for filepath in fileinfo.to_dicts():
+        data_path = paths.stimuli / Path(filepath['filepath'])
+        stimuli_list.append(
+            load_text_stimuli_file(
+                data_path,
+                definition=definition,
+                custom_read_kwargs=definition.custom_read_kwargs.get('text_stimuli', None),
+            ),
+        )
+    return stimuli_list
+
+
+def load_text_stimuli_file(
+        data_path: str | Path,
+        definition: DatasetDefinition,
+        custom_read_kwargs: dict[str, Any] | None = None,
+) -> TextStimulus:
+    """Load stimuli from a single file.
+
+    File format is inferred from the extension:
+        - CSV-like: .csv, .tsv, .txt
+        # TODO not implemented yet, to be added in TextStimulus class:
+        - (JSON-like: jsonl, .ndjson, Excel) 
+
+    Raises a ValueError for unsupported formats.
+
+    Parameters
+    ----------
+    data_path:  str | Path
+        Path to file to be read.
+
+    definition: DatasetDefinition
+        The dataset definition.
+
+    custom_read_kwargs: dict[str, Any] | None
+        Custom read keyword arguments for polars. (default: None)
+
+    Returns
+    -------
+    TextStimulus
+        Returns a TextStimulus object.
+
+    Raises
+    ------
+    ValueError
+        If one or more of the required AOI file columns are not specified 
+        in the dataset definition: aoi_content_column, aoi_start_x_column, aoi_start_y_column.
+
+    """
+    data_path = Path(data_path)
+    if custom_read_kwargs is None:
+        custom_read_kwargs = {}
+
+    # check if we have aoi columns specified
+    if definition.aoi_content_column:
+        aoi_content_column = definition.aoi_content_column
+    else:
+        raise ValueError(
+            'Please specify aoi_content_column in definition for loading text stimuli.',
+        )
+    if definition.aoi_start_x_column:
+        aoi_start_x_column = definition.aoi_start_x_column
+    else:
+        raise ValueError(
+            'Please specify aoi_start_x_column in definition for loading text stimuli.',
+        )
+    if definition.aoi_start_y_column:
+        aoi_start_y_column = definition.aoi_start_y_column
+    else:
+        raise ValueError(
+            'Please specify aoi_start_y_column in definition for loading text stimuli.',
+        )
+
+    text_stimulus_object = TextStimulus.from_file(
+        data_path,
+        aoi_column=aoi_content_column,
+        start_x_column=aoi_start_x_column,
+        start_y_column=aoi_start_y_column,
+        width_column=definition.aoi_width_column,
+        height_column=definition.aoi_height_column,
+        end_x_column=definition.aoi_end_x_column,
+        end_y_column=definition.aoi_end_y_column,
+        page_column=definition.aoi_page_column,
+        custom_read_kwargs=custom_read_kwargs,
+    )
+    return text_stimulus_object
+
+
 def add_fileinfo(
         definition: DatasetDefinition,
         df: pl.DataFrame,
@@ -600,109 +716,6 @@ def add_fileinfo(
     ])
 
     return df
-
-
-def load_text_stimuli_files(   # TODO only prototype, from copilot need checking
-        definition: DatasetDefinition,
-        fileinfo: pl.DataFrame,
-        paths: DatasetPaths,
-        stimuli_dirname: str | None = None,
-        extension: str = 'txt',
-) -> list[TextStimulus]:
-    """Load all available text stimuli files.
-
-    Parameters
-    ----------
-    definition: DatasetDefinition
-        The dataset definition.
-    fileinfo: pl.DataFrame
-        A dataframe holding file information.
-    paths: DatasetPaths
-        Path of directory containing stimuli files.
-    stimuli_dirname: str | None
-        One-time usage of an alternative directory name to save data relative to
-        :py:meth:`pymovements.Dataset.path`.
-        This argument is used only for this single call and does not alter
-        :py:meth:`pymovements.Dataset.stimuli_rootpath`.
-    extension: str
-        Specifies the file format for loading data. Valid options are: `txt`, `csv`, etc.
-        (default: 'txt')
-
-    Returns
-    -------
-    list[TextStimulus]
-        List of loaded text stimuli objects.
-
-    Raises
-    ------
-    AttributeError
-        If `fileinfo` is None or the `fileinfo` dataframe is empty.
-    RuntimeError
-        If file type of stimuli file is not supported.
-    """
-    stimuli_list: list[TextStimulus] = []
-    for fileinfo_row in tqdm(fileinfo.to_dicts()):
-        filepath = Path(fileinfo_row['filepath'])
-        filepath = paths.stimuli / filepath
-        if stimuli_dirname:
-            filepath = paths.dataset / stimuli_dirname / filepath.name
-        if extension in {'txt', 'csv'}:
-            with open(filepath, 'r', encoding='utf-8') as f:
-                text = f.read()
-            stimulus = TextStimulus(text=text, fileinfo=fileinfo_row)
-            stimuli_list.append(stimulus)
-        else:
-            valid_extensions = ['txt', 'csv']
-            raise ValueError(
-                f'unsupported file format "{extension}". Supported formats are: {valid_extensions}',
-            )
-    return stimuli_list
-
-def load_text_stimuli_file(
-        data_path: str | Path,
-        definition: DatasetDefinition,
-        custom_read_kwargs: dict[str, Any] | None = None,
-) -> TextStimulus:
-    """Load stimuli from a single file.
-
-    File format is inferred from the extension:
-        - CSV-like: .csv, .tsv, .txt
-        - (JSON-like: jsonl, .ndjson, Excel) # TODO not implemented yet, to be added in TextStimulus class
-
-    Raises a ValueError for unsupported formats.
-
-    Parameters
-    ----------
-    data_path:  str | Path
-        Path to file to be read.
-
-    custom_read_kwargs: dict[str, Any] | None
-        Custom read keyword arguments for polars. (default: None)
-
-    Returns
-    -------
-    TextStimulus
-        Returns a TextStimulus object.
-
-    Raises
-    ------
-    ValueError
-        If the file format is unsupported based on its extension.
-    """
-    data_path = Path(data_path)
-    if custom_read_kwargs is None:
-        custom_read_kwargs = {}
-
-    stimulus_object = from_file(
-        data_path,
-        aoi_column,
-        start_x_column,
-        start_y_column,
-        custom_read_kwargs=custom_read_kwargs)
-
-
-    return stimulus_object
-
 
 
 def save_events(

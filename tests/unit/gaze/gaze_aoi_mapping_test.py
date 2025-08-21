@@ -1097,7 +1097,7 @@ EXPECTED_DF = {
     ],
 )
 def test_gaze_to_aoi_mapping_char_width_height(eye, aoi_column, gaze_type):
-    aoi_df = pm.stimulus.text.from_file(
+    aoi_df = pm.stimulus.text.TextStimulus.from_file(
         'tests/files/toy_text_1_1_aoi.csv',
         aoi_column=aoi_column,
         start_x_column='top_left_x',
@@ -1152,7 +1152,7 @@ def test_gaze_to_aoi_mapping_char_width_height(eye, aoi_column, gaze_type):
     ],
 )
 def test_gaze_to_aoi_mapping_char_end(eye, aoi_column, gaze_type):
-    aoi_df = pm.stimulus.text.from_file(
+    aoi_df = pm.stimulus.text.TextStimulus.from_file(
         'tests/files/toy_text_1_1_aoi.csv',
         aoi_column=aoi_column,
         start_x_column='top_left_x',
@@ -1181,7 +1181,7 @@ def test_gaze_to_aoi_mapping_char_end(eye, aoi_column, gaze_type):
 
 
 def test_map_to_aois_raises_value_error():
-    aoi_df = pm.stimulus.text.from_file(
+    aoi_df = pm.stimulus.text.TextStimulus.from_file(
         'tests/files/toy_text_1_1_aoi.csv',
         aoi_column='char',
         start_x_column='top_left_x',

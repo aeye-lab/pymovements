@@ -40,7 +40,6 @@ from pymovements.events import Events
 from pymovements.events.precomputed import PrecomputedEventDataFrame
 from pymovements.gaze import Gaze
 from pymovements.reading_measures import ReadingMeasures
-
 from pymovements.stimulus.text import TextStimulus
 
 logging.basicConfig(level=logging.INFO)
@@ -65,7 +64,7 @@ class Dataset:
     def __init__(
             self,
             definition: str | Path | DatasetDefinition | type[DatasetDefinition],
-            path: str | Path | DatasetPaths
+            path: str | Path | DatasetPaths,
     ):
         self.fileinfo: pl.DataFrame = pl.DataFrame()
         self.gaze: list[Gaze] = []
@@ -174,11 +173,10 @@ class Dataset:
                 loaded_gaze.events = loaded_events
 
         # Load text stimuli files if present
-        if self.definition.resources.has_content('stimuli'): # ToDo only prototype from copilot need improvement
-            self.load_stimuli_files(
-                stimuli_dirname=stimuli_dirname,
-                extension=extension,
-            )
+        if self.definition.resources.has_content('stimuli'):
+            self.load_text_stimuli()
+            # stimuli_dirname=stimuli_dirname, # TODO custom dir name
+            # extension=extension,
 
         return self
 
@@ -379,6 +377,29 @@ class Dataset:
             extension=extension,
         )
         return self
+
+    def load_text_stimuli(self) -> None:
+        """Load stimuli.
+
+        This method checks that the file information for stimuli is available,
+        then loads each stimulus file listed in `self.fileinfo['stimuli']` using
+        the dataset definition and path settings. The resulting list of
+        `TextStimulus` objects is assigned to `self.stimuli`.
+
+        Supported file extensions:
+        - CSV-like: .csv, .tsv, .txt
+
+        Raises
+        ------
+        ValueError
+            If the file info is missing or improperly formatted.
+        """
+        self._check_fileinfo()
+        self.stimuli = dataset_files.load_text_stimuli_files(
+            self.definition,
+            self.fileinfo['stimuli'],
+            self.paths,
+        )
 
     def apply(
             self,
