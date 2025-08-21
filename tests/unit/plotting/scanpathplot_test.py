@@ -207,7 +207,7 @@ def test_scanpathplot_gaze_events_all_none_exception(gaze):
         scanpathplot(gaze=gaze)
 
 
-def test_scanpathplot_gaze_events_all_none_exception():
+def test_scanpathplot_traceplot_gaze_samples_none_exception():
     with pytest.raises(TypeError, match='must not be both None'):
         scanpathplot(events=None, gaze=None)
 
