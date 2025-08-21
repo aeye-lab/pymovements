@@ -25,6 +25,7 @@ import warnings
 from collections.abc import Callable
 from collections.abc import Sequence
 from copy import deepcopy
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -708,6 +709,7 @@ class Gaze:
         --------
         Lets create an example Gaze of 1000Hz with a time column and a position column.
         Please note that time is always stored in milliseconds in the Gaze.
+
         >>> df = pl.DataFrame({
         ...     'time': [0, 1, 2, 3, 4],
         ...     'x': [1, 2, 3, 4, 5],
@@ -730,6 +732,7 @@ class Gaze:
 
         We can now upsample the Gaze to 2000Hz with interpolating the values in
         the pixel column.
+
         >>> gaze.resample(
         ...     resampling_rate=2000,
         ...     fill_null_strategy='interpolate_linear',
@@ -754,6 +757,7 @@ class Gaze:
         └──────┴────────────┘
 
         Downsample the Gaze to 500Hz results in the following DataFrame.
+
         >>> gaze.resample(resampling_rate=500)
         >>> gaze.samples
         shape: (3, 2)
@@ -1747,6 +1751,160 @@ class Gaze:
     def __repr__(self) -> str:
         """Return string representation of Gaze."""
         return self.__str__()
+
+    def save(
+            self,
+            dirpath: str | Path,
+            *,
+            save_events: bool | None = None,
+            save_samples: bool | None = None,
+            save_experiment: bool | None = None,
+            verbose: int = 1,
+            extension: str = 'feather',
+    ) -> Gaze:
+        """Save data from the Gaze object in the provided directory.
+
+        Depending on parameters it may save three files:
+        * preprocessed gaze in samples (samples)
+        * calculated gaze events (events)
+        * metadatata experiment in YAML file (experiment).
+
+        Data will be saved as feather or csv files.
+
+        Returns
+        -------
+        Gaze
+            Returns self, useful for method cascading.
+
+        Parameters
+        ----------
+        dirpath: str | Path
+            Absloute directory name to save data.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.events_rootpath`.
+        save_events: bool | None
+            Save events in events.{extension} file
+        save_samples: bool | None
+            Save samples in sample.{extension} file
+        save_experiment: bool | None
+            Save experiment metadata in experiment.yaml file
+        verbose: int
+            Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
+            (default: 1)
+        extension: str
+            Extension specifies the fileformat to store the data. (default: 'feather')
+
+        Raises
+        ------
+        ValueError
+            If save_events is True and self.events is None or empty
+        ValueError
+            If save_experiment is True and self.experiment is None
+
+        """
+        # Create dir if does not exist
+        Path(dirpath).mkdir(parents=True, exist_ok=True)
+
+        if save_events is None or save_events:
+            if save_events and (self.events is None or len(self.events) == 0):
+                raise ValueError('there are no events in the Gaze object')
+            self.save_events(Path(f'{dirpath}/events.{extension}'), verbose=verbose)
+
+        if save_samples is None or save_samples:
+            self.save_samples(Path(f'{dirpath}/samples.{extension}'), verbose=verbose)
+
+        if save_experiment is None or save_experiment:
+            if verbose >= 2:
+                print('Saving experiment file to', dirpath)
+            if self.experiment is not None:
+                self.experiment.to_yaml(Path(f"{dirpath}/experiment.yaml"))
+            elif save_experiment is not None:
+                raise ValueError('no experiment data in the Gaze object')
+        return self
+
+    def save_events(
+            self,
+            path: Path,
+            *,
+            verbose: int = 1,
+
+    ) -> None:
+        """Save gaze events to file.
+
+        Data will be saved as the given file.
+
+        Parameters
+        ----------
+        path: Path
+            File to save data.
+        verbose: int
+            Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
+            (default: 1)
+
+        Raises
+        ------
+        ValueError
+            If file extension in path is not in list of valid extensions.
+        """
+        events_out = self.events.frame.clone()
+        extension = path.suffix[1:]
+
+        if verbose >= 2:
+            print('Saving events to ', path)
+
+        if extension == 'feather':
+            events_out.write_ipc(path)
+        elif extension == 'csv':
+            events_out.write_csv(path)
+        else:
+            valid_extensions = ['csv', 'feather']
+            raise ValueError(
+                f'unsupported file format "{extension}".'
+                f'Supported formats are: {valid_extensions}',
+            )
+
+    def save_samples(
+            self,
+            path: Path,
+            *,
+            verbose: int = 1,
+    ) -> None:
+        """Save preprocessed gaze files.
+
+        Samples will be saved to the file given by path.
+
+        Parameters
+        ----------
+        path: Path
+            File to save data.
+        verbose: int
+            Verbosity level (0: no print output, 1: show progress bar, 2: print saved filepaths)
+            (default: 1)
+
+        Raises
+        ------
+        ValueError
+            If file extension in path is not in list of valid extensions.
+        """
+        gaze = self.clone()
+        extension = path.suffix[1:]
+
+        if extension == 'csv':
+            gaze.unnest()
+
+        if verbose >= 2:
+            print('Saving samples to', path)
+
+        if extension == 'feather':
+            gaze.samples.write_ipc(path)
+        elif extension == 'csv':
+            gaze.samples.write_csv(path)
+        else:
+            valid_extensions = ['csv', 'feather']
+            raise ValueError(
+                f'unsupported file format "{extension}".'
+                f'Supported formats are: {valid_extensions}',
+            )
 
 
 def _check_trial_columns(trial_columns: list[str] | None, samples: pl.DataFrame) -> None:
