@@ -644,23 +644,23 @@ def load_text_stimuli_file(
 
     # check if we have all the required aoi columns specified
     required = {
-        "aoi_content_column": definition.aoi_content_column,
-        "aoi_start_x_column": definition.aoi_start_x_column,
-        "aoi_start_y_column": definition.aoi_start_y_column,
+        'aoi_content_column': definition.aoi_content_column,
+        'aoi_start_x_column': definition.aoi_start_x_column,
+        'aoi_start_y_column': definition.aoi_start_y_column,
     }
 
     missing = [name for name, value in required.items() if not value]
 
     if missing:
         raise ValueError(
-            f"Please specify the following in DatasetDefinition for loading text stimuli: {', '.join(missing)}"
+            f"Please specify the following in DatasetDefinition for loading text stimuli: {
+                ', '.join(missing)}",
         )
 
     # unpack them if all are present
-    aoi_content_column = required["aoi_content_column"]
-    aoi_start_x_column = required["aoi_start_x_column"]
-    aoi_start_y_column = required["aoi_start_y_column"]
-
+    aoi_content_column = required['aoi_content_column']
+    aoi_start_x_column = required['aoi_start_x_column']
+    aoi_start_y_column = required['aoi_start_y_column']
 
     text_stimulus_object = TextStimulus.from_file(
         data_path,
