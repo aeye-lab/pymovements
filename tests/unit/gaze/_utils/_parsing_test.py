@@ -1076,3 +1076,89 @@ def test_tracked_vs_recorded_eye_warning(tmp_path):
     # The parser maps RECCFG 'LR' -> 'LR' and SAMPLES 'RIGHT' -> 'R', so expect [LR, R]
     with pytest.warns(Warning, match=r'inconsistent: \[LR, R\]'):
         parsing.parse_eyelink(filepath)
+
+
+@pytest.mark.filterwarnings('ignore:No metadata found.')
+@pytest.mark.filterwarnings('ignore:No recording configuration found.')
+@pytest.mark.filterwarnings('ignore:No samples configuration found.')
+def test_sampling_rate_inconsistent_warning(tmp_path):
+    """When RECCFG and SAMPLES report different sampling rates, a warning should be raised."""
+    asc_text = (
+        'MSG\t2154555 RECCFG CR 2000 2 1 L\n'
+        'SAMPLES\tGAZE\tLEFT\tRATE\t1000.00\tTRACKING\tCR\tFILTER\t2\n'
+    )
+
+    filepath = tmp_path / 'sub_rate_mismatch.asc'
+    filepath.write_text(asc_text)
+
+    # Depending on internal casting, the warning should contain both values; match the float form
+    with pytest.warns(
+        Warning,
+        match=r"inconsistent values for 'sampling_rate': \[1000\.0, 2000\.0\]",
+    ):
+        parsing.parse_eyelink(filepath)
+
+
+@pytest.mark.parametrize(
+    ('samples_line', 'expected_tracked'),
+    [
+        ('SAMPLES\tGAZE\tLEFT\tRATE\t1000.00\tTRACKING\tCR\tFILTER\t2\n', 'L'),
+        ('SAMPLES\tGAZE\tRIGHT\tRATE\t1000.00\tTRACKING\tCR\tFILTER\t2\n', 'R'),
+        ('SAMPLES\tGAZE\tLEFT RIGHT\tRATE\t1000.00\tTRACKING\tCR\tFILTER\t2\n', 'LR'),
+    ],
+)
+@pytest.mark.filterwarnings('ignore:No metadata found.')
+@pytest.mark.filterwarnings('ignore:No recording configuration found.')
+def test_tracked_eye_mapping_from_samples(tmp_path, samples_line, expected_tracked):
+    """SAMPLES tracked_eye strings should map to metadata['tracked_eye'] correctly."""
+    asc_text = samples_line
+
+    filepath = tmp_path / 'sub_tracked.asc'
+    filepath.write_text(asc_text)
+
+    _, _, metadata = parsing.parse_eyelink(filepath)
+
+    assert metadata['tracked_eye'] == expected_tracked
+
+
+@pytest.mark.filterwarnings('ignore:No metadata found.')
+def test_recording_config_missing_sampling_rate_key(monkeypatch, tmp_path):
+    """Simulate a recording_config entry missing 'sampling_rate' to trigger KeyError path."""
+
+    class DummyMatch:
+        def groupdict(self):
+            # deliberately omit 'sampling_rate' to trigger KeyError in parser
+            return {
+                'timestamp': '2154555',
+                'file_sample_filter': '2',
+                'link_sample_filter': '1',
+                'tracked_eye': 'L',
+                'tracking_mode': 'CR',
+            }
+
+    class DummyRegex:
+        def match(self, line):
+            return DummyMatch() if 'RECCFG' in line else None
+
+    # replace the RECORDING_CONFIG_REGEX with our dummy that returns dict without sampling_rate
+    monkeypatch.setattr(parsing, 'RECORDING_CONFIG_REGEX', DummyRegex())
+
+    asc_text = (
+        'MSG\t2154555 RECCFG CR ??? 2 1 L\n'
+        'START\t10000018 \tRIGHT\tSAMPLES\tEVENTS\n'
+        'SBLINK R 10000019\n'
+        '10000019\t  .\t  .\t   0.0\t 0.0\t...\n'
+        'EBLINK R 10000019\t10000020\t2\n'
+        'END\t10000020 \tSAMPLES\tEVENTS\tRES\t 38.54\t 31.12\n'
+    )
+
+    filepath = tmp_path / 'sub_missing_rate_key.asc'
+    filepath.write_text(asc_text)
+
+    # Now the parser should warn (e.g. missing samples or sampling rate) and
+    # set data-loss metrics to None.
+    with pytest.warns(Warning):
+        _, _, metadata = parsing.parse_eyelink(filepath)
+
+    assert metadata['data_loss_ratio'] is None
+    assert metadata['data_loss_ratio_blinks'] is None

@@ -471,9 +471,21 @@ def parse_eyelink(
             stop_recording_timestamp = match.groupdict()['timestamp']
             block_duration = float(stop_recording_timestamp) - float(start_recording_timestamp)
             total_recording_duration += block_duration
-            num_expected_samples += round(
-                block_duration * float(recording_config[-1]['sampling_rate']) / 1000,
-            )
+            # Safely obtain the sampling rate from the last recording_config entry.
+            sampling_rate_last = None
+            if recording_config:
+                sampling_rate_val = recording_config[-1].get('sampling_rate')
+                try:
+                    sampling_rate_last = float(
+                        sampling_rate_val,
+                    ) if sampling_rate_val is not None else None
+                except (TypeError, ValueError):
+                    sampling_rate_last = None
+
+            if sampling_rate_last:
+                num_expected_samples += round(
+                    block_duration * sampling_rate_last / 1000,
+                )
 
         # Use the appropriate regex based on the file type
         eye_tracking_sample_match = (
@@ -606,7 +618,7 @@ def parse_eyelink(
     if blink_intervals and recording_config:
         try:
             sampling_rate = float(recording_config[-1]['sampling_rate'])
-        except KeyError:
+        except (KeyError, TypeError, ValueError):
             sampling_rate = None
 
         if sampling_rate:
@@ -626,10 +638,48 @@ def parse_eyelink(
             for s, e in merged:
                 num_blink_samples += round((e - s) / sample_length) + 1
 
-    (
-        pre_processed_metadata['data_loss_ratio'],
-        pre_processed_metadata['data_loss_ratio_blinks'],
-    ) = _calculate_data_loss_ratio(num_expected_samples, num_valid_samples, num_blink_samples)
+    # If no sampling rate could be determined from either SAMPLES or RECCFG,
+    # only warn the user when there is evidence of samples or recording
+    # configuration present (or blink intervals) — otherwise keep silent to
+    # avoid noisy warnings for minimal metadata-only files.
+    # If we were able to compute an expected number of samples from STOP_RECORDING
+    # blocks (num_expected_samples > 0), trust that calculation and compute the
+    # data-loss metrics even if the SAMPLES/RECCFG metadata keys are missing or
+    # inconsistent. Otherwise, fall back to the previous behavior: warn (when
+    # appropriate) and set metrics to None.
+    if num_expected_samples > 0:
+        (
+            pre_processed_metadata['data_loss_ratio'],
+            pre_processed_metadata['data_loss_ratio_blinks'],
+        ) = _calculate_data_loss_ratio(num_expected_samples, num_valid_samples, num_blink_samples)
+    else:
+        # Determine if the sampling rate keys were present but inconsistent
+        def _config_inconsistent(
+            config_list: list[dict[str, Any]],
+            key: str = 'sampling_rate',
+        ) -> bool:
+            vals = [d.get(key) for d in config_list if d.get(key) is not None]
+            return len(set(vals)) > 1
+
+        inconsistent_reccfg = _config_inconsistent(recording_config)
+        inconsistent_samples = _config_inconsistent(samples_config)
+
+        # Only warn if we truly don't have a sampling-rate value from either
+        # the SAMPLES or RECCFG messages. If a sampling rate was present
+        # (even when num_expected_samples == 0), there's no need to emit
+        # the generic warning — the presence of inconsistent config
+        # warnings is already handled above.
+        if not (sampling_rate_samples_config or sampling_rate_reccfg):
+            if (samples_config or recording_config or blink_intervals) and not (
+                inconsistent_reccfg or inconsistent_samples
+            ):
+                warnings.warn(
+                    'Could not determine sampling rate from SAMPLES or RECCFG; '
+                    'data-loss metrics will be unavailable.',
+                )
+
+        pre_processed_metadata['data_loss_ratio'] = None
+        pre_processed_metadata['data_loss_ratio_blinks'] = None
 
     gaze_schema_overrides = {
         'time': pl.Float64,
@@ -736,15 +786,32 @@ def _check_reccfg_key(
         warnings.warn('No recording configuration found.')
         return None
 
-    values = {d.get(key) for d in recording_config}
-    if len(values) != 1:
-        sorted_values: list = sorted(values)
+    # Extract values for the requested key but ignore entries where the key is missing
+    raw_values = [d.get(key) for d in recording_config]
+    non_none_values = [v for v in raw_values if v is not None]
+
+    if not non_none_values:
+        # The recording config exists but the specific key was never present.
+        # Return None silently to avoid emitting unexpected warnings in callers.
+        return None
+
+    unique_values = set(non_none_values)
+    if len(unique_values) != 1:
+        # Try to present a sorted list of values for the warning, fall back if not comparable
+        try:
+            sorted_values: list = sorted(unique_values)
+        except TypeError:
+            sorted_values = list(unique_values)
         warnings.warn(f"Found inconsistent values for '{key}': {sorted_values}")
         return None
 
-    value = values.pop()
+    value = unique_values.pop()
     if astype is not None:
-        value = astype(value)
+        try:
+            value = astype(value)
+        except (TypeError, ValueError):
+            # If casting fails, return None silently to avoid unexpected warnings.
+            return None
     return value
 
 
