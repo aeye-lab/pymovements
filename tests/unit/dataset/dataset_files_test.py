@@ -358,7 +358,7 @@ def test_load_stimuli_file_missing_one_column_name():
     filepath = 'tests/files/aoi_multipleye_stimuli_toy_x_1/toy_text_1_1_aoi.csv'
 
     with pytest.raises(ValueError) as exc:
-        pm.dataset.dataset_files.load_stimulus_file(
+        pm.dataset.dataset_files.load_text_stimuli_file(
             filepath,
             definition=DatasetDefinition(
                 aoi_content_column='char',
@@ -367,19 +367,19 @@ def test_load_stimuli_file_missing_one_column_name():
         )
 
     msg, = exc.value.args
-    assert msg == 'Please specify the following in DatasetDefinition for loading text stimuli:'
-    ' aoi_start_y_column'
+    assert msg == ('Please specify the following in DatasetDefinition for loading text stimuli:'
+                   ' aoi_start_y_column')
 
 
 def test_load_stimuli_file_missing_all_column_names():
     filepath = 'tests/files/aoi_multipleye_stimuli_toy_x_1/toy_text_1_1_aoi.csv'
 
     with pytest.raises(ValueError) as exc:
-        pm.dataset.dataset_files.load_stimulus_file(
+        pm.dataset.dataset_files.load_text_stimuli_file(
             filepath,
             definition=DatasetDefinition(),
         )
 
     msg, = exc.value.args
-    assert msg == 'Please specify the following in DatasetDefinition for loading text stimuli:'
-    ' aoi_content_column, aoi_start_x_column, aoi_start_y_column'
+    assert msg == ('Please specify the following in DatasetDefinition for loading text stimuli:'
+                   ' aoi_content_column, aoi_start_x_column, aoi_start_y_column')
