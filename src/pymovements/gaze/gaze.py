@@ -1755,6 +1755,7 @@ class Gaze:
     def save(
             self,
             dirpath: str | Path,
+            *,
             save_events: bool | None = None,
             save_samples: bool | None = None,
             save_experiment: bool | None = None,
@@ -1806,9 +1807,7 @@ class Gaze:
 
         if save_events is None or save_events:
             if save_events and (self.events is None or len(self.events) == 0):
-                raise ValueError(
-                    'there are no events in the Gaze object',
-                )
+                raise ValueError('there are no events in the Gaze object')
             self.save_events(Path(f'{dirpath}/events.{extension}'), verbose=verbose)
 
         if save_samples is None or save_samples:
@@ -1816,18 +1815,17 @@ class Gaze:
 
         if save_experiment is None or save_experiment:
             if verbose >= 2:
-                print('Saving experiment.yaml file to', dirpath)
+                print('Saving experiment file to', dirpath)
             if self.experiment is not None:
                 self.experiment.to_yaml(Path(f"{dirpath}/experiment.yaml"))
             elif save_experiment is not None:
-                raise ValueError(
-                    'no experiment data in the Gaze object',
-                )
+                raise ValueError('no experiment data in the Gaze object')
         return self
 
     def save_events(
             self,
             path: Path,
+            *,
             verbose: int = 1,
 
     ) -> None:
@@ -1868,6 +1866,7 @@ class Gaze:
     def save_samples(
             self,
             path: Path,
+            *,
             verbose: int = 1,
     ) -> None:
         """Save preprocessed gaze files.
