@@ -653,9 +653,8 @@ def load_text_stimuli_file(
 
     if missing:
         raise ValueError(
-            f"Please specify the following in DatasetDefinition for loading text stimuli: {
-                ', '.join(missing)
-            }",
+            f'Please specify the following in DatasetDefinition'
+            f" for loading text stimuli: {', '.join(missing)}",
         )
 
     # unpack them if all are present
