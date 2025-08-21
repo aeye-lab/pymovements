@@ -175,9 +175,10 @@ def scanpathplot(
         ax.add_patch(fixation)
 
     if add_traceplot:
-        assert gaze
-        gaze_x_signal = gaze.frame[gaze_position_column].list.get(0)
-        gaze_y_signal = gaze.frame[gaze_position_column].list.get(1)
+        if gaze is None or gaze.samples is None:
+            raise TypeError("scanpathplot 'gaze.samples' must not be None")
+        gaze_x_signal = gaze.samples[gaze_position_column].list.get(0)
+        gaze_y_signal = gaze.samples[gaze_position_column].list.get(1)
         line = _draw_line_data(
             gaze_x_signal,
             gaze_y_signal,

@@ -136,6 +136,10 @@ def gaze_fixture(events):
             id='set_title',
         ),
         pytest.param(
+            {'add_traceplot': True},
+            id='set_traceplot',
+        ),
+        pytest.param(
             {
                 'add_stimulus': True,
                 'path_to_image_stimulus': './tests/files/pexels-zoorg-1000498.jpg',
@@ -194,6 +198,13 @@ def test_scanpathplot_exceptions(gaze, kwargs, exception, monkeypatch):
 
     with pytest.raises(exception):
         scanpathplot(gaze=gaze, **kwargs)
+
+
+def test_scanpathplot_gaze_events_all_none_exception(gaze):
+    gaze = gaze.clone()
+    gaze.samples = None
+    with pytest.raises(TypeError, match='must not be None'):
+        scanpathplot(gaze=gaze)
 
 
 def test_scanpathplot_gaze_events_all_none_exception():
