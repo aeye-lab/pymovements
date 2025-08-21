@@ -2110,12 +2110,12 @@ def test_unsupported_content_type(tmp_path):
         dataset.scan()
 
 
-def test_remove_event_property(precomputed_dataset_configuration):
-    dataset = Dataset('ToyDataset', path='data/ToyDataset')
-    dataset.download()
-    #dataset.load()
+def test_remove_event_property(gaze_dataset_configuration):
+#     dataset = Dataset('ToyDataset', path='data/ToyDataset')
+#     dataset.download()
+#     #dataset.load()
     
-    #dataset = Dataset(**precomputed_dataset_configuration['init_kwargs'])
+    dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.load()
     dataset.pix2deg()
     dataset.detect_events('idt', dispersion_threshold=2.7, name='fixation.idt')
