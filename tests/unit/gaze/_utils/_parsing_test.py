@@ -1204,7 +1204,40 @@ def test_recording_config_missing_sampling_rate_key(monkeypatch, tmp_path):
     assert metadata['data_loss_ratio_blinks'] is None
 
 
-def test_check_reccfg_key_handles_unorderable_values_with_warning():
+def test_parse_eyelink_stop_recording_calculates_expected_samples(tmp_path: Path) -> None:
+    """Write a minimal asc file with RECCFG, START, and END to exercise recording_config block.
+
+    The RECCFG line provides a sampling rate of 1000 Hz and the START/END span 1000 ms,
+    so expected number of samples = 1000 and total_recording_duration_ms should be 1000.0.
+    """
+    content = (
+        'MSG 0 RECCFG CR 1000 0 0 LR\n'
+        'START 0 RIGHT types\n'
+        'END 1000 types RES 0 0\n'
+    )
+
+    p = tmp_path / 'test_stop_recording.asc'
+    p.write_text(content)
+
+    # parse_eyelink will emit a metadata warning for this minimal file; capture it
+    with pytest.warns(UserWarning):
+        _, _, metadata = parsing.parse_eyelink(str(p))
+
+    # Duration should be 1000 ms
+    assert metadata['total_recording_duration_ms'] == 1000.0
+
+    # Because no valid samples were parsed, expected samples should be 1000 -> full data loss
+    assert metadata['data_loss_ratio'] == 1.0
+    assert metadata['data_loss_ratio_blinks'] == 0.0
+
+
+def test_check_reccfg_key_warns_on_empty_config() -> None:
+    # Empty recording_config should produce a warning and return None
+    with pytest.warns(UserWarning):
+        assert parsing._check_reccfg_key([], 'sampling_rate') is None
+
+
+def test_check_reccfg_key_handles_unorderable_values_with_warning() -> None:
     """Ensure the TypeError in sorting unique values is handled and a warning is emitted.
 
     We create a recording_config with mixed types (int and str) for the same key so
