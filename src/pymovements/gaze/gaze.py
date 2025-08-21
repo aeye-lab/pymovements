@@ -970,7 +970,7 @@ class Gaze:
             if prop in self.events._additional_columns:
                 raise ValueError(
                     f"The property '{prop}' cannot be removed beacuse it belongs to",
-                    f" additional_columns. Available properties to remove: ",
+                    ' additional_columns. Available properties to remove: ',
                     f"{self.events.event_property_columns}.",
                 )
         for prop in event_properties:
