@@ -367,8 +367,10 @@ def test_load_stimuli_file_missing_one_column_name():
         )
 
     msg, = exc.value.args
-    assert msg == ('Please specify the following in DatasetDefinition for loading text stimuli:'
-                   ' aoi_start_y_column')
+    assert msg == (
+        'Please specify the following in DatasetDefinition for loading text stimuli:'
+        ' aoi_start_y_column'
+    )
 
 
 def test_load_stimuli_file_missing_all_column_names():
@@ -381,5 +383,7 @@ def test_load_stimuli_file_missing_all_column_names():
         )
 
     msg, = exc.value.args
-    assert msg == ('Please specify the following in DatasetDefinition for loading text stimuli:'
-                   ' aoi_content_column, aoi_start_x_column, aoi_start_y_column')
+    assert msg == (
+        'Please specify the following in DatasetDefinition for loading text stimuli:'
+        ' aoi_content_column, aoi_start_x_column, aoi_start_y_column'
+    )
