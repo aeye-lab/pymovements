@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test scanpathplot."""
+import re
 from unittest.mock import Mock
 
 import matplotlib.colors
@@ -27,12 +28,16 @@ import polars as pl
 import pytest
 from matplotlib import figure
 
-import pymovements as pm
+from pymovements import __version__
+from pymovements import Events
+from pymovements import Experiment
+from pymovements.gaze import from_numpy
+from pymovements.plotting import scanpathplot
 
 
 @pytest.fixture(name='events', scope='session')
 def event_fixture():
-    return pm.Events(
+    yield Events(
         pl.DataFrame(
             data={
                 'trial': [1, 1],
@@ -43,12 +48,12 @@ def event_fixture():
                 'location': [(1, 2), (2, 3)],
             },
         ),
-    )
+    ).clone()
 
 
 @pytest.fixture(name='gaze', scope='session')
 def gaze_fixture(events):
-    experiment = pm.Experiment(
+    experiment = Experiment(
         screen_width_px=1280,
         screen_height_px=1024,
         screen_width_cm=38,
@@ -60,7 +65,7 @@ def gaze_fixture(events):
     x = np.arange(-100, 100)
     y = np.arange(-100, 100)
     arr = np.column_stack((x, y)).transpose()
-    gaze = pm.gaze.from_numpy(
+    gaze = from_numpy(
         samples=arr,
         schema=['x_pix', 'y_pix'],
         experiment=experiment,
@@ -72,7 +77,7 @@ def gaze_fixture(events):
     gaze.pix2deg()
     gaze.pos2vel()
 
-    return gaze
+    yield gaze.clone()
 
 
 @pytest.mark.parametrize(
@@ -142,7 +147,7 @@ def gaze_fixture(events):
 def test_scanpathplot_show(gaze, kwargs, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
-    pm.plotting.scanpathplot(gaze=gaze, **kwargs)
+    scanpathplot(gaze=gaze, **kwargs)
     plt.close()
     mock.assert_called_once()
 
@@ -150,7 +155,7 @@ def test_scanpathplot_show(gaze, kwargs, monkeypatch):
 def test_scanpathplot_noshow(gaze, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
-    pm.plotting.scanpathplot(gaze=gaze, show=False)
+    scanpathplot(gaze=gaze, show=False)
     plt.close()
     mock.assert_not_called()
 
@@ -158,7 +163,7 @@ def test_scanpathplot_noshow(gaze, monkeypatch):
 def test_scanpathplot_save(gaze, monkeypatch, tmp_path):
     mock = Mock()
     monkeypatch.setattr(figure.Figure, 'savefig', mock)
-    pm.plotting.scanpathplot(
+    scanpathplot(
         gaze=gaze,
         show=False,
         savepath=str(
@@ -188,4 +193,31 @@ def test_scanpathplot_exceptions(gaze, kwargs, exception, monkeypatch):
     monkeypatch.setattr(plt, 'show', mock)
 
     with pytest.raises(exception):
-        pm.plotting.scanpathplot(gaze=gaze, **kwargs)
+        scanpathplot(gaze=gaze, **kwargs)
+
+
+def test_scanpathplot_gaze_events_all_none_exception():
+    with pytest.raises(TypeError, match='must not be both None'):
+        scanpathplot(events=None, gaze=None)
+
+
+def test_scanpathplot_gaze_events_none_exception(gaze):
+    gaze = gaze.clone()
+    gaze.events = None
+    with pytest.raises(TypeError, match='must not be None'):
+        scanpathplot(gaze=gaze)
+
+
+def test_scanpathplot_events_is_deprecated(gaze):
+    with pytest.raises(DeprecationWarning) as info:
+        scanpathplot(events=gaze.events)
+
+    regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
+
+    msg = info.value.args[0]
+    remove_version = regex.match(msg).groupdict()['version']
+    current_version = __version__.split('+')[0]
+    assert current_version < remove_version, (
+        f'scnpatplot argument "events" was scheduled to be removed in v{remove_version}. '
+        f'Current version is v{current_version}.'
+    )

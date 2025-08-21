@@ -30,7 +30,6 @@ import matplotlib.scale
 import numpy as np
 from matplotlib.patches import Circle
 
-from pymovements._utils._checks import check_is_mutual_exclusive
 from pymovements.events import EventDataFrame
 from pymovements.events import Events
 from pymovements.gaze import Gaze
@@ -128,7 +127,6 @@ def scanpathplot(
 
     """
     if events is not None:
-        check_is_mutual_exclusive(gaze=gaze, events=events)
         warn(
             DeprecationWarning(
                 "scanpathplot argument 'events' is deprecated since version v0.23.1. "
@@ -138,7 +136,7 @@ def scanpathplot(
         )
     else:
         if gaze is None:
-            raise TypeError("scanpathplot argument 'gaze' or 'events' must not be None")
+            raise TypeError("scanpathplot argument 'gaze' or 'events' must not be both None")
         if gaze.events is None:
             raise TypeError("scanpathplot 'gaze.events' must not be None")
         assert gaze is not None
