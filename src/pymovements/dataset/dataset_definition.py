@@ -203,12 +203,12 @@ class DatasetDefinition:
         transformations. If not specified, the constant eye-to-screen distance will be taken from
         the experiment definition. This column will be renamed to ``distance``. (default: None)
 
-    aoi_content_column: str
+    aoi_content_column: str | None
         Name of the column that contains the content of the AOIs.
-    aoi_start_x_column: str
+    aoi_start_x_column: str | None
         Name of the column which contains the x coordinate's start position of the
         areas of interest.
-    aoi_start_y_column: str
+    aoi_start_y_column: str | None
         Name of the column which contains the y coordinate's start position of the
         areas of interest.
     aoi_width_column: str | None
