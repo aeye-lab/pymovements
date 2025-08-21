@@ -2127,15 +2127,25 @@ def test_remove_event_property(gaze_dataset_configuration):
     print(exinfo.value)
     assert str(exinfo.value).startswith("The property alamakota does not exist and cannot be removed")
 
-    dataset.remove_event_properties("peak_velocity")
+    ## Nothing should be changed
+    with pytest.raises(ValueError) as exinfo:
+        dataset.remove_event_properties(["peak_velocity","alamakota"])
+    print(exinfo.value)
+    assert "peak_velocity" in dataset.gaze[0].events.columns
 
+    ## peak_velocity should be changed
+    dataset.remove_event_properties("peak_velocity")
+    assert "peak_velocity" not in dataset.gaze[0].events.columns
+
+    ## Now error should be raised bacause peak_velocity does not exist
     with pytest.raises(ValueError) as exinfo:
         dataset.remove_event_properties("peak_velocity")
     print(exinfo.value)
     assert str(exinfo.value).startswith("The property peak_velocity does not exist and cannot be removed")
 
+    ## onset should not be removed
     with pytest.raises(ValueError) as exinfo:
         dataset.remove_event_properties("onset")
     print(exinfo.value)
     assert str(exinfo.value).startswith("The property onset cannot be removed beacuse it belongs to minimal_schema")
-
+    assert "onset" in dataset.gaze[0].events.columns

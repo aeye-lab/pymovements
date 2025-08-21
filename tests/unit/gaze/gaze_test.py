@@ -31,7 +31,6 @@ from pymovements import Experiment
 from pymovements import EyeTracker
 from pymovements import Gaze
 from pymovements import Screen
-# PK
 
 
 @pytest.mark.parametrize(
@@ -486,9 +485,10 @@ def _create_gaze():
             {
                 'x': [0, 1, 2, 3],
                 'y': [1, 1, 0, 0],
+                'pixel': [[260,150],[270,120],[271,122],[240,22]],
                 'trial_id': [0, 1, 1, 2],
             },
-            schema={'x': pl.Float64, 'y': pl.Float64, 'trial_id': pl.Int8},
+            schema={'x': pl.Float64, 'y': pl.Float64, 'pixel': list, 'trial_id': pl.Int8},
         ),
         experiment=Experiment(
             screen=Screen(
@@ -650,3 +650,4 @@ def test_gaze_save_empty_experiment_true_save(tmp_path):
             verbose=1,
             extension='csv',
         )
+
