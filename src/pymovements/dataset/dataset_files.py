@@ -95,6 +95,11 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> dict[str
 
         fileinfo_df = pl.from_dicts(data=filepaths, infer_schema_length=1)
         fileinfo_df = fileinfo_df.sort(by='filepath')
+        fileinfo_df = fileinfo_df.with_columns(
+            load_function=pl.lit(
+                resource_definition.load_function,
+            ),
+        )
 
         if resource_definition.filename_pattern_schema_overrides:
             items = resource_definition.filename_pattern_schema_overrides.items()
@@ -286,7 +291,7 @@ def load_gaze_file(
     """
     fileinfo_columns = {
         column: fileinfo_row[column] for column in
-        [column for column in fileinfo_row.keys() if column != 'filepath']
+        [column for column in fileinfo_row.keys() if column not in {'filepath', 'load_function'}]
     }
     # overrides types in fileinfo_columns that are later passed via add_columns.
     gaze_resource_definitions = definition.resources.filter('gaze')
@@ -312,7 +317,16 @@ def load_gaze_file(
         # expand trial columns with added fileinfo columns
         trial_columns = list(fileinfo_columns) + trial_columns
 
-    if filepath.suffix in {'.csv', '.txt', '.tsv'}:
+    load_function_name = fileinfo_row['load_function']
+    if load_function_name is None:
+        if filepath.suffix in {'.csv', '.txt', '.tsv'}:
+            load_function_name = 'from_csv'
+        elif filepath.suffix == '.feather':
+            load_function_name = 'from_ipc'
+        elif filepath.suffix == '.asc':
+            load_function_name = 'from_asc'
+
+    if load_function_name == 'from_csv':
         if preprocessed:
             # Time unit is always milliseconds for preprocessed data if a time column is present.
             time_unit = 'ms'
@@ -334,7 +348,7 @@ def load_gaze_file(
                 # column_schema_overrides is used for fileinfo_columns passed as add_columns.
                 column_schema_overrides=column_schema_overrides,
             )
-    elif filepath.suffix == '.feather':
+    elif load_function_name == 'from_ipc':
         gaze = from_ipc(
             filepath,
             experiment=definition.experiment,
@@ -343,7 +357,7 @@ def load_gaze_file(
             # column_schema_overrides is used for fileinfo_columns passed as add_columns.
             column_schema_overrides=column_schema_overrides,
         )
-    elif filepath.suffix == '.asc':
+    elif load_function_name == 'from_asc':
         gaze = from_asc(
             filepath,
             definition=definition,
@@ -352,6 +366,7 @@ def load_gaze_file(
             # column_schema_overrides is used for fileinfo_columns passed as add_columns.
             column_schema_overrides=column_schema_overrides,
         )
+    # TODO: adapt error message
     else:
         valid_extensions = ['csv', 'tsv', 'txt', 'feather', 'asc']
         raise ValueError(
@@ -577,13 +592,15 @@ def add_fileinfo(
     pl.DataFrame
         Dataframe with added columns from fileinfo dictionary keys.
     """
+    print(df)
     df = df.select(
         [
             pl.lit(value).alias(column)
             for column, value in fileinfo.items()
-            if column != 'filepath' and column not in df.columns
+            if column not in {'filepath', 'load_function'} and column not in df.columns
         ] + [pl.all()],
     )
+    print(df)
 
     # Cast columns from fileinfo according to specification.
     resource_definitions = definition.resources.filter('gaze')

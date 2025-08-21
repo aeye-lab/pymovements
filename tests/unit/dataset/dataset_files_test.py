@@ -224,7 +224,7 @@ def test_load_eyelink_file(tmp_path, read_kwargs):
 
 
 @pytest.mark.parametrize(
-    'filepath', 'rename_extension', 'load_function, read_kwargs',
+    ('filepath', 'rename_extension', 'load_function', 'read_kwargs'),
     [
         pytest.param(
             'tests/files/monocular_example.csv',
@@ -296,20 +296,25 @@ def test_load_gaze_file(tmp_path, filepath, rename_extension, load_function, rea
     filepath = Path(filepath)
     renamed_filename = filepath.stem + '.' + rename_extension
     renamed_filepath = tmp_path / renamed_filename
-    renamed_filepath.write_text(filepath.read_text(encoding='utf-8'), encoding='utf-8')
+    renamed_filepath.write_bytes(filepath.read_bytes())
 
     gaze = pm.dataset.dataset_files.load_gaze_file(
         renamed_filepath,
-        fileinfo_row={},
+        fileinfo_row={'load_function': load_function},
         definition=DatasetDefinition(
             experiment=pm.Experiment(1280, 1024, 38, 30, None, 'center', 1000),
-            load_function=load_function,
+            pixel_columns=['x_left_pix', 'y_left_pix'],
             custom_read_kwargs={'gaze': read_kwargs},
         ),
     )
-    expected_df = pl.read_csv('tests/files/monocular_example.csv')
+    expected_df = pl.from_dict(
+        {
+            'time': list(range(10)),
+            'pixel': [[0, 0]] * 10,
+        },
+    )
 
-    assert_frame_equal(gaze.frame, expected_df, check_column_order=False)
+    assert_frame_equal(gaze.samples, expected_df, check_column_order=False)
 
 
 def test_load_precomputed_rm_file():
