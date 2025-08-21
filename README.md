@@ -15,9 +15,8 @@
 [![Test Status](https://img.shields.io/github/actions/workflow/status/aeye-lab/pymovements/tests.yml?label=tests)](https://github.com/aeye-lab/pymovements/actions/workflows/tests.yml)
 [![Documentation Status](https://readthedocs.org/projects/pymovements/badge/?version=latest)](https://pymovements.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/github/aeye-lab/pymovements/branch/main/graph/badge.svg?token=QY3NDHAT2C)](https://app.codecov.io/gh/aeye-lab/pymovements)
-[![PyPI downloads/month](https://img.shields.io/pypi/dm/pymovements.svg)](https://pypistats.org/packages/pymovements)
+[![PyPI Downloads](https://static.pepy.tech/badge/pymovements)](https://pepy.tech/projects/pymovements)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/aeye-lab/pymovements/HEAD?labpath=docs%2Fsource%2Ftutorials)
-
 
 pymovements is an open-source python package for processing eye movement data. It provides a simple
 interface to download publicly available datasets, preprocess gaze data, detect oculomotoric events
@@ -33,7 +32,6 @@ and render plots to visually analyze your results.
 - **Mailing list:** pymovements@python.org ([subscribe](https://mail.python.org/mailman3/lists/pymovements.python.org/))
 - **Discord:** https://discord.gg/K2uS2R6PNj
 
-
 ## Getting Started
 
 With pymovements loading your eye movement [datasets](https://pymovements.readthedocs.io/en/stable/reference/pymovements.datasets.html#module-pymovements.datasets) is just a few lines of code away
@@ -42,24 +40,24 @@ With pymovements loading your eye movement [datasets](https://pymovements.readth
 import pymovements as pm
 
 dataset = pm.Dataset(
-    'JuDo1000',                  # choose a public dataset from our dataset library
-    path='data/judo100',         # setup your local dataset path
+    'JuDo1000',  # choose a public dataset from our dataset library
+    path='data/judo100',  # setup your local dataset path
 )
-dataset.download()               # download a public dataset from our dataset library
-dataset.load()                   # load the dataset
+dataset.download()  # download a public dataset from our dataset library
+dataset.load()  # load the dataset
 ```
 
 calculate velocities on the fly
 
 ```python
-dataset.pix2deg()                # transform pixel coordinates to degrees of visual angle
-dataset.pos2vel()                # transform positional data to velocity data
+dataset.pix2deg()  # transform pixel coordinates to degrees of visual angle
+dataset.pos2vel()  # transform positional data to velocity data
 ```
 
 and extract events with different eye movements event extraction algorithms
 
 ```python
-dataset.detect('ivt')            # detect fixation using the I-VT algorithm
+dataset.detect('ivt')  # detect fixation using the I-VT algorithm
 dataset.detect('microsaccades')  # detect saccades using the microsaccades algorithm
 ```
 
@@ -72,7 +70,6 @@ We provide a range of tutorial aimed at beginners:
 The complete reference of the package can be found here:
 [API Reference](https://pymovements.readthedocs.io/en/stable/reference/index.html)
 
-
 ## Contributing
 
 We welcome any sort of contribution to pymovements!
@@ -83,7 +80,6 @@ If you have any questions, please [open an issue](
 https://github.com/aeye-lab/pymovements/issues/new/choose) or write us at
 [pymovements-list@uni-potsdam.de](mailto:pymovements-list@uni-potsdam.de)
 
-
 ## Citing
 
 If you are using pymovements in your research, we would be happy if you cite our work by using the following BibTex entry:
@@ -91,8 +87,8 @@ If you are using pymovements in your research, we would be happy if you cite our
 ```bibtex
 @inproceedings{pymovements,
     author = {Krakowczyk, Daniel G. and Reich, David R. and Chwastek, Jakob and Jakobi, Deborah N.
-   and Prasse, Paul and Süss, Assunta and Turuta, Oleksii and Kasprowski, Paweł
-   and Jäger, Lena A.},
+ and Prasse, Paul and Süss, Assunta and Turuta, Oleksii and Kasprowski, Paweł
+ and Jäger, Lena A.},
     title = {pymovements: A Python Package for Processing Eye Movement Data},
     year = {2023},
     isbn = {979-8-4007-0150-4/23/05},
