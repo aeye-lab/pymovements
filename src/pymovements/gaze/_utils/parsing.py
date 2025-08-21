@@ -486,12 +486,9 @@ def parse_eyelink(
             sampling_rate_last = None
             if recording_config:
                 sampling_rate_val = recording_config[-1].get('sampling_rate')
-                try:
-                    sampling_rate_last = float(
-                        sampling_rate_val,
-                    ) if sampling_rate_val is not None else None
-                except (TypeError, ValueError):
-                    sampling_rate_last = None
+                sampling_rate_last = float(
+                    sampling_rate_val,
+                ) if sampling_rate_val is not None else None
 
             if sampling_rate_last:
                 num_expected_samples += round(
