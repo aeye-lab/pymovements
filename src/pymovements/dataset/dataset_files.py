@@ -325,6 +325,13 @@ def load_gaze_file(
             load_function_name = 'from_ipc'
         elif filepath.suffix == '.asc':
             load_function_name = 'from_asc'
+        else:
+            valid_extensions = ['csv', 'tsv', 'txt', 'feather', 'asc']
+            raise ValueError(
+                f'Unknown file extension "{filepath.suffix}". '
+                f'Known extensions are: {valid_extensions}\n'
+                f'Otherwise, specify load_function in the resource definition.',
+            )
 
     if load_function_name == 'from_csv':
         if preprocessed:
@@ -366,12 +373,11 @@ def load_gaze_file(
             # column_schema_overrides is used for fileinfo_columns passed as add_columns.
             column_schema_overrides=column_schema_overrides,
         )
-    # TODO: adapt error message
     else:
-        valid_extensions = ['csv', 'tsv', 'txt', 'feather', 'asc']
+        valid_load_functions = ['from_csv', 'from_ipc', 'from_asc']
         raise ValueError(
-            f'unsupported file format "{filepath.suffix}".'
-            f'Supported formats are: {valid_extensions}',
+            f'Unsupported load_function "{load_function_name}".'
+            f'Available options are: {valid_load_functions}',
         )
 
     return gaze
