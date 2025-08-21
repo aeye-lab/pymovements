@@ -148,19 +148,19 @@ def scanpathplot(
     y_signal = events.frame[position_column].list.get(1)
 
     fig, ax, cmap, cmap_norm, cval, show_cbar = _setup_matplotlib(
-        x_signal,
-        y_signal,
-        figsize,
-        cmap,
-        cmap_norm,
-        cmap_segmentdata,
-        cval,
-        show_cbar,
-        add_stimulus,
-        path_to_image_stimulus,
-        stimulus_origin,
-        padding,
-        pad_factor,
+        x_signal=x_signal,
+        y_signal=y_signal,
+        figsize=figsize,
+        cmap=cmap,
+        cmap_norm=cmap_norm,
+        cmap_segmentdata=cmap_segmentdata,
+        cval=cval,
+        show_cbar=show_cbar,
+        add_stimulus=add_stimulus,
+        path_to_image_stimulus=path_to_image_stimulus,
+        stimulus_origin=stimulus_origin,
+        padding=padding,
+        pad_factor=pad_factor,
     )
 
     for row in events.frame.iter_rows(named=True):
@@ -187,7 +187,6 @@ def scanpathplot(
             cmap_norm,
             cval,
         )
-
         if show_cbar:
             # sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
             # sm.set_array(cval)

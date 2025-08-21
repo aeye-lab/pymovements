@@ -140,8 +140,8 @@ def gaze_fixture(events):
             id='set_traceplot',
         ),
         pytest.param(
-            {'add_traceplot': True, 'show_cbar': True},
-            id='set_traceplo_and_cbart',
+            {'add_traceplot': True, 'cval': np.arange(0, 200), 'show_cbar': True},
+            id='set_traceplot_and_cbar',
         ),
         pytest.param(
             {
