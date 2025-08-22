@@ -50,7 +50,7 @@ def traceplot(
         show_cbar: bool = False,
         padding: float | None = None,
         pad_factor: float | None = 0.05,
-        figsize: tuple[int, int] = (10, 10),
+        figsize: tuple[int, int] = (15, 5),
         title: str | None = None,
         savepath: str | None = None,
         show: bool = True,
@@ -118,7 +118,6 @@ def traceplot(
 
         if screen_width_px is not None and screen_height_px is not None:
             figsize = (int(screen_width_px / screen_height_px * 10), 10)
-            # print(figsize)
 
         if screen.origin != 'upper left':
             raise ValueError(
