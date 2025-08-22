@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test scanpathplot."""
+import re
 from unittest.mock import Mock
 
 import matplotlib.colors
@@ -27,12 +28,16 @@ import polars as pl
 import pytest
 from matplotlib import figure
 
-import pymovements as pm
+from pymovements import __version__
+from pymovements import Events
+from pymovements import Experiment
+from pymovements.gaze import from_numpy
+from pymovements.plotting import scanpathplot
 
 
 @pytest.fixture(name='events', scope='session')
 def event_fixture():
-    return pm.EventDataFrame(
+    yield Events(
         pl.DataFrame(
             data={
                 'trial': [1, 1],
@@ -43,12 +48,12 @@ def event_fixture():
                 'location': [(1, 2), (2, 3)],
             },
         ),
-    )
+    ).clone()
 
 
 @pytest.fixture(name='gaze', scope='session')
-def gaze_fixture():
-    experiment = pm.Experiment(
+def gaze_fixture(events):
+    experiment = Experiment(
         screen_width_px=1280,
         screen_height_px=1024,
         screen_width_cm=38,
@@ -60,17 +65,19 @@ def gaze_fixture():
     x = np.arange(-100, 100)
     y = np.arange(-100, 100)
     arr = np.column_stack((x, y)).transpose()
-    gaze = pm.gaze.from_numpy(
-        data=arr,
+    gaze = from_numpy(
+        samples=arr,
         schema=['x_pix', 'y_pix'],
         experiment=experiment,
         pixel_columns=['x_pix', 'y_pix'],
     )
 
+    gaze.events = events
+
     gaze.pix2deg()
     gaze.pos2vel()
 
-    return gaze
+    yield gaze.clone()
 
 
 @pytest.mark.parametrize(
@@ -129,6 +136,14 @@ def gaze_fixture():
             id='set_title',
         ),
         pytest.param(
+            {'add_traceplot': True},
+            id='set_traceplot',
+        ),
+        pytest.param(
+            {'add_traceplot': True, 'cval': np.arange(0, 200), 'show_cbar': True},
+            id='set_traceplot_and_cbar',
+        ),
+        pytest.param(
             {
                 'add_stimulus': True,
                 'path_to_image_stimulus': './tests/files/pexels-zoorg-1000498.jpg',
@@ -137,27 +152,26 @@ def gaze_fixture():
         ),
     ],
 )
-def test_scanpathplot_show(events, gaze, kwargs, monkeypatch):
+def test_scanpathplot_show(gaze, kwargs, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
-    pm.plotting.scanpathplot(events=events, gaze=gaze, **kwargs)
+    scanpathplot(gaze=gaze, **kwargs)
     plt.close()
     mock.assert_called_once()
 
 
-def test_scanpathplot_noshow(events, gaze, monkeypatch):
+def test_scanpathplot_noshow(gaze, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
-    pm.plotting.scanpathplot(events=events, gaze=gaze, show=False)
+    scanpathplot(gaze=gaze, show=False)
     plt.close()
     mock.assert_not_called()
 
 
-def test_scanpathplot_save(events, gaze, monkeypatch, tmp_path):
+def test_scanpathplot_save(gaze, monkeypatch, tmp_path):
     mock = Mock()
     monkeypatch.setattr(figure.Figure, 'savefig', mock)
-    pm.plotting.scanpathplot(
-        events=events,
+    scanpathplot(
         gaze=gaze,
         show=False,
         savepath=str(
@@ -182,9 +196,43 @@ def test_scanpathplot_save(events, gaze, monkeypatch, tmp_path):
         ),
     ],
 )
-def test_scanpathplot_exceptions(events, gaze, kwargs, exception, monkeypatch):
+def test_scanpathplot_exceptions(gaze, kwargs, exception, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(plt, 'show', mock)
 
     with pytest.raises(exception):
-        pm.plotting.scanpathplot(events=events, gaze=gaze, **kwargs)
+        scanpathplot(gaze=gaze, **kwargs)
+
+
+def test_scanpathplot_gaze_events_all_none_exception():
+    with pytest.raises(TypeError, match='must not be both None'):
+        scanpathplot(gaze=None, events=None)
+
+
+def test_scanpathplot_traceplot_gaze_samples_none_exception(gaze):
+    gaze = gaze.clone()
+    gaze.samples = None
+    with pytest.raises(TypeError, match='must not be None'):
+        scanpathplot(events=None, gaze=gaze, add_traceplot=True)
+
+
+def test_scanpathplot_gaze_events_none_exception(gaze):
+    gaze = gaze.clone()
+    gaze.events = None
+    with pytest.raises(TypeError, match='must not be None'):
+        scanpathplot(gaze=gaze)
+
+
+def test_scanpathplot_events_is_deprecated(gaze):
+    with pytest.raises(DeprecationWarning) as info:
+        scanpathplot(events=gaze.events)
+
+    regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
+
+    msg = info.value.args[0]
+    remove_version = regex.match(msg).groupdict()['version']
+    current_version = __version__.split('+')[0]
+    assert current_version < remove_version, (
+        f'scnpatplot argument "events" was scheduled to be removed in v{remove_version}. '
+        f'Current version is v{current_version}.'
+    )

@@ -17,17 +17,20 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Functionality to load GazeDataFrame from a csv file."""
+"""Functionality to load Gaze from a csv file."""
 from __future__ import annotations
 
+import math
 from pathlib import Path
 from typing import Any
 
 import polars as pl
 
+import pymovements as pm  # pylint: disable=cyclic-import
+from pymovements.events.frame import Events
 from pymovements.gaze._utils.parsing import parse_eyelink
 from pymovements.gaze.experiment import Experiment
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
+from pymovements.gaze.gaze import Gaze
 
 
 def from_csv(
@@ -46,9 +49,10 @@ def from_csv(
         column_map: dict[str, str] | None = None,
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, type] | None = None,
+        definition: pm.DatasetDefinition | None = None,
         **read_csv_kwargs: Any,
-) -> GazeDataFrame:
-    """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
+) -> Gaze:
+    """Initialize a :py:class:`~pymovements.Gaze`.
 
     Parameters
     ----------
@@ -100,6 +104,9 @@ def from_csv(
     column_schema_overrides:  dict[str, type] | None
         Dictionary containing types for columns.
         (default: None)
+    definition: pm.DatasetDefinition | None
+        A dataset definition. Explicitly passed arguments take precedence over definition.
+        (default: None)
     **read_csv_kwargs: Any
         Additional keyword arguments to be passed to :py:func:`polars.read_csv` to read in the csv.
         These can include custom separators, a subset of columns, or specific data types
@@ -107,8 +114,8 @@ def from_csv(
 
     Returns
     -------
-    GazeDataFrame
-        The gaze data frame read from the csv file.
+    Gaze
+        The initialized gaze object read from the csv file.
 
     Notes
     -----
@@ -152,7 +159,7 @@ def from_csv(
     │ 9    ┆ 0          ┆ 0          │
     └──────┴────────────┴────────────┘
 
-    We can now load the data into a ``GazeDataFrame`` by specyfing the experimental setting
+    We can now load the data into a ``Gaze`` by specyfing the experimental setting
     and the names of the pixel position columns. We can specify a custom separator for the csv
     file by passing it as a keyword argument to :py:func:`polars.read_csv`:
 
@@ -164,7 +171,7 @@ def from_csv(
     ...     pixel_columns = ['x_left_pix','y_left_pix'],
     ...     separator = ',',
     ... )
-    >>> gaze.frame
+    >>> gaze.samples
     shape: (10, 2)
     ┌──────┬───────────┐
     │ time ┆ pixel     │
@@ -196,7 +203,7 @@ def from_csv(
     ...     pixel_columns = ['x_left_pix','y_left_pix'],
     ...     schema_overrides = {'time': pl.Int64, 'x_left_pix': pl.Int64, 'y_left_pix': pl.Int64},
     ... )
-    >>> gaze.frame
+    >>> gaze.samples
     shape: (10, 2)
     ┌──────┬───────────┐
     │ time ┆ pixel     │
@@ -216,22 +223,31 @@ def from_csv(
     └──────┴───────────┘
 
     """
+    # explicit arguments take precedence over definition.
+    if definition:
+        if column_map is None:
+            column_map = definition.column_map
+
+        if not read_csv_kwargs and 'gaze' in definition.custom_read_kwargs:
+            if definition.custom_read_kwargs['gaze']:
+                read_csv_kwargs = definition.custom_read_kwargs['gaze']
+
     # Read data.
-    gaze_data = pl.read_csv(file, **read_csv_kwargs)
+    samples = pl.read_csv(file, **read_csv_kwargs)
     if column_map is not None:
-        gaze_data = gaze_data.rename({
+        samples = samples.rename({
             key: column_map[key] for key in
             [
                 key for key in column_map.keys()
-                if key in gaze_data.columns
+                if key in samples.columns
             ]
         })
 
     if add_columns is not None:
-        gaze_data = gaze_data.with_columns([
+        samples = samples.with_columns([
             pl.lit(value).alias(column)
             for column, value in add_columns.items()
-            if column not in gaze_data.columns
+            if column not in samples.columns
         ])
 
     # Cast numerical columns to Float64 if they were incorrectly inferred to be Utf8.
@@ -244,21 +260,22 @@ def from_csv(
         + ([distance_column] if distance_column else [])
     )
     for column in numerical_columns:
-        if gaze_data[column].dtype == pl.Utf8:
-            gaze_data = gaze_data.with_columns([
+        if samples[column].dtype == pl.Utf8:
+            samples = samples.with_columns([
                 pl.col(column).cast(pl.Float64),
             ])
 
     if column_schema_overrides is not None:
-        gaze_data = gaze_data.with_columns([
+        samples = samples.with_columns([
             pl.col(fileinfo_key).cast(fileinfo_dtype)
             for fileinfo_key, fileinfo_dtype in column_schema_overrides.items()
         ])
 
-    # Create gaze data frame.
-    gaze_df = GazeDataFrame(
-        gaze_data,
+    # Create gaze object.
+    gaze = Gaze(
+        samples=samples,
         experiment=experiment,
+        definition=definition,
         trial_columns=trial_columns,
         time_column=time_column,
         time_unit=time_unit,
@@ -269,13 +286,13 @@ def from_csv(
         distance_column=distance_column,
         auto_column_detect=auto_column_detect,
     )
-    return gaze_df
+    return gaze
 
 
 def from_asc(
         file: str | Path,
         *,
-        patterns: str | list[dict[str, Any] | str] | None = 'eyelink',
+        patterns: str | list[dict[str, Any] | str] | None = None,
         metadata_patterns: list[dict[str, Any] | str] | None = None,
         schema: dict[str, Any] | None = None,
         experiment: Experiment | None = None,
@@ -283,16 +300,19 @@ def from_asc(
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, Any] | None = None,
         encoding: str | None = None,
-) -> GazeDataFrame:
-    """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
+        definition: pm.DatasetDefinition | None = None,
+        events: bool = False,
+) -> Gaze:
+    """Initialize a :py:class:`~pymovements.Gaze`.
 
     Parameters
     ----------
     file: str | Path
-        Path of IPC/feather file.
+        Path of ASC file.
     patterns: str | list[dict[str, Any] | str] | None
         List of patterns to match for additional columns or a key identifier of eye tracker specific
-        default patterns. Supported values are: eyelink. (default: 'eyelink')
+        default patterns. Supported values are: `'eyelink'`. If `None` is passed, `'eyelink'` is
+        assumed. (default: None)
     metadata_patterns: list[dict[str, Any] | str] | None
         List of patterns to match for extracting metadata from custom logged messages.
         (default: None)
@@ -313,20 +333,69 @@ def from_asc(
         (default: None)
     encoding: str | None
         Text encoding of the file. If None, the locale encoding is used. (default: None)
+    definition: pm.DatasetDefinition | None
+        A dataset definition. Explicitly passed arguments take precedence over definition.
+        (default: None)
+    events: bool
+        Flag indicating if events should be parsed from the asc file. (default: False)
 
     Returns
     -------
-    GazeDataFrame
-        The gaze data frame read from the asc file.
+    Gaze
+        The initialized gaze object read from the asc file.
+
+    Notes
+    -----
+    ASC files are created from EyeLink EDF files using the edf2asc tool
+    (can be downloaded from the SR Research Support website).
+    ASC files contain gaze samples, events, and metadata about
+    the experiment in a text (ASCII) format.
+    For example, if you have an Eyelink EDF file stored at
+    `tests/files/eyelink_monocular_example.edf`,
+    you can convert it to an ASC file using the following command:
+    `edf2asc tests/files/eyelink_monocular_example.edf`.
+    This will create an ASC file named `tests/files/eyelink_monocular_example.asc`.
+
+    Running edf2asc with the default settings (no flags/parameters) will always produce
+    an ASC file that can be read by this function, although currently only monocular
+    recordings are supported.
+    If a binocular ASC file is provided, only the left eye data will be read.
+    If you want to use right eye data, you can use the
+    `-r` or `-nl` edf2asc flags to get an ASC file with only right eye data.
+    Additionally, the following optional edf2asc parameters/flags are safe to use
+    and will also result in an ASC file that can be read by this function:
+
+    - `-input` for writing the status of the Host PC parallel port to the ASC
+      file (although these values will not be read).
+
+    - `-ftime` for outputting time as a floating point value.
+
+    - `-t` for using only tabs as delimiters.
+
+    - `-utf8` for forcing UTF-8 encoding of the ASC file.
+
+    - `-buttons` for outputting button values in samples (although these values will not be read).
+
+    - `-vel` and `-fvel` for outputting velocity values (although these values will not be read).
+
+    - `-l` or `-nr` and `-r` or `-nl`  for outputting left and right eye data only in case of a
+      binocular file (this is currently the only way to access right eye data).
+
+    - `-avg` for outputting average values of the left and right eye data
+      in case of a binocular file (although these will not be read).
+
+    Using other edf2asc parameters may lead to errors or unexpected behavior. For example, using
+    `-e` or `-ns` to output only events or `-s` or `-ne` to only output samples will not work
+    with this function, as it expects both samples and events to be present in the ASC file.
+
 
     Examples
     --------
-    Let's assume we have an EyeLink asc file stored at `tests/files/eyelink_monocular_example.asc`.
-    We can then load the data into a ``GazeDataFrame``:
+    We can load an asc file stored at `tests/files/eyelink_monocular_example.asc` into a ``Gaze``:
 
     >>> from pymovements.gaze.io import from_asc
     >>> gaze = from_asc(file='tests/files/eyelink_monocular_example.asc')
-    >>> gaze.frame
+    >>> gaze.samples
     shape: (16, 3)
     ┌─────────┬───────┬────────────────┐
     │ time    ┆ pupil ┆ pixel          │
@@ -351,28 +420,56 @@ def from_asc(
     if isinstance(patterns, str):
         if patterns == 'eyelink':
             # We use the default patterns of parse_eyelink then.
-            patterns = None
+            _patterns = None
         else:
             raise ValueError(f"unknown pattern key '{patterns}'. Supported keys are: eyelink")
+    else:
+        _patterns = patterns
+
+    # Explicit arguments take precedence over definition.
+    if definition:
+        if experiment is None:
+            experiment = definition.experiment
+
+        if trial_columns is None:
+            trial_columns = definition.trial_columns
+
+        if 'gaze' in definition.custom_read_kwargs and definition.custom_read_kwargs['gaze']:
+            custom_read_kwargs = definition.custom_read_kwargs['gaze']
+
+            if _patterns is None and 'patterns' in custom_read_kwargs:
+                _patterns = custom_read_kwargs['patterns']
+
+            if metadata_patterns is None and 'metadata_patterns' in custom_read_kwargs:
+                metadata_patterns = custom_read_kwargs['metadata_patterns']
+
+            if schema is None and 'schema' in custom_read_kwargs:
+                schema = custom_read_kwargs['schema']
+
+            if column_schema_overrides is None and 'column_schema_overrides' in custom_read_kwargs:
+                column_schema_overrides = custom_read_kwargs['column_schema_overrides']
+
+            if encoding is None and 'encoding' in custom_read_kwargs:
+                encoding = custom_read_kwargs['encoding']
 
     # Read data.
-    gaze_data, metadata = parse_eyelink(
+    samples, event_data, metadata = parse_eyelink(
         file,
-        patterns=patterns,
+        patterns=_patterns,
         schema=schema,
         metadata_patterns=metadata_patterns,
         encoding=encoding,
     )
 
     if add_columns is not None:
-        gaze_data = gaze_data.with_columns([
+        samples = samples.with_columns([
             pl.lit(value).alias(column)
             for column, value in add_columns.items()
-            if column not in gaze_data.columns
+            if column not in samples.columns
         ])
 
     if column_schema_overrides is not None:
-        gaze_data = gaze_data.with_columns([
+        samples = samples.with_columns([
             pl.col(fileinfo_key).cast(fileinfo_dtype)
             for fileinfo_key, fileinfo_dtype in column_schema_overrides.items()
         ])
@@ -380,17 +477,18 @@ def from_asc(
     # Fill experiment with parsed metadata.
     experiment = _fill_experiment_from_parsing_metadata(experiment, metadata)
 
-    # Create gaze data frame.
-    gaze_df = GazeDataFrame(
-        gaze_data,
+    # Instantiate Gaze with parsed data.
+    gaze = Gaze(
+        samples=samples,
         experiment=experiment,
+        events=Events(event_data) if events else None,
         trial_columns=trial_columns,
         time_column='time',
         time_unit='ms',
         pixel_columns=['x_pix', 'y_pix'],
     )
-    gaze_df._metadata = metadata  # pylint: disable=protected-access
-    return gaze_df
+    gaze._metadata = metadata  # pylint: disable=protected-access
+    return gaze
 
 
 def from_ipc(
@@ -402,8 +500,8 @@ def from_ipc(
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, type] | None = None,
         **read_ipc_kwargs: Any,
-) -> GazeDataFrame:
-    """Initialize a :py:class:`pymovements.gaze.GazeDataFrame`.
+) -> Gaze:
+    """Initialize a :py:class:`~pymovements.Gaze`.
 
     Parameters
     ----------
@@ -431,17 +529,17 @@ def from_ipc(
 
     Returns
     -------
-    GazeDataFrame
-        The gaze data frame read from the ipc file.
+    Gaze
+        The initialized gaze object read from the ipc file.
 
     Examples
     --------
     Let's assume we have an IPC file stored at `tests/files/monocular_example.feather`.
-    We can then load the data into a ``GazeDataFrame``:
+    We can then load the data into a ``Gaze``:
 
     >>> from pymovements.gaze.io import from_ipc
     >>> gaze = from_ipc(file='tests/files/monocular_example.feather')
-    >>> gaze.frame
+    >>> gaze.samples
     shape: (10, 2)
     ┌──────┬───────────┐
     │ time ┆ pixel     │
@@ -462,37 +560,37 @@ def from_ipc(
 
     """
     # Read data.
-    gaze_data = pl.read_ipc(file, **read_ipc_kwargs)
+    samples = pl.read_ipc(file, **read_ipc_kwargs)
 
     if column_map is not None:
-        gaze_data = gaze_data.rename({
+        samples = samples.rename({
             key: column_map[key] for key in
             [
                 key for key in column_map.keys()
-                if key in gaze_data.columns
+                if key in samples.columns
             ]
         })
 
     if add_columns is not None:
-        gaze_data = gaze_data.with_columns([
+        samples = samples.with_columns([
             pl.lit(value).alias(column)
             for column, value in add_columns.items()
-            if column not in gaze_data.columns
+            if column not in samples.columns
         ])
 
     if column_schema_overrides is not None:
-        gaze_data = gaze_data.with_columns([
+        samples = samples.with_columns([
             pl.col(fileinfo_key).cast(fileinfo_dtype)
             for fileinfo_key, fileinfo_dtype in column_schema_overrides.items()
         ])
 
-    # Create gaze data frame.
-    gaze_df = GazeDataFrame(
-        gaze_data,
+    # Create gaze object.
+    gaze = Gaze(
+        samples=samples,
         experiment=experiment,
         trial_columns=trial_columns,
     )
-    return gaze_df
+    return gaze
 
 
 def _fill_experiment_from_parsing_metadata(
@@ -510,7 +608,9 @@ def _fill_experiment_from_parsing_metadata(
     # Screen resolution (assuming that width and height will always be missing or set together)
     experiment_resolution = (experiment.screen.width_px, experiment.screen.height_px)
     if experiment_resolution == (None, None):
-        experiment.screen.width_px, experiment.screen.height_px = metadata['resolution']
+        width, height = metadata['resolution']
+        experiment.screen.width_px = math.ceil(width)
+        experiment.screen.height_px = math.ceil(height)
     elif experiment_resolution != metadata['resolution']:
         issues.append(f"Screen resolution: {experiment_resolution} != {metadata['resolution']}")
 

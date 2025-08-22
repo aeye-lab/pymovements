@@ -27,11 +27,10 @@ import matplotlib.pyplot as plt
 import matplotlib.scale
 import numpy as np
 
-from pymovements.gaze.gaze_dataframe import GazeDataFrame
-from pymovements.utils.plotting import draw_line_data
-from pymovements.utils.plotting import LinearSegmentedColormapType
-from pymovements.utils.plotting import setup_matplotlib
-
+from pymovements.gaze.gaze import Gaze
+from pymovements.plotting._matplotlib import _draw_line_data
+from pymovements.plotting._matplotlib import _setup_matplotlib
+from pymovements.plotting._matplotlib import LinearSegmentedColormapType
 
 # This is really a dirty workaround to use the Agg backend if runnning pytest.
 # This is needed as Windows workers on GitHub fail randomly with other backends.
@@ -41,9 +40,9 @@ if 'pytest' in sys.modules:  # pragma: no cover
 
 
 def traceplot(
-        gaze: GazeDataFrame,
+        gaze: Gaze,
         position_column: str = 'pixel',
-        cval: np.ndarray | None = None,  # pragma: no cover
+        cval: np.ndarray | None = None,
         cmap: matplotlib.colors.Colormap | None = None,
         cmap_norm: matplotlib.colors.Normalize | str | None = None,
         cmap_segmentdata: LinearSegmentedColormapType | None = None,
@@ -63,8 +62,8 @@ def traceplot(
 
     Parameters
     ----------
-    gaze: GazeDataFrame
-        The GazeDataFrame to plot.
+    gaze: Gaze
+        The Gaze to plot.
     position_column: str
         The column name of the x and y position data (default: 'pixel')
     cval: np.ndarray | None
@@ -106,10 +105,10 @@ def traceplot(
 
     """
     # pylint: disable=duplicate-code
-    x_signal = gaze.frame[position_column].list.get(0)
-    y_signal = gaze.frame[position_column].list.get(1)
+    x_signal = gaze.samples[position_column].list.get(0)
+    y_signal = gaze.samples[position_column].list.get(1)
 
-    fig, ax, cmap, cmap_norm, cval, show_cbar = setup_matplotlib(
+    fig, ax, cmap, cmap_norm, cval, show_cbar = _setup_matplotlib(
         x_signal,
         y_signal,
         figsize,
@@ -125,7 +124,7 @@ def traceplot(
         pad_factor,
     )
 
-    line = draw_line_data(
+    line = _draw_line_data(
         x_signal,
         y_signal,
         ax,
