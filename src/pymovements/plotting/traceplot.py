@@ -118,7 +118,7 @@ def traceplot(
 
         if screen_width_px is not None and screen_height_px is not None:
             figsize = (int(screen_width_px / screen_height_px * 10), 10)
-            print(figsize)
+            # print(figsize)
 
         if screen.origin != 'upper left':
             raise ValueError(
