@@ -59,6 +59,23 @@ def gaze_fixture():
     return gaze
 
 
+@pytest.fixture(name='gaze_no_exp', scope='session')
+def gaze_no_exp_fixture():
+    # pylint: disable=duplicate-code
+    x = np.arange(-100, 100)
+    y = np.arange(-100, 100)
+    arr = np.column_stack((x, y)).transpose()
+
+    gaze_no_exp = pm.gaze.from_numpy(
+        samples=arr,
+        schema=['x_pix', 'y_pix'],
+        experiment=None,
+        pixel_columns=['x_pix', 'y_pix'],
+    )
+
+    return gaze_no_exp
+
+
 @pytest.mark.parametrize(
     'kwargs',
     [
@@ -87,11 +104,18 @@ def gaze_fixture():
             id='cmap_norm_linear',
         ),
         pytest.param(
-            {'cval': np.arange(0, 200), 'cmap_norm': matplotlib.colors.NoNorm()},
+            {
+                'cval': np.arange(0, 200),
+                'cmap_norm': matplotlib.colors.NoNorm(),
+            },
             id='cmap_norm_class',
         ),
         pytest.param(
-            {'cmap': matplotlib.colors.LinearSegmentedColormap(name='test', segmentdata={})},
+            {
+                'cmap': matplotlib.colors.LinearSegmentedColormap(
+                    name='test', segmentdata={},
+                ),
+            },
             id='cmap_class',
         ),
         pytest.param(
@@ -173,3 +197,31 @@ def test_traceplot_exceptions(gaze, kwargs, exception, monkeypatch):
 
     with pytest.raises(exception):
         pm.plotting.traceplot(gaze=gaze, **kwargs)
+
+
+def test_traceplot_no_experiment(gaze_no_exp):
+    # Should not raise any exception
+    pm.plotting.traceplot(gaze_no_exp, show=False)
+
+
+@pytest.mark.parametrize(
+    'width,height',
+    [
+        (1280, 1024),  # both defined
+        (None, 1024),   # width None
+        (1280, None),   # height None
+        (None, None),   # both None
+    ],
+)
+def test_traceplot_screen_dims(gaze, width, height):
+    # Set screen dimensions
+    gaze.experiment.screen.width_px = width
+    gaze.experiment.screen.height_px = height
+
+    pm.plotting.traceplot(gaze=gaze, show=False)
+
+
+def test_traceplot_origin_wrong(gaze):
+    gaze.experiment.screen.origin = 'bottom right'
+    with pytest.raises(ValueError, match="only 'upper left' is supported"):
+        pm.plotting.traceplot(gaze=gaze, show=False)
