@@ -33,6 +33,11 @@ from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze import Gaze
 
 
+# Note: column detection for ASC files now uses simple substring matching
+# for 'pix' and 'pos' further down in `from_asc`. The older helper-based
+# detection was removed to avoid duplication and simplify the logic.
+
+
 def from_csv(
         file: str | Path,
         experiment: Experiment | None = None,
@@ -477,7 +482,28 @@ def from_asc(
     # Fill experiment with parsed metadata.
     experiment = _fill_experiment_from_parsing_metadata(experiment, metadata)
 
-    # Instantiate Gaze with parsed data.
+    # Detect pixel / position column names (monocular or binocular) and pass them to Gaze
+    cols = set(samples.columns)
+
+    # Simpler detection: pick any columns that contain the substrings 'pix' or 'pos'
+    # and pass them directly to Gaze. This covers monocular/binocular naming
+    # produced by parse_eyelink without complex subset checks.
+    # Annotate as optional so mypy knows these variables may be None.
+    pixel_columns_detect: list[str] | None = [c for c in samples.columns if 'pix' in c]
+    if not pixel_columns_detect:
+        pixel_columns_detect = None
+
+    position_columns_detect: list[str] | None = [c for c in samples.columns if 'pos' in c]
+    if not position_columns_detect:
+        position_columns_detect = None
+
+    # Instantiate Gaze with parsed data using detected column names
+    # If binocular pupils exist, create a nested 'pupil' column [left, right]
+    if 'pupil_left' in cols and 'pupil_right' in cols:
+        samples = samples.with_columns(
+            pl.concat_list([pl.col('pupil_left'), pl.col('pupil_right')]).alias('pupil'),
+        ).drop(['pupil_left', 'pupil_right'])
+
     gaze = Gaze(
         samples=samples,
         experiment=experiment,
@@ -485,7 +511,8 @@ def from_asc(
         trial_columns=trial_columns,
         time_column='time',
         time_unit='ms',
-        pixel_columns=['x_pix', 'y_pix'],
+        pixel_columns=pixel_columns_detect,
+        position_columns=position_columns_detect,
     )
     gaze._metadata = metadata  # pylint: disable=protected-access
     return gaze
@@ -626,25 +653,27 @@ def _fill_experiment_from_parsing_metadata(
     if experiment.eyetracker.left is None:
         experiment.eyetracker.left = asc_left_eye
     elif experiment.eyetracker.left != asc_left_eye:
-        issues.append(f"Left eye tracked: {experiment.eyetracker.left} != {asc_left_eye}")
+        issues.append(f'Left eye tracked: {experiment.eyetracker.left} != {asc_left_eye}')
     if experiment.eyetracker.right is None:
         experiment.eyetracker.right = asc_right_eye
     elif experiment.eyetracker.right != asc_right_eye:
-        issues.append(f"Right eye tracked: {experiment.eyetracker.right} != {asc_right_eye}")
+        issues.append(f'Right eye tracked: {experiment.eyetracker.right} != {asc_right_eye}')
 
     # Mount configuration
     if experiment.eyetracker.mount is None:
         experiment.eyetracker.mount = metadata['mount_configuration']['mount_type']
     elif experiment.eyetracker.mount != metadata['mount_configuration']['mount_type']:
-        issues.append(f"Mount configuration: {experiment.eyetracker.mount} != "
-                      f"{metadata['mount_configuration']['mount_type']}")
+        issues.append(
+            f'Mount configuration: {experiment.eyetracker.mount} != '
+            f"{metadata['mount_configuration']['mount_type']}",
+        )
 
     # Eye tracker vendor
     asc_vendor = 'EyeLink' if 'EyeLink' in metadata['model'] else None
     if experiment.eyetracker.vendor is None:
         experiment.eyetracker.vendor = asc_vendor
     elif experiment.eyetracker.vendor != asc_vendor:
-        issues.append(f"Eye tracker vendor: {experiment.eyetracker.vendor} != {asc_vendor}")
+        issues.append(f'Eye tracker vendor: {experiment.eyetracker.vendor} != {asc_vendor}')
 
     # Eye tracker model
     if experiment.eyetracker.model is None:
@@ -656,8 +685,10 @@ def _fill_experiment_from_parsing_metadata(
     if experiment.eyetracker.version is None:
         experiment.eyetracker.version = metadata['version_number']
     elif experiment.eyetracker.version != metadata['version_number']:
-        issues.append(f"Eye tracker software version: {experiment.eyetracker.version} != "
-                      f"{metadata['version_number']}")
+        issues.append(
+            f'Eye tracker software version: {experiment.eyetracker.version} != '
+            f"{metadata['version_number']}",
+        )
 
     if issues:
         raise ValueError(
