@@ -54,6 +54,9 @@ class ResourceDefinition:
     filename_pattern_schema_overrides: dict[str, type] | None
         If named groups are present in the `filename_pattern`, this specifies their particular
         datatypes. (default: None)
+    load_function: str | None
+        The name of the function used to load the data files. If None, the function is determined
+        by the file extension. Refer to :ref:`gaze-io` for available function names. (default: None)
     """
 
     content: str
@@ -64,6 +67,8 @@ class ResourceDefinition:
 
     filename_pattern: str | None = None
     filename_pattern_schema_overrides: dict[str, type] | None = None
+
+    load_function: str | None = None
 
     @staticmethod
     def from_dict(dictionary: dict[str, Any]) -> ResourceDefinition:

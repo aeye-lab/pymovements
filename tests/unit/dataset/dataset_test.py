@@ -149,6 +149,7 @@ def mock_toy(
 
     fileinfo = fileinfo.with_columns([
         pl.format('{}.' + raw_fileformat, 'subject_id').alias('filepath'),
+        pl.lit(None).alias('load_function'),
     ])
 
     fileinfo = fileinfo.sort(by='filepath')
