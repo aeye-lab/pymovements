@@ -42,7 +42,7 @@ if 'pytest' in sys.modules:  # pragma: no cover
 def traceplot(
         gaze: Gaze,
         position_column: str = 'pixel',
-        cval: np.ndarray | None = None,  # pragma: no cover
+        cval: np.ndarray | None = None,
         cmap: matplotlib.colors.Colormap | None = None,
         cmap_norm: matplotlib.colors.Normalize | str | None = None,
         cmap_segmentdata: LinearSegmentedColormapType | None = None,

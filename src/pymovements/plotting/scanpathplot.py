@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import math
 import sys
+from warnings import warn
 
 import matplotlib.pyplot as plt
 import matplotlib.scale
@@ -29,6 +30,7 @@ import numpy as np
 from matplotlib.patches import Circle
 
 from pymovements.events import EventDataFrame
+from pymovements.events import Events
 from pymovements.gaze import Gaze
 from pymovements.plotting._matplotlib import _draw_line_data
 from pymovements.plotting._matplotlib import _setup_axes_and_colormap
@@ -43,10 +45,9 @@ if 'pytest' in sys.modules:  # pragma: no cover
 
 
 def scanpathplot(
-        events: EventDataFrame,
         gaze: Gaze | None = None,
         position_column: str = 'location',
-        cval: np.ndarray | None = None,  # pragma: no cover
+        cval: np.ndarray | None = None,
         cmap: matplotlib.colors.Colormap | None = None,
         cmap_norm: matplotlib.colors.Normalize | str | None = None,
         cmap_segmentdata: LinearSegmentedColormapType | None = None,
@@ -65,6 +66,7 @@ def scanpathplot(
         add_stimulus: bool = False,
         path_to_image_stimulus: str | None = None,
         stimulus_origin: str = 'upper',
+        events: Events | EventDataFrame | None = None,
         *,
         ax: plt.Axes | None = None,
         closefig: bool | None = None,
@@ -73,8 +75,6 @@ def scanpathplot(
 
     Parameters
     ----------
-    events: EventDataFrame
-        The EventDataFrame to plot.
     gaze: Gaze | None
         Optional Gaze Dataframe. (default: None)
     position_column: str
@@ -118,6 +118,8 @@ def scanpathplot(
         Path of the stimulus to be shown. (default: None)
     stimulus_origin: str
         Origin of stimuls to plot on the stimulus. (default: 'upper')
+    events: Events | EventDataFrame | None
+        The events to plot. (default: None)
     ax: plt.Axes | None
         External axes to draw into. If provided, the function will not show or close the figure.
     closefig: bool | None
@@ -130,10 +132,29 @@ def scanpathplot(
 
     Raises
     ------
+    TypeError
+        If both gaze and events are 'None'.
     ValueError
         If length of x and y coordinates do not match or if ``cmap_norm`` is unknown.
 
     """
+    if events is not None:
+        warn(
+            DeprecationWarning(
+                "scanpathplot argument 'events' is deprecated since version v0.23.1. "
+                "Please use argument 'gaze' instead. "
+                'This argument will be removed in v0.28.0.',
+            ),
+        )
+    else:
+        if gaze is None:
+            raise TypeError("scanpathplot argument 'gaze' or 'events' must not be both None")
+        if gaze.events is None:
+            raise TypeError("scanpathplot 'gaze.events' must not be None")
+        assert gaze is not None
+        assert gaze.events is not None
+        events = gaze.events
+
     # pylint: disable=duplicate-code
     x_signal = events.frame[position_column].list.get(0)
     y_signal = events.frame[position_column].list.get(1)
@@ -169,9 +190,10 @@ def scanpathplot(
         ax.add_patch(fixation)
 
     if add_traceplot:
-        assert gaze
-        gaze_x_signal = gaze.frame[gaze_position_column].list.get(0)
-        gaze_y_signal = gaze.frame[gaze_position_column].list.get(1)
+        if gaze is None or gaze.samples is None:
+            raise TypeError("scanpathplot 'gaze.samples' must not be None")
+        gaze_x_signal = gaze.samples[gaze_position_column].list.get(0)
+        gaze_y_signal = gaze.samples[gaze_position_column].list.get(1)
         line = _draw_line_data(
             gaze_x_signal,
             gaze_y_signal,
@@ -180,7 +202,6 @@ def scanpathplot(
             cmap_norm,
             cval,
         )
-
         if show_cbar:
             # sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
             # sm.set_array(cval)
