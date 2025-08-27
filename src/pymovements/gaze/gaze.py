@@ -952,23 +952,7 @@ class Gaze:
             If ``event_properties`` do not exist in the event dataframe
             or it is not allowed to remove them
         """
-        if isinstance(event_properties, str):
-            event_properties = [event_properties]
-        existing_columns = self.events.columns
-        for prop in event_properties:
-            if prop not in existing_columns:
-                raise ValueError(
-                    f"The property {prop} does not exist and cannot be removed. "
-                    f"Available properties to remove: {self.events.event_property_columns}.",
-                )
-            if prop not in self.events.event_property_columns:
-                raise ValueError(
-                    f"The property {prop} cannot be removed because"
-                    f" it belongs to minimal_schema or additional_columns. "
-                    f"Available properties to remove: {self.events.event_property_columns}.",
-                )
-        for prop in event_properties:
-            self.events.drop_event_property(prop)
+        self.events.remove_event_properties(event_properties)
 
     def compute_event_properties(
             self,
