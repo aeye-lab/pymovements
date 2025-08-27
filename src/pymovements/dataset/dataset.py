@@ -779,7 +779,6 @@ class Dataset:
     def remove_event_properties(
             self,
             event_properties: str | list[str],
-            verbose: bool = True,
     ) -> Dataset:
         """Remove event properties from the event dataframe.
 
@@ -787,8 +786,6 @@ class Dataset:
         ----------
         event_properties: str | list[str]
             The event properties to remove.
-        verbose : bool
-            If ``True``, show progress bar. (default: True)
 
         Raises
         ------
@@ -800,7 +797,7 @@ class Dataset:
         Dataset
             Returns self, useful for method cascading.
         """
-        for gaze in tqdm(self.gaze, disable=not verbose):
+        for gaze in self.gaze:
             gaze.remove_event_properties(event_properties)
         return self
 
