@@ -262,13 +262,13 @@ class Events:
             if event_property not in existing_columns:
                 raise ValueError(
                     f"The property {event_property} does not exist and cannot be removed. "
-                    f"Available properties to remove: {self.frame.event_property_columns}.",
+                    f"Available properties to remove: {self.event_property_columns}.",
                 )
             if event_property not in self.event_property_columns:
                 raise ValueError(
                     f"The property {event_property} cannot be removed because"
                     f" it belongs to minimal_schema or additional_columns. "
-                    f"Available properties to remove: {self.frame.event_property_columns}.",
+                    f"Available properties to remove: {self.event_property_columns}.",
                 )
         for event_property in event_properties:
             self.frame = self.frame.drop(event_property)
