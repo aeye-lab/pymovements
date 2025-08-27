@@ -42,7 +42,7 @@ if 'pytest' in sys.modules:  # pragma: no cover
 def traceplot(
         gaze: Gaze,
         position_column: str = 'pixel',
-        cval: np.ndarray | None = None,  # pragma: no cover
+        cval: np.ndarray | None = None,
         cmap: matplotlib.colors.Colormap | None = None,
         cmap_norm: matplotlib.colors.Normalize | str | None = None,
         cmap_segmentdata: LinearSegmentedColormapType | None = None,
@@ -108,6 +108,20 @@ def traceplot(
     x_signal = gaze.samples[position_column].list.get(0)
     y_signal = gaze.samples[position_column].list.get(1)
 
+    screen_width_px = None
+    screen_height_px = None
+
+    if gaze.experiment is not None:
+        screen = gaze.experiment.screen
+        screen_width_px = screen.width_px
+        screen_height_px = screen.height_px
+
+        if screen.origin != 'upper left':
+            raise ValueError(
+                f"Origin of the experiment screen is set to {screen.origin}, "
+                "but only 'upper left' is supported for traceplot.",
+            )
+
     fig, ax, cmap, cmap_norm, cval, show_cbar = _setup_matplotlib(
         x_signal,
         y_signal,
@@ -132,6 +146,11 @@ def traceplot(
         cmap_norm,
         cval,
     )
+
+    # only set axes limits if we have experiment screen info
+    if screen_width_px is not None and screen_height_px is not None:
+        ax.set_xlim(0, screen_width_px)
+        ax.set_ylim(screen_height_px, 0)
 
     if show_cbar:
         # sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
