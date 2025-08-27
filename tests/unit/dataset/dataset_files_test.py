@@ -20,6 +20,8 @@
 """Tests pymovements asc to csv processing."""
 # flake8: noqa: E101, W191, E501
 # pylint: disable=duplicate-code
+from pathlib import Path
+
 import polars as pl
 import pyreadr
 import pytest
@@ -199,13 +201,17 @@ PATTERNS = [
         ),
     ],
 )
-def test_load_eyelink_file(tmp_path, read_kwargs):
+@pytest.mark.parametrize(
+    'load_function',
+    [None, 'from_asc'],
+)
+def test_load_eyelink_file(tmp_path, read_kwargs, load_function):
     filepath = tmp_path / 'sub.asc'
     filepath.write_text(ASC_TEXT)
 
     gaze = pm.dataset.dataset_files.load_gaze_file(
         filepath,
-        fileinfo_row={},
+        fileinfo_row={'load_function': load_function},
         definition=DatasetDefinition(
             experiment=pm.Experiment(1280, 1024, 38, 30, None, 'center', 1000),
             custom_read_kwargs={'gaze': read_kwargs},
@@ -219,6 +225,120 @@ def test_load_eyelink_file(tmp_path, read_kwargs):
 
     assert_frame_equal(gaze.samples, expected_df, check_column_order=False)
     assert gaze.experiment is not None
+
+
+@pytest.mark.parametrize(
+    ('filepath', 'rename_extension', 'load_function', 'read_kwargs'),
+    [
+        pytest.param(
+            'tests/files/monocular_example.csv',
+            'csv',
+            None,
+            None,
+            id='load_csv_default',
+        ),
+        pytest.param(
+            'tests/files/monocular_example.csv',
+            'csv',
+            'from_csv',
+            None,
+            id='load_csv_from_csv',
+        ),
+        pytest.param(
+            'tests/files/monocular_example.csv',
+            'renamed',
+            'from_csv',
+            None,
+            id='load_csv_rename_from_csv',
+        ),
+        pytest.param(
+            'tests/files/monocular_example.tsv',
+            'tsv',
+            None,
+            {'separator': '\t'},
+            id='load_tsv_default',
+        ),
+        pytest.param(
+            'tests/files/monocular_example.tsv',
+            'tsv',
+            'from_csv',
+            {'separator': '\t'},
+            id='load_tsv_from_csv',
+        ),
+        pytest.param(
+            'tests/files/monocular_example.tsv',
+            'renamed',
+            'from_csv',
+            {'separator': '\t'},
+            id='load_tsv_rename_from_csv',
+        ),
+        pytest.param(
+            'tests/files/monocular_example.feather',
+            'feather',
+            None,
+            None,
+            id='load_feather_default',
+        ),
+        pytest.param(
+            'tests/files/monocular_example.feather',
+            'feather',
+            'from_ipc',
+            None,
+            id='load_feather_from_ipc',
+        ),
+        pytest.param(
+            'tests/files/monocular_example.feather',
+            'csv',
+            'from_ipc',
+            None,
+            id='load_feather_rename_from_ipc',
+        ),
+    ],
+)
+def test_load_gaze_file(tmp_path, filepath, rename_extension, load_function, read_kwargs):
+    # Copy the file to the temporary path with the new extension
+    filepath = Path(filepath)
+    renamed_filename = filepath.stem + '.' + rename_extension
+    renamed_filepath = tmp_path / renamed_filename
+    renamed_filepath.write_bytes(filepath.read_bytes())
+
+    gaze = pm.dataset.dataset_files.load_gaze_file(
+        renamed_filepath,
+        fileinfo_row={'load_function': load_function},
+        definition=DatasetDefinition(
+            experiment=pm.Experiment(1280, 1024, 38, 30, None, 'center', 1000),
+            pixel_columns=['x_left_pix', 'y_left_pix'],
+            custom_read_kwargs={'gaze': read_kwargs},
+        ),
+    )
+    expected_df = pl.from_dict(
+        {
+            'time': list(range(10)),
+            'pixel': [[0, 0]] * 10,
+        },
+    )
+
+    assert_frame_equal(gaze.samples, expected_df, check_column_order=False)
+
+
+def test_load_gaze_file_unsupported_load_function():
+    filepath = 'tests/files/monocular_example.csv'
+
+    with pytest.raises(ValueError) as exc:
+        pm.dataset.dataset_files.load_gaze_file(
+            filepath,
+            fileinfo_row={'load_function': 'from_a_land_down_under'},
+            definition=DatasetDefinition(
+                experiment=pm.Experiment(1280, 1024, 38, 30, None, 'center', 1000),
+                pixel_columns=['x_left_pix', 'y_left_pix'],
+            ),
+        )
+
+    msg, = exc.value.args
+    assert msg == (
+        'Unsupported load_function "from_a_land_down_under". '
+        'Available options are: [\'from_csv\', \'from_ipc\', \'from_asc\']'
+    )
 
 
 def test_load_precomputed_rm_file():
