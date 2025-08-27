@@ -45,7 +45,7 @@ dependencies = [
   "pyyaml>=6.0.2,<6.1",
   "scipy>=1.8.0,<1.16",
   "tqdm>=4.27.0,<4.68",
-  "typing_extensions>=4.0.0,<4.15"
+  "typing_extensions>=4.0.0,<4.16"
 ]
 dynamic = ["version"]
 
