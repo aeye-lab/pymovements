@@ -598,7 +598,6 @@ def add_fileinfo(
     pl.DataFrame
         Dataframe with added columns from fileinfo dictionary keys.
     """
-    print(df)
     df = df.select(
         [
             pl.lit(value).alias(column)
@@ -606,7 +605,6 @@ def add_fileinfo(
             if column not in {'filepath', 'load_function'} and column not in df.columns
         ] + [pl.all()],
     )
-    print(df)
 
     # Cast columns from fileinfo according to specification.
     resource_definitions = definition.resources.filter('gaze')
