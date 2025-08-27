@@ -34,7 +34,7 @@ and render plots to visually analyze your results.
 
 ## Getting Started
 
-With pymovements loading your eye movement [datasets](https://pymovements.readthedocs.io/en/stable/reference/pymovements.datasets.html#module-pymovements.datasets) is just a few lines of code away
+With pymovements loading your eye movement [datasets](https://pymovements.readthedocs.io/en/stable/datasets/index.html) is just a few lines of code away
 
 ```python
 import pymovements as pm
@@ -78,7 +78,7 @@ For a detailed guide, please refer to our [CONTRIBUTING.md](CONTRIBUTING.md) fir
 
 If you have any questions, please [open an issue](
 https://github.com/aeye-lab/pymovements/issues/new/choose) or write us at
-[pymovements-list@uni-potsdam.de](mailto:pymovements-list@uni-potsdam.de)
+[pymovements@python.org](mailto:pymovements@python.org)
 
 ## Citing
 
