@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import math
+import warnings
 from pathlib import Path
 from typing import Any
 
@@ -635,9 +636,12 @@ def _fill_experiment_from_parsing_metadata(
     # Screen resolution (assuming that width and height will always be missing or set together)
     experiment_resolution = (experiment.screen.width_px, experiment.screen.height_px)
     if experiment_resolution == (None, None):
-        width, height = metadata['resolution']
-        experiment.screen.width_px = math.ceil(width)
-        experiment.screen.height_px = math.ceil(height)
+        try:
+            width, height = metadata['resolution']
+            experiment.screen.width_px = math.ceil(width)
+            experiment.screen.height_px = math.ceil(height)
+        except TypeError:
+            warnings.warn('No screen resolution found.')
     elif experiment_resolution != metadata['resolution']:
         issues.append(f"Screen resolution: {experiment_resolution} != {metadata['resolution']}")
 
@@ -661,7 +665,10 @@ def _fill_experiment_from_parsing_metadata(
 
     # Mount configuration
     if experiment.eyetracker.mount is None:
-        experiment.eyetracker.mount = metadata['mount_configuration']['mount_type']
+        try:
+            experiment.eyetracker.mount = metadata['mount_configuration']['mount_type']
+        except KeyError:
+            warnings.warn('No mount configuration found.')
     elif experiment.eyetracker.mount != metadata['mount_configuration']['mount_type']:
         issues.append(
             f'Mount configuration: {experiment.eyetracker.mount} != '
