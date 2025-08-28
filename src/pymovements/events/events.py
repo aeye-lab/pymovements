@@ -252,8 +252,7 @@ class Events:
         Raises
         ------
         ValueError
-            If ``event_properties`` do not exist in the event dataframe
-            or it is not allowed to remove them.
+            If ``columns`` do not exist in the event dataframe or it is not allowed to remove them.
         """
         if isinstance(columns, str):
             columns = [columns]
