@@ -935,6 +935,25 @@ class Gaze:
                 how='diagonal',
             )
 
+    def drop_event_properties(
+            self,
+            event_properties: str | list[str],
+    ) -> None:
+        """Remove event properties from the event dataframe.
+
+        Parameters
+        ----------
+        event_properties: str | list[str]
+            The event properties to remove.
+
+        Raises
+        ------
+        ValueError
+            If ``event_properties`` do not exist in the event dataframe
+            or it is not allowed to remove them
+        """
+        self.events.drop(event_properties)
+
     def compute_event_properties(
             self,
             event_properties: str | tuple[str, dict[str, Any]]
