@@ -2122,7 +2122,7 @@ def test_drop_event_property(gaze_dataset_configuration):
 
     with pytest.raises(ValueError) as exinfo:
         dataset.drop_event_properties('alamakota')
-    assert str(exinfo.value).startswith('The property alamakota does not exist')
+    assert str(exinfo.value).startswith("The column 'alamakota' does not exist")
 
     # Nothing should be changed
     with pytest.raises(ValueError) as exinfo:
@@ -2137,10 +2137,10 @@ def test_drop_event_property(gaze_dataset_configuration):
     # Now error should be raised because peak_velocity does not exist
     with pytest.raises(ValueError) as exinfo:
         dataset.drop_event_properties('peak_velocity')
-    assert str(exinfo.value).startswith('The property peak_velocity does not exist')
+    assert str(exinfo.value).startswith("The column 'peak_velocity' does not exist")
 
     # onset should not be removed
     with pytest.raises(ValueError) as exinfo:
         dataset.drop_event_properties('onset')
-    assert str(exinfo.value).startswith('The property onset cannot be removed')
+    assert str(exinfo.value).startswith("The column 'onset' cannot be removed")
     assert 'onset' in dataset.gaze[0].events.columns

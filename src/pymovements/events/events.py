@@ -257,14 +257,15 @@ class Events:
         if isinstance(columns, str):
             columns = [columns]
         existing_columns = set(self.frame.columns)
+        minimal_schema = set(self._minimal_schema)
         for column in columns:
-            available_columns = existing_columns - set(self._minimal_schema)
+            available_columns = existing_columns - minimal_schema
             if column not in existing_columns:
                 raise ValueError(
                     f"The column '{column}' does not exist and thus cannot be removed. "
                     f"Available columns to remove: {available_columns}.",
                 )
-            if columns in self._minimal_schema:
+            if column in minimal_schema:
                 raise ValueError(
                     f"The column '{column}' cannot be removed "
                     'because it belongs to the minimal schema (onset, offset, name). '

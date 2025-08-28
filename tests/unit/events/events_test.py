@@ -726,7 +726,7 @@ def test_drop_event_properties_has_expected_columns(
         pytest.param(
             [], None,
             'onset',
-            ValueError, 'onset.*belongs to minimal_schema',
+            ValueError, 'onset.*belongs to the minimal schema',
             id='onset',
         ),
     ],
