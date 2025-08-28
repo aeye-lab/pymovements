@@ -317,7 +317,7 @@ def test_gaze_split_list():
 
 def test_gaze_drop_event_properties(make_gaze_with_events):
     gaze = make_gaze_with_events(names=['fixation', 'saccade'], properties=['test1', 'test2'])
-    gaze.drop('test1')
+    gaze.drop_event_properties('test1')
     assert set(gaze.events.event_property_columns) == {'test2'}
 
 
