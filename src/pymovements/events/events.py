@@ -234,20 +234,20 @@ class Events:
         """
         self.frame = self.frame.join(event_properties, on=join_on, how='left')
 
-    def remove_event_properties(
+    def drop(
             self,
-            event_properties: str | list[str],
+            columns: str | list[str],
     ) -> None:
-        """Remove event properties from the data frame.
+        """Remove columns from the events data frame.
 
         Notes
         -----
-        The columns ``name``, ``onset`` and ``offset`` cannot be removed.
+        The minimal schema columns ``name``, ``onset`` and ``offset`` cannot be removed.
 
         Parameters
         ----------
-        event_properties: str | list[str]
-            The event properties to remove.
+        columns: str | list[str]
+            The columns in the event data frame to remove.
 
         Raises
         ------
@@ -255,23 +255,24 @@ class Events:
             If ``event_properties`` do not exist in the event dataframe
             or it is not allowed to remove them.
         """
-        if isinstance(event_properties, str):
-            event_properties = [event_properties]
+        if isinstance(columns, str):
+            columns = [columns]
         existing_columns = self.frame.columns
-        for event_property in event_properties:
-            if event_property not in existing_columns:
+        for column in columns:
+            available_columns = set(self.frame.columns) - set(self._minimal_schema)
+            if column not in existing_columns:
                 raise ValueError(
-                    f"The property {event_property} does not exist and cannot be removed. "
-                    f"Available properties to remove: {self.event_property_columns}.",
+                    f"The column '{column}' does not exist and thus cannot be removed. "
+                    f"Available columns to remove: {available_columns}.",
                 )
-            if event_property not in self.event_property_columns:
+            if columns in self._minimal_schema:
                 raise ValueError(
-                    f"The property {event_property} cannot be removed because"
-                    f" it belongs to minimal_schema or additional_columns. "
-                    f"Available properties to remove: {self.event_property_columns}.",
+                    f"The column '{column}' cannot be removed "
+                    'because it belongs to the minimal schema (onset, offset, name). '
+                    f"Available columns to remove: {available_columns}.",
                 )
-        for event_property in event_properties:
-            self.frame = self.frame.drop(event_property)
+        for column in columns:
+            self.frame = self.frame.drop(column)
 
     def add_trial_column(
             self,

@@ -935,7 +935,7 @@ class Gaze:
                 how='diagonal',
             )
 
-    def remove_event_properties(
+    def drop_event_properties(
             self,
             event_properties: str | list[str],
     ) -> None:
@@ -952,7 +952,7 @@ class Gaze:
             If ``event_properties`` do not exist in the event dataframe
             or it is not allowed to remove them
         """
-        self.events.remove_event_properties(event_properties)
+        self.events.drop(event_properties)
 
     def compute_event_properties(
             self,

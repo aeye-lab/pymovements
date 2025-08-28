@@ -776,7 +776,7 @@ class Dataset:
             self.events[file_id] = gaze.events
         return self
 
-    def remove_event_properties(
+    def drop_event_properties(
             self,
             event_properties: str | list[str],
     ) -> Dataset:
@@ -798,7 +798,7 @@ class Dataset:
             Returns self, useful for method cascading.
         """
         for gaze in self.gaze:
-            gaze.remove_event_properties(event_properties)
+            gaze.drop_event_properties(event_properties)
         return self
 
     def compute_event_properties(

@@ -706,11 +706,11 @@ def test_microsaccades_filter(make_events):
         ),
     ],
 )
-def test_remove_event_properties_has_expected_columns(
+def test_drop_event_properties_has_expected_columns(
         init_names, init_properties, remove_properties, expected_columns, make_events,
 ):
     events = make_events(names=init_names, properties=init_properties)
-    events.remove_event_properties(remove_properties)
+    events.drop(remove_properties)
     assert set(events.event_property_columns) == set(expected_columns)
 
 
@@ -731,10 +731,10 @@ def test_remove_event_properties_has_expected_columns(
         ),
     ],
 )
-def test_remove_event_properties_raises_exception(
+def test_drop_event_properties_raises_exception(
         init_names, init_properties, remove_properties, exception, message, make_events,
 ):
     events = make_events(names=init_names, properties=init_properties)
 
     with pytest.raises(exception, match=message):
-        events.remove_event_properties(remove_properties)
+        events.drop(remove_properties)

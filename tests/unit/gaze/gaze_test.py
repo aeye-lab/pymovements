@@ -39,7 +39,7 @@ from pymovements import Screen
 def fixture_make_gaze_with_events():
     """Make a fixture function to create simple Gaze objects with event data."""
 
-    def _make_gaze_with_events(names: list[str], properties: list[str] | None = None) -> Events:
+    def _make_gaze_with_events(names: list[str], properties: list[str] | None = None) -> Gaze:
         data = {
             'name': names,
             'onset': range(0, 2 * len(names), 2),
@@ -315,9 +315,9 @@ def test_gaze_split_list():
     assert len(split_gaze) == 4
 
 
-def test_gaze_remove_event_properties(make_gaze_with_events):
+def test_gaze_drop_event_properties(make_gaze_with_events):
     gaze = make_gaze_with_events(names=['fixation', 'saccade'], properties=['test1', 'test2'])
-    gaze.remove_event_properties('test1')
+    gaze.drop('test1')
     assert set(gaze.events.event_property_columns) == {'test2'}
 
 
