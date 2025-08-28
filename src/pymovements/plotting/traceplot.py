@@ -134,7 +134,6 @@ def traceplot(
                 "but only 'upper left' is supported for traceplot.",
             )
 
-
     own_figure = ax is None
 
     fig, ax, cmap, cmap_norm, cval, show_cbar = _setup_axes_and_colormap(
