@@ -776,6 +776,31 @@ class Dataset:
             self.events[file_id] = gaze.events
         return self
 
+    def drop_event_properties(
+            self,
+            event_properties: str | list[str],
+    ) -> Dataset:
+        """Remove event properties from the event dataframe.
+
+        Parameters
+        ----------
+        event_properties: str | list[str]
+            The event properties to remove.
+
+        Raises
+        ------
+        InvalidProperty
+            If ``event_properties`` does not exist in the event dataframe
+
+        Returns
+        -------
+        Dataset
+            Returns self, useful for method cascading.
+        """
+        for gaze in self.gaze:
+            gaze.drop_event_properties(event_properties)
+        return self
+
     def compute_event_properties(
             self,
             event_properties: str | tuple[str, dict[str, Any]]
