@@ -256,9 +256,9 @@ class Events:
         """
         if isinstance(columns, str):
             columns = [columns]
-        existing_columns = self.frame.columns
+        existing_columns = set(self.frame.columns)
         for column in columns:
-            available_columns = set(self.frame.columns) - set(self._minimal_schema)
+            available_columns = existing_columns - set(self._minimal_schema)
             if column not in existing_columns:
                 raise ValueError(
                     f"The column '{column}' does not exist and thus cannot be removed. "
