@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test all Gaze functionality."""
+from __future__ import annotations
+
 import os
 import re
 
@@ -31,6 +33,32 @@ from pymovements import Experiment
 from pymovements import EyeTracker
 from pymovements import Gaze
 from pymovements import Screen
+
+
+@pytest.fixture(name='make_gaze_with_events', scope='function')
+def fixture_make_gaze_with_events():
+    """Make a fixture function to create simple Gaze objects with event data."""
+
+    def _make_gaze_with_events(names: list[str], properties: list[str] | None = None) -> Events:
+        data = {
+            'name': names,
+            'onset': range(0, 2 * len(names), 2),
+            'offset': range(1, 2 * len(names) + 1, 2),
+        }
+        events = Events(pl.from_dict(data))
+        gaze = Gaze(events=events)
+
+        # adding columns afterward to not count them as non-property additional_columns
+        if properties is not None:
+            gaze.events.frame = gaze.events.frame.select(
+                [pl.all()] + [
+                    pl.int_ranges(0, 100 * len(names), 100).alias(property)
+                    for property in properties
+                ],
+            )
+        return gaze
+
+    return _make_gaze_with_events
 
 
 @pytest.mark.parametrize(
@@ -285,6 +313,12 @@ def test_gaze_split_list():
     split_gaze = gaze.split(['trial_ida', 'trial_idb'])
     assert all(gaze.samples.n_unique(['trial_ida', 'trial_idb']) == 1 for gaze in split_gaze)
     assert len(split_gaze) == 4
+
+
+def test_gaze_remove_event_properties(make_gaze_with_events):
+    gaze = make_gaze_with_events(names=['fixation', 'saccade'], properties=['test1', 'test2'])
+    gaze.remove_event_properties('test1')
+    assert set(gaze.events.event_property_columns) == {'test2'}
 
 
 def test_gaze_compute_event_properties_no_events():
