@@ -134,10 +134,10 @@ We use [`flake8`](https://pypi.org/project/flake8/) for quick style checks and
 https://pypi.org/project/mypy/) for checking type annotations.
 
 You can check your code style by using [pre-commit](https://www.pre-commit.com).
-You can install `pre-commit` and `pylint` via pip:
+You can install `pre-commit` and `pylint` via pip. **Note**: Quoting '[dev]' ensures the command works in both bash and zsh.
 
 ```bash
-pip install -e .[dev]
+pip install -e '.[dev]'
 ```
 
 To always run style checks when pushing commits upstream,
