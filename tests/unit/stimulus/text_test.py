@@ -192,7 +192,7 @@ EXPECTED_DF = polars.DataFrame(
     ],
 )
 def test_text_stimulus(aoi_file, custom_read_kwargs, expected):
-    aois = text.from_file(
+    aois = text.TextStimulus.from_file(
         aoi_file,
         aoi_column='char',
         start_x_column='top_left_x',
@@ -213,7 +213,7 @@ def test_text_stimulus(aoi_file, custom_read_kwargs, expected):
 
 def test_text_stimulus_unsupported_format():
     with pytest.raises(ValueError) as excinfo:
-        text.from_file(
+        text.TextStimulus.from_file(
             'tests/files/toy_text_1_1_aoi.pickle',
             aoi_column='char',
             start_x_column='top_left_x',
@@ -244,7 +244,7 @@ def test_text_stimulus_unsupported_format():
     ],
 )
 def test_text_stimulus_splitting(aoi_file, custom_read_kwargs):
-    aois_df = text.from_file(
+    aois_df = text.TextStimulus.from_file(
         aoi_file,
         aoi_column='char',
         start_x_column='top_left_x',
@@ -275,7 +275,7 @@ def test_text_stimulus_splitting(aoi_file, custom_read_kwargs):
     ],
 )
 def test_text_stimulus_splitting_unique_within(aoi_file, custom_read_kwargs):
-    aois_df = text.from_file(
+    aois_df = text.TextStimulus.from_file(
         aoi_file,
         aoi_column='char',
         start_x_column='top_left_x',
@@ -306,7 +306,7 @@ def test_text_stimulus_splitting_unique_within(aoi_file, custom_read_kwargs):
     ],
 )
 def test_text_stimulus_splitting_different_between(aoi_file, custom_read_kwargs):
-    aois_df = text.from_file(
+    aois_df = text.TextStimulus.from_file(
         aoi_file,
         aoi_column='char',
         start_x_column='top_left_x',
@@ -328,7 +328,7 @@ def test_text_stimulus_splitting_different_between(aoi_file, custom_read_kwargs)
 
 @pytest.fixture(name='text_stimulus')
 def fixture_text_stimulus():
-    yield text.from_file(
+    yield text.TextStimulus.from_file(
         'tests/files/toy_text_1_1_aoi.csv',
         aoi_column='word',
         start_x_column='top_left_x',
