@@ -35,7 +35,8 @@ class BSC(DatasetDefinition):
     The Beijing Sentence Corpus (BSC) is a Simplified Chinese sentence corpus of eye-tracking data,
     including word boundaries and predictability norms for each word. The sentences were selected
     from the People's Daily, the largest newspaper group and an official newspaper of the People's
-    Republic of China. Data was collected from 60 native Chinese university students.
+    Republic of China. Data was collected from 60 native Chinese university students. The eye
+    movements were recorded with an Eyelink II system running at 500 Hz.
 
     Check the respective paper for details :cite:p:`BSC`.
 

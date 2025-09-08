@@ -38,6 +38,7 @@ class BSCII(DatasetDefinition):
     predictability on fixation location and duration. Since the BSCII sentences are nearly
     identical to those in the BSC, the two corpora together provide a valuable resource for
     studying cross-script similarities and differences between Simplified and Traditional Chinese.
+    The eye-movements were recorded with an Eyelink 1000 system at 1000 Hz.
 
     Check the respective paper for details :cite:p:`BSCII`.
 
