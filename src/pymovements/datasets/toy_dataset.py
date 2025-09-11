@@ -35,7 +35,7 @@ from pymovements.gaze.experiment import Experiment
 class ToyDataset(DatasetDefinition):
     """Example toy dataset.
 
-    This dataset includes monocular eye tracking data from a single participants in a single
+    This dataset includes monocular eye tracking data from a single participant in a single
     session. Eye movements are recorded at a sampling frequency of 1000 Hz using an EyeLink Portable
     Duo video-based eye tracker and are provided as pixel coordinates.
 
