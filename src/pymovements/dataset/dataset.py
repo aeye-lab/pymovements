@@ -40,7 +40,7 @@ from pymovements.events import Events
 from pymovements.events.precomputed import PrecomputedEventDataFrame
 from pymovements.gaze import Gaze
 from pymovements.reading_measures import ReadingMeasures
-
+from pymovements.stimulus.text import TextStimulus
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -71,6 +71,7 @@ class Dataset:
         self.events: list[Events] = []
         self.precomputed_events: list[PrecomputedEventDataFrame] = []
         self.precomputed_reading_measures: list[ReadingMeasures] = []
+        self.stimuli: list[TextStimulus] = []
 
         # Handle different definition input types
         if isinstance(definition, (str, Path)):
@@ -103,6 +104,7 @@ class Dataset:
             subset: dict[str, float | int | str | list[float | int | str]] | None = None,
             events_dirname: str | None = None,
             preprocessed_dirname: str | None = None,
+            stimuli_dirname: str | None = None,
             extension: str = 'feather',
     ) -> Dataset:
         """Parse file information and load all gaze files.
@@ -131,6 +133,8 @@ class Dataset:
             :py:meth:`pymovements.Dataset.path`.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`. (default: None)
+        stimuli_dirname: str | None
+            :py:meth:`pymovements.Dataset.stimuli_rootpath`. (default: None)
         extension: str
             Specifies the file format for loading data. Valid options are: `csv`, `feather`,
             `tsv`, `txt`, `asc`.
@@ -167,6 +171,12 @@ class Dataset:
             )
             for loaded_gaze, loaded_events in zip(self.gaze, self.events):
                 loaded_gaze.events = loaded_events
+
+        # Load text stimuli files if present
+        if self.definition.resources.has_content('stimuli'):
+            self.load_text_stimuli()
+            # stimuli_dirname=stimuli_dirname, # TODO custom dir name
+            # extension=extension,
 
         return self
 
@@ -367,6 +377,29 @@ class Dataset:
             extension=extension,
         )
         return self
+
+    def load_text_stimuli(self) -> None:
+        """Load text stimuli.
+
+        This method checks that the file information for text stimuli is available,
+        then loads each text stimulus file listed in `self.fileinfo['stimuli']` using
+        the dataset definition and path settings. The resulting list of
+        `TextStimulus` objects is assigned to `self.stimuli`.
+
+        Supported file extensions:
+        - CSV-like: .csv, .tsv, .txt
+
+        Raises
+        ------
+        ValueError
+            If the file info is missing or improperly formatted.
+        """
+        self._check_fileinfo()
+        self.stimuli = dataset_files.load_text_stimuli_files(
+            self.definition,
+            self.fileinfo['stimuli'],
+            self.paths,
+        )
 
     def apply(
             self,
