@@ -35,7 +35,7 @@ repos:
     -   id: databooks-meta
         args: [--cell-fields-keep=id]
 -   repo: https://github.com/pappasam/toml-sort
-    rev: v0.24.2
+    rev: v0.24.3
     hooks:
     -   id: toml-sort-fix
 -   repo: https://github.com/dannysepler/rm_unneeded_f_str
@@ -68,7 +68,7 @@ repos:
     -   id: nbqa-pyupgrade
         args: ["--py39-plus"]
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.17.1
+    rev: v1.18.1
     hooks:
     -   id: mypy
         additional_dependencies: [pandas-stubs, types-tqdm, types-PyYAML]
