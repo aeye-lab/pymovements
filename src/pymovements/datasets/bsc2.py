@@ -36,11 +36,11 @@ class BSCII(DatasetDefinition):
     data, based on the original Beijing Sentence Corpus (BSC) in Simplified Chinese. Data was
     collected from 60 native Traditional Chinese readers. The corpus enables analyses of word
     frequency, visual complexity, and predictability on fixation location and duration.
-    
+
     Since the BSCII sentences are nearly identical to those in the BSC, the two corpora together
     provide a valuable resource for studying cross-script similarities and differences between
     Simplified and Traditional Chinese.
-    
+
     Eye-movements were recorded with an Eyelink 1000 system at 1000 Hz.
 
     Check the respective paper for details :cite:p:`BSCII`.
