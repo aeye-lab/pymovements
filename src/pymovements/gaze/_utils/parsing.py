@@ -483,7 +483,17 @@ def parse_eyelink(
             block_duration = float(stop_recording_timestamp) - float(start_recording_timestamp)
             total_recording_duration += block_duration
             # Safely obtain the sampling rate from the last recording_config entry.
-            sampling_rate_last = _check_reccfg_key(recording_config, 'sampling_rate', float)
+            sampling_rate_last = None
+            if recording_config:
+                sampling_rate_val = recording_config[-1].get('sampling_rate')
+                sampling_rate_last = float(
+                    sampling_rate_val,
+                ) if sampling_rate_val is not None else None
+            else:
+                warn(
+                    'END recording message without associated START recording message. '
+                    f'file {filepath} may be corrupted. data-loss metrics may be incorrect.'
+                )
 
             if sampling_rate_last:
                 num_expected_samples += round(
