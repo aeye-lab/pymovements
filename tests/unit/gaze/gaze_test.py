@@ -23,6 +23,7 @@ from __future__ import annotations
 import os
 import re
 
+import numpy as np
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
@@ -268,7 +269,7 @@ def test_gaze_copy_events():
     assert_frame_equal(gaze.events.frame, gaze_copy.events.frame)
 
 
-def test_gaze_split():
+def test_gaze_split_by_str():
     gaze = Gaze(
         pl.DataFrame(
             {
@@ -289,8 +290,15 @@ def test_gaze_split():
     assert_frame_equal(gaze.samples.filter(pl.col('trial_id') == 1), split_gaze[1].samples)
     assert_frame_equal(gaze.samples.filter(pl.col('trial_id') == 2), split_gaze[2].samples)
 
+def test_gaze_split_example():
+    samples = pl.from_dict(
+        {'x': range(100), 'y': range(100), 'trial': np.repeat([1, 2, 3, 4, 5], 20)},
+    )
+    gaze = Gaze(samples=samples, pixel_columns=['x', 'y'], trial_columns='trial')
+    gazes = gaze.split(by='trial')
+    assert len(gazes) == 5
 
-def test_gaze_split_list():
+def test_gaze_split_by_list():
     gaze = Gaze(
         pl.DataFrame(
             {
@@ -315,27 +323,7 @@ def test_gaze_split_list():
     assert len(split_gaze) == 4
 
 
-def test_gaze_drop_event_properties(make_gaze_with_events):
-    gaze = make_gaze_with_events(names=['fixation', 'saccade'], properties=['test1', 'test2'])
-    gaze.drop_event_properties('test1')
-    assert set(gaze.events.event_property_columns) == {'test2'}
-
-
-def test_gaze_compute_event_properties_no_events():
-    gaze = Gaze(
-        pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64, 'trial_id': pl.Int8}),
-        position_columns=['x', 'y'],
-        trial_columns=['trial_id'],
-    )
-
-    with pytest.warns(
-        UserWarning,
-        match='No events available to compute event properties. Did you forget to use detect()?',
-    ):
-        gaze.compute_event_properties('amplitude')
-
-
-def test_gaze_dataframe_split_events():
+def test_gaze_split_events_by_str():
     gaze = Gaze(
         pl.DataFrame(
             {
@@ -367,7 +355,7 @@ def test_gaze_dataframe_split_events():
     assert_frame_equal(gaze.events.frame.filter(pl.col(by) == 2), split_gaze[2].events.frame)
 
 
-def test_gaze_dataframe_split_events_list():
+def test_gaze_dataframe_split_events_by_list():
     gaze = Gaze(
         pl.DataFrame(
             {
@@ -457,6 +445,26 @@ def test_gaze_dataframe_split_default_no_trial_columns():
 
     with pytest.raises(TypeError):
         gaze.split()
+
+
+def test_gaze_drop_event_properties(make_gaze_with_events):
+    gaze = make_gaze_with_events(names=['fixation', 'saccade'], properties=['test1', 'test2'])
+    gaze.drop_event_properties('test1')
+    assert set(gaze.events.event_property_columns) == {'test2'}
+
+
+def test_gaze_compute_event_properties_no_events():
+    gaze = Gaze(
+        pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64, 'trial_id': pl.Int8}),
+        position_columns=['x', 'y'],
+        trial_columns=['trial_id'],
+    )
+
+    with pytest.warns(
+        UserWarning,
+        match='No events available to compute event properties. Did you forget to use detect()?',
+    ):
+        gaze.compute_event_properties('amplitude')
 
 
 @pytest.mark.parametrize(

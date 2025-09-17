@@ -343,6 +343,8 @@ class Gaze:
             else [pm.Events()] * len(samples_list)
         )
 
+        print('foo:', len(samples_list), len(events_list))
+
         return [
             Gaze(
                 samples=samples,

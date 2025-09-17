@@ -423,7 +423,10 @@ class Events:
         """
         return self.clone()
 
-    def split(self, by: Sequence[str] | None = None) -> list[Events]:
+    def split(
+            self, by: Sequence[str] | None = None,
+            as_dict: bool = False,
+    ) -> list[Events] | dict[tuple[Any, ...], Events]:
         """Split the Events into multiple frames based on specified column(s).
 
         Parameters
@@ -433,6 +436,9 @@ class Events:
             it will be used as a single column name. If a list is provided, the Events
             will be split by unique combinations of values in all specified columns.
             If None, uses trial_columns. (default: None)
+        as_dict: bool
+            Return a dictionary instead of a list. The dictionary keys are tuples of the distinct
+            group values that identify each group split. (default: False)
 
         Returns
         -------
@@ -445,6 +451,9 @@ class Events:
             by = self.trial_columns
             if by is None:
                 raise TypeError("Either 'by' or 'self.trial_columns' must be specified")
+
+        if as_dict:
+            return self.frame.partition_by(by=by, as_dict=as_dict)
 
         event_pl_df_list = list(self.frame.partition_by(by=by))
 
