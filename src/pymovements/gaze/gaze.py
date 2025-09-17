@@ -367,12 +367,6 @@ class Gaze:
         >>> gazes = gaze.split(by='trial')
         >>> len(gazes)
         5
-
-
-- `by=["trial"]` → split by trial; each trial becomes a separate Gaze object.
-            - `by=["subject_id", "trial"]` → split by subject and trial; one Gaze object per
-            subject-trial pair.
-
         """
         # Use trial_columns if by is None
         if by is None:
