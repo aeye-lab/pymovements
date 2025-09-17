@@ -607,8 +607,8 @@ def test_from_asc_example_raises_exception(
             {'encoding': 'latin1'},
             Experiment(
                 screen=Screen(
-                    width_px=1920,
-                    height_px=1080,
+                    width_px=1921,
+                    height_px=1081,
                 ),
                 eyetracker=EyeTracker(
                     sampling_rate=1000.0,
@@ -629,8 +629,6 @@ def test_from_asc_example_has_expected_experiment(
 ):
     filepath = make_example_asc_file(filename)
     gaze = from_asc(filepath, **kwargs)
-    print(gaze.experiment)
-    print(expected_experiment)
     assert gaze.experiment == expected_experiment
 
 

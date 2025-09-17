@@ -576,8 +576,8 @@ def parse_eyelink(
     if not metadata:
         warnings.warn('No metadata found. Please check the file for errors.')
 
-# the actual tracked eye is in the samples config, not in the recording config
-# the recording config contains the eyes that were recorded
+    # the actual tracked eye is in the samples config, not in the recording config
+    # the recording config contains the eyes that were recorded
     sampling_rate_samples_config = _check_samples_config_key(samples_config, 'sampling_rate', float)
     sampling_rate_reccfg = _check_reccfg_key(recording_config, 'sampling_rate', float)
     if sampling_rate_samples_config and sampling_rate_reccfg:
@@ -590,9 +590,9 @@ def parse_eyelink(
             )
     metadata['sampling_rate'] = sampling_rate_samples_config
     metadata['recorded_eye'] = _check_reccfg_key(recording_config, 'tracked_eye')
-# the actual tracked eye is in the samples config, not in the recording config
-# the recording config contains the eyes that were recorded
-# RECCFG uses L/R/LR, SAMPLES uses LEFT/RIGHT/LEFT RIGHT
+    # the actual tracked eye is in the samples config, not in the recording config
+    # the recording config contains the eyes that were recorded
+    # RECCFG uses L/R/LR, SAMPLES uses LEFT/RIGHT/LEFT RIGHT
     tracked_eye_samples_config = _check_samples_config_key(samples_config, 'tracked_eye')
     if tracked_eye_samples_config == 'LEFT':
         metadata['tracked_eye'] = 'L'
