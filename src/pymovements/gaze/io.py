@@ -359,7 +359,7 @@ def from_asc(
 
     Running ``edf2asc`` with the default settings (no flags/parameters) will always produce
     an ASC file that can be read by ``from_asc()``.
-    
+
     Moreover, the following optional ``edf2asc`` parameters are safe to use
     and will also result in an ASC file that is compatible with ``from_asc()``:
 
