@@ -490,7 +490,7 @@ def parse_eyelink(
                     'END recording message without associated START recording message. '
                     f"File '{filepath}' may be corrupted. Data-loss metrics may be incorrect.",
                 )
-            else:
+            else:  # this will only be executed if no exception was raised in the try block.
                 total_recording_duration += block_duration
                 if current_sampling_rate:
                     num_expected_samples += round(
