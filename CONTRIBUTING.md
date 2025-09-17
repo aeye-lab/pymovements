@@ -134,10 +134,12 @@ We use [`flake8`](https://pypi.org/project/flake8/) for quick style checks and
 https://pypi.org/project/mypy/) for checking type annotations.
 
 You can check your code style by using [pre-commit](https://www.pre-commit.com).
-You can install `pre-commit` and `pylint` via pip:
+You can install `pre-commit` and `pylint` via pip.
+
+**Note**: Quoting '.[dev]' ensures the command works in both bash and zsh.
 
 ```bash
-pip install -e .[dev]
+pip install -e '.[dev]'
 ```
 
 To always run style checks when pushing commits upstream,
@@ -188,7 +190,7 @@ in a separate environment using [Tox](https://tox.readthedocs.io/en/latest/).
 If you have not yet installed `tox` and the testing dependencies you can do so via
 
 ```bash
-pip install -e .[dev]
+pip install -e '.[dev]'
 ```
 
 You can run all tests on all supported python versions run by simply calling `tox` in the repository root.
@@ -219,7 +221,7 @@ documentation as an example.
 To generate documentation pages, you can install the necessary dependencies using:
 
 ```bash
-pip install -e .[docs]
+pip install -e '.[docs]'
 ```
 
 [Sphinx](https://www.sphinx-doc.org) generates the API documentation from the
