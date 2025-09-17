@@ -326,7 +326,7 @@ class Gaze:
             original data with all metadata and configurations preserved.
 
         Notes
-        ------
+        -----
             The original gaze data and metadata are not modified; the method returns new
             Gaze objects.
 
