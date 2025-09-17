@@ -423,6 +423,77 @@ def test_init_expected_trial_column_data(kwargs, expected_trial_column_data):
     assert_frame_equal(events.frame[events.trial_columns], expected_trial_column_data)
 
 
+@pytest.mark.parametrize(
+    ('events_left', 'events_right', 'expected_equality'),
+    [
+        pytest.param(
+            Events(),
+            Events(),
+            True,
+            id='empty_events',
+        ),
+        pytest.param(
+            Events(),
+            Events(onsets=[0], offsets=[1]),
+            False,
+            id='one_empty_one_not',
+        ),
+        pytest.param(
+            Events(
+                pl.from_dict({'name': ['saccade'], 'onset': [0], 'offset': [1]}),
+            ),
+            Events(name=['saccade'], onsets=[0], offsets=[1]),
+            True,
+            id='same_events',
+        ),
+        pytest.param(
+            Events(
+                pl.from_dict({'name': ['saccade', None], 'onset': [0, 1], 'offset': [1, 2]}),
+            ),
+            Events(
+                pl.from_dict({'name': ['saccade', None], 'onset': [0, 1], 'offset': [1, 2]}),
+            ),
+            True,
+            id='same_events_with_nulls',
+        ),
+        pytest.param(
+            Events(name=['saccade'], onsets=[0], offsets=[1]),
+            Events(name=['fixation'], onsets=[0], offsets=[1]),
+            False,
+            id='different_events',
+        ),
+        pytest.param(
+            Events(name=['saccade'], onsets=[0], offsets=[1], trials=[0]),
+            Events(name=['saccade'], onsets=[0], offsets=[1], trials=[1]),
+            False,
+            id='same_events_different_trials',
+        ),
+        pytest.param(
+            Events(
+                pl.from_dict({'trial': [0], 'name': ['saccade'], 'onset': [0], 'offset': [1]}),
+                trial_columns='trial',
+            ),
+            Events(name=['saccade'], onsets=[0], offsets=[1], trials=[0]),
+            True,
+            id='same_events_same_trials',
+        ),
+        pytest.param(
+            Events(
+                pl.from_dict({'trial': [0], 'name': ['saccade'], 'onset': [0], 'offset': [1]}),
+                trial_columns='trial',
+            ),
+            Events(
+                pl.from_dict({'trial': [0], 'name': ['saccade'], 'onset': [0], 'offset': [1]}),
+            ),
+            False,
+            id='same_events_same_trials_different_trial_columns',
+        ),
+    ],
+)
+def test_equality(events_left, events_right, expected_equality):
+    assert (events_left == events_right) == expected_equality
+
+
 def test_columns_same_as_frame():
     init_kwargs = {'onsets': [0], 'offsets': [1]}
     events = Events(**init_kwargs)
