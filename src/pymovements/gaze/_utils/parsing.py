@@ -114,7 +114,7 @@ RECORDING_CONFIG_REGEX = re.compile(
 )
 
 # Resolution (GAZE_COORDS) pattern used to extract screen coordinates
-RESOLUTION_REGEX = re.compile(
+GAZE_COORDS_REGEX = re.compile(
     r'MSG\s+\d+[.]?\d*\s+GAZE_COORDS\s*=?\s*(?P<resolution>.*)',
 )
 
@@ -470,7 +470,7 @@ def parse_eyelink(
         elif match := RECORDING_CONFIG_REGEX.match(line):
             recording_config.append(match.groupdict())
 
-        elif match := RESOLUTION_REGEX.match(line):
+        elif match := GAZE_COORDS_REGEX.match(line):
             left, top, right, bottom = (float(coord) for coord in match.group('resolution').split())
             # GAZE_COORDS is always logged after RECCFG -> add it to the last recording_config
             recording_config[-1]['resolution'] = (right - left + 1, bottom - top + 1)
@@ -483,12 +483,7 @@ def parse_eyelink(
             block_duration = float(stop_recording_timestamp) - float(start_recording_timestamp)
             total_recording_duration += block_duration
             # Safely obtain the sampling rate from the last recording_config entry.
-            sampling_rate_last = None
-            if recording_config:
-                sampling_rate_val = recording_config[-1].get('sampling_rate')
-                sampling_rate_last = float(
-                    sampling_rate_val,
-                ) if sampling_rate_val is not None else None
+            sampling_rate_last = _check_reccfg_key(recording_config, 'sampling_rate', float)
 
             if sampling_rate_last:
                 num_expected_samples += round(
