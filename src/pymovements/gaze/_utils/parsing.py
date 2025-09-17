@@ -492,7 +492,7 @@ def parse_eyelink(
             else:
                 warn(
                     'END recording message without associated START recording message. '
-                    f'file {filepath} may be corrupted. data-loss metrics may be incorrect.'
+                    f'file {filepath} may be corrupted. data-loss metrics may be incorrect.',
                 )
 
             if sampling_rate_last:
