@@ -234,6 +234,46 @@ class Events:
         """
         self.frame = self.frame.join(event_properties, on=join_on, how='left')
 
+    def drop(
+            self,
+            columns: str | list[str],
+    ) -> None:
+        """Remove columns from the events data frame.
+
+        Notes
+        -----
+        The minimal schema columns ``name``, ``onset`` and ``offset`` cannot be removed.
+
+        Parameters
+        ----------
+        columns: str | list[str]
+            The columns in the event data frame to remove.
+
+        Raises
+        ------
+        ValueError
+            If ``columns`` do not exist in the event dataframe or it is not allowed to remove them.
+        """
+        if isinstance(columns, str):
+            columns = [columns]
+        existing_columns = set(self.frame.columns)
+        minimal_schema = set(self._minimal_schema)
+        for column in columns:
+            available_columns = existing_columns - minimal_schema
+            if column not in existing_columns:
+                raise ValueError(
+                    f"The column '{column}' does not exist and thus cannot be removed. "
+                    f"Available columns to remove: {available_columns}.",
+                )
+            if column in minimal_schema:
+                raise ValueError(
+                    f"The column '{column}' cannot be removed "
+                    'because it belongs to the minimal schema (onset, offset, name). '
+                    f"Available columns to remove: {available_columns}.",
+                )
+        for column in columns:
+            self.frame = self.frame.drop(column)
+
     def add_trial_column(
             self,
             column: str | list[str],

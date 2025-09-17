@@ -30,6 +30,7 @@ import pymovements as pm
 
 @pytest.fixture(name='gaze')
 def gaze_fixture():
+    # pylint: disable=duplicate-code
     x = np.arange(-100, 100)
     y = np.arange(-100, 100)
     arr = np.column_stack((x, y)).transpose()
@@ -111,3 +112,9 @@ def test_tsplot_save(gaze, monkeypatch, tmp_path):
     pm.plotting.tsplot(gaze=gaze, show=False, savepath=str(tmp_path / 'test.svg'))
     plt.close()
     mock.assert_called_once()
+
+
+def test_tsplot_sets_title(gaze):
+    fig, ax = pm.plotting.tsplot(gaze, title='My Title', show=False)
+    assert ax.get_title() == 'My Title'
+    plt.close(fig)

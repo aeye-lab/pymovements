@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test all Gaze functionality."""
+from __future__ import annotations
+
 import os
 import re
 
@@ -31,7 +33,32 @@ from pymovements import Experiment
 from pymovements import EyeTracker
 from pymovements import Gaze
 from pymovements import Screen
-# PK
+
+
+@pytest.fixture(name='make_gaze_with_events', scope='function')
+def fixture_make_gaze_with_events():
+    """Make a fixture function to create simple Gaze objects with event data."""
+
+    def _make_gaze_with_events(names: list[str], properties: list[str] | None = None) -> Gaze:
+        data = {
+            'name': names,
+            'onset': range(0, 2 * len(names), 2),
+            'offset': range(1, 2 * len(names) + 1, 2),
+        }
+        events = Events(pl.from_dict(data))
+        gaze = Gaze(events=events)
+
+        # adding columns afterward to not count them as non-property additional_columns
+        if properties is not None:
+            gaze.events.frame = gaze.events.frame.select(
+                [pl.all()] + [
+                    pl.int_ranges(0, 100 * len(names), 100).alias(property)
+                    for property in properties
+                ],
+            )
+        return gaze
+
+    return _make_gaze_with_events
 
 
 @pytest.mark.parametrize(
@@ -288,6 +315,12 @@ def test_gaze_split_list():
     assert len(split_gaze) == 4
 
 
+def test_gaze_drop_event_properties(make_gaze_with_events):
+    gaze = make_gaze_with_events(names=['fixation', 'saccade'], properties=['test1', 'test2'])
+    gaze.drop_event_properties('test1')
+    assert set(gaze.events.event_property_columns) == {'test2'}
+
+
 def test_gaze_compute_event_properties_no_events():
     gaze = Gaze(
         pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64, 'trial_id': pl.Int8}),
@@ -486,9 +519,10 @@ def _create_gaze():
             {
                 'x': [0, 1, 2, 3],
                 'y': [1, 1, 0, 0],
+                'pixel': [[260, 150], [270, 120], [271, 122], [240, 22]],
                 'trial_id': [0, 1, 1, 2],
             },
-            schema={'x': pl.Float64, 'y': pl.Float64, 'trial_id': pl.Int8},
+            schema={'x': pl.Float64, 'y': pl.Float64, 'pixel': list, 'trial_id': pl.Int8},
         ),
         experiment=Experiment(
             screen=Screen(

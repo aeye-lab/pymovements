@@ -22,14 +22,14 @@ from __future__ import annotations
 
 import sys
 
-import matplotlib.colors
 import matplotlib.pyplot as plt
 import matplotlib.scale
 import numpy as np
 
 from pymovements.gaze.gaze import Gaze
 from pymovements.plotting._matplotlib import _draw_line_data
-from pymovements.plotting._matplotlib import _setup_matplotlib
+from pymovements.plotting._matplotlib import _setup_axes_and_colormap
+from pymovements.plotting._matplotlib import finalize_figure
 from pymovements.plotting._matplotlib import LinearSegmentedColormapType
 
 # This is really a dirty workaround to use the Agg backend if runnning pytest.
@@ -57,7 +57,10 @@ def traceplot(
         add_stimulus: bool = False,
         path_to_image_stimulus: str | None = None,
         stimulus_origin: str = 'upper',
-) -> None:
+        *,
+        ax: plt.Axes | None = None,
+        closefig: bool | None = None,
+) -> tuple[plt.Figure, plt.Axes]:
     """Plot eye gaze trace from positional data.
 
     Parameters
@@ -97,6 +100,15 @@ def traceplot(
         Path to image stimulus. (default: None)
     stimulus_origin: str
         Origin of stimulus. (default: 'upper')
+    ax: plt.Axes | None
+        External axes to draw into. If provided, the function will not show or close the figure.
+    closefig: bool | None
+        Whether to close the figure. If None, close only when the function created the figure.
+
+    Returns
+    -------
+    tuple[plt.Figure, plt.Axes]
+        The created or provided figure and axes.
 
     Raises
     ------
@@ -122,7 +134,9 @@ def traceplot(
                 "but only 'upper left' is supported for traceplot.",
             )
 
-    fig, ax, cmap, cmap_norm, cval, show_cbar = _setup_matplotlib(
+    own_figure = ax is None
+
+    fig, ax, cmap, cmap_norm, cval, show_cbar = _setup_axes_and_colormap(
         x_signal,
         y_signal,
         figsize,
@@ -136,6 +150,7 @@ def traceplot(
         stimulus_origin,
         padding,
         pad_factor,
+        ax=ax,
     )
 
     line = _draw_line_data(
@@ -160,9 +175,13 @@ def traceplot(
     if title:
         ax.set_title(title)
 
-    if savepath is not None:
-        fig.savefig(savepath)
+    finalize_figure(
+        fig,
+        show=show,
+        savepath=savepath,
+        closefig=closefig,
+        own_figure=own_figure,
+        func_name='traceplot',
+    )
 
-    if show:
-        plt.show()
-    plt.close(fig)
+    return fig, ax
