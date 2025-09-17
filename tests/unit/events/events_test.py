@@ -424,7 +424,7 @@ def test_init_expected_trial_column_data(kwargs, expected_trial_column_data):
 
 
 @pytest.mark.parametrize(
-    ('events_left', 'events_right', 'expected_equality'),
+    ('events_left', 'events_right', 'expected'),
     [
         pytest.param(
             Events(),
@@ -490,8 +490,8 @@ def test_init_expected_trial_column_data(kwargs, expected_trial_column_data):
         ),
     ],
 )
-def test_equality(events_left, events_right, expected_equality):
-    assert (events_left == events_right) == expected_equality
+def test_equality_as_expected(events_left, events_right, expected):
+    assert (events_left == events_right) == expected
 
 
 def test_columns_same_as_frame():

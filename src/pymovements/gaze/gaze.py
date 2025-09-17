@@ -1760,6 +1760,14 @@ class Gaze:
         else:
             self.experiment = experiment
 
+    def __eq__(self, other: Gaze) -> bool:
+        """Check equality between this and another :py:cls:`~pymovements.Gaze` object."""
+        samples_equal = self.samples.equals(other.samples, null_equal=True)
+        events_equal = self.events == other.events
+        experiment_equal = self.experiment == other.experiment
+        trial_columns_equal = self.trial_columns == other.trial_columns
+        return samples_equal and events_equal and experiment_equal and trial_columns_equal
+
     def __str__(self) -> str:
         """Return string representation of Gaze."""
         if self.experiment is None:
