@@ -347,46 +347,45 @@ def from_asc(
 
     Notes
     -----
-    ASC files are created from EyeLink EDF files using the edf2asc tool
+    ASC files are created from EyeLink EDF files using the ``edf2asc`` tool
     (can be downloaded from the SR Research Support website).
     ASC files contain gaze samples, events, and metadata about
     the experiment in a text (ASCII) format.
     For example, if you have an Eyelink EDF file stored at
-    `tests/files/eyelink_monocular_example.edf`,
+    ``tests/files/eyelink_monocular_example.edf``,
     you can convert it to an ASC file using the following command:
-    `edf2asc tests/files/eyelink_monocular_example.edf`.
-    This will create an ASC file named `tests/files/eyelink_monocular_example.asc`.
+    ``edf2asc tests/files/eyelink_monocular_example.edf``.
+    This will create an ASC file named ``tests/files/eyelink_monocular_example.asc``.
 
-    Running edf2asc with the default settings (no flags/parameters) will always produce
-    an ASC file that can be read by this function, although currently only monocular
-    recordings are supported.
-    If a binocular ASC file is provided, only the left eye data will be read.
-    If you want to use right eye data, you can use the
-    `-r` or `-nl` edf2asc flags to get an ASC file with only right eye data.
-    Additionally, the following optional edf2asc parameters/flags are safe to use
-    and will also result in an ASC file that can be read by this function:
+    Running ``edf2asc`` with the default settings (no flags/parameters) will always produce
+    an ASC file that can be read by ``from_asc()``.
+    
+    Moreover, the following optional ``edf2asc`` parameters are safe to use
+    and will also result in an ASC file that is compatible with ``from_asc()``:
 
-    - `-input` for writing the status of the Host PC parallel port to the ASC
-      file (although these values will not be read).
+    - ``-input``: include the status of the Host PC parallel port (although the values will not be
+      read by `pymovements`).
 
-    - `-ftime` for outputting time as a floating point value.
+    - ``-ftime``: format timestamps as floating point values.
 
-    - `-t` for using only tabs as delimiters.
+    - ``-t``: use only tabs as delimiters.
 
-    - `-utf8` for forcing UTF-8 encoding of the ASC file.
+    - ``-utf8``: force UTF-8 encoding.
 
-    - `-buttons` for outputting button values in samples (although these values will not be read).
+    - ``-buttons``: include button events (although the values will not be read by `pymovements`).
 
-    - `-vel` and `-fvel` for outputting velocity values (although these values will not be read).
+    - ``-vel`` and ``-fvel``: include velocity values (although the values will not be read by
+      `pymovements`).
 
-    - `-l` or `-nr` and `-r` or `-nl`  for outputting left and right eye data only in case of a
-      binocular file (this is currently the only way to access right eye data).
+    - ``-l`` or ``-nr``: only include left eye data.
 
-    - `-avg` for outputting average values of the left and right eye data
-      in case of a binocular file (although these will not be read).
+    - ``-r`` or ``-nl``: only include right eye data.
 
-    Using other edf2asc parameters may lead to errors or unexpected behavior. For example, using
-    `-e` or `-ns` to output only events or `-s` or `-ne` to only output samples will not work
+    - ``-avg``: include average values of the left and right eye data in case of a binocular file
+      (although the values will not be read by `pymovements`).
+
+    Using other ``edf2asc`` parameters may lead to errors or unexpected behavior. For example, using
+    ``-e`` or ``-ns`` to output only events or ``-s`` or ``-ne`` to only output samples will not work
     with this function, as it expects both samples and events to be present in the ASC file.
 
 
