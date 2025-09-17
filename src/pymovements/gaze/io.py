@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import math
+import warnings
 from pathlib import Path
 from typing import Any
 
@@ -346,47 +347,46 @@ def from_asc(
 
     Notes
     -----
-    ASC files are created from EyeLink EDF files using the edf2asc tool
+    ASC files are created from EyeLink EDF files using the ``edf2asc`` tool
     (can be downloaded from the SR Research Support website).
     ASC files contain gaze samples, events, and metadata about
     the experiment in a text (ASCII) format.
     For example, if you have an Eyelink EDF file stored at
-    `tests/files/eyelink_monocular_example.edf`,
+    ``tests/files/eyelink_monocular_example.edf``,
     you can convert it to an ASC file using the following command:
-    `edf2asc tests/files/eyelink_monocular_example.edf`.
-    This will create an ASC file named `tests/files/eyelink_monocular_example.asc`.
+    ``edf2asc tests/files/eyelink_monocular_example.edf``.
+    This will create an ASC file named ``tests/files/eyelink_monocular_example.asc``.
 
-    Running edf2asc with the default settings (no flags/parameters) will always produce
-    an ASC file that can be read by this function, although currently only monocular
-    recordings are supported.
-    If a binocular ASC file is provided, only the left eye data will be read.
-    If you want to use right eye data, you can use the
-    `-r` or `-nl` edf2asc flags to get an ASC file with only right eye data.
-    Additionally, the following optional edf2asc parameters/flags are safe to use
-    and will also result in an ASC file that can be read by this function:
+    Running ``edf2asc`` with the default settings (no flags/parameters) will always produce
+    an ASC file that can be read by ``from_asc()``.
 
-    - `-input` for writing the status of the Host PC parallel port to the ASC
-      file (although these values will not be read).
+    Moreover, the following optional ``edf2asc`` parameters are safe to use
+    and will also result in an ASC file that is compatible with ``from_asc()``:
 
-    - `-ftime` for outputting time as a floating point value.
+    - ``-input``: include the status of the Host PC parallel port (although the values will not be
+      read by `pymovements`).
 
-    - `-t` for using only tabs as delimiters.
+    - ``-ftime``: format timestamps as floating point values.
 
-    - `-utf8` for forcing UTF-8 encoding of the ASC file.
+    - ``-t``: use only tabs as delimiters.
 
-    - `-buttons` for outputting button values in samples (although these values will not be read).
+    - ``-utf8``: force UTF-8 encoding.
 
-    - `-vel` and `-fvel` for outputting velocity values (although these values will not be read).
+    - ``-buttons``: include button events (although the values will not be read by `pymovements`).
 
-    - `-l` or `-nr` and `-r` or `-nl`  for outputting left and right eye data only in case of a
-      binocular file (this is currently the only way to access right eye data).
+    - ``-vel`` and ``-fvel``: include velocity values (although the values will not be read by
+      `pymovements`).
 
-    - `-avg` for outputting average values of the left and right eye data
-      in case of a binocular file (although these will not be read).
+    - ``-l`` or ``-nr``: only include left eye data.
 
-    Using other edf2asc parameters may lead to errors or unexpected behavior. For example, using
-    `-e` or `-ns` to output only events or `-s` or `-ne` to only output samples will not work
-    with this function, as it expects both samples and events to be present in the ASC file.
+    - ``-r`` or ``-nl``: only include right eye data.
+
+    - ``-avg``: include average values of the left and right eye data in case of a binocular file
+      (although the values will not be read by `pymovements`).
+
+    Using other ``edf2asc`` parameters may lead to errors or unexpected behavior. For example, using
+    ``-e`` or ``-ns`` to output only events or ``-s`` or ``-ne`` to only output samples will not
+    work with this function, as it expects both samples and events to be present in the ASC file.
 
 
     Examples
@@ -477,7 +477,26 @@ def from_asc(
     # Fill experiment with parsed metadata.
     experiment = _fill_experiment_from_parsing_metadata(experiment, metadata)
 
-    # Instantiate Gaze with parsed data.
+    # Detect pixel / position column names (monocular or binocular) and pass them to Gaze
+    # Note: column detection for ASC files now uses simple substring matching
+    # for 'pix' and 'pos' further down in `from_asc`. The older helper-based
+    # detection was removed to avoid duplication and simplify the logic.
+
+    cols = set(samples.columns)
+
+    # Simpler detection: pick any columns that contain the substrings 'pix' or 'pos'
+    # and pass them directly to Gaze. This covers monocular/binocular naming
+    # produced by parse_eyelink without complex subset checks.
+    # Annotate as optional so mypy knows these variables may be None.
+    detected_pixel_columns: list[str] | None = [c for c in samples.columns if '_pix' in c]
+
+    # Instantiate Gaze with parsed data using detected column names
+    # If binocular pupils exist, create a nested 'pupil' column [left, right]
+    if 'pupil_left' in cols and 'pupil_right' in cols:
+        samples = samples.with_columns(
+            pl.concat_list([pl.col('pupil_left'), pl.col('pupil_right')]).alias('pupil'),
+        ).drop(['pupil_left', 'pupil_right'])
+
     gaze = Gaze(
         samples=samples,
         experiment=experiment,
@@ -485,7 +504,7 @@ def from_asc(
         trial_columns=trial_columns,
         time_column='time',
         time_unit='ms',
-        pixel_columns=['x_pix', 'y_pix'],
+        pixel_columns=detected_pixel_columns,
     )
     gaze._metadata = metadata  # pylint: disable=protected-access
     return gaze
@@ -608,9 +627,12 @@ def _fill_experiment_from_parsing_metadata(
     # Screen resolution (assuming that width and height will always be missing or set together)
     experiment_resolution = (experiment.screen.width_px, experiment.screen.height_px)
     if experiment_resolution == (None, None):
-        width, height = metadata['resolution']
-        experiment.screen.width_px = math.ceil(width)
-        experiment.screen.height_px = math.ceil(height)
+        try:
+            width, height = metadata['resolution']
+            experiment.screen.width_px = math.ceil(width)
+            experiment.screen.height_px = math.ceil(height)
+        except TypeError:
+            warnings.warn('No screen resolution found.')
     elif experiment_resolution != metadata['resolution']:
         issues.append(f"Screen resolution: {experiment_resolution} != {metadata['resolution']}")
 
@@ -626,25 +648,30 @@ def _fill_experiment_from_parsing_metadata(
     if experiment.eyetracker.left is None:
         experiment.eyetracker.left = asc_left_eye
     elif experiment.eyetracker.left != asc_left_eye:
-        issues.append(f"Left eye tracked: {experiment.eyetracker.left} != {asc_left_eye}")
+        issues.append(f'Left eye tracked: {experiment.eyetracker.left} != {asc_left_eye}')
     if experiment.eyetracker.right is None:
         experiment.eyetracker.right = asc_right_eye
     elif experiment.eyetracker.right != asc_right_eye:
-        issues.append(f"Right eye tracked: {experiment.eyetracker.right} != {asc_right_eye}")
+        issues.append(f'Right eye tracked: {experiment.eyetracker.right} != {asc_right_eye}')
 
     # Mount configuration
     if experiment.eyetracker.mount is None:
-        experiment.eyetracker.mount = metadata['mount_configuration']['mount_type']
+        try:
+            experiment.eyetracker.mount = metadata['mount_configuration']['mount_type']
+        except KeyError:
+            warnings.warn('No mount configuration found.')
     elif experiment.eyetracker.mount != metadata['mount_configuration']['mount_type']:
-        issues.append(f"Mount configuration: {experiment.eyetracker.mount} != "
-                      f"{metadata['mount_configuration']['mount_type']}")
+        issues.append(
+            f'Mount configuration: {experiment.eyetracker.mount} != '
+            f"{metadata['mount_configuration']['mount_type']}",
+        )
 
     # Eye tracker vendor
     asc_vendor = 'EyeLink' if 'EyeLink' in metadata['model'] else None
     if experiment.eyetracker.vendor is None:
         experiment.eyetracker.vendor = asc_vendor
     elif experiment.eyetracker.vendor != asc_vendor:
-        issues.append(f"Eye tracker vendor: {experiment.eyetracker.vendor} != {asc_vendor}")
+        issues.append(f'Eye tracker vendor: {experiment.eyetracker.vendor} != {asc_vendor}')
 
     # Eye tracker model
     if experiment.eyetracker.model is None:
@@ -656,8 +683,10 @@ def _fill_experiment_from_parsing_metadata(
     if experiment.eyetracker.version is None:
         experiment.eyetracker.version = metadata['version_number']
     elif experiment.eyetracker.version != metadata['version_number']:
-        issues.append(f"Eye tracker software version: {experiment.eyetracker.version} != "
-                      f"{metadata['version_number']}")
+        issues.append(
+            f'Eye tracker software version: {experiment.eyetracker.version} != '
+            f"{metadata['version_number']}",
+        )
 
     if issues:
         raise ValueError(
