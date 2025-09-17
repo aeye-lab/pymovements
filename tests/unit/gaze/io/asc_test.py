@@ -994,3 +994,25 @@ def test_from_asc_example_has_expected_events(
     gaze = from_asc(filepath, **kwargs)
 
     assert_frame_equal(gaze.events.frame, expected_event_frame, check_column_order=False)
+
+
+@pytest.mark.filterwarnings('ignore:.*No metadata.*:UserWarning')
+@pytest.mark.filterwarnings('ignore:.*No mount configuration.*:UserWarning')
+@pytest.mark.filterwarnings('ignore:.*No recording configuration.*:UserWarning')
+@pytest.mark.filterwarnings('ignore:.*No samples configuration.*:UserWarning')
+@pytest.mark.filterwarnings('ignore:.*No screen resolution.*:UserWarning')
+@pytest.mark.parametrize(
+    ('header', 'body', 'expected_warning', 'expected_message'),
+    [
+        pytest.param(
+            '', 'END	1408901 	SAMPLES	EVENTS	RES	  47.75	  45.92',
+            UserWarning, 'END recording message without associated START recording message',
+            id='no_start_recording',
+        ),
+    ],
+)
+def test_from_asc_warns(header, body, expected_warning, expected_message, make_custom_asc_file):
+    filepath = make_custom_asc_file(filename='test.asc', header=header, body=body)
+
+    with pytest.warns(expected_warning, match=expected_message):
+        from_asc(filepath)

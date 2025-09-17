@@ -480,25 +480,22 @@ def parse_eyelink(
 
         elif match := STOP_RECORDING_REGEX.match(line):
             stop_recording_timestamp = match.groupdict()['timestamp']
-            block_duration = float(stop_recording_timestamp) - float(start_recording_timestamp)
-            total_recording_duration += block_duration
-            # Safely obtain the sampling rate from the last recording_config entry.
-            sampling_rate_last = None
-            if recording_config:
-                sampling_rate_val = recording_config[-1].get('sampling_rate')
-                sampling_rate_last = float(
-                    sampling_rate_val,
-                ) if sampling_rate_val is not None else None
-            else:
-                warn(
-                    'END recording message without associated START recording message. '
-                    f'file {filepath} may be corrupted. data-loss metrics may be incorrect.',
-                )
 
-            if sampling_rate_last:
-                num_expected_samples += round(
-                    block_duration * sampling_rate_last / 1000,
+            try:
+                # Safely obtain the sampling rate from the last recording_config entry.
+                block_duration = float(stop_recording_timestamp) - float(start_recording_timestamp)
+                current_sampling_rate = recording_config[-1].get('sampling_rate')
+            except UnboundLocalError:
+                warnings.warn(
+                    'END recording message without associated START recording message. '
+                    f"File '{filepath}' may be corrupted. Data-loss metrics may be incorrect.",
                 )
+            else:
+                total_recording_duration += block_duration
+                if current_sampling_rate:
+                    num_expected_samples += round(
+                        block_duration * float(current_sampling_rate) / 1000,
+                    )
 
         # Use the appropriate regex based on the file type
         eye_tracking_sample_match = (
