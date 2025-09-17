@@ -652,8 +652,8 @@ def _fill_experiment_from_parsing_metadata(
         )
 
     # Tracked eye
-    asc_left_eye = 'L' in (metadata['recorded_eye'] or '')
-    asc_right_eye = 'R' in (metadata['recorded_eye'] or '')
+    asc_left_eye = 'L' in (metadata['tracked_eye'] or '')
+    asc_right_eye = 'R' in (metadata['tracked_eye'] or '')
     if experiment.eyetracker.left is None:
         experiment.eyetracker.left = asc_left_eye
     elif experiment.eyetracker.left != asc_left_eye:

@@ -598,7 +598,7 @@ def parse_eyelink(
         metadata['tracked_eye'] = 'L'
     elif tracked_eye_samples_config == 'RIGHT':
         metadata['tracked_eye'] = 'R'
-    elif tracked_eye_samples_config == 'LEFT RIGHT':
+    elif tracked_eye_samples_config == 'LEFT\tRIGHT':
         metadata['tracked_eye'] = 'LR'
 
     if metadata['tracked_eye'] and metadata['recorded_eye']:
