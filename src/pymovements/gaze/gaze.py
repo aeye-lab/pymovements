@@ -319,11 +319,6 @@ class Gaze:
             will be split by unique combinations of values in all specified columns.
             If None, uses trial_columns. (default=None)
 
-            Examples:
-            - `by=["trial"]` → split by trial; each trial becomes a separate Gaze object.
-            - `by=["subject_id", "trial"]` → split by subject and trial; one Gaze object per
-            subject-trial pair.
-
         Returns
         -------
         list[Gaze]
@@ -332,10 +327,52 @@ class Gaze:
 
         Notes
         ------
-            - This method is particularly useful for large datasets or experiments where
-            analyses are performed at the trial or block level.
-            - The original gaze data and metadata are not modified; the method returns new
+            The original gaze data and metadata are not modified; the method returns new
             Gaze objects.
+
+        Examples
+        --------
+        First let's create a simple samples dataframe:
+        
+        >>> import numpy as np
+        >>> import polars as pl
+        >>> import pymovements as pm
+        >>> samples = pl.from_dict(
+        ...     {'x': range(100), 'y': range(100), 'trial': np.repeat([1, 2, 3, 4, 5], 20)},
+        ... )
+        >>> samples
+        shape: (3, 100)
+        ┌──────┬─────┬───────┐
+        │ x    ┆ y   ┆ trial │
+        │ ---  ┆ --- ┆ ----- │
+        │ i64  ┆ i64 ┆ i64   │
+        ╞══════╪═════╪═══════╡
+        │ 0    ┆ 0   ┆ 1     │
+        │ 1    ┆ 1   ┆ 1     │
+        │ 2    ┆ 3   ┆ 1     │
+        │ ...  ┆ ... ┆ ...   │
+        │ 97   ┆ 97  ┆ 5     │
+        │ 98   ┆ 98  ┆ 5     │
+        │ 99   ┆ 99  ┆ 5     │
+        └──────┴─────┴───────┘        
+        
+        Then let's initialize our `Gaze` object:
+        
+        >>> gaze = pm.Gaze(samples=samples, trial_columns='trial')
+        >>> gaze
+        example
+        
+        Now we can split the gaze by the 5 unique trial column values into 5 separate objects:
+        
+        >>> gazes = gaze.split(by='trial')
+        >>> len(gazes)
+        5
+        
+
+- `by=["trial"]` → split by trial; each trial becomes a separate Gaze object.
+            - `by=["subject_id", "trial"]` → split by subject and trial; one Gaze object per
+            subject-trial pair.
+
         """
         # Use trial_columns if by is None
         if by is None:
