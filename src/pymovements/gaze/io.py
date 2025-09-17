@@ -490,8 +490,6 @@ def from_asc(
     # produced by parse_eyelink without complex subset checks.
     # Annotate as optional so mypy knows these variables may be None.
     detected_pixel_columns: list[str] | None = [c for c in samples.columns if '_pix' in c]
-    if not detected_pixel_columns:
-        detected_pixel_columns = None
 
     # Instantiate Gaze with parsed data using detected column names
     # If binocular pupils exist, create a nested 'pupil' column [left, right]
