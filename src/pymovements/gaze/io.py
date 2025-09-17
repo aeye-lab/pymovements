@@ -34,11 +34,6 @@ from pymovements.gaze.experiment import Experiment
 from pymovements.gaze.gaze import Gaze
 
 
-# Note: column detection for ASC files now uses simple substring matching
-# for 'pix' and 'pos' further down in `from_asc`. The older helper-based
-# detection was removed to avoid duplication and simplify the logic.
-
-
 def from_csv(
         file: str | Path,
         experiment: Experiment | None = None,
@@ -484,6 +479,10 @@ def from_asc(
     experiment = _fill_experiment_from_parsing_metadata(experiment, metadata)
 
     # Detect pixel / position column names (monocular or binocular) and pass them to Gaze
+    # Note: column detection for ASC files now uses simple substring matching
+    # for 'pix' and 'pos' further down in `from_asc`. The older helper-based
+    # detection was removed to avoid duplication and simplify the logic.
+
     cols = set(samples.columns)
 
     # Simpler detection: pick any columns that contain the substrings 'pix' or 'pos'
