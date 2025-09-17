@@ -333,7 +333,7 @@ class Gaze:
         Examples
         --------
         First let's create a simple samples dataframe:
-        
+
         >>> import numpy as np
         >>> import polars as pl
         >>> import pymovements as pm
@@ -354,20 +354,20 @@ class Gaze:
         │ 97   ┆ 97  ┆ 5     │
         │ 98   ┆ 98  ┆ 5     │
         │ 99   ┆ 99  ┆ 5     │
-        └──────┴─────┴───────┘        
-        
+        └──────┴─────┴───────┘
+
         Then let's initialize our `Gaze` object:
-        
+
         >>> gaze = pm.Gaze(samples=samples, trial_columns='trial')
         >>> gaze
         example
-        
+
         Now we can split the gaze by the 5 unique trial column values into 5 separate objects:
-        
+
         >>> gazes = gaze.split(by='trial')
         >>> len(gazes)
         5
-        
+
 
 - `by=["trial"]` → split by trial; each trial becomes a separate Gaze object.
             - `by=["subject_id", "trial"]` → split by subject and trial; one Gaze object per
