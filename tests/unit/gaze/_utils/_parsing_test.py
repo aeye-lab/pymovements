@@ -1160,7 +1160,7 @@ def test_sampling_rate_inconsistent_warning(tmp_path):
     [
         ('SAMPLES\tGAZE\tLEFT\tRATE\t1000.00\tTRACKING\tCR\tFILTER\t2\n', 'L'),
         ('SAMPLES\tGAZE\tRIGHT\tRATE\t1000.00\tTRACKING\tCR\tFILTER\t2\n', 'R'),
-        ('SAMPLES\tGAZE\tLEFT RIGHT\tRATE\t1000.00\tTRACKING\tCR\tFILTER\t2\n', 'LR'),
+        ('SAMPLES\tGAZE\tLEFT\tRIGHT\tRATE\t1000.00\tTRACKING\tCR\tFILTER\t2\n', 'LR'),
     ],
 )
 @pytest.mark.filterwarnings('ignore:No metadata found.')
