@@ -489,13 +489,9 @@ def from_asc(
     # and pass them directly to Gaze. This covers monocular/binocular naming
     # produced by parse_eyelink without complex subset checks.
     # Annotate as optional so mypy knows these variables may be None.
-    pixel_columns_detect: list[str] | None = [c for c in samples.columns if 'pix' in c]
-    if not pixel_columns_detect:
-        pixel_columns_detect = None
-
-    position_columns_detect: list[str] | None = [c for c in samples.columns if 'pos' in c]
-    if not position_columns_detect:
-        position_columns_detect = None
+    detected_pixel_columns: list[str] | None = [c for c in samples.columns if '_pix' in c]
+    if not detected_pixel_columns:
+        detected_pixel_columns = None
 
     # Instantiate Gaze with parsed data using detected column names
     # If binocular pupils exist, create a nested 'pupil' column [left, right]
@@ -511,8 +507,7 @@ def from_asc(
         trial_columns=trial_columns,
         time_column='time',
         time_unit='ms',
-        pixel_columns=pixel_columns_detect,
-        position_columns=position_columns_detect,
+        pixel_columns=detected_pixel_columns,
     )
     gaze._metadata = metadata  # pylint: disable=protected-access
     return gaze
