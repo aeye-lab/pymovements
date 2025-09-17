@@ -385,8 +385,8 @@ def from_asc(
       (although the values will not be read by `pymovements`).
 
     Using other ``edf2asc`` parameters may lead to errors or unexpected behavior. For example, using
-    ``-e`` or ``-ns`` to output only events or ``-s`` or ``-ne`` to only output samples will not work
-    with this function, as it expects both samples and events to be present in the ASC file.
+    ``-e`` or ``-ns`` to output only events or ``-s`` or ``-ne`` to only output samples will not
+    work with this function, as it expects both samples and events to be present in the ASC file.
 
 
     Examples
