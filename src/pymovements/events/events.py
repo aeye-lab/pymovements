@@ -234,6 +234,46 @@ class Events:
         """
         self.frame = self.frame.join(event_properties, on=join_on, how='left')
 
+    def drop(
+            self,
+            columns: str | list[str],
+    ) -> None:
+        """Remove columns from the events data frame.
+
+        Notes
+        -----
+        The minimal schema columns ``name``, ``onset`` and ``offset`` cannot be removed.
+
+        Parameters
+        ----------
+        columns: str | list[str]
+            The columns in the event data frame to remove.
+
+        Raises
+        ------
+        ValueError
+            If ``columns`` do not exist in the event dataframe or it is not allowed to remove them.
+        """
+        if isinstance(columns, str):
+            columns = [columns]
+        existing_columns = set(self.frame.columns)
+        minimal_schema = set(self._minimal_schema)
+        for column in columns:
+            available_columns = existing_columns - minimal_schema
+            if column not in existing_columns:
+                raise ValueError(
+                    f"The column '{column}' does not exist and thus cannot be removed. "
+                    f"Available columns to remove: {available_columns}.",
+                )
+            if column in minimal_schema:
+                raise ValueError(
+                    f"The column '{column}' cannot be removed "
+                    'because it belongs to the minimal schema (onset, offset, name). '
+                    f"Available columns to remove: {available_columns}.",
+                )
+        for column in columns:
+            self.frame = self.frame.drop(column)
+
     def add_trial_column(
             self,
             column: str | list[str],
@@ -286,6 +326,70 @@ class Events:
         event_property_columns -= set(list(self._minimal_schema.keys()))
         event_property_columns -= set(self._additional_columns)
         return list(event_property_columns)
+
+    def _filter_by_prefix(self, prefix: str) -> pl.DataFrame:
+        """Filter events by name prefix.
+
+        Parameters
+        ----------
+        prefix: str
+            Event name prefix used to select rows (e.g., ``"fixation"``, ``"saccade"``).
+
+        Returns
+        -------
+        pl.DataFrame
+            DataFrame containing events whose ``name`` column starts with ``prefix``.
+        """
+        return self.frame.filter(pl.col('name').str.starts_with(prefix))
+
+    @property
+    def fixations(self) -> pl.DataFrame:
+        """Fixation events.
+
+        Returns
+        -------
+        pl.DataFrame
+            DataFrame containing all fixation events, i.e., rows where
+            ``name`` starts with ``"fixation"`` (e.g., ``"fixation"``, ``"fixation_ivt"``,
+            ``"fixation_eyelink"``).
+        """
+        return self._filter_by_prefix('fixation')
+
+    @property
+    def saccades(self) -> pl.DataFrame:
+        """Saccade events.
+
+        Returns
+        -------
+        pl.DataFrame
+            DataFrame containing all saccade events, i.e., rows where
+            ``name`` starts with ``"saccade"`` (e.g., ``"saccade"``, ``"saccade_algo"``).
+        """
+        return self._filter_by_prefix('saccade')
+
+    @property
+    def blinks(self) -> pl.DataFrame:
+        """Blink events.
+
+        Returns
+        -------
+        pl.DataFrame
+            DataFrame containing all blink events, i.e., rows where
+            ``name`` starts with ``"blink"`` (e.g., ``"blink"``, ``"blink_detectorX"``).
+        """
+        return self._filter_by_prefix('blink')
+
+    @property
+    def microsaccades(self) -> pl.DataFrame:
+        """Microsaccade events.
+
+        Returns
+        -------
+        pl.DataFrame
+            DataFrame containing all microsaccade events, i.e., rows where
+            ``name`` starts with ``"microsaccade"`` (e.g., ``"microsaccade"``).
+        """
+        return self._filter_by_prefix('microsaccade')
 
     def clone(self) -> Events:
         """Return a copy of an Events object.

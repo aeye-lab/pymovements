@@ -36,7 +36,7 @@ from pymovements.gaze.eyetracker import EyeTracker
 class ToyDatasetEyeLink(DatasetDefinition):
     """Example toy dataset with EyeLink data.
 
-    This dataset includes monocular eye tracking data from a single participants in a single
+    This dataset includes monocular eye tracking data from a single participant in a single
     session. Eye movements are recorded at a sampling frequency of 1000 Hz using an EyeLink Portable
     Duo video-based eye tracker and are provided as pixel coordinates.
 
