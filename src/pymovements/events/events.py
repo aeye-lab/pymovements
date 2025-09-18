@@ -531,6 +531,12 @@ class Events:
         aoi_df = pl.concat(aois)
         self.frame = pl.concat([self.frame, aoi_df], how='horizontal')
 
+    def __eq__(self, other: Events) -> bool:
+        """Check equality between this and another :py:cls:`~pymovements.Events` object."""
+        frames_equal = self.frame.equals(other.frame, null_equal=True)
+        trial_columns_equal = self.trial_columns == other.trial_columns
+        return frames_equal and trial_columns_equal
+
     def __str__(self: Any) -> str:
         """Return string representation of event dataframe."""
         return self.frame.__str__()

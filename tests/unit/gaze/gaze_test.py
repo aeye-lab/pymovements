@@ -203,6 +203,120 @@ def test_gaze_position_columns(init_df, position_columns):
     assert 'position' in gaze.columns
 
 
+@pytest.mark.parametrize(
+    ('gaze_left', 'gaze_right', 'expected'),
+    [
+        pytest.param(
+            Gaze(),
+            Gaze(),
+            True,
+            id='empty_gaze',
+        ),
+        pytest.param(
+            Gaze(
+                samples=pl.from_dict({'time': [0, 1], 'x': [20, 21], 'y': [30, 34]}),
+                pixel_columns=['x', 'y'],
+            ),
+            Gaze(
+                samples=pl.from_dict({'time': [0, 1], 'x': [20, 21], 'y': [30, 34]}),
+                pixel_columns=['x', 'y'],
+            ),
+            True,
+            id='same_samples',
+        ),
+        pytest.param(
+            Gaze(
+                samples=pl.from_dict({'time': [0, 1], 'x': [20, 21], 'y': [30, 34]}),
+                pixel_columns=['x', 'y'],
+            ),
+            Gaze(
+                samples=pl.from_dict({'time': [0, 1], 'x': [20, 21], 'y': [10, 14]}),
+                pixel_columns=['x', 'y'],
+            ),
+            False,
+            id='different_samples',
+        ),
+        pytest.param(
+            Gaze(
+                samples=pl.from_dict(
+                    {'time': [0, 1], 'x': [20, 21], 'y': [30, 34], 'trial': [1, 2]},
+                ),
+                pixel_columns=['x', 'y'],
+                trial_columns='trial',
+            ),
+            Gaze(
+                samples=pl.from_dict(
+                    {'time': [0, 1], 'x': [20, 21], 'y': [30, 34], 'trial': [1, 2]},
+                ),
+                pixel_columns=['x', 'y'],
+                trial_columns='trial',
+            ),
+            True,
+            id='same_samples_same_trial_columns',
+        ),
+        pytest.param(
+            Gaze(
+                samples=pl.from_dict(
+                    {'time': [0, 1], 'x': [20, 21], 'y': [30, 34], 'trial': [1, 2]},
+                ),
+                pixel_columns=['x', 'y'],
+                trial_columns='trial',
+            ),
+            Gaze(
+                samples=pl.from_dict(
+                    {'time': [0, 1], 'x': [20, 21], 'y': [30, 34], 'trial': [1, 2]},
+                ),
+                pixel_columns=['x', 'y'],
+            ),
+            False,
+            id='same_samples_different_trial_columns',
+        ),
+        pytest.param(
+            Gaze(
+                samples=pl.from_dict({'time': [0, 1], 'x': [20, 21], 'y': [30, 34]}),
+                pixel_columns=['x', 'y'],
+                events=Events(name=['saccade'], onsets=[0], offsets=[1]),
+            ),
+            Gaze(
+                samples=pl.from_dict({'time': [0, 1], 'x': [20, 21], 'y': [30, 34]}),
+                pixel_columns=['x', 'y'],
+                events=Events(name=['saccade'], onsets=[0], offsets=[1]),
+            ),
+            True,
+            id='same_samples_same_events',
+        ),
+        pytest.param(
+            Gaze(
+                samples=pl.from_dict({'time': [0, 1], 'x': [20, 21], 'y': [30, 34]}),
+                pixel_columns=['x', 'y'],
+                events=Events(name=['saccade'], onsets=[0], offsets=[1]),
+            ),
+            Gaze(
+                samples=pl.from_dict({'time': [0, 1], 'x': [20, 21], 'y': [30, 34]}),
+                pixel_columns=['x', 'y'],
+                events=Events(name=['fixation'], onsets=[0], offsets=[1]),
+            ),
+            False,
+            id='same_samples_different_events',
+        ),
+        pytest.param(
+            Gaze(experiment=Experiment(1024, 768, 38, 30, 60, 'center', 1000)),
+            Gaze(experiment=Experiment(1024, 768, 38, 30, 60, 'center', 1000)),
+            True,
+            id='same_experiment',
+        ),
+        pytest.param(
+            Gaze(experiment=Experiment(1024, 768, 38, 30, 60, 'center', 1000)),
+            Gaze(experiment=Experiment(1280, 1024, 38, 30, 60, 'center', 1000)),
+            False,
+            id='different_experiment',
+        ),
+    ],
+)
+def test_gaze_equals(gaze_left, gaze_right, expected):
+    assert (gaze_left == gaze_right) == expected
+
+
 def test_gaze_copy_with_experiment():
     gaze = Gaze(
         pl.DataFrame(schema={'x': pl.Float64, 'y': pl.Float64}),
