@@ -226,6 +226,24 @@ def test_gaze_position_columns(init_df, position_columns):
         ),
         pytest.param(
             Gaze(
+                samples=pl.from_dict(
+                    {'time': [0, 1], 'x': [20, 21], 'y': [30, 34]},
+                    schema={'time': pl.Int64, 'x': pl.Int64, 'y': pl.Int64},
+                ),
+                pixel_columns=['x', 'y'],
+            ),
+            Gaze(
+                samples=pl.from_dict(
+                    {'time': [0, 1], 'x': [20, 21], 'y': [30, 34]},
+                    schema={'time': pl.Float64, 'x': pl.Float64, 'y': pl.Float64},
+                ),
+                pixel_columns=['x', 'y'],
+            ),
+            True,
+            id='same_samples_int_float',
+        ),
+        pytest.param(
+            Gaze(
                 samples=pl.from_dict({'time': [0, 1], 'x': [20, 21], 'y': [30, 34]}),
                 pixel_columns=['x', 'y'],
             ),
