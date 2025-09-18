@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Gaze implementation."""
+# pylint: disable=too-many-lines
 from __future__ import annotations
 
 import inspect
@@ -325,6 +326,70 @@ class Gaze:
         list[Gaze]
             A list of new Gaze instances, each containing a partition of the
             original data with all metadata and configurations preserved.
+
+        Notes
+        -----
+            The original gaze data and metadata are not modified; the method returns new
+            Gaze objects.
+
+        Examples
+        --------
+        First let's create a simple samples dataframe:
+
+        >>> import numpy as np
+        >>> import polars as pl
+        >>> import pymovements as pm
+        >>> samples = pl.from_dict(
+        ...     {'x': range(100), 'y': range(100), 'trial': np.repeat([1, 2, 3, 4, 5], 20)},
+        ... )
+        >>> samples
+        shape: (100, 3)
+        ┌─────┬─────┬───────┐
+        │ x   ┆ y   ┆ trial │
+        │ --- ┆ --- ┆ ---   │
+        │ i64 ┆ i64 ┆ i64   │
+        ╞═════╪═════╪═══════╡
+        │ 0   ┆ 0   ┆ 1     │
+        │ 1   ┆ 1   ┆ 1     │
+        │ 2   ┆ 2   ┆ 1     │
+        │ 3   ┆ 3   ┆ 1     │
+        │ 4   ┆ 4   ┆ 1     │
+        │ …   ┆ …   ┆ …     │
+        │ 95  ┆ 95  ┆ 5     │
+        │ 96  ┆ 96  ┆ 5     │
+        │ 97  ┆ 97  ┆ 5     │
+        │ 98  ┆ 98  ┆ 5     │
+        │ 99  ┆ 99  ┆ 5     │
+        └─────┴─────┴───────┘
+
+        Then let's initialize our `Gaze` object:
+
+        >>> gaze = pm.Gaze(samples=samples, pixel_columns=['x', 'y'], trial_columns='trial')
+        >>> gaze
+        shape: (100, 2)
+        ┌───────┬───────────┐
+        │ trial ┆ pixel     │
+        │ ---   ┆ ---       │
+        │ i64   ┆ list[i64] │
+        ╞═══════╪═══════════╡
+        │ 1     ┆ [0, 0]    │
+        │ 1     ┆ [1, 1]    │
+        │ 1     ┆ [2, 2]    │
+        │ 1     ┆ [3, 3]    │
+        │ 1     ┆ [4, 4]    │
+        │ …     ┆ …         │
+        │ 5     ┆ [95, 95]  │
+        │ 5     ┆ [96, 96]  │
+        │ 5     ┆ [97, 97]  │
+        │ 5     ┆ [98, 98]  │
+        │ 5     ┆ [99, 99]  │
+        └───────┴───────────┘
+
+        Now we can split the gaze by the 5 unique trial column values into 5 separate objects:
+
+        >>> gazes = gaze.split(by='trial')
+        >>> len(gazes)
+        5
         """
         # Use trial_columns if by is None
         if by is None:
