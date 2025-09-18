@@ -424,7 +424,9 @@ class Events:
         return self.clone()
 
     def split(
-            self, by: Sequence[str] | None = None,
+            self,
+            by: Sequence[str] | None = None,
+            *,
             as_dict: bool = False,
     ) -> list[Events] | dict[tuple[Any, ...], Events]:
         """Split the Events into multiple frames based on specified column(s).
@@ -442,32 +444,29 @@ class Events:
 
         Returns
         -------
-        list[Events]
-            A list of new Events instances, each containing a partition of the
-            original data with all metadata and configurations preserved.
+        list[Events] | dict[tuple[Any, ...], Events]
+            A list (or a dictionary in case of ``as_dict==True`) of new Events instances, each
+            containing a partition of the original data with all metadata and configurations
+            preserved.
         """
         # Use trial_columns if by is None
         if by is None:
             by = self.trial_columns
             if by is None:
-                raise TypeError("Either 'by' or 'self.trial_columns' must be specified")
+                raise TypeError("Either 'by' or 'Events.trial_columns' must be specified")
+
+        event_dfs = self.frame.partition_by(by=by, as_dict=as_dict)
 
         if as_dict:
-            return self.frame.partition_by(by=by, as_dict=as_dict)
+            # keys are tuples of the unique values of the columns specified in `by`.
+            return {
+                key: Events(frame, trial_columns=self.trial_columns)
+                for key, frame in event_dfs.items()
+            }
 
-        event_pl_df_list = list(self.frame.partition_by(by=by))
-
-        # Ensure column order: trial columns, name, onset, offset.
-        if self.trial_columns is not None:
-            event_pl_df_list = [
-                frame.select([*self.trial_columns, *self._minimal_schema.keys()])
-                for frame in event_pl_df_list
-            ]
         return [
-            Events(
-                frame,
-                trial_columns=self.trial_columns,
-            ) for frame in event_pl_df_list
+            Events(frame, trial_columns=self.trial_columns)
+            for frame in event_dfs
         ]
 
     def _add_minimal_schema_columns(self, df: pl.DataFrame) -> pl.DataFrame:

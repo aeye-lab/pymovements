@@ -404,6 +404,7 @@ def test_gaze_split_by_str():
     assert_frame_equal(gaze.samples.filter(pl.col('trial_id') == 1), split_gaze[1].samples)
     assert_frame_equal(gaze.samples.filter(pl.col('trial_id') == 2), split_gaze[2].samples)
 
+
 def test_gaze_split_example():
     samples = pl.from_dict(
         {'x': range(100), 'y': range(100), 'trial': np.repeat([1, 2, 3, 4, 5], 20)},
@@ -411,6 +412,7 @@ def test_gaze_split_example():
     gaze = Gaze(samples=samples, pixel_columns=['x', 'y'], trial_columns='trial')
     gazes = gaze.split(by='trial')
     assert len(gazes) == 5
+
 
 def test_gaze_split_by_list():
     gaze = Gaze(

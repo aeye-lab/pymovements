@@ -330,7 +330,7 @@ class Gaze:
         if by is None:
             by = self.trial_columns
             if by is None:
-                raise TypeError("Either 'by' or 'self.trial_columns' must be specified")
+                raise TypeError("Either 'by' or 'Gaze.trial_columns' must be specified")
 
         # Convert single string to list for consistent handling
         by = [by] if isinstance(by, str) else by

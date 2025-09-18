@@ -687,7 +687,7 @@ def test_split_default():
     assert_frame_equal(events.frame.filter(pl.col('trial_id') == 2), split_event[2].frame)
 
 
-def test_split_default_no_trial_columns():
+def test_split_default_no_trial_columns_raises_typeerror():
     events = Events(
         pl.DataFrame(
             {
@@ -699,42 +699,8 @@ def test_split_default_no_trial_columns():
             },
         ),
     )
-    with pytest.raises(TypeError, match="Either 'by' or 'self.trial_columns' must be specified"):
+    with pytest.raises(TypeError, match="Either 'by' or 'Events.trial_columns' must be specified"):
         events.split()
-
-
-@pytest.mark.parametrize(
-    ('by', 'expected_keys'),
-    [
-        pytest.param(
-            'trial_id',
-            {(0, ), (1, ), (2, )},
-            id='trial_id',
-        ),
-        pytest.param(
-            'task_id',
-            {('A', ), ('B', ), ('C', ), ('D', )},
-            id='task_id',
-        ),
-    ],
-)
-def test_split_as_dict_returns_expected_keys(by, expected_keys):
-    events = Events(
-        pl.DataFrame(
-            {
-                'trial_id': [0, 1, 1, 2],
-                'task_id': ['A', 'B', 'C', 'D'],
-                'name': ['fixation', 'fixation', 'fixation', 'fixation'],
-                'onset': [0, 1, 2, 3],
-                'offset': [1, 2, 44, 1340],
-                'duration': [1, 1, 42, 1337],
-            },
-        ),
-    )
-
-    splits = events.split(by=by, as_dict=True)
-
-    assert set(splits.keys()) == expected_keys
 
 
 @pytest.mark.parametrize(
@@ -743,7 +709,7 @@ def test_split_as_dict_returns_expected_keys(by, expected_keys):
         pytest.param(
             'trial_id',
             {
-                (0, ): Events(
+                (0,): Events(
                     pl.DataFrame({
                         'trial_id': [0],
                         'task_id': ['A'],
@@ -753,7 +719,7 @@ def test_split_as_dict_returns_expected_keys(by, expected_keys):
                         'duration': [1],
                     }),
                 ),
-                (1, ): Events(
+                (1,): Events(
                     pl.DataFrame({
                         'trial_id': [1, 1],
                         'task_id': ['B', 'C'],
@@ -763,7 +729,7 @@ def test_split_as_dict_returns_expected_keys(by, expected_keys):
                         'duration': [1, 42],
                     }),
                 ),
-                (2, ): Events(
+                (2,): Events(
                     pl.DataFrame({
                         'trial_id': [2],
                         'task_id': ['D'],
@@ -779,10 +745,46 @@ def test_split_as_dict_returns_expected_keys(by, expected_keys):
         pytest.param(
             'task_id',
             {
-                ('A', ): Events(),
-                ('B', ): Events(),
-                ('C', ): Events(),
-                ('D', ): Events(),
+                ('A',): Events(
+                    pl.DataFrame({
+                        'trial_id': [0],
+                        'task_id': ['A'],
+                        'name': ['fixation'],
+                        'onset': [0],
+                        'offset': [1],
+                        'duration': [1],
+                    }),
+                ),
+                ('B',): Events(
+                    pl.DataFrame({
+                        'trial_id': [1],
+                        'task_id': ['B'],
+                        'name': ['fixation'],
+                        'onset': [1],
+                        'offset': [2],
+                        'duration': [1],
+                    }),
+                ),
+                ('C',): Events(
+                    pl.DataFrame({
+                        'trial_id': [1],
+                        'task_id': ['C'],
+                        'name': ['fixation'],
+                        'onset': [2],
+                        'offset': [44],
+                        'duration': [42],
+                    }),
+                ),
+                ('D',): Events(
+                    pl.DataFrame({
+                        'trial_id': [2],
+                        'task_id': ['D'],
+                        'name': ['fixation'],
+                        'onset': [3],
+                        'offset': [1340],
+                        'duration': [1337],
+                    }),
+                ),
             },
             id='task_id',
         ),
@@ -806,7 +808,7 @@ def test_split_as_dict_returns_expected_dict(by, expected_dict):
 
     assert splits.keys() == expected_dict.keys()
     for key in splits.keys():
-        assert_frame_equal(splits[key].frame, expected_dict[key].frame)
+        assert splits[key] == expected_dict[key]
 
 
 def test_fixations_filter(make_events):
