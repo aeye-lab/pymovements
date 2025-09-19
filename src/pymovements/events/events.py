@@ -451,9 +451,9 @@ class Events:
         """
         # Use trial_columns if by is None
         if by is None:
-            by = self.trial_columns
-            if by is None:
+            if self.trial_columns is None:
                 raise TypeError("Either 'by' or 'Events.trial_columns' must be specified")
+            by = self.trial_columns
 
         event_dfs = self.frame.partition_by(by=by, as_dict=as_dict)
 

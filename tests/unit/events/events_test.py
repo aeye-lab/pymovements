@@ -704,7 +704,7 @@ def test_split_default_no_trial_columns_raises_typeerror():
 
 
 @pytest.mark.parametrize(
-    ('by', 'expected_dict'),
+    ('by', 'expected_splits'),
     [
         pytest.param(
             'trial_id',
@@ -790,7 +790,7 @@ def test_split_default_no_trial_columns_raises_typeerror():
         ),
     ],
 )
-def test_split_as_dict_returns_expected_dict(by, expected_dict):
+def test_split_as_dict_returns_expected_dict(by, expected_splits):
     events = Events(
         pl.DataFrame(
             {
@@ -806,9 +806,7 @@ def test_split_as_dict_returns_expected_dict(by, expected_dict):
 
     splits = events.split(by=by, as_dict=True)
 
-    assert splits.keys() == expected_dict.keys()
-    for key in splits.keys():
-        assert splits[key] == expected_dict[key]
+    assert splits == expected_splits
 
 
 def test_fixations_filter(make_events):

@@ -309,7 +309,12 @@ class Gaze:
         else:
             raise ValueError(f"unsupported method '{function}'")
 
-    def split(self, by: Sequence[str] | None = None) -> list[Gaze]:
+    def split(
+            self,
+            by: Sequence[str] | None = None,
+            *,
+            as_dict: bool = False,
+    ) -> list[Gaze] | dict[tuple[Any, ...], Gaze]:
         """Split a single Gaze object into multiple Gaze objects based on specified column(s).
 
         Parameters
@@ -319,43 +324,54 @@ class Gaze:
             it will be used as a single column name. If a sequence is provided, the DataFrame
             will be split by unique combinations of values in all specified columns.
             If None, uses trial_columns. (default=None)
+        as_dict: bool
+            Return a dictionary instead of a list. The dictionary keys are tuples of the distinct
+            group values that identify each group split. (default: False)
 
         Returns
         -------
-        list[Gaze]
+        list[Gaze] | dict[tuple[Any, ...], Gaze]
             A list of new Gaze instances, each containing a partition of the
             original data with all metadata and configurations preserved.
         """
         # Use trial_columns if by is None
         if by is None:
-            by = self.trial_columns
-            if by is None:
+            if self.trial_columns is None:
                 raise TypeError("Either 'by' or 'Gaze.trial_columns' must be specified")
+            by = self.trial_columns
 
         # Convert single string to list for consistent handling
         by = [by] if isinstance(by, str) else by
-        samples_list = self.samples.partition_by(by=by)
 
+        # We use as_dict=True here to make sure to map samples to the correct events.
+        grouped_samples = self.samples.partition_by(by=by, as_dict=True)
+
+        '''
         # Check if all columns in 'by' are in events columns
         events_list = (
             self.events.split(by)
             if all(col in self.events.columns for col in by)
             else [pm.Events()] * len(samples_list)
         )
+        '''
 
-        print('foo:', len(samples_list), len(events_list))
+        grouped_events = self.events.split(by=by, as_dict=True)
 
-        return [
-            Gaze(
-                samples=samples,
+        keys = sorted(set(grouped_samples.keys()) | set(grouped_events.keys()))
+
+        gazes = {
+            key: Gaze(
+                samples=grouped_samples.get(key, None),
+                events=grouped_events.get(key, None),
                 experiment=self.experiment,
                 trial_columns=self.trial_columns,
-                time_column='time',
-                distance_column='distance',
-                events=events,
             )
-            for samples, events in zip(samples_list, events_list)
-        ]
+            for key in keys
+        }
+
+        if as_dict:
+            return gazes
+        return list(gazes.values())
 
     def transform(
             self,
