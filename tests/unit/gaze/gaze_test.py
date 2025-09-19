@@ -453,9 +453,9 @@ def test_gaze_split_example():
             'trial',
             {
                 (1,): Gaze(
-                samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1]}),
-                pixel_columns=['x', 'y'], trial_columns='trial',
-            ),
+                    samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1]}),
+                    pixel_columns=['x', 'y'], trial_columns='trial',
+                ),
             },
             id='samples_one_events_empty_trial_by_single_column',
         ),
@@ -467,9 +467,9 @@ def test_gaze_split_example():
             None,
             {
                 (1,): Gaze(
-                samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1]}),
-                pixel_columns=['x', 'y'], trial_columns='trial',
-            ),
+                    samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1]}),
+                    pixel_columns=['x', 'y'], trial_columns='trial',
+                ),
             },
             id='samples_one_trial_by_none',
         ),
@@ -480,7 +480,7 @@ def test_gaze_split_example():
             ),
             ['task', 'trial'],
             {
-                ('A', 1,): Gaze(
+                ('A', 1): Gaze(
                     samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1], 'task': ['A']}),
                     pixel_columns=['x', 'y'], trial_columns=['task', 'trial'],
                 ),
