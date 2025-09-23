@@ -707,159 +707,94 @@ def test_split_default_no_trial_columns_raises_typeerror():
     ('events', 'by', 'expected_splits'),
     [
         pytest.param(
-            Events(
-                pl.DataFrame(
-                    {
-                        'trial_id': [0, 1, 1, 2],
-                        'name': ['fixation', 'saccade', 'blink', 'fixation'],
-                        'onset': [0, 10, 20, 30],
-                        'offset': [1, 12, 24, 40],
-                    },
-                ),
-            ),
+            Events(pl.from_dict({
+                'trial_id': [0, 1],
+                'name': ['fixation', 'saccade'],
+                'onset': [0, 10],
+                'offset': [1, 12],
+            })),
             'trial_id',
             {
-                (0,): Events(
-                    pl.DataFrame({
-                        'trial_id': [0],
-                        'name': ['fixation'],
-                        'onset': [0],
-                        'offset': [1],
-                    }),
-                ),
-                (1,): Events(
-                    pl.DataFrame({
-                        'trial_id': [1, 1],
-                        'name': ['saccade', 'blink'],
-                        'onset': [10, 20],
-                        'offset': [12, 24],
-                    }),
-                ),
-                (2,): Events(
-                    pl.DataFrame({
-                        'trial_id': [2],
-                        'name': ['fixation'],
-                        'onset': [30],
-                        'offset': [40],
-                    }),
-                ),
+                (0,): Events(pl.from_dict({
+                    'trial_id': [0],
+                    'name': ['fixation'],
+                    'onset': [0],
+                    'offset': [1],
+                })),
+                (1,): Events(pl.from_dict({
+                    'trial_id': [1],
+                    'name': ['saccade'],
+                    'onset': [10],
+                    'offset': [12],
+                })),
             },
-            id='trial_id',
+            id='single_column',
         ),
         pytest.param(
-            Events(
-                pl.DataFrame(
-                    {
-                        'trial_id': [0, 1, 1, 2],
-                        'name': ['fixation', 'saccade', 'blink', 'fixation'],
-                        'onset': [0, 10, 20, 30],
-                        'offset': [1, 12, 24, 40],
-                    },
-                ),
-                trial_columns='trial_id',
-            ),
+            Events(onsets=[20, 30], offsets=[24, 40], name=['blink', 'fixation'], trials=[1, 2]),
             None,
             {
-                (0,): Events(
-                    pl.DataFrame({
-                        'trial_id': [0],
-                        'name': ['fixation'],
-                        'onset': [0],
-                        'offset': [1],
-                    }),
-                    trial_columns='trial_id',
-                ),
-                (1,): Events(
-                    pl.DataFrame({
-                        'trial_id': [1, 1],
-                        'name': ['saccade', 'blink'],
-                        'onset': [10, 20],
-                        'offset': [12, 24],
-                    }),
-                    trial_columns='trial_id',
-                ),
-                (2,): Events(
-                    pl.DataFrame({
-                        'trial_id': [2],
-                        'name': ['fixation'],
-                        'onset': [30],
-                        'offset': [40],
-                    }),
-                    trial_columns='trial_id',
-                ),
+                (1,): Events(onsets=[20], offsets=[24], name=['blink'], trials=[1]),
+                (2,): Events(onsets=[30], offsets=[40], name=['fixation'], trials=[2]),
             },
-            id='default_single_trial_column',
+            id='single_column_default',
         ),
         pytest.param(
-            Events(
-                pl.DataFrame(
-                    {
-                        'trial_id': [0, 1, 1, 2],
-                        'task_id': ['A', 'B', 'C', 'D'],
-                        'name': ['saccade', 'fixation', 'blink', 'fixation'],
-                        'onset': [0, 1, 2, 3],
-                        'offset': [1, 2, 44, 1340],
-                    },
-                ),
-            ),
+            Events(pl.from_dict({
+                'trial_id': [0, 1, 1, 2],
+                'task_id': ['A', 'B', 'C', 'D'],
+                'name': ['saccade', 'fixation', 'blink', 'fixation'],
+                'onset': [0, 1, 2, 3],
+                'offset': [1, 2, 44, 1340],
+            })),
             'task_id',
             {
-                ('A',): Events(
-                    pl.DataFrame({
-                        'trial_id': [0],
-                        'task_id': ['A'],
-                        'name': ['saccade'],
-                        'onset': [0],
-                        'offset': [1],
-                    }),
-                ),
-                ('B',): Events(
-                    pl.DataFrame({
-                        'trial_id': [1],
-                        'task_id': ['B'],
-                        'name': ['fixation'],
-                        'onset': [1],
-                        'offset': [2],
-                    }),
-                ),
-                ('C',): Events(
-                    pl.DataFrame({
-                        'trial_id': [1],
-                        'task_id': ['C'],
-                        'name': ['blink'],
-                        'onset': [2],
-                        'offset': [44],
-                    }),
-                ),
-                ('D',): Events(
-                    pl.DataFrame({
-                        'trial_id': [2],
-                        'task_id': ['D'],
-                        'name': ['fixation'],
-                        'onset': [3],
-                        'offset': [1340],
-                    }),
-                ),
+                ('A',): Events(pl.from_dict({
+                    'trial_id': [0],
+                    'task_id': ['A'],
+                    'name': ['saccade'],
+                    'onset': [0],
+                    'offset': [1],
+                })),
+                ('B',): Events(pl.from_dict({
+                    'trial_id': [1],
+                    'task_id': ['B'],
+                    'name': ['fixation'],
+                    'onset': [1],
+                    'offset': [2],
+                })),
+                ('C',): Events(pl.from_dict({
+                    'trial_id': [1],
+                    'task_id': ['C'],
+                    'name': ['blink'],
+                    'onset': [2],
+                    'offset': [44],
+                })),
+                ('D',): Events(pl.from_dict({
+                    'trial_id': [2],
+                    'task_id': ['D'],
+                    'name': ['fixation'],
+                    'onset': [3],
+                    'offset': [1340],
+                })),
             },
-            id='task_id',
+            id='two_columns',
         ),
         pytest.param(
             Events(
-                pl.DataFrame(
-                    {
-                        'trial_id': [0, 1, 1, 2],
-                        'task_id': ['A', 'B', 'C', 'D'],
-                        'name': ['saccade', 'fixation', 'blink', 'fixation'],
-                        'onset': [0, 1, 2, 3],
-                        'offset': [1, 2, 44, 1340],
-                    },
-                ),
+                pl.from_dict({
+                    'trial_id': [0, 1, 1, 2],
+                    'task_id': ['A', 'B', 'C', 'D'],
+                    'name': ['saccade', 'fixation', 'blink', 'fixation'],
+                    'onset': [0, 1, 2, 3],
+                    'offset': [1, 2, 44, 1340],
+                }),
                 trial_columns=['task_id', 'trial_id'],
             ),
             None,
             {
                 ('A', 0): Events(
-                    pl.DataFrame({
+                    pl.from_dict({
                         'trial_id': [0],
                         'task_id': ['A'],
                         'name': ['saccade'],
@@ -869,7 +804,7 @@ def test_split_default_no_trial_columns_raises_typeerror():
                     trial_columns=['task_id', 'trial_id'],
                 ),
                 ('B', 1): Events(
-                    pl.DataFrame({
+                    pl.from_dict({
                         'trial_id': [1],
                         'task_id': ['B'],
                         'name': ['fixation'],
@@ -879,7 +814,7 @@ def test_split_default_no_trial_columns_raises_typeerror():
                     trial_columns=['task_id', 'trial_id'],
                 ),
                 ('C', 1): Events(
-                    pl.DataFrame({
+                    pl.from_dict({
                         'trial_id': [1],
                         'task_id': ['C'],
                         'name': ['blink'],
@@ -889,7 +824,7 @@ def test_split_default_no_trial_columns_raises_typeerror():
                     trial_columns=['task_id', 'trial_id'],
                 ),
                 ('D', 2): Events(
-                    pl.DataFrame({
+                    pl.from_dict({
                         'trial_id': [2],
                         'task_id': ['D'],
                         'name': ['fixation'],
@@ -899,9 +834,8 @@ def test_split_default_no_trial_columns_raises_typeerror():
                     trial_columns=['task_id', 'trial_id'],
                 ),
             },
-            id='default_two_trial_columns',
+            id='two_trial_columns_default',
         ),
-
     ],
 )
 def test_split_as_dict_returns_expected_dict(events, by, expected_splits):

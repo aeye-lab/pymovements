@@ -436,6 +436,12 @@ def test_gaze_split_example():
     ('gaze', 'by', 'expected_splits'),
     [
         pytest.param(
+            Gaze(),
+            'trial',
+            dict(),
+            id='empty_gaze',
+        ),
+        pytest.param(
             Gaze(
                 samples=pl.DataFrame(schema={'x': pl.Int64, 'y': pl.Int64, 'trial': pl.Int64}),
                 events=None,
@@ -443,21 +449,35 @@ def test_gaze_split_example():
             ),
             'trial',
             dict(),
-            id='samples_empty_events_none_with_trial_columns_by_single_column',
+            id='empty_samples_no_events_none_with_trial_columns_by_single_column',
         ),
         pytest.param(
             Gaze(
                 samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1]}),
-                pixel_columns=['x', 'y'], trial_columns='trial',
+                pixel_columns=['x', 'y'],
             ),
             'trial',
             {
                 (1,): Gaze(
                     samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1]}),
-                    pixel_columns=['x', 'y'], trial_columns='trial',
+                    pixel_columns=['x', 'y'],
                 ),
             },
-            id='samples_one_events_empty_trial_by_single_column',
+            id='one_sample_no_events_one_trial_by_single_column',
+        ),
+        pytest.param(
+            Gaze(
+                samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1]}),
+                pixel_columns=['x', 'y'], experiment=Experiment(1024, 768, 30, 31, 1000),
+            ),
+            'trial',
+            {
+                (1,): Gaze(
+                    samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1]}),
+                    pixel_columns=['x', 'y'], experiment=Experiment(1024, 768, 30, 31, 1000),
+                ),
+            },
+            id='one_sample_no_events_with_experiment_one_trial_by_single_column',
         ),
         pytest.param(
             Gaze(
@@ -471,28 +491,64 @@ def test_gaze_split_example():
                     pixel_columns=['x', 'y'], trial_columns='trial',
                 ),
             },
-            id='samples_one_trial_by_none',
+            id='one_sample_no_events_one_trial_by_none',
         ),
         pytest.param(
             Gaze(
                 samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1], 'task': ['A']}),
-                pixel_columns=['x', 'y'], trial_columns=['task', 'trial'],
+                pixel_columns=['x', 'y'],
             ),
             ['task', 'trial'],
             {
                 ('A', 1): Gaze(
                     samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1], 'task': ['A']}),
-                    pixel_columns=['x', 'y'], trial_columns=['task', 'trial'],
+                    pixel_columns=['x', 'y'],
                 ),
             },
-            id='samples_one_trial_by_two_columns',
+            id='one_sample_no_events_one_trial_by_two_columns',
+        ),
+        pytest.param(
+            Gaze(
+                samples=pl.from_dict({'x': [0, 1], 'y': [2, 3], 'trial': [1, 2]}),
+                pixel_columns=['x', 'y'],
+            ),
+            'trial',
+            {
+                (1,): Gaze(
+                    samples=pl.from_dict({'x': [0], 'y': [2], 'trial': [1]}),
+                    pixel_columns=['x', 'y'],
+                ),
+                (2,): Gaze(
+                    samples=pl.from_dict({'x': [1], 'y': [3], 'trial': [2]}),
+                    pixel_columns=['x', 'y'],
+                ),
+            },
+            id='two_samples_no_events_two_trials_by_single_column',
+        ),
+        pytest.param(
+            Gaze(
+                samples=pl.from_dict({'x': [0, 1], 'y': [2, 3], 'trial': [1, 2]}),
+                pixel_columns=['x', 'y'], experiment=Experiment(1024, 768, 30, 31, 1000),
+            ),
+            'trial',
+            {
+                (1,): Gaze(
+                    samples=pl.from_dict({'x': [0], 'y': [2], 'trial': [1]}),
+                    pixel_columns=['x', 'y'], experiment=Experiment(1024, 768, 30, 31, 1000),
+                ),
+                (2,): Gaze(
+                    samples=pl.from_dict({'x': [1], 'y': [3], 'trial': [2]}),
+                    pixel_columns=['x', 'y'], experiment=Experiment(1024, 768, 30, 31, 1000),
+                ),
+            },
+            id='two_samples_no_events_with_experiment_two_trials_by_single_column',
         ),
         pytest.param(
             Gaze(
                 samples=pl.from_dict({'x': [0, 1], 'y': [2, 3], 'trial': [1, 2]}),
                 pixel_columns=['x', 'y'], trial_columns='trial',
             ),
-            'trial',
+            None,
             {
                 (1,): Gaze(
                     samples=pl.from_dict({'x': [0], 'y': [2], 'trial': [1]}),
@@ -503,7 +559,7 @@ def test_gaze_split_example():
                     pixel_columns=['x', 'y'], trial_columns='trial',
                 ),
             },
-            id='samples_two_trials_by_single_column',
+            id='two_samples_no_events_with_experiment_two_trials_by_default',
         ),
         pytest.param(
             Gaze(
@@ -533,9 +589,146 @@ def test_gaze_split_example():
                     pixel_columns=['x', 'y'], trial_columns='trial',
                 ),
             },
-            id='samples_five_trials_single_column_trials',
+            id='five_samples_no_events_five_trials_single_column_trials',
+        ),
+        pytest.param(
+            Gaze(
+                samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1]}),
+                events=Events(onsets=[0], offsets=[10], trials=[1]),
+                pixel_columns=['x', 'y'],
+                trial_columns=['trial'],
+            ),
+            None,
+            {
+                (1,): Gaze(
+                    samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1]}),
+                    events=Events(onsets=[0], offsets=[10], trials=[1]),
+                    pixel_columns=['x', 'y'],
+                    trial_columns=['trial'],
+                ),
+            },
+            id='one_sample_one_event_same_trial_by_default',
+        ),
+        pytest.param(
+            Gaze(
+                samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1]}),
+                events=Events(onsets=[10], offsets=[100], trials=[2]),
+                pixel_columns=['x', 'y'],
+                trial_columns=['trial'],
+            ),
+            None,
+            {
+                (1,): Gaze(
+                    samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1]}),
+                    events=None,
+                    pixel_columns=['x', 'y'],
+                    trial_columns=['trial'],
+                ),
+                (2,): Gaze(
+                    samples=pl.DataFrame(schema={'x': pl.Int64, 'y': pl.Int64, 'trial': pl.Int64}),
+                    events=Events(onsets=[10], offsets=[100], trials=[2]),
+                    pixel_columns=['x', 'y'],
+                    trial_columns=['trial'],
+                ),
+            },
+            id='one_sample_one_event_different_trial_by_default',
+        ),
+        pytest.param(
+            Gaze(
+                samples=pl.from_dict({'x': [0, 1], 'y': [2, 3], 'trial': [1, 2]}),
+                events=Events(
+                    pl.DataFrame({'trial': [2], 'name': ['saccade'], 'onset': [0], 'offset': [1]}),
+                ),
+                pixel_columns=['x', 'y'],
+            ),
+            'trial',
+            {
+                (1,): Gaze(
+                    samples=pl.from_dict({'x': [0], 'y': [2], 'trial': [1]}),
+                    pixel_columns=['x', 'y'],
+                ),
+                (2,): Gaze(
+                    samples=pl.from_dict({'x': [1], 'y': [3], 'trial': [2]}),
+                    events=Events(pl.DataFrame(
+                        {'trial': [2], 'name': ['saccade'], 'onset': [0], 'offset': [1]},
+                    )),
+                    pixel_columns=['x', 'y'],
+                ),
+            },
+            id='two_samples_one_event_two_trials_by_single_column',
+        ),
+        pytest.param(
+            Gaze(
+                samples=pl.from_dict({'x': [0, 1], 'y': [2, 3], 'trial': [1, 2]}),
+                events=Events(pl.DataFrame(
+                    {
+                        'trial': [1, 2], 'name': ['fixation', 'saccade'],
+                        'onset': [0, 100], 'offset': [1, 200],
+                    },
+                )),
+                pixel_columns=['x', 'y'],
+            ),
+            'trial',
+            {
+                (1,): Gaze(
+                    samples=pl.from_dict({'x': [0], 'y': [2], 'trial': [1]}),
+                    events=Events(pl.DataFrame(
+                        {'trial': [1], 'name': ['fixation'], 'onset': [0], 'offset': [1]},
+                    )),
+                    pixel_columns=['x', 'y'],
+                ),
+                (2,): Gaze(
+                    samples=pl.from_dict({'x': [1], 'y': [3], 'trial': [2]}),
+                    events=Events(pl.DataFrame(
+                        {'trial': [2], 'name': ['saccade'], 'onset': [100], 'offset': [200]},
+                    )),
+                    pixel_columns=['x', 'y'],
+                ),
+            },
+            id='two_samples_two_events_two_trials_by_single_column',
+        ),
+        pytest.param(
+            Gaze(
+                events=Events(
+                    pl.DataFrame({'trial': [1], 'name': ['saccade'], 'onset': [0], 'offset': [1]}),
+                ),
+            ),
+            'trial',
+            {
+                (1,): Gaze(
+                    events=Events(pl.DataFrame(
+                        {'trial': [1], 'name': ['saccade'], 'onset': [0], 'offset': [1]},
+                    )),
+                ),
+            },
+            id='no_samples_one_event_one_trial_by_single_column',
+        ),
+        pytest.param(
+            Gaze(
+                events=Events(pl.DataFrame(
+                    {
+                        'trial': [1, 2], 'name': ['fixation', 'saccade'],
+                        'onset': [0, 100], 'offset': [1, 200],
+                    },
+                )),
+            ),
+            'trial',
+            {
+                (1,): Gaze(
+                    events=Events(pl.DataFrame(
+                        {'trial': [1], 'name': ['fixation'], 'onset': [0], 'offset': [1]},
+                    )),
+                ),
+                (2,): Gaze(
+                    events=Events(pl.DataFrame(
+                        {'trial': [2], 'name': ['saccade'], 'onset': [100], 'offset': [200]},
+                    )),
+                ),
+            },
+            id='no_samples_two_events_two_trials_by_single_column',
         ),
     ],
+    # TODO: by columns not in events
 )
 def test_gaze_split_as_dict(gaze, by, expected_splits):
     gaze_splits = gaze.split(by=by, as_dict=True)
@@ -547,17 +740,44 @@ def test_gaze_split_as_dict(gaze, by, expected_splits):
     [
         pytest.param(
             Gaze(),
-            'trial',
-            pl.exceptions.ColumnNotFoundError,
-            '"trial" not found',
-            id='empty_gaze',
-        ),
-        pytest.param(
-            Gaze(),
             None,
             TypeError,
             "Either 'by' or 'Gaze.trial_columns' must be specified",
             id='empty_gaze_by_none',
+        ),
+        pytest.param(
+            Gaze(
+                samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1]}),
+                pixel_columns=['x', 'y'],
+            ),
+            'task',
+            pl.exceptions.ColumnNotFoundError,
+            '"task" not found',
+            id='columns_missing_from_samples',
+        ),
+        pytest.param(
+            Gaze(
+                events=Events(
+                    pl.DataFrame({'trial': [1], 'name': ['saccade'], 'onset': [0], 'offset': [1]}),
+                ),
+            ),
+            'task',
+            pl.exceptions.ColumnNotFoundError,
+            '"task" not found',
+            id='columns_missing_from_events_no_samples',
+        ),
+        pytest.param(
+            Gaze(
+                samples=pl.from_dict({'x': [0], 'y': [1], 'task': ['A']}),
+                pixel_columns=['x', 'y'],
+                events=Events(
+                    pl.DataFrame({'trial': [1], 'name': ['saccade'], 'onset': [0], 'offset': [1]}),
+                ),
+            ),
+            'task',
+            pl.exceptions.ColumnNotFoundError,
+            '"task" not found',
+            id='columns_missing_from_events_no_samples',
         ),
     ],
 )

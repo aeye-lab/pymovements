@@ -343,30 +343,28 @@ class Gaze:
         # Convert single string to list for consistent handling
         by = [by] if isinstance(by, str) else by
 
-        # We use as_dict=True here to make sure to map samples to the correct events.
-        grouped_samples = self.samples.partition_by(by=by, as_dict=True)
+        if not self.samples.is_empty():
+            # We use as_dict=True here to make sure to map samples to the correct events.
+            grouped_samples = self.samples.partition_by(by=by, as_dict=True)
+        else:
+            grouped_samples = {}
 
-        '''
-        # Check if all columns in 'by' are in events columns
-        events_list = (
-            self.events.split(by)
-            if all(col in self.events.columns for col in by)
-            else [pm.Events()] * len(samples_list)
-        )
-        '''
-
-        grouped_events = self.events.split(by=by, as_dict=True)
+        if self.events: # and all(col in self.events.columns for col in by):
+            # We use as_dict=True here to make sure to map events to the correct samples.
+            grouped_events = self.events.split(by=by, as_dict=True)
+        else:
+            grouped_events = {}
 
         keys = sorted(set(grouped_samples.keys()) | set(grouped_events.keys()))
 
         gazes = {
             key: Gaze(
-                samples=grouped_samples.get(key, None),
+                samples=grouped_samples.get(key, pl.DataFrame(schema=self.samples.schema)),
                 events=grouped_events.get(key, None),
                 experiment=self.experiment,
                 trial_columns=self.trial_columns,
             )
-            for key in keys
+            for key in sorted(keys)
         }
 
         if as_dict:
