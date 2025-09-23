@@ -366,7 +366,7 @@ class Gaze:
                 experiment=self.experiment,
                 trial_columns=self.trial_columns,
             )
-            for key in sorted(keys)
+            for key in keys
         }
 
         if as_dict:
