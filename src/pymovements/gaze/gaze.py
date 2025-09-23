@@ -346,12 +346,14 @@ class Gaze:
         if not self.samples.is_empty():
             # We use as_dict=True here to make sure to map samples to the correct events.
             grouped_samples = self.samples.partition_by(by=by, as_dict=True)
+            assert isinstance(grouped_samples, dict)  # or else mypy complains below
         else:
             grouped_samples = {}
 
-        if self.events: # and all(col in self.events.columns for col in by):
+        if self.events:  # and all(col in self.events.columns for col in by):
             # We use as_dict=True here to make sure to map events to the correct samples.
             grouped_events = self.events.split(by=by, as_dict=True)
+            assert isinstance(grouped_events, dict)  # or else mypy complains below
         else:
             grouped_events = {}
 

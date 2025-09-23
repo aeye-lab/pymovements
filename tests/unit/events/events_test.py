@@ -707,26 +707,32 @@ def test_split_default_no_trial_columns_raises_typeerror():
     ('events', 'by', 'expected_splits'),
     [
         pytest.param(
-            Events(pl.from_dict({
-                'trial_id': [0, 1],
-                'name': ['fixation', 'saccade'],
-                'onset': [0, 10],
-                'offset': [1, 12],
-            })),
+            Events(
+                pl.from_dict({
+                    'trial_id': [0, 1],
+                    'name': ['fixation', 'saccade'],
+                    'onset': [0, 10],
+                    'offset': [1, 12],
+                }),
+            ),
             'trial_id',
             {
-                (0,): Events(pl.from_dict({
-                    'trial_id': [0],
-                    'name': ['fixation'],
-                    'onset': [0],
-                    'offset': [1],
-                })),
-                (1,): Events(pl.from_dict({
-                    'trial_id': [1],
-                    'name': ['saccade'],
-                    'onset': [10],
-                    'offset': [12],
-                })),
+                (0,): Events(
+                    pl.from_dict({
+                        'trial_id': [0],
+                        'name': ['fixation'],
+                        'onset': [0],
+                        'offset': [1],
+                    }),
+                ),
+                (1,): Events(
+                    pl.from_dict({
+                        'trial_id': [1],
+                        'name': ['saccade'],
+                        'onset': [10],
+                        'offset': [12],
+                    }),
+                ),
             },
             id='single_column',
         ),
@@ -740,43 +746,53 @@ def test_split_default_no_trial_columns_raises_typeerror():
             id='single_column_default',
         ),
         pytest.param(
-            Events(pl.from_dict({
-                'trial_id': [0, 1, 1, 2],
-                'task_id': ['A', 'B', 'C', 'D'],
-                'name': ['saccade', 'fixation', 'blink', 'fixation'],
-                'onset': [0, 1, 2, 3],
-                'offset': [1, 2, 44, 1340],
-            })),
+            Events(
+                pl.from_dict({
+                    'trial_id': [0, 1, 1, 2],
+                    'task_id': ['A', 'B', 'C', 'D'],
+                    'name': ['saccade', 'fixation', 'blink', 'fixation'],
+                    'onset': [0, 1, 2, 3],
+                    'offset': [1, 2, 44, 1340],
+                }),
+            ),
             'task_id',
             {
-                ('A',): Events(pl.from_dict({
-                    'trial_id': [0],
-                    'task_id': ['A'],
-                    'name': ['saccade'],
-                    'onset': [0],
-                    'offset': [1],
-                })),
-                ('B',): Events(pl.from_dict({
-                    'trial_id': [1],
-                    'task_id': ['B'],
-                    'name': ['fixation'],
-                    'onset': [1],
-                    'offset': [2],
-                })),
-                ('C',): Events(pl.from_dict({
-                    'trial_id': [1],
-                    'task_id': ['C'],
-                    'name': ['blink'],
-                    'onset': [2],
-                    'offset': [44],
-                })),
-                ('D',): Events(pl.from_dict({
-                    'trial_id': [2],
-                    'task_id': ['D'],
-                    'name': ['fixation'],
-                    'onset': [3],
-                    'offset': [1340],
-                })),
+                ('A',): Events(
+                    pl.from_dict({
+                        'trial_id': [0],
+                        'task_id': ['A'],
+                        'name': ['saccade'],
+                        'onset': [0],
+                        'offset': [1],
+                    }),
+                ),
+                ('B',): Events(
+                    pl.from_dict({
+                        'trial_id': [1],
+                        'task_id': ['B'],
+                        'name': ['fixation'],
+                        'onset': [1],
+                        'offset': [2],
+                    }),
+                ),
+                ('C',): Events(
+                    pl.from_dict({
+                        'trial_id': [1],
+                        'task_id': ['C'],
+                        'name': ['blink'],
+                        'onset': [2],
+                        'offset': [44],
+                    }),
+                ),
+                ('D',): Events(
+                    pl.from_dict({
+                        'trial_id': [2],
+                        'task_id': ['D'],
+                        'name': ['fixation'],
+                        'onset': [3],
+                        'offset': [1340],
+                    }),
+                ),
             },
             id='two_columns',
         ),
