@@ -38,6 +38,7 @@ from pymovements import DatasetPaths
         'CustomGazeAndPrecomputedLegacyMirror',
         'CustomGazeAndPrecomputedNoMirror',
         'CustomGazeOnlySingleMirror',
+        'CustomGazeOnlyTwoMirrors',
         'CustomGazeOnlyLegacyMirror',
         'CustomGazeOnlyNoMirror',
         'CustomPrecomputedOnlySingleMirror',
@@ -129,6 +130,23 @@ def dataset_definition_fixture(request):  # pylint: disable=too-many-return-stat
                     'content': 'gaze',
                     'url': 'https://example.com/test.gz.tar',
                     'mirrors': ['https://another_example.com/test.gz.tar'],
+                    'filename': 'test.gz.tar',
+                    'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                },
+            ],
+        )
+
+    if request.param == 'CustomGazeOnlyTwoMirrors':
+        return DatasetDefinition(
+            name='CustomPublicDataset',
+            resources=[
+                {
+                    'content': 'gaze',
+                    'url': 'https://example.com/test.gz.tar',
+                    'mirrors': [
+                        'https://mirror1.example.com/test.gz.tar',
+                        'https://mirror2.example.com/test.gz.tar',
+                    ],
                     'filename': 'test.gz.tar',
                     'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
                 },
@@ -370,7 +388,7 @@ def test_paths(init_path, expected_paths, dataset_definition):
 @pytest.mark.filterwarnings('ignore:Downloading resource .* failed.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomGazeOnlyLegacyMirror', 'CustomGazeOnlySingleMirror'],
+    ['CustomGazeOnlyLegacyMirror', 'CustomGazeOnlySingleMirror', 'CustomGazeOnlyTwoMirrors'],
     indirect=['dataset_definition'],
 )
 def test_dataset_download_both_mirrors_fail_gaze_only(
@@ -656,7 +674,7 @@ def test_dataset_download_precomputed_and_gaze_without_mirrors_fail(
 @pytest.mark.filterwarnings('ignore:Downloading resource .* failed.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomGazeOnlyLegacyMirror', 'CustomGazeOnlySingleMirror'],
+    ['CustomGazeOnlyLegacyMirror', 'CustomGazeOnlySingleMirror', 'CustomGazeOnlyTwoMirrors'],
     indirect=['dataset_definition'],
 )
 def test_dataset_download_first_mirror_gaze_fails(mock_download_file, tmp_path, dataset_definition):
@@ -802,6 +820,7 @@ def test_dataset_download_first_mirror_fails(mock_download_file, tmp_path, datas
     [
         'CustomGazeOnlyLegacyMirror',
         'CustomGazeOnlySingleMirror',
+        'CustomGazeOnlyTwoMirrors',
         'CustomGazeOnlyNoMirror',
         'CustomGazeAndPrecomputedLegacyMirror',
         'CustomGazeAndPrecomputedSingleMirror',
@@ -868,6 +887,7 @@ def test_dataset_download_file_precomputed_not_found(
     [
         'CustomGazeOnlyLegacyMirror',
         'CustomGazeOnlySingleMirror',
+        'CustomGazeOnlyTwoMirrors',
         'CustomGazeOnlyNoMirror',
         'CustomGazeAndPrecomputedLegacyMirror',
         'CustomGazeAndPrecomputedSingleMirror',
@@ -957,6 +977,7 @@ def test_dataset_download_precomputed_no_extract_rm(
     [
         'CustomGazeOnlyLegacyMirror',
         'CustomGazeOnlySingleMirror',
+        'CustomGazeOnlyTwoMirrors',
         'CustomGazeOnlyNoMirror',
     ],
     indirect=['dataset_definition'],
@@ -1145,6 +1166,7 @@ def test_dataset_extract_remove_finished_false_both(
     [
         'CustomGazeOnlyLegacyMirror',
         'CustomGazeOnlySingleMirror',
+        'CustomGazeOnlyTwoMirrors',
         'CustomGazeOnlyNoMirror',
     ],
     indirect=['dataset_definition'],
