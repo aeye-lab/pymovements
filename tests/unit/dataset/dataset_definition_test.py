@@ -827,31 +827,13 @@ def test_dataset_to_dict_exclude_none(dataset_definition, exclude_none, expected
             {'has_files': {'gaze': True}},
             id='has_files',
         ),
-    ],
-)
-def test_dataset_definition_attribute_is_deprecated(attribute_kwarg):
-    with pytest.raises(DeprecationWarning):
-        DatasetDefinition(**attribute_kwarg)
-
-
-@pytest.mark.parametrize(
-    'attribute_kwarg',
-    [
         pytest.param(
-            {'extract': True},
-            id='extract_true',
-        ),
-        pytest.param(
-            {'extract': False},
-            id='extract_false',
-        ),
-        pytest.param(
-            {'has_files': {'gaze': True}},
-            id='has_files',
+            {'mirrors': {'gaze': ['https://mirror.com']}},
+            id='mirrors',
         ),
     ],
 )
-def test_dataset_definition_attribute_is_removed(attribute_kwarg):
+def test_dataset_definition_attribute_is_deprecated_or_removed(attribute_kwarg):
     with pytest.raises(DeprecationWarning) as info:
         DatasetDefinition(**attribute_kwarg)
 
