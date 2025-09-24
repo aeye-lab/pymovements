@@ -121,6 +121,24 @@ def test_dataset_definition_is_equal(init_kwargs):
 
         pytest.param(
             {
+                'resources': [
+                    {
+                        'content': 'gaze', 'filename_pattern': 'test.csv',
+                        'url': 'https://example.com', 'mirrors': ['https://mirror.com'],
+                    },
+                ],
+            },
+            ResourceDefinitions([
+                ResourceDefinition(
+                    content='gaze', filename_pattern='test.csv',
+                    url='https://example.com', mirrors=['https://mirror.com'],
+                ),
+            ]),
+            id='single_gaze_resource_with_url_and_mirror',
+        ),
+
+        pytest.param(
+            {
                 'filename_format': {'gaze': 'test.csv'},
             },
             ResourceDefinitions([ResourceDefinition(content='gaze', filename_pattern='test.csv')]),
