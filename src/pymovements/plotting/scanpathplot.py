@@ -32,6 +32,7 @@ from matplotlib.patches import Circle
 from pymovements.events import EventDataFrame
 from pymovements.events import Events
 from pymovements.gaze import Gaze
+from pymovements.plotting._matplotlib import _apply_screen_axes
 from pymovements.plotting._matplotlib import _draw_line_data
 from pymovements.plotting._matplotlib import _setup_axes_and_colormap
 from pymovements.plotting._matplotlib import finalize_figure
@@ -177,6 +178,8 @@ def scanpathplot(
         pad_factor,
         ax=ax,
     )
+
+    _apply_screen_axes(ax, gaze, func_name='scanpathplot')
 
     for row in events.frame.iter_rows(named=True):
         fixation = Circle(
