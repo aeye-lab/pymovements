@@ -1495,6 +1495,54 @@ def test_dataset_download_raises_exception(
 
 
 @pytest.mark.filterwarnings('ignore:DatasetDefinition.mirrors is deprecated.*:DeprecationWarning')
+@pytest.mark.parametrize(
+    ('init_kwargs', 'expected_exception', 'expected_msg'),
+    [
+        pytest.param(
+            {
+                'name': 'CustomPublicDataset',
+                'mirrors': {'gaze': ['https://example.com/']},
+                'resources': [
+                    {
+                        'content': 'gaze',
+                        'url': None,
+                        'filename': 'test.gz.tar',
+                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                    },
+                ],
+            },
+            AttributeError,
+            'Resource.url must not be None',
+            id='url_none',
+        ),
+        pytest.param(
+            {
+                'name': 'CustomPublicDataset',
+                'mirrors': {'gaze': ['https://example.com/']},
+                'resources': [
+                    {
+                        'content': 'gaze',
+                        'url': 'https://example.com/test.gz.tar',
+                        'filename': None,
+                        'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
+                    },
+                ],
+            },
+            AttributeError,
+            'Resource.filename must not be None',
+            id='filename_none',
+        ),
+    ],
+)
+def test_dataset_download_legacy_mirror_raises_exception(
+        init_kwargs, expected_exception, expected_msg, tmp_path,
+):
+    dataset_definition = DatasetDefinition(**init_kwargs)
+    with pytest.raises(expected_exception, match=expected_msg):
+        Dataset(dataset_definition, path=tmp_path).download()
+
+
+@pytest.mark.filterwarnings('ignore:DatasetDefinition.mirrors is deprecated.*:DeprecationWarning')
 def test_public_dataset_registered_correct_attributes(tmp_path, dataset_definition):
     dataset = Dataset(dataset_definition, path=tmp_path)
 
