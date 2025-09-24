@@ -36,7 +36,6 @@ from matplotlib import scale as mpl_scale
 from matplotlib.collections import LineCollection
 from typing_extensions import TypeAlias
 
-
 LinearSegmentedColormapType: TypeAlias = dict[
     Literal['red', 'green', 'blue', 'alpha'],
     Sequence[tuple[float, ...]],
@@ -314,3 +313,41 @@ def _draw_line_data(
     line_collection.set_linewidth(2)
     line = ax.add_collection(line_collection)
     return line
+
+
+def _apply_screen_axes(
+    ax: plt.Axes,
+    gaze: object | None,
+    *,
+    func_name: str,
+) -> None:
+    """Set axes limits and aspect ratio from gaze.experiment.screen, if available.
+
+    Parameters
+    ----------
+    ax : plt.Axes
+        Matplotlib axes object to modify.
+    gaze : object | None
+        Gaze object with experiment data. If None, no action is taken.
+    func_name : str
+        Name of the plotting function, used in error messages.
+
+    """
+    experiment = getattr(gaze, 'experiment', None)
+    if experiment is None:
+        return
+
+    screen = experiment.screen
+    width_px = screen.width_px
+    height_px = screen.height_px
+
+    if screen.origin != 'upper left':
+        raise ValueError(
+            f"Origin of the experiment screen is set to {screen.origin}, "
+            f"but only 'upper left' is supported for {func_name}.",
+        )
+
+    if width_px is not None and height_px is not None:
+        ax.set_xlim(0, width_px)
+        ax.set_ylim(height_px, 0)
+        ax.set_aspect('equal', adjustable='box')
