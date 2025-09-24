@@ -727,7 +727,7 @@ def test_dataset_download_precomputed_and_gaze_without_mirrors_fail(
 @pytest.mark.filterwarnings('ignore:Downloading resource .* failed.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomGazeOnlyLegacyMirror', 'CustomGazeOnlySingleMirror',],
+    ['CustomGazeOnlyLegacyMirror', 'CustomGazeOnlySingleMirror'],
     indirect=['dataset_definition'],
 )
 def test_dataset_download_first_mirror_gaze_fails(mock_download_file, tmp_path, dataset_definition):
@@ -761,7 +761,8 @@ def test_dataset_download_first_mirror_gaze_fails(mock_download_file, tmp_path, 
 @pytest.mark.parametrize(
     'dataset_definition', ['CustomGazeOnlyTwoMirrors'], indirect=['dataset_definition'],
 )
-def test_dataset_download_first_of_two_mirrors_gaze_fails(mock_download_file, tmp_path, dataset_definition):
+def test_dataset_download_first_of_two_mirrors_gaze_fails(
+        mock_download_file, tmp_path, dataset_definition):
     mock_download_file.side_effect = [OSError(), OSError(), None]
 
     paths = DatasetPaths(root=tmp_path, dataset='.')
