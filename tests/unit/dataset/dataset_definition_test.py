@@ -457,6 +457,7 @@ def test_dataset_definition_to_yaml_equal_dicts(definition, tmp_path):
     assert definition.to_dict() == yaml_dict
 
 
+@pytest.mark.filterwarnings('ignore:DatasetDefinition.mirrors is deprecated.*:DeprecationWarning')
 def test_write_yaml_already_existing_dataset_definition_w_tuple_screen(tmp_path):
     tmp_file = tmp_path / 'tmp.yaml'
     definition = DatasetLibrary.get('ToyDatasetEyeLink')

@@ -390,7 +390,7 @@ def test_paths(init_path, expected_paths, dataset_definition):
 @pytest.mark.filterwarnings('ignore:Downloading resource .* failed.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition',
-    ['CustomGazeOnlyLegacyMirror', 'CustomGazeOnlySingleMirror', 'CustomGazeOnlyTwoMirrors'],
+    ['CustomGazeOnlyLegacyMirror', 'CustomGazeOnlySingleMirror'],
     indirect=['dataset_definition'],
 )
 def test_dataset_download_both_mirrors_fail_gaze_only(
@@ -1490,7 +1490,7 @@ def test_dataset_download_default_extract_precomputed(
 def test_dataset_download_raises_exception(
         dataset_definition, expected_exception, expected_msg, tmp_path,
 ):
-    with pytest.raises(expected_exception, match=expected_msg) as excinfo:
+    with pytest.raises(expected_exception, match=expected_msg):
         Dataset(dataset_definition, path=tmp_path).download()
 
 
@@ -1506,16 +1506,10 @@ def test_public_dataset_registered_correct_attributes(tmp_path, dataset_definiti
 def test_extract_dataset_precomputed_move_single_file(tmp_path):
     definition = DatasetDefinition(
         name='CustomPublicDataset',
-        mirrors={
-            'precompued_events': (
-                'https://example.com/',
-                'https://another_example.com/',
-            ),
-        },
         resources=[
             {
                 'content': 'precomputed_events',
-                'url': 'tests/files/',
+                'url': 'https://example.com/tests/files/',
                 'filename': '18sat_fixfinal.csv',
                 'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
             },
@@ -1535,16 +1529,10 @@ def test_extract_dataset_precomputed_move_single_file(tmp_path):
 def test_extract_dataset_precomputed_rm_move_single_file(tmp_path):
     definition = DatasetDefinition(
         name='CustomPublicDataset',
-        mirrors={
-            'precomputed_reading_measures': (
-                'https://example.com/',
-                'https://another_example.com/',
-            ),
-        },
         resources=[
             {
                 'content': 'precomputed_reading_measures',
-                'url': 'tests/files/',
+                'url': 'https://example.com/tests/files/',
                 'filename': 'copco_rm_dummy.csv',
                 'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
             },
