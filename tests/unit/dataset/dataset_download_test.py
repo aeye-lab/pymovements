@@ -367,7 +367,7 @@ def test_paths(init_path, expected_paths, dataset_definition):
 
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
-@pytest.mark.filterwarnings('ignore:Failed to download from mirror.*:UserWarning')
+@pytest.mark.filterwarnings('ignore:Downloading resource .* failed.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomGazeOnlyLegacyMirror', 'CustomGazeOnlySingleMirror'],
@@ -385,7 +385,7 @@ def test_dataset_download_both_mirrors_fail_gaze_only(
 
     with pytest.raises(
         RuntimeError,
-        match='downloading resource test.gz.tar failed for all mirrors',
+        match='Downloading resource test.gz.tar failed for all mirrors',
     ):
         dataset.download()
 
@@ -423,7 +423,7 @@ def test_dataset_download_without_mirrors_fail_gaze_only(
 
     with pytest.raises(
         RuntimeError,
-        match='downloading resource https://example.com/test.gz.tar failed.',
+        match='Downloading resource https://example.com/test.gz.tar failed.',
     ):
         dataset.download()
 
@@ -439,7 +439,7 @@ def test_dataset_download_without_mirrors_fail_gaze_only(
 
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
-@pytest.mark.filterwarnings('ignore:Failed to download from mirror.*:UserWarning')
+@pytest.mark.filterwarnings('ignore:Downloading resource .* failed.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomPrecomputedOnlyLegacyMirror', 'CustomPrecomputedOnlySingleMirror'],
@@ -457,7 +457,7 @@ def test_dataset_download_precomputed_events_both_mirrors_fail(
 
     with pytest.raises(
         RuntimeError,
-        match='downloading resource test_pc.gz.tar failed for all mirrors',
+        match='Downloading resource test_pc.gz.tar failed for all mirrors',
     ):
         dataset.download()
 
@@ -495,7 +495,7 @@ def test_dataset_download_precomputed_events_without_mirrors_fail(
 
     with pytest.raises(
         RuntimeError,
-        match='downloading resource https://example.com/test_pc.gz.tar failed.',
+        match='Downloading resource https://example.com/test_pc.gz.tar failed.',
     ):
         dataset.download()
 
@@ -511,7 +511,7 @@ def test_dataset_download_precomputed_events_without_mirrors_fail(
 
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
-@pytest.mark.filterwarnings('ignore:Failed to download from mirror.*:UserWarning')
+@pytest.mark.filterwarnings('ignore:Downloading resource .* failed.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomPrecomputedRMOnlyLegacyMirror', 'CustomPrecomputedRMOnlySingleMirror'],
@@ -529,7 +529,7 @@ def test_dataset_download_precomputed_reading_measures_both_mirrors_fail(
 
     with pytest.raises(
         RuntimeError,
-        match='downloading resource test_rm.gz.tar failed for all mirrors',
+        match='Downloading resource test_rm.gz.tar failed for all mirrors',
     ):
         dataset.download()
 
@@ -567,7 +567,7 @@ def test_dataset_download_precomputed_reading_measures_without_mirrors_fail(
 
     with pytest.raises(
         RuntimeError,
-        match='downloading resource https://example.com/test_rm.gz.tar failed.',
+        match='Downloading resource https://example.com/test_rm.gz.tar failed.',
     ):
         dataset.download()
 
@@ -583,7 +583,7 @@ def test_dataset_download_precomputed_reading_measures_without_mirrors_fail(
 
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
-@pytest.mark.filterwarnings('ignore:Failed to download from mirror.*:UserWarning')
+@pytest.mark.filterwarnings('ignore:Downloading resource .* failed.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomGazeAndPrecomputedLegacyMirror', 'CustomGazeAndPrecomputedSingleMirror'],
@@ -601,7 +601,7 @@ def test_dataset_download_precomputed_and_gaze_both_mirrors_fail(
 
     with pytest.raises(
         RuntimeError,
-        match='downloading resource test.gz.tar failed for all mirrors',
+        match='Downloading resource test.gz.tar failed for all mirrors',
     ):
         dataset.download()
     mock_download_file.assert_has_calls([
@@ -638,7 +638,7 @@ def test_dataset_download_precomputed_and_gaze_without_mirrors_fail(
 
     with pytest.raises(
         RuntimeError,
-        match='downloading resource https://example.com/test.gz.tar failed.',
+        match='Downloading resource https://example.com/test.gz.tar failed.',
     ):
         dataset.download()
     mock_download_file.assert_has_calls([
@@ -653,7 +653,7 @@ def test_dataset_download_precomputed_and_gaze_without_mirrors_fail(
 
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
-@pytest.mark.filterwarnings('ignore:Failed to download from mirror.*:UserWarning')
+@pytest.mark.filterwarnings('ignore:Downloading resource .* failed.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomGazeOnlyLegacyMirror', 'CustomGazeOnlySingleMirror'],
@@ -685,7 +685,7 @@ def test_dataset_download_first_mirror_gaze_fails(mock_download_file, tmp_path, 
 
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
-@pytest.mark.filterwarnings('ignore:Failed to download from mirror.*:UserWarning')
+@pytest.mark.filterwarnings('ignore:Downloading resource .* failed.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomPrecomputedOnlyLegacyMirror', 'CustomPrecomputedOnlySingleMirror'],
@@ -718,7 +718,7 @@ def test_dataset_download_first_mirror_precomputed_fails(
 
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
-@pytest.mark.filterwarnings('ignore:Failed to download from mirror.*:UserWarning')
+@pytest.mark.filterwarnings('ignore:Downloading resource .* failed.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomPrecomputedRMOnlyLegacyMirror', 'CustomPrecomputedRMOnlySingleMirror'],
@@ -751,7 +751,7 @@ def test_dataset_download_first_mirror_precomputed_fails_rm(
 
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
-@pytest.mark.filterwarnings('ignore:Failed to download from mirror.*:UserWarning')
+@pytest.mark.filterwarnings('ignore:Downloading resource .* failed.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition',
     ['CustomGazeAndPrecomputedLegacyMirror', 'CustomGazeAndPrecomputedSingleMirror'],
@@ -796,7 +796,7 @@ def test_dataset_download_first_mirror_fails(mock_download_file, tmp_path, datas
 
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
-@pytest.mark.filterwarnings('ignore:Failed to download from mirror.*:UserWarning')
+@pytest.mark.filterwarnings('ignore:Downloading resource .* failed.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition',
     [
@@ -830,7 +830,7 @@ def test_dataset_download_file_not_found(mock_download_file, tmp_path, dataset_d
 
 
 @mock.patch('pymovements.dataset.dataset_download.download_file')
-@pytest.mark.filterwarnings('ignore:Failed to download from mirror.*:UserWarning')
+@pytest.mark.filterwarnings('ignore:Downloading resource .* failed.*:UserWarning')
 @pytest.mark.parametrize(
     'dataset_definition',
     [
