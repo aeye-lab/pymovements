@@ -762,7 +762,8 @@ def test_dataset_download_first_mirror_gaze_fails(mock_download_file, tmp_path, 
     'dataset_definition', ['CustomGazeOnlyTwoMirrors'], indirect=['dataset_definition'],
 )
 def test_dataset_download_first_of_two_mirrors_gaze_fails(
-        mock_download_file, tmp_path, dataset_definition):
+        mock_download_file, tmp_path, dataset_definition,
+):
     mock_download_file.side_effect = [OSError(), OSError(), None]
 
     paths = DatasetPaths(root=tmp_path, dataset='.')
