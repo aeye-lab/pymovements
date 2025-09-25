@@ -223,7 +223,8 @@ def test_traceplot_screen_dims(gaze, width, height):
     if width is not None and height is not None:
         assert ax.get_xlim() == (0, width)
         assert ax.get_ylim() == (height, 0)
-        assert ax.get_aspect() == 'equal'
+        # numeric value for equal aspect ratio
+        assert ax.get_aspect() == 1.0
 
     plt.close(fig)
 
