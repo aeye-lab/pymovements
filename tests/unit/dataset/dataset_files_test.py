@@ -228,7 +228,7 @@ def test_load_eyelink_file(tmp_path, read_kwargs, load_function):
 
 
 @pytest.mark.parametrize(
-    ('filepath', 'rename_extension', 'load_function', 'read_kwargs'),
+    ('filepath', 'rename_extension', 'load_function', 'load_kwargs'),
     [
         pytest.param(
             'tests/files/monocular_example.csv',
