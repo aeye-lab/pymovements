@@ -211,7 +211,7 @@ def test_load_eyelink_file(tmp_path, read_kwargs, load_function):
 
     gaze = pm.dataset.dataset_files.load_gaze_file(
         filepath,
-        fileinfo_row={'load_function': load_function},
+        fileinfo_row={'load_function': load_function, 'load_kwargs': None},
         definition=DatasetDefinition(
             experiment=pm.Experiment(1280, 1024, 38, 30, None, 'center', 1000),
             custom_read_kwargs={'gaze': read_kwargs},
@@ -228,7 +228,7 @@ def test_load_eyelink_file(tmp_path, read_kwargs, load_function):
 
 
 @pytest.mark.parametrize(
-    ('filepath', 'rename_extension', 'load_function', 'read_kwargs'),
+    ('filepath', 'rename_extension', 'load_function', 'load_kwargs'),
     [
         pytest.param(
             'tests/files/monocular_example.csv',
@@ -295,7 +295,7 @@ def test_load_eyelink_file(tmp_path, read_kwargs, load_function):
         ),
     ],
 )
-def test_load_gaze_file(tmp_path, filepath, rename_extension, load_function, read_kwargs):
+def test_load_gaze_file(tmp_path, filepath, rename_extension, load_function, load_kwargs):
     # Copy the file to the temporary path with the new extension
     filepath = Path(filepath)
     renamed_filename = filepath.stem + '.' + rename_extension
@@ -304,11 +304,10 @@ def test_load_gaze_file(tmp_path, filepath, rename_extension, load_function, rea
 
     gaze = pm.dataset.dataset_files.load_gaze_file(
         renamed_filepath,
-        fileinfo_row={'load_function': load_function},
+        fileinfo_row={'load_function': load_function, 'load_kwargs': load_kwargs},
         definition=DatasetDefinition(
             experiment=pm.Experiment(1280, 1024, 38, 30, None, 'center', 1000),
             pixel_columns=['x_left_pix', 'y_left_pix'],
-            custom_read_kwargs={'gaze': read_kwargs},
         ),
     )
     expected_df = pl.from_dict(
@@ -327,7 +326,7 @@ def test_load_gaze_file_unsupported_load_function():
     with pytest.raises(ValueError) as exc:
         pm.dataset.dataset_files.load_gaze_file(
             filepath,
-            fileinfo_row={'load_function': 'from_a_land_down_under'},
+            fileinfo_row={'load_function': 'from_a_land_down_under', 'load_kwargs': None},
             definition=DatasetDefinition(
                 experiment=pm.Experiment(1280, 1024, 38, 30, None, 'center', 1000),
                 pixel_columns=['x_left_pix', 'y_left_pix'],
