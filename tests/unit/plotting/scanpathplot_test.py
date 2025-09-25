@@ -247,6 +247,6 @@ def test_scanpathplot_sets_screen_axes(gaze):
     assert ax.get_ylim() == (gaze.experiment.screen.height_px, 0)
 
     # Assert that the aspect ratio is equal (square pixels)
-    assert ax.get_aspect() == 'equal'
+    assert ax.get_aspect() == 1.0  # numeric value for equal aspect ratio
 
     plt.close(fig)
