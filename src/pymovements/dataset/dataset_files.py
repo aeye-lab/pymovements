@@ -605,11 +605,12 @@ def add_fileinfo(
     pl.DataFrame
         Dataframe with added columns from fileinfo dictionary keys.
     """
+    ignored_fileinfo_columns = {'filepath', 'load_function', 'load_kwargs'}
     df = df.select(
         [
             pl.lit(value).alias(column)
             for column, value in fileinfo.items()
-            if column not in {'filepath', 'load_function'} and column not in df.columns
+            if column not in ignored_fileinfo_columns and column not in df.columns
         ] + [pl.all()],
     )
 
