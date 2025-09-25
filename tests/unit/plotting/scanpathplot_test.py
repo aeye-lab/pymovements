@@ -236,3 +236,17 @@ def test_scanpathplot_events_is_deprecated(gaze):
         f'scnpatplot argument "events" was scheduled to be removed in v{remove_version}. '
         f'Current version is v{current_version}.'
     )
+
+
+def test_scanpathplot_sets_screen_axes(gaze):
+    """Test that scanpathplot applies screen dimensions and equal aspect ratio."""
+    fig, ax = scanpathplot(gaze=gaze, show=False)
+
+    # Assert that axes limits match screen dimensions from the experiment
+    assert ax.get_xlim() == (0, gaze.experiment.screen.width_px)
+    assert ax.get_ylim() == (gaze.experiment.screen.height_px, 0)
+
+    # Assert that the aspect ratio is equal (square pixels)
+    assert ax.get_aspect() == 'equal'
+
+    plt.close(fig)

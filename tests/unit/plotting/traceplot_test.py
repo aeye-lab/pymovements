@@ -218,7 +218,14 @@ def test_traceplot_screen_dims(gaze, width, height):
     gaze.experiment.screen.width_px = width
     gaze.experiment.screen.height_px = height
 
-    pm.plotting.traceplot(gaze=gaze, show=False)
+    fig, ax = pm.plotting.traceplot(gaze=gaze, show=False)
+
+    if width is not None and height is not None:
+        assert ax.get_xlim() == (0, width)
+        assert ax.get_ylim() == (height, 0)
+        assert ax.get_aspect() == 'equal'
+
+    plt.close(fig)
 
 
 def test_traceplot_origin_wrong(gaze):
