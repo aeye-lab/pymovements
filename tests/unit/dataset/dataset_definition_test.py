@@ -671,35 +671,6 @@ def test_dataset_definition_has_resources_not_equal():
         ),
 
         pytest.param(
-            DatasetDefinition(
-                distance_column='test',
-                position_columns=['test', 'foo', 'bar'],
-            ),
-            True,
-            {
-                'name': '.',
-                'position_columns': ['test', 'foo', 'bar'],
-                'distance_column': 'test',
-            },
-            id='true_str_dict_list',
-        ),
-
-        pytest.param(
-            DatasetDefinition(
-                experiment=Experiment(origin=None),
-                distance_column='test',
-                position_columns=['test', 'foo', 'bar'],
-            ),
-            True,
-            {
-                'name': '.',
-                'position_columns': ['test', 'foo', 'bar'],
-                'distance_column': 'test',
-            },
-            id='true_str_dict_list_experiment_origin_none',
-        ),
-
-        pytest.param(
             DatasetDefinition(),
             False,
             {
@@ -787,6 +758,62 @@ def test_dataset_definition_has_resources_not_equal():
                 'distance_column': None,
             },
             id='false_experiment_origin_none',
+        ),
+
+        pytest.param(
+            DatasetDefinition(
+                resources=[
+                    {
+                        'content': 'gaze',
+                        'load_kwargs': {
+                            'distance_column': 'test',
+                            'position_columns': ['test', 'foo', 'bar'],
+                        },
+                    },
+                ],
+            ),
+            True,
+            {
+                'name': '.',
+                'resources': [
+                    {
+                        'content': 'gaze',
+                        'load_kwargs': {
+                            'distance_column': 'test',
+                            'position_columns': ['test', 'foo', 'bar'],
+                        },
+                    },
+                ],
+            },
+            id='true_resources',
+        ),
+
+        pytest.param(
+            DatasetDefinition(
+                resources=[
+                    {
+                        'content': 'gaze',
+                        'load_kwargs': {
+                            'distance_column': 'test',
+                            'position_columns': ['test', 'foo', 'bar'],
+                        },
+                    },
+                ],
+            ),
+            False,
+            {
+                'name': '.',
+                'resources': [
+                    {
+                        'content': 'gaze',
+                        'load_kwargs': {
+                            'distance_column': 'test',
+                            'position_columns': ['test', 'foo', 'bar'],
+                        },
+                    },
+                ],
+            },
+            id='false_resources',
         ),
     ],
 )
