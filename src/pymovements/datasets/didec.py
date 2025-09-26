@@ -141,12 +141,12 @@ class DIDEC(DatasetDefinition):
                         'trial': int,
                     },
                     'load_kwargs': {
-                        'trial_columns': ["Stimulus"],
-                        'time_column': "Time",
-                        'time_unit': "ms",
+                        'trial_columns': ['Stimulus'],
+                        'time_column': 'Time',
+                        'time_unit': 'ms',
                         'pixel_columns': [
-                            "L POR X [px]", "L POR Y [px]",
-                            "R POR X [px]", "R POR Y [px]",
+                            'L POR X [px]', 'L POR Y [px]',
+                            'R POR X [px]', 'R POR Y [px]',
                         ],
                     },
                 },

@@ -108,7 +108,7 @@ class MECOL1W1(DatasetDefinition):
                     'md5': '3c969a930a71cd62c67b936426dd079b',
                     'filename_pattern': 'joint_l1_fixation_version1.3.rda',
                     'load_kwargs': {
-                        'trial_columns': ["uniform_id", "itemid"],
+                        'trial_columns': ['uniform_id', 'itemid'],
                     },
                 },
                 {

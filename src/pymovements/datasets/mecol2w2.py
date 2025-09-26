@@ -108,7 +108,7 @@ class MECOL2W2(DatasetDefinition):
                     'md5': 'f7eaf80ac5916d79351419fd4f1da2f6',
                     'filename_pattern': 'joint_fix_trimmed_L2_wave2.rda',
                     'load_kwargs': {
-                        'trial_columns': ["uniform_id", "itemid"],
+                        'trial_columns': ['uniform_id', 'itemid'],
                     },
                 },
                 {
