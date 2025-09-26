@@ -159,7 +159,7 @@ class PotsdamBingeWearablePVT(DatasetDefinition):
                         'time_unit': 'ms',
                         'distance_column': 'target_distance',
                         'pixel_columns': [
-                            'x_pix_pupilcore_interpolated', 'x_pix_pupilcore_interpolated',
+                            'x_pix_pupilcore_interpolated', 'y_pix_pupilcore_interpolated',
                         ],
                     },
                 },

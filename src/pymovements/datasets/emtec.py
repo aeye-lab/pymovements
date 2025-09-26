@@ -167,7 +167,7 @@ class EMTeC(DatasetDefinition):
 
     filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
-    trial_columns: list[str] = field(default_factory=lambda: ['item_id'])
+    trial_columns: list[str] | None = None
 
     time_column: str | None = None
 

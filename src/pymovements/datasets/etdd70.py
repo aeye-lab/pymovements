@@ -124,7 +124,6 @@ class ETDD70(DatasetDefinition):
                     'md5': None,  # type: ignore
                     'filename_pattern': r'Subject_{subject_id:d}_{task:s}_raw.csv',
                     'load_kwargs': {
-                        'trial_columns': ['book_name', 'screen_id'],
                         'time_column': 'time',
                         'time_unit': 'ms',
                         'pixel_columns': [

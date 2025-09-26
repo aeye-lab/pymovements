@@ -130,7 +130,6 @@ class HBN(DatasetDefinition):
                         'video_id': str,
                     },
                     'load_kwargs': {
-                        'trial_columns': ['book_name', 'screen_id'],
                         'time_column': 'time',
                         'time_unit': 'step',
                         'pixel_columns': ['x_pix', 'y_pix'],

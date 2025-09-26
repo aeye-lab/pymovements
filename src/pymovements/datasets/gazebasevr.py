@@ -142,7 +142,6 @@ class GazeBaseVR(DatasetDefinition):
                         'session_id': int,
                     },
                     'load_kwargs': {
-                        'trial_columns': ['book_name', 'screen_id'],
                         'time_column': 'n',
                         'time_unit': 'ms',
                         'position_columns': ['lx', 'ly', 'rx', 'ry', 'x', 'y'],
