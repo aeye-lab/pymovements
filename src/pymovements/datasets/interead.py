@@ -167,7 +167,7 @@ class InteRead(DatasetDefinition):
 
     time_column: str | None = None
 
-    time_unit: str  | None = None
+    time_unit: str | None = None
 
     pixel_columns: list[str] | None = None
 

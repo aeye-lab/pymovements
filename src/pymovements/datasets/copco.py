@@ -137,7 +137,7 @@ class CopCo(DatasetDefinition):
                         'time_column': 'time',
                         'time_unit': 'ms',
                         'pixel_columns': ['x_right', 'y_right'],
-                },
+                    },
                 },
                 {
                     'content': 'precomputed_events',
