@@ -140,6 +140,9 @@ class DIDEC(DatasetDefinition):
                         'session': int,
                         'trial': int,
                     },
+                    'load_kwargs': {
+                        'trial_columns': ['book_name', 'screen_id'],
+                    },
                 },
             ],
         ),
@@ -161,22 +164,13 @@ class DIDEC(DatasetDefinition):
 
     filename_format_schema_overrides: dict[str, dict[str, type]] | None = None
 
-    trial_columns: list[str] = field(
-        default_factory=lambda: ['Stimulus'],
-    )
+    trial_columns: list[str] | None = None
 
-    time_column: str = 'Time'
+    time_column: str | None = None
 
-    time_unit: str = 'ms'
+    time_unit: str | None = None
 
-    pixel_columns: list[str] = field(
-        default_factory=lambda: [
-            'L POR X [px]',
-            'L POR Y [px]',
-            'R POR X [px]',
-            'R POR Y [px]',
-        ],
-    )
+    pixel_columns: list[str] | None = None
 
     column_map: dict[str, str] = field(default_factory=lambda: {})
 

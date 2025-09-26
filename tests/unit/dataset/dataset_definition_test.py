@@ -975,21 +975,6 @@ def test_dataset_definition_set_filename_format_schema_expected(definition, new_
 
 
 @pytest.mark.parametrize(
-    ('definition', 'attribute'),
-    [
-        pytest.param(
-            DatasetDefinition(),
-            'filename_format',
-            id='filename_format',
-        ),
-    ],
-)
-def test_dataset_definition_get_attribute_is_deprecated(definition, attribute):
-    with pytest.warns(DeprecationWarning):
-        getattr(definition, attribute)
-
-
-@pytest.mark.parametrize(
     ('definition', 'attribute', 'value'),
     [
         pytest.param(
@@ -1006,13 +991,85 @@ def test_dataset_definition_set_attribute_is_deprecated(definition, attribute, v
 
 
 @pytest.mark.parametrize(
+    ('attribute', 'value', 'expected_resource'),
+    [
+        pytest.param(
+            'trial_columns',
+            'trial',
+            {'content': 'gaze', 'load_kwargs': {'trial_columns': 'trial'}},
+            id='trial_columns',
+        ),
+        pytest.param(
+            'time_column',
+            't',
+            {'content': 'gaze', 'load_kwargs': {'time_column': 't'}},
+            id='time_column',
+        ),
+        pytest.param(
+            'time_unit',
+            'sec',
+            {'content': 'gaze', 'load_kwargs': {'time_unit': 'sec'}},
+            id='time_unit',
+        ),
+        pytest.param(
+            'pixel_columns',
+            ['px', 'py'],
+            {'content': 'gaze', 'load_kwargs': {'pixel_columns': ['px', 'py']}},
+            id='pixel_columns',
+        ),
+        pytest.param(
+            'position_columns',
+            ['dvax', 'dvay'],
+            {'content': 'gaze', 'load_kwargs': {'pixel_columns': ['dvax', 'dvay']}},
+            id='position_columns',
+        ),
+        pytest.param(
+            'velocity_columns',
+            ['vx', 'vy'],
+            {'content': 'gaze', 'load_kwargs': {'pixel_columns': ['vx', 'vy']}},
+            id='velocity_columns',
+        ),
+        pytest.param(
+            'acceleration_columns',
+            ['ax', 'ay'],
+            {'content': 'gaze', 'load_kwargs': {'pixel_columns': ['ax', 'ay']}},
+            id='acceleration_columns',
+        ),
+        pytest.param(
+            'distance_column',
+            'd',
+            {'content': 'gaze', 'load_kwargs': {'distance_column': 'd'}},
+            id='distance_column',
+        ),
+    ],
+)
+def test_dataset_definition_set_column_attribute_has_expected_resources_and_is_deprecated(
+        attribute, value, expected_resource,
+):
+    definition = DatasetDefinition(resources=[{'content': 'gaze'}]),
+    with pytest.warns(DeprecationWarning):
+        setattr(definition, attribute, value)
+
+    assert len(definition.resources) == 1  # didn't change number of resources
+    assert definition.resources[0] == expected_resource
+
+
+@pytest.mark.parametrize(
     'attribute',
     [
         'filename_format',
         'filename_format_schema_overrides',
+        'trial_columns',
+        'time_column',
+        'time_unit',
+        'pixel_columns',
+        'position_columns',
+        'velocity_columns',
+        'acceleration_columns',
+        'distance_column',
     ],
 )
-def test_dataset_definition_get_attribute_is_removed(attribute):
+def test_dataset_definition_get_attribute_is_deprecated_or_removed(attribute):
     definition = DatasetDefinition()
     with pytest.raises(DeprecationWarning) as info:
         getattr(definition, attribute)
