@@ -68,7 +68,6 @@ class Dataset:
     ):
         self.fileinfo: pl.DataFrame = pl.DataFrame()
         self.gaze: list[Gaze] = []
-        self.events: list[Events] = []
         self.precomputed_events: list[PrecomputedEventDataFrame] = []
         self.precomputed_reading_measures: list[ReadingMeasures] = []
 
@@ -165,10 +164,34 @@ class Dataset:
                 events_dirname=events_dirname,
                 extension=extension,
             )
-            for loaded_gaze, loaded_events in zip(self.gaze, self.events):
-                loaded_gaze.events = loaded_events
+            # self.events = self.events
 
         return self
+
+    @property
+    def events(self) -> list[Events]:
+        """Return events for all Gaze objects in the Dataset.
+
+        This harmonizes Dataset.events with Gaze.events
+        """
+        return [gaze.events for gaze in self.gaze]
+
+    @events.setter
+    def events(self, events_list: list[Events]) -> None:
+        """Assign events to each Gaze object in the Dataset.
+
+        Parameters
+        ----------
+        events_list : list[Events]
+            Must have the same length as Dataset.gaze.
+        """
+        if len(events_list) != len(self.gaze):
+            raise ValueError(
+                f"Number of events ({len(events_list)}) does not match "
+                f"number of gazes ({len(self.gaze)}).",
+            )
+        for gaze, ev in zip(self.gaze, events_list):
+            gaze.events = ev
 
     def scan(self) -> Dataset:
         """Infer information from filepaths and filenames.
@@ -359,13 +382,14 @@ class Dataset:
             If extension is not in list of valid extensions.
         """
         self._check_fileinfo()
-        self.events = dataset_files.load_event_files(
+        events = dataset_files.load_event_files(
             definition=self.definition,
             fileinfo=self.fileinfo['gaze'],
             paths=self.paths,
             events_dirname=events_dirname,
             extension=extension,
         )
+        self.events = events
         return self
 
     def apply(
