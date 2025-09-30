@@ -53,7 +53,7 @@ class Events:
         List of onsets. (default: None)
     offsets: list[int | float] | np.ndarray | None
         List of offsets. (default: None)
-    trials: list[int | float | str] | np.ndarray | None
+    trials: list[int | float | str | None] | np.ndarray | None
         List of trial identifiers. (default: None)
     trial_columns: list[str] | str | None
         List of trial columns in passed dataframe.
@@ -108,7 +108,7 @@ class Events:
             name: str | list[str] | None = None,
             onsets: list[int | float] | np.ndarray | None = None,
             offsets: list[int | float] | np.ndarray | None = None,
-            trials: list[int | float | str] | np.ndarray | None = None,
+            trials: list[int | float | str | None] | np.ndarray | None = None,
             trial_columns: list[str] | str | None = None,
     ):
         self.trial_columns: list[str] | None  # otherwise mypy gets confused.

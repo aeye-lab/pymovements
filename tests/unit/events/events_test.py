@@ -746,6 +746,15 @@ def test_split_default_no_trial_columns_raises_typeerror():
             id='single_column_default',
         ),
         pytest.param(
+            Events(onsets=[20, 30], offsets=[24, 40], name=['blink', 'fixation'], trials=[1, None]),
+            None,
+            {
+                (1,): Events(onsets=[20], offsets=[24], name=['blink'], trials=[1]),
+                (None,): Events(onsets=[30], offsets=[40], name=['fixation'], trials=[None]),
+            },
+            id='single_column_two_trials_one_none',
+        ),
+        pytest.param(
             Events(
                 pl.from_dict({
                     'trial_id': [0, 1, 1, 2],

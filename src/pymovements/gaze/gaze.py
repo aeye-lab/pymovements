@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import inspect
+import math
 import warnings
 from collections.abc import Callable
 from collections.abc import Sequence
@@ -366,7 +367,11 @@ class Gaze:
         else:
             grouped_events = {}
 
-        keys = sorted(set(grouped_samples.keys()) | set(grouped_events.keys()))
+        keys = sorted(
+            set(grouped_samples.keys()) | set(grouped_events.keys()),
+            # treat None as negative infinity values
+            key=lambda t: tuple(-math.inf if x is None else x for x in t),
+        )
 
         gazes = {
             key: Gaze(
