@@ -441,6 +441,7 @@ def test_gaze_split_example():
             {},
             id='empty_gaze',
         ),
+
         pytest.param(
             Gaze(
                 samples=pl.DataFrame(schema={'x': pl.Int64, 'y': pl.Int64, 'trial': pl.Int64}),
@@ -451,6 +452,7 @@ def test_gaze_split_example():
             {},
             id='empty_samples_no_events_none_with_trial_columns_by_single_column',
         ),
+
         pytest.param(
             Gaze(
                 samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1]}),
@@ -465,6 +467,7 @@ def test_gaze_split_example():
             },
             id='one_sample_no_events_one_trial_by_single_column',
         ),
+
         pytest.param(
             Gaze(
                 samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1]}),
@@ -479,6 +482,7 @@ def test_gaze_split_example():
             },
             id='one_sample_no_events_with_experiment_one_trial_by_single_column',
         ),
+
         pytest.param(
             Gaze(
                 samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1]}),
@@ -493,6 +497,7 @@ def test_gaze_split_example():
             },
             id='one_sample_no_events_one_trial_by_none',
         ),
+
         pytest.param(
             Gaze(
                 samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1], 'task': ['A']}),
@@ -507,6 +512,7 @@ def test_gaze_split_example():
             },
             id='one_sample_no_events_one_trial_by_two_columns',
         ),
+
         pytest.param(
             Gaze(
                 samples=pl.from_dict({'x': [0, 1], 'y': [2, 3], 'trial': [1, 2]}),
@@ -525,6 +531,7 @@ def test_gaze_split_example():
             },
             id='two_samples_no_events_two_trials_by_single_column',
         ),
+
         pytest.param(
             Gaze(
                 samples=pl.from_dict({'x': [0, 1], 'y': [2, 3], 'trial': [1, None]}),
@@ -543,6 +550,7 @@ def test_gaze_split_example():
             },
             id='two_samples_no_events_one_trial_one_none_by_single_column',
         ),
+
         pytest.param(
             Gaze(
                 samples=pl.from_dict({'x': [0, 1], 'y': [2, 3], 'trial': [1, 2]}),
@@ -561,6 +569,7 @@ def test_gaze_split_example():
             },
             id='two_samples_no_events_with_experiment_two_trials_by_single_column',
         ),
+
         pytest.param(
             Gaze(
                 samples=pl.from_dict({'x': [0, 1], 'y': [2, 3], 'trial': [1, 2]}),
@@ -579,6 +588,7 @@ def test_gaze_split_example():
             },
             id='two_samples_no_events_with_experiment_two_trials_by_default',
         ),
+
         pytest.param(
             Gaze(
                 samples=pl.from_dict({'x': range(5, 10), 'y': range(5), 'trial': [8, 5, 3, 4, 1]}),
@@ -609,6 +619,7 @@ def test_gaze_split_example():
             },
             id='five_samples_no_events_five_trials_single_column_trials',
         ),
+
         pytest.param(
             Gaze(
                 samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1]}),
@@ -627,6 +638,7 @@ def test_gaze_split_example():
             },
             id='one_sample_one_event_same_trial_by_default',
         ),
+
         pytest.param(
             Gaze(
                 samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1]}),
@@ -651,6 +663,7 @@ def test_gaze_split_example():
             },
             id='one_sample_one_event_different_trial_by_default',
         ),
+
         pytest.param(
             Gaze(
                 samples=pl.from_dict({'x': [0, 1], 'y': [2, 3], 'trial': [1, 2]}),
@@ -677,6 +690,7 @@ def test_gaze_split_example():
             },
             id='two_samples_one_event_two_trials_by_single_column',
         ),
+
         pytest.param(
             Gaze(
                 samples=pl.from_dict({'x': [0, 1], 'y': [2, 3], 'trial': [1, 2]}),
@@ -713,6 +727,7 @@ def test_gaze_split_example():
             },
             id='two_samples_two_events_two_trials_by_single_column',
         ),
+
         pytest.param(
             Gaze(
                 samples=pl.from_dict({'x': [0, 1], 'y': [2, 3], 'trial': [1, None]}),
@@ -749,6 +764,7 @@ def test_gaze_split_example():
             },
             id='two_samples_two_events_one_trial_one_none_by_single_column',
         ),
+
         pytest.param(
             Gaze(
                 events=Events(
@@ -767,6 +783,7 @@ def test_gaze_split_example():
             },
             id='no_samples_one_event_one_trial_by_single_column',
         ),
+
         pytest.param(
             Gaze(
                 events=Events(

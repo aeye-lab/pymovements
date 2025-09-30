@@ -736,6 +736,7 @@ def test_split_default_no_trial_columns_raises_typeerror():
             },
             id='single_column',
         ),
+
         pytest.param(
             Events(onsets=[20, 30], offsets=[24, 40], name=['blink', 'fixation'], trials=[1, 2]),
             None,
@@ -745,6 +746,7 @@ def test_split_default_no_trial_columns_raises_typeerror():
             },
             id='single_column_default',
         ),
+
         pytest.param(
             Events(onsets=[20, 30], offsets=[24, 40], name=['blink', 'fixation'], trials=[1, None]),
             None,
@@ -754,6 +756,7 @@ def test_split_default_no_trial_columns_raises_typeerror():
             },
             id='single_column_two_trials_one_none',
         ),
+
         pytest.param(
             Events(
                 pl.from_dict({
@@ -805,6 +808,7 @@ def test_split_default_no_trial_columns_raises_typeerror():
             },
             id='two_columns',
         ),
+
         pytest.param(
             Events(
                 pl.from_dict({
