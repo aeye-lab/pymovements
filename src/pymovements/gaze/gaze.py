@@ -357,7 +357,6 @@ class Gaze:
         if not self.samples.is_empty():
             # We use as_dict=True here to make sure to map samples to the correct events.
             grouped_samples = self.samples.partition_by(by=by, as_dict=True)
-            assert isinstance(grouped_samples, dict)  # or else mypy complains below
         else:
             grouped_samples = {}
 
