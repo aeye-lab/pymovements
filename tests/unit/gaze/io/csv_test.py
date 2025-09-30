@@ -314,3 +314,46 @@ def test_from_csv_gaze_has_expected_shape_and_columns(kwargs, expected_shape, ex
 
     assert gaze.samples.shape == expected_shape
     assert gaze.samples.schema == expected_schema
+
+
+@pytest.mark.parametrize(
+    ('filename', 'kwargs'},
+    [
+        pytest.param(
+            'eyelink_monocular_example.asc',
+            {'patterns': 'eyelink'},
+            id='data',
+        ),
+    ],
+)
+def test_from_asc_parameter_is_deprecated(filename, kwargs, make_example_asc_file):
+    filepath = make_example_asc_file(filename)
+    gaze = from_asc(filepath, **kwargs)
+
+    with pytest.warns(DeprecationWarning):
+        from_asc(**init_kwargs)
+
+
+@pytest.mark.parametrize(
+    'init_kwargs',
+    [
+        pytest.param(
+            {'data': pl.DataFrame()},
+            id='data',
+        ),
+    ],
+)
+def test_from_asc_parameter_is_removed(init_kwargs):
+    with pytest.raises(DeprecationWarning) as info:
+        from_asc(**init_kwargs)
+
+    regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
+
+    msg = info.value.args[0]
+    argument_name = list(init_kwargs.keys())[0]
+    remove_version = regex.match(msg).groupdict()['version']
+    current_version = __version__.split('+')[0]
+    assert current_version < remove_version, (
+        f'keyword argument {argument_name} was planned to be removed in v{remove_version}. '
+        f'Current version is v{current_version}.'
+    )
