@@ -22,6 +22,8 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from typing import Any
+from typing import Literal
+from typing import overload
 
 import numpy as np
 import polars as pl
@@ -422,6 +424,15 @@ class Events:
             A copy of the Events.
         """
         return self.clone()
+
+    @overload
+    def split(self, by: Sequence[str] | None = None, *, as_dict: Literal[False]) -> list[Events]:
+        ...
+
+    @overload
+    def split(self, by: Sequence[str] | None = None, *, as_dict: Literal[True]) \
+            -> dict[tuple[Any, ...], Events]:
+        ...
 
     def split(
             self,

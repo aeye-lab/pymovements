@@ -27,6 +27,8 @@ from collections.abc import Sequence
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
+from typing import Literal
+from typing import overload
 
 import numpy as np
 import polars as pl
@@ -308,6 +310,15 @@ class Gaze:
             self.detect(function, **kwargs)
         else:
             raise ValueError(f"unsupported method '{function}'")
+
+    @overload
+    def split(self, by: Sequence[str] | None = None, *, as_dict: Literal[False]) -> list[Gaze]:
+        ...
+
+    @overload
+    def split(self, by: Sequence[str] | None = None, *, as_dict: Literal[True]) \
+            -> dict[tuple[Any, ...], Gaze]:
+        ...
 
     def split(
             self,

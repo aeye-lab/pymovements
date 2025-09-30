@@ -304,7 +304,6 @@ class Dataset:
 
         for frame, fileinfo_row in zip(self.gaze, fileinfo_dicts):
             split_frames = frame.split(by=by, as_dict=False)
-            assert isinstance(split_frames, list)  # or else mypy complains
             all_gaze_frames.extend(split_frames)
             all_fileinfo_rows.extend([fileinfo_row] * len(split_frames))
 
