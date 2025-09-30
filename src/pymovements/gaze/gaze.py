@@ -363,7 +363,6 @@ class Gaze:
         if self.events:
             # We use as_dict=True here to make sure to map events to the correct samples.
             grouped_events = self.events.split(by=by, as_dict=True)
-            assert isinstance(grouped_events, dict)  # or else mypy complains below
         else:
             grouped_events = {}
 
