@@ -548,7 +548,26 @@ def test_gaze_split_example():
                     pixel_columns=['x', 'y'],
                 ),
             },
-            id='two_samples_no_events_one_trial_one_none_by_single_column',
+            id='two_samples_no_events_one_trial_int_one_none_by_single_column',
+        ),
+
+        pytest.param(
+            Gaze(
+                samples=pl.from_dict({'x': [0, 1], 'y': [2, 3], 'trial': ['A', None]}),
+                pixel_columns=['x', 'y'],
+            ),
+            'trial',
+            {
+                ('A',): Gaze(
+                    samples=pl.from_dict({'x': [0], 'y': [2], 'trial': ['A']}),
+                    pixel_columns=['x', 'y'],
+                ),
+                (None,): Gaze(
+                    samples=pl.from_dict({'x': [1], 'y': [3], 'trial': [None]}),
+                    pixel_columns=['x', 'y'],
+                ),
+            },
+            id='two_samples_no_events_one_trial_str_one_none_by_single_column',
         ),
 
         pytest.param(
