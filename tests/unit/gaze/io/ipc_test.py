@@ -44,6 +44,29 @@ from pymovements.gaze import from_ipc
         pytest.param(
             'monocular_example.feather',
             {
+                'read_ipc_kwargs': {'columns': ['time']},
+            },
+            (10, 1),
+            marks=pytest.mark.filterwarnings(
+                'ignore:Gaze contains samples but no.*:UserWarning',
+            ),
+            id='read_ipc_kwargs',
+        ),
+        pytest.param(
+            'monocular_example.feather',
+            {
+                'columns': ['time'],
+            },
+            (10, 1),
+            marks=pytest.mark.filterwarnings(
+                'ignore:Gaze contains samples but no.*:UserWarning',
+                'ignore:.*kwargs.*:DeprecationWarning',
+            ),
+            id='**kwargs',
+        ),
+        pytest.param(
+            'monocular_example.feather',
+            {
                 'column_map': {'pixel': 'pixel_coordinates'},
             },
             (10, 2),
