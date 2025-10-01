@@ -51,7 +51,8 @@ def from_csv(
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, type] | None = None,
         definition: pm.DatasetDefinition | None = None,
-        **read_csv_kwargs: Any,
+        read_csv_kwargs: dict[str, Any] | None = None,
+        **kwargs: Any,
 ) -> Gaze:
     """Initialize a :py:class:`~pymovements.Gaze`.
 
@@ -108,7 +109,11 @@ def from_csv(
     definition: pm.DatasetDefinition | None
         A dataset definition. Explicitly passed arguments take precedence over definition.
         (default: None)
-    **read_csv_kwargs: Any
+    read_csv_kwargs: dict[str, Any] | None
+        Additional keyword arguments to be passed to :py:func:`polars.read_csv` to read in the csv.
+        These can include custom separators, a subset of columns, or specific data types
+        for columns. (default: None)
+    **kwargs: Any
         Additional keyword arguments to be passed to :py:func:`polars.read_csv` to read in the csv.
         These can include custom separators, a subset of columns, or specific data types
         for columns.
@@ -224,6 +229,20 @@ def from_csv(
     └──────┴───────────┘
 
     """
+    if read_csv_kwargs is None:
+        read_csv_kwargs = {}
+
+    if kwargs:
+        warnings.warn(
+            DeprecationWarning(
+                "from_csv() argument '**kwargs' is deprecated since version v0.24.0. "
+                'This argument will be removed in v0.29.0.',
+                "Please use argument 'read_csv_kawrgs' instead. ",
+            ),
+        )
+        # merge dictionaries, **kwargs takes precedence
+        read_csv_kwargs = {**read_csv_kwargs, **kwargs}
+
     # explicit arguments take precedence over definition.
     if definition:
         if column_map is None:
@@ -518,7 +537,8 @@ def from_ipc(
         column_map: dict[str, str] | None = None,
         add_columns: dict[str, str] | None = None,
         column_schema_overrides: dict[str, type] | None = None,
-        **read_ipc_kwargs: Any,
+        read_ipc_kwargs: dict[str, Any] | None = None,
+        **kwargs: Any,
 ) -> Gaze:
     """Initialize a :py:class:`~pymovements.Gaze`.
 
@@ -543,7 +563,9 @@ def from_ipc(
     column_schema_overrides:  dict[str, type] | None
         Dictionary containing types for columns.
         (default: None)
-    **read_ipc_kwargs: Any
+    read_ipc_kwargs: dict[str, Any] | None
+            Additional keyword arguments to be passed to ``polars.read_ipc()``. (default: None)
+    **kwargs: Any
             Additional keyword arguments to be passed to polars to read in the ipc file.
 
     Returns
@@ -578,6 +600,20 @@ def from_ipc(
     └──────┴───────────┘
 
     """
+    if read_ipc_kwargs is None:
+        read_ipc_kwargs = {}
+
+    if kwargs:
+        warnings.warn(
+            DeprecationWarning(
+                "from_ipc() argument '**kwargs' is deprecated since version v0.24.0. "
+                'This argument will be removed in v0.29.0.',
+                "Please use argument 'read_ipc_kwargs' instead. ",
+            ),
+        )
+        # merge dictionaries, **kwargs takes precedence
+        read_ipc_kwargs = {**read_ipc_kwargs, **kwargs}
+
     # Read data.
     samples = pl.read_ipc(file, **read_ipc_kwargs)
 
