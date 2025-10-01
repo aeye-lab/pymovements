@@ -910,8 +910,8 @@ class Dataset:
         if len(self.events) == 0:
             return self
 
-        for file_id, _ in enumerate(self.events):
-            self.events[file_id] = Events()
+        for gaze in self.gaze:
+            gaze.events = Events()
 
         return self
 
