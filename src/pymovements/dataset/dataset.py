@@ -781,9 +781,6 @@ class Dataset:
         """
         self._check_gaze()
 
-        if not self.events:
-            self.events = [gaze.events for gaze in self.gaze]
-
         disable_progressbar = not verbose
         for file_id, (gaze, fileinfo_row) in tqdm(
                 enumerate(zip(self.gaze, self.fileinfo['gaze'].to_dicts())),
