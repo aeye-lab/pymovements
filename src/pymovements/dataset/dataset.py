@@ -164,7 +164,6 @@ class Dataset:
                 events_dirname=events_dirname,
                 extension=extension,
             )
-            # self.events = self.events
 
         return self
 
