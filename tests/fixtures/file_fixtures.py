@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2025 The pymovements Project Authors
+# Copyright (c) 2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,42 +17,28 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test read from IPC/feather."""
+"""Provide fixtures to securely make files from examples in ``tests/files``."""
+import shutil
+from pathlib import Path
+
 import pytest
 
-import pymovements as pm
+
+@pytest.fixture(name='testfiles_dirpath')
+def fixture_testfiles_dirpath(request):
+    """Return the path to tests/files."""
+    return request.config.rootpath / 'tests' / 'files'
 
 
-@pytest.mark.parametrize(
-    ('filename', 'kwargs', 'shape'),
-    [
-        pytest.param(
-            'monocular_example.feather',
-            {},
-            (10, 2),
-            id='feather_mono_shape',
-        ),
-        pytest.param(
-            'binocular_example.feather',
-            {},
-            (10, 3),
-            id='feather_bino_shape',
-        ),
-        pytest.param(
-            'monocular_example.feather',
-            {
-                'column_map': {'pixel': 'pixel_coordinates'},
-            },
-            (10, 2),
-            marks=pytest.mark.filterwarnings(
-                'ignore:Gaze contains samples but no.*:UserWarning',
-            ),
-            id='feather_mono_shape_column_map',
-        ),
-    ],
-)
-def test_shapes(filename, kwargs, shape, make_example_file):
-    filepath = make_example_file(filename)
-    gaze = pm.gaze.from_ipc(file=filepath, **kwargs)
+@pytest.fixture(name='make_example_file')
+def fixture_make_example_file(testfiles_dirpath, tmp_path):
+    """Make a copy of a file from one of the example files in tests/files.
 
-    assert gaze.samples.shape == shape
+    This way each file can be used in tests without the risk of changing contents.
+    """
+    def _make_example_file(filename: str) -> Path:
+        source_filepath = testfiles_dirpath / filename
+        target_filepath = tmp_path / filename
+        shutil.copy2(source_filepath, target_filepath)
+        return target_filepath
+    return _make_example_file
