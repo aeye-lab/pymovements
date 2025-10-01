@@ -2175,3 +2175,20 @@ def test_events_setter_raises_on_length_mismatch(tmp_path):
     # Try to assign two events for one gaze
     with pytest.raises(ValueError, match='Number of events'):
         dataset.events = [Events(), Events()]
+
+
+def test_events_property_populates_from_gazes(tmp_path):
+    dataset = Dataset('ToyDataset', path=tmp_path)
+    dataset.gaze.append(
+        Gaze(
+            pl.DataFrame({'time': [], 'pixel_x': [], 'pixel_y': []}),
+            pixel_columns=['pixel_x', 'pixel_y'],
+            time_column='time',
+            time_unit='ms',
+        ),
+    )
+
+    assert isinstance(dataset.events, list)
+    assert len(dataset.events) == 1
+    assert isinstance(dataset.events[0], Events)
+    assert dataset.events[0].frame.is_empty()
