@@ -566,9 +566,9 @@ def from_ipc(
         Dictionary containing types for columns.
         (default: None)
     read_ipc_kwargs: dict[str, Any] | None
-            Additional keyword arguments to be passed to ``polars.read_ipc()``. (default: None)
+            Additional keyword arguments to be passed to :py:func:`polars.read_ipc`. (default: None)
     **kwargs: Any
-            Additional keyword arguments to be passed to polars to read in the ipc file.
+            Additional keyword arguments to be passed to :py:func:`polars.read_ipc`.
 
     Returns
     -------
