@@ -36,6 +36,8 @@ from matplotlib import scale as mpl_scale
 from matplotlib.collections import LineCollection
 from typing_extensions import TypeAlias
 
+from pymovements.gaze.experiment import Screen
+
 LinearSegmentedColormapType: TypeAlias = dict[
     Literal['red', 'green', 'blue', 'alpha'],
     Sequence[tuple[float, ...]],
@@ -315,9 +317,9 @@ def _draw_line_data(
     return line
 
 
-def _apply_screen_axes(
+def _set_screen_axes(
     ax: plt.Axes,
-    gaze: object | None,
+    screen: Screen | None,
     *,
     func_name: str,
 ) -> None:
@@ -327,27 +329,35 @@ def _apply_screen_axes(
     ----------
     ax : plt.Axes
         Matplotlib axes object to modify.
-    gaze : object | None
-        Gaze object with experiment data. If None, no action is taken.
+    screen : Screen | None
+        Screen object from a Gaze's Experiment. If None, no changes are made.
     func_name : str
         Name of the plotting function, used in error messages.
 
+    Raises
+    ------
+    ValueError
+        If the screen origin is not 'upper left'.
+    ValueError
+        If the screen width or height is not positive.
     """
-    experiment = getattr(gaze, 'experiment', None)
-    if experiment is None:
+    if screen is None:
         return
-
-    screen = experiment.screen
-    width_px = screen.width_px
-    height_px = screen.height_px
 
     if screen.origin != 'upper left':
         raise ValueError(
-            f"Origin of the experiment screen is set to {screen.origin}, "
-            f"but only 'upper left' is supported for {func_name}.",
+            f'{func_name}: screen origin must be "upper left", got "{screen.origin}".',
         )
 
-    if width_px is not None and height_px is not None:
-        ax.set_xlim(0, width_px)
-        ax.set_ylim(height_px, 0)
-        ax.set_aspect('equal', adjustable='box')
+    if (
+        screen.width_px is None or screen.height_px is None
+        or screen.width_px <= 0 or screen.height_px <= 0
+    ):
+        raise ValueError(
+            f'{func_name}: screen width and height must be positive and not None, '
+            f'got width={screen.width_px}, height={screen.height_px}.',
+        )
+
+    ax.set_xlim(0, screen.width_px)
+    ax.set_ylim(screen.height_px, 0)
+    ax.set_aspect('equal', adjustable='box')

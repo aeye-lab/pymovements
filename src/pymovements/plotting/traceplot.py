@@ -27,8 +27,8 @@ import matplotlib.scale
 import numpy as np
 
 from pymovements.gaze.gaze import Gaze
-from pymovements.plotting._matplotlib import _apply_screen_axes
 from pymovements.plotting._matplotlib import _draw_line_data
+from pymovements.plotting._matplotlib import _set_screen_axes
 from pymovements.plotting._matplotlib import _setup_axes_and_colormap
 from pymovements.plotting._matplotlib import finalize_figure
 from pymovements.plotting._matplotlib import LinearSegmentedColormapType
@@ -140,8 +140,6 @@ def traceplot(
         ax=ax,
     )
 
-    _apply_screen_axes(ax, gaze, func_name='traceplot')
-
     line = _draw_line_data(
         x_signal,
         y_signal,
@@ -150,6 +148,9 @@ def traceplot(
         cmap_norm,
         cval,
     )
+
+    if gaze is not None and gaze.experiment is not None:
+        _set_screen_axes(ax, gaze.experiment.screen, func_name='traceplot')
 
     if show_cbar:
         # sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
