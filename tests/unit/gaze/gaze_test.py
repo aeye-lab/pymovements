@@ -850,6 +850,7 @@ def test_gaze_split_as_dict(gaze, by, expected_splits):
             "Either 'by' or 'Gaze.trial_columns' must be specified",
             id='empty_gaze_by_none',
         ),
+
         pytest.param(
             Gaze(
                 samples=pl.from_dict({'x': [0], 'y': [1], 'trial': [1]}),
@@ -860,6 +861,7 @@ def test_gaze_split_as_dict(gaze, by, expected_splits):
             '"task" not found',
             id='columns_missing_from_samples',
         ),
+
         pytest.param(
             Gaze(
                 events=Events(
@@ -871,6 +873,7 @@ def test_gaze_split_as_dict(gaze, by, expected_splits):
             '"task" not found',
             id='columns_missing_from_events_no_samples',
         ),
+
         pytest.param(
             Gaze(
                 samples=pl.from_dict({'x': [0], 'y': [1], 'task': ['A']}),
@@ -884,6 +887,34 @@ def test_gaze_split_as_dict(gaze, by, expected_splits):
             '"task" not found',
             id='columns_missing_from_events_has_samples',
         ),
+
+        pytest.param(
+            Gaze(
+                samples=pl.from_dict(
+                    {'x': [0, 2], 'y': [1, 3], 'task': [b'\x00\x10', None]},
+                ),
+                pixel_columns=['x', 'y'],
+            ),
+            'task',
+            TypeError,
+            'dtype bytes not supported .* in split.* supported dtypes are',
+            id='none_trial_values_with_unsupported_split_column_dtype',
+        ),
+
+        pytest.param(
+            Gaze(
+                samples=pl.from_dict({'x': [0], 'y': [1], 'task': ['A']}),
+                pixel_columns=['x', 'y'],
+                events=Events(
+                    pl.DataFrame({'task': [1], 'name': ['saccade'], 'onset': [0], 'offset': [1]}),
+                ),
+            ),
+            'task',
+            TypeError,
+            '"by" column dtypes do not match between samples and events.*str.*!=.*int',
+            id='by_column_dtypes_do_not_match',
+        ),
+
     ],
 )
 def test_gaze_split_as_dict_raises_exception(gaze, by, expected_exception, expected_message):

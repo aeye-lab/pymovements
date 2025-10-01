@@ -426,17 +426,20 @@ class Events:
         return self.clone()
 
     @overload
-    def split(self, by: Sequence[str] | None = None, *, as_dict: Literal[False]) -> list[Events]:
+    def split(
+            self, by: str | Sequence[str] | None = None, *, as_dict: Literal[False],
+    ) -> list[Events]:
         ...
 
     @overload
-    def split(self, by: Sequence[str] | None = None, *, as_dict: Literal[True]) \
-            -> dict[tuple[Any, ...], Events]:
+    def split(
+            self, by: str | Sequence[str] | None = None, *, as_dict: Literal[True],
+    ) -> dict[tuple[Any, ...], Events]:
         ...
 
     def split(
             self,
-            by: Sequence[str] | None = None,
+            by: str | Sequence[str] | None = None,
             *,
             as_dict: bool = False,
     ) -> list[Events] | dict[tuple[Any, ...], Events]:
@@ -444,7 +447,7 @@ class Events:
 
         Parameters
         ----------
-        by: Sequence[str] | None
+        by: str | Sequence[str] | None
             Column name(s) to split the Events by. If a single string is provided,
             it will be used as a single column name. If a list is provided, the Events
             will be split by unique combinations of values in all specified columns.
