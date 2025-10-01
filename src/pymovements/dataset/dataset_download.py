@@ -245,7 +245,7 @@ def _download_resource_from_mirrors(
             msg = f'Downloading resource from mirror {mirror_url} failed.'
             if mirror_idx < len(mirrors) - 1:
                 msg = msg + ' Trying next mirror.'
-            
+
             warning = UserWarning(msg)
             warning.__cause__ = error
             warn(warning)
