@@ -2160,3 +2160,18 @@ def test_drop_event_property(gaze_dataset_configuration):
         dataset.drop_event_properties('onset')
     assert str(exinfo.value).startswith("The column 'onset' cannot be removed")
     assert 'onset' in dataset.gaze[0].events.columns
+
+
+def test_events_setter_raises_on_length_mismatch(tmp_path):
+    dataset = Dataset('ToyDataset', path=tmp_path)
+    # Add one gaze
+    dataset.gaze.append(
+        Gaze(
+            pl.DataFrame({'time': [], 'pixel_x': [], 'pixel_y': []}),
+            pixel_columns=['pixel_x', 'pixel_y'],
+            time_column='time', time_unit='ms',
+        ),
+    )
+    # Try to assign two events for one gaze
+    with pytest.raises(ValueError, match='Number of events'):
+        dataset.events = [Events(), Events()]
