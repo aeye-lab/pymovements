@@ -459,9 +459,8 @@ class Events:
         Returns
         -------
         list[Events] | dict[tuple[Any, ...], Events]
-            A list (or a dictionary in case of ``as_dict==True``) of new Events instances, each
-            containing a partition of the original data with all metadata and configurations
-            preserved.
+            A collection of new Events instances, each containing a partition of the original data
+            with all metadata and configurations preserved.
         """
         # Use trial_columns if by is None
         if by is None:

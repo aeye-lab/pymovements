@@ -347,7 +347,7 @@ class Gaze:
         Returns
         -------
         list[Gaze] | dict[tuple[Any, ...], Gaze]
-            A list of new Gaze instances, each containing a partition of the
+            A collection of new Gaze instances, each containing a partition of the
             original data with all metadata and configurations preserved.
         """
         # Use trial_columns if by is None
