@@ -1163,21 +1163,24 @@ def test_detect_events_raises_column_not_found_error(
 
 
 @pytest.mark.parametrize(
-    ('events_init', 'events_expected'),
+    ('events_init', 'events_expected', 'num_gazes'),
     [
         pytest.param(
             [],
             [],
+            0,
             id='empty_list_stays_empty_list',
         ),
         pytest.param(
             [Events()],
             [Events()],
+            1,
             id='empty_df_stays_empty_df',
         ),
         pytest.param(
             [Events(name='event', onsets=[0], offsets=[99])],
             [Events()],
+            1,
             id='single_instance_filled_df_gets_cleared_to_empty_df',
         ),
         pytest.param(
@@ -1186,21 +1189,33 @@ def test_detect_events_raises_column_not_found_error(
                 Events(name='event', onsets=[0], offsets=[99]),
             ],
             [Events(), Events()],
+            2,
             id='two_instance_filled_df_gets_cleared_to_two_empty_dfs',
         ),
     ],
 )
-def test_clear_events(events_init, events_expected, tmp_path):
+def test_clear_events(events_init, events_expected, tmp_path, num_gazes):
     dataset = Dataset('ToyDataset', path=tmp_path)
+
+    # add dummy gazes so events and gazes stay in sync
+    for _ in range(num_gazes):
+        dummy_gaze = Gaze(
+            pl.DataFrame({
+                'time': [],
+                'pixel_x': [],
+                'pixel_y': [],
+            }),
+            pixel_columns=['pixel_x', 'pixel_y'],
+            time_column='time',
+            time_unit='ms',
+        )
+        dataset.gaze.append(dummy_gaze)
+
     dataset.events = events_init
     dataset.clear_events()
 
-    if isinstance(events_init, list) and not events_init:
-        assert dataset.events == events_expected
-
-    else:
-        for events_df_result, events_df_expected in zip(dataset.events, events_expected):
-            assert_frame_equal(events_df_result.frame, events_df_expected.frame)
+    for events_df_result, events_df_expected in zip(dataset.events, events_expected):
+        assert_frame_equal(events_df_result.frame, events_df_expected.frame)
 
 
 @pytest.mark.parametrize(
@@ -1304,7 +1319,7 @@ def test_load_previously_saved_events_gaze(
     dataset.save_events(events_dirname, **load_save_kwargs)
     dataset.save_preprocessed(**load_save_kwargs)
 
-    dataset.events = []
+    dataset.clear_events()
 
     dataset.load(events=True, preprocessed=True, events_dirname=events_dirname, **load_save_kwargs)
     assert dataset.events
