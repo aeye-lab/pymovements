@@ -172,10 +172,10 @@ def from_csv(
     >>> from pymovements.gaze.io import from_csv
     >>> gaze = from_csv(
     ...     file='tests/files/monocular_example.csv',
-    ...     time_column = 'time',
+    ...     time_column='time',
     ...     time_unit='ms',
-    ...     pixel_columns = ['x_left_pix','y_left_pix'],
-    ...     separator = ',',
+    ...     pixel_columns=['x_left_pix','y_left_pix'],
+    ...     read_csv_kwargs={'separator': ','},
     ... )
     >>> gaze.samples
     shape: (10, 2)
@@ -204,29 +204,31 @@ def from_csv(
     >>> import polars as pl
     >>> gaze = from_csv(
     ...     file='tests/files/monocular_example.csv',
-    ...     time_column = 'time',
+    ...     time_column='time',
     ...     time_unit='ms',
-    ...     pixel_columns = ['x_left_pix','y_left_pix'],
-    ...     schema_overrides = {'time': pl.Int64, 'x_left_pix': pl.Int64, 'y_left_pix': pl.Int64},
+    ...     pixel_columns=['x_left_pix','y_left_pix'],
+    ...     read_csv_kwargs={
+    ...         'schema_overrides': {'x_left_pix': pl.Float64, 'y_left_pix': pl.Float64},
+    ...     },
     ... )
     >>> gaze.samples
     shape: (10, 2)
-    ┌──────┬───────────┐
-    │ time ┆ pixel     │
-    │ ---  ┆ ---       │
-    │ i64  ┆ list[i64] │
-    ╞══════╪═══════════╡
-    │ 0    ┆ [0, 0]    │
-    │ 1    ┆ [0, 0]    │
-    │ 2    ┆ [0, 0]    │
-    │ 3    ┆ [0, 0]    │
-    │ 4    ┆ [0, 0]    │
-    │ 5    ┆ [0, 0]    │
-    │ 6    ┆ [0, 0]    │
-    │ 7    ┆ [0, 0]    │
-    │ 8    ┆ [0, 0]    │
-    │ 9    ┆ [0, 0]    │
-    └──────┴───────────┘
+    ┌──────┬────────────┐
+    │ time ┆ pixel      │
+    │ ---  ┆ ---        │
+    │ i64  ┆ list[f64]  │
+    ╞══════╪════════════╡
+    │ 0    ┆ [0.0, 0.0] │
+    │ 1    ┆ [0.0, 0.0] │
+    │ 2    ┆ [0.0, 0.0] │
+    │ 3    ┆ [0.0, 0.0] │
+    │ 4    ┆ [0.0, 0.0] │
+    │ 5    ┆ [0.0, 0.0] │
+    │ 6    ┆ [0.0, 0.0] │
+    │ 7    ┆ [0.0, 0.0] │
+    │ 8    ┆ [0.0, 0.0] │
+    │ 9    ┆ [0.0, 0.0] │
+    └──────┴────────────┘
 
     """
     if read_csv_kwargs is None:
