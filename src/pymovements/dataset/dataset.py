@@ -182,7 +182,7 @@ class Dataset:
 
         # Load stimulus files if desired and if present
         if stimuli is not False:
-            if stimuli is True or self.definition.resources.has_content('stimuli')):
+            if stimuli is True or self.definition.resources.has_content('stimuli'):
                 self.load_stimuli(stimuli_dirname=stimuli_dirname)
 
         return self
