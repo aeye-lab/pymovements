@@ -101,10 +101,11 @@ class Dataset:
             *,
             events: bool | None = None,
             preprocessed: bool = False,
+            stimuli: bool | None = True,
             subset: dict[str, float | int | str | list[float | int | str]] | None = None,
             events_dirname: str | None = None,
             preprocessed_dirname: str | None = None,
-            stimuli_dirname: str | None = None,
+            stimuli_dirpath: Path | str | None = None,
             extension: str = 'feather',
     ) -> Dataset:
         """Parse file information and load all gaze files.
@@ -119,21 +120,26 @@ class Dataset:
         preprocessed: bool
             If ``True``, load previously saved preprocessed data, otherwise load raw data.
             (default: False)
+        stimuli: bool
+            If ``True``, load stimulus data, otherwise load raw data. (default: True)
         subset:  dict[str, float | int | str | list[float | int | str]] | None
             If specified, load only a subset of the dataset. All keys in the dictionary must be
             present in the fileinfo dataframe inferred by `scan()`. Values can be either
             float, int , str or a list of these. (default: None)
         events_dirname: str | None
-            One-time usage of an alternative directory name to save data relative to
+            One-time usage of an alternative directory name to load data relative to
             :py:meth:`pymovements.Dataset.path`.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.events_rootpath`. (default: None)
         preprocessed_dirname: str | None
-            One-time usage of an alternative directory name to save data relative to
+            One-time usage of an alternative directory name to load data relative to
             :py:meth:`pymovements.Dataset.path`.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`. (default: None)
-        stimuli_dirname: str | None
+        stimuli_dirpath: Path | str | None
+            One-time usage of an alternative directory path to load data relative to
+            :py:meth:`pymovements.Dataset.path`.
+            This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.stimuli_rootpath`. (default: None)
         extension: str
             Specifies the file format for loading data. Valid options are: `csv`, `feather`,
@@ -172,11 +178,9 @@ class Dataset:
             for loaded_gaze, loaded_events in zip(self.gaze, self.events):
                 loaded_gaze.events = loaded_events
 
-        # Load text stimuli files if present
-        if self.definition.resources.has_content('stimuli'):
-            self.load_text_stimuli()
-            # stimuli_dirname=stimuli_dirname, # TODO custom dir name
-            # extension=extension,
+        # Load stimulus files if desired and if present
+        if stimuli and self.definition.resources.has_content('stimuli'):
+            self.load_text_stimuli(stimuli_dirpath=stimuli_dirpath)
 
         return self
 
