@@ -303,7 +303,7 @@ class Dataset:
         all_fileinfo_rows = []
 
         for frame, fileinfo_row in zip(self.gaze, fileinfo_dicts):
-            split_frames = frame.split(by=by)
+            split_frames = frame.split(by=by, as_dict=False)
             all_gaze_frames.extend(split_frames)
             all_fileinfo_rows.extend([fileinfo_row] * len(split_frames))
 
@@ -776,6 +776,31 @@ class Dataset:
             self.events[file_id] = gaze.events
         return self
 
+    def drop_event_properties(
+            self,
+            event_properties: str | list[str],
+    ) -> Dataset:
+        """Remove event properties from the event dataframe.
+
+        Parameters
+        ----------
+        event_properties: str | list[str]
+            The event properties to remove.
+
+        Raises
+        ------
+        InvalidProperty
+            If ``event_properties`` does not exist in the event dataframe
+
+        Returns
+        -------
+        Dataset
+            Returns self, useful for method cascading.
+        """
+        for gaze in self.gaze:
+            gaze.drop_event_properties(event_properties)
+        return self
+
     def compute_event_properties(
             self,
             event_properties: str | tuple[str, dict[str, Any]]
@@ -1150,7 +1175,7 @@ class Dataset:
         else:
             dataset_name = self.definition.name + ' dataset'
 
-        return f"""\
+        return f"""
         You are downloading the {dataset_name}. Please be aware that pymovements does not
         host or distribute any dataset resources and only provides a convenient interface to
         download the public dataset resources that were published by their respective authors.
