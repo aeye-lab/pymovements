@@ -173,13 +173,13 @@ def _download_resources(
     """Download resources."""
     for resource in resources:
         if not mirrors:
-            _download_resource_without_mirrors(resource, target_dirpath, verbose)
+            _download_resource(resource, target_dirpath, verbose)
         else:
             assert mirrors is not None
-            _download_resource_with_mirrors(mirrors, resource, target_dirpath, verbose)
+            _download_resource_with_legacy_mirrors(mirrors, resource, target_dirpath, verbose)
 
 
-def _download_resource_without_mirrors(
+def _download_resource(
         resource: ResourceDefinition,
         target_dirpath: Path,
         verbose: bool,
@@ -201,12 +201,63 @@ def _download_resource_without_mirrors(
 
     # pylint: disable=overlapping-except
     except (URLError, OSError, RuntimeError) as error:
-        raise RuntimeError(
-            f"downloading resource {resource.url} failed.",
-        ) from error
+        if not resource.mirrors:
+            raise RuntimeError(f"Downloading resource {resource.url} failed.") from error
+
+        warn(UserWarning(f'Downloading resource {resource.url} failed. Trying mirror.'))
+
+        success = _download_resource_from_mirrors(
+            mirrors=resource.mirrors,
+            filename=resource.filename,
+            md5=resource.md5,
+            target_dirpath=target_dirpath,
+            verbose=verbose,
+        )
+
+        if not success:
+            raise RuntimeError(
+                f"Downloading resource {resource.filename} failed for all mirrors.",
+            ) from error
 
 
-def _download_resource_with_mirrors(
+def _download_resource_from_mirrors(
+        mirrors: list[str],
+        filename: str,
+        md5: str | None,
+        target_dirpath: Path,
+        verbose: bool,
+) -> bool:
+    """Download resource from mirrors."""
+    success = False
+
+    for mirror_idx, mirror_url in enumerate(mirrors):
+        try:
+            download_file(
+                url=mirror_url,
+                dirpath=target_dirpath,
+                filename=filename,
+                md5=md5,
+                verbose=verbose,
+            )
+        # pylint: disable=overlapping-except
+        except (URLError, OSError, RuntimeError) as error:
+            # Error downloading the resource, try next mirror if there are any left
+            if mirror_idx < len(mirrors) - 1:
+                warning = UserWarning(
+                    f'Downloading resource from mirror {mirror_url} failed. Trying next mirror.',
+                )
+                warning.__cause__ = error
+                warn(warning)
+            continue  # try next mirror if there is any left, else quit for loop
+
+        # downloading the resource was successful, we don't need to try another mirror
+        success = True
+        break
+
+    return success
+
+
+def _download_resource_with_legacy_mirrors(
         mirrors: Sequence[str],
         resource: ResourceDefinition,
         target_dirpath: Path,
@@ -221,9 +272,10 @@ def _download_resource_with_mirrors(
     success = False
 
     for mirror_idx, mirror in enumerate(mirrors):
+        mirror_url = f'{mirror}{resource.url}'
         try:
             download_file(
-                url=f'{mirror}{resource.url}',
+                url=mirror_url,
                 dirpath=target_dirpath,
                 filename=resource.filename,
                 md5=resource.md5,
@@ -236,7 +288,7 @@ def _download_resource_with_mirrors(
             # Error downloading the resource, try next mirror
             if mirror_idx < len(mirrors) - 1:
                 warning = UserWarning(
-                    f'Failed to download from mirror {mirror}\nTrying next mirror.',
+                    f'Downloading resource from mirror {mirror_url} failed. Trying next mirror.',
                 )
                 warning.__cause__ = error
                 warn(warning)
@@ -247,5 +299,5 @@ def _download_resource_with_mirrors(
 
     if not success:
         raise RuntimeError(
-            f"downloading resource {resource.url} failed for all mirrors.",
+            f"Downloading resource {resource.url} failed for all mirrors.",
         )
