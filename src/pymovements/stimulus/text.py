@@ -183,11 +183,11 @@ class TextStimulus:
         height_column: str | None
             Name of the column which contains the height of the area of interest. (default: None)
         end_x_column: str | None
-            Name of the column which contains the x coordinate's end position of the areas of interest.
-            (default: None)
+            Name of the column which contains the x coordinate's end position of the areas of
+            interest. (default: None)
         end_y_column: str | None
-            Name of the column which contains the y coordinate's end position of the areas of interest.
-            (default: None)
+            Name of the column which contains the y coordinate's end position of the areas of
+            interest. (default: None)
         page_column: str | None
             Name of the column which contains the page information of the area of interest.
             (default: None)
