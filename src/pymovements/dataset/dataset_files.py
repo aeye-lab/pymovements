@@ -77,13 +77,13 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> dict[str
             resource_dirpath = paths.precomputed_events
         elif content_type == 'precomputed_reading_measures':
             resource_dirpath = paths.precomputed_reading_measures
-        elif content_type == 'stimuli':
+        elif content_type == 'stimulus':
             resource_dirpath = paths.stimuli
         else:
             warnings.warn(
                 f'content type {content_type} is not supported. '
                 'supported contents are: gaze, precomputed_events, '
-                'precomputed_reading_measures, stimuli. '
+                'precomputed_reading_measures, stimulus. '
                 'skipping this resource definition during scan.',
             )
             continue
@@ -560,7 +560,7 @@ def load_precomputed_event_file(
     return PrecomputedEventDataFrame(data=precomputed_event_df)
 
 
-def load_text_stimuli_files(
+def load_stimuli_files(
         definition: DatasetDefinition,
         fileinfo: pl.DataFrame,
         paths: DatasetPaths,

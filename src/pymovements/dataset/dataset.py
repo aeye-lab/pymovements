@@ -40,6 +40,7 @@ from pymovements.events import Events
 from pymovements.events.precomputed import PrecomputedEventDataFrame
 from pymovements.gaze import Gaze
 from pymovements.reading_measures import ReadingMeasures
+from pymovements.stimulus.image import ImageStimulus
 from pymovements.stimulus.text import TextStimulus
 
 logging.basicConfig(level=logging.INFO)
@@ -71,7 +72,7 @@ class Dataset:
         self.events: list[Events] = []
         self.precomputed_events: list[PrecomputedEventDataFrame] = []
         self.precomputed_reading_measures: list[ReadingMeasures] = []
-        self.stimuli: list[TextStimulus] = []
+        self.stimuli: list[ImageStimulus | TextStimulus] = []
 
         # Handle different definition input types
         if isinstance(definition, (str, Path)):
@@ -181,7 +182,7 @@ class Dataset:
 
         # Load stimulus files if desired and if present
         if stimuli is not False and self.definition.resources.has_content('stimuli'):
-            self.load_text_stimuli(stimuli_dirname=stimuli_dirname)
+            self.load_stimuli(stimuli_dirname=stimuli_dirname)
 
         return self
 
@@ -383,7 +384,7 @@ class Dataset:
         )
         return self
 
-    def load_text_stimuli(self, stimuli_dirname: str | None = None) -> None:
+    def load_stimuli(self, stimuli_dirname: str | None = None) -> None:
         """Load text stimuli.
 
         This method checks that the file information for text stimuli is available,
@@ -408,7 +409,7 @@ class Dataset:
             If the file info is missing or improperly formatted.
         """
         self._check_fileinfo()
-        self.stimuli = dataset_files.load_text_stimuli_files(
+        self.stimuli = dataset_files.load_stimuli_files(
             definition=self.definition,
             fileinfo=self.fileinfo['stimuli'],
             paths=self.paths,

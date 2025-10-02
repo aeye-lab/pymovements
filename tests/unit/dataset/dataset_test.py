@@ -634,7 +634,7 @@ def test_text_stimuli_list_not_empty(gaze_dataset_configuration):
 def test_loaded_text_stimuli_list_correct(gaze_dataset_configuration, expected):
     dataset = Dataset(**gaze_dataset_configuration['init_kwargs'])
     dataset.scan()
-    dataset.load_text_stimuli()
+    dataset.load_stimuli()
     aois_list = dataset.stimuli
     assert len(aois_list) == 3
     head = aois_list[0].aois.head(10)
