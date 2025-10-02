@@ -101,7 +101,7 @@ class Dataset:
             *,
             events: bool | None = None,
             preprocessed: bool = False,
-            stimuli: bool | None = True,
+            stimuli: bool | None = None,
             subset: dict[str, float | int | str | list[float | int | str]] | None = None,
             events_dirname: str | None = None,
             preprocessed_dirname: str | None = None,
@@ -120,8 +120,9 @@ class Dataset:
         preprocessed: bool
             If ``True``, load previously saved preprocessed data, otherwise load raw data.
             (default: False)
-        stimuli: bool
-            If ``True``, load stimulus data, otherwise load raw data. (default: True)
+        stimuli: bool | None
+            If ``True``, load stimulus data. If ``None``, load stimulus data only if available.
+            (default: True)
         subset:  dict[str, float | int | str | list[float | int | str]] | None
             If specified, load only a subset of the dataset. All keys in the dictionary must be
             present in the fileinfo dataframe inferred by `scan()`. Values can be either
@@ -179,7 +180,7 @@ class Dataset:
                 loaded_gaze.events = loaded_events
 
         # Load stimulus files if desired and if present
-        if stimuli and self.definition.resources.has_content('stimuli'):
+        if stimuli is not False and self.definition.resources.has_content('stimuli'):
             self.load_text_stimuli(stimuli_dirname=stimuli_dirname)
 
         return self
@@ -382,7 +383,7 @@ class Dataset:
         )
         return self
 
-    def load_text_stimuli(self) -> None:
+    def load_text_stimuli(self, stimuli_dirname: str | None = None) -> None:
         """Load text stimuli.
 
         This method checks that the file information for text stimuli is available,
@@ -393,6 +394,14 @@ class Dataset:
         Supported file extensions:
         - CSV-like: .csv, .tsv, .txt
 
+        Parameters
+        ----------
+        stimuli_dirname: str | None
+            One-time usage of an alternative directory name to load data relative to
+            :py:meth:`pymovements.Dataset.path`.
+            This argument is used only for this single call and does not alter
+            :py:meth:`pymovements.Dataset.stimuli_rootpath`. (default: None)
+
         Raises
         ------
         ValueError
@@ -400,9 +409,10 @@ class Dataset:
         """
         self._check_fileinfo()
         self.stimuli = dataset_files.load_text_stimuli_files(
-            self.definition,
-            self.fileinfo['stimuli'],
-            self.paths,
+            definition=self.definition,
+            fileinfo=self.fileinfo['stimuli'],
+            paths=self.paths,
+            stimuli_dirname=stimuli_dirname,
         )
 
     def apply(

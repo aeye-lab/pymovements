@@ -564,7 +564,7 @@ def load_text_stimuli_files(
         definition: DatasetDefinition,
         fileinfo: pl.DataFrame,
         paths: DatasetPaths,
-        stimulus_dirname: Path | str | None = None,
+        stimuli_dirname: str | None = None,
 ) -> list[TextStimulus]:
     """Load all available text stimuli files.
 
@@ -576,7 +576,7 @@ def load_text_stimuli_files(
         A dataframe holding file information.
     paths: DatasetPaths
         Path of directory containing stimuli files.
-    stimulus_dirname: str | None
+    stimuli_dirname: str | None
         One-time usage of an alternative directory name to load data relative to
         :py:meth:`pymovements.Dataset.path`.
         This argument is used only for this single call and does not alter
@@ -588,10 +588,10 @@ def load_text_stimuli_files(
         List of loaded text stimuli objects.
 
     """
-    if stimuls_dirpath:
-        dirpath = paths.dataset / stimulus_dirname
+    if stimuli_dirname:
+        dirpath = paths.dataset / stimuli_dirname
     else:
-        paths.stimuli
+        dirpath = paths.stimuli
 
     stimuli_list: list[TextStimulus] = []
     for filepath in fileinfo.to_dicts():
