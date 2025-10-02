@@ -17,29 +17,28 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Tests deprecated utils.filters."""
-import numpy as np
+"""Provide fixtures to securely make files from examples in ``tests/files``."""
+import shutil
+from pathlib import Path
+
 import pytest
 
-from pymovements import __version__
-from pymovements.utils.filters import events_split_nans
-from pymovements.utils.filters import filter_candidates_remove_nans
+
+@pytest.fixture(name='testfiles_dirpath')
+def fixture_testfiles_dirpath(request):
+    """Return the path to tests/files."""
+    return request.config.rootpath / 'tests' / 'files'
 
 
-@pytest.mark.filterwarnings('ignore::DeprecationWarning')
-@pytest.mark.parametrize('filter_function', [events_split_nans, filter_candidates_remove_nans])
-def test_filter_function(filter_function):
-    candidates = [[0, 1], [2, 3]]
-    values = np.array([(np.nan, np.nan), (0, 0), (0, 0), (0, 0)])
+@pytest.fixture(name='make_example_file')
+def fixture_make_example_file(testfiles_dirpath, tmp_path):
+    """Make a copy of a file from one of the example files in tests/files.
 
-    filter_function(candidates=candidates, values=values)
-
-
-@pytest.mark.parametrize('filter_function', [events_split_nans, filter_candidates_remove_nans])
-def test_filter_function_removed(filter_function, assert_deprecation_is_removed):
-    candidates = [[0, 1], [2, 3]]
-    values = np.array([(np.nan, np.nan), (0, 0), (0, 0), (0, 0)])
-
-    with pytest.raises(DeprecationWarning) as info:
-        filter_function(candidates=candidates, values=values)
-    assert_deprecation_is_removed('utils/filters.py', info.value.args[0], __version__)
+    This way each file can be used in tests without the risk of changing contents.
+    """
+    def _make_example_file(filename: str) -> Path:
+        source_filepath = testfiles_dirpath / filename
+        target_filepath = tmp_path / filename
+        shutil.copy2(source_filepath, target_filepath)
+        return target_filepath
+    return _make_example_file

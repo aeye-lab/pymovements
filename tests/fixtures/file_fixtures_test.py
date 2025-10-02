@@ -17,29 +17,25 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Tests deprecated utils.filters."""
-import numpy as np
+"""Test file fixtures."""
+import filecmp
+
 import pytest
 
-from pymovements import __version__
-from pymovements.utils.filters import events_split_nans
-from pymovements.utils.filters import filter_candidates_remove_nans
+
+def test_testfiles_dirpath_has_files(testfiles_dirpath):
+    assert len(list(testfiles_dirpath.iterdir())) > 0
 
 
-@pytest.mark.filterwarnings('ignore::DeprecationWarning')
-@pytest.mark.parametrize('filter_function', [events_split_nans, filter_candidates_remove_nans])
-def test_filter_function(filter_function):
-    candidates = [[0, 1], [2, 3]]
-    values = np.array([(np.nan, np.nan), (0, 0), (0, 0), (0, 0)])
+@pytest.mark.parametrize(
+    'filename',
+    [
+        'judo1000_example.csv',
+    ],
+)
+def test_make_example_file_returns_copy(filename, make_example_file, testfiles_dirpath):
+    fixture_filepath = make_example_file(filename)
+    testfiles_filepath = testfiles_dirpath / filename
 
-    filter_function(candidates=candidates, values=values)
-
-
-@pytest.mark.parametrize('filter_function', [events_split_nans, filter_candidates_remove_nans])
-def test_filter_function_removed(filter_function, assert_deprecation_is_removed):
-    candidates = [[0, 1], [2, 3]]
-    values = np.array([(np.nan, np.nan), (0, 0), (0, 0), (0, 0)])
-
-    with pytest.raises(DeprecationWarning) as info:
-        filter_function(candidates=candidates, values=values)
-    assert_deprecation_is_removed('utils/filters.py', info.value.args[0], __version__)
+    assert fixture_filepath != testfiles_filepath  # different filepath
+    assert filecmp.cmp(fixture_filepath, testfiles_filepath)  # same content

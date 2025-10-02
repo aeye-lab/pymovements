@@ -18,7 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Test dataset definition."""
-import re
 from dataclasses import dataclass
 
 import pytest
@@ -117,6 +116,24 @@ def test_dataset_definition_is_equal(init_kwargs):
             ResourceDefinitions([ResourceDefinition(content='gaze', filename_pattern='test.csv')]),
             marks=pytest.mark.filterwarnings('ignore:.*from_dict.*:DeprecationWarning'),
             id='single_gaze_resource_filename_format_legacy',
+        ),
+
+        pytest.param(
+            {
+                'resources': [
+                    {
+                        'content': 'gaze', 'filename_pattern': 'test.csv',
+                        'url': 'https://example.com', 'mirrors': ['https://mirror.com'],
+                    },
+                ],
+            },
+            ResourceDefinitions([
+                ResourceDefinition(
+                    content='gaze', filename_pattern='test.csv',
+                    url='https://example.com', mirrors=['https://mirror.com'],
+                ),
+            ]),
+            id='single_gaze_resource_with_url_and_mirror',
         ),
 
         pytest.param(
@@ -439,6 +456,7 @@ def test_dataset_definition_to_yaml_equal_dicts(definition, tmp_path):
     assert definition.to_dict() == yaml_dict
 
 
+@pytest.mark.filterwarnings('ignore:DatasetDefinition.mirrors is deprecated.*:DeprecationWarning')
 def test_write_yaml_already_existing_dataset_definition_w_tuple_screen(tmp_path):
     tmp_file = tmp_path / 'tmp.yaml'
     definition = DatasetLibrary.get('ToyDatasetEyeLink')
@@ -809,44 +827,19 @@ def test_dataset_to_dict_exclude_none(dataset_definition, exclude_none, expected
             {'has_files': {'gaze': True}},
             id='has_files',
         ),
-    ],
-)
-def test_dataset_definition_attribute_is_deprecated(attribute_kwarg):
-    with pytest.raises(DeprecationWarning):
-        DatasetDefinition(**attribute_kwarg)
-
-
-@pytest.mark.parametrize(
-    'attribute_kwarg',
-    [
         pytest.param(
-            {'extract': True},
-            id='extract_true',
-        ),
-        pytest.param(
-            {'extract': False},
-            id='extract_false',
-        ),
-        pytest.param(
-            {'has_files': {'gaze': True}},
-            id='has_files',
+            {'mirrors': {'gaze': ['https://mirror.com']}},
+            id='mirrors',
         ),
     ],
 )
-def test_dataset_definition_attribute_is_removed(attribute_kwarg):
+def test_dataset_definition_attribute_is_deprecated_or_removed(
+        attribute_kwarg, assert_deprecation_is_removed,
+):
     with pytest.raises(DeprecationWarning) as info:
         DatasetDefinition(**attribute_kwarg)
-
-    regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
-
-    msg = info.value.args[0]
-    remove_version = regex.match(msg).groupdict()['version']
-    current_version = __version__.split('+')[0]
-    attribute_name = list(attribute_kwarg.keys())[0]
-    assert current_version < remove_version, (
-        f'{attribute_name} is scheduled to be removed in v{remove_version}. '
-        f'Current version is v{current_version}.'
-    )
+    function_name = f'keyword argument {list(attribute_kwarg.keys())[0]}'
+    assert_deprecation_is_removed(function_name, info.value.args[0], __version__)
 
 
 @pytest.mark.parametrize(
@@ -975,21 +968,6 @@ def test_dataset_definition_set_filename_format_schema_expected(definition, new_
 
 
 @pytest.mark.parametrize(
-    ('definition', 'attribute'),
-    [
-        pytest.param(
-            DatasetDefinition(),
-            'filename_format',
-            id='filename_format',
-        ),
-    ],
-)
-def test_dataset_definition_get_attribute_is_deprecated(definition, attribute):
-    with pytest.warns(DeprecationWarning):
-        getattr(definition, attribute)
-
-
-@pytest.mark.parametrize(
     ('definition', 'attribute', 'value'),
     [
         pytest.param(
@@ -1012,17 +990,8 @@ def test_dataset_definition_set_attribute_is_deprecated(definition, attribute, v
         'filename_format_schema_overrides',
     ],
 )
-def test_dataset_definition_get_attribute_is_removed(attribute):
+def test_dataset_definition_get_attribute_is_removed(attribute, assert_deprecation_is_removed):
     definition = DatasetDefinition()
     with pytest.raises(DeprecationWarning) as info:
         getattr(definition, attribute)
-
-    regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
-
-    msg = info.value.args[0]
-    remove_version = regex.match(msg).groupdict()['version']
-    current_version = __version__.split('+')[0]
-    assert current_version < remove_version, (
-        f'DatasetDefinition.{attribute} was planned to be removed in v{remove_version}. '
-        f'Current version is v{current_version}.'
-    )
+    assert_deprecation_is_removed(f'DatasetDefinition.{attribute}', info.value.args[0], __version__)

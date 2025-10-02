@@ -17,24 +17,37 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Tests deprecated utils.paths."""
+"""Provide fixtures to assert deprecations."""
 import re
 
 import pytest
 
-from pymovements import __version__
-from pymovements.utils.paths import get_filepaths
-from pymovements.utils.paths import match_filepaths
 
+@pytest.fixture(name='assert_deprecation_is_removed', scope='session')
+def fixture_assert_deprecation_is_removed():
+    """Assert that function deprecation is removed as scheduled."""
+    regex = re.compile(r'.*will be removed in v(?P<version>[0-9]*[.][0-9]*[.][0-9]*)[.)].*')
 
-@pytest.mark.filterwarnings('ignore::DeprecationWarning')
-@pytest.mark.parametrize('path_function', [get_filepaths, match_filepaths])
-def test_downloads_function(path_function, tmp_path):
-    path_function(path=tmp_path, regex=re.compile('foo'))
+    def _assert_deprecation_is_removed(
+            function_name: str,
+            warning_message: str,
+            current_version: str,
+    ) -> None:
 
+        match = regex.match(warning_message)
 
-@pytest.mark.parametrize('path_function', [get_filepaths, match_filepaths])
-def test_parse_eyelink_removed(path_function, tmp_path, assert_deprecation_is_removed):
-    with pytest.raises(DeprecationWarning) as info:
-        path_function(path=tmp_path, regex=re.compile('foo'))
-    assert_deprecation_is_removed('utils/paths.py', info.value.args[0], __version__)
+        if not match:
+            raise AssertionError(
+                'DeprecationWarning message does not match regex.\n'
+                f'message: {warning_message}\n'
+                f'regex: {regex.pattern}',
+            )
+
+        remove_version = match.groupdict()['version']
+        current_version_stem = current_version.split('+')[0].split('-')[0]
+
+        assert current_version_stem < remove_version, (
+            f'{function_name} was scheduled to be removed in v{remove_version}. '
+            f'Current version is v{current_version}.'
+        )
+    return _assert_deprecation_is_removed

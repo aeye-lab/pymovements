@@ -20,29 +20,51 @@
 """Test read from IPC/feather."""
 import pytest
 
-import pymovements as pm
+from pymovements import __version__
+from pymovements.gaze import from_ipc
 
 
 @pytest.mark.parametrize(
-    ('kwargs', 'shape'),
+    ('filename', 'kwargs', 'shape'),
     [
         pytest.param(
-            {
-                'file': 'tests/files/monocular_example.feather',
-            },
+            'monocular_example.feather',
+            {},
             (10, 2),
             id='feather_mono_shape',
         ),
         pytest.param(
-            {
-                'file': 'tests/files/binocular_example.feather',
-            },
+            'binocular_example.feather',
+            {},
             (10, 3),
             id='feather_bino_shape',
         ),
         pytest.param(
+            'monocular_example.feather',
             {
-                'file': 'tests/files/monocular_example.feather',
+                'read_ipc_kwargs': {'columns': ['time']},
+            },
+            (10, 1),
+            marks=pytest.mark.filterwarnings(
+                'ignore:Gaze contains samples but no.*:UserWarning',
+            ),
+            id='read_ipc_kwargs',
+        ),
+        pytest.param(
+            'monocular_example.feather',
+            {
+                'columns': ['time'],
+            },
+            (10, 1),
+            marks=pytest.mark.filterwarnings(
+                'ignore:Gaze contains samples but no.*:UserWarning',
+                'ignore:.*kwargs.*:DeprecationWarning',
+            ),
+            id='**kwargs',
+        ),
+        pytest.param(
+            'monocular_example.feather',
+            {
                 'column_map': {'pixel': 'pixel_coordinates'},
             },
             (10, 2),
@@ -53,7 +75,31 @@ import pymovements as pm
         ),
     ],
 )
-def test_shapes(kwargs, shape):
-    gaze = pm.gaze.from_ipc(**kwargs)
+def test_shapes(filename, kwargs, shape, make_example_file):
+    filepath = make_example_file(filename)
+    gaze = from_ipc(file=filepath, **kwargs)
 
     assert gaze.samples.shape == shape
+
+
+@pytest.mark.parametrize(
+    ('filename', 'kwargs'),
+    [
+        pytest.param(
+            'monocular_example.feather',
+            {
+                'n_rows': 1,
+            },
+            id='**kwargs',
+        ),
+    ],
+)
+def test_from_asc_parameter_is_deprecated(
+        filename, kwargs, make_example_file, assert_deprecation_is_removed,
+):
+    filepath = make_example_file(filename)
+
+    with pytest.raises(DeprecationWarning) as info:
+        from_ipc(filepath, **kwargs)
+    function_name = f'keyword argument {list(kwargs.keys())[0]}'
+    assert_deprecation_is_removed(function_name, info.value.args[0], __version__)

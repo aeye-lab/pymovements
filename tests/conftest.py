@@ -17,29 +17,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Tests deprecated utils.filters."""
-import numpy as np
-import pytest
+"""Fixtures for datasets."""
 
-from pymovements import __version__
-from pymovements.utils.filters import events_split_nans
-from pymovements.utils.filters import filter_candidates_remove_nans
-
-
-@pytest.mark.filterwarnings('ignore::DeprecationWarning')
-@pytest.mark.parametrize('filter_function', [events_split_nans, filter_candidates_remove_nans])
-def test_filter_function(filter_function):
-    candidates = [[0, 1], [2, 3]]
-    values = np.array([(np.nan, np.nan), (0, 0), (0, 0), (0, 0)])
-
-    filter_function(candidates=candidates, values=values)
-
-
-@pytest.mark.parametrize('filter_function', [events_split_nans, filter_candidates_remove_nans])
-def test_filter_function_removed(filter_function, assert_deprecation_is_removed):
-    candidates = [[0, 1], [2, 3]]
-    values = np.array([(np.nan, np.nan), (0, 0), (0, 0), (0, 0)])
-
-    with pytest.raises(DeprecationWarning) as info:
-        filter_function(candidates=candidates, values=values)
-    assert_deprecation_is_removed('utils/filters.py', info.value.args[0], __version__)
+pytest_plugins = [
+    'tests.fixtures.deprecation_fixtures',
+    'tests.fixtures.file_fixtures',
+]
