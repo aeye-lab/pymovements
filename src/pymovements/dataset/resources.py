@@ -30,7 +30,10 @@ from warnings import warn
 
 from deprecated.sphinx import deprecated
 
+from pymovements._utils._html import repr_html
 
+
+@repr_html()
 @dataclass
 class ResourceDefinition:
     """ResourceDefinition definition.
@@ -51,6 +54,9 @@ class ResourceDefinition:
     filename_pattern_schema_overrides: dict[str, type] | None
         If named groups are present in the `filename_pattern`, this specifies their particular
         datatypes. (default: None)
+    load_function: str | None
+        The name of the function used to load the data files. If None, the function is determined
+        by the file extension. Refer to :ref:`gaze-io` for available function names. (default: None)
     """
 
     content: str
@@ -61,6 +67,8 @@ class ResourceDefinition:
 
     filename_pattern: str | None = None
     filename_pattern_schema_overrides: dict[str, type] | None = None
+
+    load_function: str | None = None
 
     @staticmethod
     def from_dict(dictionary: dict[str, Any]) -> ResourceDefinition:
@@ -118,7 +126,7 @@ class ResourceDefinition:
 
 
 class ResourceDefinitions(list):
-    """List of ``ResourceDefinition`` instances."""
+    """List of :py:class:`~pymovements.ResourceDefinition` instances."""
 
     def __init__(self, resources: Iterable[ResourceDefinition] | None = None) -> None:
         if resources is None:

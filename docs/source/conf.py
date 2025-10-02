@@ -59,10 +59,10 @@ author = 'The pymovements Project Authors'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
-    'sphinx.ext.napoleon',
+    'sphinx.ext.extlinks',
     'sphinx.ext.linkcode',
     'sphinx.ext.mathjax',
-    'sphinx.ext.extlinks',
+    'sphinx.ext.napoleon',
     'sphinx_copybutton',
     'sphinx_design',
     'sphinx_favicon',
@@ -118,6 +118,7 @@ html_css_files = [
 
 html_theme_options = {
     'navigation_with_keys': False,
+    'sidebar_includehidden': True,
     'external_links': [
         {
             'name': 'Contributing',
@@ -157,7 +158,7 @@ bibtex_reference_style = 'author_year'
 class AuthorYearLabelStyle(BaseLabelStyle):
     def format_labels(self, sorted_entries):
         for entry in sorted_entries:
-            yield f'[{entry.persons["author"][0].last_names[0]} et al., {entry.fields["year"]}]'
+            yield f'{entry.persons["author"][0].rich_last_names[0]} et al., {entry.fields["year"]}'
 
 
 class AuthorYearStyle(PlainStyle):

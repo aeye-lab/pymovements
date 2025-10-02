@@ -151,11 +151,11 @@ class Dataset:
                 extension=extension,
             )
 
-        # Event files precomuted by authors of the dataset
+        # Event files precomputed by authors of the dataset
         if self.definition.resources.has_content('precomputed_events'):
             self.load_precomputed_events()
 
-        # Reading measures files precomuted by authors of the dataset
+        # Reading measures files precomputed by authors of the dataset
         if self.definition.resources.has_content('precomputed_reading_measures'):
             self.load_precomputed_reading_measures()
 
@@ -261,7 +261,7 @@ class Dataset:
         )
 
     def load_precomputed_reading_measures(self) -> None:
-        """Load precomputed reading reading measures.
+        """Load precomputed reading measures.
 
         This method checks that the file information for precomputed reading measures are
         available, then loads each event file listed in
@@ -303,7 +303,7 @@ class Dataset:
         all_fileinfo_rows = []
 
         for frame, fileinfo_row in zip(self.gaze, fileinfo_dicts):
-            split_frames = frame.split(by=by)
+            split_frames = frame.split(by=by, as_dict=False)
             all_gaze_frames.extend(split_frames)
             all_fileinfo_rows.extend([fileinfo_row] * len(split_frames))
 
@@ -314,7 +314,7 @@ class Dataset:
             self,
             by: list[str] | str,
     ) -> None:
-        """Split precomputed event data into seperated PrecomputedEventDataFrame's.
+        """Split precomputed event data into separated PrecomputedEventDataFrame's.
 
         Parameters
         ----------
@@ -643,7 +643,7 @@ class Dataset:
             verbose: bool = True,
             **kwargs: Any,
     ) -> Dataset:
-        """Compute gaze velocites in dva/s from dva coordinates.
+        """Compute gaze velocities in dva/s from dva coordinates.
 
         This method requires a properly initialized :py:attr:`~.Dataset.experiment` attribute.
 
@@ -774,6 +774,31 @@ class Dataset:
                 fileinfo=fileinfo_row,
             )
             self.events[file_id] = gaze.events
+        return self
+
+    def drop_event_properties(
+            self,
+            event_properties: str | list[str],
+    ) -> Dataset:
+        """Remove event properties from the event dataframe.
+
+        Parameters
+        ----------
+        event_properties: str | list[str]
+            The event properties to remove.
+
+        Raises
+        ------
+        InvalidProperty
+            If ``event_properties`` does not exist in the event dataframe
+
+        Returns
+        -------
+        Dataset
+            Returns self, useful for method cascading.
+        """
+        for gaze in self.gaze:
+            gaze.drop_event_properties(event_properties)
         return self
 
     def compute_event_properties(
@@ -1150,7 +1175,7 @@ class Dataset:
         else:
             dataset_name = self.definition.name + ' dataset'
 
-        return f"""\
+        return f"""
         You are downloading the {dataset_name}. Please be aware that pymovements does not
         host or distribute any dataset resources and only provides a convenient interface to
         download the public dataset resources that were published by their respective authors.
