@@ -181,8 +181,9 @@ class Dataset:
                 loaded_gaze.events = loaded_events
 
         # Load stimulus files if desired and if present
-        if stimuli is not False and self.definition.resources.has_content('stimuli'):
-            self.load_stimuli(stimuli_dirname=stimuli_dirname)
+        if stimuli is not False:
+            if stimuli is True or self.definition.resources.has_content('stimuli')):
+                self.load_stimuli(stimuli_dirname=stimuli_dirname)
 
         return self
 
