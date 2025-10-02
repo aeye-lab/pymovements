@@ -152,7 +152,7 @@ class TextStimulus:
 
     @staticmethod
     def from_file(
-            aoi_path: str | Path,
+            path: str | Path,
             *,
             aoi_column: str,
             start_x_column: str,
@@ -168,7 +168,7 @@ class TextStimulus:
 
         Parameters
         ----------
-        aoi_path:  str | Path
+        path:  str | Path
             Path to file to be read.
         aoi_column: str
             Name of the column that contains the content of the aois.
@@ -205,21 +205,21 @@ class TextStimulus:
         ValueError
             If the file type of the stimuli file is not supported.
         """
-        if isinstance(aoi_path, str):
-            aoi_path = Path(aoi_path)
+        if isinstance(path, str):
+            path = Path(path)
         if custom_read_kwargs is None:
             custom_read_kwargs = {}
 
         valid_extensions = {'.csv', '.tsv', '.txt', '.ias'}
-        if aoi_path.suffix in valid_extensions:
+        if path.suffix in valid_extensions:
             stimulus_df = pl.read_csv(
-                aoi_path,
+                path,
                 **custom_read_kwargs,
             )
             stimulus_df = stimulus_df.fill_null(' ')
         else:
             raise ValueError(
-                f'unsupported file format "{aoi_path.suffix}".'
+                f'unsupported file format "{path.suffix}".'
                 f'Supported formats are: {sorted(valid_extensions)}',
             )
 
@@ -286,7 +286,7 @@ def from_file(
         Returns the text stimulus file.
     """
     return TextStimulus.from_file(
-        aoi_path=aoi_path,
+        path=aoi_path,
         aoi_column=aoi_column,
         start_x_column=start_x_column,
         start_y_column=start_y_column,
