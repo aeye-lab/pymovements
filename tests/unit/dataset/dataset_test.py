@@ -421,11 +421,11 @@ def mock_toy(
         },
     ]
 
-    if 'stimuli' in filename_format_schema_overrides:
+    if 'stimulus' in filename_format_schema_overrides:
         resources.append({
-            'content': 'stimuli',
+            'content': 'stimulus',
             'filename_pattern': r'toy_text_{text_id:d}_{page_id:d}_aoi.' + raw_fileformat,
-            'filename_pattern_schema_overrides': filename_format_schema_overrides.get('stimuli', None),
+            'filename_pattern_schema_overrides': filename_format_schema_overrides['stimulus'],
         })
 
     dataset_definition = DatasetDefinition(
@@ -558,7 +558,7 @@ def gaze_fixture_dataset(request, tmp_path):
             'gaze': {'subject_id': pl.Int64},
             'precomputed_events': {'subject_id': pl.Int64},
             'precomputed_reading_measures': {'subject_id': pl.Int64},
-            'stimuli': {'text_id': pl.Int64, 'page_id': pl.Int64},
+            'stimulus': {'text_id': pl.Int64, 'page_id': pl.Int64},
         }
 
         dataset_dict = mock_toy(
