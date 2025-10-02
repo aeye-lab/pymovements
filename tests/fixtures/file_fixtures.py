@@ -30,7 +30,7 @@ def fixture_testfiles_dirpath(request):
     return request.config.rootpath / 'tests' / 'files'
 
 
-@pytest.fixture(name='make_example_file', scope='session')
+@pytest.fixture(name='make_example_file', scope='function')
 def fixture_make_example_file(testfiles_dirpath, tmp_path):
     """Make a copy of a file from one of the example files in tests/files.
 
