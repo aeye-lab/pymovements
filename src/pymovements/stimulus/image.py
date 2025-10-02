@@ -87,7 +87,7 @@ class ImageStimulus:
         ImageStimulus
             Returns an ImmageStimulus initialized with all matched image stimulus files.
         """
-        filenames = get_filepaths(path, regex=curly_to_regex(filename_format))
+        filenames = get_filepaths(path, regex=curly_to_regex(filename_pattern))
         image_stimuli = []
         for filename in filenames:
             image_stimuli.append(filename)
