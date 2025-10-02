@@ -236,6 +236,69 @@ class TextStimulus:
         )
 
 
+def from_file(
+        aoi_path: str | Path,
+        *,
+        aoi_column: str,
+        start_x_column: str,
+        start_y_column: str,
+        width_column: str | None = None,
+        height_column: str | None = None,
+        end_x_column: str | None = None,
+        end_y_column: str | None = None,
+        page_column: str | None = None,
+        custom_read_kwargs: dict[str, Any] | None = None,
+) -> TextStimulus:
+    """Load text stimulus from file.
+
+    Parameters
+    ----------
+    aoi_path:  str | Path
+        Path to file to be read.
+    aoi_column: str
+        Name of the column that contains the content of the aois.
+    start_x_column: str
+        Name of the column which contains the x coordinate's start position of the
+        areas of interest.
+    start_y_column: str
+        Name of the column which contains the y coordinate's start position of the
+        areas of interest.
+    width_column: str | None
+        Name of the column which contains the width of the area of interest. (default: None)
+    height_column: str | None
+        Name of the column which contains the height of the area of interest. (default: None)
+    end_x_column: str | None
+        Name of the column which contains the x coordinate's end position of the areas of interest.
+        (default: None)
+    end_y_column: str | None
+        Name of the column which contains the y coordinate's end position of the areas of interest.
+        (default: None)
+    page_column: str | None
+        Name of the column which contains the page information of the area of interest.
+        (default: None)
+    custom_read_kwargs: dict[str, Any] | None
+        Custom read keyword arguments for polars. (default: None)
+
+
+    Returns
+    -------
+    TextStimulus
+        Returns the text stimulus file.
+    """
+    return TextStimulus.from_file(
+        aoi_path=aoi_path,
+        aoi_column=aoi_column,
+        start_x_column=start_x_column,
+        start_y_column=start_y_column,
+        width_column=width_column,
+        height_column=height_column,
+        end_x_column=end_x_column,
+        end_y_column=end_y_column,
+        page_column=page_column,
+        custom_read_kwargs=custom_read_kwargs,
+    )
+
+
 def _get_aoi(
         aoi_dataframe: TextStimulus,
         row: pl.DataFrame.row,
