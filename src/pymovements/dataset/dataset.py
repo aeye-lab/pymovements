@@ -303,7 +303,7 @@ class Dataset:
         all_fileinfo_rows = []
 
         for frame, fileinfo_row in zip(self.gaze, fileinfo_dicts):
-            split_frames = frame.split(by=by)
+            split_frames = frame.split(by=by, as_dict=False)
             all_gaze_frames.extend(split_frames)
             all_fileinfo_rows.extend([fileinfo_row] * len(split_frames))
 
