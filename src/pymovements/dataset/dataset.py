@@ -105,7 +105,7 @@ class Dataset:
             subset: dict[str, float | int | str | list[float | int | str]] | None = None,
             events_dirname: str | None = None,
             preprocessed_dirname: str | None = None,
-            stimuli_dirpath: Path | str | None = None,
+            stimuli_dirname: str | None = None,
             extension: str = 'feather',
     ) -> Dataset:
         """Parse file information and load all gaze files.
@@ -136,8 +136,8 @@ class Dataset:
             :py:meth:`pymovements.Dataset.path`.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.preprocessed_rootpath`. (default: None)
-        stimuli_dirpath: Path | str | None
-            One-time usage of an alternative directory path to load data relative to
+        stimuli_dirname: str | None
+            One-time usage of an alternative directory name to load data relative to
             :py:meth:`pymovements.Dataset.path`.
             This argument is used only for this single call and does not alter
             :py:meth:`pymovements.Dataset.stimuli_rootpath`. (default: None)
@@ -180,7 +180,7 @@ class Dataset:
 
         # Load stimulus files if desired and if present
         if stimuli and self.definition.resources.has_content('stimuli'):
-            self.load_text_stimuli(stimuli_dirpath=stimuli_dirpath)
+            self.load_text_stimuli(stimuli_dirname=stimuli_dirname)
 
         return self
 

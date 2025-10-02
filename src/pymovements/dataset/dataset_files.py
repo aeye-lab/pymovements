@@ -576,8 +576,8 @@ def load_text_stimuli_files(
         A dataframe holding file information.
     paths: DatasetPaths
         Path of directory containing stimuli files.
-    stimulus_dirpath: Path | str | None
-        One-time usage of an alternative directory path to load data relative to
+    stimulus_dirname: str | None
+        One-time usage of an alternative directory name to load data relative to
         :py:meth:`pymovements.Dataset.path`.
         This argument is used only for this single call and does not alter
         :py:meth:`pymovements.Dataset.stimuli_rootpath`. (default: None)
@@ -589,9 +589,9 @@ def load_text_stimuli_files(
 
     """
     if stimuls_dirpath:
-        dirpath = Path(stimulus_dirpath)
+        dirpath = paths.dataset / stimulus_dirname
     else:
-        dirpath = paths.stimuli
+        paths.stimuli
 
     stimuli_list: list[TextStimulus] = []
     for filepath in fileinfo.to_dicts():
