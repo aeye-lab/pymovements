@@ -38,7 +38,7 @@ def heatmap(
         gridsize: tuple[int, int] = (10, 10),
         cmap: colors.Colormap | str = 'jet',
         interpolation: str = 'gaussian',
-        origin: str = 'lower',
+        origin: str = 'upper',
         figsize: tuple[float, float] = (15, 10),
         cbar_label: str | None = None,
         show_cbar: bool = True,
