@@ -171,7 +171,13 @@ class Dataset:
     def events(self) -> list[Events]:
         """Return events for all Gaze objects in the Dataset.
 
-        This harmonizes Dataset.events with Gaze.events
+        This maps Dataset.events to Gaze.events.
+
+        Notes
+        -----
+        - Dataset.events[i] is Dataset.gaze[i].events
+        - Dataset.events[i] = new_events will NOT make Dataset.gaze[i].events is new_events
+        - Changing Dataset.gaze[i].events will change Dataset.events[i] accordingly.
         """
         return [gaze.events for gaze in self.gaze]
 
@@ -179,10 +185,22 @@ class Dataset:
     def events(self, events_list: list[Events]) -> None:
         """Assign events to each Gaze object in the Dataset.
 
+        This updates the Dataset.events object for every Gaze in the Dataset.
+
         Parameters
         ----------
         events_list : list[Events]
             Must have the same length as Dataset.gaze.
+
+        Raises
+        ------
+        ValueError
+            If the length of input events_list does not match the length of Dataset.gaze.
+
+        Notes
+        -----
+        - Dataset.events = [ev1, ev2, ...] will replace Dataset.gaze[i].events with ev1, ev2, ...
+        - Partial assignment will not propagate to Dataset.gaze[i].events
         """
         if len(events_list) != len(self.gaze):
             raise ValueError(

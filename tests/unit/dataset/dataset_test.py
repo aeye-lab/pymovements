@@ -1163,24 +1163,21 @@ def test_detect_events_raises_column_not_found_error(
 
 
 @pytest.mark.parametrize(
-    ('events_init', 'events_expected', 'num_gazes'),
+    ('events_init', 'events_expected'),
     [
         pytest.param(
             [],
             [],
-            0,
             id='empty_list_stays_empty_list',
         ),
         pytest.param(
             [Events()],
             [Events()],
-            1,
             id='empty_df_stays_empty_df',
         ),
         pytest.param(
             [Events(name='event', onsets=[0], offsets=[99])],
             [Events()],
-            1,
             id='single_instance_filled_df_gets_cleared_to_empty_df',
         ),
         pytest.param(
@@ -1189,13 +1186,14 @@ def test_detect_events_raises_column_not_found_error(
                 Events(name='event', onsets=[0], offsets=[99]),
             ],
             [Events(), Events()],
-            2,
             id='two_instance_filled_df_gets_cleared_to_two_empty_dfs',
         ),
     ],
 )
-def test_clear_events(events_init, events_expected, tmp_path, num_gazes):
+def test_clear_events(events_init, events_expected, tmp_path):
     dataset = Dataset('ToyDataset', path=tmp_path)
+
+    num_gazes = len(events_init)
 
     # add dummy gazes so events and gazes stay in sync
     for _ in range(num_gazes):
@@ -2177,18 +2175,53 @@ def test_events_setter_raises_on_length_mismatch(tmp_path):
         dataset.events = [Events(), Events()]
 
 
-def test_events_property_populates_from_gazes(tmp_path):
+@pytest.mark.parametrize('n_gazes', [1, 3])
+def test_events_property_populates_from_gazes(tmp_path, n_gazes):
     dataset = Dataset('ToyDataset', path=tmp_path)
-    dataset.gaze.append(
-        Gaze(
-            pl.DataFrame({'time': [], 'pixel_x': [], 'pixel_y': []}),
-            pixel_columns=['pixel_x', 'pixel_y'],
-            time_column='time',
-            time_unit='ms',
-        ),
-    )
 
-    assert isinstance(dataset.events, list)
-    assert len(dataset.events) == 1
-    assert isinstance(dataset.events[0], Events)
-    assert dataset.events[0].frame.is_empty()
+    for _ in range(n_gazes):
+        dataset.gaze.append(
+            Gaze(
+                pl.DataFrame({'time': [], 'pixel_x': [], 'pixel_y': []}),
+                pixel_columns=['pixel_x', 'pixel_y'],
+                time_column='time', time_unit='ms',
+            ),
+        )
+
+    assert len(dataset.events) == n_gazes
+    for i, ev in enumerate(dataset.events):
+        assert isinstance(ev, Events)
+        assert ev.frame.is_empty()
+        assert ev is dataset.gaze[i].events
+
+
+def test_events_setter_updates_gaze_events(tmp_path):
+    dataset = Dataset('ToyDataset', path=tmp_path)
+
+    for _ in range(3):
+        dataset.gaze.append(
+            Gaze(
+                pl.DataFrame({'time': [], 'pixel_x': [], 'pixel_y': []}),
+                pixel_columns=['pixel_x', 'pixel_y'],
+                time_column='time', time_unit='ms',
+            ),
+        )
+
+    ev = Events(pl.DataFrame({'onset': [0], 'offset': [1], 'name': ['fixation']}))
+    dataset.events[1] = ev
+    assert dataset.gaze[0].events is not ev
+    assert dataset.events[0] is not ev
+    assert dataset.gaze[2].events is not ev
+    assert dataset.events[2] is not ev
+    # these do not work because of how getter/setter is implemented
+    # assert dataset.gaze[1].events is ev
+    # assert dataset.events[1] is ev
+
+    ev2 = Events(pl.DataFrame({'onset': [2], 'offset': [3], 'name': ['saccade']}))
+    dataset.gaze[2].events = ev2
+    assert dataset.gaze[2].events is ev2
+    assert dataset.events[2] is ev2
+    assert dataset.gaze[0].events is not ev2
+    assert dataset.events[0] is not ev2
+    assert dataset.gaze[1].events is not ev2
+    assert dataset.events[1] is not ev2
