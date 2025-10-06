@@ -427,6 +427,15 @@ def mock_toy(
             'content': 'stimulus',
             'filename_pattern': r'toy_text_{text_id:d}_{page_id:d}_aoi.' + raw_fileformat,
             'filename_pattern_schema_overrides': filename_format_schema_overrides['stimulus'],
+            'load_function': 'TextStimulus.from_file',
+            'load_kwargs': {
+                'aoi_content_column': 'char',
+                'aoi_start_x_column': 'top_left_x',
+                'aoi_start_y_column': 'top_left_y',
+                'aoi_width_column': 'width',
+                'aoi_height_column': 'height',
+                'aoi_page_column': 'page',
+            },
         })
 
     dataset_definition = DatasetDefinition(
@@ -442,12 +451,6 @@ def mock_toy(
         resources=resources,
         time_column='time',
         time_unit='ms',
-        aoi_content_column='char',
-        aoi_start_x_column='top_left_x',
-        aoi_start_y_column='top_left_y',
-        aoi_width_column='width',
-        aoi_height_column='height',
-        aoi_page_column='page',
         distance_column=distance_column,
         pixel_columns=pixel_columns,
         extract=extract,
