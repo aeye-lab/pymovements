@@ -209,7 +209,7 @@ def test_load_eyelink_file(tmp_path, read_kwargs, load_function):
 
     gaze = pm.dataset.dataset_files.load_gaze_file(
         filepath,
-        fileinfo_row={'load_function': load_function},
+        fileinfo_row={'load_function': load_function, 'load_kwargs': None},
         definition=DatasetDefinition(
             experiment=pm.Experiment(1280, 1024, 38, 30, None, 'center', 1000),
             custom_read_kwargs={'gaze': read_kwargs},
@@ -294,7 +294,7 @@ def test_load_eyelink_file(tmp_path, read_kwargs, load_function):
     ],
 )
 def test_load_gaze_file(
-        filename, rename_extension, load_function, read_kwargs, tmp_path, make_example_file,
+        filename, rename_extension, load_function, load_kwargs, tmp_path, make_example_file,
 ):
     # Copy the file to the temporary path with the new extension
     filepath = make_example_file(filename)
@@ -304,11 +304,10 @@ def test_load_gaze_file(
 
     gaze = pm.dataset.dataset_files.load_gaze_file(
         renamed_filepath,
-        fileinfo_row={'load_function': load_function},
+        fileinfo_row={'load_function': load_function, 'load_kwargs': load_kwargs},
         definition=DatasetDefinition(
             experiment=pm.Experiment(1280, 1024, 38, 30, None, 'center', 1000),
             pixel_columns=['x_left_pix', 'y_left_pix'],
-            custom_read_kwargs={'gaze': read_kwargs},
         ),
     )
     expected_df = pl.from_dict(
@@ -327,7 +326,7 @@ def test_load_gaze_file_unsupported_load_function(make_example_file):
     with pytest.raises(ValueError) as exc:
         pm.dataset.dataset_files.load_gaze_file(
             filepath,
-            fileinfo_row={'load_function': 'from_a_land_down_under'},
+            fileinfo_row={'load_function': 'from_a_land_down_under', 'load_kwargs': None},
             definition=DatasetDefinition(
                 experiment=pm.Experiment(1280, 1024, 38, 30, None, 'center', 1000),
                 pixel_columns=['x_left_pix', 'y_left_pix'],
