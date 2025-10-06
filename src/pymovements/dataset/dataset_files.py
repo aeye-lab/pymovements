@@ -670,7 +670,7 @@ def load_text_stimuli_file(
         valid_load_functions = ['TextStimulus.from_file', 'ImageStimulus.from_file']
         raise ValueError(
             f'Unknown load_function "{load_function_name}". '
-            f'Known functions are: {valid_load_functions}'
+            f'Known functions are: {valid_load_functions}',
         )
 
     load_function_kwargs = fileinfo_row['load_kwargs']
