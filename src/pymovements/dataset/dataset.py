@@ -410,10 +410,15 @@ class Dataset:
             If the file info is missing or improperly formatted.
         """
         self._check_fileinfo()
+
+        if stimuli_dirname:
+            dirpath = self.paths.dataset / stimuli_dirname
+        else:
+            dirpath = self.paths.stimuli
+
         self.stimuli = dataset_files.load_stimuli_files(
-            definition=self.definition,
             fileinfo=self.fileinfo['stimulus'],
-            paths=self.paths,
+            dirpath=dirpath,
             stimuli_dirname=stimuli_dirname,
         )
 

@@ -473,11 +473,11 @@ def test_load_precomputed_rm_file_rda_raise_value_error():
     assert msg == 'please specify r_dataframe_key in custom_read_kwargs'
 
 
-def test_load_stimuli_file_missing_one_column_name():
+def test_load_stimuli_unknown_load_function():
     filepath = 'tests/files/aoi_multipleye_stimuli_toy_x_1/toy_text_1_1_aoi.csv'
 
     with pytest.raises(ValueError) as exc:
-        pm.dataset.dataset_files.load_text_stimuli_file(
+        pm.dataset.dataset_files.load_stimulus_file(
             filepath,
             definition=DatasetDefinition(
                 aoi_content_column='char',
@@ -496,7 +496,7 @@ def test_load_stimuli_file_missing_all_column_names():
     filepath = 'tests/files/aoi_multipleye_stimuli_toy_x_1/toy_text_1_1_aoi.csv'
 
     with pytest.raises(ValueError) as exc:
-        pm.dataset.dataset_files.load_text_stimuli_file(
+        pm.dataset.dataset_files.load_stimulus_file(
             filepath,
             definition=DatasetDefinition(),
         )

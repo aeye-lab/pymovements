@@ -590,20 +590,17 @@ def load_precomputed_event_file(
 
 
 def load_stimuli_files(
-        definition: DatasetDefinition,
         fileinfo: pl.DataFrame,
-        paths: DatasetPaths,
+        dirpath: Path,
         stimuli_dirname: str | None = None,
 ) -> list[ImageStimulus | TextStimulus]:
     """Load all available text stimuli files.
 
     Parameters
     ----------
-    definition: DatasetDefinition
-        The dataset definition.
     fileinfo: pl.DataFrame
         A dataframe holding file information.
-    paths: DatasetPaths
+    dirpath: Path
         Path of directory containing stimuli files.
     stimuli_dirname: str | None
         One-time usage of an alternative directory name to load data relative to
@@ -617,21 +614,16 @@ def load_stimuli_files(
         List of loaded text stimuli objects.
 
     """
-    if stimuli_dirname:
-        dirpath = paths.dataset / stimuli_dirname
-    else:
-        dirpath = paths.stimuli
-
     stimuli: list[TextStimulus] = []
     for fileinfo_row in fileinfo.to_dicts():
         filepath = dirpath / Path(fileinfo_row['filepath'])
-        stimulus = load_text_stimuli_file(path=filepath, fileinfo_row=fileinfo_row)
+        stimulus = load_stimulus_file(filepath=filepath, fileinfo_row=fileinfo_row)
         stimuli.append(stimulus)
 
     return stimuli
 
 
-def load_text_stimuli_file(
+def load_stimulus_file(
         filepath: Path,
         fileinfo_row: dict[str, Any],
 ) -> ImageStimulus | TextStimulus:
