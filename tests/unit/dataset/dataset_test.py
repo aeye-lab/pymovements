@@ -429,12 +429,12 @@ def mock_toy(
             'filename_pattern_schema_overrides': filename_format_schema_overrides['stimulus'],
             'load_function': 'TextStimulus.from_file',
             'load_kwargs': {
-                'aoi_content_column': 'char',
-                'aoi_start_x_column': 'top_left_x',
-                'aoi_start_y_column': 'top_left_y',
-                'aoi_width_column': 'width',
-                'aoi_height_column': 'height',
-                'aoi_page_column': 'page',
+                'aoi_column': 'char',
+                'start_x_column': 'top_left_x',
+                'start_y_column': 'top_left_y',
+                'width_column': 'width',
+                'height_column': 'height',
+                'page_column': 'page',
             },
         })
 
