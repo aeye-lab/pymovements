@@ -592,7 +592,6 @@ def load_precomputed_event_file(
 def load_stimuli_files(
         fileinfo: pl.DataFrame,
         dirpath: Path,
-        stimuli_dirname: str | None = None,
 ) -> list[ImageStimulus | TextStimulus]:
     """Load all available text stimuli files.
 
@@ -602,11 +601,6 @@ def load_stimuli_files(
         A dataframe holding file information.
     dirpath: Path
         Path of directory containing stimuli files.
-    stimuli_dirname: str | None
-        One-time usage of an alternative directory name to load data relative to
-        :py:meth:`pymovements.Dataset.path`.
-        This argument is used only for this single call and does not alter
-        :py:meth:`pymovements.Dataset.stimuli_rootpath`. (default: None)
 
     Returns
     -------
