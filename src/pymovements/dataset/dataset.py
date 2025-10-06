@@ -412,7 +412,7 @@ class Dataset:
         self._check_fileinfo()
         self.stimuli = dataset_files.load_stimuli_files(
             definition=self.definition,
-            fileinfo=self.fileinfo['stimuli'],
+            fileinfo=self.fileinfo['stimulus'],
             paths=self.paths,
             stimuli_dirname=stimuli_dirname,
         )

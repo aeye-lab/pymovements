@@ -594,7 +594,7 @@ def load_stimuli_files(
         fileinfo: pl.DataFrame,
         paths: DatasetPaths,
         stimuli_dirname: str | None = None,
-) -> list[TextStimulus]:
+) -> list[ImageStimulus | TextStimulus]:
     """Load all available text stimuli files.
 
     Parameters
@@ -613,7 +613,7 @@ def load_stimuli_files(
 
     Returns
     -------
-    list[TextStimulus]
+    list[ImageStimulus | TextStimulus]
         List of loaded text stimuli objects.
 
     """
@@ -622,17 +622,13 @@ def load_stimuli_files(
     else:
         dirpath = paths.stimuli
 
-    stimuli_list: list[TextStimulus] = []
-    for filepath in fileinfo.to_dicts():
-        data_path = dirpath / Path(filepath['filepath'])
-        stimuli_list.append(
-            load_text_stimuli_file(
-                data_path,
-                definition=definition,
-                custom_read_kwargs=definition.custom_read_kwargs.get('text_stimuli', None),
-            ),
-        )
-    return stimuli_list
+    stimuli: list[TextStimulus] = []
+    for fileinfo_row in fileinfo.to_dicts():
+        filepath = dirpath / Path(fileinfo_row['filepath'])
+        stimulus = load_text_stimuli_file(path=filepath, fileinfo_row=fileinfo_row)
+        stimuli.append(stimulus)
+
+    return stimuli
 
 
 def load_text_stimuli_file(
