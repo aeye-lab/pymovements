@@ -419,7 +419,6 @@ class Dataset:
         self.stimuli = dataset_files.load_stimuli_files(
             fileinfo=self.fileinfo['stimulus'],
             dirpath=dirpath,
-            stimuli_dirname=stimuli_dirname,
         )
 
     def apply(
