@@ -59,6 +59,9 @@ class ResourceDefinition:
     load_function: str | None
         The name of the function used to load the data files. If None, the function is determined
         by the file extension. Refer to :ref:`gaze-io` for available function names. (default: None)
+    load_kwargs: dict[str, Any] | None
+        A dictionary of additional keyword arguments that are passed to the ``load_function``.
+        (default: None)
     """
 
     content: str
@@ -72,6 +75,7 @@ class ResourceDefinition:
     filename_pattern_schema_overrides: dict[str, type] | None = None
 
     load_function: str | None = None
+    load_kwargs: dict[str, Any] | None = None
 
     @staticmethod
     def from_dict(dictionary: dict[str, Any]) -> ResourceDefinition:
