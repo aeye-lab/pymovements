@@ -203,28 +203,6 @@ class DatasetDefinition:
         transformations. If not specified, the constant eye-to-screen distance will be taken from
         the experiment definition. This column will be renamed to ``distance``. (default: None)
 
-    aoi_content_column: str | None
-        Name of the column that contains the content of the AOIs.
-    aoi_start_x_column: str | None
-        Name of the column which contains the x coordinate's start position of the
-        areas of interest.
-    aoi_start_y_column: str | None
-        Name of the column which contains the y coordinate's start position of the
-        areas of interest.
-    aoi_width_column: str | None
-        Name of the column which contains the width of the area of interest. (default: None)
-    aoi_height_column: str | None
-        Name of the column which contains the height of the area of interest. (default: None)
-    aoi_end_x_column: str | None
-        Name of the column which contains the x coordinate's end position of the areas of interest.
-        (default: None)
-    aoi_end_y_column: str | None
-        Name of the column which contains the y coordinate's end position of the areas of interest.
-        (default: None)
-    aoi_page_column: str | None
-        Name of the column which contains the page information of the area of interest.
-        (default: None)
-
     Notes
     -----
     When working with the ``gaze_custom_read_kwargs`` attribute there are specific use cases and
@@ -296,14 +274,6 @@ class DatasetDefinition:
             velocity_columns: list[str] | None = None,
             acceleration_columns: list[str] | None = None,
             distance_column: str | None = None,
-            aoi_content_column: str | None = None,
-            aoi_start_x_column: str | None = None,
-            aoi_start_y_column: str | None = None,
-            aoi_width_column: str | None = None,
-            aoi_height_column: str | None = None,
-            aoi_end_x_column: str | None = None,
-            aoi_end_y_column: str | None = None,
-            aoi_page_column: str | None = None,
     ) -> None:
         self.name = name
         self.long_name = long_name
@@ -320,15 +290,6 @@ class DatasetDefinition:
         self.velocity_columns = velocity_columns
         self.acceleration_columns = acceleration_columns
         self.distance_column = distance_column
-
-        self.aoi_content_column = aoi_content_column
-        self.aoi_start_x_column = aoi_start_x_column
-        self.aoi_start_y_column = aoi_start_y_column
-        self.aoi_width_column = aoi_width_column
-        self.aoi_height_column = aoi_height_column
-        self.aoi_end_x_column = aoi_end_x_column
-        self.aoi_end_y_column = aoi_end_y_column
-        self.aoi_page_column = aoi_page_column
 
         if mirrors is None:
             self.mirrors = {}

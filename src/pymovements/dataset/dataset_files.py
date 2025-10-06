@@ -635,10 +635,9 @@ def load_stimuli_files(
 
 
 def load_text_stimuli_file(
-        data_path: str | Path,
-        definition: DatasetDefinition,
-        custom_read_kwargs: dict[str, Any] | None = None,
-) -> TextStimulus:
+        filepath: Path,
+        fileinfo_row: dict[str, Any],
+) -> ImageStimulus | TextStimulus:
     """Load stimuli from a single file.
 
     File format is inferred from the extension:
@@ -647,64 +646,38 @@ def load_text_stimuli_file(
 
     Parameters
     ----------
-    data_path:  str | Path
-        Path to file to be read.
-
-    definition: DatasetDefinition
-        The dataset definition.
-
-    custom_read_kwargs: dict[str, Any] | None
-        Custom read keyword arguments for polars. (default: None)
+    filepath: Path
+        Path of gaze file.
+    fileinfo_row: dict[str, Any]
+        A dictionary holding file information.
 
     Returns
     -------
-    TextStimulus
-        Returns a TextStimulus object.
+    ImageStimulus | TextStimulus
+        A stimulus object initialized with data from the loaded file.
 
     Raises
     ------
     ValueError
-        If one or more of the required AOI file columns are not specified
-        in the dataset definition: aoi_content_column, aoi_start_x_column, aoi_start_y_column.
-
+        If ``load_function`` is not in list of supported functions.
     """
-    data_path = Path(data_path)
-    if custom_read_kwargs is None:
-        custom_read_kwargs = {}
-
-    # check if we have all the required aoi columns specified
-    required = {
-        'aoi_content_column': definition.aoi_content_column,
-        'aoi_start_x_column': definition.aoi_start_x_column,
-        'aoi_start_y_column': definition.aoi_start_y_column,
-    }
-
-    missing = [name for name, value in required.items() if not value]
-
-    if missing:
+    load_function_name = fileinfo_row['load_function']
+    if load_function_name == 'TextStimulus.from_file':
+        load_function = TextStimulus.from_file
+    elif load_function_name == 'ImageStimulus.from_file':
+        load_function = ImageStimulus.from_file
+    else:
+        valid_load_functions = ['TextStimulus.from_file', 'ImageStimulus.from_file']
         raise ValueError(
-            f'Please specify the following in DatasetDefinition'
-            f" for loading text stimuli: {', '.join(missing)}",
+            f'Unknown load_function "{load_function_name}". '
+            f'Known functions are: {valid_load_functions}'
         )
 
-    # unpack them if all are present
-    aoi_content_column = required['aoi_content_column']
-    aoi_start_x_column = required['aoi_start_x_column']
-    aoi_start_y_column = required['aoi_start_y_column']
+    load_function_kwargs = fileinfo_row['load_kwargs']
+    if load_function_kwargs is None:
+        load_function_kwargs = {}
 
-    text_stimulus_object = TextStimulus.from_file(
-        data_path,
-        aoi_column=aoi_content_column,
-        start_x_column=aoi_start_x_column,
-        start_y_column=aoi_start_y_column,
-        width_column=definition.aoi_width_column,
-        height_column=definition.aoi_height_column,
-        end_x_column=definition.aoi_end_x_column,
-        end_y_column=definition.aoi_end_y_column,
-        page_column=definition.aoi_page_column,
-        custom_read_kwargs=custom_read_kwargs,
-    )
-    return text_stimulus_object
+    return load_function(path=filepath, **load_function_kwargs)
 
 
 def add_fileinfo(
