@@ -1,10 +1,9 @@
 name: deploy
 
 on:
-  - pull_request
-  - push
-  - workflow_dispatch
-  - release
+  release:
+    types:
+      - created
 
 jobs:
   build:
