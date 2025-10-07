@@ -123,7 +123,7 @@ def scanpathplot(
     events: Events | EventDataFrame | None
         The events to plot. (default: None)
     event_name: str
-        Filters events for particular value in ``name`` column. (default: 'fixation')
+        Filters events for a particular value in ``name`` column. (default: 'fixation')
     ax: plt.Axes | None
         External axes to draw into. If provided, the function will not show or close the figure.
     closefig: bool | None
