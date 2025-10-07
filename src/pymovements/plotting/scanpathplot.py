@@ -79,8 +79,6 @@ def scanpathplot(
     ----------
     gaze: Gaze | None
         Optional Gaze Dataframe. (default: None)
-    event_type: str
-        The event type to filter for. (default: 'fixation.idt')
     position_column: str
         The column name of the x and y position data (default: 'location')
     cval: np.ndarray | None
