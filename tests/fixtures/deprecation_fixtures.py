@@ -33,6 +33,23 @@ def fixture_assert_deprecation_is_removed():
             warning_message: str,
             current_version: str,
     ) -> None:
+        """Assert that function deprecation is removed as scheduled.
+
+        Parameters
+        ----------
+        function_name: str
+            Name of the deprecated functionality.
+        warning_message: str
+            The DeprecationWarning message.
+        current_version: str
+            The current version without the leading v.
+
+        Raises
+        ------
+        AssertionError
+            If the warning message does not match the expected regex or if the current version
+            is equal or above the version that was scheduled for removal of the deprecated function.
+        """
 
         match = regex.match(warning_message)
 
