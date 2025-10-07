@@ -96,7 +96,7 @@ def test_shapes(filename, kwargs, shape, make_example_file):
         ),
     ],
 )
-def test_from_asc_parameter_is_deprecated(filename, kwargs, make_example_file):
+def test_from_ipc_parameter_is_deprecated(filename, kwargs, make_example_file):
     filepath = make_example_file(filename)
 
     with pytest.raises(DeprecationWarning) as info:
