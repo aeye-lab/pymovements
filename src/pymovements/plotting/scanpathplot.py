@@ -47,7 +47,6 @@ if 'pytest' in sys.modules:  # pragma: no cover
 
 def scanpathplot(
         gaze: Gaze | None = None,
-        event_name: str = 'fixation.idt',
         position_column: str = 'location',
         cval: np.ndarray | None = None,
         cmap: matplotlib.colors.Colormap | None = None,
@@ -70,6 +69,7 @@ def scanpathplot(
         stimulus_origin: str = 'upper',
         events: Events | EventDataFrame | None = None,
         *,
+        event_name: str = 'fixation',
         ax: plt.Axes | None = None,
         closefig: bool | None = None,
 ) -> tuple[plt.Figure, plt.Axes]:
@@ -122,6 +122,8 @@ def scanpathplot(
         Path of the stimulus to be shown. (default: None)
     stimulus_origin: str
         Origin of stimuls to plot on the stimulus. (default: 'upper')
+    event_name: str
+        Filters events for particular value in ``name`` column. (default: 'fixation')
     events: Events | EventDataFrame | None
         The events to plot. (default: None)
     ax: plt.Axes | None
