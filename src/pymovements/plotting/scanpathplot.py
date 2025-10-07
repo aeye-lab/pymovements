@@ -158,6 +158,7 @@ def scanpathplot(
         assert gaze is not None
         assert gaze.events is not None
         events = gaze.events
+    assert isinstance(events, Events)  # otherwise mypy complains
 
     events = gaze.events.frame.filter(pl.col('name') == event_name)
 
