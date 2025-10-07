@@ -18,7 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Provides plotting related functionality."""
-from pymovements.plotting.fixationplot import fixationplot
 from pymovements.plotting.heatmap import heatmap
 from pymovements.plotting.main_sequence_plot import main_sequence_plot
 from pymovements.plotting.scanpathplot import scanpathplot
@@ -31,5 +30,4 @@ __all__ = [
     'scanpathplot',
     'traceplot',
     'tsplot',
-    'fixationplot',
 ]
