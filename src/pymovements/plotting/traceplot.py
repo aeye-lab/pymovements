@@ -119,21 +119,6 @@ def traceplot(
     # pylint: disable=duplicate-code
     x_signal = gaze.samples[position_column].list.get(0)
     y_signal = gaze.samples[position_column].list.get(1)
-    figsize = (10, 10)
-
-    screen_width_px = None
-    screen_height_px = None
-
-    if gaze.experiment is not None:
-        screen = gaze.experiment.screen
-        screen_width_px = screen.width_px
-        screen_height_px = screen.height_px
-
-        if screen.origin != 'upper left':
-            raise ValueError(
-                f"Origin of the experiment screen is set to {screen.origin}, "
-                "but only 'upper left' is supported for traceplot.",
-            )
 
     screen_width_px = None
     screen_height_px = None
