@@ -27,6 +27,7 @@ from warnings import warn
 import matplotlib.pyplot as plt
 import matplotlib.scale
 import numpy as np
+import polars as pl
 from matplotlib.patches import Circle
 
 from pymovements.events import EventDataFrame
@@ -36,7 +37,6 @@ from pymovements.plotting._matplotlib import _draw_line_data
 from pymovements.plotting._matplotlib import _setup_axes_and_colormap
 from pymovements.plotting._matplotlib import finalize_figure
 from pymovements.plotting._matplotlib import LinearSegmentedColormapType
-import polars as pl
 
 # This is really a dirty workaround to use the Agg backend if runnning pytest.
 # This is needed as Windows workers on GitHub fail randomly with other backends.
