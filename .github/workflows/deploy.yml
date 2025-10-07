@@ -9,6 +9,7 @@ on:
 jobs:
   build:
     name: Build pymovements package
+
     runs-on: ubuntu-latest
 
     steps:
@@ -37,6 +38,9 @@ jobs:
 
   publish-to-github:
     name: Publish to GitHub release
+
+    needs: build
+    runs-on: ubuntu-latest
 
     steps:
     - name: Download distribution packages
@@ -67,8 +71,8 @@ jobs:
 
   publish-to-test-pypi:
     name: publish to Test PyPI
-    needs: build
 
+    needs: build
     runs-on: ubuntu-latest
 
     environment:
