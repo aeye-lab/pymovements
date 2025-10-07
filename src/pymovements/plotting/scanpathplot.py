@@ -160,10 +160,10 @@ def scanpathplot(
         events = gaze.events
     assert isinstance(events, Events)  # otherwise mypy complains
 
-    events = gaze.events.frame.filter(pl.col('name') == event_name)
+    fixations = events.frame.filter(pl.col('name') == event_name)
 
-    x_signal = events.frame[position_column].list.get(0)
-    y_signal = events.frame[position_column].list.get(1)
+    x_signal = fixations[position_column].list.get(0)
+    y_signal = fixations[position_column].list.get(1)
 
     own_figure = ax is None
 
@@ -184,7 +184,7 @@ def scanpathplot(
         ax=ax,
     )
 
-    for row in events.iter_rows(named=True):
+    for row in fixations.iter_rows(named=True):
         fixation = Circle(
             row[position_column],
             math.sqrt(row['duration']),
