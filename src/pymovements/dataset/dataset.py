@@ -168,28 +168,31 @@ class Dataset:
         return self
 
     @property
-    def events(self) -> list[Events]:
+    def events(self) -> tuple[Events, ...]:
         """Return events for all Gaze objects in the Dataset.
 
-        This maps Dataset.events to Gaze.events.
+        Returns
+        -------
+        tuple[Events, ...]
+            Immutable tuple mapping Dataset.events[i] to Dataset.gaze[i].events.
+            Attempting to assign to Dataset.events[i] will raise a TypeError.
 
         Notes
         -----
-        - Dataset.events[i] is Dataset.gaze[i].events
-        - Dataset.events[i] = new_events will NOT make Dataset.gaze[i].events is new_events
-        - Changing Dataset.gaze[i].events will change Dataset.events[i] accordingly.
+            To modify events for a single gaze, assign directly via
+            Dataset.gaze[i].events = new_events instead.
         """
-        return [gaze.events for gaze in self.gaze]
+        return tuple(gaze.events for gaze in self.gaze)
 
     @events.setter
-    def events(self, events_list: list[Events]) -> None:
+    def events(self, events_list: Sequence[Events]) -> None:
         """Assign events to each Gaze object in the Dataset.
 
         This updates the Dataset.events object for every Gaze in the Dataset.
 
         Parameters
         ----------
-        events_list : list[Events]
+        events_list: Sequence[Events]
             Must have the same length as Dataset.gaze.
 
         Raises
@@ -197,10 +200,8 @@ class Dataset:
         ValueError
             If the length of input events_list does not match the length of Dataset.gaze.
 
-        Notes
-        -----
-        - Dataset.events = [ev1, ev2, ...] will replace Dataset.gaze[i].events with ev1, ev2, ...
-        - Partial assignment will not propagate to Dataset.gaze[i].events
+        TypeError
+            If attempting to assign to Dataset.events[i] directly.
         """
         if len(events_list) != len(self.gaze):
             raise ValueError(
@@ -811,7 +812,8 @@ class Dataset:
                 df=gaze.events.frame,
                 fileinfo=fileinfo_row,
             )
-            self.events[file_id] = gaze.events
+            self.gaze[file_id].events = gaze.events
+
         return self
 
     def drop_event_properties(
@@ -1001,7 +1003,7 @@ class Dataset:
             If extension is not in list of valid extensions.
         """
         dataset_files.save_events(
-            events=self.events,
+            events=list(self.events),
             fileinfo=self.fileinfo['gaze'],
             paths=self.paths,
             events_dirname=events_dirname,

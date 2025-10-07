@@ -2176,7 +2176,7 @@ def test_events_setter_raises_on_length_mismatch(tmp_path):
 
 
 @pytest.mark.parametrize('n_gazes', [1, 3])
-def test_events_property_populates_from_gazes(tmp_path, n_gazes):
+def test_events_getter_reflects_gazes(tmp_path, n_gazes):
     dataset = Dataset('ToyDataset', path=tmp_path)
 
     for _ in range(n_gazes):
@@ -2207,21 +2207,30 @@ def test_events_setter_updates_gaze_events(tmp_path):
             ),
         )
 
-    ev = Events(pl.DataFrame({'onset': [0], 'offset': [1], 'name': ['fixation']}))
-    dataset.events[1] = ev
+    # create 3 Events objects
+    ev_list = [Events(), Events(), Events()]
+    dataset.events = ev_list
+    for i, ev in enumerate(dataset.events):
+        assert ev is ev_list[i]
+        assert ev is dataset.gaze[i].events
+
+
+def test_events_setter_identity_preserved(tmp_path):
+    dataset = Dataset('ToyDataset', path=tmp_path)
+    for _ in range(3):
+        dataset.gaze.append(
+            Gaze(
+                pl.DataFrame({'time': [], 'pixel_x': [], 'pixel_y': []}),
+                pixel_columns=['pixel_x', 'pixel_y'],
+                time_column='time', time_unit='ms',
+            ),
+        )
+
+    ev = Events(pl.DataFrame({'onset': [2], 'offset': [3], 'name': ['saccade']}))
+    dataset.gaze[2].events = ev
+    assert dataset.gaze[2].events is ev
+    assert dataset.events[2] is ev
     assert dataset.gaze[0].events is not ev
     assert dataset.events[0] is not ev
-    assert dataset.gaze[2].events is not ev
-    assert dataset.events[2] is not ev
-    # these do not work because of how getter/setter is implemented
-    # assert dataset.gaze[1].events is ev
-    # assert dataset.events[1] is ev
-
-    ev2 = Events(pl.DataFrame({'onset': [2], 'offset': [3], 'name': ['saccade']}))
-    dataset.gaze[2].events = ev2
-    assert dataset.gaze[2].events is ev2
-    assert dataset.events[2] is ev2
-    assert dataset.gaze[0].events is not ev2
-    assert dataset.events[0] is not ev2
-    assert dataset.gaze[1].events is not ev2
-    assert dataset.events[1] is not ev2
+    assert dataset.gaze[1].events is not ev
+    assert dataset.events[1] is not ev
