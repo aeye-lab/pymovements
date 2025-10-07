@@ -24,7 +24,6 @@ import math
 import sys
 from warnings import warn
 
-import matplotlib.colors
 import matplotlib.pyplot as plt
 import matplotlib.scale
 import numpy as np
@@ -34,7 +33,8 @@ from pymovements.events import EventDataFrame
 from pymovements.events import Events
 from pymovements.gaze import Gaze
 from pymovements.plotting._matplotlib import _draw_line_data
-from pymovements.plotting._matplotlib import _setup_matplotlib
+from pymovements.plotting._matplotlib import _setup_axes_and_colormap
+from pymovements.plotting._matplotlib import finalize_figure
 from pymovements.plotting._matplotlib import LinearSegmentedColormapType
 import polars as pl
 
@@ -69,7 +69,10 @@ def scanpathplot(
         path_to_image_stimulus: str | None = None,
         stimulus_origin: str = 'upper',
         events: Events | EventDataFrame | None = None,
-) -> None:
+        *,
+        ax: plt.Axes | None = None,
+        closefig: bool | None = None,
+) -> tuple[plt.Figure, plt.Axes]:
     """Plot scanpath from positional data.
 
     Parameters
@@ -121,6 +124,15 @@ def scanpathplot(
         Origin of stimuls to plot on the stimulus. (default: 'upper')
     events: Events | EventDataFrame | None
         The events to plot. (default: None)
+    ax: plt.Axes | None
+        External axes to draw into. If provided, the function will not show or close the figure.
+    closefig: bool | None
+        Whether to close the figure. If None, close only when the function created the figure.
+
+    Returns
+    -------
+    tuple[plt.Figure, plt.Axes]
+        The created or provided figure and axes.
 
     Raises
     ------
@@ -147,25 +159,28 @@ def scanpathplot(
         assert gaze.events is not None
         events = gaze.events
 
-    # pylint: disable=duplicate-code
     events = gaze.events.frame.filter(pl.col('name') == event_name)
-    x_signal = events[position_column].list.get(0)
-    y_signal = events[position_column].list.get(1)
-    figsize = (gaze.experiment.screen.width_cm, gaze.experiment.screen.height_cm)
-    fig, ax, cmap, cmap_norm, cval, show_cbar = _setup_matplotlib(
-        x_signal=x_signal,
-        y_signal=y_signal,
-        figsize=figsize,
-        cmap=cmap,
-        cmap_norm=cmap_norm,
-        cmap_segmentdata=cmap_segmentdata,
-        cval=cval,
-        show_cbar=show_cbar,
-        add_stimulus=add_stimulus,
-        path_to_image_stimulus=path_to_image_stimulus,
-        stimulus_origin=stimulus_origin,
-        padding=padding,
-        pad_factor=pad_factor,
+
+    x_signal = events.frame[position_column].list.get(0)
+    y_signal = events.frame[position_column].list.get(1)
+
+    own_figure = ax is None
+
+    fig, ax, cmap, cmap_norm, cval, show_cbar = _setup_axes_and_colormap(
+        x_signal,
+        y_signal,
+        figsize,
+        cmap,
+        cmap_norm,
+        cmap_segmentdata,
+        cval,
+        show_cbar,
+        add_stimulus,
+        path_to_image_stimulus,
+        stimulus_origin,
+        padding,
+        pad_factor,
+        ax=ax,
     )
 
     for row in events.iter_rows(named=True):
@@ -200,9 +215,13 @@ def scanpathplot(
     if title:
         ax.set_title(title)
 
-    if savepath is not None:
-        fig.savefig(savepath)
+    finalize_figure(
+        fig,
+        show=show,
+        savepath=savepath,
+        closefig=closefig,
+        own_figure=own_figure,
+        func_name='scanpathplot',
+    )
 
-    if show:
-        plt.show()
-    plt.close(fig)
+    return fig, ax
