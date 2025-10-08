@@ -218,18 +218,20 @@ def test_traceplot_screen_dims(gaze, width, height):
     gaze.experiment.screen.width_px = width
     gaze.experiment.screen.height_px = height
 
-    fig, ax = pm.plotting.traceplot(gaze=gaze, show=False)
-
-    if width is not None and height is not None:
+    # Should not raise any exception
+    if width is None or height is None or width <= 0 or height <= 0:
+        # Expect ValueError for invalid dimensions
+        with pytest.raises(ValueError, match='must be positive and not None'):
+            pm.plotting.traceplot(gaze=gaze, show=False)
+    else:
+        fig, ax = pm.plotting.traceplot(gaze=gaze, show=False)
         assert ax.get_xlim() == (0, width)
         assert ax.get_ylim() == (height, 0)
-        # numeric value for equal aspect ratio
         assert ax.get_aspect() == 1.0
-
-    plt.close(fig)
+        plt.close(fig)
 
 
 def test_traceplot_origin_wrong(gaze):
     gaze.experiment.screen.origin = 'bottom right'
-    with pytest.raises(ValueError, match="only 'upper left' is supported"):
+    with pytest.raises(ValueError, match='must be "upper left"'):
         pm.plotting.traceplot(gaze=gaze, show=False)
