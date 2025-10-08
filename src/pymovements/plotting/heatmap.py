@@ -27,6 +27,7 @@ import numpy as np
 from matplotlib import colors
 
 from pymovements.gaze import Gaze
+from pymovements.plotting._matplotlib import _set_screen_axes
 from pymovements.plotting._matplotlib import finalize_figure
 from pymovements.plotting._matplotlib import prepare_figure
 from pymovements.stimulus.image import _draw_image_stimulus
@@ -38,7 +39,7 @@ def heatmap(
         gridsize: tuple[int, int] = (10, 10),
         cmap: colors.Colormap | str = 'jet',
         interpolation: str = 'gaussian',
-        origin: str = 'upper',
+        origin: str = 'upper',  # kept for API consistency
         figsize: tuple[float, float] = (15, 10),
         cbar_label: str | None = None,
         show_cbar: bool = True,
@@ -120,6 +121,8 @@ def heatmap(
     ValueError
         If the experiment property of the Gaze is None
     """
+    _ = origin  # silence unused-argument warning
+
     # Extract x and y positions from the gaze dataframe
     x = gaze.samples[position_column].list.get(0).to_numpy()
     y = gaze.samples[position_column].list.get(1).to_numpy()
@@ -165,13 +168,14 @@ def heatmap(
     # Convert heatmap values from sample count to seconds
     heatmap_value /= gaze.experiment.sampling_rate
 
-    if origin == 'upper':
-        extent = [x_edges[0], x_edges[-1], y_edges[0], y_edges[-1]]
-    else:
-        extent = [x_edges[0], x_edges[-1], y_edges[-1], y_edges[0]]
+    extent = [x_edges[0], x_edges[-1], y_edges[0], y_edges[-1]]
 
     # If add_stimulus is requested, we still reuse/create fig/ax via prepare_figure and then draw
     fig, ax, own_figure = prepare_figure(ax, figsize, func_name='heatmap')
+
+    # # Apply screen-based axis limits and aspect ratio
+    if gaze is not None and gaze.experiment is not None:
+        _set_screen_axes(ax, gaze.experiment.screen, func_name='heatmap')
 
     if add_stimulus:
         assert path_to_image_stimulus
@@ -190,7 +194,7 @@ def heatmap(
     heatmap_plot = ax.imshow(
         heatmap_value,
         cmap=cmap,
-        origin=origin,
+        origin='lower',   # prevent double flip
         interpolation=interpolation,
         extent=extent,
         alpha=alpha,
