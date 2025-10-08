@@ -150,7 +150,7 @@ class DatasetDefinition:
         .. deprecated:: v0.22.1
         This field will be removed in v0.27.0.
     filename_format: dict[str, str] | None
-        Regular expression which will be matched before trying to load the file. Namedgroups will
+        Regular expression which will be matched before trying to load the file. Named groups will
         appear in the `fileinfo` dataframe. (default: None)
     filename_format_schema_overrides: dict[str, dict[str, type]] | None
         If named groups are present in the `filename_format`, this makes it possible to cast
@@ -351,7 +351,7 @@ class DatasetDefinition:
             filename format for each content type
         """
         data: dict[str, str] = {}
-        content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures')
+        content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures', 'stimulus')
         for content_type in content_types:
             if content_resources := self.resources.filter(content=content_type):
                 # take first resource with matching content type.
@@ -391,7 +391,7 @@ class DatasetDefinition:
             filename format schema overrides for each content type
         """
         data: dict[str, dict[str, type]] = {}
-        content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures')
+        content_types = ('gaze', 'precomputed_events', 'precomputed_reading_measures', 'stimulus')
         for content_type in content_types:
             if content_resources := self.resources.filter(content=content_type):
                 # take first resource with matching content type.

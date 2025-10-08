@@ -40,6 +40,8 @@ from pymovements.gaze.io import from_asc
 from pymovements.gaze.io import from_csv
 from pymovements.gaze.io import from_ipc
 from pymovements.reading_measures import ReadingMeasures
+from pymovements.stimulus.image import ImageStimulus
+from pymovements.stimulus.text import TextStimulus
 
 
 def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> dict[str, pl.DataFrame]:
@@ -76,10 +78,13 @@ def scan_dataset(definition: DatasetDefinition, paths: DatasetPaths) -> dict[str
             resource_dirpath = paths.precomputed_events
         elif content_type == 'precomputed_reading_measures':
             resource_dirpath = paths.precomputed_reading_measures
+        elif content_type == 'stimulus':
+            resource_dirpath = paths.stimuli
         else:
             warnings.warn(
                 f'content type {content_type} is not supported. '
-                'supported contents are: gaze, precomputed_events, precomputed_reading_measures. '
+                'supported contents are: gaze, precomputed_events, '
+                'precomputed_reading_measures, stimulus. '
                 'skipping this resource definition during scan.',
             )
             continue
@@ -582,6 +587,80 @@ def load_precomputed_event_file(
         )
 
     return PrecomputedEventDataFrame(data=precomputed_event_df)
+
+
+def load_stimuli_files(
+        fileinfo: pl.DataFrame,
+        dirpath: Path,
+) -> list[ImageStimulus | TextStimulus]:
+    """Load all available text stimuli files.
+
+    Parameters
+    ----------
+    fileinfo: pl.DataFrame
+        A dataframe holding file information.
+    dirpath: Path
+        Path of directory containing stimuli files.
+
+    Returns
+    -------
+    list[ImageStimulus | TextStimulus]
+        List of loaded text stimuli objects.
+
+    """
+    stimuli: list[TextStimulus] = []
+    for fileinfo_row in fileinfo.to_dicts():
+        filepath = dirpath / Path(fileinfo_row['filepath'])
+        stimulus = load_stimulus_file(filepath=filepath, fileinfo_row=fileinfo_row)
+        stimuli.append(stimulus)
+
+    return stimuli
+
+
+def load_stimulus_file(
+        filepath: Path,
+        fileinfo_row: dict[str, Any],
+) -> ImageStimulus | TextStimulus:
+    """Load stimuli from a single file.
+
+    File format is inferred from the extension:
+        - CSV-like: .csv
+    Raises a ValueError for unsupported formats.
+
+    Parameters
+    ----------
+    filepath: Path
+        Path of gaze file.
+    fileinfo_row: dict[str, Any]
+        A dictionary holding file information.
+
+    Returns
+    -------
+    ImageStimulus | TextStimulus
+        A stimulus object initialized with data from the loaded file.
+
+    Raises
+    ------
+    ValueError
+        If ``load_function`` is not in list of supported functions.
+    """
+    load_function_name = fileinfo_row['load_function']
+    if load_function_name == 'TextStimulus.from_file':
+        load_function = TextStimulus.from_file
+    elif load_function_name == 'ImageStimulus.from_file':
+        load_function = ImageStimulus.from_file
+    else:
+        valid_load_functions = ['TextStimulus.from_file', 'ImageStimulus.from_file']
+        raise ValueError(
+            f'Unknown load_function "{load_function_name}". '
+            f'Known functions are: {valid_load_functions}',
+        )
+
+    load_function_kwargs = fileinfo_row['load_kwargs']
+    if load_function_kwargs is None:
+        load_function_kwargs = {}
+
+    return load_function(path=filepath, **load_function_kwargs)
 
 
 def add_fileinfo(
