@@ -261,3 +261,18 @@ def test_heatmap_with_missing_experiment_raises(gaze):
     gaze.experiment = None
     with pytest.raises(ValueError, match='Experiment property of Gaze is None'):
         pm.plotting.heatmap(gaze, show=False)
+
+
+def test_heatmap_skips_screen_axes_if_no_experiment(monkeypatch):
+    gaze = pm.Gaze(
+        samples=pl.DataFrame({'x_pix': [0], 'y_pix': [0]}),
+        pixel_columns=['x_pix', 'y_pix'],
+        experiment=None,
+    )
+    mock = Mock()
+    monkeypatch.setattr(pm.plotting._matplotlib, '_set_screen_axes', mock)
+
+    with pytest.raises(ValueError, match='Experiment property of Gaze is None'):
+        pm.plotting.heatmap(gaze, show=False)
+
+    mock.assert_not_called()

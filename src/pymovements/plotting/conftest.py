@@ -30,7 +30,7 @@ import pytest
 
 
 @pytest.fixture(autouse=True)
-def close_figures_after_test() -> Generator[None]:
+def close_figures_after_test() -> Generator[None]:  # pragma: no cover
     """Automatically close all Matplotlib figures after each test."""
     yield
     plt.close('all')
