@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build pymovements package
+    name: Build distribution packages
 
     runs-on: ubuntu-latest
 
@@ -29,14 +29,16 @@ jobs:
     - name: Build a binary wheel and a source tarball
       run: python -m build
 
-    - name: Store distribution packages
+    - name: Upload distribution packages
       uses: actions/upload-artifact@v4
       with:
-        name: python-package-distributions
+        name: pymovements-${{ github.event.release.tag_name }}
         path: dist/
+        if-no-files-found: error
+        retention-days: 1
 
   publish-to-github:
-    name: Publish to GitHub release
+    name: Attach distribution packages to GitHub release
 
     needs: build
     runs-on: ubuntu-latest
@@ -45,7 +47,7 @@ jobs:
     - name: Download distribution packages
       uses: actions/download-artifact@v4
       with:
-        name: python-package-distributions
+        name: pymovements-${{ github.event.release.tag_name }}
         path: dist/
 
     - name: Upload wheel
@@ -69,7 +71,7 @@ jobs:
         asset_content_type: application/gzip
 
   publish-to-test-pypi:
-    name: publish to Test PyPI
+    name: Publish to Test PyPI
 
     needs: build
     runs-on: ubuntu-latest
@@ -79,6 +81,7 @@ jobs:
       url: https://test.pypi.org/p/pymovements
 
     permissions:
+      contents: read
       id-token: write  # IMPORTANT: mandatory for trusted publishing
 
     steps:
