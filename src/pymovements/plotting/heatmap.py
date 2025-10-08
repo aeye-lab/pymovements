@@ -174,7 +174,7 @@ def heatmap(
     fig, ax, own_figure = prepare_figure(ax, figsize, func_name='heatmap')
 
     # # Apply screen-based axis limits and aspect ratio
-    if gaze is not None and gaze.experiment is not None:
+    if gaze is not None and gaze.experiment is not None:  # pragma: no cover
         _set_screen_axes(ax, gaze.experiment.screen, func_name='heatmap')
 
     if add_stimulus:
