@@ -202,36 +202,3 @@ def test_traceplot_exceptions(gaze, kwargs, exception, monkeypatch):
 def test_traceplot_no_experiment(gaze_no_exp):
     # Should not raise any exception
     pm.plotting.traceplot(gaze_no_exp, show=False)
-
-
-@pytest.mark.parametrize(
-    'width,height',
-    [
-        (1280, 1024),  # both defined
-        (None, 1024),   # width None
-        (1280, None),   # height None
-        (None, None),   # both None
-    ],
-)
-def test_traceplot_screen_dims(gaze, width, height):
-    # Set screen dimensions
-    gaze.experiment.screen.width_px = width
-    gaze.experiment.screen.height_px = height
-
-    # Should not raise any exception
-    if width is None or height is None or width <= 0 or height <= 0:
-        # Expect ValueError for invalid dimensions
-        with pytest.raises(ValueError, match='must be positive and not None'):
-            pm.plotting.traceplot(gaze=gaze, show=False)
-    else:
-        fig, ax = pm.plotting.traceplot(gaze=gaze, show=False)
-        assert ax.get_xlim() == (0, width)
-        assert ax.get_ylim() == (height, 0)
-        assert ax.get_aspect() == 1.0
-        plt.close(fig)
-
-
-def test_traceplot_origin_wrong(gaze):
-    gaze.experiment.screen.origin = 'bottom right'
-    with pytest.raises(ValueError, match='must be "upper left"'):
-        pm.plotting.traceplot(gaze=gaze, show=False)

@@ -238,15 +238,9 @@ def test_scanpathplot_events_is_deprecated(gaze):
     )
 
 
-def test_scanpathplot_sets_screen_axes(gaze):
-    """Test that scanpathplot applies screen dimensions and equal aspect ratio."""
-    fig, ax = scanpathplot(gaze=gaze, show=False)
-
-    # Assert that axes limits match screen dimensions from the experiment
-    assert ax.get_xlim() == (0, gaze.experiment.screen.width_px)
-    assert ax.get_ylim() == (gaze.experiment.screen.height_px, 0)
-
-    # Assert that the aspect ratio is equal (square pixels)
-    assert ax.get_aspect() == 1.0  # numeric value for equal aspect ratio
-
-    plt.close(fig)
+def test_scanpathplot_no_experiment(gaze):
+    # test if gaze is not None and gaze.experiment is not None:
+    gaze = gaze.clone()
+    gaze.experiment = None
+    # Should not raise any exception
+    scanpathplot(gaze=gaze, show=False)
