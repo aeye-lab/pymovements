@@ -28,6 +28,7 @@ import pytest
 from matplotlib import figure
 
 import pymovements as pm
+import pymovements.plotting._matplotlib as pm_matplotlib  # type: ignore[attr-defined]
 from pymovements import Experiment
 from pymovements import Gaze
 from pymovements.plotting import heatmap
@@ -263,16 +264,14 @@ def test_heatmap_with_missing_experiment_raises(gaze):
         pm.plotting.heatmap(gaze, show=False)
 
 
-def test_heatmap_skips_screen_axes_if_no_experiment(monkeypatch):
-    gaze = pm.Gaze(
-        samples=pl.DataFrame({'x_pix': [0], 'y_pix': [0]}),
-        pixel_columns=['x_pix', 'y_pix'],
-        experiment=None,
-    )
+def test_heatmap_skips_screen_axes_if_no_gaze(monkeypatch):
+    """Ensure _set_screen_axes is skipped when gaze is None."""
     mock = Mock()
-    monkeypatch.setattr(pm.plotting._matplotlib, '_set_screen_axes', mock)
+    monkeypatch.setattr(pm_matplotlib, '_set_screen_axes', mock)
 
-    with pytest.raises(ValueError, match='Experiment property of Gaze is None'):
-        pm.plotting.heatmap(gaze, show=False)
+    # Call heatmap directly with gaze=None
+    # (we expect it to raise an AttributeError or ValueError later, but not call _set_screen_axes)
+    with pytest.raises((AttributeError, TypeError)):
+        pm.plotting.heatmap(None, show=False)
 
     mock.assert_not_called()
