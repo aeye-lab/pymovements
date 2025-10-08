@@ -7,35 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build distribution packages
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        persist-credentials: false
-
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.13"
-
-    - name: Install build dependency
-      run: python -m pip install build
-
-    - name: Build a binary wheel and a source tarball
-      run: python -m build
-
-    - name: Upload distribution packages
-      uses: actions/upload-artifact@v4
-      with:
-        name: pymovements-${{ github.event.release.tag_name }}
-        path: dist/
-        if-no-files-found: error
-        retention-days: 1
+    uses: ./.github/workflows/build.yml
 
   publish-to-github:
     name: Attach distribution packages to GitHub release
@@ -47,7 +19,7 @@ jobs:
     - name: Download distribution packages
       uses: actions/download-artifact@v4
       with:
-        name: pymovements-${{ github.event.release.tag_name }}
+        name: pymovements-distribution-packages
         path: dist/
 
     - name: Upload wheel
@@ -88,7 +60,7 @@ jobs:
     - name: Download distribution packages
       uses: actions/download-artifact@v4
       with:
-        name: python-package-distributions
+        name: pymovements-distribution-packages
         path: dist/
 
     - name: Publish distribution to TestPyPI
