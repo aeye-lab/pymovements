@@ -32,7 +32,7 @@ from pymovements import ResourceDefinitions
     [
         pytest.param(
             {
-                'content': 'gaze',
+                'content': 'samples',
                 'filename': 'test.csv',
             },
             id='gaze_content_filename',
@@ -40,7 +40,7 @@ from pymovements import ResourceDefinitions
 
         pytest.param(
             {
-                'content': 'gaze',
+                'content': 'samples',
                 'filename': 'test.csv',
                 'url': 'https://example.com',
             },
@@ -49,7 +49,7 @@ from pymovements import ResourceDefinitions
 
         pytest.param(
             {
-                'content': 'gaze',
+                'content': 'samples',
                 'filename': 'test.csv',
                 'url': 'https://example.com',
                 'md5': 'abcdefgh',
@@ -158,17 +158,30 @@ def test_resource_is_not_equal(resource1, resource2):
                 'content': 'gaze',
             },
             ResourceDefinition(
-                content='gaze',
+                content='samples',
                 filename=None,
                 url=None,
                 md5=None,
             ),
-            id='content',
+            id='content_gaze',
         ),
 
         pytest.param(
             {
-                'content': 'gaze',
+                'content': 'samples',
+            },
+            ResourceDefinition(
+                content='samples',
+                filename=None,
+                url=None,
+                md5=None,
+            ),
+            id='content_samples',
+        ),
+
+        pytest.param(
+            {
+                'content': 'samples',
                 'filename': 'test.csv',
             },
             ResourceDefinition(
@@ -182,7 +195,7 @@ def test_resource_is_not_equal(resource1, resource2):
 
         pytest.param(
             {
-                'content': 'gaze',
+                'content': 'samples',
                 'filename': 'test.csv',
                 'url': 'https://example.com',
             },
@@ -197,7 +210,7 @@ def test_resource_is_not_equal(resource1, resource2):
 
         pytest.param(
             {
-                'content': 'gaze',
+                'content': 'samples',
                 'filename': 'test.csv',
                 'url': 'https://example.com',
                 'md5': 'abcdefgh',
@@ -213,7 +226,7 @@ def test_resource_is_not_equal(resource1, resource2):
 
         pytest.param(
             {
-                'content': 'gaze',
+                'content': 'samples',
                 'filename': 'test.csv',
                 'resource': 'https://example.com',
             },
@@ -229,7 +242,7 @@ def test_resource_is_not_equal(resource1, resource2):
 
         pytest.param(
             {
-                'content': 'gaze',
+                'content': 'samples',
                 'filename_pattern': 'test.csv',
             },
             ResourceDefinition(
@@ -244,7 +257,7 @@ def test_resource_is_not_equal(resource1, resource2):
 
         pytest.param(
             {
-                'content': 'gaze',
+                'content': 'samples',
                 'filename_pattern': '{subject_id:d}.csv',
                 'filename_pattern_schema_overrides': {'subject_id': int},
             },
@@ -400,7 +413,7 @@ def test_resource_definitions_from_dict_deprecated():
                 ],
             ),
             [
-                {'filename': 'myfile.txt', 'content': 'gaze'},
+                {'filename': 'myfile.txt', 'content': 'samples'},
             ],
             id='single_gaze_resource',
         ),
@@ -413,8 +426,8 @@ def test_resource_definitions_from_dict_deprecated():
                 ],
             ),
             [
-                {'filename': 'myfile1.zip', 'content': 'gaze'},
-                {'filename': 'myfile2.zip', 'content': 'gaze'},
+                {'filename': 'myfile1.zip', 'content': 'samples'},
+                {'filename': 'myfile2.zip', 'content': 'samples'},
             ],
             id='two_gaze_resources',
         ),
@@ -473,7 +486,7 @@ def test_resources_to_dicts_expected(resources, expected_dicts):
         ),
 
         pytest.param(
-            ResourceDefinitions.from_dicts([{'filename': 'myfile.txt', 'content': 'gaze'}]),
+            ResourceDefinitions.from_dicts([{'filename': 'myfile.txt', 'content': 'samples'}]),
             'gaze',
             [
                 ResourceDefinition(filename='myfile.txt', content='gaze'),
@@ -482,7 +495,7 @@ def test_resources_to_dicts_expected(resources, expected_dicts):
         ),
 
         pytest.param(
-            ResourceDefinitions.from_dicts([{'filename': 'myfile.txt', 'content': 'gaze'}]),
+            ResourceDefinitions.from_dicts([{'filename': 'myfile.txt', 'content': 'samples'}]),
             'precomputed_events',
             [],
             id='single_gaze_filter_precomputed_events',
@@ -511,7 +524,7 @@ def test_resources_to_dicts_expected(resources, expected_dicts):
         pytest.param(
             ResourceDefinitions.from_dicts(
                 [
-                    {'filename': 'myfile.txt', 'content': 'gaze'},
+                    {'filename': 'myfile.txt', 'content': 'samples'},
                     {'filename': 'events.csv', 'content': 'precomputed_events'},
                 ],
             ),
@@ -526,7 +539,7 @@ def test_resources_to_dicts_expected(resources, expected_dicts):
         pytest.param(
             ResourceDefinitions.from_dicts(
                 [
-                    {'filename': 'myfile.txt', 'content': 'gaze'},
+                    {'filename': 'myfile.txt', 'content': 'samples'},
                     {'filename': 'events.csv', 'content': 'precomputed_events'},
                 ],
             ),
@@ -540,7 +553,7 @@ def test_resources_to_dicts_expected(resources, expected_dicts):
         pytest.param(
             ResourceDefinitions.from_dicts(
                 [
-                    {'filename': 'myfile.txt', 'content': 'gaze'},
+                    {'filename': 'myfile.txt', 'content': 'samples'},
                     {'filename': 'events.csv', 'content': 'precomputed_events'},
                 ],
             ),
@@ -659,7 +672,7 @@ def test_resources_has_content_expected(resources, expected_has_content):
         ),
 
         pytest.param(
-            [{'filename': 'myfile.txt', 'content': 'gaze'}],
+            [{'filename': 'myfile.txt', 'content': 'samples'}],
             [
                 ResourceDefinition(filename='myfile.txt', content='gaze'),
             ],
@@ -668,7 +681,7 @@ def test_resources_has_content_expected(resources, expected_has_content):
 
         pytest.param(
             [
-                {'filename': 'myfile.txt', 'content': 'gaze'},
+                {'filename': 'myfile.txt', 'content': 'samples'},
                 {'filename': 'events.csv', 'content': 'precomputed_events'},
             ],
             [
