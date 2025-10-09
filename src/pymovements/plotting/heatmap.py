@@ -121,8 +121,6 @@ def heatmap(
     ValueError
         If the experiment property of the Gaze is None
     """
-    _ = origin  # silence unused-argument warning
-
     # Extract x and y positions from the gaze dataframe
     x = gaze.samples[position_column].list.get(0).to_numpy()
     y = gaze.samples[position_column].list.get(1).to_numpy()
@@ -194,7 +192,7 @@ def heatmap(
     heatmap_plot = ax.imshow(
         heatmap_value,
         cmap=cmap,
-        origin='lower',   # prevent double flip
+        origin=origin,
         interpolation=interpolation,
         extent=extent,
         alpha=alpha,
