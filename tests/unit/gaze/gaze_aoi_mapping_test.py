@@ -1096,9 +1096,12 @@ EXPECTED_DF = {
         'position',
     ],
 )
-def test_gaze_to_aoi_mapping_char_width_height(eye, aoi_column, gaze_type):
+def test_gaze_to_aoi_mapping_char_width_height(eye, aoi_column, gaze_type, make_example_file):
+    aoi_filepath = make_example_file('toy_text_1_1_aoi.csv')
+    gaze_filepath = make_example_file('judo1000_example.csv')
+
     aoi_df = pm.stimulus.text.from_file(
-        'tests/files/toy_text_1_1_aoi.csv',
+        aoi_filepath,
         aoi_column=aoi_column,
         start_x_column='top_left_x',
         start_y_column='top_left_y',
@@ -1108,13 +1111,13 @@ def test_gaze_to_aoi_mapping_char_width_height(eye, aoi_column, gaze_type):
     )
     if gaze_type == 'pixel':
         gaze = pm.gaze.io.from_csv(
-            'tests/files/judo1000_example.csv',
+            gaze_filepath,
             **{'separator': '\t'},
             pixel_columns=['x_left', 'y_left', 'x_right', 'y_right'],
         )
     elif gaze_type == 'position':
         gaze = pm.gaze.io.from_csv(
-            'tests/files/judo1000_example.csv',
+            gaze_filepath,
             **{'separator': '\t'},
             position_columns=['x_left', 'y_left', 'x_right', 'y_right'],
         )
@@ -1151,9 +1154,12 @@ def test_gaze_to_aoi_mapping_char_width_height(eye, aoi_column, gaze_type):
         'position',
     ],
 )
-def test_gaze_to_aoi_mapping_char_end(eye, aoi_column, gaze_type):
+def test_gaze_to_aoi_mapping_char_end(eye, aoi_column, gaze_type, make_example_file):
+    aoi_filepath = make_example_file('toy_text_1_1_aoi.csv')
+    gaze_filepath = make_example_file('judo1000_example.csv')
+
     aoi_df = pm.stimulus.text.from_file(
-        'tests/files/toy_text_1_1_aoi.csv',
+        aoi_filepath,
         aoi_column=aoi_column,
         start_x_column='top_left_x',
         start_y_column='top_left_y',
@@ -1163,13 +1169,13 @@ def test_gaze_to_aoi_mapping_char_end(eye, aoi_column, gaze_type):
     )
     if gaze_type == 'pixel':
         gaze = pm.gaze.io.from_csv(
-            'tests/files/judo1000_example.csv',
+            gaze_filepath,
             **{'separator': '\t'},
             pixel_columns=['x_left', 'y_left', 'x_right', 'y_right'],
         )
     elif gaze_type == 'position':
         gaze = pm.gaze.io.from_csv(
-            'tests/files/judo1000_example.csv',
+            gaze_filepath,
             **{'separator': '\t'},
             position_columns=['x_left', 'y_left', 'x_right', 'y_right'],
         )
@@ -1180,9 +1186,12 @@ def test_gaze_to_aoi_mapping_char_end(eye, aoi_column, gaze_type):
     assert_frame_equal(gaze.samples, EXPECTED_DF[f'{aoi_column}_{eye}_{gaze_type}'])
 
 
-def test_map_to_aois_raises_value_error():
+def test_map_to_aois_raises_value_error(make_example_file):
+    aoi_filepath = make_example_file('toy_text_1_1_aoi.csv')
+    gaze_filepath = make_example_file('judo1000_example.csv')
+
     aoi_df = pm.stimulus.text.from_file(
-        'tests/files/toy_text_1_1_aoi.csv',
+        aoi_filepath,
         aoi_column='char',
         start_x_column='top_left_x',
         start_y_column='top_left_y',
@@ -1191,7 +1200,7 @@ def test_map_to_aois_raises_value_error():
         page_column='page',
     )
     gaze = pm.gaze.io.from_csv(
-        'tests/files/judo1000_example.csv',
+        gaze_filepath,
         **{'separator': '\t'},
         position_columns=['x_left', 'y_left', 'x_right', 'y_right'],
     )
