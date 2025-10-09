@@ -171,10 +171,6 @@ def heatmap(
     # If add_stimulus is requested, we still reuse/create fig/ax via prepare_figure and then draw
     fig, ax, own_figure = prepare_figure(ax, figsize, func_name='heatmap')
 
-    # # Apply screen-based axis limits and aspect ratio
-    if gaze is not None and gaze.experiment is not None:  # pragma: no cover
-        _set_screen_axes(ax, gaze.experiment.screen, func_name='heatmap')
-
     if add_stimulus:
         assert path_to_image_stimulus
         # draw the background stimulus onto the current axes
@@ -197,6 +193,9 @@ def heatmap(
         extent=extent,
         alpha=alpha,
     )
+
+    # # Apply screen-based axis limits and aspect ratio
+    _set_screen_axes(ax, gaze.experiment.screen, func_name='heatmap')
 
     # Set the plot title and axis labels
     if title:

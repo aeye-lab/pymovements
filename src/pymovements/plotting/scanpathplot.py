@@ -179,9 +179,6 @@ def scanpathplot(
         ax=ax,
     )
 
-    if gaze is not None and gaze.experiment is not None:
-        _set_screen_axes(ax, gaze.experiment.screen, func_name='scanpathplot')
-
     for row in events.frame.iter_rows(named=True):
         fixation = Circle(
             row[position_column],
@@ -210,6 +207,9 @@ def scanpathplot(
             # sm = matplotlib.cm.ScalarMappable(cmap=cmap, norm=cmap_norm)
             # sm.set_array(cval)
             fig.colorbar(line, label=cbar_label, ax=ax)
+
+    if gaze is not None and gaze.experiment is not None:
+        _set_screen_axes(ax, gaze.experiment.screen, func_name='scanpathplot')
 
     if title:
         ax.set_title(title)

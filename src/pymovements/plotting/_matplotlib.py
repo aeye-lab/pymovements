@@ -344,18 +344,22 @@ def _set_screen_axes(
     if screen is None:
         return
 
-    if screen.origin != 'upper left':
-        raise ValueError(
-            f'{func_name}: screen origin must be "upper left", got "{screen.origin}".',
-        )
+    # If screen has no pixel info, skip silently
+    if screen.width_px is None or screen.height_px is None:
+        return
 
     if (
         screen.width_px is None or screen.height_px is None
         or screen.width_px <= 0 or screen.height_px <= 0
     ):
         raise ValueError(
-            f'{func_name}: screen width and height must be positive and not None, '
+            f'{func_name}: screen width and height must be positive, '
             f'got width={screen.width_px}, height={screen.height_px}.',
+        )
+
+    if screen.origin != 'upper left':
+        raise ValueError(
+            f'{func_name}: screen origin must be "upper left", got "{screen.origin}".',
         )
 
     ax.set_xlim(0, screen.width_px)

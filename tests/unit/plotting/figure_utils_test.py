@@ -186,20 +186,35 @@ class DummyScreen(Screen):
 
 
 @pytest.mark.parametrize(
-    'width,height', [
+    'width,height',
+    [
         (None, 768),
         (1024, None),
-        (0, 768),
-        (1024, 0),
     ],
 )
-def test_set_screen_axes_invalid_dimensions(width, height):
+def test_set_screen_axes_none_dimensions_returns(width, height):
+    """Should return silently when dimensions are None (no ValueError)."""
     fig, ax = plt.subplots()
     screen = DummyScreen(width_px=width, height_px=height, origin='upper left')
+    _set_screen_axes(ax, screen, func_name='dummyplot')  # should not raise
+    plt.close(fig)
 
-    with pytest.raises(ValueError, match='(must be positive and not None|greater than zero)'):
+
+@pytest.mark.parametrize(
+    'width,height',
+    [
+        (0, 768),
+        (1024, 0),
+        (-1, 768),
+        (1024, -10),
+    ],
+)
+def test_set_screen_axes_nonpositive_dimensions_raises(width, height):
+    """Should raise ValueError when width or height is <= 0."""
+    fig, ax = plt.subplots()
+    screen = DummyScreen(width_px=width, height_px=height, origin='upper left')
+    with pytest.raises(ValueError, match='must be positive'):
         _set_screen_axes(ax, screen, func_name='dummyplot')
-
     plt.close(fig)
 
 
