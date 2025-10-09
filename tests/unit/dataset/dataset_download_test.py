@@ -1290,21 +1290,13 @@ def test_public_dataset_registered_correct_attributes(tmp_path, dataset_definiti
     assert dataset.definition.experiment == dataset_definition.experiment
 
 
-def test_extract_dataset_precomputed_move_single_file(tmp_path):
+def test_extract_dataset_precomputed_move_single_file(tmp_path, testfiles_dirpath):
     definition = DatasetDefinition(
         name='CustomPublicDataset',
-        mirrors={
-            'precompued_events': (
-                'https://example.com/',
-                'https://another_example.com/',
-            ),
-        },
         resources=[
             {
                 'content': 'precomputed_events',
-                'url': 'tests/files/',
                 'filename': '18sat_fixfinal.csv',
-                'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
             },
         ],
     )
@@ -1312,28 +1304,20 @@ def test_extract_dataset_precomputed_move_single_file(tmp_path):
     # Create directory and copy test file.
     (tmp_path / 'downloads').mkdir(parents=True)
     shutil.copyfile(
-        'tests/files/18sat_fixfinal.csv',
+        testfiles_dirpath / '18sat_fixfinal.csv',
         tmp_path / 'downloads' / '18sat_fixfinal.csv',
     )
 
     Dataset(definition, path=tmp_path).extract()
 
 
-def test_extract_dataset_precomputed_rm_move_single_file(tmp_path):
+def test_extract_dataset_precomputed_rm_move_single_file(tmp_path, testfiles_dirpath):
     definition = DatasetDefinition(
         name='CustomPublicDataset',
-        mirrors={
-            'precomputed_reading_measures': (
-                'https://example.com/',
-                'https://another_example.com/',
-            ),
-        },
         resources=[
             {
                 'content': 'precomputed_reading_measures',
-                'url': 'tests/files/',
                 'filename': 'copco_rm_dummy.csv',
-                'md5': '52bbf03a7c50ee7152ccb9d357c2bb30',
             },
         ],
     )
@@ -1342,7 +1326,7 @@ def test_extract_dataset_precomputed_rm_move_single_file(tmp_path):
     (tmp_path / 'downloads').mkdir(parents=True)
 
     shutil.copyfile(
-        'tests/files/copco_rm_dummy.csv',
+        testfiles_dirpath / 'copco_rm_dummy.csv',
         tmp_path / 'downloads' / 'copco_rm_dummy.csv',
     )
 
