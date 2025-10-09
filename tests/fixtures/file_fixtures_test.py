@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2025 The pymovements Project Authors
+# Copyright (c) 2025 The pymovements Project Authors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,42 +17,29 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Test read from IPC/feather."""
+"""Test file fixtures."""
+import filecmp
+
 import pytest
 
-import pymovements as pm
+
+def test_testfiles_dirpath_has_files(testfiles_dirpath):
+    assert len(list(testfiles_dirpath.iterdir())) > 0
 
 
 @pytest.mark.parametrize(
-    ('filename', 'kwargs', 'shape'),
+    'filename',
     [
-        pytest.param(
-            'monocular_example.feather',
-            {},
-            (10, 2),
-            id='feather_mono_shape',
-        ),
-        pytest.param(
-            'binocular_example.feather',
-            {},
-            (10, 3),
-            id='feather_bino_shape',
-        ),
-        pytest.param(
-            'monocular_example.feather',
-            {
-                'column_map': {'pixel': 'pixel_coordinates'},
-            },
-            (10, 2),
-            marks=pytest.mark.filterwarnings(
-                'ignore:Gaze contains samples but no.*:UserWarning',
-            ),
-            id='feather_mono_shape_column_map',
-        ),
+        'eyelink_binocular_example.asc',
+        'monocular_example.feather',
+        'judo1000_example.csv',
+        'potec_word_aoi_b0.tsv',
+        'rda_test_file.rda',
     ],
 )
-def test_shapes(filename, kwargs, shape, make_example_file):
-    filepath = make_example_file(filename)
-    gaze = pm.gaze.from_ipc(file=filepath, **kwargs)
+def test_make_example_file_returns_copy(filename, make_example_file, testfiles_dirpath):
+    fixture_filepath = make_example_file(filename)
+    testfiles_filepath = testfiles_dirpath / filename
 
-    assert gaze.samples.shape == shape
+    assert fixture_filepath != testfiles_filepath  # different filepath
+    assert filecmp.cmp(fixture_filepath, testfiles_filepath)  # same content

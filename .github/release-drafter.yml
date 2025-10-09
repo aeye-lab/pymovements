@@ -33,6 +33,7 @@ exclude-labels:
 
 exclude-contributors:
   - dependabot[bot]
+  - pre-commit-ci
   - pre-commit-ci[bot]
 
 change-template: '- $TITLE (#$NUMBER)'
