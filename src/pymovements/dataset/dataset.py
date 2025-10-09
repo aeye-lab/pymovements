@@ -801,8 +801,8 @@ class Dataset:
         self._check_gaze()
 
         disable_progressbar = not verbose
-        for file_id, (gaze, fileinfo_row) in tqdm(
-                enumerate(zip(self.gaze, self.fileinfo['gaze'].to_dicts())),
+        for gaze, fileinfo_row in tqdm(
+                zip(self.gaze, self.fileinfo['gaze'].to_dicts()),
                 disable=disable_progressbar,
         ):
             gaze.detect(method, eye=eye, clear=clear, **kwargs)
@@ -812,7 +812,6 @@ class Dataset:
                 df=gaze.events.frame,
                 fileinfo=fileinfo_row,
             )
-            self.gaze[file_id].events = gaze.events
 
         return self
 
@@ -1003,7 +1002,7 @@ class Dataset:
             If extension is not in list of valid extensions.
         """
         dataset_files.save_events(
-            events=list(self.events),
+            events=self.events,
             fileinfo=self.fileinfo['gaze'],
             paths=self.paths,
             events_dirname=events_dirname,
